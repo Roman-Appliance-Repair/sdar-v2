@@ -1,0 +1,851 @@
+---
+/**
+ * AiDiagnostic — Special Block on homepage.
+ *
+ * Flow:
+ *   1. User picks Residential/Commercial tab
+ *   2. Selects Category → Equipment (cascading dropdown)
+ *   3. Optional: brand + model + optional phone
+ *   4. Describes problem → POST /api/diagnose → AI response
+ *   5. Three CTA cards appear: PDF · Call Back · Book Visit
+ *
+ * Backend: functions/api/diagnose.js (Anthropic proxy)
+ *          functions/api/contact.js (Telegram + Resend logger)
+ * PDF: generated client-side with jsPDF (CDN), attached to email on server via base64.
+ */
+
+// Residential equipment catalog (mirrors /services/ + /price-list/ from SDAR sitemap)
+const residential = [
+  {
+    category: 'Cooking',
+    items: [
+      { label: 'Oven', value: 'oven' },
+      { label: 'Range', value: 'range' },
+      { label: 'Stove', value: 'stove' },
+      { label: 'Cooktop', value: 'cooktop' },
+      { label: 'Induction Cooktop', value: 'induction-cooktop' },
+      { label: 'Wall Oven', value: 'wall-oven' },
+      { label: 'Range Hood', value: 'range-hood' },
+      { label: 'Microwave', value: 'microwave' },
+    ],
+  },
+  {
+    category: 'Cooling',
+    items: [
+      { label: 'Refrigerator', value: 'refrigerator' },
+      { label: 'Built-in Refrigerator', value: 'built-in-refrigerator' },
+      { label: 'Freezer', value: 'freezer' },
+      { label: 'Wine Cooler', value: 'wine-cooler' },
+      { label: 'Wine Cellar', value: 'wine-cellar' },
+      { label: 'Ice Maker', value: 'ice-maker' },
+    ],
+  },
+  {
+    category: 'Laundry',
+    items: [
+      { label: 'Washer', value: 'washer' },
+      { label: 'Dryer', value: 'dryer' },
+      { label: 'Stackable Washer/Dryer', value: 'stackable-washer-dryer' },
+    ],
+  },
+  {
+    category: 'Cleaning',
+    items: [
+      { label: 'Dishwasher', value: 'dishwasher' },
+      { label: 'Garbage Disposal', value: 'garbage-disposal' },
+      { label: 'Trash Compactor', value: 'trash-compactor' },
+    ],
+  },
+  {
+    category: 'Outdoor',
+    items: [
+      { label: 'BBQ Grill', value: 'bbq-grill' },
+      { label: 'Pizza Oven', value: 'pizza-oven' },
+      { label: 'Fireplace (gas/electric)', value: 'fireplace' },
+    ],
+  },
+];
+
+// Commercial catalog (mirrors /commercial/ from SDAR sitemap)
+const commercial = [
+  {
+    category: 'Refrigeration',
+    items: [
+      { label: 'Walk-in Cooler', value: 'walk-in-cooler' },
+      { label: 'Walk-in Freezer', value: 'walk-in-freezer' },
+      { label: 'Reach-in Refrigerator', value: 'reach-in-refrigerator' },
+      { label: 'Reach-in Freezer', value: 'reach-in-freezer' },
+      { label: 'Bar Refrigerator', value: 'bar-refrigerator' },
+      { label: 'Showcase Refrigerator', value: 'showcase-refrigerator' },
+      { label: 'Ice Machine', value: 'ice-machine' },
+    ],
+  },
+  {
+    category: 'Cooking',
+    items: [
+      { label: 'Commercial Oven', value: 'commercial-oven' },
+      { label: 'Commercial Range', value: 'commercial-range' },
+      { label: 'Commercial Stove', value: 'commercial-stove' },
+      { label: 'Pizza Oven', value: 'commercial-pizza-oven' },
+      { label: 'Fryer', value: 'fryer' },
+      { label: 'Exhaust Hood', value: 'exhaust-hood' },
+    ],
+  },
+  {
+    category: 'Cleaning',
+    items: [
+      { label: 'Commercial Dishwasher', value: 'commercial-dishwasher' },
+    ],
+  },
+  {
+    category: 'Laundry',
+    items: [
+      { label: 'Commercial Washer', value: 'commercial-washer' },
+      { label: 'Commercial Dryer', value: 'commercial-dryer' },
+      { label: 'Laundromat Equipment', value: 'laundry' },
+    ],
+  },
+  {
+    category: 'Other',
+    items: [
+      { label: 'Slushie Machine', value: 'slushie-machine' },
+    ],
+  },
+];
+
+// Pass data to client-side script via data attribute (JSON-safe)
+const catalogJson = JSON.stringify({ residential, commercial });
+---
+
+<section class="ai-diag section-black" id="ai-diagnostic" aria-labelledby="ai-diag-title">
+  <div class="container">
+    <!-- Header -->
+    <div class="ai-diag-header">
+      <p class="eyebrow">AI Diagnostic · Free · No signup</p>
+      <h2 id="ai-diag-title">Not sure what's wrong? Describe it.</h2>
+      <p class="lede">
+        Tell us what your appliance is doing. Our AI technician — trained on 15+ years
+        of repair data — will give you a likely cause, realistic cost range, and the
+        next step. Takes 30 seconds. Keep the PDF, or have a real C-20 tech call you in 10.
+      </p>
+    </div>
+
+    <!-- Form card -->
+    <div class="ai-diag-card" data-catalog={catalogJson}>
+      <!-- Sector toggle -->
+      <div class="sector-toggle" role="tablist" aria-label="Service type">
+        <button type="button" class="sector-btn is-active" data-sector="residential" role="tab" aria-selected="true">
+          Residential
+        </button>
+        <button type="button" class="sector-btn" data-sector="commercial" role="tab" aria-selected="false">
+          Commercial
+        </button>
+      </div>
+
+      <!-- Step 1: Category + Equipment -->
+      <div class="field-row">
+        <div class="field">
+          <label for="ai-category">Category</label>
+          <select id="ai-category" name="category" required>
+            <option value="">Choose a category…</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="ai-equipment">Equipment</label>
+          <select id="ai-equipment" name="equipment" required disabled>
+            <option value="">Select a category first</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Step 2: Optional brand/model -->
+      <div class="field-row">
+        <div class="field">
+          <label for="ai-brand">Brand <span class="optional">(optional, improves accuracy)</span></label>
+          <input type="text" id="ai-brand" name="brand" placeholder="e.g. Sub-Zero, LG, Whirlpool" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="ai-model">Model # <span class="optional">(optional)</span></label>
+          <input type="text" id="ai-model" name="model" placeholder="e.g. DLE7300WE" autocomplete="off" />
+        </div>
+      </div>
+
+      <!-- Step 3: Description -->
+      <div class="field">
+        <label for="ai-description">What's happening? <span class="req">*</span></label>
+        <textarea id="ai-description" name="description" rows="4" required
+          placeholder="Example: My fridge stopped cooling overnight. Lights work but compressor won't kick in. Started with a humming sound yesterday."></textarea>
+        <div class="char-count"><span id="ai-char-count">0</span> / 1000</div>
+      </div>
+
+      <!-- Submit -->
+      <button type="button" class="btn-diagnose" id="ai-submit">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/>
+        </svg>
+        <span>Get AI Diagnosis</span>
+      </button>
+
+      <p class="disclaimer">
+        AI-generated guidance based on symptom patterns — not a final diagnosis.
+        For confirmation, a C-20 tech inspects on site.
+      </p>
+    </div>
+
+    <!-- ============ Result zone (hidden until we have a response) ============ -->
+    <div class="ai-diag-result" id="ai-result" hidden>
+      <div class="result-header">
+        <div class="result-badge">Preliminary Diagnosis</div>
+        <button type="button" class="result-reset" id="ai-reset" aria-label="Start over">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M3 3v6h6"/></svg>
+          New diagnosis
+        </button>
+      </div>
+
+      <div class="result-text" id="ai-result-text"></div>
+
+      <!-- Three CTA cards -->
+      <div class="cta-grid">
+        <!-- Card 1: PDF -->
+        <div class="cta-card cta-pdf">
+          <div class="cta-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <h3>Save Your Diagnosis</h3>
+          <p>Download a PDF with your results, our direct phone, and a 15% savings code for first-time repair.</p>
+          <div class="cta-form">
+            <input type="email" id="pdf-email" placeholder="you@email.com" autocomplete="email" />
+            <button type="button" class="btn-cta" id="pdf-submit">
+              <span>Send PDF</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+          <div class="cta-status" id="pdf-status" hidden></div>
+        </div>
+
+        <!-- Card 2: Call Back -->
+        <div class="cta-card cta-call">
+          <div class="cta-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+          </div>
+          <h3>Call Back in 10 Min</h3>
+          <p>Licensed C-20 technician calls you with real pricing, parts availability, and earliest slot.</p>
+          <div class="cta-form">
+            <input type="tel" id="call-phone" placeholder="(323) 870-4790" autocomplete="tel" />
+            <button type="button" class="btn-cta btn-red-cta" id="call-submit">
+              <span>Call Me Back</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+          <div class="cta-status" id="call-status" hidden></div>
+        </div>
+
+        <!-- Card 3: Book Visit -->
+        <div class="cta-card cta-book">
+          <div class="cta-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <h3>Book a Tech Today</h3>
+          <p>Same-day visit with common parts on the truck. $89 diagnostic waived with repair.</p>
+          <div class="cta-form cta-form-book">
+            <input type="tel" id="book-phone" placeholder="Phone" autocomplete="tel" />
+            <input type="text" id="book-address" placeholder="Address or ZIP" autocomplete="street-address" />
+            <select id="book-time">
+              <option value="asap">As soon as possible</option>
+              <option value="morning">This morning (8 AM – 12 PM)</option>
+              <option value="afternoon">This afternoon (12 – 5 PM)</option>
+              <option value="evening">This evening (5 – 8 PM)</option>
+              <option value="tomorrow">Tomorrow</option>
+            </select>
+            <button type="button" class="btn-cta btn-red-cta" id="book-submit">
+              <span>Book Visit</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </button>
+          </div>
+          <div class="cta-status" id="book-status" hidden></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- jsPDF for client-side PDF generation -->
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+
+<script is:inline>
+  (function() {
+    document.addEventListener('DOMContentLoaded', init);
+
+    function init() {
+      const root = document.querySelector('.ai-diag-card');
+      if (!root) return;
+      const catalog = JSON.parse(root.dataset.catalog);
+      const state = {
+        sector: 'residential',
+        category: '',
+        equipment: '',
+        equipmentLabel: '',
+        brand: '',
+        model: '',
+        description: '',
+        diagnosis: '',
+      };
+
+      const $ = (id) => document.getElementById(id);
+      const sectorBtns = document.querySelectorAll('.sector-btn');
+      const catSelect = $('ai-category');
+      const eqSelect = $('ai-equipment');
+      const brandInput = $('ai-brand');
+      const modelInput = $('ai-model');
+      const descInput = $('ai-description');
+      const charCount = $('ai-char-count');
+      const submitBtn = $('ai-submit');
+      const resultZone = $('ai-result');
+      const resultText = $('ai-result-text');
+      const resetBtn = $('ai-reset');
+
+      // --- Sector toggle ---
+      sectorBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          sectorBtns.forEach((b) => {
+            b.classList.remove('is-active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          btn.classList.add('is-active');
+          btn.setAttribute('aria-selected', 'true');
+          state.sector = btn.dataset.sector;
+          state.category = '';
+          state.equipment = '';
+          populateCategories();
+        });
+      });
+
+      // --- Populate categories for current sector ---
+      function populateCategories() {
+        const list = catalog[state.sector];
+        catSelect.innerHTML = '<option value="">Choose a category…</option>';
+        list.forEach((cat) => {
+          const opt = document.createElement('option');
+          opt.value = cat.category;
+          opt.textContent = cat.category;
+          catSelect.appendChild(opt);
+        });
+        eqSelect.innerHTML = '<option value="">Select a category first</option>';
+        eqSelect.disabled = true;
+      }
+
+      // --- Category change → populate equipment ---
+      catSelect.addEventListener('change', () => {
+        state.category = catSelect.value;
+        const list = catalog[state.sector];
+        const cat = list.find((c) => c.category === state.category);
+        if (!cat) {
+          eqSelect.innerHTML = '<option value="">Select a category first</option>';
+          eqSelect.disabled = true;
+          return;
+        }
+        eqSelect.innerHTML = '<option value="">Choose equipment…</option>';
+        cat.items.forEach((item) => {
+          const opt = document.createElement('option');
+          opt.value = item.value;
+          opt.textContent = item.label;
+          eqSelect.appendChild(opt);
+        });
+        eqSelect.disabled = false;
+      });
+
+      eqSelect.addEventListener('change', () => {
+        state.equipment = eqSelect.value;
+        state.equipmentLabel = eqSelect.options[eqSelect.selectedIndex]?.text || '';
+      });
+
+      // --- Char counter ---
+      descInput.addEventListener('input', () => {
+        const len = descInput.value.length;
+        charCount.textContent = len;
+        if (len > 1000) descInput.value = descInput.value.slice(0, 1000);
+      });
+
+      // --- Submit ---
+      submitBtn.addEventListener('click', async () => {
+        state.brand = brandInput.value.trim();
+        state.model = modelInput.value.trim();
+        state.description = descInput.value.trim();
+
+        if (!state.equipment) { alert('Please select the equipment type.'); return; }
+        if (!state.description || state.description.length < 10) {
+          alert('Please describe the problem (at least 10 characters).');
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Analyzing…</span>';
+
+        try {
+          const res = await fetch('/api/diagnose', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sector: state.sector,
+              category: state.category,
+              equipment: state.equipment,
+              equipmentLabel: state.equipmentLabel,
+              brand: state.brand,
+              model: state.model,
+              description: state.description,
+            }),
+          });
+          const data = await res.json();
+          state.diagnosis = data.result || 'Unable to generate diagnosis. Please call (323) 870-4790.';
+          showResult(state.diagnosis);
+          logEvent({ type: 'ai_diagnostic', ...state });
+        } catch (err) {
+          console.error(err);
+          state.diagnosis = 'We hit a snag — please call (323) 870-4790 for a free phone diagnosis.';
+          showResult(state.diagnosis);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg><span>Get AI Diagnosis</span>';
+        }
+      });
+
+      function showResult(text) {
+        resultText.textContent = text;
+        resultZone.hidden = false;
+        resultZone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      resetBtn.addEventListener('click', () => {
+        resultZone.hidden = true;
+        descInput.value = '';
+        brandInput.value = '';
+        modelInput.value = '';
+        charCount.textContent = '0';
+        window.scrollTo({ top: root.offsetTop - 80, behavior: 'smooth' });
+      });
+
+      // --- Logging helper (fire-and-forget) ---
+      function logEvent(payload) {
+        try {
+          fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: '🤖 AI Diagnostics',
+              ...payload,
+            }),
+            keepalive: true,
+          }).catch(() => {});
+        } catch (e) {}
+      }
+
+      // ========== CTA: PDF ==========
+      $('pdf-submit').addEventListener('click', async () => {
+        const email = $('pdf-email').value.trim();
+        const status = $('pdf-status');
+        if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
+          status.hidden = false; status.textContent = '✗ Please enter a valid email.';
+          status.className = 'cta-status is-error'; return;
+        }
+        status.hidden = false; status.textContent = 'Building your PDF…';
+        status.className = 'cta-status';
+
+        // Build PDF client-side
+        const pdfBase64 = await buildPdf(state);
+
+        // Trigger download immediately
+        const link = document.createElement('a');
+        link.href = 'data:application/pdf;base64,' + pdfBase64;
+        link.download = `SDAR-Diagnosis-${Date.now()}.pdf`;
+        link.click();
+
+        // Send to server (email + log)
+        try {
+          await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: '📄 PDF Request',
+              type: 'pdf',
+              email,
+              equipment: state.equipmentLabel,
+              brand: state.brand,
+              diagnosis: state.diagnosis,
+              pdfBase64,
+            }),
+          });
+          status.textContent = '✓ PDF downloaded + emailed to ' + email;
+          status.className = 'cta-status is-success';
+        } catch (err) {
+          status.textContent = '✓ PDF downloaded (email delivery may be delayed).';
+          status.className = 'cta-status is-success';
+        }
+      });
+
+      // ========== CTA: Call Back ==========
+      $('call-submit').addEventListener('click', async () => {
+        const phone = $('call-phone').value.trim();
+        const status = $('call-status');
+        if (!phone || phone.length < 7) {
+          status.hidden = false; status.textContent = '✗ Please enter a valid phone number.';
+          status.className = 'cta-status is-error'; return;
+        }
+        status.hidden = false; status.textContent = 'Sending to dispatch…';
+        status.className = 'cta-status';
+
+        try {
+          await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: '📞 Call Back Request',
+              type: 'callback',
+              phone,
+              equipment: state.equipmentLabel,
+              brand: state.brand,
+              model: state.model,
+              diagnosis: state.diagnosis,
+            }),
+          });
+          status.textContent = '✓ Got it — a C-20 tech will call within 10 minutes.';
+          status.className = 'cta-status is-success';
+        } catch (err) {
+          status.textContent = '✗ Failed to send. Please call (323) 870-4790.';
+          status.className = 'cta-status is-error';
+        }
+      });
+
+      // ========== CTA: Book Visit ==========
+      $('book-submit').addEventListener('click', async () => {
+        const phone = $('book-phone').value.trim();
+        const address = $('book-address').value.trim();
+        const time = $('book-time').value;
+        const status = $('book-status');
+        if (!phone || phone.length < 7) {
+          status.hidden = false; status.textContent = '✗ Please enter a valid phone number.';
+          status.className = 'cta-status is-error'; return;
+        }
+        if (!address) {
+          status.hidden = false; status.textContent = '✗ Please enter an address or ZIP.';
+          status.className = 'cta-status is-error'; return;
+        }
+        status.hidden = false; status.textContent = 'Booking…';
+        status.className = 'cta-status';
+
+        try {
+          await fetch('/api/contact', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: '📅 Booking Request',
+              type: 'booking',
+              phone,
+              address,
+              time,
+              equipment: state.equipmentLabel,
+              brand: state.brand,
+              model: state.model,
+              diagnosis: state.diagnosis,
+            }),
+          });
+          status.textContent = '✓ Booked — dispatcher will confirm within 10 minutes.';
+          status.className = 'cta-status is-success';
+        } catch (err) {
+          status.textContent = '✗ Failed to send. Please call (323) 870-4790.';
+          status.className = 'cta-status is-error';
+        }
+      });
+
+      // ========== PDF Builder (jsPDF) ==========
+      async function buildPdf(s) {
+        // Wait for jsPDF to load if not yet
+        let tries = 0;
+        while (!window.jspdf && tries < 30) {
+          await new Promise((r) => setTimeout(r, 100));
+          tries++;
+        }
+        if (!window.jspdf) throw new Error('PDF lib failed to load');
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+        const W = 612, M = 48;
+
+        // Header bar (black)
+        doc.setFillColor(10, 10, 10);
+        doc.rect(0, 0, W, 80, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(22);
+        doc.text('SAME DAY', M, 34);
+        doc.setFontSize(10);
+        doc.setTextColor(200, 16, 46);
+        doc.text('APPLIANCE REPAIR', M, 50);
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.text('Preliminary Diagnosis Report', W - M, 34, { align: 'right' });
+        doc.text(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }), W - M, 50, { align: 'right' });
+
+        // Title
+        let y = 120;
+        doc.setTextColor(10, 10, 10);
+        doc.setFont('times', 'bold');
+        doc.setFontSize(20);
+        doc.text('Your Preliminary Diagnosis', M, y);
+
+        y += 30;
+        // Equipment summary
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(200, 16, 46);
+        doc.text('EQUIPMENT', M, y);
+        doc.setTextColor(10, 10, 10);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(11);
+        const equipLine = [s.sector === 'residential' ? 'Residential' : 'Commercial', s.equipmentLabel, s.brand, s.model].filter(Boolean).join(' · ');
+        doc.text(equipLine || '—', M, y + 14);
+
+        y += 42;
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.setTextColor(200, 16, 46);
+        doc.text('REPORTED ISSUE', M, y);
+        doc.setTextColor(60, 60, 60);
+        doc.setFont('helvetica', 'italic');
+        doc.setFontSize(10);
+        const descLines = doc.splitTextToSize(s.description || '—', W - M * 2);
+        doc.text(descLines, M, y + 14);
+        y += 14 + descLines.length * 12 + 20;
+
+        // Diagnosis box
+        doc.setFillColor(245, 245, 245);
+        const diagLines = doc.splitTextToSize(s.diagnosis || '—', W - M * 2 - 24);
+        const diagHeight = 20 + diagLines.length * 14 + 20;
+        doc.rect(M, y, W - M * 2, diagHeight, 'F');
+        doc.setTextColor(200, 16, 46);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text('AI DIAGNOSIS', M + 12, y + 20);
+        doc.setTextColor(10, 10, 10);
+        doc.setFont('times', 'normal');
+        doc.setFontSize(11);
+        doc.text(diagLines, M + 12, y + 38);
+        y += diagHeight + 24;
+
+        // Why us
+        doc.setTextColor(10, 10, 10);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(12);
+        doc.text('Why Homeowners Pick Same Day', M, y);
+        y += 18;
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(10);
+        const bullets = [
+          '• CSLB C-20 licensed #1138898 — most handyman shops aren\'t',
+          '• BBB A+ accredited, fully insured, EPA 608 certified',
+          '• $89 diagnostic — waived when you approve the repair',
+          '• Same-day service Monday–Saturday · phone answered 24/7',
+          '• Most common parts stocked on trucks — fixed in one visit',
+        ];
+        bullets.forEach((line, i) => { doc.text(line, M, y + i * 14); });
+        y += bullets.length * 14 + 20;
+
+        // Footer — NAP + branches
+        doc.setFillColor(10, 10, 10);
+        doc.rect(0, 720, W, 72, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        doc.text('Call us now — dispatcher answers 24/7', M, 738);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(9);
+        doc.setTextColor(200, 200, 200);
+        doc.text('West Hollywood (323) 870-4790   ·   Los Angeles (424) 325-0520   ·   Thousand Oaks (424) 208-0228', M, 754);
+        doc.text('Pasadena (626) 376-4458   ·   Irvine (213) 401-9019', M, 766);
+        doc.setTextColor(150, 150, 150);
+        doc.setFontSize(8);
+        doc.text('HVAC 777 LLC dba Same Day Appliance Repair · CSLB C-20 #1138898 · 6230 Wilshire Blvd Ste A PMB 2267, Los Angeles CA 90048', M, 782);
+
+        // Return base64 (strip data: prefix)
+        return doc.output('datauristring').split(',')[1];
+      }
+
+      // Initial populate
+      populateCategories();
+    }
+  })();
+</script>
+
+<style>
+  .ai-diag { padding: clamp(70px, 9vw, 130px) 0; }
+
+  .ai-diag-header { text-align: center; max-width: 780px; margin: 0 auto 48px; }
+  .ai-diag-header .eyebrow {
+    font-size: 12px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.18em; color: var(--red); margin-bottom: 20px;
+  }
+  .ai-diag-header h2 { margin-bottom: 20px; color: var(--white); }
+  .ai-diag-header .lede {
+    font-size: clamp(15px, 1.6vw, 17px); line-height: 1.7;
+    color: rgba(255,255,255,0.72); max-width: 680px; margin: 0 auto;
+  }
+
+  /* Card */
+  .ai-diag-card {
+    background: var(--white); color: var(--text);
+    border-radius: 8px; padding: 36px;
+    max-width: 820px; margin: 0 auto;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.25), 0 6px 16px rgba(0,0,0,0.15);
+  }
+
+  /* Sector toggle */
+  .sector-toggle {
+    display: inline-flex; background: var(--gray); border-radius: 6px;
+    padding: 4px; margin-bottom: 28px;
+  }
+  .sector-btn {
+    padding: 10px 22px; background: transparent; border: none;
+    font-family: var(--font-body); font-size: 14px; font-weight: 600;
+    color: var(--muted); cursor: pointer; border-radius: 4px;
+    transition: all 0.15s var(--ease);
+  }
+  .sector-btn.is-active { background: var(--black); color: var(--white); }
+
+  /* Form fields */
+  .field-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;
+  }
+  .field { display: flex; flex-direction: column; margin-bottom: 20px; }
+  .field label {
+    font-size: 13px; font-weight: 600; margin-bottom: 8px;
+    color: var(--text); letter-spacing: 0.01em;
+  }
+  .field label .optional {
+    font-weight: 400; color: var(--muted); font-size: 12px;
+  }
+  .field label .req { color: var(--red); }
+  .field input, .field select, .field textarea {
+    font-family: var(--font-body); font-size: 15px;
+    padding: 12px 14px; border: 1.5px solid var(--border);
+    border-radius: 5px; background: var(--white); color: var(--text);
+    transition: border-color 0.15s var(--ease);
+    width: 100%;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--red);
+  }
+  .field select:disabled { background: var(--gray); color: var(--muted); cursor: not-allowed; }
+  .field textarea { resize: vertical; min-height: 96px; font-family: var(--font-body); }
+  .char-count {
+    font-size: 11px; color: var(--muted); margin-top: 6px; text-align: right;
+  }
+
+  /* Submit button */
+  .btn-diagnose {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 10px; width: 100%; padding: 16px 28px; margin-top: 8px;
+    background: var(--red); color: var(--white); border: none;
+    font-family: var(--font-body); font-size: 16px; font-weight: 600;
+    border-radius: 5px; cursor: pointer; transition: background 0.15s var(--ease);
+  }
+  .btn-diagnose:hover:not(:disabled) { background: var(--red-dark); }
+  .btn-diagnose:disabled { opacity: 0.7; cursor: wait; }
+
+  .disclaimer {
+    font-size: 12px; color: var(--muted); text-align: center;
+    margin: 18px 0 0; line-height: 1.5;
+  }
+
+  /* ===== Result zone ===== */
+  .ai-diag-result {
+    max-width: 960px; margin: 48px auto 0;
+  }
+  .result-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .result-badge {
+    display: inline-block; padding: 6px 12px;
+    background: var(--red); color: var(--white);
+    font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.12em;
+    border-radius: 3px;
+  }
+  .result-reset {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: transparent; border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7); padding: 6px 14px;
+    font-size: 13px; font-weight: 500; border-radius: 4px;
+    cursor: pointer; transition: all 0.15s var(--ease);
+  }
+  .result-reset:hover { border-color: var(--white); color: var(--white); }
+
+  .result-text {
+    background: var(--white); color: var(--text);
+    padding: 32px 36px; border-radius: 8px;
+    font-family: var(--font-display); font-size: 18px; line-height: 1.7;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+    margin-bottom: 32px;
+    white-space: pre-wrap;
+  }
+
+  /* CTA grid */
+  .cta-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+  }
+  @media (max-width: 900px) { .cta-grid { grid-template-columns: 1fr; } }
+
+  .cta-card {
+    background: var(--white); color: var(--text);
+    padding: 28px 24px; border-radius: 8px;
+    display: flex; flex-direction: column;
+    transition: transform 0.2s var(--ease);
+  }
+  .cta-card:hover { transform: translateY(-3px); }
+
+  .cta-icon {
+    width: 54px; height: 54px; border-radius: 50%;
+    background: rgba(200, 16, 46, 0.08); color: var(--red);
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-bottom: 16px;
+  }
+  .cta-card h3 {
+    font-size: 19px; margin-bottom: 8px; color: var(--black);
+  }
+  .cta-card p {
+    font-size: 13px; line-height: 1.6; color: var(--muted); margin-bottom: 18px;
+    flex: 1;
+  }
+  .cta-form { display: flex; flex-direction: column; gap: 8px; }
+  .cta-form input, .cta-form select {
+    padding: 10px 12px; border: 1.5px solid var(--border);
+    border-radius: 4px; font-size: 14px; font-family: var(--font-body);
+  }
+  .cta-form input:focus, .cta-form select:focus {
+    outline: none; border-color: var(--red);
+  }
+  .btn-cta {
+    display: inline-flex; align-items: center; justify-content: center;
+    gap: 8px; padding: 11px 16px;
+    background: var(--black); color: var(--white); border: none;
+    font-family: var(--font-body); font-size: 14px; font-weight: 600;
+    border-radius: 4px; cursor: pointer;
+    transition: background 0.15s var(--ease);
+  }
+  .btn-cta:hover { background: #1a1a1a; }
+  .btn-red-cta { background: var(--red); }
+  .btn-red-cta:hover { background: var(--red-dark); }
+
+  .cta-status {
+    font-size: 12px; margin-top: 10px; padding: 8px 12px;
+    border-radius: 4px; background: var(--gray); color: var(--text);
+  }
+  .cta-status.is-success { background: #e8f7ed; color: #116329; }
+  .cta-status.is-error { background: #fdecea; color: #8f1d1d; }
+
+  @media (max-width: 720px) {
+    .field-row { grid-template-columns: 1fr; gap: 0; }
+    .ai-diag-card { padding: 24px 18px; }
+    .result-text { padding: 22px 20px; font-size: 16px; }
+  }
+</style>
