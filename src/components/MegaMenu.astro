@@ -5,6 +5,8 @@
  * Links generated dynamically from src/pages/* via import.meta.glob.
  */
 
+import { counties as countyData, toSlug } from '../data/counties.ts';
+
 const ACRONYMS = new Set([
   'bbb', 'oem', 'epa', 'osha', 'bbq', 'cslb', 'hvac', 'ac', 'la', 'ca', 'cma', 'ge', 'lg', 'sks', 'zline',
 ]);
@@ -38,24 +40,22 @@ const credentials = toLinks(import.meta.glob('../pages/credentials/*.astro'), '/
 const forBusiness = toLinks(import.meta.glob('../pages/for-business/*.astro'),'/for-business/');
 const priceList   = toLinks(import.meta.glob('../pages/price-list/*.astro'),  '/price-list/');
 
-// Root pages: counties + cities
-const rootSlugs = Object.keys(import.meta.glob('../pages/*.astro'))
-  .map(pathToSlug)
-  .filter((slug) => slug !== 'index')
-  .sort();
+// Root pages: which city slugs actually have .astro files?
+const existingSlugs = new Set(
+  Object.keys(import.meta.glob('../pages/*.astro'))
+    .map(pathToSlug)
+    .filter((slug) => slug !== 'index' && !slug.endsWith('-county'))
+);
 
-const counties = rootSlugs
-  .filter((s) => s.endsWith('-county'))
-  .map((slug) => ({ label: slugToLabel(slug), href: `/${slug}/` }));
-
-const citiesAll = rootSlugs
-  .filter((s) => !s.endsWith('-county'))
-  .map((slug) => ({ label: slugToLabel(slug), href: `/${slug}/` }));
-
-// Split cities alphabetically into two columns
-const citiesHalf = Math.ceil(citiesAll.length / 2);
-const citiesA = citiesAll.slice(0, citiesHalf);
-const citiesB = citiesAll.slice(citiesHalf);
+// Enrich counties.ts data with per-city existence flag
+const enrichedCounties = countyData.map((county) => ({
+  name: county.name,
+  slug: county.slug,
+  cities: county.cities.map((name) => {
+    const slug = toSlug(name);
+    return { name, slug, exists: existingSlugs.has(slug) };
+  }),
+}));
 
 // Price list — strip "Cost" suffix for cleaner labels and split res/com
 const stripCost = (label: string) => label.replace(/\s+Cost$/i, '');
@@ -76,9 +76,12 @@ const mainPhoneTel = '+13238704790';
 
 type Link = { label: string; href: string };
 type Column = { title?: string; links?: Link[]; html?: string };
+type CityCell = { name: string; slug: string; exists: boolean };
+type CountyGroup = { name: string; slug: string; cities: CityCell[] };
 type Panel =
   | { kind: 'flow'; links: Link[] }
-  | { kind: 'grouped'; columns: Column[]; align?: 'center' };
+  | { kind: 'grouped'; columns: Column[]; align?: 'center' }
+  | { kind: 'areas'; counties: CountyGroup[] };
 
 const menu: Array<{ label: string; href: string; panel: Panel }> = [
   {
@@ -128,14 +131,7 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
   {
     label: 'Areas',
     href: '/areas/',
-    panel: {
-      kind: 'grouped',
-      columns: [
-        { title: 'By County', links: counties },
-        { title: 'Cities A–M', links: citiesA },
-        { title: 'Cities N–Z', links: citiesB },
-      ],
-    },
+    panel: { kind: 'areas', counties: enrichedCounties },
   },
   {
     label: 'About',
@@ -171,6 +167,23 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
                   <li><a href={link.href}>{link.label}</a></li>
                 ))}
               </ul>
+            </div>
+          ) : item.panel.kind === 'areas' ? (
+            <div class="mega-panel-inner panel-areas">
+              {item.panel.counties.map((county) => (
+                <div class="areas-county">
+                  <a href={`/${county.slug}/`} class="county-heading">{county.name}</a>
+                  <div class="city-grid">
+                    {county.cities.map((city) => (
+                      city.exists ? (
+                        <a href={`/${city.slug}/`} class="city-link">{city.name}</a>
+                      ) : (
+                        <span class="city-link missing" title="Page not yet created">{city.name}</span>
+                      )
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div class={`mega-panel-inner mega-panel-grid ${item.panel.align === 'center' ? 'is-center' : ''}`}>
@@ -446,6 +459,61 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     padding-bottom: 0;
   }
 
+  /* ===================== Areas layout (counties + city grid) ===================== */
+  .panel-areas {
+    max-width: 1200px;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .areas-county { margin-bottom: 32px; }
+  .areas-county:last-child { margin-bottom: 0; }
+
+  .county-heading {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--red);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(200, 16, 46, 0.2);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .county-heading:hover { color: #ff4458; }
+
+  .city-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px 24px;
+  }
+
+  .city-link {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 400;
+    padding: 6px 0;
+    text-decoration: none;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+  }
+
+  a.city-link:not(.missing) { color: rgba(255, 255, 255, 0.85); }
+  a.city-link:not(.missing):hover { color: #ffffff; padding-left: 4px; }
+
+  .city-link.missing {
+    color: #ff4458;
+    cursor: not-allowed;
+    opacity: 0.75;
+  }
+  .city-link.missing::after {
+    content: " ⚠";
+    font-size: 11px;
+    opacity: 0.8;
+  }
+
   /* ===================== Mobile (≤1024px): accordion ===================== */
   @media (max-width: 1024px) {
     .mega-menu {
@@ -537,5 +605,12 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     .panel-message strong { color: var(--black); }
     .panel-message a { color: var(--red); }
     .panel-message .panel-phone { color: var(--black); font-size: 22px; }
+
+    /* Areas panel on mobile */
+    .panel-areas { max-height: none; overflow-y: visible; }
+    .city-grid { grid-template-columns: repeat(2, 1fr); gap: 2px 16px; }
+    a.city-link:not(.missing) { color: var(--text); }
+    a.city-link:not(.missing):hover { color: var(--red); }
+    .county-heading { color: var(--red); border-bottom-color: rgba(200, 16, 46, 0.2); }
   }
 </style>
