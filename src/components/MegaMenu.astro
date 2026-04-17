@@ -57,14 +57,16 @@ const enrichedCounties = countyData.map((county) => ({
   }),
 }));
 
-// Price list — strip "Cost" suffix for cleaner labels and split res/com
+// Price list — strip "Cost" suffix for cleaner labels and split res/com.
+// All glob'd items exist (built from actual .astro files), so exists: true.
+// `missing` styling stays in the renderer for forward compatibility (future canonical list).
 const stripCost = (label: string) => label.replace(/\s+Cost$/i, '');
 const priceCommercial  = priceList
   .filter((l) => l.label.startsWith('Commercial'))
-  .map((l) => ({ ...l, label: stripCost(l.label).replace(/^Commercial\s+/, '') }));
+  .map((l) => ({ ...l, label: stripCost(l.label).replace(/^Commercial\s+/, ''), exists: true }));
 const priceResidential = priceList
   .filter((l) => !l.label.startsWith('Commercial'))
-  .map((l) => ({ ...l, label: stripCost(l.label) }));
+  .map((l) => ({ ...l, label: stripCost(l.label), exists: true }));
 
 // Credentials split for two columns
 const credHalf = Math.ceil(credentials.length / 2);
@@ -78,10 +80,12 @@ type Link = { label: string; href: string };
 type Column = { title?: string; links?: Link[]; html?: string };
 type CityCell = { name: string; slug: string; exists: boolean };
 type CountyGroup = { name: string; slug: string; cities: CityCell[] };
+type PriceCell = { label: string; href: string; exists: boolean };
 type Panel =
   | { kind: 'flow'; links: Link[] }
   | { kind: 'grouped'; columns: Column[]; align?: 'center' }
-  | { kind: 'areas'; counties: CountyGroup[] };
+  | { kind: 'areas'; counties: CountyGroup[] }
+  | { kind: 'pricelist'; residential: PriceCell[]; commercial: PriceCell[]; html: string };
 
 const menu: Array<{ label: string; href: string; panel: Panel }> = [
   {
@@ -117,15 +121,10 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     label: 'Price List',
     href: '/price-list/',
     panel: {
-      kind: 'grouped',
-      columns: [
-        { title: 'Residential', links: priceResidential },
-        { title: 'Commercial',  links: priceCommercial  },
-        {
-          title: 'Transparent Pricing',
-          html: '<strong>$89 diagnostic</strong> — waived with repair.<br/>OEM parts, 90-day warranty, no hidden fees.<br/><br/><a href="/price-list/">View full price list →</a>',
-        },
-      ],
+      kind: 'pricelist',
+      residential: priceResidential,
+      commercial: priceCommercial,
+      html: '<strong>$89 diagnostic</strong> — waived with repair.<br/>OEM parts, 90-day warranty, no hidden fees.<br/><br/><a href="/price-list/">View full price list →</a>',
     },
   },
   {
@@ -167,6 +166,39 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
                   <li><a href={link.href}>{link.label}</a></li>
                 ))}
               </ul>
+            </div>
+          ) : item.panel.kind === 'pricelist' ? (
+            <div class="mega-panel-inner">
+              <div class="price-list-grid">
+                <div class="price-col">
+                  <h4>Residential</h4>
+                  <div class="price-items-grid">
+                    {item.panel.residential.map((p) => (
+                      p.exists ? (
+                        <a href={p.href} class="price-link">{p.label}</a>
+                      ) : (
+                        <span class="price-link missing" title="Page not yet created">{p.label}</span>
+                      )
+                    ))}
+                  </div>
+                </div>
+                <div class="price-col">
+                  <h4>Commercial</h4>
+                  <div class="price-items-grid">
+                    {item.panel.commercial.map((p) => (
+                      p.exists ? (
+                        <a href={p.href} class="price-link">{p.label}</a>
+                      ) : (
+                        <span class="price-link missing" title="Page not yet created">{p.label}</span>
+                      )
+                    ))}
+                  </div>
+                </div>
+                <div class="price-col">
+                  <h4>Transparent Pricing</h4>
+                  <div class="panel-message" set:html={item.panel.html} />
+                </div>
+              </div>
             </div>
           ) : item.panel.kind === 'areas' ? (
             <div class="mega-panel-inner panel-areas">
@@ -459,6 +491,51 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     padding-bottom: 0;
   }
 
+  /* ===================== Price List layout (2 subcolumns × 2 + info) ===================== */
+  .price-list-grid {
+    display: grid;
+    grid-template-columns: 2fr 2fr 1fr;
+    gap: 40px;
+  }
+  .price-items-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px 24px;
+  }
+  .price-col h4 {
+    font-family: var(--font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--red);
+    margin: 0 0 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(200, 16, 46, 0.2);
+  }
+  .price-link {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    padding: 4px 0;
+    line-height: 1.4;
+    text-decoration: none;
+    transition: color 0.2s ease, padding-left 0.2s ease;
+  }
+  a.price-link { color: rgba(255, 255, 255, 0.85); }
+  a.price-link:hover { color: #ffffff; padding-left: 4px; }
+  .price-link.missing {
+    color: #ff4458;
+    cursor: not-allowed;
+    opacity: 0.75;
+  }
+  .price-link.missing::after {
+    content: " ⚠";
+    font-size: 10px;
+    opacity: 0.8;
+  }
+
   /* ===================== Areas layout (counties + city grid) ===================== */
   .panel-areas {
     max-width: 1200px;
@@ -614,5 +691,12 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     a.city-link:not(.missing) { color: var(--text); }
     a.city-link:not(.missing):hover { color: var(--red); }
     .county-heading { color: var(--red); border-bottom-color: rgba(200, 16, 46, 0.2); }
+
+    /* Price List panel on mobile */
+    .price-list-grid { grid-template-columns: 1fr; gap: 20px; }
+    .price-items-grid { grid-template-columns: 1fr; }
+    a.price-link { color: var(--text); }
+    a.price-link:hover { color: var(--red); }
+    .price-col h4 { color: var(--red); }
   }
 </style>
