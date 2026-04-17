@@ -1,60 +1,934 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import ServiceHero from '../../components/ServiceHero.astro';
 
-const title = 'Brands | Same Day Appliance Repair';
-const description = 'Brand-specific appliance repair pages — new catalog in development. We service every major residential and commercial appliance brand.';
+// ── Existence detection ──
+const residentialFiles = Object.keys(
+  import.meta.glob('./*.astro', { eager: false })
+).map(p => p.replace('./', '').replace('.astro', ''))
+ .filter(p => p !== 'index');
+
+const commercialBrandFiles = Object.keys(
+  import.meta.glob('./commercial-refrigeration/*.astro', { eager: false })
+).map(p => p.split('/').pop().replace('.astro', ''));
+
+const commercialCategoryFiles = Object.keys(
+  import.meta.glob('../commercial/*.astro', { eager: false })
+).map(p => p.split('/').pop().replace('.astro', ''))
+ .filter(p => p !== 'index' && p !== 'refrigeration-hub');
+
+const has = (slug, list) => list.includes(slug);
+
+// ── Residential section data ──
+const residentialSections = [
+  {
+    icon: '🧊',
+    title: 'Refrigerators',
+    count: '14/22',
+    tiers: [
+      { label: 'Luxury', items: [
+        { slug: 'sub-zero-refrigerator-repair', label: 'Sub-Zero' },
+        { slug: 'thermador-refrigerator-repair', label: 'Thermador' },
+        { slug: 'viking-refrigerator-repair', label: 'Viking' },
+        { slug: 'jennair-refrigerator-repair', label: 'Jenn-Air' },
+      ]},
+      { label: 'Premium', items: [
+        { slug: 'kitchenaid-refrigerator-repair', label: 'KitchenAid' },
+        { slug: 'bosch-refrigerator-repair', label: 'Bosch' },
+        { slug: 'dacor', label: 'Dacor' },
+      ]},
+      { label: 'Mass-Market', items: [
+        { slug: 'lg-refrigerator-repair', label: 'LG' },
+        { slug: 'samsung-refrigerator-repair', label: 'Samsung' },
+        { slug: 'ge-refrigerator-repair', label: 'GE' },
+        { slug: 'whirlpool-refrigerator-repair', label: 'Whirlpool' },
+        { slug: 'maytag-refrigerator-repair', label: 'Maytag' },
+      ]},
+      { label: 'Value', items: [
+        { slug: 'frigidaire-refrigerator-repair', label: 'Frigidaire' },
+        { slug: 'amana-refrigerator-repair', label: 'Amana' },
+      ]},
+    ],
+    future: ['Fisher & Paykel', 'True Residential', 'SKS', 'Liebherr', 'Smeg', 'Big Chill', 'GE Profile', 'GE Monogram'],
+  },
+  {
+    icon: '🍽️',
+    title: 'Dishwashers',
+    count: '11/17',
+    tiers: [
+      { label: 'Luxury', items: [
+        { slug: 'miele-dishwasher-repair', label: 'Miele' },
+        { slug: 'thermador-dishwasher-repair', label: 'Thermador' },
+        { slug: 'jennair-dishwasher-repair', label: 'Jenn-Air' },
+      ]},
+      { label: 'Premium', items: [
+        { slug: 'kitchenaid-dishwasher-repair', label: 'KitchenAid' },
+        { slug: 'bosch-dishwasher-repair', label: 'Bosch' },
+      ]},
+      { label: 'Mass-Market', items: [
+        { slug: 'lg-dishwasher-repair', label: 'LG' },
+        { slug: 'samsung-dishwasher-repair', label: 'Samsung' },
+        { slug: 'ge-dishwasher-repair', label: 'GE' },
+        { slug: 'whirlpool-dishwasher-repair', label: 'Whirlpool' },
+        { slug: 'maytag-dishwasher-repair', label: 'Maytag' },
+      ]},
+      { label: 'Value', items: [
+        { slug: 'frigidaire-dishwasher-repair', label: 'Frigidaire' },
+      ]},
+    ],
+    future: ['Cove', 'Gaggenau', 'Fisher & Paykel', 'Asko', 'Smeg', 'Electrolux'],
+  },
+  {
+    icon: '🌀',
+    title: 'Washers & Dryers',
+    count: '17/24',
+    tiers: [
+      { label: 'Luxury', items: [
+        { slug: 'miele-washer-repair', label: 'Miele Washer' },
+        { slug: 'miele-dryer-repair', label: 'Miele Dryer' },
+      ]},
+      { label: 'Premium', items: [
+        { slug: 'bosch-washer-repair', label: 'Bosch Washer' },
+        { slug: 'bosch-dryer-repair', label: 'Bosch Dryer' },
+      ]},
+      { label: 'Mass-Market', items: [
+        { slug: 'lg-washer-repair', label: 'LG Washer' },
+        { slug: 'lg-dryer-repair', label: 'LG Dryer' },
+        { slug: 'samsung-washer-repair', label: 'Samsung Washer' },
+        { slug: 'samsung-dryer-repair', label: 'Samsung Dryer' },
+        { slug: 'ge-washer-repair', label: 'GE Washer' },
+        { slug: 'ge-dryer-repair', label: 'GE Dryer' },
+        { slug: 'whirlpool-washer-repair', label: 'Whirlpool Washer' },
+        { slug: 'whirlpool-dryer-repair', label: 'Whirlpool Dryer' },
+        { slug: 'maytag-washer-repair', label: 'Maytag Washer' },
+        { slug: 'maytag-dryer-repair', label: 'Maytag Dryer' },
+      ]},
+      { label: 'Value', items: [
+        { slug: 'frigidaire-washer-repair', label: 'Frigidaire Washer' },
+        { slug: 'frigidaire-dryer-repair', label: 'Frigidaire Dryer' },
+        { slug: 'amana-laundry-repair', label: 'Amana Laundry' },
+      ]},
+    ],
+    future: ['Speed Queen', 'Electrolux', 'Kenmore', 'Fisher & Paykel', 'Asko', 'Roper', 'Haier'],
+  },
+];
+
+// Section 4 — Ranges/Ovens/Cooktops with three subgroups
+const rangesOvensCooktops = {
+  icon: '🔥',
+  title: 'Ranges, Ovens & Cooktops',
+  count: '25/40',
+  subgroups: [
+    {
+      title: 'Ranges',
+      tiers: [
+        { label: 'Luxury', items: [
+          { slug: 'wolf-range-repair', label: 'Wolf' },
+          { slug: 'thermador-range-repair', label: 'Thermador' },
+          { slug: 'viking-range-repair', label: 'Viking' },
+          { slug: 'jennair-range-repair', label: 'Jenn-Air' },
+        ]},
+        { label: 'Mass-Market', items: [
+          { slug: 'lg-range-repair', label: 'LG' },
+          { slug: 'samsung-range-repair', label: 'Samsung' },
+          { slug: 'ge-range-repair', label: 'GE' },
+          { slug: 'whirlpool-range-repair', label: 'Whirlpool' },
+          { slug: 'maytag-range-repair', label: 'Maytag' },
+        ]},
+        { label: 'Value', items: [
+          { slug: 'frigidaire-range-repair', label: 'Frigidaire' },
+          { slug: 'amana-range-repair', label: 'Amana' },
+        ]},
+      ],
+    },
+    {
+      title: 'Ovens',
+      tiers: [
+        { label: 'Luxury', items: [
+          { slug: 'wolf-oven-repair', label: 'Wolf' },
+          { slug: 'thermador-oven-repair', label: 'Thermador' },
+          { slug: 'viking-oven-repair', label: 'Viking' },
+          { slug: 'jennair-oven-repair', label: 'Jenn-Air' },
+        ]},
+        { label: 'Premium', items: [
+          { slug: 'kitchenaid-oven-repair', label: 'KitchenAid' },
+          { slug: 'bosch-oven-repair', label: 'Bosch' },
+        ]},
+      ],
+    },
+    {
+      title: 'Cooktops',
+      tiers: [
+        { label: 'Luxury', items: [
+          { slug: 'wolf-cooktop-repair', label: 'Wolf' },
+          { slug: 'thermador-cooktop-repair', label: 'Thermador' },
+          { slug: 'viking-cooktop-repair', label: 'Viking' },
+          { slug: 'jennair-cooktop-repair', label: 'Jenn-Air' },
+        ]},
+        { label: 'Premium', items: [
+          { slug: 'kitchenaid-cooktop-repair', label: 'KitchenAid' },
+          { slug: 'bosch-cooktop-repair', label: 'Bosch' },
+        ]},
+        { label: 'Mass-Market', items: [
+          { slug: 'ge-cooktop-repair', label: 'GE' },
+          { slug: 'whirlpool-cooktop-repair', label: 'Whirlpool' },
+        ]},
+      ],
+    },
+  ],
+  future: ['Dacor', 'BlueStar', 'American Range', 'FiveStar', 'Bertazzoni', 'Smeg', 'ILVE', 'Lacanche', 'La Cornue', 'Fulgor Milano', 'AGA', 'Elmira Stove Works', 'Hestan', 'Gaggenau', 'Big Chill'],
+};
+
+const residentialSectionsTail = [
+  {
+    icon: '📻',
+    title: 'Microwaves',
+    count: '7/15',
+    tiers: [
+      { label: 'Luxury', items: [
+        { slug: 'jennair-microwave-repair', label: 'Jenn-Air' },
+      ]},
+      { label: 'Mass-Market', items: [
+        { slug: 'lg-microwave-repair', label: 'LG' },
+        { slug: 'samsung-microwave-repair', label: 'Samsung' },
+        { slug: 'ge-microwave-repair', label: 'GE' },
+        { slug: 'whirlpool-microwave-repair', label: 'Whirlpool' },
+        { slug: 'maytag-microwave-repair', label: 'Maytag' },
+      ]},
+      { label: 'Value', items: [
+        { slug: 'frigidaire-microwave-repair', label: 'Frigidaire' },
+      ]},
+    ],
+    future: ['Bosch', 'Miele', 'KitchenAid', 'Dacor', 'Thermador', 'Sharp', 'Panasonic', 'Big Chill'],
+  },
+  {
+    icon: '🍷',
+    title: 'Specialty Refrigeration',
+    count: '4/14',
+    tiers: [
+      { label: 'Luxury', items: [
+        { slug: 'sub-zero-wine-cooler-repair', label: 'Sub-Zero Wine Cooler' },
+        { slug: 'sub-zero-ice-maker-repair', label: 'Sub-Zero Ice Maker' },
+      ]},
+      { label: 'Mass-Market', items: [
+        { slug: 'lg-freezer-repair', label: 'LG Freezer' },
+      ]},
+      { label: 'Value', items: [
+        { slug: 'frigidaire-freezer-repair', label: 'Frigidaire Freezer' },
+      ]},
+    ],
+    future: ['Viking Wine', 'Dacor Wine', 'Liebherr', 'Eurocave', 'Perlick (wine)', 'U-Line', 'Marvel', 'Allavino', 'True Residential', 'SKS'],
+  },
+  {
+    icon: '🔥',
+    title: 'Outdoor & BBQ',
+    count: '1/14',
+    tiers: [
+      { label: 'Luxury', items: [
+        { slug: 'viking-bbq-grill-repair', label: 'Viking BBQ' },
+      ]},
+    ],
+    future: ['Wolf Outdoor', 'Hestan Outdoor', 'Weber', 'Napoleon', 'Lynx', 'Fire Magic', 'DCS', 'Alfresco', 'Coyote', 'Bull', 'Kalamazoo', 'Twin Eagles', 'Traeger'],
+  },
+  {
+    icon: '⭐',
+    title: 'Specialty Categories',
+    count: '1/∞',
+    tiers: [
+      { label: 'Premium', items: [
+        { slug: 'kitchenaid-stand-mixer-repair', label: 'KitchenAid Stand Mixer' },
+      ]},
+    ],
+    future: [],
+    footer: 'Trash compactors, warming drawers, steam ovens coming soon.',
+  },
+];
+
+// ── Residential brand cards (tier order) ──
+const residentialCards = [
+  // LUXURY (6)
+  { slug: 'sub-zero',   name: 'Sub-Zero',   logo: 'S', tagline: 'Built-in refrigeration pioneer. Wine columns, Pro series.', categories: '3 categories' },
+  { slug: 'wolf',       name: 'Wolf',       logo: 'W', tagline: 'Sub-Zero/Wolf family. Dual-fuel ranges. The LA luxury standard.', categories: '3 categories' },
+  { slug: 'thermador',  name: 'Thermador',  logo: 'T', tagline: 'Professional Star Burner ranges. Freedom Induction built-ins.', categories: '5 categories' },
+  { slug: 'miele',      name: 'Miele',      logo: 'M', tagline: 'German luxury. Generations of ownership. 20-year engineering.', categories: '3 categories' },
+  { slug: 'viking',     name: 'Viking',     logo: 'V', tagline: 'Commercial-grade residential. Outdoor Series. LA icon.', categories: '5 categories' },
+  { slug: 'jennair',    name: 'Jenn-Air',   logo: 'J', tagline: 'Rise & Noir luxury. Downdraft DNA since 1961. BORA induction.', categories: '6 categories' },
+  // PREMIUM (3)
+  { slug: 'kitchenaid', name: 'KitchenAid', logo: 'K', tagline: 'Iconic stand mixer + full built-in kitchen lineup.', categories: '5 categories' },
+  { slug: 'bosch',      name: 'Bosch',      logo: 'B', tagline: 'German engineering. Silent dishwashers, induction cooking.', categories: '6 categories' },
+  { slug: 'dacor',      name: 'Dacor',      logo: 'D', tagline: 'California 1965. Samsung luxury sub-brand. Modernist series.', categories: '1 overview page' },
+  // MASS-MARKET (5)
+  { slug: 'lg',         name: 'LG',         logo: 'L', tagline: 'Smart, connected full-kitchen and laundry. ThinQ platform.', categories: '7 categories' },
+  { slug: 'samsung',    name: 'Samsung',    logo: 'S', tagline: 'Bespoke panels, AI-driven cooking, Family Hub ecosystem.', categories: '6 categories' },
+  { slug: 'ge',         name: 'GE',         logo: 'G', tagline: 'America\u2019s kitchen since 1907. Profile, Café & Monogram tiers.', categories: '7 categories' },
+  { slug: 'whirlpool',  name: 'Whirlpool',  logo: 'W', tagline: 'Mass-market reliability across fridge, laundry, cooking.', categories: '7 categories' },
+  { slug: 'maytag',     name: 'Maytag',     logo: 'M', tagline: 'Maytag Man dependability. Commercial-grade residential laundry.', categories: '6 categories' },
+  // VALUE (2)
+  { slug: 'frigidaire', name: 'Frigidaire', logo: 'F', tagline: 'Full kitchen mass-market. Gallery & Professional tiers.', categories: '7 categories' },
+  { slug: 'amana',      name: 'Amana',      logo: 'A', tagline: 'Simple & dependable. 1934 Iowa heritage. Property-manager favorite.', categories: '3 categories' },
+];
+
+// ── Commercial left-column section data ──
+const commercialSections = [
+  {
+    icon: '❄️',
+    title: 'Commercial Refrigeration',
+    count: '12/18',
+    blocks: [
+      {
+        subhead: 'Equipment categories',
+        items: [
+          { slug: 'walk-in-cooler-repair',        href: '/commercial/walk-in-cooler-repair/',        label: 'Walk-In Cooler',           source: 'category' },
+          { slug: 'walk-in-freezer-repair',       href: '/commercial/walk-in-freezer-repair/',       label: 'Walk-In Freezer',          source: 'category' },
+          { slug: 'refrigerator-repair',          href: '/commercial/refrigerator-repair/',          label: 'Commercial Refrigerator',  source: 'category' },
+          { slug: 'freezer-repair',               href: '/commercial/freezer-repair/',               label: 'Commercial Freezer',       source: 'category' },
+          { slug: 'bar-refrigerator-repair',      href: '/commercial/bar-refrigerator-repair/',      label: 'Bar Refrigerator',         source: 'category' },
+          { slug: 'showcase-refrigerator-repair', href: '/commercial/showcase-refrigerator-repair/', label: 'Showcase Display',         source: 'category' },
+        ],
+      },
+      {
+        subhead: 'Brand-specific',
+        items: [
+          { slug: 'hoshizaki-commercial-repair',          href: '/brands/commercial-refrigeration/hoshizaki-commercial-repair/',          label: 'Hoshizaki',          source: 'brand' },
+          { slug: 'true-refrigeration-commercial-repair', href: '/brands/commercial-refrigeration/true-refrigeration-commercial-repair/', label: 'True Refrigeration', source: 'brand' },
+          { slug: 'traulsen-commercial-repair',           href: '/brands/commercial-refrigeration/traulsen-commercial-repair/',           label: 'Traulsen',           source: 'brand' },
+          { slug: 'beverage-air-commercial-repair',       href: '/brands/commercial-refrigeration/beverage-air-commercial-repair/',       label: 'Beverage-Air',       source: 'brand' },
+          { slug: 'perlick-commercial-repair',            href: '/brands/commercial-refrigeration/perlick-commercial-repair/',            label: 'Perlick',            source: 'brand' },
+          { slug: 'delfield-commercial-repair',           href: '/brands/commercial-refrigeration/delfield-commercial-repair/',           label: 'Delfield',           source: 'brand' },
+        ],
+      },
+    ],
+    future: [],
+  },
+  {
+    icon: '🧊',
+    title: 'Commercial Ice',
+    count: '2/7',
+    blocks: [
+      { subhead: null, items: [
+        { slug: 'ice-machine-repair',    href: '/commercial/ice-machine-repair/',    label: 'Ice Machine',     source: 'category' },
+        { slug: 'slushie-machine-repair',href: '/commercial/slushie-machine-repair/',label: 'Slushie Machine', source: 'category' },
+      ]},
+    ],
+    future: ['Manitowoc', 'Scotsman', 'Ice-O-Matic', 'Follett', 'Hoshizaki Ice'],
+  },
+  {
+    icon: '🍽️',
+    title: 'Commercial Dishwashers',
+    count: '1/6',
+    blocks: [
+      { subhead: null, items: [
+        { slug: 'dishwasher-repair', href: '/commercial/dishwasher-repair/', label: 'Commercial Dishwasher', source: 'category' },
+      ]},
+    ],
+    future: ['Hobart', 'Jackson', 'CMA', 'Champion', 'Insinger'],
+  },
+  {
+    icon: '🔥',
+    title: 'Commercial Cooking',
+    count: '4/11',
+    blocks: [
+      { subhead: null, items: [
+        { slug: 'oven-repair',         href: '/commercial/oven-repair/',         label: 'Commercial Oven',  source: 'category' },
+        { slug: 'stove-repair',        href: '/commercial/stove-repair/',        label: 'Commercial Stove', source: 'category' },
+        { slug: 'fryer-repair',        href: '/commercial/fryer-repair/',        label: 'Fryer',            source: 'category' },
+        { slug: 'exhaust-hood-repair', href: '/commercial/exhaust-hood-repair/', label: 'Exhaust Hood',     source: 'category' },
+      ]},
+    ],
+    future: ['Pizza Oven', 'Vulcan', 'Garland', 'Southbend', 'Pitco', 'Imperial', 'Montague'],
+  },
+  {
+    icon: '🌀',
+    title: 'Commercial Laundry',
+    count: '3/8',
+    blocks: [
+      { subhead: null, items: [
+        { slug: 'washer-repair',  href: '/commercial/washer-repair/',  label: 'Commercial Washer',   source: 'category' },
+        { slug: 'dryer-repair',   href: '/commercial/dryer-repair/',   label: 'Commercial Dryer',    source: 'category' },
+        { slug: 'laundry-repair', href: '/commercial/laundry-repair/', label: 'Laundromat Equipment',source: 'category' },
+      ]},
+    ],
+    future: ['Speed Queen Commercial', 'Huebsch', 'Continental Girbau', 'Dexter', 'Maytag Commercial'],
+  },
+];
+
+// ── Commercial brand cards ──
+const commercialCards = [
+  // EXISTING (6)
+  { slug: 'hoshizaki-commercial-repair',          href: '/brands/commercial-refrigeration/hoshizaki-commercial-repair/',          name: 'Hoshizaki',          logo: 'H', tagline: 'Japanese precision commercial ice machines and refrigeration. Lead-free certified.',  categories: '2 categories', exists: true },
+  { slug: 'true-refrigeration-commercial-repair', href: '/brands/commercial-refrigeration/true-refrigeration-commercial-repair/', name: 'True Refrigeration', logo: 'T', tagline: 'Wisconsin-built commercial refrigerators. NSF-certified. Energy Star leader.',          categories: '1 category',   exists: true },
+  { slug: 'traulsen-commercial-repair',           href: '/brands/commercial-refrigeration/traulsen-commercial-repair/',           name: 'Traulsen',           logo: 'T', tagline: 'Heavy-duty commercial refrigeration for hotels, hospitals, and high-volume kitchens.',  categories: '1 category',   exists: true },
+  { slug: 'beverage-air-commercial-repair',       href: '/brands/commercial-refrigeration/beverage-air-commercial-repair/',       name: 'Beverage-Air',       logo: 'B', tagline: 'Back-bar coolers, beverage centers, food service refrigeration. Since 1944.',           categories: '1 category',   exists: true },
+  { slug: 'perlick-commercial-repair',            href: '/brands/commercial-refrigeration/perlick-commercial-repair/',            name: 'Perlick',            logo: 'P', tagline: 'Bar refrigeration specialists. Wisconsin brewing heritage since 1917.',                 categories: '1 category',   exists: true },
+  { slug: 'delfield-commercial-repair',           href: '/brands/commercial-refrigeration/delfield-commercial-repair/',           name: 'Delfield',           logo: 'D', tagline: 'Welbilt group commercial refrigeration. Sandwich units, chef bases, refrigerated prep.', categories: '1 category',   exists: true },
+  // FUTURE (6)
+  { slug: 'hobart',    href: null, name: 'Hobart',    logo: 'H', tagline: 'Commercial dishwashing & food prep equipment',        categories: 'Coming soon', exists: false },
+  { slug: 'jackson',   href: null, name: 'Jackson',   logo: 'J', tagline: 'Low-temp dishwashers. NSF-certified',                 categories: 'Coming soon', exists: false },
+  { slug: 'vulcan',    href: null, name: 'Vulcan',    logo: 'V', tagline: 'Commercial cooking equipment since 1865',             categories: 'Coming soon', exists: false },
+  { slug: 'garland',   href: null, name: 'Garland',   logo: 'G', tagline: 'Professional ranges & ovens',                         categories: 'Coming soon', exists: false },
+  { slug: 'manitowoc', href: null, name: 'Manitowoc', logo: 'M', tagline: 'Commercial ice machines & refrigeration',             categories: 'Coming soon', exists: false },
+  { slug: 'scotsman',  href: null, name: 'Scotsman',  logo: 'S', tagline: 'Ice makers & commercial refrigeration',               categories: 'Coming soon', exists: false },
+];
+
+const title = "All Appliance Brands We Repair | Los Angeles | Same Day Service";
+const description = "40+ residential and commercial appliance brands. Sub-Zero, Wolf, Miele, Thermador, Viking, LG, Samsung, GE. 17 commercial equipment categories. Same-day service across LA, Orange, Ventura, San Bernardino, Riverside.";
 ---
 
 <Layout title={title} description={description}>
-  <section class="hub">
-    <div class="container">
-      <p class="hub-eyebrow">Brands</p>
-      <h1 class="hub-title">Brand-specific Repair</h1>
-      <p class="hub-intro">
-        New brand catalog is in development. In the meantime, you can browse all service categories — we repair every major residential and commercial appliance brand.
-      </p>
 
-      <div class="cta-row">
-        <a href="/services/" class="btn-primary">All Appliance Services →</a>
-        <a href="/commercial/" class="btn-secondary">Commercial Equipment →</a>
+  <ServiceHero
+    title="Every Major Appliance Brand. One Number."
+    subtitle="40+ residential and commercial brands across 20+ appliance categories. Same-day service across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties."
+    heroImageTitle="All Brands"
+  />
+
+  <section class="brands-section">
+    <div class="container">
+
+      {/* ── TOGGLE ── */}
+      <div class="mode-toggle" role="tablist" aria-label="Residential or Commercial">
+        <button class="mode-toggle-btn active" data-mode="residential" type="button" role="tab" aria-selected="true">
+          <span>🏠 Residential</span>
+          <span class="toggle-count">16 brands · 51 pages</span>
+        </button>
+        <button class="mode-toggle-btn" data-mode="commercial" type="button" role="tab" aria-selected="false">
+          <span>🏢 Commercial</span>
+          <span class="toggle-count">6 brands · 16 categories</span>
+        </button>
       </div>
 
-      <p class="hub-note">
-        Brand-specific deep-dives (Sub-Zero, Wolf, Thermador, Miele, Viking, Bosch, KitchenAid, LG, Samsung, GE, Whirlpool, and more) will roll out through Q2–Q3 2026.
-      </p>
+      {/* ── RESIDENTIAL MODE ── */}
+      <div class="mode-grids active" data-mode="residential">
+
+        <div class="column-left">
+          <h2 class="column-title">Find Your Appliance</h2>
+          <p class="column-subtitle">Pick your appliance type to see brands, models, and common failures.</p>
+
+          {residentialSections.map((sec) => (
+            <div class="section-block">
+              <div class="section-heading">
+                <h3><span class="section-icon">{sec.icon}</span> {sec.title}</h3>
+                <span class="section-count">{sec.count}</span>
+              </div>
+              {sec.tiers.map((tier) => (
+                <div class="tier-group">
+                  <p class="tier-label">{tier.label}</p>
+                  <div class="tier-tags">
+                    {tier.items.map((item) => (
+                      has(item.slug, residentialFiles) ? (
+                        <a href={`/brands/${item.slug}/`} class="brand-tag">{item.label}</a>
+                      ) : (
+                        <span class="brand-tag disabled">{item.label} 🟡</span>
+                      )
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {sec.future && sec.future.length > 0 && (
+                <div class="tier-group future">
+                  <p class="tier-label muted">Coming Soon</p>
+                  <div class="tier-tags">
+                    {sec.future.map((name) => (
+                      <span class="brand-tag disabled">{name} 🟡</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* SECTION 4 — Ranges, Ovens & Cooktops */}
+          <div class="section-block">
+            <div class="section-heading">
+              <h3><span class="section-icon">{rangesOvensCooktops.icon}</span> {rangesOvensCooktops.title}</h3>
+              <span class="section-count">{rangesOvensCooktops.count}</span>
+            </div>
+            {rangesOvensCooktops.subgroups.map((sg) => (
+              <div class="subgroup">
+                <h4 class="subgroup-title">{sg.title}</h4>
+                {sg.tiers.map((tier) => (
+                  <div class="tier-group">
+                    <p class="tier-label">{tier.label}</p>
+                    <div class="tier-tags">
+                      {tier.items.map((item) => (
+                        has(item.slug, residentialFiles) ? (
+                          <a href={`/brands/${item.slug}/`} class="brand-tag">{item.label}</a>
+                        ) : (
+                          <span class="brand-tag disabled">{item.label} 🟡</span>
+                        )
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+            <div class="tier-group future">
+              <p class="tier-label muted">Coming Soon (all 3 subgroups)</p>
+              <div class="tier-tags">
+                {rangesOvensCooktops.future.map((name) => (
+                  <span class="brand-tag disabled">{name} 🟡</span>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {residentialSectionsTail.map((sec) => (
+            <div class="section-block">
+              <div class="section-heading">
+                <h3><span class="section-icon">{sec.icon}</span> {sec.title}</h3>
+                <span class="section-count">{sec.count}</span>
+              </div>
+              {sec.tiers.map((tier) => (
+                <div class="tier-group">
+                  <p class="tier-label">{tier.label}</p>
+                  <div class="tier-tags">
+                    {tier.items.map((item) => (
+                      has(item.slug, residentialFiles) ? (
+                        <a href={`/brands/${item.slug}/`} class="brand-tag">{item.label}</a>
+                      ) : (
+                        <span class="brand-tag disabled">{item.label} 🟡</span>
+                      )
+                    ))}
+                  </div>
+                </div>
+              ))}
+              {sec.future && sec.future.length > 0 && (
+                <div class="tier-group future">
+                  <p class="tier-label muted">Coming Soon</p>
+                  <div class="tier-tags">
+                    {sec.future.map((name) => (
+                      <span class="brand-tag disabled">{name} 🟡</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {sec.footer && (
+                <p class="section-footer-note">{sec.footer}</p>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div class="column-right">
+          <h2 class="column-title">Learn About Your Brand</h2>
+          <p class="column-subtitle">Full hub pages with models, common failures, and pricing.</p>
+          {residentialCards.map((card) => (
+            has(card.slug, residentialFiles) ? (
+              <a href={`/brands/${card.slug}/`} class="brand-card">
+                <div class="brand-card-header">
+                  <div class="brand-logo-placeholder">{card.logo}</div>
+                  <h3>{card.name}</h3>
+                </div>
+                <p class="brand-tagline">{card.tagline}</p>
+                <div class="brand-card-meta">
+                  <span class="brand-rating">★ 4.6 · 37 reviews</span>
+                  <span class="brand-categories">{card.categories}</span>
+                </div>
+                <span class="brand-card-cta">View {card.name} Services →</span>
+              </a>
+            ) : (
+              <div class="brand-card disabled">
+                <div class="brand-card-header">
+                  <div class="brand-logo-placeholder">{card.logo}</div>
+                  <h3>{card.name}</h3>
+                </div>
+                <p class="brand-tagline">{card.tagline}</p>
+                <div class="brand-card-meta">
+                  <span class="brand-rating">★ 4.6 · 37 reviews</span>
+                  <span class="brand-categories">{card.categories}</span>
+                </div>
+                <span class="brand-card-cta">Coming Soon 🟡</span>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
+
+      {/* ── COMMERCIAL MODE ── */}
+      <div class="mode-grids" data-mode="commercial">
+
+        <div class="column-left">
+          <h2 class="column-title">Find Your Commercial Equipment</h2>
+          <p class="column-subtitle">B2B service for restaurants, hotels, laundromats, and property management. 24/7 emergency available.</p>
+
+          {commercialSections.map((sec) => (
+            <div class="section-block">
+              <div class="section-heading">
+                <h3><span class="section-icon">{sec.icon}</span> {sec.title}</h3>
+                <span class="section-count">{sec.count}</span>
+              </div>
+              {sec.blocks.map((block) => (
+                <div class="tier-group">
+                  {block.subhead && <p class="tier-label">{block.subhead}</p>}
+                  <div class="tier-tags">
+                    {block.items.map((item) => {
+                      const list = item.source === 'brand' ? commercialBrandFiles : commercialCategoryFiles;
+                      return has(item.slug, list) ? (
+                        <a href={item.href} class="brand-tag">{item.label}</a>
+                      ) : (
+                        <span class="brand-tag disabled">{item.label} 🟡</span>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+              {sec.future && sec.future.length > 0 && (
+                <div class="tier-group future">
+                  <p class="tier-label muted">Coming Soon</p>
+                  <div class="tier-tags">
+                    {sec.future.map((name) => (
+                      <span class="brand-tag disabled">{name} 🟡</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        <div class="column-right">
+          <h2 class="column-title">Commercial Brand Guides</h2>
+          <p class="column-subtitle">Detailed guides for the commercial equipment brands we service.</p>
+          {commercialCards.map((card) => (
+            card.exists && has(card.slug, commercialBrandFiles) ? (
+              <a href={card.href} class="brand-card">
+                <div class="brand-card-header">
+                  <div class="brand-logo-placeholder">{card.logo}</div>
+                  <h3>{card.name}</h3>
+                </div>
+                <p class="brand-tagline">{card.tagline}</p>
+                <div class="brand-card-meta">
+                  <span class="brand-rating">★ 4.6 · 37 reviews</span>
+                  <span class="brand-categories">{card.categories}</span>
+                </div>
+                <span class="brand-card-cta">View {card.name} Services →</span>
+              </a>
+            ) : (
+              <div class="brand-card disabled">
+                <div class="brand-card-header">
+                  <div class="brand-logo-placeholder">{card.logo}</div>
+                  <h3>{card.name}</h3>
+                </div>
+                <p class="brand-tagline">{card.tagline}</p>
+                <div class="brand-card-meta">
+                  <span class="brand-rating">★ 4.6 · 37 reviews</span>
+                  <span class="brand-categories">{card.categories}</span>
+                </div>
+                <span class="brand-card-cta">Coming Soon 🟡</span>
+              </div>
+            )
+          ))}
+        </div>
+      </div>
     </div>
   </section>
+
+  {/* ── BOTTOM CTA ── */}
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>Don't see your brand?</h2>
+      <p>We service a lot more than what's listed — commercial refrigeration, specialty luxury imports, and vintage units too. Tell us your model, we'll confirm service fit.</p>
+      <div class="bottom-ctas">
+        <a href="tel:+14243250520" class="btn-primary">☎ Call (424) 325-0520</a>
+        <a href="/contact/" class="btn-outline">Contact Us</a>
+      </div>
+    </div>
+  </section>
+
 </Layout>
 
+<script is:inline>
+  document.querySelectorAll('.mode-toggle-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var mode = btn.dataset.mode;
+      document.querySelectorAll('.mode-toggle-btn').forEach(function (b) {
+        var isActive = b === btn;
+        b.classList.toggle('active', isActive);
+        b.setAttribute('aria-selected', String(isActive));
+      });
+      document.querySelectorAll('.mode-grids').forEach(function (g) {
+        g.classList.toggle('active', g.dataset.mode === mode);
+      });
+      window.scrollTo({ top: document.querySelector('.brands-section').offsetTop - 80, behavior: 'smooth' });
+    });
+  });
+</script>
+
 <style>
-  .hub { padding: 80px 0; }
-  .hub-eyebrow {
-    font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
-    text-transform: uppercase; color: var(--red); margin-bottom: 12px;
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+  .brands-section { padding: 64px 0 96px; background: var(--white); }
+
+  /* ── Toggle ── */
+  .mode-toggle {
+    display: flex;
+    max-width: 600px;
+    margin: 0 auto 48px;
+    gap: 0;
+    border: 2px solid var(--black);
+    border-radius: 8px;
+    overflow: hidden;
   }
-  .hub-title { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; }
-  .hub-intro {
-    max-width: 680px; font-size: 17px; line-height: 1.6; color: var(--muted);
-    margin-bottom: 32px;
+  .mode-toggle-btn {
+    flex: 1;
+    padding: 16px 24px;
+    background: white;
+    color: var(--black);
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: background 0.2s;
+    font-family: inherit;
   }
-  .cta-row {
-    display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 40px;
+  .mode-toggle-btn.active {
+    background: var(--black);
+    color: white;
   }
-  .btn-primary, .btn-secondary {
-    display: inline-flex; align-items: center;
-    padding: 14px 24px; font-weight: 600; font-size: 15px;
-    border-radius: 4px; text-decoration: none;
-    transition: all 0.15s var(--ease);
+  .mode-toggle-btn:not(.active):hover { background: #f5f5f5; }
+  .mode-toggle-btn .toggle-count {
+    font-size: 12px;
+    font-weight: 400;
+    opacity: 0.7;
   }
-  .btn-primary { background: var(--red); color: var(--white); }
-  .btn-primary:hover { background: var(--red-dark); color: var(--white); }
-  .btn-secondary {
-    background: var(--white); color: var(--black);
+
+  /* ── Grid ── */
+  .mode-grids { display: none; }
+  .mode-grids.active {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 48px;
+  }
+  .column-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: var(--black);
+  }
+  .column-subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 32px;
+    line-height: 1.5;
+  }
+
+  /* ── Section ── */
+  .section-block { margin-bottom: 40px; }
+  .section-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--border);
+  }
+  .section-heading h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--black);
+    letter-spacing: -0.01em;
+  }
+  .section-icon { display: inline-block; margin-right: 6px; }
+  .section-count {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+  }
+  .section-footer-note {
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+    margin-top: 8px;
+  }
+
+  /* ── Subgroup (Ranges/Ovens/Cooktops) ── */
+  .subgroup { margin-bottom: 18px; }
+  .subgroup-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--black);
+    margin: 0 0 8px;
+  }
+
+  /* ── Tier group ── */
+  .tier-group { margin-bottom: 14px; }
+  .tier-group:last-of-type { margin-bottom: 0; }
+  .tier-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--red);
+    margin: 0 0 6px;
+  }
+  .tier-label.muted { color: var(--muted); }
+  .tier-group.future { opacity: 0.85; }
+  .tier-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+
+  /* ── Tag ── */
+  .brand-tag {
+    display: inline-block;
+    padding: 6px 12px;
+    background: white;
+    border: 1px solid var(--black);
+    border-radius: 4px;
+    color: var(--black);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 6px 8px 0;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .brand-tag:hover {
+    background: var(--red);
+    border-color: var(--red);
+    color: white;
+  }
+  .brand-tag.disabled {
+    background: rgba(200, 200, 200, 0.25);
+    border-color: #ccc;
+    color: #999;
+    cursor: not-allowed;
+    pointer-events: none;
+    font-weight: 500;
+  }
+
+  /* ── Brand Card ── */
+  .brand-card {
+    display: block;
+    padding: 20px;
+    margin-bottom: 14px;
+    background: white;
     border: 1px solid var(--border);
+    border-radius: 8px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
   }
-  .btn-secondary:hover { border-color: var(--black); color: var(--black); }
-  .hub-note {
-    font-size: 14px; color: var(--muted); max-width: 680px;
-    padding-top: 24px; border-top: 1px solid var(--border);
+  .brand-card:hover {
+    border-color: var(--red);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+  .brand-card.disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    pointer-events: none;
+    background: rgba(245, 245, 245, 0.5);
+  }
+  .brand-card-header {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .brand-logo-placeholder {
+    width: 40px;
+    height: 40px;
+    background: var(--red);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 18px;
+    font-family: 'Playfair Display', serif;
+    flex-shrink: 0;
+  }
+  .brand-card.disabled .brand-logo-placeholder {
+    background: #999;
+  }
+  .brand-card h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: var(--black);
+  }
+  .brand-tagline {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 0 0 12px;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .brand-card-meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+  .brand-rating { color: var(--red); font-weight: 700; }
+  .brand-categories { color: var(--muted); font-weight: 600; }
+  .brand-card-cta {
+    font-size: 13px;
+    color: var(--red);
+    font-weight: 600;
+  }
+  .brand-card.disabled .brand-card-cta { color: #999; }
+
+  /* ── Bottom CTA ── */
+  .bottom-cta {
+    background: var(--black);
+    color: #fff;
+    padding: 72px 24px;
+    text-align: center;
+  }
+  .bottom-cta h2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: clamp(26px, 3.5vw, 38px);
+    color: #fff;
+    margin: 0 0 16px;
+  }
+  .bottom-cta p {
+    font-size: 16px;
+    color: rgba(255,255,255,.72);
+    max-width: 620px;
+    margin: 0 auto 28px;
+    line-height: 1.6;
+  }
+  .bottom-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .bottom-cta .btn-primary {
+    background: var(--red); color: #fff;
+    padding: 14px 28px; border-radius: 6px;
+    font-size: 15px; font-weight: 600; text-decoration: none;
+  }
+  .bottom-cta .btn-outline {
+    border: 1.5px solid rgba(255,255,255,.35); color: #fff;
+    padding: 14px 28px; border-radius: 6px;
+    font-size: 15px; font-weight: 500; text-decoration: none;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 1023px) {
+    .mode-grids.active {
+      grid-template-columns: 1fr;
+      gap: 64px;
+    }
+  }
+  @media (max-width: 640px) {
+    .mode-toggle { max-width: 100%; }
+    .mode-toggle-btn { padding: 12px 14px; font-size: 14px; }
+    .mode-toggle-btn .toggle-count { font-size: 11px; }
+    .column-title { font-size: 22px; }
+    .section-heading h3 { font-size: 17px; }
   }
 </style>
