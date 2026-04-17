@@ -1,8 +1,8 @@
 ---
 /**
- * MegaMenu — dynamic navigation.
- * Scans src/pages/* via import.meta.glob and builds dropdown lists.
- * Labels derived from file slug (dishwasher-repair → "Dishwasher Repair").
+ * MegaMenu — full-width frosted-glass multi-column panels.
+ * Hover on a top-level item opens a 100vw panel pinned under the navbar.
+ * Links generated dynamically from src/pages/* via import.meta.glob.
  */
 
 const ACRONYMS = new Set([
@@ -38,7 +38,7 @@ const credentials = toLinks(import.meta.glob('../pages/credentials/*.astro'), '/
 const forBusiness = toLinks(import.meta.glob('../pages/for-business/*.astro'),'/for-business/');
 const priceList   = toLinks(import.meta.glob('../pages/price-list/*.astro'),  '/price-list/');
 
-// Root pages: split into cities and county hubs
+// Root pages: counties + cities
 const rootSlugs = Object.keys(import.meta.glob('../pages/*.astro'))
   .map(pathToSlug)
   .filter((slug) => slug !== 'index')
@@ -52,67 +52,105 @@ const citiesAll = rootSlugs
   .filter((s) => !s.endsWith('-county'))
   .map((slug) => ({ label: slugToLabel(slug), href: `/${slug}/` }));
 
-// Top 15 cities for dropdown (alphabetical first 15)
-const citiesTop = citiesAll.slice(0, 15);
+// Split cities alphabetically into two columns
+const citiesHalf = Math.ceil(citiesAll.length / 2);
+const citiesA = citiesAll.slice(0, citiesHalf);
+const citiesB = citiesAll.slice(citiesHalf);
 
-// Price list split by "commercial-" prefix → two columns
-const priceCommercial  = priceList.filter((l) => l.label.startsWith('Commercial'));
-const priceResidential = priceList.filter((l) => !l.label.startsWith('Commercial'));
+// Price list — strip "Cost" suffix for cleaner labels and split res/com
+const stripCost = (label: string) => label.replace(/\s+Cost$/i, '');
+const priceCommercial  = priceList
+  .filter((l) => l.label.startsWith('Commercial'))
+  .map((l) => ({ ...l, label: stripCost(l.label).replace(/^Commercial\s+/, '') }));
+const priceResidential = priceList
+  .filter((l) => !l.label.startsWith('Commercial'))
+  .map((l) => ({ ...l, label: stripCost(l.label) }));
 
-// Final menu structure
-const menu = [
+// Credentials split for two columns
+const credHalf = Math.ceil(credentials.length / 2);
+const credA = credentials.slice(0, credHalf);
+const credB = credentials.slice(credHalf);
+
+const mainPhone = '(323) 870-4790';
+const mainPhoneTel = '+13238704790';
+
+type Link = { label: string; href: string };
+type Column = { title?: string; links?: Link[]; html?: string };
+type Panel =
+  | { kind: 'flow'; links: Link[] }
+  | { kind: 'grouped'; columns: Column[]; align?: 'center' };
+
+const menu: Array<{ label: string; href: string; panel: Panel }> = [
   {
     label: 'Services',
     href: '/services/',
-    columns: [
-      { title: 'All Appliance Services', links: services },
-    ],
+    panel: { kind: 'flow', links: services },
   },
   {
     label: 'Commercial',
     href: '/commercial/',
-    columns: [
-      { title: 'Commercial Equipment', links: commercial },
-    ],
+    panel: { kind: 'flow', links: commercial },
   },
   {
     label: 'Brands',
     href: '/brands/',
-    columns: [
-      { title: 'Brand Pages',
-        links: [{ label: 'All brand pages (coming soon)', href: '/brands/' }],
-      },
-    ],
+    panel: {
+      kind: 'grouped',
+      align: 'center',
+      columns: [
+        {
+          title: 'Brand Pages',
+          html: 'Dedicated pages for Sub-Zero, Wolf, Viking, Thermador and more — coming soon. <br/>Browse all <a href="/services/">appliance services</a> in the meantime.',
+        },
+      ],
+    },
   },
   {
     label: 'For Business',
     href: '/for-business/',
-    columns: [
-      { title: 'Industries', links: forBusiness },
-    ],
+    panel: { kind: 'flow', links: forBusiness },
   },
   {
     label: 'Price List',
     href: '/price-list/',
-    columns: [
-      { title: 'Residential', links: priceResidential },
-      { title: 'Commercial',  links: priceCommercial  },
-    ],
+    panel: {
+      kind: 'grouped',
+      columns: [
+        { title: 'Residential', links: priceResidential },
+        { title: 'Commercial',  links: priceCommercial  },
+        {
+          title: 'Transparent Pricing',
+          html: '<strong>$89 diagnostic</strong> — waived with repair.<br/>OEM parts, 90-day warranty, no hidden fees.<br/><br/><a href="/price-list/">View full price list →</a>',
+        },
+      ],
+    },
   },
   {
     label: 'Areas',
     href: '/areas/',
-    columns: [
-      { title: 'County Hubs', links: counties },
-      { title: 'Featured Cities', links: citiesTop },
-    ],
+    panel: {
+      kind: 'grouped',
+      columns: [
+        { title: 'By County', links: counties },
+        { title: 'Cities A–M', links: citiesA },
+        { title: 'Cities N–Z', links: citiesB },
+      ],
+    },
   },
   {
     label: 'About',
     href: '/credentials/',
-    columns: [
-      { title: 'Credentials & Trust', links: credentials },
-    ],
+    panel: {
+      kind: 'grouped',
+      columns: [
+        { title: 'Credentials', links: credA },
+        { title: 'Trust & Quality', links: credB },
+        {
+          title: 'Contact Us',
+          html: `<a href="tel:${mainPhoneTel}" class="panel-phone">${mainPhone}</a>Same-day service across LA, Orange &amp; Ventura counties.<br/><br/><a href="/credentials/">All credentials →</a>`,
+        },
+      ],
+    },
   },
 ];
 ---
@@ -120,37 +158,92 @@ const menu = [
 <nav class="mega-menu" aria-label="Main navigation">
   <ul class="mega-menu-list">
     {menu.map((item) => (
-      <li class="mega-menu-item">
+      <li class="mega-menu-item" data-has-panel>
         <a href={item.href} class="mega-menu-trigger">
-          {item.label}
-          {item.columns && (
-            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          )}
+          <span class="trigger-label">{item.label}</span>
+          <span class="trigger-underline" aria-hidden="true"></span>
         </a>
-        {item.columns && (
-          <div class="mega-menu-dropdown">
-            <div class="mega-menu-dropdown-inner" data-cols={item.columns.length}>
-              {item.columns.map((col) => (
-                <div class="mega-menu-column">
-                  <h4>{col.title}</h4>
-                  <ul>
-                    {col.links.map((link) => (
-                      <li><a href={link.href}>{link.label}</a></li>
-                    ))}
-                  </ul>
+        <div class="mega-panel" role="region" aria-label={`${item.label} menu`}>
+          {item.panel.kind === 'flow' ? (
+            <div class="mega-panel-inner">
+              <ul class="panel-flow">
+                {item.panel.links.map((link) => (
+                  <li><a href={link.href}>{link.label}</a></li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <div class={`mega-panel-inner mega-panel-grid ${item.panel.align === 'center' ? 'is-center' : ''}`}>
+              {item.panel.columns.map((col) => (
+                <div class="panel-col">
+                  {col.title && <h4>{col.title}</h4>}
+                  {col.links && (
+                    <ul class="panel-list">
+                      {col.links.map((link) => (
+                        <li><a href={link.href}>{link.label}</a></li>
+                      ))}
+                    </ul>
+                  )}
+                  {col.html && <div class="panel-message" set:html={col.html} />}
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </li>
     ))}
   </ul>
 </nav>
 
+<script is:inline>
+  (function () {
+    const items = Array.from(document.querySelectorAll('.mega-menu-item[data-has-panel]'));
+    const isMobile = () => window.matchMedia('(max-width: 1024px)').matches;
+    let closeTimer = null;
+
+    function closeAll() {
+      items.forEach((i) => i.classList.remove('is-open'));
+    }
+
+    items.forEach((item) => {
+      item.addEventListener('mouseenter', () => {
+        if (isMobile()) return;
+        clearTimeout(closeTimer);
+        items.forEach((i) => { if (i !== item) i.classList.remove('is-open'); });
+        item.classList.add('is-open');
+      });
+      item.addEventListener('mouseleave', () => {
+        if (isMobile()) return;
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(() => item.classList.remove('is-open'), 150);
+      });
+
+      // Mobile accordion: tap trigger to toggle, prevent navigation on first tap
+      const trigger = item.querySelector('.mega-menu-trigger');
+      if (trigger) {
+        trigger.addEventListener('click', (e) => {
+          if (!isMobile()) return;
+          if (!item.classList.contains('is-open')) {
+            e.preventDefault();
+            items.forEach((i) => { if (i !== item) i.classList.remove('is-open'); });
+            item.classList.add('is-open');
+          }
+        });
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeAll();
+    });
+    document.addEventListener('click', (e) => {
+      if (isMobile()) return;
+      if (!e.target.closest('.mega-menu-item')) closeAll();
+    });
+  })();
+</script>
+
 <style>
+  /* ===================== Top-level nav ===================== */
   .mega-menu {
     flex: 1;
     display: flex;
@@ -160,113 +253,200 @@ const menu = [
   .mega-menu-list {
     display: flex;
     list-style: none;
-    gap: 2px;
+    gap: 4px;
     margin: 0;
     padding: 0;
   }
 
   .mega-menu-item {
-    position: relative;
+    /* No position: relative — let .mega-panel position relative to the sticky .navbar */
   }
 
   .mega-menu-trigger {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
-    padding: 10px 13px;
+    padding: 10px 14px;
     font-family: var(--font-body);
     font-size: 14px;
     font-weight: 500;
     color: var(--text);
     text-decoration: none;
-    border-radius: 4px;
-    transition: background 0.15s var(--ease);
+    transition: color 0.2s var(--ease);
   }
-  .mega-menu-trigger:hover {
-    background: var(--gray);
-    color: var(--black);
+  .mega-menu-trigger:hover { color: var(--black); }
+
+  .trigger-underline {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 4px;
+    height: 2px;
+    background: var(--red);
+    transform: scaleX(0);
+    transform-origin: center;
+    transition: transform 0.25s var(--ease);
+    pointer-events: none;
+  }
+  .mega-menu-item:hover .trigger-underline,
+  .mega-menu-item:focus-within .trigger-underline,
+  .mega-menu-item.is-open .trigger-underline {
+    transform: scaleX(1);
   }
 
-  .chevron {
-    transition: transform 0.2s var(--ease);
-  }
-  .mega-menu-item:hover .chevron {
-    transform: rotate(180deg);
-  }
-
-  /* Dropdown */
-  .mega-menu-dropdown {
+  /* ===================== Full-width panel ===================== */
+  .mega-panel {
     position: absolute;
     top: 100%;
-    left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04);
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: rgba(10, 10, 10, 0.85);
+    -webkit-backdrop-filter: blur(20px) saturate(1.8);
+    backdrop-filter: blur(20px) saturate(1.8);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
+    color: #ffffff;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.2s var(--ease);
-    z-index: 10;
+    transform: translateY(-8px);
+    transition:
+      opacity 0.25s ease-out,
+      transform 0.25s ease-out,
+      visibility 0s linear 0.25s;
+    z-index: 5;
   }
 
-  .mega-menu-item:hover .mega-menu-dropdown,
-  .mega-menu-item:focus-within .mega-menu-dropdown {
+  /* Fallback when backdrop-filter is unsupported */
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .mega-panel { background: rgba(10, 10, 10, 0.95); }
+  }
+
+  /* Invisible hover bridge between trigger and panel */
+  .mega-panel::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    height: 8px;
+  }
+
+  .mega-menu-item:hover .mega-panel,
+  .mega-menu-item:focus-within .mega-panel,
+  .mega-menu-item.is-open .mega-panel {
     opacity: 1;
     visibility: visible;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
+    transition:
+      opacity 0.25s ease-out,
+      transform 0.25s ease-out,
+      visibility 0s linear 0s;
   }
 
-  .mega-menu-dropdown-inner {
+  .mega-panel-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px 64px;
+  }
+
+  /* ===================== Flow layout (auto vertical columns) ===================== */
+  .panel-flow {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    column-count: 3;
+    column-gap: 64px;
+  }
+  .panel-flow li {
+    break-inside: avoid;
+  }
+
+  /* ===================== Grid layout (explicit columns) ===================== */
+  .mega-panel-grid {
     display: grid;
-    gap: 32px;
-    padding: 24px 28px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px 64px;
   }
-  .mega-menu-dropdown-inner[data-cols="1"] { grid-template-columns: 1fr; min-width: 320px; }
-  .mega-menu-dropdown-inner[data-cols="2"] { grid-template-columns: 1fr 1fr; min-width: 560px; }
-  .mega-menu-dropdown-inner[data-cols="3"] { grid-template-columns: repeat(3, 1fr); min-width: 720px; }
+  .mega-panel-grid.is-center {
+    grid-template-columns: minmax(0, 560px);
+    justify-content: center;
+    text-align: center;
+  }
 
-  .mega-menu-column h4 {
+  .panel-col h4 {
     font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 700;
+    font-weight: 600;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
     color: var(--red);
-    margin-bottom: 14px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border);
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(200, 16, 46, 0.2);
   }
 
-  .mega-menu-column ul {
+  .panel-list {
     list-style: none;
-    padding: 0;
     margin: 0;
-    max-height: 460px;
-    overflow-y: auto;
-  }
-  .mega-menu-column ul::-webkit-scrollbar { width: 4px; }
-  .mega-menu-column ul::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-  .mega-menu-column li {
-    margin-bottom: 2px;
+    padding: 0;
   }
 
-  .mega-menu-column a {
+  /* Shared link styling for both layouts */
+  .panel-flow a,
+  .panel-list a {
     display: block;
-    padding: 5px 0;
-    font-size: 13.5px;
-    font-weight: 500;
-    color: var(--text);
+    padding: 10px 0;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
     text-decoration: none;
-    transition: color 0.15s var(--ease), padding 0.15s var(--ease);
+    transition: color 0.2s ease, padding-left 0.2s ease;
   }
-  .mega-menu-column a:hover {
-    color: var(--red);
+  .panel-flow a:hover,
+  .panel-list a:hover {
+    color: #ffffff;
     padding-left: 4px;
   }
 
-  /* --- Mobile --- */
+  /* Rich-content message blocks */
+  .panel-message {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.7);
+  }
+  .panel-message strong { color: #ffffff; font-weight: 600; }
+  .panel-message a {
+    color: #ffffff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgba(255, 255, 255, 0.3);
+    transition: text-decoration-color 0.2s ease, color 0.2s ease;
+  }
+  .panel-message a:hover {
+    color: var(--red);
+    text-decoration-color: var(--red);
+  }
+  .panel-message .panel-phone {
+    display: block;
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: #ffffff;
+    text-decoration: none;
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
+  }
+  .panel-message .panel-phone:hover { color: var(--red); }
+
+  .mega-panel-grid.is-center .panel-col h4 {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  /* ===================== Mobile (≤1024px): accordion ===================== */
   @media (max-width: 1024px) {
     .mega-menu {
       position: fixed;
@@ -280,10 +460,10 @@ const menu = [
       transform: translateX(100%);
       transition: transform 0.3s var(--ease);
       z-index: 99;
+      display: block;
     }
-    .mega-menu.is-open {
-      transform: translateX(0);
-    }
+    .mega-menu.is-open { transform: translateX(0); }
+
     .mega-menu-list {
       flex-direction: column;
       gap: 0;
@@ -293,37 +473,69 @@ const menu = [
     }
     .mega-menu-trigger {
       width: 100%;
-      justify-content: space-between;
       padding: 16px 0;
       font-size: 17px;
       font-weight: 600;
+      color: var(--black);
+      justify-content: space-between;
     }
-    .mega-menu-dropdown {
+    .trigger-underline { display: none; }
+
+    .mega-panel {
       position: static;
-      transform: none;
-      min-width: 0;
-      border: none;
+      background: transparent;
       box-shadow: none;
+      border-top: none;
+      color: var(--text);
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
       opacity: 1;
       visibility: visible;
+      transform: none;
       max-height: 0;
       overflow: hidden;
       transition: max-height 0.3s var(--ease);
+      z-index: auto;
     }
-    .mega-menu-item:hover .mega-menu-dropdown,
-    .mega-menu-item:focus-within .mega-menu-dropdown {
-      transform: none;
-      max-height: 4000px;
+    .mega-panel::before { display: none; }
+    .mega-menu-item.is-open .mega-panel,
+    .mega-menu-item:focus-within .mega-panel {
+      max-height: 6000px;
     }
-    .mega-menu-dropdown-inner,
-    .mega-menu-dropdown-inner[data-cols="1"],
-    .mega-menu-dropdown-inner[data-cols="2"],
-    .mega-menu-dropdown-inner[data-cols="3"] {
+    .mega-panel-inner {
+      padding: 0 0 16px;
+      max-width: none;
+    }
+    .mega-panel-grid,
+    .mega-panel-grid.is-center {
       grid-template-columns: 1fr;
       gap: 20px;
-      padding: 0 0 20px;
-      min-width: 0;
+      justify-content: stretch;
+      text-align: left;
     }
-    .mega-menu-column ul { max-height: none; }
+    .panel-flow {
+      column-count: 1;
+    }
+    .panel-flow a,
+    .panel-list a {
+      color: var(--text);
+      font-size: 15px;
+      padding: 8px 0;
+    }
+    .panel-flow a:hover,
+    .panel-list a:hover {
+      color: var(--red);
+      padding-left: 4px;
+    }
+    .panel-col h4 {
+      color: var(--red);
+      border-bottom-color: rgba(200, 16, 46, 0.2);
+    }
+    .panel-message {
+      color: var(--muted);
+    }
+    .panel-message strong { color: var(--black); }
+    .panel-message a { color: var(--red); }
+    .panel-message .panel-phone { color: var(--black); font-size: 22px; }
   }
 </style>
