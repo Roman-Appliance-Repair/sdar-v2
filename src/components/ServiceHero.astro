@@ -1,0 +1,206 @@
+---
+/**
+ * ServiceHero.astro
+ * Unified hero block for /services/* pages.
+ * Visual match to /services/garbage-disposal-repair/ (reference).
+ *
+ * Structure: black hero (2-col) + red trust bar.
+ */
+
+export interface Props {
+  eyebrow?: string;
+  title: string;
+  subtitle: string;
+  phone?: string;
+  phoneHref?: string;
+  bookingUrl?: string;
+  reviewsRating?: number;
+  reviewsCount?: number;
+  heroImageTitle?: string;
+  heroImageLocation?: string;
+  trustBarItems?: string[];
+}
+
+const {
+  eyebrow = 'Los Angeles · 90048 · 90046 · 90026 · 90036',
+  title,
+  subtitle,
+  phone = '(424) 325-0520',
+  phoneHref = 'tel:+14243250520',
+  bookingUrl = '/contact/',
+  reviewsRating = 4.6,
+  reviewsCount = 37,
+  heroImageTitle = title,
+  heroImageLocation = 'Los Angeles',
+  trustBarItems = [
+    '🏅 CSLB Licensed #1138898',
+    '🛡️ Fully Insured',
+    '⚡ Same Day Available',
+    '🔩 OEM Parts on Truck',
+    '💬 $89 Diagnostic — Waived With Repair',
+  ],
+} = Astro.props;
+---
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <p class="hero-eyebrow">{eyebrow}</p>
+      <h1>{title}</h1>
+      <p class="hero-sub">{subtitle}</p>
+      <div class="hero-ctas">
+        <a href={phoneHref} class="btn-primary">☎ {phone}</a>
+        <a href={bookingUrl} class="btn-outline">Book Online</a>
+      </div>
+      <div class="hero-rating">
+        <span class="stars">★★★★★</span>
+        <span>{reviewsRating} · {reviewsCount} reviews · Google</span>
+      </div>
+    </div>
+    <div class="hero-img-wrap">
+      <div class="hero-img-placeholder">
+        <p>{heroImageTitle}</p>
+        <p>{heroImageLocation}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    {trustBarItems.map((item) => {
+      const match = item.match(/^(\S+)\s+(.*)$/);
+      const icon = match ? match[1] : '';
+      const text = match ? match[2] : item;
+      return (
+        <div class="trust-item"><span class="trust-icon">{icon}</span> {text}</div>
+      );
+    })}
+  </div>
+</div>
+
+<style>
+  .hero {
+    background: #0a0a0a;
+    color: #fff;
+    padding: 80px 24px 72px;
+  }
+  .hero-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .hero-eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: #C8102E;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 4vw, 46px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0 0 20px;
+    letter-spacing: -.02em;
+    color: #fff;
+    max-width: none;
+  }
+  .hero-sub {
+    font-size: 17px;
+    color: rgba(255, 255, 255, .72);
+    margin: 0 0 32px;
+    line-height: 1.6;
+  }
+  .hero-ctas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    background: #C8102E;
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .btn-outline {
+    border: 1.5px solid rgba(255, 255, 255, .35);
+    color: #fff;
+    padding: 14px 28px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    display: inline-block;
+  }
+  .hero-rating {
+    margin-top: 28px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, .55);
+  }
+  .stars {
+    color: #f59e0b;
+    letter-spacing: 2px;
+  }
+  .hero-img-wrap {
+    border-radius: 12px;
+    overflow: hidden;
+    background: #1a1a1a;
+    aspect-ratio: 4 / 3;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-img-placeholder {
+    color: rgba(255, 255, 255, .2);
+    font-size: 13px;
+    text-align: center;
+  }
+  .hero-img-placeholder p {
+    margin: 0;
+  }
+
+  .trust-bar {
+    background: #C8102E;
+    color: #fff;
+    padding: 16px 24px;
+  }
+  .trust-bar-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .trust-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .trust-icon {
+    font-size: 16px;
+  }
+
+  @media (max-width: 768px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+    }
+    .hero-img-wrap {
+      display: none;
+    }
+  }
+</style>
