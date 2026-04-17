@@ -1,0 +1,118 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+function slugFromPath(p: string) { return (p.split('/').pop() ?? '').replace(/\.astro$/, ''); }
+function slugToLabel(slug: string) {
+  return slug.split('-').map((w) =>
+    w.charAt(0).toUpperCase() + w.slice(1)
+  ).join(' ');
+}
+
+// County hubs and city pages live at the root, not here.
+const rootSlugs = Object.keys(import.meta.glob('../*.astro'))
+  .map(slugFromPath)
+  .filter((s) => s !== 'index')
+  .sort();
+
+const counties = rootSlugs
+  .filter((s) => s.endsWith('-county'))
+  .map((slug) => ({ slug, label: slugToLabel(slug), href: `/${slug}/` }));
+
+const cities = rootSlugs
+  .filter((s) => !s.endsWith('-county'))
+  .map((slug) => ({ slug, label: slugToLabel(slug), href: `/${slug}/` }));
+
+const title = 'Service Areas | Same Day Appliance Repair';
+const description = 'Same-day appliance repair across Los Angeles, Orange, Ventura, Riverside, and San Bernardino counties. 80+ cities served with dedicated branch teams.';
+---
+
+<Layout title={title} description={description}>
+  <section class="hub">
+    <div class="container">
+      <p class="hub-eyebrow">Service Areas</p>
+      <h1 class="hub-title">Where We Work</h1>
+      <p class="hub-intro">
+        {cities.length} cities across {counties.length} Southern California counties. Dedicated branch teams with local knowledge and fast dispatch.
+      </p>
+
+      <h2 class="section-head">County Hubs</h2>
+      <div class="card-grid big">
+        {counties.map((item) => (
+          <a href={item.href} class="card">
+            <h3>{item.label}</h3>
+            <span class="card-cta">View county →</span>
+          </a>
+        ))}
+      </div>
+
+      <h2 class="section-head">All Cities</h2>
+      <div class="city-grid">
+        {cities.map((item) => (
+          <a href={item.href} class="city-link">{item.label}</a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hub { padding: 80px 0; }
+  .hub-eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--red); margin-bottom: 12px;
+  }
+  .hub-title { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; }
+  .hub-intro {
+    max-width: 680px; font-size: 17px; line-height: 1.6; color: var(--muted);
+    margin-bottom: 48px;
+  }
+  .section-head {
+    font-size: 20px; font-weight: 700;
+    margin: 48px 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .card-grid.big {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+  .card {
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 28px 24px;
+    background: var(--black);
+    border: 1px solid var(--black);
+    border-radius: 6px;
+    color: var(--white);
+    text-decoration: none;
+    transition: all 0.2s var(--ease);
+    min-height: 140px;
+  }
+  .card:hover { background: var(--red); border-color: var(--red); color: var(--white); }
+  .card h3 {
+    font-size: 20px; font-weight: 600;
+    font-family: var(--font-body); letter-spacing: -0.01em;
+    margin: 0 0 12px; color: var(--white);
+  }
+  .card-cta {
+    font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8);
+    letter-spacing: 0.05em;
+  }
+  .city-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 4px 16px;
+  }
+  .city-link {
+    padding: 8px 0;
+    font-size: 14.5px;
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: all 0.15s var(--ease);
+  }
+  .city-link:hover { color: var(--red); border-bottom-color: var(--red); }
+</style>

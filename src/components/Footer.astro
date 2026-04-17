@@ -1,7 +1,24 @@
 ---
 /**
- * Footer — NAP, branch locations, quick links, legal.
+ * Footer — NAP, branches, quick links, counties, legal.
  */
+
+function slugFromPath(p: string) { return (p.split('/').pop() ?? '').replace(/\.astro$/, ''); }
+function slugToLabel(slug: string) {
+  return slug.split('-').map((w) =>
+    w.charAt(0).toUpperCase() + w.slice(1)
+  ).join(' ');
+}
+
+// Dynamically pull county hubs from root pages
+const countySlugs = Object.keys(import.meta.glob('../pages/*.astro'))
+  .map(slugFromPath)
+  .filter((s) => s.endsWith('-county'))
+  .sort();
+const counties = countySlugs.map((slug) => ({
+  label: slugToLabel(slug),
+  href: `/${slug}/`,
+}));
 
 const currentYear = new Date().getFullYear();
 
@@ -19,16 +36,16 @@ const servicesLinks = [
   { label: 'Dryer Repair', href: '/services/dryer-repair/' },
   { label: 'Oven Repair', href: '/services/oven-repair/' },
   { label: 'Dishwasher Repair', href: '/services/dishwasher-repair/' },
-  { label: 'HVAC Repair', href: '/services/hvac-repair/' },
+  { label: 'All Services →', href: '/services/' },
 ];
 
 const companyLinks = [
-  { label: 'About Us', href: '/about/' },
   { label: 'Credentials', href: '/credentials/' },
-  { label: 'Pricing', href: '/price-list/' },
-  { label: 'Reviews', href: '/reviews/' },
-  { label: 'Contact', href: '/contact/' },
   { label: 'For Business', href: '/for-business/' },
+  { label: 'Price List', href: '/price-list/' },
+  { label: 'Service Areas', href: '/areas/' },
+  { label: 'Commercial', href: '/commercial/' },
+  { label: 'Brands', href: '/brands/' },
 ];
 
 const legalLinks = [
@@ -55,7 +72,8 @@ const legalLinks = [
           <strong>HVAC 777 LLC</strong><br />
           DBA Same Day Appliance Repair<br />
           6230 Wilshire Blvd Ste A PMB 2267<br />
-          Los Angeles, CA 90048
+          Los Angeles, CA 90048<br />
+          <a href="tel:+14243250520" class="address-phone">(424) 325-0520</a>
         </address>
       </div>
 
@@ -68,6 +86,16 @@ const legalLinks = [
               <a href={`tel:${b.tel}`} class="branch-phone">{b.phone}</a>
             </li>
           ))}
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Counties</h4>
+        <ul>
+          {counties.map((c) => (
+            <li><a href={c.href}>{c.label}</a></li>
+          ))}
+          <li><a href="/areas/"><strong>All Areas →</strong></a></li>
         </ul>
       </div>
 
@@ -171,20 +199,23 @@ const legalLinks = [
     margin: 0;
   }
 
-  /* Top grid */
+  /* Top grid — 5 columns (brand + 4 cols) */
   .footer-top {
     display: grid;
-    grid-template-columns: 2fr 1.2fr 1fr 1fr;
-    gap: 48px;
+    grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
     padding-bottom: 48px;
     border-bottom: 1px solid rgba(255,255,255,0.12);
   }
 
-  @media (max-width: 960px) {
-    .footer-top { grid-template-columns: 1fr 1fr; gap: 40px; }
+  @media (max-width: 1100px) {
+    .footer-top { grid-template-columns: 1.6fr 1fr 1fr; gap: 36px; }
   }
-  @media (max-width: 560px) {
-    .footer-top { grid-template-columns: 1fr; gap: 32px; }
+  @media (max-width: 720px) {
+    .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+  }
+  @media (max-width: 480px) {
+    .footer-top { grid-template-columns: 1fr; gap: 28px; }
   }
 
   /* Brand block */
@@ -220,6 +251,15 @@ const legalLinks = [
     color: rgba(255,255,255,0.65);
   }
   .footer-address strong { color: var(--white); font-weight: 600; }
+  .address-phone {
+    display: inline-block;
+    margin-top: 8px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--white) !important;
+  }
+  .address-phone:hover { color: var(--red) !important; }
 
   /* Column lists */
   .footer-col li { margin-bottom: 10px; font-size: 14px; }

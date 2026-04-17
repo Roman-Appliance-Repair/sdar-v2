@@ -1,0 +1,103 @@
+---
+/**
+ * CTA — luxury editorial closing block.
+ * Props match legacy signature so existing page usages keep working:
+ *   <CTA phone={phone} branch={branch} zones={[...]} />
+ * Layout already provides navbar + footer, so this is content-only.
+ */
+interface Props {
+  phone: string;
+  phoneRaw?: string;
+  branch: string;
+  zones?: string[];
+}
+
+const { phone, phoneRaw, branch, zones = [] } = Astro.props;
+const telHref = `tel:${phoneRaw || '+1' + phone.replace(/[^0-9]/g, '')}`;
+---
+
+<section class="cta-block">
+  <div class="container cta-inner">
+    <p class="cta-eyebrow">Same-day service in {branch}</p>
+    <h2 class="cta-title">Need repair today? Talk to a dispatcher now.</h2>
+    {zones.length > 0 && (
+      <p class="cta-zones">
+        Serving {zones.map((z, i) => (
+          <><strong>{z}</strong>{i < zones.length - 1 ? ' · ' : ''}</>
+        ))}
+      </p>
+    )}
+    <a href={telHref} class="cta-phone">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+      </svg>
+      <span>{phone}</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .cta-block {
+    background: #C8102E;
+    color: #ffffff;
+    padding: 64px 0;
+    margin-top: 48px;
+  }
+
+  .cta-inner {
+    text-align: center;
+  }
+
+  .cta-eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #ffffff;
+    opacity: 0.85;
+    margin: 0 0 14px;
+  }
+
+  .cta-title {
+    font-family: var(--font-display, Georgia, serif);
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.15;
+    margin: 0 0 20px;
+    color: #ffffff;
+  }
+
+  .cta-zones {
+    font-size: 15px;
+    line-height: 1.6;
+    margin: 0 0 28px;
+    opacity: 0.9;
+  }
+
+  .cta-zones strong {
+    font-weight: 600;
+  }
+
+  .cta-phone {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: #0a0a0a;
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .cta-phone:hover {
+    background: #1a1a1a;
+    color: #ffffff;
+    transform: translateY(-1px);
+  }
+
+  @media (max-width: 640px) {
+    .cta-block { padding: 48px 0; }
+  }
+</style>

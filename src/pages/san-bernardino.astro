@@ -1,0 +1,512 @@
+---
+// src/pages/san-bernardino.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const city = "San Bernardino";
+const citySlug = "san-bernardino";
+const phone = "(626) 376-4458";
+const phoneRaw = "6263764458";
+const zipCodes = ["92401", "92404", "92405", "92407", "92408", "92410", "92411"];
+const county = "San Bernardino";
+
+const title = `Appliance Repair San Bernardino CA — Same Day | All Brands | ${phone}`;
+const description = `Same-day appliance repair in San Bernardino CA. Refrigerator, washer, dryer, oven, dishwasher & more. Del Rosa, Verdemont, CSUSB area. Licensed. OEM parts. Call ${phone}.`;
+
+const services = [
+  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
+  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
+  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
+  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
+  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
+  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
+  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
+  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+];
+
+const neighborhoods = [
+  { name: "Del Rosa", zip: "92404" },
+  { name: "Verdemont", zip: "92407" },
+  { name: "Arrowhead Farms", zip: "92405" },
+  { name: "University / CSUSB Area", zip: "92407" },
+  { name: "Muscoy", zip: "92405" },
+  { name: "Highland Ave Corridor", zip: "92404" },
+  { name: "Kendall Drive Area", zip: "92407" },
+  { name: "Baseline St Area", zip: "92410" },
+  { name: "E Street Corridor", zip: "92401" },
+  { name: "Waterman Ave", zip: "92408" },
+  { name: "Downtown San Bernardino", zip: "92401" },
+  { name: "North San Bernardino", zip: "92405" },
+];
+
+const faqItems = [
+  {
+    q: "Do you offer same-day appliance repair in San Bernardino?",
+    a: `Yes — same-day service is available throughout San Bernardino including Del Rosa, Verdemont, Arrowhead Farms, CSUSB area, and all city neighborhoods. Call ${phone} before noon for same-day scheduling. We cover all San Bernardino ZIP codes without a trip surcharge.`
+  },
+  {
+    q: "Is it worth repairing an older appliance in San Bernardino?",
+    a: "Very often, yes. San Bernardino has some of the oldest residential housing stock in the IE — homes from the 1950s, '60s, and '70s where older Whirlpool, GE, and Maytag appliances have been running for 15–25 years. These machines are mechanically simpler than modern units with fewer electronics to fail, and they're frequently worth repairing. A 20-year-old Whirlpool Direct Drive with a worn drive coupling costs $120–$140 to fix. A replacement is $700–$900. We tell you honestly which way the math goes after diagnosis."
+  },
+  {
+    q: "Do you service rental properties near CSUSB?",
+    a: "Yes. California State University San Bernardino generates significant student rental demand in the surrounding neighborhoods. We work with landlords and property managers throughout the CSUSB corridor and the university area. Rental calls get priority scheduling — a tenant without a working washer or refrigerator is a habitability issue. We coordinate directly with landlords and aim to close every occupied rental call same-day."
+  },
+  {
+    q: "What brands do you repair in San Bernardino?",
+    a: "All major brands. San Bernardino's housing stock spans from older Whirlpool, GE, and Maytag in the established neighborhoods to mid-range Samsung, LG, and KitchenAid in renovated or newer builds. Verdemont and the newer North San Bernardino developments have more recent appliances. We carry OEM parts for all generations."
+  },
+  {
+    q: "What is your diagnostic fee?",
+    a: `$89, applied directly to the repair cost when you proceed. No hidden trip charge to San Bernardino. We quote on-site after diagnosis — what we quote is what appears on the invoice.`
+  },
+  {
+    q: "Why does my fridge run warm every summer?",
+    a: "San Bernardino sits in the Inland Valley and regularly hits 100–108°F in summer. At those ambient temperatures, refrigerators that were managing fine in spring get pushed past their threshold. Condenser coils in San Bernardino's dry, dusty environment load up faster than coastal cities. We see the summer refrigerator surge start in June and peak in July. Every summer refrigerator call in San Bernardino starts with condenser coil cleaning before anything else."
+  },
+  {
+    q: "Do you service commercial appliances for San Bernardino businesses?",
+    a: "Yes. As the county seat of San Bernardino County, the city has significant commercial, government, and institutional activity. We service commercial refrigerators, walk-in coolers, commercial ice machines, and commercial laundry. Commercial diagnostic is $120, applied to the repair."
+  },
+];
+
+const recentRepairs = [
+  {
+    title: "Whirlpool WTW4855HW top-loader — won't agitate, spins fine, 18 years old",
+    neighborhood: "Del Rosa, 92404",
+    description: "18-year-old Whirlpool top-loader in a Del Rosa home that the owner had maintained well. No agitation, spin cycle working. Classic transmission shift actuator failure — the actuator dogs had worn down enough that the transmission couldn't engage agitate mode. Checked the motor — solid. Drive belt — intact. Transmission — functional. Just the actuator. Had the OEM part on the truck. Repair: $89 diagnostic + $95 actuator and labor. Owner had been quoted a new machine at $750 by a big-box store. Machine has years left in it.",
+    note: "Old Whirlpool top-loaders: simple mechanics, strong motors, worth repairing when the core components are sound."
+  },
+  {
+    title: "Samsung RF23M8570SR — not cooling, 21E error, CSUSB rental property",
+    neighborhood: "University area, 92407",
+    description: "Landlord called — tenant in a CSUSB-area rental reporting warm refrigerator. 21E on Samsung French-door units is a freezer sensor error, but the actual cause here was an iced-over evaporator from a failed defrost heater — the sensor was reading correctly, but the evaporator coil had frosted solid. Replaced the defrost heater assembly with OEM Samsung parts, manually defrosted the coil, confirmed 38°F recovery. Done same afternoon — landlord needed it resolved before the tenant got home from class.",
+    note: "Samsung 21E: diagnose the defrost system first. Sensor replacement without finding the root cause is a callback."
+  },
+  {
+    title: "LG DLEX3700W dryer — no heat, thermal fuse blown, Verdemont home",
+    neighborhood: "Verdemont, 92407",
+    description: "LG dryer in a newer Verdemont home, no heat. Confirmed blown thermal fuse. Traced the root cause: 20-foot vent run through the garage wall with a lint trap that had never been cleaned in four years. Cleared the full vent, replaced the thermal fuse and high-limit thermostat as a set (on LG dryers, always replace both together), confirmed airflow at the exterior vent before leaving. Also found the heating element was operating at 85% — borderline. Replaced it while everything was open rather than come back in six months for an element call.",
+    note: "LG thermal fuse: replace with the high-limit thermostat as a set. Clear the vent. Confirm airflow at exit."
+  },
+  {
+    title: "GE GFSS2HCYSS — ice maker not making ice, water dispenser fine, 2012 model",
+    neighborhood: "Baseline St area, 92410",
+    description: "12-year-old GE side-by-side, ice maker silent, water dispenser working normally. Isolated to the ice maker inlet valve secondary solenoid — independent failure from the water solenoid. Also found the ice maker mold had significant hard water scale — 12 years of San Bernardino water without descaling. Replaced the inlet valve assembly with OEM GE parts, descaled the ice maker mold thoroughly, adjusted the freezer set point from 0°F to 2°F (was too cold, contributing to fill tube icing risk). Water filter was 26 months old — replaced. Ice production restored same visit.",
+    note: "12 years of SB County hard water without descaling creates significant ice maker mold scale. Always descale on ice maker calls here."
+  },
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "HomeAndConstructionBusiness",
+  "name": "Same Day Appliance Repair — San Bernardino",
+  "telephone": phone,
+  "email": "info@samedayappliance.repair",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "San Bernardino",
+    "addressRegion": "CA",
+    "addressCountry": "US"
+  },
+  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
+  "openingHoursSpecification": [
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
+    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
+  ],
+  "priceRange": "$$",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.6",
+    "reviewCount": "37",
+    "bestRating": "5"
+  }
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqItems.map(item => ({
+    "@type": "Question",
+    "name": item.q,
+    "acceptedAnswer": { "@type": "Answer", "text": item.a }
+  }))
+};
+---
+
+<BaseLayout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+  <!-- HERO -->
+  <section class="city-hero">
+    <div class="hero-inner container">
+      <div class="hero-text">
+        <p class="eyebrow">San Bernardino County Seat · ZIP 92401–92411</p>
+        <h1>Appliance Repair<br><span class="accent">San Bernardino</span></h1>
+        <p class="hero-sub">Same-day service in Del Rosa, Verdemont, Arrowhead Farms, CSUSB area, and throughout the city. All ages of appliances welcome. All brands, OEM parts, licensed.</p>
+        <div class="hero-ctas">
+          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
+          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
+        </div>
+        <div class="hero-trust">
+          <span>⭐ 4.6 · 37 Reviews</span>
+          <span>Licensed &amp; Insured</span>
+          <span>$89 Diagnostic</span>
+        </div>
+      </div>
+      <div class="hero-img">
+        <img src="/images/cities/san-bernardino-appliance-repair.jpg" alt="Appliance repair in San Bernardino CA" width="560" height="420" loading="eager" />
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="container trust-bar-inner">
+      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
+      <div class="trust-item"><span class="ti-icon">🔧</span><span>All Eras of Appliances</span></div>
+      <div class="trust-item"><span class="ti-icon">📋</span><span>Licensed &amp; Insured</span></div>
+      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
+      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
+    </div>
+  </div>
+
+  <!-- INTRO + SIDEBAR -->
+  <section class="intro-section container">
+    <div class="intro-content">
+
+      <h2>Appliance Repair in San Bernardino — The County Seat Has Its Own Service Profile</h2>
+
+      <p>San Bernardino is the largest city in the IE and the county seat of San Bernardino County — the largest county by land area in the contiguous United States. It's also one of the most diverse cities we service, with housing stock that spans from 1940s bungalows in Del Rosa and Arrowhead Farms to newer development in Verdemont and the university corridor near CSUSB. That housing diversity creates a service profile unlike any other city in the county.</p>
+
+      <p>The oldest neighborhoods in San Bernardino — Del Rosa, Muscoy, the Baseline Street corridor — have 1950s and '60s homes with appliances that have been replaced once or twice since original construction. A significant share of the calls we make in these neighborhoods are for older Whirlpool, GE, and Maytag machines that are 15–25 years old and still fundamentally sound. We approach these differently than newer appliance calls: the first question is always whether the core mechanical components are worth repairing. Usually they are. We tell you honestly when they aren't.</p>
+
+      <p>California State University San Bernardino anchors a rental market in the university corridor that creates a specific service dynamic — active occupancy, heavier-than-normal appliance use, and landlords who need issues resolved quickly. We work with both landlords and property managers on priority scheduling for occupied rental properties.</p>
+
+      <p>The climate here matches Fontana and the broader IE: 100–108°F summers, dry and dusty conditions, hard water throughout. Condenser coil cleaning every 6 months and dishwasher filter cleaning every 3 months are standard recommendations for San Bernardino homes.</p>
+
+      <p>Same-day coverage across all San Bernardino ZIP codes. Call {phone}.</p>
+
+    </div>
+
+    <aside class="sticky-cta-box">
+      <p class="scb-city">San Bernardino</p>
+      <p class="scb-phone">{phone}</p>
+      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
+      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
+      <ul class="scb-list">
+        <li>✓ Same-Day Available</li>
+        <li>✓ $89 Diagnostic → Applied to Repair</li>
+        <li>✓ Older &amp; Newer Appliances Welcome</li>
+        <li>✓ Rental Property Priority</li>
+        <li>✓ OEM Parts — No Aftermarket</li>
+        <li>✓ 90-Day Warranty</li>
+      </ul>
+      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
+    </aside>
+  </section>
+
+  <!-- SERVICES GRID -->
+  <section class="services-section">
+    <div class="container">
+      <h2>What We Repair in San Bernardino</h2>
+      <div class="services-grid">
+        {services.map(svc => (
+          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
+            <span class="svc-icon">{svc.icon}</span>
+            <span class="svc-name">{svc.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- HOUSING + NEIGHBORHOODS BLOCK -->
+  <section class="context-block container">
+    <div class="context-inner">
+      <div class="context-number">01</div>
+      <div class="context-body">
+        <h2>San Bernardino's Housing Stock — What We Find in Each Part of the City</h2>
+
+        <h3>Del Rosa, Arrowhead Farms &amp; North San Bernardino — Historic Stock</h3>
+        <p>Del Rosa and Arrowhead Farms are among the oldest established residential neighborhoods in San Bernardino — primarily homes built in the 1940s, '50s, and '60s. These are solid mid-century construction homes with appliances ranging from 15-year-old replacements to original vintage machines still in service. Whirlpool, GE, Hotpoint, and Maytag dominate. These machines are often worth keeping — mechanical simplicity, strong motors, parts still available for most. A $130 repair on a 1998 GE refrigerator that's cooling properly and has a sound compressor is almost always better economics than a $1,000+ replacement.</p>
+
+        <p>We approach repair-versus-replace conversations in this part of San Bernardino differently than newer housing areas. The question isn't the machine's age — it's the condition of its core components. We diagnose before advising, and we don't push replacement on machines worth repairing.</p>
+
+        <h3>Verdemont &amp; North Kendall — Newer Development</h3>
+        <p>Verdemont is one of San Bernardino's newer residential areas — hillside development from the 1980s through 2000s with more recent appliance profiles. Samsung, LG, Whirlpool, and KitchenAid from the 2010s are the most common. These are now in the 7–12 year failure window: LG linear inverter start relay failures, Samsung ice maker issues, front-load washer bearing wear. We carry OEM parts for all of these on the truck.</p>
+
+        <h3>CSUSB University Corridor — Rental Market</h3>
+        <p>California State University San Bernardino sits in the northwest part of the city, and the surrounding streets have a dense rental market supporting students, faculty, and staff. Appliances in rental units near CSUSB see higher-than-normal use and need service more frequently than owner-occupied homes. We work directly with landlords and property managers throughout this area. When a tenant calls about a broken appliance, we coordinate the scheduling to minimize disruption and aim to close the call the same day we open it.</p>
+
+        <h3>Baseline St, Waterman Ave &amp; Central San Bernardino — Mixed Stock</h3>
+        <p>The central corridors of San Bernardino have a consistent mix of mid-century and 1970s–1980s housing alongside apartments and multi-family properties. Appliances here span from older machines worth repairing to newer mid-range units from the 2010s. Hard water is consistent throughout — San Bernardino's municipal water supply has high mineral content, and we include descaling as standard on every dishwasher and ice maker call in this market.</p>
+
+        <h3>Climate — Inland Valley Heat and Hard Water</h3>
+        <p>San Bernardino's summers run hot — 100–108°F in July and August, with occasional spikes higher. Condenser coils load up faster in the dry, dusty conditions than in coastal climates. We recommend 6-month coil cleaning for refrigerators throughout San Bernardino, and 5-month intervals for homes near unimproved roads or industrial areas. Dishwasher filter cleaning every 3 months is not optional with San Bernardino County water — it's maintenance. We leave every customer with the right schedule for their specific usage and water quality.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEIGHBORHOODS -->
+  <section class="neighborhoods-section container">
+    <div class="section-intro">
+      <div class="context-number">02</div>
+      <h2>Neighborhoods We Service in San Bernardino</h2>
+      <p>We cover all of San Bernardino — from Del Rosa and Arrowhead Farms to Verdemont, CSUSB, and Downtown. No travel surcharge to any San Bernardino ZIP code.</p>
+    </div>
+    <div class="neighborhoods-grid">
+      {neighborhoods.map(n => (
+        <div class="nbhd-card">
+          <span class="nbhd-name">{n.name}</span>
+          <span class="nbhd-zip">ZIP {n.zip}</span>
+        </div>
+      ))}
+    </div>
+    <p class="nbhd-note">Also serving Rialto, Colton, and Highland — same dispatch, no surcharge. Call {phone}.</p>
+  </section>
+
+  <!-- RECENT REPAIRS -->
+  <section class="repairs-section container">
+    <div class="section-header">
+      <div class="context-number">03</div>
+      <h2>Recent Repairs in San Bernardino</h2>
+    </div>
+    <div class="repairs-grid">
+      {recentRepairs.map(r => (
+        <div class="repair-card">
+          <h3 class="repair-title">"{r.title}"</h3>
+          <p class="repair-location">📍 {r.neighborhood}</p>
+          <p class="repair-desc">{r.description}</p>
+          <p class="repair-note"><em>{r.note}</em></p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- WHY US + REVIEWS + PRICING -->
+  <section class="why-section container">
+    <div class="context-number">04</div>
+    <h2>Why San Bernardino Residents Call Us</h2>
+
+    <div class="why-grid">
+      <div class="why-item">
+        <h3>We work on older appliances — honestly</h3>
+        <p>San Bernardino has more older housing stock than most IE cities, and that means more older appliances worth keeping. We don't have a policy of refusing machines over 10 years old. If the core components are sound and parts are available, we quote the repair honestly and let you decide. We don't push replacement when repair is the right call.</p>
+      </div>
+      <div class="why-item">
+        <h3>Rental property priority</h3>
+        <p>CSUSB-area landlords know that a broken appliance in an occupied rental needs same-day attention. We coordinate directly with landlords and tenants, and we treat rental calls with the urgency they deserve. A habitability issue shouldn't wait until tomorrow.</p>
+      </div>
+      <div class="why-item">
+        <h3>Root cause, not just symptoms</h3>
+        <p>A blown thermal fuse means something caused it to blow. A Samsung error code points to a system, not a cause. We find the actual problem before recommending parts — because replacing the symptom without fixing the cause means a callback in 6 weeks.</p>
+      </div>
+      <div class="why-item">
+        <h3>The $89 diagnostic means something</h3>
+        <p>We look at the actual appliance before quoting. An 18-year-old Whirlpool not agitating could be a $120 actuator or a worn transmission — we find out which before recommending anything. What we quote is what appears on the invoice.</p>
+      </div>
+    </div>
+
+    <!-- Reviews -->
+    <div class="reviews-grid">
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p>"Old Whirlpool washer in our Del Rosa home stopped agitating. Every other company said just replace it. Same Day fixed an actuator for $95. Machine is running perfectly. Really appreciate that they actually tried to fix it instead of selling me a new one."</p>
+        <p class="reviewer">— Diana M., Del Rosa</p>
+      </div>
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p>"Landlord for two CSUSB-area rentals. Tenant called about a warm fridge — Samsung showing an error code. Same Day was there same afternoon, found a defrost heater failure, fixed it. Done before the tenant got home. Exactly the response I needed."</p>
+        <p class="reviewer">— Robert K., CSUSB area landlord</p>
+      </div>
+      <div class="review-card">
+        <div class="stars">★★★★★</div>
+        <p>"LG dryer in our Verdemont home stopped heating. Tech found a blocked vent AND a blown fuse, replaced both together and cleared the whole 20-foot run. Said replacing just the fuse would blow it again. Very thorough, fair price."</p>
+        <p class="reviewer">— Angela &amp; James T., Verdemont</p>
+      </div>
+    </div>
+
+    <!-- Pricing -->
+    <div class="pricing-block">
+      <h3>Typical Repair Pricing in San Bernardino</h3>
+      <p>Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed.</p>
+      <div class="pricing-grid">
+        <div class="price-item">
+          <span class="pi-service">Refrigerator Repair</span>
+          <span class="pi-range">$120–$420</span>
+        </div>
+        <div class="price-item">
+          <span class="pi-service">Washer Repair</span>
+          <span class="pi-range">$120–$360</span>
+        </div>
+        <div class="price-item">
+          <span class="pi-service">Dryer Repair</span>
+          <span class="pi-range">$120–$300</span>
+        </div>
+        <div class="price-item">
+          <span class="pi-service">Dishwasher Repair</span>
+          <span class="pi-range">$89–$340</span>
+        </div>
+        <div class="price-item">
+          <span class="pi-service">Oven / Range Repair</span>
+          <span class="pi-range">$130–$380</span>
+        </div>
+        <div class="price-item">
+          <span class="pi-service">Ice Maker Repair</span>
+          <span class="pi-range">$120–$260</span>
+        </div>
+        <div class="price-item">
+          <span class="pi-service">Condenser Coil Cleaning</span>
+          <span class="pi-range">$89–$140</span>
+        </div>
+        <div class="price-item">
+          <span class="pi-service">Dryer Vent Cleaning</span>
+          <span class="pi-range">$89–$140</span>
+        </div>
+      </div>
+      <p class="pricing-note">$89 diagnostic applied to repair cost. No trip charge to any San Bernardino ZIP code.</p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section container">
+    <h2>San Bernardino Appliance Repair — FAQ</h2>
+    <div class="faq-list">
+      {faqItems.map(item => (
+        <details class="faq-item">
+          <summary class="faq-q">{item.q}</summary>
+          <p class="faq-a">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- NEARBY -->
+  <section class="nearby-section container">
+    <h2>Also Serving Nearby Cities</h2>
+    <div class="nearby-grid">
+      <a href="/fontana/">Fontana</a>
+      <a href="/redlands/">Redlands</a>
+      <a href="/loma-linda/">Loma Linda</a>
+      <a href="/rancho-cucamonga/">Rancho Cucamonga</a>
+      <a href="/ontario/">Ontario</a>
+      <a href="/riverside/">Riverside</a>
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>Need Appliance Repair in San Bernardino Today?</h2>
+      <p>Same-day service in Del Rosa, Verdemont, CSUSB area, Baseline St, and all San Bernardino neighborhoods. Old homes or new, we service them all.</p>
+      <div class="cta-buttons">
+        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
+        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
+.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
+h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+h1 .accent { color: var(--color-accent); }
+.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
+.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
+.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
+.trust-bar { background: var(--color-accent); padding: 1rem 0; }
+.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
+.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
+.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
+.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
+.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
+.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
+.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
+.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
+.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
+.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
+.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
+.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
+.services-section { background: var(--color-surface); padding: 4rem 0; }
+.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
+.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
+.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+.svc-icon { font-size: 2rem; }
+.svc-name { font-size: .9rem; font-weight: 600; }
+.context-block { padding: 4rem 0; }
+.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
+.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; }
+.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
+.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
+.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
+.neighborhoods-section { padding: 4rem 0; }
+.section-intro { margin-bottom: 2rem; }
+.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
+.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
+.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
+.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
+.nbhd-note { margin-top: 1.5rem; font-size: .875rem; color: var(--color-text-muted); }
+.repairs-section { padding: 4rem 0; }
+.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
+.section-header h2 { font-size: 1.6rem; }
+.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
+.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
+.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
+.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
+.why-section { padding: 4rem 0; }
+.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
+.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
+.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
+.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
+.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
+.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
+.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
+.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
+.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
+.reviewer { font-size: .8rem; color: var(--color-text-muted); }
+.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
+.pricing-block h3 { margin-bottom: .5rem; }
+.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
+.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.price-item { display: flex; flex-direction: column; gap: .25rem; }
+.pi-service { font-size: .85rem; color: var(--color-text-muted); }
+.pi-range { font-size: 1rem; font-weight: 700; }
+.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
+.faq-section { padding: 4rem 0; }
+.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
+.faq-list { display: flex; flex-direction: column; gap: .75rem; }
+.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
+.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
+.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
+.nearby-section { padding: 3rem 0; }
+.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
+.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
+.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
+.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
+.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
+.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
+.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+@media (max-width: 1024px) {
+  .intro-section { grid-template-columns: 1fr; }
+  .sticky-cta-box { position: static; }
+  .services-grid, .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
+  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-img { display: none; }
+  .context-inner { grid-template-columns: 1fr; }
+  .repairs-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
+}
+</style>

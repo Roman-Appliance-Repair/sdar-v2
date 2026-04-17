@@ -1,0 +1,86 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const ACRONYMS = new Set(['bbq', 'hvac', 'ac', 'oem']);
+function slugFromPath(p: string) { return (p.split('/').pop() ?? '').replace(/\.astro$/, ''); }
+function slugToLabel(slug: string) {
+  return slug.split('-').map((w) =>
+    ACRONYMS.has(w.toLowerCase()) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)
+  ).join(' ');
+}
+
+const files = Object.keys(import.meta.glob('./*.astro'));
+const items = files
+  .map(slugFromPath)
+  .filter((s) => s !== 'index')
+  .sort()
+  .map((slug) => ({ slug, label: slugToLabel(slug), href: `/services/${slug}/` }));
+
+const title = 'Appliance Repair Services | Same Day Appliance Repair';
+const description = 'All home appliance repair services we offer across Los Angeles, Orange, and Ventura counties. Same-day service, licensed, EPA-certified.';
+---
+
+<Layout title={title} description={description}>
+  <section class="hub">
+    <div class="container">
+      <p class="hub-eyebrow">All Services</p>
+      <h1 class="hub-title">Appliance Repair Services</h1>
+      <p class="hub-intro">
+        Same-day repair across {items.length} appliance categories — from refrigerators and ovens to wine coolers and wall ovens. Licensed C-20, EPA 608 certified, OEM parts, 90-day warranty.
+      </p>
+
+      <div class="card-grid">
+        {items.map((item) => (
+          <a href={item.href} class="card">
+            <h3>{item.label}</h3>
+            <span class="card-cta">View →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hub { padding: 80px 0; }
+  .hub-eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--red); margin-bottom: 12px;
+  }
+  .hub-title { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; }
+  .hub-intro {
+    max-width: 680px; font-size: 17px; line-height: 1.6; color: var(--muted);
+    margin-bottom: 48px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 16px;
+  }
+  .card {
+    display: flex; flex-direction: column; justify-content: space-between;
+    padding: 24px;
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s var(--ease);
+    min-height: 120px;
+  }
+  .card:hover {
+    background: var(--white);
+    border-color: var(--black);
+    transform: translateY(-2px);
+    color: var(--black);
+  }
+  .card h3 {
+    font-size: 18px; font-weight: 600;
+    font-family: var(--font-body); letter-spacing: -0.01em;
+    margin: 0 0 12px; color: var(--black);
+  }
+  .card-cta {
+    font-size: 13px; font-weight: 600; color: var(--red);
+    letter-spacing: 0.05em;
+  }
+</style>

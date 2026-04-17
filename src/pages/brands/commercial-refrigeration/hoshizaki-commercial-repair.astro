@@ -1,0 +1,442 @@
+---
+// src/pages/brands/commercial/hoshizaki-repair.astro
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const brand = "Hoshizaki";
+const phone = "(323) 870-4790";
+const phoneRaw = "3238704790";
+
+const title = `Hoshizaki Repair Los Angeles & SoCal — Commercial Ice Machine & Refrigeration | ${phone}`;
+const description = `Expert Hoshizaki commercial repair in Los Angeles, Orange County & SoCal. Ice machines (KM, KML, AM, F, DCM series), reach-ins, prep tables. EPA-certified technicians. Same-day response. Call ${phone}.`;
+
+const productLines = [
+  {
+    series: "KM Series — Crescent Cube Ice Machines",
+    models: "KM-320M, KM-515M, KM-901M, KM-1340M, KM-1900M",
+    description: "Hoshizaki's flagship modular crescent cube machines. The KM series runs a 3-stage harvest cycle: freeze, harvest initiation via hot gas valve, and curtain release. The Steelheart stainless steel evaporator eliminates plating loss — unlike aluminum evaporators on competing brands, the stainless surface won't degrade over time. Common failure points in SoCal: clogged inlet screens from LA hard water mineral deposits, slow harvest from scale on water distribution nozzles, bin thermostat drift in high-ambient kitchen environments.",
+    failures: ["Inlet screen clogged — hard water scale blocks water flow, causing long harvest or no-ice", "Hot gas valve sticking — harvest won't initiate, ice adheres to evaporator", "Bin thermostat drift — machine cycles off prematurely or overfills bin", "Water curtain wear — curtain doesn't seal, bin gets wet or ice falls out of cycle"]
+  },
+  {
+    series: "KML Series — Slim-Line Crescent Cube",
+    models: "KML-200MAJ, KML-250MAJ, KML-325MAJ, KML-451MAH",
+    description: "Slim-profile undercounter crescent cube machines designed for bars, sushi counters, and tight back-of-house installations. The KML runs the same Steelheart evaporator as the KM series but in a 24-inch footprint. In LA's hospitality density — craft cocktail bars in Silver Lake, sushi counters in Sawtelle, hotel bars in Downtown — the KML is one of the most common commercial ice machines we service. Water quality is critical: the KML's compact water reservoir concentrates mineral scale faster than larger units.",
+    failures: ["Scale buildup in reservoir — LA hard water concentrates quickly in compact units", "Suction line thermistor failure — triggers false shutdown codes", "Drain pump failure on elevated installations — water backs up into bin", "Fan motor failure in enclosed undercounter spaces — ambient heat in bars"]
+  },
+  {
+    series: "F Series — Flaker Ice Machines",
+    models: "F-330BAH, F-801MAH, F-1060MAH, F-2000MRH",
+    description: "Hoshizaki flakers produce soft, chewable flake ice — the standard for healthcare, seafood display, produce sections, and patient hydration. The F series uses an auger-driven mechanism rather than a flat evaporator: ice forms on the inside of a cylindrical evaporator and is scraped off by a rotating auger. Auger wear and flange seal failure are the primary failure modes. In SoCal healthcare environments — hospitals in the South Bay, Cedars-Sinai adjacent facilities — keeping F series machines operational is a patient care issue.",
+    failures: ["Auger shaft seal failure — water leaks into gear assembly, damages bearings", "Auger motor overload — debris or scale jams the auger, trips thermal protector", "Evaporator cylinder scaling — hard water deposits reduce ice production", "Gear box oil leak — indicates worn output shaft seal"]
+  },
+  {
+    series: "DCM Series — Cubelet / Nugget Ice Dispensers",
+    models: "DCM-270BAH, DCM-300BAH, DCM-500BAH, DCM-751BAH",
+    description: "The DCM series combines ice making and dispensing in one unit — standard in healthcare (patient bedside dispensers), fast casual restaurants, and convenience stores. The internal ice maker feeds directly to an auger-driven dispenser. Sanitization is critical: DCM units accumulate biofilm faster than bin-style machines because ice contact surfaces are enclosed. LA County health inspectors specifically check dispensers. We service DCM units on a bi-monthly sanitization schedule for most of our healthcare and QSR clients.",
+    failures: ["Dispenser auger jam — ice bridges at the auger entrance, common in humid environments", "Sanitization code trigger — unit locks out when internal sensors detect contamination", "Water inlet valve scale — LA water deposits restrict fill rate, triggering slow-ice alarms", "Control board failure — DCM boards are sensitive to power fluctuations in commercial kitchens"]
+  },
+  {
+    series: "Hoshizaki Reach-In Refrigerators & Freezers",
+    models: "HRF-66, HRF-87, HBF-66, HBF-87, RTE-70 (sushi)",
+    description: "Hoshizaki's commercial reach-in and sushi display cases are built to a different standard than residential refrigerators. The refrigeration circuits run R-404A or R-448A refrigerant. Door gaskets are NSF-listed. The RTE sushi case holds 35–40°F and features adjustable humidity — critical for proper sushi rice and fish presentation. LA County health code requires sushi cases to maintain proper temperature logs. When a sushi case fails during service, the restaurant faces both food safety and compliance risk.",
+    failures: ["Door gasket wear — NSF-rated gaskets need replacement every 18–24 months in high-traffic locations", "Evaporator coil icing — defrost timer or heater failure common in high-humidity kitchens", "Condenser fan motor failure — grease-laden air in restaurant kitchens accelerates motor wear", "Temperature controller drift — digital controllers in Hoshizaki reach-ins are sensitive to voltage fluctuation"]
+  },
+];
+
+const errorCodes = [
+  { code: "E1", meaning: "Freeze cycle timeout — ice not harvesting within set time", cause: "Water flow restriction, scale on evaporator, or refrigerant issue", action: "Check inlet screen, inspect nozzles, verify refrigerant charge" },
+  { code: "E2", meaning: "Harvest timeout — harvest cycle not completing", cause: "Hot gas valve malfunction or low refrigerant", action: "Test hot gas valve operation, check suction/discharge pressures" },
+  { code: "E3", meaning: "High temperature — ice machine running too hot", cause: "Condenser coil dirty, fan motor failure, or high ambient temp", action: "Clean condenser, check fan operation, verify ventilation clearance" },
+  { code: "E4", meaning: "Water supply issue — insufficient water flow", cause: "Clogged inlet screen, low water pressure, or filter restriction", action: "Clean inlet screen, replace water filter, check supply pressure (20 PSI min)" },
+  { code: "E5", meaning: "Bin full or thermostat issue", cause: "Bin thermostat drift or ice bridging at curtain", action: "Check bin thermostat calibration, inspect ice curtain for bridging" },
+  { code: "E6", meaning: "Float switch error", cause: "Float stuck by mineral scale or debris", cause2: "Common in LA hard water environments", action: "Clean float assembly, check water level sensor" },
+];
+
+const maintenanceSchedule = [
+  { interval: "Monthly", tasks: ["Clean and sanitize ice machine interior", "Check water filter — replace if flow reduced >15%", "Inspect bin and curtain for scale buildup", "Check air filter on air-cooled units", "Verify ice production rate against nameplate"] },
+  { interval: "Quarterly", tasks: ["Deep descale with manufacturer-approved cleaner", "Inspect and clean condenser coils", "Check all water distribution nozzles", "Test harvest cycle timing against spec", "Inspect door gaskets on reach-in units", "Verify temperature log compliance"] },
+  { interval: "Semi-Annual", tasks: ["Full sanitization with EPA-registered sanitizer", "Inspect auger seal and bearings (F series)", "Check refrigerant pressures and superheat", "Inspect electrical connections and contactors", "Full safety check — bin thermostat, high-pressure cutout"] },
+];
+
+const industries = [
+  { name: "Sushi & Japanese Restaurants", detail: "SoCal has the highest density of Japanese restaurants outside Japan. Hoshizaki supplies roughly 40% of all sushi counter ice machines in LA and Orange County. The KML undercounter crescent cube is the sushi bar standard — crescent cubes are clear and dense, ideal for display. When a sushi counter's ice machine fails mid-service, raw fish presentation and food safety are immediately compromised. We prioritize sushi restaurant calls and stock KML parts specifically for this." },
+  { name: "Hotels & Hospitality", detail: "Downtown LA, Beverly Hills, and Santa Monica hotel corridors run Hoshizaki equipment in multiple locations — bar service, ice rooms on guest floors, banquet prep. A hotel property typically has 3–8 Hoshizaki units across the property. We work with hotel facility managers on preventive maintenance contracts that coordinate servicing across all units on a single visit schedule." },
+  { name: "Healthcare & Hospitals", detail: "F series flakers and DCM dispensers are the hospital standard in SoCal. Cedars-Sinai, UCLA Health, and affiliated facilities use Hoshizaki in patient rooms, nursing stations, and cafeterias. Healthcare maintenance schedules are more stringent — monthly sanitization is required, and downtime is a patient care issue, not just a business inconvenience. We service under hospital maintenance protocols." },
+  { name: "Craft Cocktail Bars", detail: "The LA cocktail scene — from West Hollywood to Arts District — has elevated ice to an ingredient. KML undercounter crescent cube machines produce the clear, dense ice that doesn't immediately dilute a cocktail. When a bar's ice machine fails before a weekend, it affects every drink served. We service bar ice machines on the same urgency level as restaurant calls." },
+  { name: "Seafood & Produce Markets", detail: "F series flake ice machines are standard in seafood cases and produce departments throughout LA's market corridor — from Grand Central Market to Asian supermarkets in the San Gabriel Valley. Flake ice keeps product cold without bruising. Auger seal failure is the most common call in this segment — we stock auger assemblies for the most common F series models." },
+];
+
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "HomeAndConstructionBusiness",
+  "name": "Same Day Appliance Repair — Hoshizaki Commercial Service",
+  "telephone": phone,
+  "email": "info@samedayappliance.repair",
+  "areaServed": ["Los Angeles", "Orange County", "Ventura County", "San Bernardino County", "Riverside County"],
+  "priceRange": "$$",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "reviewCount": "29",
+    "bestRating": "5"
+  }
+};
+
+const faqItems = [
+  {
+    q: "Do you service all Hoshizaki commercial equipment — not just ice machines?",
+    a: "Yes. We service the full Hoshizaki commercial line: KM and KML crescent cube ice machines, F series flakers, DCM nugget/cubelet dispensers, reach-in refrigerators and freezers, sushi display cases, and prep tables. Most of our Hoshizaki calls are ice machine related, but the reach-in and sushi case work is significant in LA's restaurant density."
+  },
+  {
+    q: "How fast can you respond to a Hoshizaki ice machine failure?",
+    a: `Same-day response is standard for commercial refrigeration failures. Call ${phone} and tell us the unit type, the error code if displayed, and your service window. Ice machine failures during service are treated as emergency calls — we dispatch from the nearest location with parts stocked for the most common KM, KML, and F series failures.`
+  },
+  {
+    q: "My Hoshizaki ice machine is showing an E1 error — is this serious?",
+    a: "E1 is a freeze cycle timeout — the machine failed to complete a freeze cycle within the programmed time. In SoCal, the most common cause is a clogged inlet screen from hard water mineral deposits restricting water flow. Secondary causes include scale on the water distribution nozzles or, less commonly, a refrigerant issue. Don't ignore E1 — a machine cycling repeatedly on E1 is stressing the compressor."
+  },
+  {
+    q: "How often should Hoshizaki ice machines be cleaned in Los Angeles?",
+    a: "Monthly sanitization minimum, quarterly deep descale. LA's water is harder than average — municipal water in most of the city and county has elevated calcium and magnesium content that accelerates scale buildup in ice machine water circuits. Machines that aren't descaled quarterly will develop restricted nozzles, clogged inlet screens, and reduced ice production within 6–12 months. LA County health code also requires ice machine maintenance logs."
+  },
+  {
+    q: "Do you provide preventive maintenance contracts for Hoshizaki equipment?",
+    a: `Yes. For restaurants, hotels, and healthcare facilities running multiple Hoshizaki units, we offer preventive maintenance contracts covering monthly sanitization, quarterly descaling, semi-annual full inspection, and priority response for emergency calls. Contracts are structured by number of units and service frequency. Call ${phone} for a quote.`
+  },
+  {
+    q: "Can you repair a Hoshizaki sushi display case that's not holding temperature?",
+    a: "Yes. The Hoshizaki RTE sushi case is a specialized refrigerated display that requires 35–40°F with controlled humidity. Temperature drift usually indicates evaporator coil icing (defrost system failure), a failing door gasket (NSF-rated gasket wear), or controller drift. A sushi case that's not holding temperature is a food safety compliance issue — LA County health inspectors specifically check sushi case temperatures. We treat sushi case calls with the same urgency as ice machine failures."
+  },
+];
+---
+
+<BaseLayout title={title} description={description}>
+  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+
+  <!-- HERO -->
+  <section class="brand-hero">
+    <div class="container hero-inner">
+      <div class="hero-text">
+        <p class="eyebrow">Commercial Refrigeration — Los Angeles &amp; SoCal</p>
+        <h1><span class="brand-name">Hoshizaki</span><br>Commercial Repair</h1>
+        <p class="hero-sub">Expert service for Hoshizaki ice machines (KM, KML, AM, F, DCM series), reach-in refrigerators, sushi display cases, and prep tables throughout Los Angeles, Orange County, and Southern California.</p>
+        <div class="hero-ctas">
+          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
+          <a href="/book" class="btn btn-outline btn-lg">Request Service</a>
+        </div>
+        <div class="hero-trust">
+          <span>⭐ 4.8 · 29 Commercial Reviews</span>
+          <span>EPA 608 Certified</span>
+          <span>$120 Commercial Diagnostic</span>
+          <span>Same-Day Response</span>
+        </div>
+      </div>
+      <div class="hero-badge">
+        <div class="badge-inner">
+          <div class="badge-brand">HOSHIZAKI</div>
+          <div class="badge-line">Authorized Service</div>
+          <div class="badge-specs">
+            <span>Ice Machines</span>
+            <span>Reach-Ins</span>
+            <span>Sushi Cases</span>
+            <span>Flakers</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST BAR -->
+  <div class="trust-bar">
+    <div class="container trust-bar-inner">
+      <div class="trust-item"><span class="ti-icon">🧊</span><span>All Hoshizaki Ice Series</span></div>
+      <div class="trust-item"><span class="ti-icon">⚡</span><span>Same-Day Emergency Response</span></div>
+      <div class="trust-item"><span class="ti-icon">🔬</span><span>EPA 608 Certified Technicians</span></div>
+      <div class="trust-item"><span class="ti-icon">🍱</span><span>Restaurant &amp; Healthcare Specialists</span></div>
+      <div class="trust-item"><span class="ti-icon">📋</span><span>Maintenance Contracts Available</span></div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <section class="intro-section container">
+    <div class="intro-content">
+      <h2>Hoshizaki Commercial Repair in Southern California — The Technical Standard</h2>
+
+      <p>Hoshizaki is not a consumer appliance brand. Every piece of equipment they manufacture — from the KM-320M undercounter crescent cube machine to the F-2000MRH modular flaker to the RTE sushi display case — is built for commercial food service environments with requirements that residential appliance companies aren't equipped to handle. The refrigerant circuits require EPA 608 certification. The failure modes are fundamentally different. The service urgency is categorically higher: a restaurant that loses its ice machine during dinner service isn't just inconvenienced, it's potentially serving drinks without ice and compromising the sushi case where fish is on display.</p>
+
+      <p>Southern California is one of the densest Hoshizaki markets in the United States. LA County's Japanese restaurant concentration alone represents thousands of KML undercounter machines. The hotel corridors in Beverly Hills, Santa Monica, and Downtown LA run Hoshizaki equipment in multiple locations per property. The healthcare system — Cedars-Sinai, UCLA, Kaiser, and dozens of affiliated facilities — relies on Hoshizaki F series flakers and DCM dispensers for patient care. When any of this equipment fails, the response standard is commercial, not residential.</p>
+
+      <p>We service the full Hoshizaki commercial line throughout Los Angeles County, Orange County, Ventura County, and the Inland Empire. EPA 608 certified. OEM parts. $120 commercial diagnostic applied to the repair. Same-day response on emergency calls. Call {phone}.</p>
+    </div>
+
+    <aside class="sticky-cta-box">
+      <p class="scb-brand">Hoshizaki</p>
+      <p class="scb-phone">{phone}</p>
+      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Emergency Call</a>
+      <a href="/book" class="btn btn-outline btn-block">Schedule Service</a>
+      <ul class="scb-list">
+        <li>✓ $120 Commercial Diagnostic → Applied to Repair</li>
+        <li>✓ EPA 608 Certified Technicians</li>
+        <li>✓ OEM Hoshizaki Parts</li>
+        <li>✓ Same-Day Emergency Response</li>
+        <li>✓ Maintenance Contracts Available</li>
+        <li>✓ LA, OC, Ventura, IE Coverage</li>
+      </ul>
+      <p class="scb-note">Ice machine down during service? Call immediately — we dispatch from the nearest stocked truck.</p>
+    </aside>
+  </section>
+
+  <!-- PRODUCT LINES -->
+  <section class="product-lines container">
+    <h2>Hoshizaki Equipment We Service</h2>
+    <div class="lines-grid">
+      {productLines.map((line, i) => (
+        <div class="line-card">
+          <div class="line-number">{String(i + 1).padStart(2, '0')}</div>
+          <div class="line-body">
+            <h3>{line.series}</h3>
+            <p class="line-models"><strong>Models:</strong> {line.models}</p>
+            <p class="line-desc">{line.description}</p>
+            <div class="failure-list">
+              <p class="failure-label">Common SoCal failures:</p>
+              <ul>
+                {line.failures.map(f => <li>{f}</li>)}
+              </ul>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- ERROR CODES -->
+  <section class="error-section">
+    <div class="container">
+      <h2>Hoshizaki Error Code Reference</h2>
+      <p class="section-sub">Hoshizaki ice machines display E-codes when a fault is detected. Here's what each code means and the most common causes in SoCal commercial environments.</p>
+      <div class="error-table">
+        <div class="error-header">
+          <span>Code</span>
+          <span>Meaning</span>
+          <span>Common Cause in SoCal</span>
+          <span>First Action</span>
+        </div>
+        {errorCodes.map(e => (
+          <div class="error-row">
+            <span class="error-code">{e.code}</span>
+            <span class="error-meaning">{e.meaning}</span>
+            <span class="error-cause">{e.cause}</span>
+            <span class="error-action">{e.action}</span>
+          </div>
+        ))}
+      </div>
+      <p class="error-note">⚠️ Repeated E1 or E2 codes stress the compressor. Don't clear and restart — diagnose the root cause first.</p>
+    </div>
+  </section>
+
+  <!-- INDUSTRIES -->
+  <section class="industries-section container">
+    <h2>Industries We Serve — Hoshizaki in SoCal</h2>
+    <div class="industries-grid">
+      {industries.map(ind => (
+        <div class="industry-card">
+          <h3>{ind.name}</h3>
+          <p>{ind.detail}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- LA HARD WATER BLOCK -->
+  <section class="hardwater-section">
+    <div class="container hardwater-inner">
+      <div class="hw-text">
+        <h2>LA Hard Water and Hoshizaki Equipment</h2>
+        <p>Los Angeles municipal water is harder than the national average, and the specific hardness varies significantly by distribution zone — water from the Metropolitan Water District running through older infrastructure in Hollywood and Mid-City can reach 250–300 ppm total dissolved solids. The San Gabriel Valley and parts of the Inland Empire run even harder, with some zones over 400 ppm.</p>
+        <p>Hoshizaki ice machines are designed to operate optimally at 150–300 ppm. Above 300 ppm, scale accumulates in the water distribution nozzles, inlet screen, water reservoir, and on the evaporator surface at an accelerated rate. The KML undercounter units — common in sushi bars and compact bar installations — have a smaller water reservoir that concentrates minerals faster than larger modular units.</p>
+        <p>Our standard maintenance protocol for all Hoshizaki ice machines in LA, Orange County, and the Inland Empire includes quarterly descaling with manufacturer-approved Hoshizaki Scale Away. We also recommend and install in-line water filtration — a properly sized filter removes particulate and reduces mineral content, extending the interval between descaling services and protecting the Steelheart evaporator surface.</p>
+      </div>
+      <div class="hw-specs">
+        <h3>Water Quality Thresholds</h3>
+        <div class="spec-grid">
+          <div class="spec-item"><span class="spec-label">Optimal operation</span><span class="spec-val">150–300 ppm TDS</span></div>
+          <div class="spec-item"><span class="spec-label">Accelerated scale</span><span class="spec-val">&gt;300 ppm TDS</span></div>
+          <div class="spec-item"><span class="spec-label">Filter recommended</span><span class="spec-val">&gt;200 ppm TDS</span></div>
+          <div class="spec-item"><span class="spec-label">Min. water pressure</span><span class="spec-val">20 PSI at inlet</span></div>
+          <div class="spec-item"><span class="spec-label">Max. water pressure</span><span class="spec-val">113 PSI</span></div>
+          <div class="spec-item"><span class="spec-label">Water temp range</span><span class="spec-val">50–100°F</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MAINTENANCE SCHEDULE -->
+  <section class="maint-section container">
+    <h2>Hoshizaki Maintenance Schedule — SoCal Standard</h2>
+    <p class="section-sub">The manufacturer's maintenance guidelines assume average water quality. In SoCal, we adjust intervals for local conditions.</p>
+    <div class="maint-grid">
+      {maintenanceSchedule.map(m => (
+        <div class="maint-card">
+          <div class="maint-interval">{m.interval}</div>
+          <ul class="maint-tasks">
+            {m.tasks.map(t => <li>{t}</li>)}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- RECENT REPAIRS -->
+  <section class="repairs-section container">
+    <h2>Recent Hoshizaki Service Calls</h2>
+    <div class="repairs-grid">
+      <div class="repair-card">
+        <h3>"KML-451MAH — E4 code, no ice, sushi bar Sawtelle"</h3>
+        <p class="repair-loc">📍 Sawtelle Japantown, Los Angeles</p>
+        <p>High-volume sushi bar, KML undercounter showing E4 (water supply fault). Inlet screen completely blocked by mineral scale — LA water in this part of West LA has run over 320 ppm for the past two years. Removed and cleaned inlet screen, cleaned and flushed water distribution nozzles, performed full descale with Hoshizaki Scale Away. Installed an inline pre-filter on the supply line. Machine back producing ice within 90 minutes. Set restaurant on quarterly maintenance contract — three KML units in the facility.</p>
+        <p class="repair-note"><em>E4 at a sushi bar: assume inlet screen first. Pre-filter installation prevents recurrence.</em></p>
+      </div>
+      <div class="repair-card">
+        <h3>"F-801MAH flaker — auger motor tripped, seafood market SGV"</h3>
+        <p class="repair-loc">📍 San Gabriel Valley seafood market</p>
+        <p>F series flaker for fresh seafood display, auger motor tripped on thermal overload. Root cause: auger shaft seal had been leaking for an estimated 4–6 weeks, allowing water to migrate into the gear assembly. Gear assembly had significant corrosion and the auger was intermittently binding. Replaced the auger shaft seal, cleaned and regreased the gear assembly, replaced the thermal protector, tested through 3 full production cycles. Briefed the manager on the early signs of seal failure — reduced flake quality and water under the unit. Machine running at full production.",
+        <p class="repair-note"><em>F series auger seal: replace at first sign of water under the unit. Seal failure → gear damage is the expensive sequence.</em></p>
+      </div>
+      <div class="repair-card">
+        <h3>"KM-901M — slow ice production, hotel bar Downtown LA"</h3>
+        <p class="repair-loc">📍 Downtown LA hotel, beverage service</p>
+        <p>Hotel bar running a KM-901M modular crescent cube machine reporting 40% reduction in ice output over two months. Classic scale accumulation: water distribution nozzles partially blocked, reducing water flow across the Steelheart evaporator during the freeze cycle. Extended freeze cycles were stressing the compressor. Performed full descale, cleaned all nozzles, verified harvest cycle timing — back to nameplate production. Also found the condenser air filter completely loaded with the grease-laden air common in hotel bar environments. Cleaned condenser coils and filter. Set property on bi-monthly filter cleaning as part of facility maintenance.</p>
+        <p class="repair-note"><em>Hotel bar ice machines: condenser filters load with grease rapidly. Monthly visual check, bi-monthly cleaning.</em></p>
+      </div>
+      <div class="repair-card">
+        <h3>"RTE-70 sushi case — not holding temp, health inspection pending"</h3>
+        <p class="repair-loc">📍 Sushi restaurant, South Bay</p>
+        <p>Called at 7am — health inspection scheduled for 2pm, sushi case not holding below 40°F. Door gasket had failed on the upper right hinge, allowing warm kitchen air infiltration. Also found the evaporator fan running at reduced speed from grease buildup on the fan blade. Replaced the NSF-rated door gasket with an OEM Hoshizaki part, cleaned the evaporator fan assembly, confirmed case holding 38°F within 45 minutes. Restaurant passed the afternoon inspection. A sushi case gasket failure is exactly the kind of thing a maintenance contract catches before the inspection call.</p>
+        <p class="repair-note"><em>Sushi case: NSF gasket inspection every 6 months. Never run a sushi display with a compromised door seal.</em></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="faq-section container">
+    <h2>Hoshizaki Commercial Service — FAQ</h2>
+    <div class="faq-list">
+      {faqItems.map(item => (
+        <details class="faq-item">
+          <summary class="faq-q">{item.q}</summary>
+          <p class="faq-a">{item.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- BOTTOM CTA -->
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>Hoshizaki Equipment Down? We Respond Today.</h2>
+      <p>Same-day emergency service throughout Los Angeles, Orange County, Ventura County, and the Inland Empire. EPA 608 certified. OEM parts. $120 commercial diagnostic applied to repair.</p>
+      <div class="cta-buttons">
+        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
+        <a href="/book" class="btn btn-outline btn-lg">Schedule Service</a>
+      </div>
+      <p class="cta-sub">Also servicing: True Refrigeration · Traulsen · Beverage-Air · Perlick · Delfield</p>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style>
+.brand-hero{background:var(--color-bg);padding:5rem 0 4rem;border-bottom:1px solid var(--color-border)}
+.hero-inner{display:grid;grid-template-columns:1fr auto;gap:4rem;align-items:center}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:.75rem}
+h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
+.brand-name{color:var(--color-accent)}
+.hero-sub{font-size:1.05rem;color:var(--color-text-muted);margin-bottom:2rem;max-width:52ch}
+.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.hero-trust{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.8rem;color:var(--color-text-muted)}
+.hero-badge{background:var(--color-surface);border:1px solid var(--color-border);border-radius:1rem;padding:2rem;min-width:200px;text-align:center}
+.badge-brand{font-size:1.1rem;font-weight:900;letter-spacing:.1em;color:var(--color-accent);margin-bottom:.25rem}
+.badge-line{font-size:.75rem;color:var(--color-text-muted);margin-bottom:1rem}
+.badge-specs{display:flex;flex-direction:column;gap:.5rem}
+.badge-specs span{background:var(--color-bg);border:1px solid var(--color-border);border-radius:.25rem;padding:.3rem .6rem;font-size:.8rem}
+.trust-bar{background:var(--color-accent);padding:1rem 0}
+.trust-bar-inner{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:.5rem;color:#fff;font-size:.875rem;font-weight:600}
+.intro-section{display:grid;grid-template-columns:1fr 300px;gap:4rem;padding-top:4rem;padding-bottom:4rem}
+.intro-content h2{font-size:1.6rem;margin-bottom:1.25rem}
+.intro-content p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
+.sticky-cta-box{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem;position:sticky;top:5rem;height:fit-content}
+.scb-brand{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--color-accent);margin-bottom:.25rem}
+.scb-phone{font-size:1.4rem;font-weight:800;margin-bottom:1.25rem}
+.btn-block{display:block;width:100%;text-align:center;margin-bottom:.75rem}
+.scb-list{list-style:none;padding:0;margin:1.25rem 0;font-size:.8rem}
+.scb-list li{padding:.3rem 0;border-bottom:1px solid var(--color-border);color:var(--color-text-body)}
+.scb-note{font-size:.75rem;color:var(--color-text-muted);margin-top:1rem;font-style:italic}
+.product-lines{padding:4rem 0}
+.product-lines h2{font-size:1.6rem;margin-bottom:2rem}
+.lines-grid{display:flex;flex-direction:column;gap:2rem}
+.line-card{display:grid;grid-template-columns:60px 1fr;gap:1.5rem;background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:2rem}
+.line-number{font-size:2.5rem;font-weight:900;color:var(--color-accent);opacity:.25;line-height:1}
+.line-body h3{font-size:1.1rem;margin-bottom:.4rem}
+.line-models{font-size:.8rem;color:var(--color-text-muted);margin-bottom:.75rem}
+.line-desc{font-size:.9rem;line-height:1.7;color:var(--color-text-body);margin-bottom:1rem}
+.failure-label{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--color-accent);margin-bottom:.5rem}
+.failure-list ul{list-style:none;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:.5rem}
+.failure-list li{font-size:.85rem;color:var(--color-text-body);padding-left:1rem;position:relative}
+.failure-list li::before{content:"→";position:absolute;left:0;color:var(--color-accent)}
+.error-section{background:var(--color-surface);padding:4rem 0;border-top:1px solid var(--color-border)}
+.section-sub{color:var(--color-text-muted);margin-bottom:2rem;max-width:60ch}
+.error-table{border:1px solid var(--color-border);border-radius:.5rem;overflow:hidden}
+.error-header,.error-row{display:grid;grid-template-columns:80px 1fr 1.5fr 1.5fr;gap:1rem;padding:.75rem 1.25rem}
+.error-header{background:var(--color-accent);color:#fff;font-size:.8rem;font-weight:700;text-transform:uppercase}
+.error-row{border-bottom:1px solid var(--color-border);font-size:.875rem}
+.error-row:last-child{border-bottom:none}
+.error-row:nth-child(even){background:var(--color-bg)}
+.error-code{font-weight:800;color:var(--color-accent);font-size:1rem}
+.error-note{margin-top:1rem;font-size:.875rem;color:var(--color-text-muted);padding:.75rem 1rem;background:var(--color-bg);border:1px solid var(--color-border);border-radius:.375rem}
+.industries-section{padding:4rem 0}
+.industries-section h2{font-size:1.6rem;margin-bottom:2rem}
+.industries-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
+.industry-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem}
+.industry-card h3{font-size:.95rem;margin-bottom:.75rem;color:var(--color-accent)}
+.industry-card p{font-size:.875rem;line-height:1.7;color:var(--color-text-body)}
+.hardwater-section{background:var(--color-surface);border-top:1px solid var(--color-border);padding:4rem 0}
+.hardwater-inner{display:grid;grid-template-columns:1fr 280px;gap:4rem;align-items:start}
+.hw-text h2{font-size:1.6rem;margin-bottom:1.25rem}
+.hw-text p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
+.hw-specs{background:var(--color-bg);border:1px solid var(--color-border);border-radius:.75rem;padding:1.5rem}
+.hw-specs h3{font-size:1rem;margin-bottom:1rem}
+.spec-grid{display:flex;flex-direction:column;gap:.5rem}
+.spec-item{display:flex;justify-content:space-between;font-size:.85rem;padding:.4rem 0;border-bottom:1px solid var(--color-border)}
+.spec-item:last-child{border-bottom:none}
+.spec-label{color:var(--color-text-muted)}
+.spec-val{font-weight:700}
+.maint-section{padding:4rem 0}
+.maint-section h2{font-size:1.6rem;margin-bottom:.75rem}
+.maint-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem}
+.maint-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem}
+.maint-interval{font-size:1.1rem;font-weight:800;color:var(--color-accent);margin-bottom:1rem;padding-bottom:.75rem;border-bottom:1px solid var(--color-border)}
+.maint-tasks{list-style:none;padding:0;display:flex;flex-direction:column;gap:.6rem}
+.maint-tasks li{font-size:.875rem;color:var(--color-text-body);padding-left:1.25rem;position:relative;line-height:1.5}
+.maint-tasks li::before{content:"✓";position:absolute;left:0;color:var(--color-accent);font-weight:700}
+.repairs-section{padding:4rem 0}
+.repairs-section h2{font-size:1.6rem;margin-bottom:2rem}
+.repairs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.repair-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem}
+.repair-card h3{font-size:.95rem;font-weight:700;margin-bottom:.5rem}
+.repair-loc{font-size:.8rem;color:var(--color-accent);margin-bottom:.75rem}
+.repair-card p{font-size:.875rem;line-height:1.7;color:var(--color-text-body);margin-bottom:.75rem}
+.repair-note{font-size:.825rem;color:var(--color-text-muted);border-top:1px solid var(--color-border);padding-top:.75rem}
+.faq-section{padding:4rem 0}
+.faq-section h2{font-size:1.6rem;margin-bottom:2rem}
+.faq-list{display:flex;flex-direction:column;gap:.75rem}
+.faq-item{border:1px solid var(--color-border);border-radius:.5rem;background:var(--color-surface)}
+.faq-q{padding:1.25rem 1.5rem;font-weight:600;cursor:pointer;list-style:none}
+.faq-a{padding:0 1.5rem 1.25rem;font-size:.9rem;line-height:1.7;color:var(--color-text-body)}
+.bottom-cta{background:var(--color-accent);padding:4rem 0;text-align:center}
+.bottom-cta h2{font-size:1.75rem;margin-bottom:.75rem;color:#fff}
+.bottom-cta>div>p{color:rgba(255,255,255,.85);margin-bottom:2rem}
+.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem}
+.cta-sub{font-size:.8rem;color:rgba(255,255,255,.7)}
+@media(max-width:1024px){.hero-inner{grid-template-columns:1fr}.hero-badge{display:none}.intro-section{grid-template-columns:1fr}.sticky-cta-box{position:static}.hardwater-inner{grid-template-columns:1fr}.industries-grid{grid-template-columns:1fr 1fr}.maint-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.error-header,.error-row{grid-template-columns:60px 1fr}.error-cause,.error-action{display:none}.failure-list ul{grid-template-columns:1fr}.industries-grid,.maint-grid{grid-template-columns:1fr}.repairs-grid{grid-template-columns:1fr}.line-card{grid-template-columns:1fr}}
+</style>

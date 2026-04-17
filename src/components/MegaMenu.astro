@@ -1,149 +1,118 @@
 ---
 /**
- * MegaMenu — Desktop hover dropdowns + Mobile accordion.
- * 4 top-level items: Services | Commercial | Brands | Service Areas.
- * Each opens a column-based dropdown on desktop, stacks on mobile.
+ * MegaMenu — dynamic navigation.
+ * Scans src/pages/* via import.meta.glob and builds dropdown lists.
+ * Labels derived from file slug (dishwasher-repair → "Dishwasher Repair").
  */
 
+const ACRONYMS = new Set([
+  'bbb', 'oem', 'epa', 'osha', 'bbq', 'cslb', 'hvac', 'ac', 'la', 'ca', 'cma', 'ge', 'lg', 'sks', 'zline',
+]);
+
+function pathToSlug(path: string): string {
+  return (path.split('/').pop() ?? '').replace(/\.astro$/, '');
+}
+
+function slugToLabel(slug: string): string {
+  return slug.split('-').map((w) =>
+    ACRONYMS.has(w.toLowerCase())
+      ? w.toUpperCase()
+      : w.charAt(0).toUpperCase() + w.slice(1)
+  ).join(' ');
+}
+
+function toLinks(glob: Record<string, unknown>, hrefPrefix: string) {
+  return Object.keys(glob)
+    .map(pathToSlug)
+    .filter((slug) => slug !== 'index')
+    .sort()
+    .map((slug) => ({
+      label: slugToLabel(slug),
+      href: `${hrefPrefix}${slug}/`,
+    }));
+}
+
+const services    = toLinks(import.meta.glob('../pages/services/*.astro'),    '/services/');
+const commercial  = toLinks(import.meta.glob('../pages/commercial/*.astro'),  '/commercial/');
+const credentials = toLinks(import.meta.glob('../pages/credentials/*.astro'), '/credentials/');
+const forBusiness = toLinks(import.meta.glob('../pages/for-business/*.astro'),'/for-business/');
+const priceList   = toLinks(import.meta.glob('../pages/price-list/*.astro'),  '/price-list/');
+
+// Root pages: split into cities and county hubs
+const rootSlugs = Object.keys(import.meta.glob('../pages/*.astro'))
+  .map(pathToSlug)
+  .filter((slug) => slug !== 'index')
+  .sort();
+
+const counties = rootSlugs
+  .filter((s) => s.endsWith('-county'))
+  .map((slug) => ({ label: slugToLabel(slug), href: `/${slug}/` }));
+
+const citiesAll = rootSlugs
+  .filter((s) => !s.endsWith('-county'))
+  .map((slug) => ({ label: slugToLabel(slug), href: `/${slug}/` }));
+
+// Top 15 cities for dropdown (alphabetical first 15)
+const citiesTop = citiesAll.slice(0, 15);
+
+// Price list split by "commercial-" prefix → two columns
+const priceCommercial  = priceList.filter((l) => l.label.startsWith('Commercial'));
+const priceResidential = priceList.filter((l) => !l.label.startsWith('Commercial'));
+
+// Final menu structure
 const menu = [
+  { label: 'Home', href: '/' },
   {
     label: 'Services',
     href: '/services/',
     columns: [
-      {
-        title: 'Kitchen',
-        links: [
-          { label: 'Refrigerator Repair', href: '/services/refrigerator-repair/' },
-          { label: 'Oven & Range Repair', href: '/services/oven-repair/' },
-          { label: 'Dishwasher Repair', href: '/services/dishwasher-repair/' },
-          { label: 'Microwave Repair', href: '/services/microwave-repair/' },
-          { label: 'Ice Maker Repair', href: '/services/ice-maker-repair/' },
-        ],
-      },
-      {
-        title: 'Laundry',
-        links: [
-          { label: 'Washer Repair', href: '/services/washer-repair/' },
-          { label: 'Dryer Repair', href: '/services/dryer-repair/' },
-          { label: 'Washer & Dryer Combo', href: '/services/washer-dryer-repair/' },
-          { label: 'Dryer Vent Cleaning', href: '/services/dryer-vent-cleaning/' },
-        ],
-      },
-      {
-        title: 'HVAC',
-        links: [
-          { label: 'HVAC Repair', href: '/services/hvac-repair/' },
-          { label: 'AC Repair', href: '/services/ac-repair/' },
-          { label: 'Heating Repair', href: '/services/heating-repair/' },
-          { label: 'All Services →', href: '/services/' },
-        ],
-      },
+      { title: 'All Appliance Services', links: services },
     ],
   },
   {
     label: 'Commercial',
     href: '/commercial/',
     columns: [
-      {
-        title: 'Kitchen Equipment',
-        links: [
-          { label: 'Commercial Ovens', href: '/commercial/oven-repair/' },
-          { label: 'Commercial Ranges', href: '/commercial/range-repair/' },
-          { label: 'Commercial Fryers', href: '/commercial/fryer-repair/' },
-          { label: 'Pizza Ovens', href: '/commercial/pizza-oven-repair/' },
-          { label: 'Dishwashers', href: '/commercial/dishwasher-repair/' },
-        ],
-      },
-      {
-        title: 'Refrigeration',
-        links: [
-          { label: 'Walk-in Coolers', href: '/commercial/walk-in-cooler-repair/' },
-          { label: 'Walk-in Freezers', href: '/commercial/walk-in-freezer-repair/' },
-          { label: 'Reach-in Refrigerators', href: '/commercial/reach-in-repair/' },
-          { label: 'Ice Machines', href: '/commercial/ice-machine-repair/' },
-        ],
-      },
-      {
-        title: 'Laundry & More',
-        links: [
-          { label: 'Commercial Washers', href: '/commercial/washer-repair/' },
-          { label: 'Commercial Dryers', href: '/commercial/dryer-repair/' },
-          { label: 'For Property Managers', href: '/for-business/property-managers/' },
-          { label: 'All Commercial →', href: '/commercial/' },
-        ],
-      },
+      { title: 'Commercial Equipment', links: commercial },
     ],
   },
   {
     label: 'Brands',
     href: '/brands/',
     columns: [
-      {
-        title: 'Luxury',
-        links: [
-          { label: 'Sub-Zero', href: '/brands/sub-zero/' },
-          { label: 'Wolf', href: '/brands/wolf/' },
-          { label: 'Viking', href: '/brands/viking/' },
-          { label: 'Miele', href: '/brands/miele/' },
-          { label: 'Thermador', href: '/brands/thermador/' },
-        ],
-      },
-      {
-        title: 'Premium',
-        links: [
-          { label: 'Bosch', href: '/brands/bosch/' },
-          { label: 'KitchenAid', href: '/brands/kitchenaid/' },
-          { label: 'GE Monogram', href: '/brands/ge-monogram/' },
-          { label: 'JennAir', href: '/brands/jennair/' },
-          { label: 'Dacor', href: '/brands/dacor/' },
-        ],
-      },
-      {
-        title: 'Standard',
-        links: [
-          { label: 'LG', href: '/brands/lg/' },
-          { label: 'Samsung', href: '/brands/samsung/' },
-          { label: 'Whirlpool', href: '/brands/whirlpool/' },
-          { label: 'GE', href: '/brands/ge/' },
-          { label: 'All Brands →', href: '/brands/' },
-        ],
+      { title: 'Brand Pages',
+        links: [{ label: 'All brand pages (coming soon)', href: '/brands/' }],
       },
     ],
   },
   {
-    label: 'Service Areas',
-    href: '/service-areas/',
+    label: 'For Business',
+    href: '/for-business/',
     columns: [
-      {
-        title: 'Los Angeles County',
-        links: [
-          { label: 'West Hollywood', href: '/west-hollywood/' },
-          { label: 'Beverly Hills', href: '/beverly-hills/' },
-          { label: 'Santa Monica', href: '/santa-monica/' },
-          { label: 'Pasadena', href: '/pasadena/' },
-          { label: 'All LA County →', href: '/los-angeles-county/' },
-        ],
-      },
-      {
-        title: 'Orange County',
-        links: [
-          { label: 'Irvine', href: '/irvine/' },
-          { label: 'Newport Beach', href: '/newport-beach/' },
-          { label: 'Huntington Beach', href: '/huntington-beach/' },
-          { label: 'Anaheim', href: '/anaheim/' },
-          { label: 'All OC →', href: '/orange-county/' },
-        ],
-      },
-      {
-        title: 'Ventura County',
-        links: [
-          { label: 'Thousand Oaks', href: '/thousand-oaks/' },
-          { label: 'Oxnard', href: '/oxnard/' },
-          { label: 'Ventura', href: '/ventura/' },
-          { label: 'Simi Valley', href: '/simi-valley/' },
-          { label: 'All Ventura →', href: '/ventura-county/' },
-        ],
-      },
+      { title: 'Industries', links: forBusiness },
+    ],
+  },
+  {
+    label: 'Price List',
+    href: '/price-list/',
+    columns: [
+      { title: 'Residential', links: priceResidential },
+      { title: 'Commercial',  links: priceCommercial  },
+    ],
+  },
+  {
+    label: 'Areas',
+    href: '/areas/',
+    columns: [
+      { title: 'County Hubs', links: counties },
+      { title: 'Featured Cities', links: citiesTop },
+    ],
+  },
+  {
+    label: 'About',
+    href: '/credentials/',
+    columns: [
+      { title: 'Credentials & Trust', links: credentials },
     ],
   },
 ];
@@ -155,24 +124,28 @@ const menu = [
       <li class="mega-menu-item">
         <a href={item.href} class="mega-menu-trigger">
           {item.label}
-          <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
+          {item.columns && (
+            <svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          )}
         </a>
-        <div class="mega-menu-dropdown">
-          <div class="mega-menu-dropdown-inner">
-            {item.columns.map((col) => (
-              <div class="mega-menu-column">
-                <h4>{col.title}</h4>
-                <ul>
-                  {col.links.map((link) => (
-                    <li><a href={link.href}>{link.label}</a></li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+        {item.columns && (
+          <div class="mega-menu-dropdown">
+            <div class="mega-menu-dropdown-inner" data-cols={item.columns.length}>
+              {item.columns.map((col) => (
+                <div class="mega-menu-column">
+                  <h4>{col.title}</h4>
+                  <ul>
+                    {col.links.map((link) => (
+                      <li><a href={link.href}>{link.label}</a></li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </li>
     ))}
   </ul>
@@ -188,7 +161,7 @@ const menu = [
   .mega-menu-list {
     display: flex;
     list-style: none;
-    gap: 4px;
+    gap: 2px;
     margin: 0;
     padding: 0;
   }
@@ -200,10 +173,10 @@ const menu = [
   .mega-menu-trigger {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 10px 16px;
+    gap: 5px;
+    padding: 10px 13px;
     font-family: var(--font-body);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     color: var(--text);
     text-decoration: none;
@@ -228,7 +201,6 @@ const menu = [
     top: 100%;
     left: 50%;
     transform: translateX(-50%) translateY(8px);
-    min-width: 680px;
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 6px;
@@ -248,10 +220,12 @@ const menu = [
 
   .mega-menu-dropdown-inner {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
     gap: 32px;
-    padding: 28px 32px;
+    padding: 24px 28px;
   }
+  .mega-menu-dropdown-inner[data-cols="1"] { grid-template-columns: 1fr; min-width: 320px; }
+  .mega-menu-dropdown-inner[data-cols="2"] { grid-template-columns: 1fr 1fr; min-width: 560px; }
+  .mega-menu-dropdown-inner[data-cols="3"] { grid-template-columns: repeat(3, 1fr); min-width: 720px; }
 
   .mega-menu-column h4 {
     font-family: var(--font-body);
@@ -269,7 +243,11 @@ const menu = [
     list-style: none;
     padding: 0;
     margin: 0;
+    max-height: 460px;
+    overflow-y: auto;
   }
+  .mega-menu-column ul::-webkit-scrollbar { width: 4px; }
+  .mega-menu-column ul::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
   .mega-menu-column li {
     margin-bottom: 2px;
@@ -277,8 +255,8 @@ const menu = [
 
   .mega-menu-column a {
     display: block;
-    padding: 6px 0;
-    font-size: 14px;
+    padding: 5px 0;
+    font-size: 13.5px;
     font-weight: 500;
     color: var(--text);
     text-decoration: none;
@@ -336,12 +314,17 @@ const menu = [
     .mega-menu-item:hover .mega-menu-dropdown,
     .mega-menu-item:focus-within .mega-menu-dropdown {
       transform: none;
-      max-height: 2000px;
+      max-height: 4000px;
     }
-    .mega-menu-dropdown-inner {
+    .mega-menu-dropdown-inner,
+    .mega-menu-dropdown-inner[data-cols="1"],
+    .mega-menu-dropdown-inner[data-cols="2"],
+    .mega-menu-dropdown-inner[data-cols="3"] {
       grid-template-columns: 1fr;
       gap: 20px;
       padding: 0 0 20px;
+      min-width: 0;
     }
+    .mega-menu-column ul { max-height: none; }
   }
 </style>
