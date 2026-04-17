@@ -13,4 +13,7 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'hover',
   },
+  redirects: {
+    '/brand-thermador-appliance-repair/': '/brands/thermador/',
+  },
 });
