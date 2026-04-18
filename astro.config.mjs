@@ -16,5 +16,7 @@ export default defineConfig({
   redirects: {
     '/brand-thermador-appliance-repair/': '/brands/thermador/',
     '/brands/thermador-wall-oven-repair/': '/brands/thermador-oven-repair/',
+    '/brand-subzero-appliance-repair/': '/brands/sub-zero/',
+    '/sub-zero-freezer-repair-los-angeles/': '/brands/sub-zero-refrigerator-repair/',
   },
 });
