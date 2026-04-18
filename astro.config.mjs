@@ -15,5 +15,6 @@ export default defineConfig({
   },
   redirects: {
     '/brand-thermador-appliance-repair/': '/brands/thermador/',
+    '/brands/thermador-wall-oven-repair/': '/brands/thermador-oven-repair/',
   },
 });
