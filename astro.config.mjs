@@ -19,5 +19,13 @@ export default defineConfig({
     '/brand-subzero-appliance-repair/': '/brands/sub-zero/',
     '/sub-zero-freezer-repair-los-angeles/': '/brands/sub-zero-refrigerator-repair/',
     '/miele-stove-repair-los-angeles/': '/brands/miele/',
+
+    // Viking cluster — канонизация URL structure + kill matrix cannibalization
+    '/brands/viking-repair/': '/brands/viking/',
+    '/brands/viking/viking-refrigerator-repair/': '/brands/viking-refrigerator-repair/',
+    '/brands/viking/viking-range-repair/': '/brands/viking-range-repair/',
+    '/brands/viking/viking-bbq-grill-repair/': '/brands/viking-bbq-grill-repair/',
+    '/brands/viking/viking-oven-repair/': '/brands/viking-oven-repair/',
+    '/brands/viking/viking-cooktop-repair/': '/brands/viking-cooktop-repair/',
   },
 });
