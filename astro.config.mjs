@@ -18,5 +18,6 @@ export default defineConfig({
     '/brands/thermador-wall-oven-repair/': '/brands/thermador-oven-repair/',
     '/brand-subzero-appliance-repair/': '/brands/sub-zero/',
     '/sub-zero-freezer-repair-los-angeles/': '/brands/sub-zero-refrigerator-repair/',
+    '/miele-stove-repair-los-angeles/': '/brands/miele/',
   },
 });
