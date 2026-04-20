@@ -38,7 +38,12 @@ const services    = toLinks(import.meta.glob('../pages/services/*.astro'),    '/
 const commercial  = toLinks(import.meta.glob('../pages/commercial/*.astro'),  '/commercial/');
 const credentials = toLinks(import.meta.glob('../pages/credentials/*.astro'), '/credentials/');
 const forBusiness = toLinks(import.meta.glob('../pages/for-business/*.astro'),'/for-business/');
-const priceList   = toLinks(import.meta.glob('../pages/price-list/*.astro'),  '/price-list/');
+// Slugs intentionally excluded from megamenu nav — pages stay live and are
+// reached via internal links from their parent price-list page.
+// Door spring is a sub-variant of /price-list/dishwasher-repair-cost/, not a peer.
+const PRICE_LIST_EXCLUDE_FROM_NAV = new Set(['/price-list/dishwasher-door-spring-repair-cost/']);
+const priceList   = toLinks(import.meta.glob('../pages/price-list/*.astro'),  '/price-list/')
+  .filter((l) => !PRICE_LIST_EXCLUDE_FROM_NAV.has(l.href));
 
 // Root pages: which city slugs actually have .astro files?
 const existingSlugs = new Set(
