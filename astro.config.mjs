@@ -92,6 +92,13 @@ export default defineConfig({
     // missed. Lincoln + Bakers Pride + Peerless already covered in C07 section above.)
     '/middleby-marshall-conveyor-ovens-repair/': '/brands/middleby-marshall-pizza-oven-repair/',
 
+    // Cluster 03 Commercial Ice Machines (1 — Scotsman mislocation fix from
+    // legacy WP Service 1 Dishwasher category. Scotsman has no dishwasher line;
+    // legacy URL was a wrong-category mislocation. Activated with C03 writer
+    // deployment per wiki/decisions/legacy-migration-301-manifest.md.
+    // Target verified deployed: /brands/scotsman-ice-machine-repair/.)
+    '/scotsman-dishwasher-repair/': '/brands/scotsman-ice-machine-repair/',
+
     // ====================================================================
     // Residential cluster 301s — Cluster 07 Stove Tier 1 legacy equity
     // Source: wiki/page-plans/residential/07-stove.md §3.7 Legacy Preservation
@@ -106,8 +113,6 @@ export default defineConfig({
     '/maytag-stove-repair-los-angeles/': '/brands/maytag-stove-repair/',
 
     // NOTE: Deferred items (NOT added this commit):
-    // - /scotsman-dishwasher-repair/ → /brands/scotsman-ice-machine-repair/
-    //   (C03 target combo not yet deployed; activate when C03 writer ships)
     // - /fagor-washing-machine-repair/ → target TBD
     //   (C10 Commercial Laundry deferral per C05 Decision 15; activate with C10 writer)
     // - /beko-dishwasher-repair/ + /smeg-dishwasher-repair/ → residential track
