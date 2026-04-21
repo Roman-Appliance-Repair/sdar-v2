@@ -92,6 +92,19 @@ export default defineConfig({
     // missed. Lincoln + Bakers Pride + Peerless already covered in C07 section above.)
     '/middleby-marshall-conveyor-ovens-repair/': '/brands/middleby-marshall-pizza-oven-repair/',
 
+    // ====================================================================
+    // Residential cluster 301s — Cluster 07 Stove Tier 1 legacy equity
+    // Source: wiki/page-plans/residential/07-stove.md §3.7 Legacy Preservation
+    // Legacy URLs probed 2026-04-21; all verified live at origin domain.
+    // ====================================================================
+
+    // Cluster 07 Residential Stove Tier 1 (5 — Wolf from prior Tier 1 partial 09d3bbb + 4 mass-market this commit)
+    '/wolf-stove-repair-los-angeles/': '/brands/wolf-stove-repair/',
+    '/lg-stove-repair-los-angeles/': '/brands/lg-stove-repair/',
+    '/samsung-stove-repair-los-angeles/': '/brands/samsung-stove-repair/',
+    '/whirlpool-stove-repair-los-angeles/': '/brands/whirlpool-stove-repair/',
+    '/maytag-stove-repair-los-angeles/': '/brands/maytag-stove-repair/',
+
     // NOTE: Deferred items (NOT added this commit):
     // - /scotsman-dishwasher-repair/ → /brands/scotsman-ice-machine-repair/
     //   (C03 target combo not yet deployed; activate when C03 writer ships)
