@@ -1,0 +1,377 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { branches } from '../data/branches.ts';
+
+const title = 'Contact Us — 5 Branches Across LA, OC & Ventura | Same Day Appliance Repair';
+const description = 'Call, email, or message our 5 Southern California branches. Licensed C-20 appliance techs, same-day visits, $89 diagnostic waived with repair. Answered 24/7.';
+const canonical = 'https://samedayappliance.repair/contact/';
+
+const mailingAddress = '6230 Wilshire Blvd Ste A PMB 2267, Los Angeles, CA 90048';
+const mainPhone = '(424) 325-0520';
+const mainPhoneTel = '+14243250520';
+const generalEmail = 'support@samedayappliance.repair';
+
+const contactPageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'Contact Same Day Appliance Repair',
+  url: canonical,
+  description,
+  inLanguage: 'en-US',
+  isPartOf: {
+    '@type': 'WebSite',
+    name: 'Same Day Appliance Repair',
+    url: 'https://samedayappliance.repair/',
+  },
+};
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': 'https://samedayappliance.repair/#business',
+  name: 'Same Day Appliance Repair',
+  legalName: 'HVAC 777 LLC',
+  alternateName: 'SDAR',
+  url: 'https://samedayappliance.repair/',
+  telephone: mainPhone,
+  email: generalEmail,
+  priceRange: '$89 diagnostic · OEM parts · 90-day warranty',
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: '6230 Wilshire Blvd Ste A PMB 2267',
+    addressLocality: 'Los Angeles',
+    addressRegion: 'CA',
+    postalCode: '90048',
+    addressCountry: 'US',
+  },
+  geo: { '@type': 'GeoCoordinates', latitude: 34.0619, longitude: -118.3692 },
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' },
+  ],
+  aggregateRating: { '@type': 'AggregateRating', ratingValue: '4.6', reviewCount: '37' },
+  hasCredential: [
+    { '@type': 'EducationalOccupationalCredential', credentialCategory: 'CSLB C-20 License #1138898' },
+    { '@type': 'EducationalOccupationalCredential', credentialCategory: 'BHGS Registration #A49573' },
+    { '@type': 'EducationalOccupationalCredential', credentialCategory: 'EPA 608 Certified' },
+  ],
+  location: branches.map((b) => ({
+    '@type': 'LocalBusiness',
+    name: b.fullName,
+    telephone: b.phone,
+    email: b.email,
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: b.address.street,
+      addressLocality: b.address.city,
+      addressRegion: b.address.state,
+      postalCode: b.address.zip,
+      addressCountry: 'US',
+    },
+    openingHours: b.hours.schema,
+    areaServed: b.zones.map((z) => ({ '@type': 'City', name: z })),
+  })),
+};
+
+const breadcrumbSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://samedayappliance.repair/' },
+    { '@type': 'ListItem', position: 2, name: 'Contact', item: canonical },
+  ],
+};
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(contactPageSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </Fragment>
+
+  <section class="contact-hero">
+    <div class="container">
+      <p class="eyebrow">Contact · 5 Branches</p>
+      <h1>Talk to a technician, not a call center.</h1>
+      <p class="lede">
+        We pick up the phone. Our dispatcher routes your call to the nearest branch — West Hollywood,
+        Los Angeles, Pasadena, Thousand Oaks, or Irvine — so a tech with the right parts and the
+        right drive time is on the way.
+      </p>
+      <div class="hero-ctas">
+        <a href={`tel:${mainPhoneTel}`} class="btn-primary">Call {mainPhone}</a>
+        <a href="#branches" class="btn-ghost">See all 5 branches →</a>
+      </div>
+      <p class="hero-micro">
+        $89 diagnostic — waived when you proceed with the repair. OEM parts. 90-day labor warranty.
+        Phones answered 24/7, techs dispatched Mon–Sat 8 AM – 8 PM.
+      </p>
+    </div>
+  </section>
+
+  <section class="branches" id="branches">
+    <div class="container">
+      <h2>Five branches across Southern California</h2>
+      <p class="section-intro">
+        Each branch has its own dispatch, its own parts inventory, and its own service area.
+        Call the branch closest to you for the fastest arrival window.
+      </p>
+
+      <div class="branch-grid">
+        {branches.map((b) => (
+          <article class="branch-card">
+            <header class="branch-head">
+              <h3>{b.name}</h3>
+              {b.gmb.status === 'active' ? (
+                <span class="badge">GMB verified</span>
+              ) : (
+                <span class="badge pending">GMB pending</span>
+              )}
+            </header>
+
+            <a href={`tel:${b.phoneRaw}`} class="branch-phone">{b.phone}</a>
+            <a href={`mailto:${b.email}`} class="branch-email">{b.email}</a>
+
+            <address>
+              {b.address.street}<br />
+              {b.address.city}, {b.address.state} {b.address.zip}
+            </address>
+
+            <dl class="branch-hours">
+              <dt>{b.hours.weekdays}</dt><dd>{b.hours.weekdayHours}</dd>
+              <dt>{b.hours.saturday}</dt><dd>{b.hours.saturdayHours}</dd>
+              <dt>{b.hours.sunday}</dt><dd>{b.hours.sundayHours}</dd>
+            </dl>
+
+            <div class="branch-zones">
+              <h4>Service area</h4>
+              <p>{b.zones.join(' · ')}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-methods">
+    <div class="container">
+      <div class="method-grid">
+        <div class="method">
+          <h3>Phone — fastest</h3>
+          <p>
+            Calling gets you a live dispatcher. We ask the make/model, the symptom, and your zip —
+            then we book you into the earliest slot the right tech has open.
+          </p>
+          <a href={`tel:${mainPhoneTel}`} class="btn-primary">{mainPhone}</a>
+        </div>
+
+        <div class="method">
+          <h3>Book online</h3>
+          <p>
+            Prefer to type it out? Our booking form collects the same info and hands it to dispatch.
+            We'll call you back within 30 minutes during business hours.
+          </p>
+          <a href="/book/" class="btn-ghost">Go to /book/ →</a>
+        </div>
+
+        <div class="method">
+          <h3>Email for non-urgent</h3>
+          <p>
+            Quotes, invoice questions, warranty claims, commercial bids — email lands in the
+            office queue. Expect a reply inside one business day.
+          </p>
+          <a href={`mailto:${generalEmail}`} class="branch-email">{generalEmail}</a>
+        </div>
+
+        <div class="method">
+          <h3>Property managers & businesses</h3>
+          <p>
+            Multi-unit, restaurant, hotel, and Airbnb accounts get a named account manager and
+            net-30 invoicing after the first visit. Ask for commercial when you call.
+          </p>
+          <a href="/for-business/" class="btn-ghost">For Business →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-form-section">
+    <div class="container form-container">
+      <h2>Message us</h2>
+      <p class="section-intro">
+        For non-urgent requests. If your fridge is warming up or your oven won't heat, call the
+        branch phone above — we'll get a tech to you the same day.
+      </p>
+
+      <form class="contact-form" action={`mailto:${generalEmail}`} method="post" enctype="text/plain">
+        <div class="form-row">
+          <label>
+            <span>Your name</span>
+            <input type="text" name="name" required autocomplete="name" />
+          </label>
+          <label>
+            <span>Phone</span>
+            <input type="tel" name="phone" required autocomplete="tel" />
+          </label>
+        </div>
+
+        <div class="form-row">
+          <label>
+            <span>Email</span>
+            <input type="email" name="email" required autocomplete="email" />
+          </label>
+          <label>
+            <span>Zip code</span>
+            <input type="text" name="zip" pattern="[0-9]{5}" autocomplete="postal-code" />
+          </label>
+        </div>
+
+        <label class="full">
+          <span>Appliance &amp; brand</span>
+          <input type="text" name="appliance" placeholder="e.g. Sub-Zero 648 PRO refrigerator" />
+        </label>
+
+        <label class="full">
+          <span>Describe the problem</span>
+          <textarea name="message" rows="5" required></textarea>
+        </label>
+
+        <button type="submit" class="btn-primary submit">Send message</button>
+        <p class="form-note">
+          This form opens your email client with the info pre-filled. For faster dispatch, call
+          <a href={`tel:${mainPhoneTel}`}>{mainPhone}</a>.
+        </p>
+      </form>
+    </div>
+  </section>
+
+  <section class="business-info">
+    <div class="container">
+      <div class="biz-grid">
+        <div>
+          <h3>Legal &amp; mailing</h3>
+          <p>
+            <strong>HVAC 777 LLC</strong><br />
+            DBA Same Day Appliance Repair<br />
+            {mailingAddress}
+          </p>
+          <p class="biz-note">
+            This is our mailing and legal address. Service is dispatched from the five branches
+            above — we don't ask you to drop appliances off at the mailing address.
+          </p>
+        </div>
+
+        <div>
+          <h3>Credentials</h3>
+          <ul class="cred-list">
+            <li><strong>CSLB C-20</strong> License #1138898</li>
+            <li><strong>BHGS</strong> Registration #A49573</li>
+            <li><strong>EPA 608</strong> Refrigerant Certified</li>
+            <li><strong>BBB A+</strong> Accredited Business</li>
+            <li><strong>Fully insured</strong> — general liability + workers' comp</li>
+          </ul>
+          <p><a href="/credentials/">All credentials →</a></p>
+        </div>
+
+        <div>
+          <h3>What happens after you call</h3>
+          <ol class="flow-list">
+            <li>Dispatcher confirms appliance, symptom, address.</li>
+            <li>You get a 2-hour arrival window by text.</li>
+            <li>Tech arrives, runs the $89 diagnostic, writes a flat repair quote.</li>
+            <li>Approve it — diagnostic is waived and the repair gets a 90-day warranty.</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .contact-hero { padding: 80px 0 64px; background: var(--gray); border-bottom: 1px solid var(--border); }
+  .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--red); margin-bottom: 16px; }
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; margin: 0 0 20px; max-width: 820px; }
+  .lede { max-width: 720px; font-size: 18px; line-height: 1.65; color: var(--muted); margin-bottom: 28px; }
+  .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+  .hero-micro { font-size: 14px; color: var(--muted); max-width: 720px; }
+
+  .btn-primary {
+    display: inline-block; padding: 12px 22px; background: var(--red); color: var(--white);
+    font-weight: 600; border-radius: 4px; text-decoration: none; transition: background 0.2s var(--ease);
+  }
+  .btn-primary:hover { background: var(--red-dark, #8a0d20); color: var(--white); }
+  .btn-ghost {
+    display: inline-block; padding: 12px 22px; background: transparent; color: var(--black);
+    font-weight: 600; border: 1px solid var(--border); border-radius: 4px; text-decoration: none;
+  }
+  .btn-ghost:hover { border-color: var(--black); }
+
+  .branches { padding: 72px 0; }
+  h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin: 0 0 14px; }
+  .section-intro { color: var(--muted); max-width: 720px; margin-bottom: 36px; font-size: 16px; line-height: 1.6; }
+  .branch-grid {
+    display: grid; gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+  .branch-card {
+    padding: 24px; border: 1px solid var(--border); border-radius: 6px; background: var(--white);
+  }
+  .branch-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .branch-head h3 { font-size: 20px; margin: 0; font-family: var(--font-body); font-weight: 600; }
+  .badge {
+    font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 4px 8px; border-radius: 3px; background: rgba(16, 128, 64, 0.1); color: #0b7a3d;
+  }
+  .badge.pending { background: rgba(200, 140, 0, 0.12); color: #8a6500; }
+  .branch-phone {
+    display: block; font-family: var(--font-display); font-size: 22px; font-weight: 700;
+    color: var(--black); text-decoration: none; margin-bottom: 6px;
+  }
+  .branch-phone:hover { color: var(--red); }
+  .branch-email { display: block; color: var(--muted); font-size: 14px; margin-bottom: 14px; text-decoration: none; }
+  .branch-email:hover { color: var(--red); }
+  address { font-style: normal; font-size: 14px; line-height: 1.6; color: var(--text); margin-bottom: 14px; }
+  .branch-hours { display: grid; grid-template-columns: auto 1fr; gap: 2px 12px; font-size: 13px; margin: 0 0 14px; }
+  .branch-hours dt { color: var(--muted); font-weight: 500; }
+  .branch-hours dd { margin: 0; color: var(--text); }
+  .branch-zones h4 { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin: 0 0 6px; }
+  .branch-zones p { font-size: 13px; line-height: 1.55; color: var(--muted); margin: 0; }
+
+  .contact-methods { padding: 56px 0; background: var(--gray); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .method-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .method { background: var(--white); padding: 24px; border: 1px solid var(--border); border-radius: 6px; }
+  .method h3 { font-size: 17px; margin: 0 0 10px; font-family: var(--font-body); font-weight: 600; }
+  .method p { font-size: 14px; line-height: 1.65; color: var(--muted); margin-bottom: 14px; }
+
+  .contact-form-section { padding: 72px 0; }
+  .form-container { max-width: 780px; }
+  .contact-form { margin-top: 32px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--text); }
+  label.full { display: block; margin-bottom: 14px; }
+  label span { display: block; margin-bottom: 6px; }
+  input, textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px;
+    font-family: inherit; font-size: 14px; background: var(--white); color: var(--text);
+  }
+  input:focus, textarea:focus { outline: 2px solid var(--red); outline-offset: 1px; border-color: var(--red); }
+  .submit { margin-top: 8px; cursor: pointer; border: none; font-family: inherit; font-size: 15px; }
+  .form-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .form-note a { color: var(--red); }
+
+  .business-info { padding: 56px 0 96px; border-top: 1px solid var(--border); }
+  .biz-grid { display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .biz-grid h3 { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--red); margin: 0 0 14px; }
+  .biz-grid p { font-size: 14px; line-height: 1.65; color: var(--text); margin-bottom: 10px; }
+  .biz-note { color: var(--muted); font-size: 13px; }
+  .cred-list, .flow-list { padding: 0 0 0 18px; margin: 0 0 12px; }
+  .cred-list { list-style: none; padding: 0; }
+  .cred-list li { font-size: 14px; line-height: 1.7; color: var(--text); }
+  .cred-list strong { color: var(--black); }
+  .flow-list li { font-size: 14px; line-height: 1.6; margin-bottom: 8px; color: var(--text); }
+</style>
