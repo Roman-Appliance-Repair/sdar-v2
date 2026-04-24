@@ -111,6 +111,8 @@ export default defineConfig({
     '/samsung-stove-repair-los-angeles/': '/brands/samsung-stove-repair/',
     '/whirlpool-stove-repair-los-angeles/': '/brands/whirlpool-stove-repair/',
     '/maytag-stove-repair-los-angeles/': '/brands/maytag-stove-repair/',
+    // Cluster 17 Residential BBQ Grill (1 — service-hub rename)
+    '/services/bbq-grill-repair-los-angeles/': '/services/bbq-grill-repair/',
 
     // NOTE: Deferred items (NOT added this commit):
     // - /fagor-washing-machine-repair/ → target TBD
