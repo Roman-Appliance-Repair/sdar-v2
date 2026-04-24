@@ -115,6 +115,10 @@ export default defineConfig({
     '/services/bbq-grill-repair-los-angeles/': '/services/bbq-grill-repair/',
     // Cluster 18 Residential Range Hood (1 — service-hub rename)
     '/services/range-hood-repair-los-angeles/': '/services/range-hood-repair/',
+    // Cluster 15 Residential Wine Cooler + Wine Cellar (2 — DUAL service-hub rename
+    // pattern, first instance project-wide; 8th + 9th service-hub-rename 301s)
+    '/services/wine-cooler-repair-los-angeles/': '/services/wine-cooler-repair/',
+    '/services/wine-cellar-repair-los-angeles/': '/services/wine-cellar-repair/',
 
     // NOTE: Deferred items (NOT added this commit):
     // - /fagor-washing-machine-repair/ → target TBD
