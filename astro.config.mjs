@@ -113,6 +113,8 @@ export default defineConfig({
     '/maytag-stove-repair-los-angeles/': '/brands/maytag-stove-repair/',
     // Cluster 17 Residential BBQ Grill (1 — service-hub rename)
     '/services/bbq-grill-repair-los-angeles/': '/services/bbq-grill-repair/',
+    // Cluster 18 Residential Range Hood (1 — service-hub rename)
+    '/services/range-hood-repair-los-angeles/': '/services/range-hood-repair/',
 
     // NOTE: Deferred items (NOT added this commit):
     // - /fagor-washing-machine-repair/ → target TBD
