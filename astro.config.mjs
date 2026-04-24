@@ -123,6 +123,11 @@ export default defineConfig({
     // Legacy WP samedayappliance.repair/fisher-paykel-oven-repair/ ranks #3 DuckDuckGo
     // on "fisher paykel oven repair los angeles" — preserve ranking at sdar-v2 launch.
     '/fisher-paykel-oven-repair/': '/brands/fisher-paykel-oven-repair/',
+    // Cluster 08 Residential Microwave — service-hub rename (11th project-wide;
+    // ~4,000+ imp aggregate — LARGEST residential-track single-URL equity item.
+    // 0 brand-level 301s for C08 per Gap #80 exhaustive probe 2026-04-21: 0% brand-URL
+    // hit rate on 15 URLs; low-ticket-price-appliance economic pattern.)
+    '/services/microwave-repair-los-angeles/': '/services/microwave-repair/',
 
     // NOTE: Deferred items (NOT added this commit):
     // - /fagor-washing-machine-repair/ → target TBD
