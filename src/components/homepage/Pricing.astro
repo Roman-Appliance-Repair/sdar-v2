@@ -1,65 +1,247 @@
 ---
 // Pricing.astro — Transparent Pricing section
 //
-// Status: SCAFFOLD (Step 3) — content comes in Step 5
+// Step 10 of homepage redesign sprint (FINAL content scaffold).
+// Replicates Section 10 of public/preview-homepage.html.
 //
-// Will render: centered "Transparent Pricing" header, 2-row diagnostic-fee table
-// (Residential $89* / Commercial $120*), second-unit-free footnote,
-// 4 trust bullets (OEM, 90-day, upfront quote, no surcharge),
-// "View Full Price List →" link. Mirrors the recently-edited preview-homepage
-// pricing block.
+// 3-column static table (Service Type | Diagnostic Fee | Common Repair Examples)
+// with two rows (residential, commercial), an asterisk footnote, four trust
+// bullets, and a centered "View Full Price List →" link.
 
-interface Props {}
+import {
+  PRICING_TIERS,
+  PRICING_BULLETS,
+  PRICING_FOOTNOTE,
+} from '../../data/pricing';
 ---
 
-<section class="pricing" id="pricing">
+<section class="pricing-section" id="pricing">
   <div class="container">
     <header class="section-header-simple">
       <h2 class="section-title">
         Transparent <span class="text-gold">Pricing</span>
       </h2>
-      <p class="section-subtitle">[Scaffold] Diagnostic fee table lands in Step 5.</p>
     </header>
-    <div class="placeholder">
-      <p>Pricing table — Step 5</p>
+    <p class="section-subtitle">
+      No flat-rate book pricing. Diagnostic credited toward repair if you proceed.
+      Written estimate before any work begins.
+    </p>
+
+    <table class="pricing-table">
+      <thead>
+        <tr>
+          <th>Service Type</th>
+          <th>Diagnostic Fee</th>
+          <th>Common Repair Examples</th>
+        </tr>
+      </thead>
+      <tbody>
+        {PRICING_TIERS.map((tier) => (
+          <tr>
+            <td><span class="pricing-type">{tier.name}</span></td>
+            <td>
+              <span class="pricing-fee">${tier.diagnosticFee}<sup class="pricing-fee-asterisk">*</sup></span>
+              <span class="pricing-fee-note">{tier.waivedNote}</span>
+            </td>
+            <td><div class="pricing-examples">{tier.examples}</div></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <p class="pricing-footnote">{PRICING_FOOTNOTE}</p>
+
+    <ul class="pricing-bullets">
+      {PRICING_BULLETS.map((bullet) => (
+        <li><span class="check" aria-hidden="true">◆</span>{bullet}</li>
+      ))}
+    </ul>
+
+    <div class="pricing-cta">
+      <a href="/price-list/" class="link-arrow">View Full Price List →</a>
     </div>
   </div>
 </section>
 
 <style>
-  .pricing {
-    background: #151515;
-    color: #ffffff;
+  .pricing-section {
+    --bg: #0a0a0a;
+    --bg2: #151515;
+    --red: #C8102E;
+    --gold: #D4AF37;
+    --gold-h: #e5c254;
+    --text: #ffffff;
+    --text2: #d4d4d4;
+    --text3: #888888;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-gold: rgba(212, 175, 55, 0.4);
+
     padding: 112px 24px;
-    border-bottom: 1px dashed rgba(212, 175, 55, 0.4);
+    background: var(--bg2);
+    color: var(--text);
   }
-  .pricing .container { max-width: 1280px; margin: 0 auto; }
-  .section-header-simple { text-align: center; margin-bottom: 32px; }
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(28px, 3.4vw, 44px);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin: 0 0 16px 0;
-    color: #ffffff;
-  }
-  .text-gold { color: #D4AF37; font-style: italic; }
-  .section-subtitle {
-    color: #d4d4d4;
-    font-family: 'Montserrat', sans-serif;
-    max-width: 680px;
+  .pricing-section .container {
+    max-width: 1280px;
     margin: 0 auto;
   }
-  .placeholder {
-    margin-top: 32px;
-    padding: 48px 24px;
-    border: 1px dashed rgba(212, 175, 55, 0.4);
-    color: #888;
+
+  .section-header-simple {
     text-align: center;
+    margin-bottom: 16px;
+  }
+  .section-header-simple .section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+  }
+  .text-gold { color: var(--gold); font-style: italic; font-weight: 600; }
+  .section-subtitle {
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--text2);
+    max-width: 680px;
+    margin: 0 auto 32px;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* ==== TABLE ==== */
+  .pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--bg);
+    border: 1px solid var(--border-gold);
+    margin-bottom: 32px;
+  }
+  .pricing-table th,
+  .pricing-table td {
+    padding: 26px 28px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .pricing-table th {
+    background: var(--bg2);
     font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border-bottom: 1px solid var(--border-gold);
+  }
+  .pricing-table tr:last-child td { border-bottom: 0; }
+
+  .pricing-type {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .pricing-fee {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--red);
+    font-variant-numeric: tabular-nums;
+  }
+  .pricing-fee-asterisk {
+    font-size: 14px;
+    color: var(--text3);
+    font-weight: 500;
+    margin-left: 2px;
+    vertical-align: super;
+    line-height: 0;
+  }
+  .pricing-fee-note {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    color: var(--gold);
+    display: block;
+    margin-top: 6px;
+    font-weight: 500;
     letter-spacing: 0.15em;
     text-transform: uppercase;
   }
-  .placeholder p { margin: 0; }
+  .pricing-examples {
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.9;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* ==== FOOTNOTE + BULLETS + CTA ==== */
+  .pricing-footnote {
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 300;
+    font-style: italic;
+    margin: 16px 0 24px;
+    line-height: 1.6;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .pricing-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 28px;
+  }
+  .pricing-bullets li {
+    padding: 8px 0;
+    font-size: 14px;
+    color: var(--text2);
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .pricing-bullets .check {
+    color: var(--gold);
+    font-weight: 700;
+    margin-right: 12px;
+    font-family: 'Cinzel', serif;
+  }
+
+  .pricing-cta {
+    text-align: center;
+    margin-top: 8px;
+  }
+  .link-arrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--gold);
+    text-decoration: none;
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-gold);
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .link-arrow:hover {
+    color: var(--gold-h);
+    border-color: var(--gold);
+  }
+
+  /* ==== RESPONSIVE ==== */
+  @media (max-width: 1024px) {
+    .pricing-section { padding: 80px 24px; }
+  }
+  @media (max-width: 640px) {
+    .pricing-section { padding: 64px 20px; }
+    .section-header-simple .section-title { font-size: 24px; }
+    .pricing-table th,
+    .pricing-table td {
+      padding: 16px 14px;
+      font-size: 13px;
+    }
+    .pricing-fee { font-size: 26px; }
+    .pricing-type { font-size: 16px; }
+  }
 </style>
