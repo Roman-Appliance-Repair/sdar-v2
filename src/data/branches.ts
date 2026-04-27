@@ -1,292 +1,412 @@
 // src/data/branches.ts
-// SDAR — samedayappliance.repair
-// Single source of truth: 5 branches with full NAP data
-// Used by: CTA.astro, Footer.astro, [city].astro, Schema LocalBusiness
-// Last updated: April 2026
+//
+// SINGLE SOURCE OF TRUTH for all 7 service locations.
+//
+// CRITICAL RULE — DO NOT VIOLATE:
+//   Only `physical_pin` type renders public street address.
+//   `service_area` type MUST NEVER expose street address publicly anywhere
+//   (homepage, footer, branch page, schema, hero, anywhere).
+//   Violations risk GBP suspension under Google SAB guidelines.
+//
+// See: wiki/decisions/branch-types-and-public-nap-rules.md
 
-import type { BranchSlug, County } from './cities';
+export type LocationType = 'physical_pin' | 'service_area';
 
-export interface Branch {
-  slug: BranchSlug;
-  name: string;             // Display name — "West Hollywood"
-  fullName: string;         // Full business name for Schema
-  phone: string;            // NAP phone — must match GMB exactly
-  phoneRaw: string;         // For href="tel:..." links
-  email: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    full: string;           // One-line full address
-  };
-  hours: {
-    weekdays: string;       // "Monday–Friday"
-    weekdayHours: string;   // "7:00 AM – 9:00 PM"
-    saturday: string;
-    saturdayHours: string;
-    sunday: string;
-    sundayHours: string;
-    schema: string;         // OpeningHoursSpecification format
-  };
-  gmb: {
-    status: 'active' | 'pending';
-    profileUrl?: string;    // Full Google Business Profile URL
-    placeId?: string;       // Google Place ID for Maps embed
-  };
-  counties: County[];       // Counties this branch serves
-  zones: string[];          // Key neighborhoods/cities for display
-  mapEmbedUrl?: string;     // Google My Maps embed URL
+export type GBPStatus =
+  | 'verified_pin'   // GBP verified with public street address (storefront)
+  | 'verified_sab'   // GBP verified as Service Area Business (no public address)
+  | 'unverified'     // GBP not yet verified
+  | 'pending';       // No GBP yet, no real phone yet
+
+export type PhoneStatus =
+  | 'active'   // Real working number
+  | 'pending'; // Placeholder 555 — must be replaced before deploy
+
+export interface BranchGeo {
+  /** City center latitude — used for SVG map pins and serviceArea.geoMidpoint */
+  cityCenterLat: number;
+  /** City center longitude — same use */
+  cityCenterLng: number;
+  /** Service radius in miles for GeoCircle schema */
+  serviceRadius: number;
 }
 
-export const branches: Branch[] = [
+export interface BranchAddress {
+  street: string;
+  city: string;
+  state: 'CA';
+  zip: string;
+  /** Real geo coordinates of the actual address. ONLY used for physical_pin type. */
+  lat?: number;
+  lng?: number;
+}
 
-  // =========================================================================
-  // WEST HOLLYWOOD — Hub for WeHo, Beverly Hills, Hollywood area
-  // GMB: ✅ Active
-  // =========================================================================
+export interface Branch {
+  /** URL slug for /branches/[slug] */
+  slug: string;
+  /** Display name in UI */
+  name: string;
+  /** Full descriptive name for schema and titles */
+  fullName: string;
+  /** Determines public address visibility. CRITICAL FIELD. */
+  type: LocationType;
+  /** GBP verification status */
+  gbpStatus: GBPStatus;
+  /** GBP CID URL for schema hasMap (only if verified) */
+  gbpUrl?: string;
+  /** Date GBP was verified, ISO format. For schema reference. */
+  gbpVerifiedDate?: string;
+  /** Local DID phone for this territory */
+  phone: string;
+  phoneStatus: PhoneStatus;
+  /** ONLY populate for type === 'physical_pin'. NEVER for service_area. */
+  address?: BranchAddress;
+  /** Internal-only address (IRS, business records). NEVER rendered publicly. */
+  internalAddress?: BranchAddress;
+  /** Geo data — used for SVG map pins and serviceArea schema */
+  geo: BranchGeo;
+  hours: {
+    days: string;
+    open: string;
+    close: string;
+  };
+  /** County this branch primarily services */
+  primaryCounty: 'los-angeles' | 'orange' | 'ventura' | 'san-bernardino' | 'riverside';
+  /** All cities served by this branch (city slugs) */
+  citiesServed: string[];
+}
+
+export const BRANCHES: Branch[] = [
+  // ─────────────────────────────────────────────────
+  // 1. WEST HOLLYWOOD — Physical pin (THE ONLY ONE)
+  // ─────────────────────────────────────────────────
   {
     slug: 'west-hollywood',
     name: 'West Hollywood',
     fullName: 'Same Day Appliance Repair — West Hollywood',
+    type: 'physical_pin',
+    gbpStatus: 'verified_pin',
+    gbpUrl: 'TODO_ROMAN_PROVIDE_WEHO_GBP_URL',
+    gbpVerifiedDate: 'TODO_ROMAN_CONFIRM',
     phone: '(323) 870-4790',
-    phoneRaw: '+13238704790',
-    email: 'support@samedayappliance.repair',
+    phoneStatus: 'active',
     address: {
-      street: '8730 Santa Monica Blvd',
+      street: '8746 Rangely Ave',
       city: 'West Hollywood',
       state: 'CA',
-      zip: '90069',
-      full: '8730 Santa Monica Blvd, West Hollywood, CA 90069',
+      zip: '90048',
+      lat: 34.0894,
+      lng: -118.3895,
     },
-    hours: {
-      weekdays: 'Monday–Friday',
-      weekdayHours: '7:00 AM – 9:00 PM',
-      saturday: 'Saturday',
-      saturdayHours: '8:00 AM – 7:00 PM',
-      sunday: 'Sunday',
-      sundayHours: '9:00 AM – 5:00 PM',
-      schema: 'Mo-Fr 07:00-21:00, Sa 08:00-19:00, Su 09:00-17:00',
+    geo: {
+      cityCenterLat: 34.0900,
+      cityCenterLng: -118.3617,
+      serviceRadius: 10,
     },
-    gmb: {
-      status: 'active',
-    },
-    counties: ['los-angeles'],
-    zones: [
-      'West Hollywood',
-      'Beverly Hills',
-      'Hollywood',
-      'Hollywood Hills',
-      'Bel Air',
-      'Silver Lake',
-      'Los Feliz',
-      'East Hollywood',
+    hours: { days: 'Mon-Sun', open: '08:00', close: '20:00' },
+    primaryCounty: 'los-angeles',
+    citiesServed: [
+      'west-hollywood',
+      'beverly-hills',
+      'hollywood',
+      'mid-wilshire',
+      'fairfax',
+      'hancock-park',
     ],
   },
 
-  // =========================================================================
-  // LOS ANGELES — Hub for Santa Monica, Brentwood, Culver City, Westside
-  // GMB: ✅ Active
-  // =========================================================================
+  // ─────────────────────────────────────────────────
+  // 2. LOS ANGELES — Service Area Business
+  // ─────────────────────────────────────────────────
   {
     slug: 'los-angeles',
     name: 'Los Angeles',
     fullName: 'Same Day Appliance Repair — Los Angeles',
+    type: 'service_area',
+    gbpStatus: 'verified_sab',
+    gbpUrl: 'TODO_ROMAN_PROVIDE_LA_GBP_URL',
     phone: '(424) 325-0520',
-    phoneRaw: '+14243250520',
-    email: 'info@samedayappliance.repair',
-    address: {
-      street: '11500 W Olympic Blvd',
+    phoneStatus: 'active',
+    // address: undefined — SAB rule, NO public address
+    internalAddress: {
+      street: '11352 Elderwood Street',
       city: 'Los Angeles',
       state: 'CA',
-      zip: '90064',
-      full: '11500 W Olympic Blvd, Los Angeles, CA 90064',
+      zip: '90049',
     },
-    hours: {
-      weekdays: 'Monday–Friday',
-      weekdayHours: '7:00 AM – 9:00 PM',
-      saturday: 'Saturday',
-      saturdayHours: '8:00 AM – 7:00 PM',
-      sunday: 'Sunday',
-      sundayHours: '9:00 AM – 5:00 PM',
-      schema: 'Mo-Fr 07:00-21:00, Sa 08:00-19:00, Su 09:00-17:00',
+    geo: {
+      cityCenterLat: 34.0522,
+      cityCenterLng: -118.2437,
+      serviceRadius: 25,
     },
-    gmb: {
-      status: 'active',
-    },
-    counties: ['los-angeles', 'san-bernardino', 'riverside'],
-    zones: [
-      'Santa Monica',
-      'Brentwood',
-      'Pacific Palisades',
-      'Malibu',
-      'Culver City',
-      'Marina del Rey',
-      'Playa del Rey',
-      'Manhattan Beach',
-      'Westwood',
-      'Downtown Los Angeles',
-      'Ladera Heights',
+    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    primaryCounty: 'los-angeles',
+    citiesServed: [
+      'los-angeles',
+      'brentwood',
+      'bel-air',
+      'pacific-palisades',
+      'santa-monica',
+      'westwood',
+      'century-city',
+      'cheviot-hills',
+      'west-los-angeles',
+      'beverly-glen',
+      'marina-del-rey',
+      'playa-del-rey',
+      'culver-city',
+      'venice',
+      'mar-vista',
+      'agoura-hills',
+      'burbank',
+      'calabasas',
+      'eagle-rock',
+      'el-segundo',
+      'encino',
+      'glassell-park',
+      'long-beach',
+      'malibu',
+      'manhattan-beach',
+      'monrovia',
+      'north-hollywood',
+      'redondo-beach',
+      'sherman-oaks',
+      'studio-city',
+      'tarzana',
+      'toluca-lake',
+      'torrance',
+      'woodland-hills',
+      'koreatown',
     ],
   },
 
-  // =========================================================================
-  // PASADENA — Hub for Pasadena, Burbank, Glendale, East LA
-  // GMB: 🔄 Pending approval
-  // =========================================================================
+  // ─────────────────────────────────────────────────
+  // 3. PASADENA — Service Area (unverified GBP)
+  // ─────────────────────────────────────────────────
   {
     slug: 'pasadena',
     name: 'Pasadena',
     fullName: 'Same Day Appliance Repair — Pasadena',
+    type: 'service_area',
+    gbpStatus: 'unverified',
     phone: '(626) 376-4458',
-    phoneRaw: '+16263764458',
-    email: 'pasadena@samedayappliance.repair',
-    address: {
-      street: '55 S Lake Ave',
+    phoneStatus: 'active',
+    internalAddress: {
+      street: '1205 Columbia Pl',
       city: 'Pasadena',
       state: 'CA',
-      zip: '91101',
-      full: '55 S Lake Ave, Pasadena, CA 91101',
+      zip: '91105',
     },
-    hours: {
-      weekdays: 'Monday–Friday',
-      weekdayHours: '7:00 AM – 9:00 PM',
-      saturday: 'Saturday',
-      saturdayHours: '8:00 AM – 7:00 PM',
-      sunday: 'Sunday',
-      sundayHours: '9:00 AM – 5:00 PM',
-      schema: 'Mo-Fr 07:00-21:00, Sa 08:00-19:00, Su 09:00-17:00',
+    geo: {
+      cityCenterLat: 34.1478,
+      cityCenterLng: -118.1445,
+      serviceRadius: 20,
     },
-    gmb: {
-      status: 'pending',
-    },
-    counties: ['los-angeles'],
-    zones: [
-      'Pasadena',
-      'Burbank',
-      'Glendale',
-      'Arcadia',
-      'San Marino',
-      'La Cañada Flintridge',
-      'North Hollywood',
-      'South Pasadena',
-      'Monterey Park',
-      'Alhambra',
-      'Glassell Park',
+    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    primaryCounty: 'los-angeles',
+    citiesServed: [
+      'pasadena',
+      'la-canada-flintridge',
+      'south-pasadena',
+      'glendale',
+      'arcadia',
+      'sierra-madre',
+      'los-feliz',
+      'alhambra',
+      'san-marino',
+      'san-gabriel',
+      'monterey-park',
+      'highland-park',
+      'silver-lake',
+      'atwater-village',
+      'altadena',
+      'temple-city',
     ],
   },
 
-  // =========================================================================
-  // THOUSAND OAKS — Hub for Ventura County + Calabasas area
-  // GMB: ✅ Active
-  // =========================================================================
+  // ─────────────────────────────────────────────────
+  // 4. THOUSAND OAKS — Service Area Business
+  // ─────────────────────────────────────────────────
   {
     slug: 'thousand-oaks',
     name: 'Thousand Oaks',
     fullName: 'Same Day Appliance Repair — Thousand Oaks',
+    type: 'service_area',
+    gbpStatus: 'verified_sab',
+    gbpUrl: 'TODO_ROMAN_PROVIDE_TO_GBP_URL',
     phone: '(424) 208-0228',
-    phoneRaw: '+14242080228',
-    email: 'thousandoaks@samedayappliance.repair',
-    address: {
-      street: '100 W Hillcrest Dr',
+    phoneStatus: 'active',
+    internalAddress: {
+      street: '1669 Tiburon Ct',
       city: 'Thousand Oaks',
       state: 'CA',
-      zip: '91360',
-      full: '100 W Hillcrest Dr, Thousand Oaks, CA 91360',
+      zip: '91362',
     },
-    hours: {
-      weekdays: 'Monday–Friday',
-      weekdayHours: '7:00 AM – 9:00 PM',
-      saturday: 'Saturday',
-      saturdayHours: '8:00 AM – 7:00 PM',
-      sunday: 'Sunday',
-      sundayHours: '9:00 AM – 5:00 PM',
-      schema: 'Mo-Fr 07:00-21:00, Sa 08:00-19:00, Su 09:00-17:00',
+    geo: {
+      cityCenterLat: 34.1706,
+      cityCenterLng: -118.8376,
+      serviceRadius: 25,
     },
-    gmb: {
-      status: 'active',
-    },
-    counties: ['ventura', 'los-angeles'],
-    zones: [
-      'Thousand Oaks',
-      'Westlake Village',
-      'Agoura Hills',
-      'Calabasas',
-      'Hidden Hills',
-      'Moorpark',
-      'Camarillo',
-      'Simi Valley',
-      'Newbury Park',
-      'Oak Park',
-      'Oxnard',
-      'Ventura',
+    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    primaryCounty: 'ventura',
+    citiesServed: [
+      'thousand-oaks',
+      'westlake-village',
+      'agoura-hills',
+      'camarillo',
+      'moorpark',
+      'newbury-park',
+      'oak-park',
+      'ojai',
+      'oxnard',
+      'simi-valley',
+      'ventura',
     ],
   },
 
-  // =========================================================================
-  // IRVINE — Hub for Orange County + temp coverage for Riverside County
-  // GMB: 🔄 Pending approval
-  // =========================================================================
+  // ─────────────────────────────────────────────────
+  // 5. IRVINE — Service Area (unverified GBP)
+  // ─────────────────────────────────────────────────
   {
     slug: 'irvine',
     name: 'Irvine',
     fullName: 'Same Day Appliance Repair — Irvine',
+    type: 'service_area',
+    gbpStatus: 'unverified',
     phone: '(213) 401-9019',
-    phoneRaw: '+12134019019',
-    email: 'irvine@samedayappliance.repair',
-    address: {
-      street: '2600 Michelson Dr',
+    phoneStatus: 'active',
+    internalAddress: {
+      street: '53 Bellwind',
       city: 'Irvine',
       state: 'CA',
-      zip: '92612',
-      full: '2600 Michelson Dr, Irvine, CA 92612',
+      zip: '92603',
     },
-    hours: {
-      weekdays: 'Monday–Friday',
-      weekdayHours: '7:00 AM – 9:00 PM',
-      saturday: 'Saturday',
-      saturdayHours: '8:00 AM – 7:00 PM',
-      sunday: 'Sunday',
-      sundayHours: '9:00 AM – 5:00 PM',
-      schema: 'Mo-Fr 07:00-21:00, Sa 08:00-19:00, Su 09:00-17:00',
+    geo: {
+      cityCenterLat: 33.6846,
+      cityCenterLng: -117.8265,
+      serviceRadius: 25,
     },
-    gmb: {
-      status: 'pending',
+    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    primaryCounty: 'orange',
+    citiesServed: [
+      'irvine',
+      'newport-beach',
+      'laguna-beach',
+      'huntington-beach',
+      'costa-mesa',
+      'dana-point',
+      'anaheim',
+      'fullerton',
+      'laguna-niguel',
+      'mission-viejo',
+      'san-clemente',
+      'santa-ana',
+      'tustin',
+      'villa-park',
+      'yorba-linda',
+    ],
+  },
+
+  // ─────────────────────────────────────────────────
+  // 6. RANCHO CUCAMONGA — Service Territory (placeholder phone)
+  // ─────────────────────────────────────────────────
+  {
+    slug: 'rancho-cucamonga',
+    name: 'Rancho Cucamonga',
+    fullName: 'Same Day Appliance Repair — Rancho Cucamonga',
+    type: 'service_area',
+    gbpStatus: 'pending',
+    phone: '(909) 555-0100',
+    phoneStatus: 'pending',
+    // No internalAddress — true service territory
+    geo: {
+      cityCenterLat: 34.1064,
+      cityCenterLng: -117.5931,
+      serviceRadius: 25,
     },
-    counties: ['orange', 'riverside'],
-    zones: [
-      'Irvine',
-      'Newport Beach',
-      'Laguna Beach',
-      'Huntington Beach',
-      'Costa Mesa',
-      'Dana Point',
-      'Laguna Niguel',
-      'Mission Viejo',
-      'Anaheim',
-      'Yorba Linda',
-      'Fullerton',
-      'Temecula',
-      'Murrieta',
+    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    primaryCounty: 'san-bernardino',
+    citiesServed: [
+      'rancho-cucamonga',
+      'chino-hills',
+      'fontana',
+      'loma-linda',
+      'ontario',
+      'redlands',
+      'san-bernardino',
+      'upland',
+    ],
+  },
+
+  // ─────────────────────────────────────────────────
+  // 7. TEMECULA — Service Territory (placeholder phone)
+  // ─────────────────────────────────────────────────
+  {
+    slug: 'temecula',
+    name: 'Temecula',
+    fullName: 'Same Day Appliance Repair — Temecula',
+    type: 'service_area',
+    gbpStatus: 'pending',
+    phone: '(951) 555-0200',
+    phoneStatus: 'pending',
+    geo: {
+      cityCenterLat: 33.4936,
+      cityCenterLng: -117.1484,
+      serviceRadius: 30,
+    },
+    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    primaryCounty: 'riverside',
+    citiesServed: [
+      'temecula',
+      'corona',
+      'hemet',
+      'lake-elsinore',
+      'menifee',
+      'moreno-valley',
+      'murrieta',
+      'riverside',
     ],
   },
 ];
 
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────
 // HELPERS
-// ---------------------------------------------------------------------------
+// ─────────────────────────────────────────────────
 
-/** Get a branch by slug */
-export function getBranchBySlug(slug: BranchSlug): Branch | undefined {
-  return branches.find((b) => b.slug === slug);
+/** Main HQ phone — TopBar, Hero CTA, Layout default */
+export const MAIN_PHONE = '(424) 325-0520';
+
+/** Legal entity address — for footer legal line and Organization schema */
+export const LEGAL_ADDRESS = {
+  entity: 'HVAC 777 LLC',
+  street: '6230 Wilshire Blvd Ste A PMB 2267',
+  city: 'Los Angeles',
+  state: 'CA' as const,
+  zip: '90048',
+};
+
+/** The single physical pin — for primary LocalBusiness schema */
+export const HEADQUARTERS = BRANCHES.find(b => b.type === 'physical_pin')!;
+
+/** All 6 service area locations — for serviceArea-only LocalBusiness schema */
+export const SERVICE_AREAS = BRANCHES.filter(b => b.type === 'service_area');
+
+/** Total unique cities across all branches — should match cities.ts count */
+export const TOTAL_CITIES_SERVED = new Set(
+  BRANCHES.flatMap(b => b.citiesServed)
+).size;
+
+/** Get the branch that primarily services a given city */
+export function getBranchForCity(citySlug: string): Branch | undefined {
+  return BRANCHES.find(b => b.citiesServed.includes(citySlug));
 }
 
-/** Get all active GMB branches */
-export function getActiveBranches(): Branch[] {
-  return branches.filter((b) => b.gmb.status === 'active');
+/** Check if a phone number is a placeholder 555 fake */
+export function isPlaceholderPhone(phone: string): boolean {
+  return /\(\d{3}\)\s?555-\d{4}/.test(phone);
 }
 
-/** Get branches that serve a given county */
-export function getBranchesByCounty(county: County): Branch[] {
-  return branches.filter((b) => b.counties.includes(county));
+/** Convert miles to meters for schema GeoCircle (which expects meters) */
+export function milesToMeters(miles: number): number {
+  return Math.round(miles * 1609.344);
 }

@@ -29,9 +29,16 @@ Pulled from `wiki/decisions/sdar-v2-current-status.md`. Surface these proactivel
 
 1. **`/contact/` and `/book/` pages do not exist**, but every brand-page CTA links to them. All those CTAs currently 404.
 2. **No sitemap is generated.** `public/robots.txt` references `https://samedayappliance.repair/sitemap-index.xml`, but `@astrojs/sitemap` is not installed and no sitemap file exists in `public/`.
-3. **NAP inconsistency for the West Hollywood branch.** `src/data/branches.ts` says `8730 Santa Monica Blvd, 90069`. `src/pages/west-hollywood.astro` schema says `8746 Rangely Ave, 90048`. One is wrong — verify against GMB before any local-SEO work.
+3. **[RESOLVED 2026-04-26]** ~~NAP inconsistency for the West Hollywood branch.~~ See "Known Issue #3: WeHo NAP discrepancy [RESOLVED]" detail block below.
 4. **`STRUCTURE.md` is out of date on the brand layer.** It describes ~44 `<brand>-appliance-repair.astro` files and a `commercial-dishwashers/` folder. Reality: ~26 brand hubs at `<brand>.astro` + ~78 combo pages at `<brand>-<appliance>-repair.astro`, and `commercial-dishwashers/` no longer exists.
 5. **Two schema-injection patterns coexist.** Newer pages use the `<Fragment slot="head-scripts">` slot in `Layout.astro`. Older pages (e.g. `west-hollywood.astro`, `services/refrigerator-repair.astro`) inline `<script type="application/ld+json">` directly in the body. Tech debt — pick one when refactoring.
+
+## Known Issue #3: WeHo NAP discrepancy [RESOLVED]
+
+**Status:** RESOLVED on 2026-04-26 (commit `5e5e6f4`)
+**Resolution:** branches.ts now uses `8746 Rangely Ave, West Hollywood CA 90048` matching the verified GBP listing. Old placeholder `8730 Santa Monica Blvd, 90069` has been removed. The Astro page src/pages/west-hollywood.astro schema was already correct and now matches branches.ts.
+
+**Reference:** wiki/decisions/branch-types-and-public-nap-rules.md
 
 ## Writing knowledge back to the wiki
 
