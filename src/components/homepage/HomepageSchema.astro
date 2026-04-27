@@ -1,0 +1,208 @@
+---
+// HomepageSchema.astro
+//
+// Step 5: Generates JSON-LD structured data for the homepage using @graph
+// format. Renders one <script type="application/ld+json"> block injected
+// into <head> via Layout's `head-scripts` slot.
+//
+// Entities (11 total):
+//   1. Organization (Same Day Appliance Repair — DBA, NOT HVAC 777 LLC)
+//   2. WebSite
+//   3. WebPage (homepage)
+//   4-11. LocalBusiness × 8 (1 physical_pin + 7 service_area)
+//
+// All entities cross-reference via @id URIs.
+//
+// NAP rules (per wiki/decisions/branch-types-and-public-nap-rules.md):
+//   - Only physical_pin (West Hollywood) renders address + root geo + hasMap
+//   - service_area locations: NO address, NO root geo, ONLY serviceArea (GeoCircle)
+//   - schema `name` = branch.gbpName (matches verified GBP listing word-for-word)
+//   - HVAC 777 LLC NEVER appears in schema (only in footer legal compliance line)
+//   - Internal addresses (Bellwind, Tiburon, Columbia Pl, etc.) NEVER in schema
+
+import {
+  BRANCHES,
+  MAIN_PHONE,
+  milesToMeters,
+  type Branch,
+} from '../../data/branches';
+
+interface Props {}
+
+const SITE_URL = 'https://samedayappliance.repair';
+const ORG_ID = `${SITE_URL}/#organization`;
+const WEBSITE_ID = `${SITE_URL}/#website`;
+const WEBPAGE_ID = `${SITE_URL}/#webpage`;
+
+function phoneE164(phone: string): string {
+  return '+1' + phone.replace(/\D/g, '');
+}
+
+function branchId(slug: string): string {
+  return `${SITE_URL}/#branch-${slug}`;
+}
+
+function slugToTitle(slug: string): string {
+  return slug.split('-')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+function hoursDaysToArray(days: string): string[] {
+  const all = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  if (days === 'Mon-Sun') return all;
+  if (days === 'Mon-Sat') return all.slice(0, 6);
+  if (days === 'Mon-Fri') return all.slice(0, 5);
+  return all;
+}
+
+function countyTitle(slug: Branch['primaryCounty']): string {
+  // primaryCounty values are 'los-angeles' | 'orange' | 'ventura' |
+  // 'san-bernardino' | 'riverside' — Title-Case + " County" suffix.
+  return slugToTitle(slug) + ' County';
+}
+
+function buildLocalBusiness(branch: Branch): Record<string, unknown> {
+  const base: Record<string, unknown> = {
+    '@type': ['LocalBusiness', 'HomeAndConstructionBusiness'],
+    '@id': branchId(branch.slug),
+    name: branch.gbpName,
+    url: `${SITE_URL}/branches/${branch.slug}/`,
+    telephone: phoneE164(branch.phone),
+    email: branch.email,
+    image: `${SITE_URL}/images/branches/${branch.slug}.jpg`,
+    priceRange: '$$',
+    openingHoursSpecification: [{
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: hoursDaysToArray(branch.hours.days),
+      opens: branch.hours.open,
+      closes: branch.hours.close,
+    }],
+    areaServed: branch.citiesServed.map(citySlug => ({
+      '@type': 'City',
+      name: slugToTitle(citySlug),
+      containedInPlace: {
+        '@type': 'AdministrativeArea',
+        name: countyTitle(branch.primaryCounty),
+      },
+    })),
+    parentOrganization: { '@id': ORG_ID },
+  };
+
+  // physical_pin: full address + root geo
+  if (branch.type === 'physical_pin' && branch.address) {
+    base.address = {
+      '@type': 'PostalAddress',
+      streetAddress: branch.address.street,
+      addressLocality: branch.address.city,
+      addressRegion: branch.address.state,
+      postalCode: branch.address.zip,
+      addressCountry: 'US',
+    };
+    if (typeof branch.address.lat === 'number' && typeof branch.address.lng === 'number') {
+      base.geo = {
+        '@type': 'GeoCoordinates',
+        latitude: branch.address.lat,
+        longitude: branch.address.lng,
+      };
+    }
+  }
+
+  // service_area: GeoCircle only — NEVER address, NEVER root geo
+  if (branch.type === 'service_area') {
+    base.serviceArea = {
+      '@type': 'GeoCircle',
+      geoMidpoint: {
+        '@type': 'GeoCoordinates',
+        latitude: branch.geo.cityCenterLat,
+        longitude: branch.geo.cityCenterLng,
+      },
+      geoRadius: milesToMeters(branch.geo.serviceRadius).toString(),
+    };
+  }
+
+  // hasMap only for branches with a real (non-TODO) GBP URL
+  if (branch.gbpUrl && !branch.gbpUrl.startsWith('TODO_')) {
+    base.hasMap = branch.gbpUrl;
+  }
+
+  // aggregateRating only for branches with verified GBP reviews
+  if (branch.aggregateRating) {
+    base.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: branch.aggregateRating.ratingValue.toString(),
+      reviewCount: branch.aggregateRating.reviewCount.toString(),
+      bestRating: '5',
+      worstRating: '1',
+    };
+  }
+
+  return base;
+}
+
+const graph: Array<Record<string, unknown>> = [
+  // 1. Organization
+  {
+    '@type': 'Organization',
+    '@id': ORG_ID,
+    name: 'Same Day Appliance Repair',
+    alternateName: 'SDAR',
+    url: SITE_URL,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${SITE_URL}/logo.png`,
+      width: 512,
+      height: 512,
+    },
+    sameAs: [
+      'https://share.google/MZH7ZdnIWHiAp8Zm3',
+      'https://share.google/dBFQdBNMTF9W7og21',
+      'https://share.google/DXrnBNy1purtECJTu',
+    ],
+    contactPoint: [{
+      '@type': 'ContactPoint',
+      telephone: phoneE164(MAIN_PHONE),
+      contactType: 'customer service',
+      areaServed: 'US-CA',
+      availableLanguage: ['en'],
+    }],
+  },
+
+  // 2. WebSite
+  {
+    '@type': 'WebSite',
+    '@id': WEBSITE_ID,
+    url: SITE_URL,
+    name: 'Same Day Appliance Repair',
+    publisher: { '@id': ORG_ID },
+    inLanguage: 'en-US',
+  },
+
+  // 3. WebPage
+  {
+    '@type': 'WebPage',
+    '@id': WEBPAGE_ID,
+    url: SITE_URL + '/',
+    name: 'Same Day Appliance Repair — Los Angeles & Southern California',
+    description:
+      'Same-day appliance repair across 5 SoCal counties. Headquartered in West Hollywood. Licensed C-20, BBB A+, EPA 608. 90-day warranty on parts and labor.',
+    inLanguage: 'en-US',
+    isPartOf: { '@id': WEBSITE_ID },
+    about: { '@id': ORG_ID },
+    primaryImageOfPage: {
+      '@type': 'ImageObject',
+      url: `${SITE_URL}/og-homepage.jpg`,
+    },
+  },
+
+  // 4-11. LocalBusiness × 8 (1 physical_pin + 7 service_area)
+  ...BRANCHES.map(buildLocalBusiness),
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@graph': graph,
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd, null, 2)} />

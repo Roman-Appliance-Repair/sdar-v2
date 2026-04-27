@@ -62,6 +62,11 @@ export interface Branch {
   gbpUrl?: string;
   /** Date GBP was verified, ISO format. For schema reference. */
   gbpVerifiedDate?: string;
+  /** Aggregate rating from GBP (only for verified GBPs with reviews) */
+  aggregateRating?: {
+    ratingValue: number;
+    reviewCount: number;
+  };
   /** Local DID phone for this territory */
   phone: string;
   phoneStatus: PhoneStatus;
@@ -95,8 +100,9 @@ export const BRANCHES: Branch[] = [
     gbpName: 'Same Day Appliance Repair',
     type: 'physical_pin',
     gbpStatus: 'verified_pin',
-    gbpUrl: 'TODO_ROMAN_PROVIDE_WEHO_GBP_URL',
+    gbpUrl: 'https://share.google/MZH7ZdnIWHiAp8Zm3',
     gbpVerifiedDate: 'TODO_ROMAN_CONFIRM',
+    aggregateRating: { ratingValue: 4.6, reviewCount: 37 },
     phone: '(323) 870-4790',
     phoneStatus: 'active',
     email: 'support@samedayappliance.repair',
@@ -168,7 +174,8 @@ export const BRANCHES: Branch[] = [
     gbpName: 'Same Day Appliance Repair',
     type: 'service_area',
     gbpStatus: 'verified_sab',
-    gbpUrl: 'TODO_ROMAN_PROVIDE_LA_GBP_URL',
+    gbpUrl: 'https://share.google/dBFQdBNMTF9W7og21',
+    aggregateRating: { ratingValue: 5.0, reviewCount: 13 },
     phone: '(424) 325-0520',
     phoneStatus: 'active',
     email: 'info@samedayappliance.repair',
@@ -281,7 +288,8 @@ export const BRANCHES: Branch[] = [
     gbpName: 'Same Day Appliance Repair Thousand Oaks',
     type: 'service_area',
     gbpStatus: 'verified_sab',
-    gbpUrl: 'TODO_ROMAN_PROVIDE_TO_GBP_URL',
+    gbpUrl: 'https://share.google/DXrnBNy1purtECJTu',
+    aggregateRating: { ratingValue: 5.0, reviewCount: 7 },
     phone: '(424) 208-0228',
     phoneStatus: 'active',
     email: 'thousandoaks@samedayappliance.repair',
