@@ -70,9 +70,10 @@ export const COUNTY_BOUNDARIES: CountyBoundary[] = [
   },
 ];
 
-/** City center positions in SVG coordinate space — for branch pins (Phase B) */
+/** City center positions in SVG coordinate space — for branch pins. */
 export const BRANCH_PIN_POSITIONS: Record<string, { x: number; y: number }> = {
   'west-hollywood': { x: 227.3, y: 466.87 },
+  'beverly-hills': { x: 222.5, y: 472.5 },
   'los-angeles': { x: 248.29, y: 474.52 },
   'pasadena': { x: 265.42, y: 453.89 },
   'thousand-oaks': { x: 143.02, y: 450.99 },

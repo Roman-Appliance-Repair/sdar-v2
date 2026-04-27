@@ -1,22 +1,113 @@
 ---
 // CountyMap.astro
 //
-// Static SVG map of 5 SoCal counties served by SDAR.
+// Static SVG map of 5 SoCal counties served by SDAR with informational
+// overlays:
+//   - Layer 1: 6 main freeways (I-5, US-101, I-405, I-10, I-210, I-110)
+//   - Layer 2: 8 branch markers (1 HQ + 7 service-area) read from BRANCHES
+//   - Layer 3: 15-mile service-radius rings around each branch
+//   - Layer 4: corner stat badges + per-county branch counts
+//   - Layer 5: hover tooltip per branch (name + phone + cities served count)
 //
-// Renders inline SVG with:
-//   - 5 county paths (clickable → county hub pages)
-//   - County name labels (Cinzel small caps, gold) at visual centroids
-//   - Empty slot for branch pins (Phase B will populate)
-//   - Embedded <title> and <desc> for SEO and accessibility
-//
-// Data is pre-projected at build time by scripts/maps/geojson-to-svg.mjs.
-// Re-run that script after editing the source GeoJSON.
+// Data sources: BRANCHES (county-boundaries.BRANCH_PIN_POSITIONS for x/y),
+// CITIES (count cities per primaryBranch). Branch info propagates from data
+// files — nothing about branches is hardcoded inside this SVG.
 
-import { COUNTY_BOUNDARIES, SVG_VIEWBOX } from '../../data/county-boundaries';
+import {
+  COUNTY_BOUNDARIES,
+  SVG_VIEWBOX,
+  SVG_WIDTH,
+  SVG_HEIGHT,
+  BRANCH_PIN_POSITIONS,
+  type CountySlug,
+} from '../../data/county-boundaries';
+import { BRANCHES, type Branch } from '../../data/branches';
+import { CITIES } from '../../data/cities';
 
-// In Phase A, we render branch-pin slots but do NOT make them visible/active.
-// Step 7 will flip this to true and populate the <g class="branch-pins"> group.
-const SHOW_BRANCH_PINS = false;
+// ── Cities served per branch (for hover tooltip) ──
+const cityCountByBranch = new Map<string, number>();
+for (const c of CITIES) {
+  cityCountByBranch.set(c.primaryBranch, (cityCountByBranch.get(c.primaryBranch) ?? 0) + 1);
+}
+
+// ── Branch count per county (for sub-label under each county name) ──
+const branchCountByCounty = new Map<CountySlug, number>();
+for (const b of BRANCHES) {
+  branchCountByCounty.set(b.primaryCounty, (branchCountByCounty.get(b.primaryCounty) ?? 0) + 1);
+}
+
+// ── Branch label offsets keyed by slug (avoids LA-cluster collisions) ──
+type LabelAnchor = 'start' | 'middle' | 'end';
+interface LabelOffset { dx: number; dy: number; anchor: LabelAnchor }
+const BRANCH_LABEL_OFFSETS: Record<string, LabelOffset> = {
+  'west-hollywood':   { dx: -10, dy: -8,  anchor: 'end' },
+  'beverly-hills':    { dx: -10, dy:  14, anchor: 'end' },
+  'los-angeles':      { dx:  10, dy:   3, anchor: 'start' },
+  'pasadena':         { dx:  10, dy:  -3, anchor: 'start' },
+  'thousand-oaks':    { dx:  10, dy:   3, anchor: 'start' },
+  'irvine':           { dx:  10, dy:   3, anchor: 'start' },
+  'rancho-cucamonga': { dx:   0, dy:  18, anchor: 'middle' },
+  'temecula':         { dx:  10, dy:   3, anchor: 'start' },
+};
+
+// Branch render order in SVG (used for paint order; HQ should sit on top)
+const BRANCH_RENDER_ORDER = [
+  'thousand-oaks',
+  'beverly-hills',
+  'los-angeles',
+  'pasadena',
+  'irvine',
+  'rancho-cucamonga',
+  'temecula',
+  'west-hollywood', // HQ painted last so its ring sits on top
+];
+
+interface BranchPin {
+  branch: Branch;
+  x: number;
+  y: number;
+  isHq: boolean;
+  label: LabelOffset;
+  citiesServed: number;
+}
+const branchPins: BranchPin[] = BRANCH_RENDER_ORDER
+  .map((slug) => {
+    const branch = BRANCHES.find((b) => b.slug === slug);
+    const pos = BRANCH_PIN_POSITIONS[slug];
+    const label = BRANCH_LABEL_OFFSETS[slug];
+    if (!branch || !pos || !label) return null;
+    return {
+      branch,
+      x: pos.x,
+      y: pos.y,
+      isHq: branch.type === 'physical_pin',
+      label,
+      citiesServed: cityCountByBranch.get(slug) ?? 0,
+    };
+  })
+  .filter((p): p is BranchPin => p !== null);
+
+// ── 15-mile service radius in SVG units (~2.6 units/mile, see data calc) ──
+const SERVICE_RADIUS_SVG_UNITS = 40;
+
+// ── Approximate freeway paths in SVG coord space (1000×700) ──
+// Not cartographically precise — just routing context behind the markers.
+const FREEWAYS: { id: string; d: string }[] = [
+  { id: 'i-5',     d: 'M 280 220 L 270 360 L 258 440 L 248 475 L 270 510 L 305 545 L 340 590 L 395 660' },
+  { id: 'us-101',  d: 'M 30 405 L 90 420 L 143 451 L 200 460 L 248 475' },
+  { id: 'i-405',   d: 'M 195 410 L 215 450 L 222 480 L 240 525 L 280 600' },
+  { id: 'i-10',    d: 'M 110 478 L 200 478 L 248 475 L 320 472 L 363 470 L 540 470 L 720 470 L 920 470' },
+  { id: 'i-210',   d: 'M 130 410 L 200 425 L 265 454 L 330 450 L 420 440 L 540 425' },
+  { id: 'i-110',   d: 'M 246 475 L 245 540 L 250 600' },
+];
+
+// ── Corner stat badges ──
+interface CornerBadge { x: number; y: number; w: number; h: number; text: string; align: 'start' | 'middle' | 'end' }
+const CORNER_BADGES: CornerBadge[] = [
+  { x:  20, y:  20, w: 130, h: 32, text: '5 COUNTIES',  align: 'middle' },
+  { x:  20, y: 648, w: 130, h: 32, text: '87 CITIES',   align: 'middle' },
+  { x: 850, y: 648, w: 130, h: 32, text: '10+ YEARS',   align: 'middle' },
+];
 ---
 
 <div class="county-map-wrapper" role="region" aria-label="Service Area Map">
@@ -31,7 +122,7 @@ const SHOW_BRANCH_PINS = false;
     <desc id="map-desc">
       Map of five Southern California counties served by Same Day Appliance Repair:
       Los Angeles, Orange, Ventura, San Bernardino, and Riverside. Headquartered in
-      West Hollywood with service territories across all five counties.
+      West Hollywood with eight branch locations covering 87 cities across the region.
     </desc>
 
     <defs>
@@ -44,11 +135,12 @@ const SHOW_BRANCH_PINS = false;
       </radialGradient>
     </defs>
 
-    <rect width="1000" height="700" fill="#0a0a0a" />
-    <rect width="1000" height="700" fill="url(#county-grid)" />
+    <rect width={SVG_WIDTH} height={SVG_HEIGHT} fill="#0a0a0a" />
+    <rect width={SVG_WIDTH} height={SVG_HEIGHT} fill="url(#county-grid)" />
 
+    {/* Layer 1: Counties (existing) */}
     <g class="counties">
-      {COUNTY_BOUNDARIES.map(county => (
+      {COUNTY_BOUNDARIES.map((county) => (
         <a href={county.hubUrl} class="county-link" aria-label={`${county.name} service area`}>
           <path
             d={county.path}
@@ -61,24 +153,120 @@ const SHOW_BRANCH_PINS = false;
       ))}
     </g>
 
-    <g class="county-labels" aria-hidden="true">
-      {COUNTY_BOUNDARIES.map(county => (
-        <text
-          x={county.labelX}
-          y={county.labelY}
-          class="county-label"
-          text-anchor="middle"
-        >
-          {county.name.replace(' County', '').toUpperCase()}
-        </text>
+    {/* Layer 2: Freeways — subtle gold lines (above counties so they read through) */}
+    <g class="freeways" aria-hidden="true">
+      {FREEWAYS.map((f) => (
+        <path d={f.d} class="freeway" data-freeway={f.id} />
       ))}
     </g>
 
-    {SHOW_BRANCH_PINS && (
-      <g class="branch-pins">
-        {/* Phase B (Step 7) — populate from BRANCH_PIN_POSITIONS */}
-      </g>
-    )}
+    {/* Layer 3: County labels + per-county branch counts */}
+    <g class="county-labels" aria-hidden="true">
+      {COUNTY_BOUNDARIES.map((county) => {
+        const count = branchCountByCounty.get(county.slug) ?? 0;
+        const label = `${count} ${count === 1 ? 'branch' : 'branches'}`;
+        return (
+          <>
+            <text
+              x={county.labelX}
+              y={county.labelY}
+              class="county-label"
+              text-anchor="middle"
+            >
+              {county.name.replace(' County', '').toUpperCase()}
+            </text>
+            <text
+              x={county.labelX}
+              y={county.labelY + 18}
+              class="county-branches-label"
+              text-anchor="middle"
+            >
+              {label}
+            </text>
+          </>
+        );
+      })}
+    </g>
+
+    {/* Layer 4: Service-radius rings (15-mile, behind markers, above counties) */}
+    <g class="service-rings" aria-hidden="true">
+      {branchPins.map((p) => (
+        <circle
+          cx={p.x}
+          cy={p.y}
+          r={SERVICE_RADIUS_SVG_UNITS}
+          class="service-ring"
+        />
+      ))}
+    </g>
+
+    {/* Layer 5: Branch markers + labels + hover tooltips */}
+    <g class="branch-pins">
+      {branchPins.map((p) => {
+        const tipW = 180;
+        const tipH = 64;
+        // Anchor tooltip above the marker by default; for top-edge markers
+        // (county labels at y < 320), shift below to keep on canvas.
+        const tipY = p.y - tipH - 14;
+        const tipX = Math.max(8, Math.min(SVG_WIDTH - tipW - 8, p.x - tipW / 2));
+        return (
+          <g class={`branch-pin${p.isHq ? ' branch-pin-hq' : ''}`} data-branch={p.branch.slug}>
+            {p.isHq ? (
+              <>
+                <circle cx={p.x} cy={p.y} r={10} class="branch-dot-outer" />
+                <circle cx={p.x} cy={p.y} r={4}  class="branch-dot-inner" />
+              </>
+            ) : (
+              <circle cx={p.x} cy={p.y} r={6} class="branch-dot" />
+            )}
+            <text
+              x={p.x + p.label.dx}
+              y={p.y + p.label.dy}
+              class="branch-label"
+              text-anchor={p.label.anchor}
+            >
+              {p.branch.name.toUpperCase()}
+            </text>
+            {/* Tooltip — hidden by default, fades in on hover/focus */}
+            <g class="branch-tooltip" transform={`translate(${tipX}, ${tipY})`} aria-hidden="true">
+              <rect class="tooltip-bg" x={0} y={0} width={tipW} height={tipH} rx={2} />
+              <text class="tooltip-name"   x={12} y={20}>{p.branch.name}{p.isHq ? ' (HQ)' : ''}</text>
+              <text class="tooltip-phone"  x={12} y={38}>{p.branch.phone}</text>
+              <text class="tooltip-cities" x={12} y={54}>
+                {p.citiesServed} {p.citiesServed === 1 ? 'city' : 'cities'} served
+              </text>
+            </g>
+            {/* Invisible hit-target so the dot AND its label trigger hover */}
+            <rect
+              x={p.x - 30}
+              y={p.y - 14}
+              width={60}
+              height={28}
+              class="branch-hit"
+              fill="transparent"
+            />
+          </g>
+        );
+      })}
+    </g>
+
+    {/* Layer 6: Corner stat badges (above all map content, below tooltips) */}
+    <g class="corner-badges" aria-hidden="true">
+      {CORNER_BADGES.map((b) => (
+        <g class="corner-badge" transform={`translate(${b.x}, ${b.y})`}>
+          <rect class="corner-badge-bg" x={0} y={0} width={b.w} height={b.h} rx={2} />
+          <text
+            class="corner-badge-text"
+            x={b.w / 2}
+            y={b.h / 2 + 1}
+            text-anchor="middle"
+            dominant-baseline="middle"
+          >
+            {b.text}
+          </text>
+        </g>
+      ))}
+    </g>
   </svg>
 </div>
 
@@ -107,10 +295,8 @@ const SHOW_BRANCH_PINS = false;
     display: block;
   }
 
-  .county-link {
-    cursor: pointer;
-  }
-
+  /* ── Counties ── */
+  .county-link { cursor: pointer; }
   .county-path {
     fill: url(#county-fill);
     stroke: #D4AF37;
@@ -118,7 +304,6 @@ const SHOW_BRANCH_PINS = false;
     stroke-linejoin: round;
     transition: fill 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease;
   }
-
   .county-link:hover .county-path,
   .county-link:focus-visible .county-path {
     fill: rgba(200, 16, 46, 0.15);
@@ -126,6 +311,18 @@ const SHOW_BRANCH_PINS = false;
     stroke-width: 2;
   }
 
+  /* ── Freeways ── */
+  .freeway {
+    fill: none;
+    stroke: #D4AF37;
+    stroke-width: 1;
+    stroke-opacity: 0.20;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    pointer-events: none;
+  }
+
+  /* ── County labels ── */
   .county-label {
     font-family: 'Cinzel', serif;
     font-size: 14px;
@@ -135,17 +332,137 @@ const SHOW_BRANCH_PINS = false;
     pointer-events: none;
     user-select: none;
   }
+  .county-branches-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 500;
+    fill: rgba(212, 175, 55, 0.7);
+    letter-spacing: 0.10em;
+    pointer-events: none;
+    user-select: none;
+  }
 
+  /* ── Service rings ── */
+  .service-ring {
+    fill: rgba(200, 16, 46, 0.08);
+    stroke: rgba(200, 16, 46, 0.20);
+    stroke-width: 1;
+    pointer-events: none;
+  }
+
+  /* ── Branch pins ── */
+  .branch-pin { cursor: pointer; }
+  .branch-dot {
+    fill: #D4AF37;
+    stroke: #0a0a0a;
+    stroke-width: 1.5;
+    transition: r 0.2s ease, fill 0.2s ease;
+  }
+  .branch-pin-hq .branch-dot-outer {
+    fill: #D4AF37;
+    stroke: #0a0a0a;
+    stroke-width: 1.5;
+  }
+  .branch-pin-hq .branch-dot-inner {
+    fill: #C8102E;
+    pointer-events: none;
+  }
+  .branch-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    fill: #D4AF37;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    pointer-events: none;
+    user-select: none;
+  }
+  .branch-pin-hq .branch-label {
+    font-size: 12px;
+    font-weight: 700;
+    fill: #e5c254;
+  }
+
+  .branch-pin:hover .branch-dot {
+    fill: #e5c254;
+  }
+  .branch-hit { cursor: pointer; }
+
+  /* ── Tooltip ── */
+  .branch-tooltip {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .branch-pin:hover .branch-tooltip,
+  .branch-pin:focus-within .branch-tooltip {
+    opacity: 1;
+  }
+  .tooltip-bg {
+    fill: #0a0a0a;
+    fill-opacity: 0.95;
+    stroke: rgba(212, 175, 55, 0.6);
+    stroke-width: 1;
+  }
+  .tooltip-name {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    fill: #ffffff;
+    letter-spacing: 0.04em;
+  }
+  .tooltip-phone {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    fill: #D4AF37;
+    font-variant-numeric: tabular-nums;
+  }
+  .tooltip-cities {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 500;
+    fill: #d4d4d4;
+  }
+
+  /* ── Corner badges ── */
+  .corner-badge-bg {
+    fill: #151515;
+    fill-opacity: 0.92;
+    stroke: rgba(212, 175, 55, 0.4);
+    stroke-width: 1;
+  }
+  .corner-badge-text {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    fill: #D4AF37;
+    letter-spacing: 0.18em;
+    user-select: none;
+  }
+
+  /* ── Responsive: bump SVG-space font sizes on narrow viewports so they
+       stay legible after the SVG scales down. ── */
   @media (max-width: 768px) {
-    .county-label {
-      font-size: 11px;
-      letter-spacing: 0.1em;
-    }
+    .county-label { font-size: 12px; letter-spacing: 0.10em; }
+    .county-branches-label { font-size: 9px; }
+    .branch-label { font-size: 13px; }
+    .branch-pin-hq .branch-label { font-size: 14px; }
+    .corner-badge-text { font-size: 13px; letter-spacing: 0.15em; }
+    .tooltip-name { font-size: 13px; }
+    .tooltip-phone { font-size: 12px; }
+    .tooltip-cities { font-size: 11px; }
+  }
+  @media (max-width: 640px) {
+    .county-label { font-size: 11px; }
+    .county-branches-label { font-size: 8px; }
+    /* Hide bottom-right badge on very narrow screens to avoid overlap with Riverside */
+    .corner-badge:nth-of-type(3) { display: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .county-path {
-      transition: none;
-    }
+    .county-path,
+    .branch-dot,
+    .branch-tooltip { transition: none; }
   }
 </style>
