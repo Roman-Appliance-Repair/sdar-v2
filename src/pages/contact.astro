@@ -1,6 +1,21 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { branches } from '../data/branches.ts';
+import { BRANCHES, type Branch } from '../data/branches';
+
+// Filter out branches with placeholder 555 phones (RC + Temecula are 'pending'
+// until Roman buys real DIDs). Don't publish 555-fake numbers.
+const activeBranches = BRANCHES.filter(b => b.phoneStatus === 'active');
+const phoneRawFor = (b: Branch) => '+1' + b.phone.replace(/\D/g, '');
+const slugToTitle = (slug: string) =>
+  slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+const isoDays = (days: string): string => {
+  const map: Record<string, string> = {
+    'Mon-Sun': 'Mo-Su', 'Mon-Sat': 'Mo-Sa', 'Mon-Fri': 'Mo-Fr',
+    'Sun-Sat': 'Su-Sa', 'Tue-Sun': 'Tu-Su',
+  };
+  return map[days] ?? days;
+};
+const sharedEmail = 'support@samedayappliance.repair';
 
 const title = 'Contact Us — 5 Branches Across LA, OC & Ventura | Same Day Appliance Repair';
 const description = 'Call, email, or message our 5 Southern California branches. Licensed C-20 appliance techs, same-day visits, $89 diagnostic waived with repair. Answered 24/7.';
@@ -58,22 +73,33 @@ const localBusinessSchema = {
     { '@type': 'EducationalOccupationalCredential', credentialCategory: 'BHGS Registration #A49573' },
     { '@type': 'EducationalOccupationalCredential', credentialCategory: 'EPA 608 Certified' },
   ],
-  location: branches.map((b) => ({
-    '@type': 'LocalBusiness',
-    name: b.fullName,
-    telephone: b.phone,
-    email: b.email,
-    address: {
-      '@type': 'PostalAddress',
-      streetAddress: b.address.street,
-      addressLocality: b.address.city,
-      addressRegion: b.address.state,
-      postalCode: b.address.zip,
-      addressCountry: 'US',
-    },
-    openingHours: b.hours.schema,
-    areaServed: b.zones.map((z) => ({ '@type': 'City', name: z })),
-  })),
+  // NAP rule: only physical_pin (WeHo) renders address in schema. SAB locations
+  // emit LocalBusiness with name + phone + areaServed only — no address, no geo.
+  // See wiki/decisions/branch-types-and-public-nap-rules.md
+  location: activeBranches.map((b) => {
+    const entry: Record<string, unknown> = {
+      '@type': 'LocalBusiness',
+      name: b.gbpName,
+      telephone: b.phone,
+      openingHours: `${isoDays(b.hours.days)} ${b.hours.open}-${b.hours.close}`,
+      areaServed: b.citiesServed.slice(0, 8).map((slug) => ({
+        '@type': 'City',
+        name: slugToTitle(slug),
+      })),
+    };
+    if (b.type === 'physical_pin' && b.address) {
+      entry.address = {
+        '@type': 'PostalAddress',
+        streetAddress: b.address.street,
+        addressLocality: b.address.city,
+        addressRegion: b.address.state,
+        postalCode: b.address.zip,
+        addressCountry: 'US',
+      };
+      entry.email = sharedEmail;
+    }
+    return entry;
+  }),
 };
 
 const breadcrumbSchema = {
@@ -122,34 +148,39 @@ const breadcrumbSchema = {
       </p>
 
       <div class="branch-grid">
-        {branches.map((b) => (
+        {activeBranches.map((b) => (
           <article class="branch-card">
             <header class="branch-head">
               <h3>{b.name}</h3>
-              {b.gmb.status === 'active' ? (
+              {b.gbpStatus.startsWith('verified') ? (
                 <span class="badge">GMB verified</span>
               ) : (
                 <span class="badge pending">GMB pending</span>
               )}
             </header>
 
-            <a href={`tel:${b.phoneRaw}`} class="branch-phone">{b.phone}</a>
-            <a href={`mailto:${b.email}`} class="branch-email">{b.email}</a>
+            <a href={`tel:${phoneRawFor(b)}`} class="branch-phone">{b.phone}</a>
+            <a href={`mailto:${sharedEmail}`} class="branch-email">{sharedEmail}</a>
 
-            <address>
-              {b.address.street}<br />
-              {b.address.city}, {b.address.state} {b.address.zip}
-            </address>
+            {b.type === 'physical_pin' && b.address ? (
+              <address>
+                {b.address.street}<br />
+                {b.address.city}, {b.address.state} {b.address.zip}
+              </address>
+            ) : (
+              <address class="sab">
+                <strong>{b.name}, CA</strong><br />
+                <em>Service area — by appointment</em>
+              </address>
+            )}
 
             <dl class="branch-hours">
-              <dt>{b.hours.weekdays}</dt><dd>{b.hours.weekdayHours}</dd>
-              <dt>{b.hours.saturday}</dt><dd>{b.hours.saturdayHours}</dd>
-              <dt>{b.hours.sunday}</dt><dd>{b.hours.sundayHours}</dd>
+              <dt>{b.hours.days}</dt><dd>{b.hours.open} – {b.hours.close}</dd>
             </dl>
 
             <div class="branch-zones">
               <h4>Service area</h4>
-              <p>{b.zones.join(' · ')}</p>
+              <p>{b.citiesServed.slice(0, 8).map(slugToTitle).join(' · ')}</p>
             </div>
           </article>
         ))}

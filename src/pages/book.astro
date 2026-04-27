@@ -1,6 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { branches } from '../data/branches.ts';
+import { BRANCHES, type Branch } from '../data/branches';
+
+// Filter out branches with placeholder 555 phones (RC + Temecula are 'pending'
+// until Roman buys real DIDs). Don't publish 555-fake numbers.
+const activeBranches = BRANCHES.filter(b => b.phoneStatus === 'active');
+const phoneRawFor = (b: Branch) => '+1' + b.phone.replace(/\D/g, '');
+const slugToTitle = (slug: string) =>
+  slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
 const title = 'Book Appliance Repair — Same-Day Dispatch in LA, OC, Ventura | SDAR';
 const description = 'Book a same-day appliance repair visit online or by phone. $89 diagnostic waived with repair, OEM parts, 90-day labor warranty. 5 branches across Southern California.';
@@ -224,11 +231,11 @@ const applianceOptions = [
         us pick the right truck faster.
       </p>
       <div class="phone-grid">
-        {branches.map((b) => (
-          <a href={`tel:${b.phoneRaw}`} class="phone-card">
+        {activeBranches.map((b) => (
+          <a href={`tel:${phoneRawFor(b)}`} class="phone-card">
             <span class="phone-city">{b.name}</span>
             <span class="phone-num">{b.phone}</span>
-            <span class="phone-zones">{b.zones.slice(0, 4).join(' · ')}</span>
+            <span class="phone-zones">{b.citiesServed.slice(0, 4).map(slugToTitle).join(' · ')}</span>
           </a>
         ))}
       </div>
