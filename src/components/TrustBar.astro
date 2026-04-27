@@ -1,79 +1,79 @@
 ---
 /**
- * TrustBar — red strip at top of page with credentials.
- * Scrolls on mobile.
+ * TrustBar — top strip with credentials.
+ *
+ * Step 4-fix: rebuilt to mirror public/preview-homepage.html topbar
+ * (lines 1535-1551). One item changed per spec:
+ *   "🏢 7 BRANCHES ACROSS SOCAL"  →  "🏢 WEST HOLLYWOOD HQ · 6 SERVICE TERRITORIES"
+ *
+ * Visual: red bg, gold-bottom border, Cinzel-adjacent uppercase, pipe dividers.
+ * Mobile: < 768px hides items past index 4 (matches preview behavior).
  */
 
-const badges = [
-  { label: 'BBB A+ Accredited', href: '/credentials/bbb-accredited/' },
-  { label: 'CSLB C-20 Licensed #1138898', href: '/credentials/licensed/' },
-  { label: 'Fully Insured', href: '/credentials/insured/' },
-  { label: 'EPA 608 Certified', href: '/credentials/epa-certified/' },
-  { label: 'Background Checked', href: '/credentials/background-checked/' },
-  { label: 'BHGS #A49573', href: '/credentials/licensed/' },
+const credentials = [
+  '⚡ SAME DAY · 7 DAYS/WEEK',
+  '🔧 85% FIXED FIRST VISIT',
+  '⭐ 4.6/5 · 37 REVIEWS',
+  '📜 LICENSED & INSURED · BHGS #A49573',
+  '🏆 BBB A+',
+  '🏢 WEST HOLLYWOOD HQ · 6 SERVICE TERRITORIES',
 ];
 ---
 
-<div class="trust-bar">
-  <div class="container trust-bar-inner">
-    <div class="trust-bar-track">
-      {badges.map((badge) => (
-        <a href={badge.href} class="trust-badge">
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          <span>{badge.label}</span>
-        </a>
-      ))}
-    </div>
+<div class="top-bar">
+  <div class="top-bar-content">
+    {credentials.map((item, i) => (
+      <>
+        <span class={`credential-item${i === credentials.length - 1 ? ' hide-mobile' : ''}`}>{item}</span>
+        {i < credentials.length - 1 && <span class="divider" aria-hidden="true">|</span>}
+      </>
+    ))}
   </div>
 </div>
 
 <style>
-  .trust-bar {
-    background: var(--black);
-    color: var(--white);
-    height: var(--trust-bar-height);
-    font-size: 13px;
-    font-weight: 500;
-    letter-spacing: 0.01em;
-    overflow: hidden;
+  /* Scoped tokens — match preview-homepage.html */
+  .top-bar {
+    --red: #C8102E;
+    --gold: #D4AF37;
+
+    background: var(--red);
+    border-bottom: 1px solid var(--gold);
+    padding: 8px 24px;
   }
 
-  .trust-bar-inner {
-    height: 100%;
+  .top-bar-content {
+    max-width: 1400px;
+    margin: 0 auto;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #ffffff;
+    white-space: nowrap;
     overflow-x: auto;
     scrollbar-width: none;
   }
-  .trust-bar-inner::-webkit-scrollbar { display: none; }
+  .top-bar-content::-webkit-scrollbar { display: none; }
 
-  .trust-bar-track {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-    white-space: nowrap;
-  }
+  .credential-item { flex-shrink: 0; }
 
-  .trust-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    color: var(--white);
-    text-decoration: none;
-    opacity: 0.92;
-    transition: opacity 0.15s var(--ease);
-  }
-  .trust-badge:hover { opacity: 1; color: var(--white); }
-
-  .trust-badge svg {
-    color: var(--red);
+  .divider {
+    color: rgba(255, 255, 255, 0.3);
     flex-shrink: 0;
   }
 
-  @media (max-width: 640px) {
-    .trust-bar { font-size: 12px; }
-    .trust-bar-track { gap: 20px; }
+  @media (max-width: 1024px) {
+    .hide-mobile { display: none; }
+    .top-bar-content { font-size: 10px; gap: 8px; }
+  }
+
+  @media (max-width: 768px) {
+    .top-bar-content .credential-item:nth-child(n+5) { display: none; }
+    .top-bar-content { justify-content: flex-start; }
   }
 </style>
