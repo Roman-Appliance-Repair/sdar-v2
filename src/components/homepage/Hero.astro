@@ -40,14 +40,12 @@ const bullets = [
   { strong: '90-day warranty',       desc: 'on all repairs' },
 ];
 
-// Background image = preview's gradient overlay + literal base64 SVG placeholder
-// ("HERO PHOTO: TECHNICIAN AT WORK / (LUXURY KITCHEN, OEM PARTS VISIBLE)").
-const heroBgImage =
-  "linear-gradient(135deg, rgba(10,10,10,0.5), rgba(200,16,46,0.3)), " +
-  "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTYwMCIgaGVpZ2h0PSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iIzFhMWExYSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBmb250LWZhbWlseT0iQXJpYWwiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiM1NTU1NTUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGR5PSIuM2VtIj5IRVJPIFBIT1RPOiBURUNITklDSUFOIEFUIFdPUks8L3RleHQ+PHRleHQgeD0iNTAlIiB5PSI1NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNiIgZmlsbD0iIzU1NTU1NSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPihMVVhVUlkgS0lUQ0hFTiwgT0VNIFBBUlRTIFZJU0lCTEUpPC90ZXh0Pjwvc3ZnPg==')";
+// Background image is set in scoped CSS below: gradient overlay + real
+// Sub-Zero technician photo (Artlist, processed via scripts/process-hero-image.mjs
+// into desktop WebP/JPG and mobile WebP variants under /images/hero/).
 ---
 
-<section class="hero-section" id="hero" style={`background-image: ${heroBgImage};`}>
+<section class="hero-section" id="hero">
   <div class="hero-overlay">
     <div class="hero-content-box">
       <p class="hero-eyebrow">Same Day Appliance Repair — Est. Southern California</p>
@@ -115,6 +113,16 @@ const heroBgImage =
 
     position: relative;
     min-height: 100vh;
+    /* JPG fallback for browsers that don't understand image-set() */
+    background-image:
+      linear-gradient(135deg, rgba(10,10,10,0.5), rgba(200,16,46,0.3)),
+      url('/images/hero/hero-technician-subzero.jpg');
+    background-image:
+      linear-gradient(135deg, rgba(10,10,10,0.5), rgba(200,16,46,0.3)),
+      image-set(
+        url('/images/hero/hero-technician-subzero.webp') type('image/webp'),
+        url('/images/hero/hero-technician-subzero.jpg') type('image/jpeg')
+      );
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -295,6 +303,11 @@ const heroBgImage =
   }
 
   @media (max-width: 768px) {
+    .hero-section {
+      background-image:
+        linear-gradient(135deg, rgba(10,10,10,0.6), rgba(200,16,46,0.35)),
+        url('/images/hero/hero-technician-subzero-mobile.webp');
+    }
     .hero-content-box { max-width: 100%; padding: 32px 24px; }
     .hero-two-cols { grid-template-columns: 1fr; gap: 24px; }
     .hero-title { font-size: 32px; }
