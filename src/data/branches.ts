@@ -48,6 +48,12 @@ export interface Branch {
   name: string;
   /** Full descriptive name for schema and titles */
   fullName: string;
+  /** EXACT name as registered in Google Business Profile listing.
+   *  Used as the `name` field in LocalBusiness JSON-LD schema.
+   *  CRITICAL for NAP consistency — must match GBP word-for-word.
+   *  For service_area locations without verified GBP yet, use the pattern
+   *  'Same Day Appliance Repair {City}' which is reserved for future registration. */
+  gbpName: string;
   /** Determines public address visibility. CRITICAL FIELD. */
   type: LocationType;
   /** GBP verification status */
@@ -84,6 +90,7 @@ export const BRANCHES: Branch[] = [
     slug: 'west-hollywood',
     name: 'West Hollywood',
     fullName: 'Same Day Appliance Repair — West Hollywood',
+    gbpName: 'Same Day Appliance Repair',
     type: 'physical_pin',
     gbpStatus: 'verified_pin',
     gbpUrl: 'TODO_ROMAN_PROVIDE_WEHO_GBP_URL',
@@ -122,6 +129,7 @@ export const BRANCHES: Branch[] = [
     slug: 'los-angeles',
     name: 'Los Angeles',
     fullName: 'Same Day Appliance Repair — Los Angeles',
+    gbpName: 'Same Day Appliance Repair',
     type: 'service_area',
     gbpStatus: 'verified_sab',
     gbpUrl: 'TODO_ROMAN_PROVIDE_LA_GBP_URL',
@@ -187,6 +195,7 @@ export const BRANCHES: Branch[] = [
     slug: 'pasadena',
     name: 'Pasadena',
     fullName: 'Same Day Appliance Repair — Pasadena',
+    gbpName: 'Same Day Appliance Repair Pasadena',
     type: 'service_area',
     gbpStatus: 'unverified',
     phone: '(626) 376-4458',
@@ -231,6 +240,7 @@ export const BRANCHES: Branch[] = [
     slug: 'thousand-oaks',
     name: 'Thousand Oaks',
     fullName: 'Same Day Appliance Repair — Thousand Oaks',
+    gbpName: 'Same Day Appliance Repair Thousand Oaks',
     type: 'service_area',
     gbpStatus: 'verified_sab',
     gbpUrl: 'TODO_ROMAN_PROVIDE_TO_GBP_URL',
@@ -271,6 +281,7 @@ export const BRANCHES: Branch[] = [
     slug: 'irvine',
     name: 'Irvine',
     fullName: 'Same Day Appliance Repair — Irvine',
+    gbpName: 'Same Day Appliance Repair Irvine',
     type: 'service_area',
     gbpStatus: 'unverified',
     phone: '(213) 401-9019',
@@ -314,6 +325,7 @@ export const BRANCHES: Branch[] = [
     slug: 'rancho-cucamonga',
     name: 'Rancho Cucamonga',
     fullName: 'Same Day Appliance Repair — Rancho Cucamonga',
+    gbpName: 'Same Day Appliance Repair Rancho Cucamonga',
     type: 'service_area',
     gbpStatus: 'pending',
     phone: '(909) 555-0100',
@@ -345,6 +357,7 @@ export const BRANCHES: Branch[] = [
     slug: 'temecula',
     name: 'Temecula',
     fullName: 'Same Day Appliance Repair — Temecula',
+    gbpName: 'Same Day Appliance Repair Temecula',
     type: 'service_area',
     gbpStatus: 'pending',
     phone: '(951) 555-0200',
@@ -410,3 +423,28 @@ export function isPlaceholderPhone(phone: string): boolean {
 export function milesToMeters(miles: number): number {
   return Math.round(miles * 1609.344);
 }
+
+/** Cities in citiesServed that don't yet have .astro pages.
+ *  These are tracked but NOT shown as clickable links on the homepage.
+ *  When .astro pages are created, remove from this set. */
+export const CITIES_WITHOUT_PAGES = new Set<string>([
+  // WeHo
+  'mid-wilshire', 'fairfax', 'hancock-park',
+  // LA
+  'century-city', 'cheviot-hills', 'beverly-glen',
+  'playa-del-rey', 'venice', 'mar-vista',
+  // Pasadena
+  'sierra-madre', 'altadena',
+]);
+
+/** Returns citiesServed for a branch, but ONLY those with .astro pages on disk.
+ *  Use this when generating clickable city lists on homepage / branch pages. */
+export function getServeableCitiesForBranch(branch: Branch): string[] {
+  return branch.citiesServed.filter(slug => !CITIES_WITHOUT_PAGES.has(slug));
+}
+
+/** Total cities with actual .astro pages — use for "{N} cities" displays */
+export const TOTAL_CITIES_WITH_PAGES =
+  Array.from(new Set(BRANCHES.flatMap(b => b.citiesServed)))
+       .filter(slug => !CITIES_WITHOUT_PAGES.has(slug))
+       .length;
