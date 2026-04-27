@@ -2,12 +2,17 @@
 // CountyMap.astro
 //
 // Static SVG map of 5 SoCal counties served by SDAR with informational
-// overlays:
-//   - Layer 1: 6 main freeways (I-5, US-101, I-405, I-10, I-210, I-110)
-//   - Layer 2: 8 branch markers (1 HQ + 7 service-area) read from BRANCHES
-//   - Layer 3: 15-mile service-radius rings around each branch
-//   - Layer 4: corner stat badges + per-county branch counts
-//   - Layer 5: hover tooltip per branch (name + phone + cities served count)
+// overlays. Refactored:
+//   - Background: subtle gold grid pattern across full canvas + faint ocean
+//     fill on the SW edge for geographic context
+//   - 8 branch markers (1 HQ + 7 service_area) read from BRANCHES
+//   - 4 outer branches use leader-line external labels
+//   - 4 LA-county branches collapse into a "LOS ANGELES METRO" legend card
+//   - Per-county branch counts under county names
+//   - Corner stat badges (5 COUNTIES / 87 CITIES / 10+ YEARS)
+//   - Hover tooltip per branch (name + phone + cities served count)
+//
+// Removed: freeways, 15-mile service-radius rings, per-branch on-map labels.
 //
 // Data sources: BRANCHES (county-boundaries.BRANCH_PIN_POSITIONS for x/y),
 // CITIES (count cities per primaryBranch). Branch info propagates from data
@@ -36,21 +41,7 @@ for (const b of BRANCHES) {
   branchCountByCounty.set(b.primaryCounty, (branchCountByCounty.get(b.primaryCounty) ?? 0) + 1);
 }
 
-// ── Branch label offsets keyed by slug (avoids LA-cluster collisions) ──
-type LabelAnchor = 'start' | 'middle' | 'end';
-interface LabelOffset { dx: number; dy: number; anchor: LabelAnchor }
-const BRANCH_LABEL_OFFSETS: Record<string, LabelOffset> = {
-  'west-hollywood':   { dx: -10, dy: -8,  anchor: 'end' },
-  'beverly-hills':    { dx: -10, dy:  14, anchor: 'end' },
-  'los-angeles':      { dx:  10, dy:   3, anchor: 'start' },
-  'pasadena':         { dx:  10, dy:  -3, anchor: 'start' },
-  'thousand-oaks':    { dx:  10, dy:   3, anchor: 'start' },
-  'irvine':           { dx:  10, dy:   3, anchor: 'start' },
-  'rancho-cucamonga': { dx:   0, dy:  18, anchor: 'middle' },
-  'temecula':         { dx:  10, dy:   3, anchor: 'start' },
-};
-
-// Branch render order in SVG (used for paint order; HQ should sit on top)
+// Branch render order (HQ painted last so its dot sits on top of any cluster)
 const BRANCH_RENDER_ORDER = [
   'thousand-oaks',
   'beverly-hills',
@@ -59,7 +50,7 @@ const BRANCH_RENDER_ORDER = [
   'irvine',
   'rancho-cucamonga',
   'temecula',
-  'west-hollywood', // HQ painted last so its ring sits on top
+  'west-hollywood',
 ];
 
 interface BranchPin {
@@ -67,47 +58,89 @@ interface BranchPin {
   x: number;
   y: number;
   isHq: boolean;
-  label: LabelOffset;
   citiesServed: number;
 }
 const branchPins: BranchPin[] = BRANCH_RENDER_ORDER
   .map((slug) => {
     const branch = BRANCHES.find((b) => b.slug === slug);
     const pos = BRANCH_PIN_POSITIONS[slug];
-    const label = BRANCH_LABEL_OFFSETS[slug];
-    if (!branch || !pos || !label) return null;
+    if (!branch || !pos) return null;
     return {
       branch,
       x: pos.x,
       y: pos.y,
       isHq: branch.type === 'physical_pin',
-      label,
       citiesServed: cityCountByBranch.get(slug) ?? 0,
     };
   })
   .filter((p): p is BranchPin => p !== null);
 
-// ── 15-mile service radius in SVG units (~2.6 units/mile, see data calc) ──
-const SERVICE_RADIUS_SVG_UNITS = 40;
-
-// ── Approximate freeway paths in SVG coord space (1000×700) ──
-// Not cartographically precise — just routing context behind the markers.
-const FREEWAYS: { id: string; d: string }[] = [
-  { id: 'i-5',     d: 'M 280 220 L 270 360 L 258 440 L 248 475 L 270 510 L 305 545 L 340 590 L 395 660' },
-  { id: 'us-101',  d: 'M 30 405 L 90 420 L 143 451 L 200 460 L 248 475' },
-  { id: 'i-405',   d: 'M 195 410 L 215 450 L 222 480 L 240 525 L 280 600' },
-  { id: 'i-10',    d: 'M 110 478 L 200 478 L 248 475 L 320 472 L 363 470 L 540 470 L 720 470 L 920 470' },
-  { id: 'i-210',   d: 'M 130 410 L 200 425 L 265 454 L 330 450 L 420 440 L 540 425' },
-  { id: 'i-110',   d: 'M 246 475 L 245 540 L 250 600' },
+// ── External leader-line labels for the 4 outer-county branches.
+//    LA-county branches (WeHo, BH, LA, Pasadena) are collected into the
+//    LA Metro legend card instead of getting individual on-map labels. ──
+type LeaderAnchor = 'start' | 'middle' | 'end';
+interface LeaderLabel {
+  slug: string;
+  label: string;
+  /** Endpoint of the leader-line near the label (~10 SVG units off the text) */
+  lineX: number;
+  lineY: number;
+  /** Anchor point of the visible label text */
+  textX: number;
+  textY: number;
+  anchor: LeaderAnchor;
+}
+const LEADER_LABELS: LeaderLabel[] = [
+  // Thousand Oaks marker (143, 451) → label up-left, above Ventura
+  { slug: 'thousand-oaks',    label: 'THOUSAND OAKS',    lineX:  88, lineY: 358, textX:  88, textY: 350, anchor: 'middle' },
+  // Rancho Cucamonga marker (363, 460) → label right of marker, in empty SB strip below the SB county label
+  { slug: 'rancho-cucamonga', label: 'RANCHO CUCAMONGA', lineX: 470, lineY: 415, textX: 470, textY: 408, anchor: 'middle' },
+  // Irvine marker (324, 551) → label straight down, below Orange
+  { slug: 'irvine',           label: 'IRVINE',           lineX: 324, lineY: 632, textX: 324, textY: 644, anchor: 'middle' },
+  // Temecula marker (445, 588) → label down-right, between Riverside and the corner badge
+  { slug: 'temecula',         label: 'TEMECULA',         lineX: 555, lineY: 658, textX: 555, textY: 670, anchor: 'middle' },
 ];
+
+// ── LA Metro legend card content ──
+interface LegendBranch {
+  slug: string;
+  name: string;
+  isHq: boolean;
+}
+const LA_METRO_SLUGS = ['west-hollywood', 'los-angeles', 'beverly-hills', 'pasadena'];
+const laMetroBranches: LegendBranch[] = LA_METRO_SLUGS
+  .map((slug) => {
+    const b = BRANCHES.find((br) => br.slug === slug);
+    if (!b) return null;
+    return { slug, name: b.name, isHq: b.type === 'physical_pin' };
+  })
+  .filter((x): x is LegendBranch => x !== null);
+
+// Card geometry (top-center area of the SVG, above all county shapes)
+const LEGEND = {
+  x: 380,
+  y: 30,
+  w: 240,
+  h: 122,
+  paddingX: 18,
+  titleY: 56,
+  firstItemY: 80,
+  itemStep: 18,
+};
 
 // ── Corner stat badges ──
-interface CornerBadge { x: number; y: number; w: number; h: number; text: string; align: 'start' | 'middle' | 'end' }
+interface CornerBadge { x: number; y: number; w: number; h: number; text: string }
 const CORNER_BADGES: CornerBadge[] = [
-  { x:  20, y:  20, w: 130, h: 32, text: '5 COUNTIES',  align: 'middle' },
-  { x:  20, y: 648, w: 130, h: 32, text: '87 CITIES',   align: 'middle' },
-  { x: 850, y: 648, w: 130, h: 32, text: '10+ YEARS',   align: 'middle' },
+  { x:  20, y:  20, w: 130, h: 32, text: '5 COUNTIES'  },
+  { x:  20, y: 648, w: 130, h: 32, text: '87 CITIES'   },
+  { x: 850, y: 648, w: 130, h: 32, text: '10+ YEARS'   },
 ];
+
+// ── Pacific Ocean approximate coastline polygon (covers SW corner of canvas).
+//    Coordinates traced freehand against branch positions: Ventura west edge,
+//    south through Santa Monica, Long Beach, Newport, off the bottom. ──
+const OCEAN_PATH =
+  'M 0 0 L 0 700 L 380 700 L 350 666 L 300 624 L 256 588 L 198 545 L 130 488 L 76 422 L 38 322 L 16 200 L 0 90 Z';
 ---
 
 <div class="county-map-wrapper" role="region" aria-label="Service Area Map">
@@ -126,8 +159,9 @@ const CORNER_BADGES: CornerBadge[] = [
     </desc>
 
     <defs>
-      <pattern id="county-grid" width="40" height="40" patternUnits="userSpaceOnUse">
-        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(212,175,55,0.03)" stroke-width="1"/>
+      {/* Gold grid pattern — covers the entire SVG canvas */}
+      <pattern id="map-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 L 0 40" fill="none" stroke="#D4AF37" stroke-width="0.5" stroke-opacity="0.05"/>
       </pattern>
       <radialGradient id="county-fill" cx="50%" cy="50%" r="80%">
         <stop offset="0%" stop-color="#1a1a1a" />
@@ -135,10 +169,14 @@ const CORNER_BADGES: CornerBadge[] = [
       </radialGradient>
     </defs>
 
+    {/* Layer 1: black background + grid pattern across the full canvas */}
     <rect width={SVG_WIDTH} height={SVG_HEIGHT} fill="#0a0a0a" />
-    <rect width={SVG_WIDTH} height={SVG_HEIGHT} fill="url(#county-grid)" />
+    <rect width={SVG_WIDTH} height={SVG_HEIGHT} fill="url(#map-grid)" />
 
-    {/* Layer 1: Counties (existing) */}
+    {/* Layer 2: Pacific Ocean outline (above grid, below counties) */}
+    <path d={OCEAN_PATH} class="ocean-fill" aria-hidden="true" />
+
+    {/* Layer 3: Counties (existing — clickable links to county hubs) */}
     <g class="counties">
       {COUNTY_BOUNDARIES.map((county) => (
         <a href={county.hubUrl} class="county-link" aria-label={`${county.name} service area`}>
@@ -153,60 +191,80 @@ const CORNER_BADGES: CornerBadge[] = [
       ))}
     </g>
 
-    {/* Layer 2: Freeways — subtle gold lines (above counties so they read through) */}
-    <g class="freeways" aria-hidden="true">
-      {FREEWAYS.map((f) => (
-        <path d={f.d} class="freeway" data-freeway={f.id} />
-      ))}
-    </g>
-
-    {/* Layer 3: County labels + per-county branch counts */}
+    {/* Layer 4: County labels + per-county branch counts */}
     <g class="county-labels" aria-hidden="true">
       {COUNTY_BOUNDARIES.map((county) => {
         const count = branchCountByCounty.get(county.slug) ?? 0;
         const label = `${count} ${count === 1 ? 'branch' : 'branches'}`;
         return (
           <>
-            <text
-              x={county.labelX}
-              y={county.labelY}
-              class="county-label"
-              text-anchor="middle"
-            >
-              {county.name.replace(' County', '').toUpperCase()}
-            </text>
-            <text
-              x={county.labelX}
-              y={county.labelY + 18}
-              class="county-branches-label"
-              text-anchor="middle"
-            >
-              {label}
+            <text x={county.labelX} y={county.labelY}      class="county-label"          text-anchor="middle">{county.name.replace(' County', '').toUpperCase()}</text>
+            <text x={county.labelX} y={county.labelY + 18} class="county-branches-label" text-anchor="middle">{label}</text>
+          </>
+        );
+      })}
+    </g>
+
+    {/* Layer 5: Leader-lines for the 4 outer-county branches */}
+    <g class="leader-lines" aria-hidden="true">
+      {LEADER_LABELS.map((l) => {
+        const pos = BRANCH_PIN_POSITIONS[l.slug];
+        if (!pos) return null;
+        return <line x1={pos.x} y1={pos.y} x2={l.lineX} y2={l.lineY} class="leader-line" />;
+      })}
+    </g>
+
+    {/* Layer 6: External labels (text only — leader connects them to dots) */}
+    <g class="leader-labels" aria-hidden="true">
+      {LEADER_LABELS.map((l) => (
+        <text x={l.textX} y={l.textY} class="leader-label" text-anchor={l.anchor}>{l.label}</text>
+      ))}
+    </g>
+
+    {/* Layer 7: LA Metro legend card */}
+    <g class="la-metro-legend" aria-hidden="true">
+      <rect
+        x={LEGEND.x}
+        y={LEGEND.y}
+        width={LEGEND.w}
+        height={LEGEND.h}
+        rx={2}
+        class="legend-bg"
+      />
+      <text
+        x={LEGEND.x + LEGEND.w / 2}
+        y={LEGEND.y + LEGEND.titleY - LEGEND.y}
+        class="legend-title"
+        text-anchor="middle"
+      >LOS ANGELES METRO</text>
+      {laMetroBranches.map((b, i) => {
+        const cy = LEGEND.y + LEGEND.firstItemY - LEGEND.y + i * LEGEND.itemStep;
+        const dotX = LEGEND.x + LEGEND.paddingX + 4;
+        const textX = LEGEND.x + LEGEND.paddingX + 18;
+        return (
+          <>
+            {b.isHq ? (
+              <>
+                <circle cx={dotX} cy={cy - 3} r={5} class="legend-dot legend-dot-hq-outer" />
+                <circle cx={dotX} cy={cy - 3} r={2} class="legend-dot-hq-inner" />
+              </>
+            ) : (
+              <circle cx={dotX} cy={cy - 3} r={4} class="legend-dot" />
+            )}
+            <text x={textX} y={cy} class={`legend-item${b.isHq ? ' legend-item-hq' : ''}`}>
+              {b.name}{b.isHq ? '  (HQ)' : ''}
             </text>
           </>
         );
       })}
     </g>
 
-    {/* Layer 4: Service-radius rings (15-mile, behind markers, above counties) */}
-    <g class="service-rings" aria-hidden="true">
-      {branchPins.map((p) => (
-        <circle
-          cx={p.x}
-          cy={p.y}
-          r={SERVICE_RADIUS_SVG_UNITS}
-          class="service-ring"
-        />
-      ))}
-    </g>
-
-    {/* Layer 5: Branch markers + labels + hover tooltips */}
+    {/* Layer 8: Branch markers (no individual labels — labels live in
+        leader-lines or the LA Metro legend) + hover tooltips. */}
     <g class="branch-pins">
       {branchPins.map((p) => {
         const tipW = 180;
         const tipH = 64;
-        // Anchor tooltip above the marker by default; for top-edge markers
-        // (county labels at y < 320), shift below to keep on canvas.
         const tipY = p.y - tipH - 14;
         const tipX = Math.max(8, Math.min(SVG_WIDTH - tipW - 8, p.x - tipW / 2));
         return (
@@ -219,14 +277,6 @@ const CORNER_BADGES: CornerBadge[] = [
             ) : (
               <circle cx={p.x} cy={p.y} r={6} class="branch-dot" />
             )}
-            <text
-              x={p.x + p.label.dx}
-              y={p.y + p.label.dy}
-              class="branch-label"
-              text-anchor={p.label.anchor}
-            >
-              {p.branch.name.toUpperCase()}
-            </text>
             {/* Tooltip — hidden by default, fades in on hover/focus */}
             <g class="branch-tooltip" transform={`translate(${tipX}, ${tipY})`} aria-hidden="true">
               <rect class="tooltip-bg" x={0} y={0} width={tipW} height={tipH} rx={2} />
@@ -236,32 +286,19 @@ const CORNER_BADGES: CornerBadge[] = [
                 {p.citiesServed} {p.citiesServed === 1 ? 'city' : 'cities'} served
               </text>
             </g>
-            {/* Invisible hit-target so the dot AND its label trigger hover */}
-            <rect
-              x={p.x - 30}
-              y={p.y - 14}
-              width={60}
-              height={28}
-              class="branch-hit"
-              fill="transparent"
-            />
+            {/* Wider invisible hit-target so the dot is easy to hover */}
+            <rect x={p.x - 14} y={p.y - 14} width={28} height={28} class="branch-hit" fill="transparent" />
           </g>
         );
       })}
     </g>
 
-    {/* Layer 6: Corner stat badges (above all map content, below tooltips) */}
+    {/* Layer 9: Corner stat badges (above all map content, below tooltips) */}
     <g class="corner-badges" aria-hidden="true">
       {CORNER_BADGES.map((b) => (
         <g class="corner-badge" transform={`translate(${b.x}, ${b.y})`}>
           <rect class="corner-badge-bg" x={0} y={0} width={b.w} height={b.h} rx={2} />
-          <text
-            class="corner-badge-text"
-            x={b.w / 2}
-            y={b.h / 2 + 1}
-            text-anchor="middle"
-            dominant-baseline="middle"
-          >
+          <text class="corner-badge-text" x={b.w / 2} y={b.h / 2 + 1} text-anchor="middle" dominant-baseline="middle">
             {b.text}
           </text>
         </g>
@@ -295,6 +332,15 @@ const CORNER_BADGES: CornerBadge[] = [
     display: block;
   }
 
+  /* ── Ocean ── */
+  .ocean-fill {
+    fill: #0d1a2a;
+    fill-opacity: 0.45;
+    stroke: rgba(120, 150, 190, 0.10);
+    stroke-width: 0.5;
+    pointer-events: none;
+  }
+
   /* ── Counties ── */
   .county-link { cursor: pointer; }
   .county-path {
@@ -309,17 +355,6 @@ const CORNER_BADGES: CornerBadge[] = [
     fill: rgba(200, 16, 46, 0.15);
     stroke: #C8102E;
     stroke-width: 2;
-  }
-
-  /* ── Freeways ── */
-  .freeway {
-    fill: none;
-    stroke: #D4AF37;
-    stroke-width: 1;
-    stroke-opacity: 0.20;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    pointer-events: none;
   }
 
   /* ── County labels ── */
@@ -342,12 +377,61 @@ const CORNER_BADGES: CornerBadge[] = [
     user-select: none;
   }
 
-  /* ── Service rings ── */
-  .service-ring {
-    fill: rgba(200, 16, 46, 0.08);
-    stroke: rgba(200, 16, 46, 0.20);
-    stroke-width: 1;
+  /* ── Leader-lines + external labels ── */
+  .leader-line {
+    stroke: #D4AF37;
+    stroke-width: 0.5;
+    stroke-opacity: 0.40;
+    fill: none;
     pointer-events: none;
+  }
+  .leader-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    fill: #D4AF37;
+    letter-spacing: 0.10em;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  /* ── LA Metro legend card ── */
+  .legend-bg {
+    fill: #0a0a0a;
+    fill-opacity: 0.65;
+    stroke: rgba(212, 175, 55, 0.40);
+    stroke-width: 1;
+  }
+  .legend-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 700;
+    fill: #D4AF37;
+    letter-spacing: 0.18em;
+  }
+  .legend-dot {
+    fill: #D4AF37;
+    stroke: #0a0a0a;
+    stroke-width: 1;
+  }
+  .legend-dot-hq-outer {
+    fill: #D4AF37;
+    stroke: #0a0a0a;
+    stroke-width: 1;
+  }
+  .legend-dot-hq-inner {
+    fill: #C8102E;
+  }
+  .legend-item {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 500;
+    fill: #d4d4d4;
+    letter-spacing: 0.05em;
+  }
+  .legend-item-hq {
+    fill: #D4AF37;
+    font-weight: 700;
   }
 
   /* ── Branch pins ── */
@@ -356,7 +440,7 @@ const CORNER_BADGES: CornerBadge[] = [
     fill: #D4AF37;
     stroke: #0a0a0a;
     stroke-width: 1.5;
-    transition: r 0.2s ease, fill 0.2s ease;
+    transition: fill 0.2s ease;
   }
   .branch-pin-hq .branch-dot-outer {
     fill: #D4AF37;
@@ -367,25 +451,7 @@ const CORNER_BADGES: CornerBadge[] = [
     fill: #C8102E;
     pointer-events: none;
   }
-  .branch-label {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    font-weight: 600;
-    fill: #D4AF37;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    pointer-events: none;
-    user-select: none;
-  }
-  .branch-pin-hq .branch-label {
-    font-size: 12px;
-    font-weight: 700;
-    fill: #e5c254;
-  }
-
-  .branch-pin:hover .branch-dot {
-    fill: #e5c254;
-  }
+  .branch-pin:hover .branch-dot { fill: #e5c254; }
   .branch-hit { cursor: pointer; }
 
   /* ── Tooltip ── */
@@ -441,13 +507,13 @@ const CORNER_BADGES: CornerBadge[] = [
     user-select: none;
   }
 
-  /* ── Responsive: bump SVG-space font sizes on narrow viewports so they
-       stay legible after the SVG scales down. ── */
+  /* ── Responsive: SVG-space font bumps so labels stay legible ── */
   @media (max-width: 768px) {
     .county-label { font-size: 12px; letter-spacing: 0.10em; }
     .county-branches-label { font-size: 9px; }
-    .branch-label { font-size: 13px; }
-    .branch-pin-hq .branch-label { font-size: 14px; }
+    .leader-label { font-size: 13px; }
+    .legend-title { font-size: 14px; letter-spacing: 0.15em; }
+    .legend-item { font-size: 13px; }
     .corner-badge-text { font-size: 13px; letter-spacing: 0.15em; }
     .tooltip-name { font-size: 13px; }
     .tooltip-phone { font-size: 12px; }
@@ -456,7 +522,7 @@ const CORNER_BADGES: CornerBadge[] = [
   @media (max-width: 640px) {
     .county-label { font-size: 11px; }
     .county-branches-label { font-size: 8px; }
-    /* Hide bottom-right badge on very narrow screens to avoid overlap with Riverside */
+    /* Hide bottom-right badge on very narrow screens to avoid Riverside overlap */
     .corner-badge:nth-of-type(3) { display: none; }
   }
 
