@@ -1,0 +1,108 @@
+---
+// ServiceArea.astro — UNIFIED Service Area section (replaces old Branches + Areas)
+//
+// Status: SCAFFOLD (Step 3) — full content comes in Step 4
+//
+// Will render:
+//   1. Centered section header: "Our Service Area · 5 Counties · {N} Cities"
+//   2. <CountyMap /> SVG component (Step 2 output, already wired below)
+//   3. 7-branch listing below map (HQ + 6 SAB):
+//        - HQ: name + full address + phone
+//        - SAB: name + city/state + phone (NO street, per NAP rule)
+//   4. City grid by county (5 cols) — only cities with .astro pages clickable
+//   5. CTA: "View All Cities →" → /areas/
+
+import CountyMap from './CountyMap.astro';
+import {
+  HEADQUARTERS,
+  SERVICE_AREAS,
+  BRANCHES,
+  TOTAL_CITIES_WITH_PAGES,
+} from '../../data/branches';
+import { COUNTIES } from '../../data/cities';
+
+interface Props {
+  // Empty — fully data-driven from BRANCHES + cities.ts
+}
+
+const countyCount = Object.keys(COUNTIES).length;
+---
+
+<section class="service-area" id="service-area">
+  <div class="container">
+    <header class="section-header-simple">
+      <h2 class="section-title">
+        Our <span class="text-gold">Service Area</span>
+      </h2>
+      <p class="section-subtitle">
+        Headquartered in {HEADQUARTERS.name} · {countyCount} counties ·
+        {TOTAL_CITIES_WITH_PAGES} cities · {BRANCHES.length} service locations
+      </p>
+    </header>
+
+    <div class="map-wrapper">
+      <CountyMap />
+    </div>
+
+    <div class="branches-listing scaffold">
+      <p>
+        [Scaffold] Branch listing renders in Step 4 — 1 HQ ({HEADQUARTERS.name})
+        + {SERVICE_AREAS.length} service territories.
+      </p>
+    </div>
+
+    <div class="cities-grid scaffold">
+      <p>
+        [Scaffold] {countyCount}-county clickable city grid renders in Step 4 —
+        {TOTAL_CITIES_WITH_PAGES} cities total.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .service-area {
+    background: #0a0a0a;
+    color: #ffffff;
+    padding: 112px 24px;
+    border-bottom: 1px dashed rgba(212, 175, 55, 0.4);
+  }
+  .service-area .container {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  .section-header-simple {
+    text-align: center;
+    margin-bottom: 56px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 3.4vw, 44px);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 16px 0;
+    color: #ffffff;
+  }
+  .text-gold {
+    color: #D4AF37;
+    font-style: italic;
+  }
+  .section-subtitle {
+    color: #d4d4d4;
+    font-family: 'Montserrat', sans-serif;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  .map-wrapper {
+    margin: 56px 0;
+  }
+  .scaffold {
+    margin-top: 32px;
+    padding: 24px;
+    border: 1px dashed rgba(212, 175, 55, 0.4);
+    color: #888;
+    text-align: center;
+  }
+  .scaffold p { margin: 0; }
+</style>
