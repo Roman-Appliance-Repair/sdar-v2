@@ -112,7 +112,18 @@ const commercialJson = JSON.stringify(commercial);
       <div class="services-content">
         <div class="service-display">
           <div class="service-photo">
-            <div class="photo-placeholder">{residential[0].photoCaption}</div>
+            {residential[0].category === 'residential' ? (
+              <picture>
+                <source srcset={`/images/services/${residential[0].id}.webp`} type="image/webp" />
+                <img
+                  src={`/images/services/${residential[0].id}.jpg`}
+                  alt={`${residential[0].name} — Same Day Appliance Repair`}
+                  loading="eager"
+                />
+              </picture>
+            ) : (
+              <div class="photo-placeholder">{residential[0].photoCaption}</div>
+            )}
           </div>
           <h3 class="service-name">{residential[0].name}</h3>
           <p class="service-desc">{residential[0].desc}</p>
@@ -153,11 +164,25 @@ const commercialJson = JSON.stringify(commercial);
         .replace(/"/g, '&quot;');
     }
 
+    function renderPhoto(item) {
+      if (item.category === 'residential') {
+        const id = escapeHtml(item.id);
+        const alt = escapeHtml(item.name + ' — Same Day Appliance Repair');
+        return (
+          '<picture>' +
+          '<source srcset="/images/services/' + id + '.webp" type="image/webp" />' +
+          '<img src="/images/services/' + id + '.jpg" alt="' + alt + '" loading="lazy" />' +
+          '</picture>'
+        );
+      }
+      return '<div class="photo-placeholder">' + escapeHtml(item.photoCaption) + '</div>';
+    }
+
     function renderContent(item) {
       content.innerHTML =
         '<div class="service-display">' +
         '<div class="service-photo">' +
-        '<div class="photo-placeholder">' + escapeHtml(item.photoCaption) + '</div>' +
+        renderPhoto(item) +
         '</div>' +
         '<h3 class="service-name">' + escapeHtml(item.name) + '</h3>' +
         '<p class="service-desc">' + escapeHtml(item.desc) + '</p>' +
@@ -377,13 +402,21 @@ const commercialJson = JSON.stringify(commercial);
   }
   .services-content :global(.service-photo) {
     width: 100%;
-    flex: 1;
-    min-height: 320px;
+    aspect-ratio: 4 / 5;
     margin-bottom: 28px;
     border: 2px solid var(--gold);
     overflow: hidden;
     box-shadow: 0 0 30px var(--red-glow);
     position: relative;
+  }
+  .services-content :global(.service-photo picture),
+  .services-content :global(.service-photo img) {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .services-content :global(.service-photo img) {
+    object-fit: cover;
   }
   .services-content :global(.service-photo .photo-placeholder) {
     width: 100%;
@@ -471,7 +504,6 @@ const commercialJson = JSON.stringify(commercial);
     .section-header-simple .section-title { font-size: 24px; }
     .services-container { flex-direction: column; min-height: 0; }
     .services-menu { flex: 1; }
-    .services-content :global(.service-photo) { min-height: 240px; }
     .services-content :global(.service-name) { font-size: 24px; }
   }
 
