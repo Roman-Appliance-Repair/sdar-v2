@@ -38,6 +38,37 @@ const branchPoints = JSON.parse(
   readFileSync(join(__dirname, 'branch-points-projected.geojson'), 'utf8'),
 );
 
+// ─── Drop offshore islands: keep only the largest polygon per county ────────
+// Census Bureau geometries include Catalina, San Clemente, San Nicolas, etc.
+// as separate polygons inside MultiPolygon features. SDAR doesn't service the
+// Channel Islands, so we collapse each MultiPolygon to its largest member
+// (the mainland) before any bbox / path / centroid math runs.
+function ringAreaXY(ring) {
+  let a = 0;
+  for (let i = 0, n = ring.length; i < n - 1; i++) {
+    const [x1, y1] = ring[i];
+    const [x2, y2] = ring[i + 1];
+    a += x1 * y2 - x2 * y1;
+  }
+  return Math.abs(a) / 2;
+}
+function mainlandOnly(geom) {
+  if (geom.type !== 'MultiPolygon') return geom;
+  let largestIdx = 0;
+  let largestArea = -1;
+  for (let i = 0; i < geom.coordinates.length; i++) {
+    const a = ringAreaXY(geom.coordinates[i][0]);
+    if (a > largestArea) {
+      largestArea = a;
+      largestIdx = i;
+    }
+  }
+  return { type: 'Polygon', coordinates: geom.coordinates[largestIdx] };
+}
+for (const f of counties.features) {
+  f.geometry = mainlandOnly(f.geometry);
+}
+
 // ─── Compute combined bbox of the 5 counties ────────────────────────────────
 let minX = +Infinity, minY = +Infinity, maxX = -Infinity, maxY = -Infinity;
 function visit(coords) {
