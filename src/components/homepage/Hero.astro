@@ -1,76 +1,402 @@
 ---
 // Hero.astro — Homepage hero section
 //
-// Status: SCAFFOLD (Step 3) — content fills in during Step 4
-//
-// Will render: full-screen luxury editorial hero with split layout
-//   - Eyebrow: "Same Day Appliance Repair · Est. Southern California"
-//   - H1 with --red and --gold color spans
-//   - Subheading: 7 service locations summary
-//   - 4 trust bullets
-//   - 7 location list with phone links (HEADQUARTERS + SERVICE_AREAS, only active phones)
-//   - 2 CTAs (Call + Book Online)
+// Step 4 of homepage redesign sprint — replaces the Step 3 scaffold.
+// Layout: full-screen 100vh, 60/40 split (text left, photo right) on desktop,
+// single column on tablet/mobile.
+// Data: BRANCHES from src/data/branches.ts. Phones rendered as-is, including
+// the (909)/(951) 555 placeholders for RC and Temecula until Monday DID swap.
 
-import { HEADQUARTERS, SERVICE_AREAS, MAIN_PHONE } from '../../data/branches';
+import { BRANCHES, MAIN_PHONE } from '../../data/branches';
 
-interface Props {
-  // Empty — Hero is fully data-driven from BRANCHES.
+interface Props {}
+
+// Display order per preview-homepage convention.
+const HERO_BRANCH_ORDER = [
+  'pasadena',
+  'west-hollywood',
+  'los-angeles',
+  'thousand-oaks',
+  'irvine',
+  'rancho-cucamonga',
+  'temecula',
+];
+
+const heroBranches = HERO_BRANCH_ORDER
+  .map(slug => BRANCHES.find(b => b.slug === slug))
+  .filter((b): b is NonNullable<typeof b> => b !== undefined);
+
+function telLink(phone: string): string {
+  return 'tel:+1' + phone.replace(/\D/g, '');
 }
+
+const mainPhoneTelLink = telLink(MAIN_PHONE);
 ---
 
-<section class="hero" id="hero">
-  <div class="container">
-    <p class="hero-eyebrow">Hero — scaffold (Step 3)</p>
-    <h1 class="hero-title">
-      Hero scaffold —
-      <span class="text-red">content</span> in
-      <span class="text-gold">Step 4</span>
-    </h1>
-    <p class="hero-subtitle">
-      Will render: 7 service locations including {HEADQUARTERS.name} HQ and
-      {SERVICE_AREAS.length} service territories. Main phone {MAIN_PHONE}.
-    </p>
+<section class="hero" id="hero" aria-labelledby="hero-title">
+  <div class="hero-bg" aria-hidden="true"></div>
+
+  <div class="hero-grid">
+    <div class="hero-content">
+      <div class="hero-content-box">
+        <p class="hero-eyebrow">Same Day Appliance Repair · Est. Southern California</p>
+
+        <h1 class="hero-title" id="hero-title">
+          Same Day Appliance Repair —
+          <span class="text-red">Los Angeles</span> &amp;
+          <span class="text-gold">Southern California</span>
+        </h1>
+
+        <p class="hero-subtitle">
+          Headquartered in West Hollywood. Service across Los Angeles, Orange,
+          Ventura, San Bernardino, and Riverside counties. Over 10 years of
+          professional appliance repair service.
+        </p>
+
+        <ul class="hero-bullets" aria-label="Why choose us">
+          <li><span class="bullet-glyph" aria-hidden="true">◆</span>Same day service</li>
+          <li><span class="bullet-glyph" aria-hidden="true">◆</span>85% fixed first visit</li>
+          <li><span class="bullet-glyph" aria-hidden="true">◆</span>Licensed &amp; Insured · BHGS #A49573</li>
+          <li><span class="bullet-glyph" aria-hidden="true">◆</span>90-day warranty</li>
+        </ul>
+
+        <ul class="hero-branches" aria-label="Branch phone lines">
+          {heroBranches.map(b => (
+            <li class="hero-branch-row">
+              <span class="hero-branch-city">{b.name}</span>
+              <span class="hero-branch-sep" aria-hidden="true">·</span>
+              <a
+                class="hero-branch-phone"
+                href={telLink(b.phone)}
+                aria-label={`Call ${b.name} location at ${b.phone}`}
+              >{b.phone}</a>
+            </li>
+          ))}
+        </ul>
+
+        <div class="hero-ctas">
+          <a
+            class="hero-cta hero-cta-primary"
+            href={mainPhoneTelLink}
+            aria-label={`Call our main line at ${MAIN_PHONE}`}
+          >Call {MAIN_PHONE}</a>
+          <a
+            class="hero-cta hero-cta-secondary"
+            href="/book/"
+            aria-label="Book a repair visit online"
+          >Book Online →</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-photo" aria-hidden="true">
+      <svg
+        class="hero-photo-placeholder"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 600 800"
+        preserveAspectRatio="xMidYMid slice"
+        role="presentation"
+      >
+        <defs>
+          <linearGradient id="hero-photo-gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#1a1a1a"/>
+            <stop offset="1" stop-color="#0a0a0a"/>
+          </linearGradient>
+        </defs>
+        <rect width="600" height="800" fill="url(#hero-photo-gradient)"/>
+        <text
+          x="300" y="400" text-anchor="middle"
+          font-family="Cinzel, serif" font-size="14"
+          letter-spacing="2.8" fill="#888"
+        >PHOTO PLACEHOLDER</text>
+        <text
+          x="300" y="430" text-anchor="middle"
+          font-family="Cinzel, serif" font-size="11"
+          letter-spacing="1.65" fill="#555"
+        >TECHNICIAN ON SERVICE CALL</text>
+      </svg>
+    </div>
   </div>
 </section>
 
 <style>
+  /* Scoped tokens — fall back when global.css doesn't expose them. */
   .hero {
-    min-height: 60vh;
-    background: var(--bg, #0a0a0a);
-    color: var(--text, #ffffff);
-    padding: 120px 24px;
+    --bg: #0a0a0a;
+    --bg2: #151515;
+    --bg3: #1a1a1a;
+    --gold: #D4AF37;
+    --gold-h: #e5c254;
+    --red-h: #e0152f;
+    --text2: #d4d4d4;
+    --text3: #888888;
+    --border-gold: rgba(212, 175, 55, 0.4);
+
+    position: relative;
+    min-height: 100vh;
+    background: var(--bg);
+    color: #ffffff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* Subtle SVG fractal-noise texture (matches preview-homepage body). */
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+      radial-gradient(circle at 30% 40%, rgba(200, 16, 46, 0.08), transparent 60%),
+      radial-gradient(circle at 80% 70%, rgba(212, 175, 55, 0.05), transparent 55%),
+      url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIj48ZmVUdXJidWxlbmNlIHR5cGU9ImZyYWN0YWxOb2lzZSIgYmFzZUZyZXF1ZW5jeT0iLjc1Ii8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iLjA1Ii8+PC9zdmc+');
+    background-color: var(--bg);
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 0;
+    min-height: 100vh;
+    max-width: 1480px;
+    margin: 0 auto;
+    align-items: stretch;
+  }
+
+  .hero-content {
     display: flex;
     align-items: center;
-    border-bottom: 1px dashed rgba(212, 175, 55, 0.4);
+    padding: 96px 48px 96px 64px;
   }
-  .hero .container {
-    max-width: 1280px;
-    margin: 0 auto;
-    width: 100%;
+
+  .hero-content-box {
+    max-width: 720px;
+    border-left: 1px solid var(--border-gold);
+    padding-left: 32px;
   }
+
+  /* ── 1. Eyebrow ── */
   .hero-eyebrow {
-    color: #D4AF37;
     font-family: 'Cinzel', serif;
     font-size: 12px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
+    color: var(--gold);
     margin: 0 0 24px 0;
   }
+
+  /* ── 2. Headline ── */
   .hero-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 5vw, 64px);
-    line-height: 1.1;
-    margin: 0 0 24px 0;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-weight: 700;
+    font-size: clamp(40px, 6vw, 72px);
+    line-height: 1.08;
+    letter-spacing: -0.01em;
     color: #ffffff;
+    margin: 0 0 24px 0;
   }
   .hero-title .text-red { color: #C8102E; }
-  .hero-title .text-gold { color: #D4AF37; font-style: italic; }
+  .hero-title .text-gold { color: var(--gold); font-style: italic; }
+
+  /* ── 3. Subheading ── */
   .hero-subtitle {
-    color: #d4d4d4;
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-size: 17px;
+    line-height: 1.7;
+    color: var(--text2);
+    max-width: 580px;
+    margin: 0 0 28px 0;
+  }
+
+  /* ── 4. Trust bullets ── */
+  .hero-bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px 0;
+    display: grid;
+    gap: 8px;
+  }
+  .hero-bullets li {
     font-family: 'Montserrat', sans-serif;
-    font-size: 16px;
-    line-height: 1.75;
-    max-width: 680px;
-    margin: 0;
+    font-size: 14px;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .bullet-glyph {
+    color: var(--gold);
+    font-size: 12px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+
+  /* ── 5. Branch list ── */
+  .hero-branches {
+    list-style: none;
+    padding: 24px 0;
+    margin: 0 0 32px 0;
+    border-top: 1px solid rgba(212, 175, 55, 0.15);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+    display: grid;
+    gap: 6px;
+  }
+  .hero-branch-row {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+  }
+  .hero-branch-city {
+    color: #ffffff;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+  .hero-branch-sep {
+    color: var(--text3);
+    flex-shrink: 0;
+  }
+  .hero-branch-phone {
+    color: var(--gold);
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+    transition: color 0.2s ease;
+    margin-left: auto;
+  }
+  .hero-branch-phone:hover,
+  .hero-branch-phone:focus-visible {
+    color: #C8102E;
+  }
+
+  /* ── 6. CTAs ── */
+  .hero-ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .hero-cta {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: 16px 28px;
+    border: 1px solid transparent;
+    border-radius: 2px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-cta-primary {
+    background: #C8102E;
+    color: #ffffff;
+    border-color: #C8102E;
+  }
+  .hero-cta-primary:hover,
+  .hero-cta-primary:focus-visible {
+    background: var(--red-h);
+    border-color: var(--red-h);
+    transform: scale(1.02);
+  }
+  .hero-cta-secondary {
+    background: transparent;
+    color: var(--gold);
+    border-color: var(--gold);
+  }
+  .hero-cta-secondary:hover,
+  .hero-cta-secondary:focus-visible {
+    background: rgba(212, 175, 55, 0.05);
+    border-color: var(--gold-h);
+    color: var(--gold-h);
+  }
+
+  /* ── Photo (right column) ── */
+  .hero-photo {
+    position: relative;
+    overflow: hidden;
+    border-left: 1px solid var(--border-gold);
+  }
+  .hero-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+  }
+
+  /* ── Responsive ── */
+
+  /* Tablet — single column, photo collapses to top band */
+  @media (max-width: 1024px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+    .hero-content {
+      padding: 72px 32px;
+      order: 2;
+    }
+    .hero-photo {
+      order: 1;
+      height: 30vh;
+      min-height: 240px;
+      border-left: 0;
+      border-bottom: 1px solid var(--border-gold);
+    }
+    .hero-content-box {
+      padding-left: 24px;
+      max-width: 100%;
+    }
+  }
+
+  /* Mobile — tighter, hide photo, smaller H1 */
+  @media (max-width: 768px) {
+    .hero {
+      min-height: auto;
+    }
+    .hero-content {
+      padding: 56px 24px;
+    }
+    .hero-content-box {
+      padding-left: 16px;
+    }
+    .hero-photo {
+      display: none;
+    }
+    .hero-title {
+      font-size: clamp(32px, 8vw, 48px);
+    }
+    .hero-subtitle {
+      font-size: 15px;
+    }
+    .hero-branch-row {
+      flex-wrap: wrap;
+    }
+    .hero-branch-sep {
+      display: none;
+    }
+    .hero-branch-phone {
+      margin-left: auto;
+    }
+    .hero-ctas {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .hero-cta {
+      width: 100%;
+    }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-cta,
+    .hero-branch-phone {
+      transition: none;
+    }
+    .hero-cta-primary:hover,
+    .hero-cta-primary:focus-visible {
+      transform: none;
+    }
   }
 </style>
