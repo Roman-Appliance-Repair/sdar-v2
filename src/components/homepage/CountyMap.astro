@@ -1,0 +1,151 @@
+---
+// CountyMap.astro
+//
+// Static SVG map of 5 SoCal counties served by SDAR.
+//
+// Renders inline SVG with:
+//   - 5 county paths (clickable → county hub pages)
+//   - County name labels (Cinzel small caps, gold) at visual centroids
+//   - Empty slot for branch pins (Phase B will populate)
+//   - Embedded <title> and <desc> for SEO and accessibility
+//
+// Data is pre-projected at build time by scripts/maps/geojson-to-svg.mjs.
+// Re-run that script after editing the source GeoJSON.
+
+import { COUNTY_BOUNDARIES, SVG_VIEWBOX } from '../../data/county-boundaries';
+
+// In Phase A, we render branch-pin slots but do NOT make them visible/active.
+// Step 7 will flip this to true and populate the <g class="branch-pins"> group.
+const SHOW_BRANCH_PINS = false;
+---
+
+<div class="county-map-wrapper" role="region" aria-label="Service Area Map">
+  <svg
+    viewBox={SVG_VIEWBOX}
+    xmlns="http://www.w3.org/2000/svg"
+    class="county-map"
+    role="img"
+    aria-labelledby="map-title map-desc"
+  >
+    <title id="map-title">Same Day Appliance Repair Service Area — Southern California</title>
+    <desc id="map-desc">
+      Map of five Southern California counties served by Same Day Appliance Repair:
+      Los Angeles, Orange, Ventura, San Bernardino, and Riverside. Headquartered in
+      West Hollywood with service territories across all five counties.
+    </desc>
+
+    <defs>
+      <pattern id="county-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(212,175,55,0.03)" stroke-width="1"/>
+      </pattern>
+      <radialGradient id="county-fill" cx="50%" cy="50%" r="80%">
+        <stop offset="0%" stop-color="#1a1a1a" />
+        <stop offset="100%" stop-color="#0a0a0a" />
+      </radialGradient>
+    </defs>
+
+    <rect width="1000" height="700" fill="#0a0a0a" />
+    <rect width="1000" height="700" fill="url(#county-grid)" />
+
+    <g class="counties">
+      {COUNTY_BOUNDARIES.map(county => (
+        <a href={county.hubUrl} class="county-link" aria-label={`${county.name} service area`}>
+          <path
+            d={county.path}
+            class="county-path"
+            data-county={county.slug}
+          >
+            <title>{county.name}</title>
+          </path>
+        </a>
+      ))}
+    </g>
+
+    <g class="county-labels" aria-hidden="true">
+      {COUNTY_BOUNDARIES.map(county => (
+        <text
+          x={county.labelX}
+          y={county.labelY}
+          class="county-label"
+          text-anchor="middle"
+        >
+          {county.name.replace(' County', '').toUpperCase()}
+        </text>
+      ))}
+    </g>
+
+    {SHOW_BRANCH_PINS && (
+      <g class="branch-pins">
+        {/* Phase B (Step 7) — populate from BRANCH_PIN_POSITIONS */}
+      </g>
+    )}
+  </svg>
+</div>
+
+<style>
+  .county-map-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 10 / 7;
+    background: #1a1a1a;
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    overflow: hidden;
+  }
+
+  .county-map-wrapper::before {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .county-map {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .county-link {
+    cursor: pointer;
+  }
+
+  .county-path {
+    fill: url(#county-fill);
+    stroke: #D4AF37;
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+    transition: fill 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease;
+  }
+
+  .county-link:hover .county-path,
+  .county-link:focus-visible .county-path {
+    fill: rgba(200, 16, 46, 0.15);
+    stroke: #C8102E;
+    stroke-width: 2;
+  }
+
+  .county-label {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    font-weight: 600;
+    fill: #D4AF37;
+    letter-spacing: 0.15em;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (max-width: 768px) {
+    .county-label {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .county-path {
+      transition: none;
+    }
+  }
+</style>
