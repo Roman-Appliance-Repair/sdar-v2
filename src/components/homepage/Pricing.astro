@@ -1,18 +1,43 @@
 ---
 // Pricing.astro — Transparent Pricing section
 //
-// Step 10 of homepage redesign sprint (FINAL content scaffold).
-// Replicates Section 10 of public/preview-homepage.html.
+// Step 10 of homepage redesign sprint (FINAL content scaffold) + Calculator
+// addition: an interactive 4-cell repair-cost calculator rendered as a third
+// row continuation of the existing pricing table.
 //
-// 3-column static table (Service Type | Diagnostic Fee | Common Repair Examples)
-// with two rows (residential, commercial), an asterisk footnote, four trust
-// bullets, and a centered "View Full Price List →" link.
+// Replicates Section 10 of public/preview-homepage.html for the static
+// table, then extends with the calculator below.
 
 import {
   PRICING_TIERS,
   PRICING_BULLETS,
   PRICING_FOOTNOTE,
 } from '../../data/pricing';
+import {
+  REPAIR_ESTIMATES,
+  UNITS_BY_CATEGORY,
+} from '../../data/repair-estimates';
+
+// Trim REPAIR_ESTIMATES for the client payload — pageRange/notes are
+// build-time provenance, not needed at runtime.
+const clientEstimates = Object.fromEntries(
+  Object.entries(REPAIR_ESTIMATES).map(([id, u]) => [
+    id,
+    {
+      label: u.label,
+      href: u.href,
+      sparse: u.sparse ?? false,
+      issues: u.issues.map((i) => ({
+        id: i.id,
+        label: i.label,
+        priceRange: i.priceRange,
+      })),
+    },
+  ]),
+);
+
+const estimatesJson = JSON.stringify(clientEstimates);
+const unitsJson = JSON.stringify(UNITS_BY_CATEGORY);
 ---
 
 <section class="pricing-section" id="pricing">
@@ -49,6 +74,45 @@ import {
       </tbody>
     </table>
 
+    {/* Calculator — visually a third row of the pricing table */}
+    <div class="pricing-calculator" id="pricing-calculator">
+      <div class="calc-row">
+        <div class="calc-cell">
+          <label class="calc-label" for="calc-service-type">Service Type</label>
+          <select id="calc-service-type" class="calc-select" aria-label="Service type">
+            <option value="" disabled selected>Select…</option>
+            <option value="residential">Residential</option>
+            <option value="commercial">Commercial</option>
+          </select>
+        </div>
+        <div class="calc-cell">
+          <label class="calc-label" for="calc-unit">Unit Type</label>
+          <select id="calc-unit" class="calc-select" aria-label="Unit type" disabled>
+            <option value="" disabled selected>Select…</option>
+          </select>
+        </div>
+        <div class="calc-cell">
+          <label class="calc-label" for="calc-issue">Issue</label>
+          <select id="calc-issue" class="calc-select" aria-label="Issue" disabled>
+            <option value="" disabled selected>Select…</option>
+          </select>
+        </div>
+        <div class="calc-cell calc-output-cell">
+          <span class="calc-label">Estimated Cost</span>
+          <div class="calc-output" aria-live="polite">
+            <span class="calc-output-placeholder">Select options to see estimate</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-footer">
+        <p class="calc-disclaimer">
+          Estimate for labor only. Final price determined by technician on-site. Parts not included.
+        </p>
+        <a class="calc-detail-link" href="#" hidden>View Repair Details →</a>
+      </div>
+    </div>
+
     <p class="pricing-footnote">{PRICING_FOOTNOTE}</p>
 
     <ul class="pricing-bullets">
@@ -63,10 +127,118 @@ import {
   </div>
 </section>
 
+<script
+  is:inline
+  define:vars={{ estimatesJson, unitsJson }}
+>
+  (function () {
+    const calc = document.getElementById('pricing-calculator');
+    if (!calc) return;
+
+    const ESTIMATES = JSON.parse(estimatesJson);
+    const UNITS = JSON.parse(unitsJson);
+
+    const serviceTypeSel = calc.querySelector('#calc-service-type');
+    const unitSel        = calc.querySelector('#calc-unit');
+    const issueSel       = calc.querySelector('#calc-issue');
+    const output         = calc.querySelector('.calc-output');
+    const detailLink     = calc.querySelector('.calc-detail-link');
+
+    const placeholderHTML = '<span class="calc-output-placeholder">Select options to see estimate</span>';
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function rebuildSelect(selectEl, opts) {
+      // Reset to placeholder + supplied options
+      while (selectEl.firstChild) selectEl.removeChild(selectEl.firstChild);
+      const ph = document.createElement('option');
+      ph.value = '';
+      ph.textContent = 'Select…';
+      ph.disabled = true;
+      ph.selected = true;
+      selectEl.appendChild(ph);
+      for (const opt of opts) {
+        const o = document.createElement('option');
+        o.value = opt.value;
+        o.textContent = opt.label;
+        selectEl.appendChild(o);
+      }
+    }
+
+    function resetIssue() {
+      rebuildSelect(issueSel, []);
+      issueSel.disabled = true;
+      resetOutput();
+    }
+
+    function resetUnit() {
+      rebuildSelect(unitSel, []);
+      unitSel.disabled = true;
+      resetIssue();
+    }
+
+    function resetOutput() {
+      output.innerHTML = placeholderHTML;
+      detailLink.hidden = true;
+      detailLink.removeAttribute('href');
+      detailLink.textContent = 'View Repair Details →';
+    }
+
+    serviceTypeSel.addEventListener('change', () => {
+      const type = serviceTypeSel.value;
+      if (!type) { resetUnit(); return; }
+      const ids = UNITS[type] || [];
+      const opts = ids
+        .map((id) => ({ value: id, label: (ESTIMATES[id] && ESTIMATES[id].label) || id }))
+        .filter((o) => o.label);
+      rebuildSelect(unitSel, opts);
+      unitSel.disabled = opts.length === 0;
+      resetIssue();
+    });
+
+    unitSel.addEventListener('change', () => {
+      const id = unitSel.value;
+      if (!id) { resetIssue(); return; }
+      const unit = ESTIMATES[id];
+      if (!unit) { resetIssue(); return; }
+      const opts = unit.issues.map((i) => ({ value: i.id, label: i.label }));
+      rebuildSelect(issueSel, opts);
+      issueSel.disabled = opts.length === 0;
+      resetOutput();
+    });
+
+    issueSel.addEventListener('change', () => {
+      const issueId = issueSel.value;
+      const unitId  = unitSel.value;
+      if (!issueId || !unitId) { resetOutput(); return; }
+      const unit = ESTIMATES[unitId];
+      const issue = unit && unit.issues.find((i) => i.id === issueId);
+      if (!unit || !issue) { resetOutput(); return; }
+      const min = issue.priceRange.min;
+      const max = issue.priceRange.max;
+      const sparseBadge = unit.sparse
+        ? ' <span class="calc-output-sparse-badge" title="Source page has no per-issue list — estimate based on similar units" aria-label="Estimate based on similar units">ⓘ</span>'
+        : '';
+      output.innerHTML =
+        '<span class="calc-output-price">$' + min + ' – $' + max + '</span>' + sparseBadge;
+      detailLink.hidden = false;
+      detailLink.href = unit.href;
+      detailLink.textContent = 'View ' + escapeHtml(unit.label) + ' Repair Details →';
+    });
+  })();
+</script>
+
 <style>
   .pricing-section {
     --bg: #0a0a0a;
     --bg2: #151515;
+    --bg3: #1a1a1a;
     --red: #C8102E;
     --gold: #D4AF37;
     --gold-h: #e5c254;
@@ -115,7 +287,7 @@ import {
     border-collapse: collapse;
     background: var(--bg);
     border: 1px solid var(--border-gold);
-    margin-bottom: 32px;
+    margin-bottom: 0;            /* changed: calculator sits flush below */
   }
   .pricing-table th,
   .pricing-table td {
@@ -176,6 +348,161 @@ import {
     font-family: 'Montserrat', sans-serif;
   }
 
+  /* ==== CALCULATOR — reads as a third table row ==== */
+  .pricing-calculator {
+    background: var(--bg);
+    border: 1px solid var(--border-gold);
+    border-top: 1px solid var(--border-gold);
+    margin-top: -1px;            /* fuse with table bottom border */
+    margin-bottom: 32px;
+    padding: 24px 28px 22px;
+  }
+  .calc-row {
+    display: grid;
+    grid-template-columns:
+      minmax(140px, 0.9fr)
+      minmax(180px, 1.15fr)
+      minmax(220px, 1.4fr)
+      minmax(190px, 1fr);
+    gap: 22px;
+    align-items: start;
+  }
+  .calc-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;                /* allow children to truncate inside grid track */
+  }
+  .calc-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.20em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .calc-select {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border-gold);
+    border-radius: 2px;
+    color: var(--gold);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 11px 36px 11px 14px;
+    cursor: pointer;
+    transition: border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    /* Custom gold chevron */
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23D4AF37' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+  }
+  .calc-select:hover:not(:disabled) {
+    border-color: rgba(212, 175, 55, 0.7);
+  }
+  .calc-select:focus {
+    outline: none;
+    border-color: var(--gold);
+    box-shadow: 0 0 0 1px var(--gold);
+  }
+  .calc-select:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .calc-select option {
+    background: var(--bg2);
+    color: var(--text);
+  }
+  .calc-select option:disabled {
+    color: var(--text3);
+  }
+
+  .calc-output-cell {
+    /* extra room so the price text isn't cramped */
+  }
+  .calc-output {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    line-height: 1.1;
+  }
+  .calc-output-placeholder {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--text3);
+  }
+  .calc-output-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--red);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+  }
+  .calc-output-sparse-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid var(--border-gold);
+    color: var(--gold);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    cursor: help;
+    line-height: 1;
+  }
+
+  .calc-footer {
+    margin-top: 18px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    border-top: 1px dashed rgba(212, 175, 55, 0.18);
+    padding-top: 14px;
+  }
+  .calc-disclaimer {
+    margin: 0;
+    font-size: 11px;
+    font-style: italic;
+    color: var(--text3);
+    font-family: 'Montserrat', sans-serif;
+    line-height: 1.5;
+    flex: 1 1 280px;
+    min-width: 0;
+  }
+  .calc-detail-link {
+    color: var(--gold);
+    text-decoration: none;
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    border-bottom: 1px solid var(--border-gold);
+    padding: 2px 0;
+    transition: color 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+  }
+  .calc-detail-link:hover {
+    color: var(--gold-h);
+    border-color: var(--gold);
+  }
+  .calc-detail-link[hidden] { display: none; }
+
   /* ==== FOOTNOTE + BULLETS + CTA ==== */
   .pricing-footnote {
     font-size: 13px;
@@ -232,6 +559,25 @@ import {
   /* ==== RESPONSIVE ==== */
   @media (max-width: 1024px) {
     .pricing-section { padding: 80px 24px; }
+    .calc-row {
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+  }
+  @media (max-width: 768px) {
+    .calc-row {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+    .pricing-calculator { padding: 22px 18px 18px; }
+    .calc-output { min-height: 36px; }
+    .calc-output-price { font-size: 24px; }
+    .calc-footer {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .calc-detail-link { white-space: normal; }
   }
   @media (max-width: 640px) {
     .pricing-section { padding: 64px 20px; }
