@@ -1,10 +1,13 @@
 ---
 // Services.astro — Residential + Commercial tabbed service catalog
 //
-// Step 7 of homepage redesign sprint: replicates Section 05 of
-// public/preview-homepage.html. Tabbed UI (Residential / Commercial),
-// 2-column "menu" of service buttons + a single "service display" card.
-// Commercial tab mirrors the layout (menu on right via flex row-reverse).
+// Step 7 of homepage redesign sprint, with post-launch fixes:
+//   - Single-column menu (was 2-col grid)
+//   - Chip-button baseline for ALL items (active state ADDS emphasis)
+//   - Both menus rendered in SSR (tab switch toggles visibility, no JS rebuild
+//     of the menu — preserves Astro scoped CSS on items)
+//   - Right photo card stretches to match menu height; photo flex-fills the
+//     remaining vertical space inside the card
 //
 // URL resolution is done at build time against src/pages/. If a service id
 // (or its `urlSlug` override) maps to an existing page, the menu links there;
@@ -60,7 +63,6 @@ const laBranch = BRANCHES.find((b) => b.slug === 'los-angeles');
 const callPhone = laBranch?.phone ?? '(424) 325-0520';
 const callPhoneE164 = '+1' + callPhone.replace(/\D/g, '');
 
-// Serialize catalogs for the inline script — keeps the click handler tiny.
 const residentialJson = JSON.stringify(residential);
 const commercialJson = JSON.stringify(commercial);
 ---
@@ -82,7 +84,9 @@ const commercialJson = JSON.stringify(commercial);
     </div>
 
     <div class="services-container residential" data-active="residential">
-      <div class="services-menu">
+      {/* Both menus are rendered server-side so tab switching only toggles
+          visibility — no innerHTML rebuild that would strip Astro scoping. */}
+      <div class="services-menu" data-tab="residential">
         {residential.map((s, idx) => (
           <button
             class={`service-item${idx === 0 ? ' active' : ''}`}
@@ -93,6 +97,18 @@ const commercialJson = JSON.stringify(commercial);
           </button>
         ))}
       </div>
+      <div class="services-menu" data-tab="commercial">
+        {commercial.map((s, idx) => (
+          <button
+            class={`service-item${idx === 0 ? ' active' : ''}`}
+            data-service={s.id}
+            type="button"
+          >
+            {s.name}
+          </button>
+        ))}
+      </div>
+
       <div class="services-content">
         <div class="service-display">
           <div class="service-photo">
@@ -122,9 +138,12 @@ const commercialJson = JSON.stringify(commercial);
     if (!root) return;
     const tabs = root.querySelectorAll('.services-tabs .tab');
     const container = root.querySelector('.services-container');
-    const menu = root.querySelector('.services-menu');
+    const menus = {
+      residential: root.querySelector('.services-menu[data-tab="residential"]'),
+      commercial: root.querySelector('.services-menu[data-tab="commercial"]'),
+    };
     const content = root.querySelector('.services-content');
-    if (!container || !menu || !content) return;
+    if (!container || !menus.residential || !menus.commercial || !content) return;
 
     function escapeHtml(s) {
       return String(s)
@@ -149,52 +168,39 @@ const commercialJson = JSON.stringify(commercial);
         '</div>';
     }
 
-    function attachMenuListeners(items) {
-      menu.querySelectorAll('.service-item').forEach((btn, idx) => {
+    function attachMenuListeners(menuEl, items) {
+      menuEl.querySelectorAll('.service-item').forEach((btn, idx) => {
         btn.addEventListener('click', () => {
-          menu.querySelectorAll('.service-item').forEach((b) => b.classList.remove('active'));
+          menuEl.querySelectorAll('.service-item').forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
           renderContent(items[idx]);
         });
       });
     }
 
-    function loadCatalog(type) {
+    function activateTab(type) {
       const items = type === 'commercial' ? COMM : RES;
-      menu.innerHTML = items
-        .map(
-          (it, idx) =>
-            '<button class="service-item' +
-            (idx === 0 ? ' active' : '') +
-            '" data-service="' +
-            escapeHtml(it.id) +
-            '" type="button">' +
-            escapeHtml(it.name) +
-            '</button>'
-        )
-        .join('');
-      attachMenuListeners(items);
+      tabs.forEach((t) => {
+        const isActive = t.dataset.type === type;
+        t.classList.toggle('active', isActive);
+        t.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+      container.className = 'services-container ' + type;
+      container.setAttribute('data-active', type);
+      // Reset active highlight to first item in the newly-shown menu
+      const menuEl = menus[type];
+      menuEl.querySelectorAll('.service-item').forEach((b, i) => {
+        b.classList.toggle('active', i === 0);
+      });
       renderContent(items[0]);
     }
 
     tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        const type = tab.dataset.type;
-        tabs.forEach((t) => {
-          t.classList.remove('active');
-          t.setAttribute('aria-selected', 'false');
-        });
-        tab.classList.add('active');
-        tab.setAttribute('aria-selected', 'true');
-        container.className = 'services-container ' + type;
-        container.setAttribute('data-active', type);
-        loadCatalog(type);
-      });
+      tab.addEventListener('click', () => activateTab(tab.dataset.type));
     });
 
-    // Wire up listeners for the SSR-rendered residential menu so the first
-    // click works without a tab toggle.
-    attachMenuListeners(RES);
+    attachMenuListeners(menus.residential, RES);
+    attachMenuListeners(menus.commercial, COMM);
   })();
 </script>
 
@@ -256,7 +262,7 @@ const commercialJson = JSON.stringify(commercial);
     margin-bottom: 32px;
     border-bottom: 1px solid var(--border);
   }
-  .tab {
+  .services-tabs .tab {
     flex: 1;
     padding: 18px 24px;
     background: transparent;
@@ -272,66 +278,76 @@ const commercialJson = JSON.stringify(commercial);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     margin-bottom: -1px;
   }
-  .tab:hover:not(.active) { color: var(--text2); border-bottom-color: var(--border2); }
-  .tab.active {
+  .services-tabs .tab:hover:not(.active) { color: var(--text2); border-bottom-color: var(--border2); }
+  .services-tabs .tab.active {
     background: var(--red);
     border-bottom-color: var(--gold);
     color: var(--text);
   }
 
   /* ==== LAYOUT ==== */
+  /* flex with default align-items: stretch — left and right columns share height */
   .services-container {
     display: flex;
     gap: 32px;
+    align-items: stretch;
     min-height: 600px;
-    transition: all 0.3s ease;
+    transition: opacity 0.2s ease;
   }
-  .services-container.residential { flex-direction: row; }
-  .services-container.commercial { flex-direction: row-reverse; }
 
-  /* ==== MENU ==== */
+  /* ==== MENU — single column for both tabs ==== */
   .services-menu {
     flex: 0 0 34%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     align-content: start;
   }
-  .service-item {
-    padding: 8px 12px;
-    background: transparent;
-    border: none;
-    border-left: 2px solid transparent;
-    color: var(--text2);
+  /* Hide the inactive tab's menu */
+  .services-container.residential .services-menu[data-tab="commercial"],
+  .services-container.commercial  .services-menu[data-tab="residential"] {
+    display: none;
+  }
+
+  /* ==== SERVICE ITEM CHIP — unconditional baseline for every item.
+       `:global` so the same rules apply to JS-rebuilt content-card descendants
+       even though the menu items themselves are now SSR-rendered. ==== */
+  .services-section :global(.service-item) {
+    display: block;
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
     font-family: 'Montserrat', sans-serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 500;
-    letter-spacing: 0.03em;
-    text-align: left;
+    letter-spacing: 0.04em;
+    text-align: center;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-height: 1.2;
   }
-  .services-container.commercial .service-item {
-    border-left: none;
-    border-right: 2px solid transparent;
-    text-align: right;
-  }
-  .service-item:hover {
-    color: var(--gold);
+  .services-section :global(.service-item:hover) {
     background: var(--bg3);
+    border-color: var(--gold);
+    color: var(--gold);
   }
-  .service-item.active {
-    background: var(--red-dim);
-    border-left-color: var(--gold);
-    color: var(--text);
-    font-weight: 600;
+  /* Active state ADDS emphasis on top of the baseline; the chip silhouette
+     (border, padding, centered text, dark fill) is preserved. */
+  .services-section :global(.service-item.active) {
+    background: var(--red);
+    border-color: var(--gold);
+    color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 0 12px var(--red-glow);
   }
-  .services-container.commercial .service-item.active {
-    border-left-color: transparent;
-    border-right-color: var(--gold);
+  .services-section :global(.service-item.active:hover) {
+    color: #ffffff;
   }
 
   /* ==== CONTENT CARD ==== */
@@ -340,22 +356,36 @@ const commercialJson = JSON.stringify(commercial);
     background: var(--bg2);
     border: 1px solid var(--border);
     padding: 32px;
+    /* flex column so the inner .service-display can stretch full height */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
-  .service-display { animation: servicesFadeIn 0.4s ease-out; }
+
+  /* `.service-display`, `.service-photo`, etc. are rebuilt by JS on item
+     click via innerHTML — use :global so scoped CSS still applies. */
+  .services-content :global(.service-display) {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    animation: servicesFadeIn 0.4s ease-out;
+  }
   @keyframes servicesFadeIn {
     from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
+    to   { opacity: 1; transform: translateY(0); }
   }
-  .service-photo {
+  .services-content :global(.service-photo) {
     width: 100%;
-    height: 450px;
+    flex: 1;
+    min-height: 320px;
     margin-bottom: 28px;
     border: 2px solid var(--gold);
     overflow: hidden;
     box-shadow: 0 0 30px var(--red-glow);
     position: relative;
   }
-  .service-photo .photo-placeholder {
+  .services-content :global(.service-photo .photo-placeholder) {
     width: 100%;
     height: 100%;
     background: var(--bg3);
@@ -368,8 +398,9 @@ const commercialJson = JSON.stringify(commercial);
     justify-content: center;
     text-align: center;
     padding: 16px;
+    box-sizing: border-box;
   }
-  .service-display .service-name {
+  .services-content :global(.service-name) {
     font-family: 'Playfair Display', serif;
     font-size: 32px;
     font-weight: 700;
@@ -378,7 +409,7 @@ const commercialJson = JSON.stringify(commercial);
     margin: 0 0 14px;
     color: var(--text);
   }
-  .service-desc {
+  .services-content :global(.service-desc) {
     font-size: 15px;
     color: var(--text2);
     line-height: 1.85;
@@ -386,12 +417,12 @@ const commercialJson = JSON.stringify(commercial);
     font-weight: 300;
     font-family: 'Montserrat', sans-serif;
   }
-  .service-actions {
+  .services-content :global(.service-actions) {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
   }
-  .btn-primary {
+  .services-content :global(.btn-primary) {
     display: inline-block;
     background: var(--red);
     border: 1px solid transparent;
@@ -406,8 +437,11 @@ const commercialJson = JSON.stringify(commercial);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
   }
-  .btn-primary:hover { border-color: var(--gold); box-shadow: 0 0 20px var(--red-glow); }
-  .btn-secondary {
+  .services-content :global(.btn-primary:hover) {
+    border-color: var(--gold);
+    box-shadow: 0 0 20px var(--red-glow);
+  }
+  .services-content :global(.btn-secondary) {
     display: inline-block;
     background: transparent;
     border: 1px solid var(--gold);
@@ -422,48 +456,23 @@ const commercialJson = JSON.stringify(commercial);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
   }
-  .btn-secondary:hover { background: var(--gold-dim); color: var(--gold-h); }
+  .services-content :global(.btn-secondary:hover) {
+    background: var(--gold-dim);
+    color: var(--gold-h);
+  }
 
   /* ==== RESPONSIVE ==== */
   @media (max-width: 1024px) {
     .services-section { padding: 80px 24px; }
-    .services-menu { flex: 0 0 30%; }
-    .service-photo { height: 320px; }
+    .services-menu { flex: 0 0 32%; }
   }
 
   @media (max-width: 768px) {
     .section-header-simple .section-title { font-size: 24px; }
-    .services-container,
-    .services-container.residential,
-    .services-container.commercial {
-      flex-direction: column !important;
-    }
-    .services-menu {
-      flex: 1;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4px 8px;
-      padding-bottom: 8px;
-    }
-    .service-item {
-      font-size: 12px;
-      white-space: nowrap;
-      border-left: none;
-      border-bottom: 3px solid transparent;
-    }
-    .services-container.commercial .service-item {
-      border-right: none;
-      border-bottom: 3px solid transparent;
-      text-align: left;
-    }
-    .service-item.active,
-    .services-container.commercial .service-item.active {
-      border-left-color: transparent;
-      border-right-color: transparent;
-      border-bottom-color: var(--gold);
-    }
-    .service-photo { height: 240px; }
-    .service-display .service-name { font-size: 24px; }
+    .services-container { flex-direction: column; min-height: 0; }
+    .services-menu { flex: 1; }
+    .services-content :global(.service-photo) { min-height: 240px; }
+    .services-content :global(.service-name) { font-size: 24px; }
   }
 
   @media (max-width: 640px) {
