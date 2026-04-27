@@ -26,6 +26,7 @@ import {
   milesToMeters,
   type Branch,
 } from '../../data/branches';
+import { HOMEPAGE_FAQ } from '../../data/faq';
 
 interface Props {}
 
@@ -197,6 +198,24 @@ const graph: Array<Record<string, unknown>> = [
 
   // 4-11. LocalBusiness × 8 (1 physical_pin + 7 service_area)
   ...BRANCHES.map(buildLocalBusiness),
+
+  // 12. FAQPage — 10 Q/A pairs from src/data/faq.ts
+  // (Same content as the visible accordion in FAQ.astro for NAP-style consistency
+  //  between visible content and rich-result eligibility.)
+  {
+    '@type': 'FAQPage',
+    '@id': `${SITE_URL}/#faq`,
+    inLanguage: 'en-US',
+    isPartOf: { '@id': WEBPAGE_ID },
+    mainEntity: HOMEPAGE_FAQ.map(item => ({
+      '@type': 'Question',
+      name: item.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: item.answer,
+      },
+    })),
+  },
 ];
 
 const jsonLd = {
