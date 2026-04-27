@@ -1,0 +1,224 @@
+---
+/**
+ * Breadcrumbs.astro
+ *
+ * Site-wide breadcrumb nav. Renders nothing on the homepage, otherwise
+ * outputs a visible <nav> trail plus matching BreadcrumbList JSON-LD.
+ *
+ * Logic runs at build time — no client JS. Defensive: any unmappable URL
+ * still produces a sane title-cased trail rather than crashing the build.
+ *
+ * Inserted once in src/layouts/Layout.astro between header and <main>.
+ */
+
+import {
+  RESIDENTIAL_SERVICES,
+  COMMERCIAL_SERVICES,
+} from '../data/homepage-services';
+import { CREDENTIALS } from '../data/credentials';
+
+const SITE = (Astro.site ?? new URL('https://samedayappliance.repair')).origin;
+
+// Strip query/hash + trailing slash, split into clean segments.
+const rawPath = Astro.url.pathname.split('?')[0].split('#')[0];
+const path = rawPath.replace(/\/+$/, '');
+const segments = path.split('/').filter(Boolean);
+
+// Static section labels for first-level segments.
+const SECTION_LABELS: Record<string, string> = {
+  services: 'Services',
+  commercial: 'Commercial',
+  credentials: 'Credentials',
+  brands: 'Brands',
+  'price-list': 'Price List',
+  'for-business': 'For Business',
+  about: 'About',
+  'privacy-policy': 'Privacy Policy',
+  terms: 'Terms',
+  contact: 'Contact',
+  book: 'Book',
+};
+
+// Words that should render in a fixed casing rather than naive Title Case.
+const WORD_OVERRIDES: Record<string, string> = {
+  ge: 'GE',
+  lg: 'LG',
+  aga: 'AGA',
+  asko: 'ASKO',
+  dcs: 'DCS',
+  bki: 'BKI',
+  cma: 'CMA',
+  bbq: 'BBQ',
+  bbb: 'BBB',
+  epa: 'EPA',
+  cslb: 'CSLB',
+  hvac: 'HVAC',
+  kitchenaid: 'KitchenAid',
+};
+
+// Compound brand slugs that should keep their hyphen (or use a special form)
+// when rendered as a label. Matches as prefix so combo URLs like
+// "sub-zero-refrigerator-repair" still render the brand part correctly.
+const COMPOUND_BRANDS: Record<string, string> = {
+  'sub-zero': 'Sub-Zero',
+  'fisher-paykel': 'Fisher & Paykel',
+  'alto-shaam': 'Alto-Shaam',
+  'bakers-pride': "Bakers Pride",
+  'big-chill': 'Big Chill',
+};
+
+function titleCaseSlug(slug: string): string {
+  const lower = slug.toLowerCase();
+  if (COMPOUND_BRANDS[lower]) return COMPOUND_BRANDS[lower];
+  for (const [prefix, display] of Object.entries(COMPOUND_BRANDS)) {
+    if (lower.startsWith(prefix + '-')) {
+      const rest = slug.substring(prefix.length + 1);
+      return display + ' ' + titleCaseSlug(rest);
+    }
+  }
+  return slug
+    .split('-')
+    .map((w) => {
+      const wLower = w.toLowerCase();
+      if (WORD_OVERRIDES[wLower]) return WORD_OVERRIDES[wLower];
+      return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+    })
+    .join(' ');
+}
+
+interface Crumb {
+  name: string;
+  href: string;
+  isCurrent: boolean;
+}
+
+function resolveLeafLabel(section: string, slug: string): string {
+  if (section === 'services') {
+    const match = RESIDENTIAL_SERVICES.find(
+      (s) => s.urlSlug === slug || `${s.id.replace(/^comm-/, '').replace(/-comm$/, '')}-repair` === slug,
+    );
+    if (match) return match.name;
+  }
+  if (section === 'commercial') {
+    const match = COMMERCIAL_SERVICES.find(
+      (s) => s.urlSlug === slug || `${s.id.replace(/^comm-/, '').replace(/-comm$/, '')}-repair` === slug,
+    );
+    if (match) return match.name;
+  }
+  if (section === 'credentials') {
+    const match = CREDENTIALS.find((c) => c.preferredSlug === slug || c.id === slug);
+    if (match) return match.title;
+  }
+  return titleCaseSlug(slug);
+}
+
+let crumbs: Crumb[] = [];
+
+if (segments.length > 0) {
+  crumbs.push({ name: 'Home', href: '/', isCurrent: false });
+
+  if (segments.length === 1) {
+    // Single-level page like /privacy-policy/, /price-list/, /commercial/, /credentials/.
+    const seg = segments[0];
+    const label = SECTION_LABELS[seg] ?? titleCaseSlug(seg);
+    crumbs.push({ name: label, href: `/${seg}/`, isCurrent: true });
+  } else {
+    // Multi-level: /services/foo/, /commercial/foo/, /credentials/foo/, /brands/foo/, …
+    const section = segments[0];
+    const sectionLabel = SECTION_LABELS[section] ?? titleCaseSlug(section);
+    crumbs.push({ name: sectionLabel, href: `/${section}/`, isCurrent: false });
+
+    // Leaf is the last segment; intermediate segments (rare here) get title-cased.
+    for (let i = 1; i < segments.length - 1; i++) {
+      const seg = segments[i];
+      const href = '/' + segments.slice(0, i + 1).join('/') + '/';
+      crumbs.push({ name: titleCaseSlug(seg), href, isCurrent: false });
+    }
+    const leafSlug = segments[segments.length - 1];
+    const leafHref = '/' + segments.join('/') + '/';
+    crumbs.push({
+      name: resolveLeafLabel(section, leafSlug),
+      href: leafHref,
+      isCurrent: true,
+    });
+  }
+}
+
+const breadcrumbSchema =
+  crumbs.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: crumbs.map((c, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: c.name,
+          item: SITE + c.href,
+        })),
+      }
+    : null;
+---
+
+{crumbs.length > 0 && (
+  <>
+    <nav class="breadcrumbs" aria-label="Breadcrumb">
+      <ol class="breadcrumbs-list">
+        {crumbs.map((c, i) => (
+          <li class="breadcrumbs-item">
+            {c.isCurrent ? (
+              <span aria-current="page">{c.name}</span>
+            ) : (
+              <a href={c.href}>{c.name}</a>
+            )}
+            {i < crumbs.length - 1 && <span class="breadcrumbs-sep" aria-hidden="true">›</span>}
+          </li>
+        ))}
+      </ol>
+    </nav>
+    <script type="application/ld+json" set:html={JSON.stringify(breadcrumbSchema)} />
+  </>
+)}
+
+<style>
+  .breadcrumbs {
+    background: var(--black);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .breadcrumbs-list {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 16px var(--container-padding);
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0;
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  .breadcrumbs-item {
+    display: inline-flex;
+    align-items: center;
+  }
+  .breadcrumbs-item a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s var(--ease);
+  }
+  .breadcrumbs-item a:hover {
+    color: #ffffff;
+  }
+  .breadcrumbs-item span[aria-current="page"] {
+    color: #ffffff;
+  }
+  .breadcrumbs-sep {
+    color: var(--muted);
+    margin: 0 8px;
+    user-select: none;
+  }
+
+  @media (max-width: 640px) {
+    .breadcrumbs-list { font-size: 13px; padding: 12px var(--container-padding); }
+    .breadcrumbs-sep { margin: 0 6px; }
+  }
+</style>
