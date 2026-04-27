@@ -65,6 +65,16 @@ const callPhoneE164 = '+1' + callPhone.replace(/\D/g, '');
 
 const residentialJson = JSON.stringify(residential);
 const commercialJson = JSON.stringify(commercial);
+
+// Photos live in two directories — residential at /images/services/, commercial
+// at /images/comm-services/ — and ship at different aspect ratios (4:5 vs 4:3).
+function photoBase(svc: HomepageService): string {
+  return svc.category === 'residential'
+    ? `/images/services/${svc.id}`
+    : `/images/comm-services/${svc.id}`;
+}
+const initial = residential[0];
+const initialPhotoBase = photoBase(initial);
 ---
 
 <section class="services-section" id="services">
@@ -112,23 +122,19 @@ const commercialJson = JSON.stringify(commercial);
       <div class="services-content">
         <div class="service-display">
           <div class="service-photo">
-            {residential[0].category === 'residential' ? (
-              <picture>
-                <source srcset={`/images/services/${residential[0].id}.webp`} type="image/webp" />
-                <img
-                  src={`/images/services/${residential[0].id}.jpg`}
-                  alt={`${residential[0].name} — Same Day Appliance Repair`}
-                  loading="eager"
-                />
-              </picture>
-            ) : (
-              <div class="photo-placeholder">{residential[0].photoCaption}</div>
-            )}
+            <picture>
+              <source srcset={`${initialPhotoBase}.webp`} type="image/webp" />
+              <img
+                src={`${initialPhotoBase}.jpg`}
+                alt={`${initial.name} — Same Day Appliance Repair`}
+                loading="eager"
+              />
+            </picture>
           </div>
-          <h3 class="service-name">{residential[0].name}</h3>
-          <p class="service-desc">{residential[0].desc}</p>
+          <h3 class="service-name">{initial.name}</h3>
+          <p class="service-desc">{initial.desc}</p>
           <div class="service-actions">
-            <a href={residential[0].url} class="btn-secondary">Learn More →</a>
+            <a href={initial.url} class="btn-secondary">Learn More →</a>
             <a href={`tel:${callPhoneE164}`} class="btn-primary">Call {callPhone}</a>
           </div>
         </div>
@@ -164,25 +170,28 @@ const commercialJson = JSON.stringify(commercial);
         .replace(/"/g, '&quot;');
     }
 
-    function renderPhoto(item) {
-      if (item.category === 'residential') {
-        const id = escapeHtml(item.id);
-        const alt = escapeHtml(item.name + ' — Same Day Appliance Repair');
-        return (
-          '<picture>' +
-          '<source srcset="/images/services/' + id + '.webp" type="image/webp" />' +
-          '<img src="/images/services/' + id + '.jpg" alt="' + alt + '" loading="lazy" />' +
-          '</picture>'
-        );
-      }
-      return '<div class="photo-placeholder">' + escapeHtml(item.photoCaption) + '</div>';
+    function photoBase(item) {
+      const dir = item.category === 'residential' ? 'services' : 'comm-services';
+      return '/images/' + dir + '/' + item.id;
     }
 
-    function renderContent(item) {
+    function renderPhoto(item, eager) {
+      const base = photoBase(item);
+      const alt = escapeHtml(item.name + ' — Same Day Appliance Repair');
+      const loading = eager ? 'eager' : 'lazy';
+      return (
+        '<picture>' +
+        '<source srcset="' + base + '.webp" type="image/webp" />' +
+        '<img src="' + base + '.jpg" alt="' + alt + '" loading="' + loading + '" />' +
+        '</picture>'
+      );
+    }
+
+    function renderContent(item, eager) {
       content.innerHTML =
         '<div class="service-display">' +
         '<div class="service-photo">' +
-        renderPhoto(item) +
+        renderPhoto(item, eager) +
         '</div>' +
         '<h3 class="service-name">' + escapeHtml(item.name) + '</h3>' +
         '<p class="service-desc">' + escapeHtml(item.desc) + '</p>' +
@@ -198,7 +207,7 @@ const commercialJson = JSON.stringify(commercial);
         btn.addEventListener('click', () => {
           menuEl.querySelectorAll('.service-item').forEach((b) => b.classList.remove('active'));
           btn.classList.add('active');
-          renderContent(items[idx]);
+          renderContent(items[idx], false);
         });
       });
     }
@@ -217,7 +226,7 @@ const commercialJson = JSON.stringify(commercial);
       menuEl.querySelectorAll('.service-item').forEach((b, i) => {
         b.classList.toggle('active', i === 0);
       });
-      renderContent(items[0]);
+      renderContent(items[0], true);
     }
 
     tabs.forEach((tab) => {
@@ -402,12 +411,18 @@ const commercialJson = JSON.stringify(commercial);
   }
   .services-content :global(.service-photo) {
     width: 100%;
-    aspect-ratio: 4 / 5;
     margin-bottom: 28px;
     border: 2px solid var(--gold);
     overflow: hidden;
     box-shadow: 0 0 30px var(--red-glow);
     position: relative;
+  }
+  /* Aspect ratio differs per tab — residential photos are 4:5 portrait, commercial are 4:3 landscape. */
+  .services-container.residential .services-content :global(.service-photo) {
+    aspect-ratio: 4 / 5;
+  }
+  .services-container.commercial .services-content :global(.service-photo) {
+    aspect-ratio: 4 / 3;
   }
   .services-content :global(.service-photo picture),
   .services-content :global(.service-photo img) {
