@@ -50,7 +50,7 @@ export const CITIES: City[] = [
   { slug: 'arcadia',              name: 'Arcadia',              county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'atwater-village',      name: 'Atwater Village',      county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'bel-air',              name: 'Bel Air',              county: 'los-angeles',    primaryBranch: 'los-angeles' },
-  { slug: 'beverly-hills',        name: 'Beverly Hills',        county: 'los-angeles',    primaryBranch: 'west-hollywood' },
+  { slug: 'beverly-hills',        name: 'Beverly Hills',        county: 'los-angeles',    primaryBranch: 'beverly-hills' },
   { slug: 'brentwood',            name: 'Brentwood',            county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'burbank',              name: 'Burbank',              county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'calabasas',            name: 'Calabasas',            county: 'los-angeles',    primaryBranch: 'los-angeles' },

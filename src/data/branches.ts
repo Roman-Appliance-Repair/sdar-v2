@@ -65,6 +65,8 @@ export interface Branch {
   /** Local DID phone for this territory */
   phone: string;
   phoneStatus: PhoneStatus;
+  /** Per-branch contact email. Used in schema and contact pages. */
+  email: string;
   /** ONLY populate for type === 'physical_pin'. NEVER for service_area. */
   address?: BranchAddress;
   /** Internal-only address (IRS, business records). NEVER rendered publicly. */
@@ -97,6 +99,7 @@ export const BRANCHES: Branch[] = [
     gbpVerifiedDate: 'TODO_ROMAN_CONFIRM',
     phone: '(323) 870-4790',
     phoneStatus: 'active',
+    email: 'support@samedayappliance.repair',
     address: {
       street: '8746 Rangely Ave',
       city: 'West Hollywood',
@@ -114,11 +117,44 @@ export const BRANCHES: Branch[] = [
     primaryCounty: 'los-angeles',
     citiesServed: [
       'west-hollywood',
-      'beverly-hills',
       'hollywood',
       'mid-wilshire',
       'fairfax',
       'hancock-park',
+    ],
+  },
+
+  // ─────────────────────────────────────────────────
+  // 8. BEVERLY HILLS — Service Area (unverified GBP)
+  // (Numbered "8" historically — added 2026-04-26 evening per Roman.
+  //  Placed between WeHo and LA in array since it shares LA County and
+  //  is geographically adjacent to WeHo.)
+  // ─────────────────────────────────────────────────
+  {
+    slug: 'beverly-hills',
+    name: 'Beverly Hills',
+    fullName: 'Same Day Appliance Repair — Beverly Hills',
+    gbpName: 'Same Day Appliance Repair Beverly Hills',
+    type: 'service_area',
+    gbpStatus: 'unverified',
+    phone: '(424) 248-1199',
+    phoneStatus: 'active',
+    email: 'beverlyhills@samedayappliance.repair',
+    internalAddress: {
+      street: '12142 W Sunset Blvd',
+      city: 'Los Angeles',
+      state: 'CA',
+      zip: '90077',
+    },
+    geo: {
+      cityCenterLat: 34.0736,
+      cityCenterLng: -118.4004,
+      serviceRadius: 8,
+    },
+    hours: { days: 'Mon-Sun', open: '08:00', close: '20:00' },
+    primaryCounty: 'los-angeles',
+    citiesServed: [
+      'beverly-hills',
     ],
   },
 
@@ -135,6 +171,7 @@ export const BRANCHES: Branch[] = [
     gbpUrl: 'TODO_ROMAN_PROVIDE_LA_GBP_URL',
     phone: '(424) 325-0520',
     phoneStatus: 'active',
+    email: 'info@samedayappliance.repair',
     // address: undefined — SAB rule, NO public address
     internalAddress: {
       street: '11352 Elderwood Street',
@@ -200,6 +237,7 @@ export const BRANCHES: Branch[] = [
     gbpStatus: 'unverified',
     phone: '(626) 376-4458',
     phoneStatus: 'active',
+    email: 'pasadena@samedayappliance.repair',
     internalAddress: {
       street: '1205 Columbia Pl',
       city: 'Pasadena',
@@ -246,6 +284,7 @@ export const BRANCHES: Branch[] = [
     gbpUrl: 'TODO_ROMAN_PROVIDE_TO_GBP_URL',
     phone: '(424) 208-0228',
     phoneStatus: 'active',
+    email: 'thousandoaks@samedayappliance.repair',
     internalAddress: {
       street: '1669 Tiburon Ct',
       city: 'Thousand Oaks',
@@ -286,6 +325,7 @@ export const BRANCHES: Branch[] = [
     gbpStatus: 'unverified',
     phone: '(213) 401-9019',
     phoneStatus: 'active',
+    email: 'irvine@samedayappliance.repair',
     internalAddress: {
       street: '53 Bellwind',
       city: 'Irvine',
@@ -330,6 +370,7 @@ export const BRANCHES: Branch[] = [
     gbpStatus: 'pending',
     phone: '(909) 555-0100',
     phoneStatus: 'pending',
+    email: 'ranchocucamonga@samedayappliance.repair',
     // No internalAddress — true service territory
     geo: {
       cityCenterLat: 34.1064,
@@ -362,6 +403,7 @@ export const BRANCHES: Branch[] = [
     gbpStatus: 'pending',
     phone: '(951) 555-0200',
     phoneStatus: 'pending',
+    email: 'temecula@samedayappliance.repair',
     geo: {
       cityCenterLat: 33.4936,
       cityCenterLng: -117.1484,
