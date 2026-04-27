@@ -1,63 +1,472 @@
 ---
-// Services.astro — Residential + Commercial tabbed service grid
+// Services.astro — Residential + Commercial tabbed service catalog
 //
-// Status: SCAFFOLD (Step 3) — content comes in Step 5
+// Step 7 of homepage redesign sprint: replicates Section 05 of
+// public/preview-homepage.html. Tabbed UI (Residential / Commercial),
+// 2-column "menu" of service buttons + a single "service display" card.
+// Commercial tab mirrors the layout (menu on right via flex row-reverse).
 //
-// Will render: tabbed UI (Residential / Commercial) with 2-col mirrored
-// service-list + selected-service detail card. Mirrors the preview-homepage
-// services section: 24 residential tiles + 18 commercial tiles.
+// URL resolution is done at build time against src/pages/. If a service id
+// (or its `urlSlug` override) maps to an existing page, the menu links there;
+// otherwise it falls back to /book/.
 
-interface Props {}
+import fs from 'node:fs';
+import path from 'node:path';
+
+import {
+  RESIDENTIAL_SERVICES,
+  COMMERCIAL_SERVICES,
+  type HomepageService,
+} from '../../data/homepage-services';
+import { BRANCHES } from '../../data/branches';
+
+const SRC_PAGES = path.resolve('./src/pages');
+const pageExists = (rel: string) => fs.existsSync(path.join(SRC_PAGES, rel));
+
+function resolveServiceUrl(svc: HomepageService): string {
+  if (svc.urlSlug) {
+    const dir = svc.category === 'residential' ? 'services' : 'commercial';
+    if (pageExists(`${dir}/${svc.urlSlug}.astro`)) return `/${dir}/${svc.urlSlug}/`;
+  }
+  const cleanId = svc.id.replace(/^comm-/, '').replace(/-comm$/, '');
+  const candidates =
+    svc.category === 'residential'
+      ? [`services/${cleanId}-repair.astro`, `${cleanId}-repair.astro`]
+      : [
+          `commercial/${cleanId}-repair.astro`,
+          `commercial/${cleanId}.astro`,
+          `${cleanId}-repair.astro`,
+        ];
+  for (const cand of candidates) {
+    if (pageExists(cand)) return '/' + cand.replace(/\.astro$/, '/');
+  }
+  return '/book/';
+}
+
+interface ResolvedService extends HomepageService {
+  url: string;
+}
+
+const residential: ResolvedService[] = RESIDENTIAL_SERVICES.map((s) => ({
+  ...s,
+  url: resolveServiceUrl(s),
+}));
+const commercial: ResolvedService[] = COMMERCIAL_SERVICES.map((s) => ({
+  ...s,
+  url: resolveServiceUrl(s),
+}));
+
+const laBranch = BRANCHES.find((b) => b.slug === 'los-angeles');
+const callPhone = laBranch?.phone ?? '(424) 325-0520';
+const callPhoneE164 = '+1' + callPhone.replace(/\D/g, '');
+
+// Serialize catalogs for the inline script — keeps the click handler tiny.
+const residentialJson = JSON.stringify(residential);
+const commercialJson = JSON.stringify(commercial);
 ---
 
-<section class="services" id="services">
+<section class="services-section" id="services">
   <div class="container">
     <header class="section-header-simple">
       <h2 class="section-title">
         Residential <span class="text-gold">+</span> Commercial
       </h2>
-      <p class="section-subtitle">[Scaffold] Tabbed service grid lands in Step 5.</p>
     </header>
-    <div class="placeholder">
-      <p>Services tabbed grid — Step 5</p>
+    <p class="section-subtitle">
+      Full coverage across home appliances and commercial restaurant / hotel / agricultural equipment.
+    </p>
+
+    <div class="services-tabs" role="tablist">
+      <button class="tab active" data-type="residential" role="tab" aria-selected="true">Residential</button>
+      <button class="tab" data-type="commercial" id="commercial" role="tab" aria-selected="false">Commercial</button>
+    </div>
+
+    <div class="services-container residential" data-active="residential">
+      <div class="services-menu">
+        {residential.map((s, idx) => (
+          <button
+            class={`service-item${idx === 0 ? ' active' : ''}`}
+            data-service={s.id}
+            type="button"
+          >
+            {s.name}
+          </button>
+        ))}
+      </div>
+      <div class="services-content">
+        <div class="service-display">
+          <div class="service-photo">
+            <div class="photo-placeholder">{residential[0].photoCaption}</div>
+          </div>
+          <h3 class="service-name">{residential[0].name}</h3>
+          <p class="service-desc">{residential[0].desc}</p>
+          <div class="service-actions">
+            <a href={residential[0].url} class="btn-secondary">Learn More →</a>
+            <a href={`tel:${callPhoneE164}`} class="btn-primary">Call {callPhone}</a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
+<script
+  is:inline
+  define:vars={{ residential: residentialJson, commercial: commercialJson, callPhone, callPhoneE164 }}
+>
+  (function () {
+    const RES = JSON.parse(residential);
+    const COMM = JSON.parse(commercial);
+
+    const root = document.getElementById('services');
+    if (!root) return;
+    const tabs = root.querySelectorAll('.services-tabs .tab');
+    const container = root.querySelector('.services-container');
+    const menu = root.querySelector('.services-menu');
+    const content = root.querySelector('.services-content');
+    if (!container || !menu || !content) return;
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function renderContent(item) {
+      content.innerHTML =
+        '<div class="service-display">' +
+        '<div class="service-photo">' +
+        '<div class="photo-placeholder">' + escapeHtml(item.photoCaption) + '</div>' +
+        '</div>' +
+        '<h3 class="service-name">' + escapeHtml(item.name) + '</h3>' +
+        '<p class="service-desc">' + escapeHtml(item.desc) + '</p>' +
+        '<div class="service-actions">' +
+        '<a href="' + escapeHtml(item.url) + '" class="btn-secondary">Learn More →</a>' +
+        '<a href="tel:' + escapeHtml(callPhoneE164) + '" class="btn-primary">Call ' + escapeHtml(callPhone) + '</a>' +
+        '</div>' +
+        '</div>';
+    }
+
+    function attachMenuListeners(items) {
+      menu.querySelectorAll('.service-item').forEach((btn, idx) => {
+        btn.addEventListener('click', () => {
+          menu.querySelectorAll('.service-item').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          renderContent(items[idx]);
+        });
+      });
+    }
+
+    function loadCatalog(type) {
+      const items = type === 'commercial' ? COMM : RES;
+      menu.innerHTML = items
+        .map(
+          (it, idx) =>
+            '<button class="service-item' +
+            (idx === 0 ? ' active' : '') +
+            '" data-service="' +
+            escapeHtml(it.id) +
+            '" type="button">' +
+            escapeHtml(it.name) +
+            '</button>'
+        )
+        .join('');
+      attachMenuListeners(items);
+      renderContent(items[0]);
+    }
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const type = tab.dataset.type;
+        tabs.forEach((t) => {
+          t.classList.remove('active');
+          t.setAttribute('aria-selected', 'false');
+        });
+        tab.classList.add('active');
+        tab.setAttribute('aria-selected', 'true');
+        container.className = 'services-container ' + type;
+        container.setAttribute('data-active', type);
+        loadCatalog(type);
+      });
+    });
+
+    // Wire up listeners for the SSR-rendered residential menu so the first
+    // click works without a tab toggle.
+    attachMenuListeners(RES);
+  })();
+</script>
+
 <style>
-  .services {
-    background: #0a0a0a;
-    color: #ffffff;
+  .services-section {
+    --bg: #0a0a0a;
+    --bg2: #151515;
+    --bg3: #1a1a1a;
+    --red: #C8102E;
+    --red-dim: rgba(200, 16, 46, 0.05);
+    --red-glow: rgba(200, 16, 46, 0.3);
+    --gold: #D4AF37;
+    --gold-h: #e5c254;
+    --gold-dim: rgba(212, 175, 55, 0.2);
+    --text: #ffffff;
+    --text2: #d4d4d4;
+    --text3: #888888;
+    --border: rgba(255, 255, 255, 0.08);
+    --border2: rgba(255, 255, 255, 0.15);
+
+    background: var(--bg);
+    color: var(--text);
     padding: 112px 24px;
-    border-bottom: 1px dashed rgba(212, 175, 55, 0.4);
+    position: relative;
   }
-  .services .container { max-width: 1280px; margin: 0 auto; }
-  .section-header-simple { text-align: center; margin-bottom: 32px; }
-  .section-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(28px, 3.4vw, 44px);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin: 0 0 16px 0;
-    color: #ffffff;
-  }
-  .text-gold { color: #D4AF37; font-style: italic; }
-  .section-subtitle {
-    color: #d4d4d4;
-    font-family: 'Montserrat', sans-serif;
-    max-width: 680px;
+  .services-section .container {
+    max-width: 1280px;
     margin: 0 auto;
   }
-  .placeholder {
-    margin-top: 32px;
-    padding: 48px 24px;
-    border: 1px dashed rgba(212, 175, 55, 0.4);
-    color: #888;
+
+  .section-header-simple {
     text-align: center;
-    font-family: 'Cinzel', serif;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    margin-bottom: 16px;
   }
-  .placeholder p { margin: 0; }
+  .section-header-simple .section-title {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0;
+  }
+  .text-gold { color: var(--gold); font-style: italic; font-weight: 600; }
+  .section-subtitle {
+    text-align: center;
+    font-size: 13px;
+    line-height: 1.3;
+    color: var(--text2);
+    max-width: 800px;
+    margin: 0 auto 20px;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  /* ==== TABS ==== */
+  .services-tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1;
+    padding: 18px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text3);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-bottom: -1px;
+  }
+  .tab:hover:not(.active) { color: var(--text2); border-bottom-color: var(--border2); }
+  .tab.active {
+    background: var(--red);
+    border-bottom-color: var(--gold);
+    color: var(--text);
+  }
+
+  /* ==== LAYOUT ==== */
+  .services-container {
+    display: flex;
+    gap: 32px;
+    min-height: 600px;
+    transition: all 0.3s ease;
+  }
+  .services-container.residential { flex-direction: row; }
+  .services-container.commercial { flex-direction: row-reverse; }
+
+  /* ==== MENU ==== */
+  .services-menu {
+    flex: 0 0 34%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 12px;
+    align-content: start;
+  }
+  .service-item {
+    padding: 8px 12px;
+    background: transparent;
+    border: none;
+    border-left: 2px solid transparent;
+    color: var(--text2);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.03em;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .services-container.commercial .service-item {
+    border-left: none;
+    border-right: 2px solid transparent;
+    text-align: right;
+  }
+  .service-item:hover {
+    color: var(--gold);
+    background: var(--bg3);
+  }
+  .service-item.active {
+    background: var(--red-dim);
+    border-left-color: var(--gold);
+    color: var(--text);
+    font-weight: 600;
+  }
+  .services-container.commercial .service-item.active {
+    border-left-color: transparent;
+    border-right-color: var(--gold);
+  }
+
+  /* ==== CONTENT CARD ==== */
+  .services-content {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 32px;
+  }
+  .service-display { animation: servicesFadeIn 0.4s ease-out; }
+  @keyframes servicesFadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .service-photo {
+    width: 100%;
+    height: 450px;
+    margin-bottom: 28px;
+    border: 2px solid var(--gold);
+    overflow: hidden;
+    box-shadow: 0 0 30px var(--red-glow);
+    position: relative;
+  }
+  .service-photo .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    background: var(--bg3);
+    border: 1px dashed var(--border2);
+    color: var(--text3);
+    font-size: 13px;
+    font-family: 'Montserrat', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 16px;
+  }
+  .service-display .service-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin: 0 0 14px;
+    color: var(--text);
+  }
+  .service-desc {
+    font-size: 15px;
+    color: var(--text2);
+    line-height: 1.85;
+    margin: 0 0 28px;
+    font-weight: 300;
+    font-family: 'Montserrat', sans-serif;
+  }
+  .service-actions {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .btn-primary {
+    display: inline-block;
+    background: var(--red);
+    border: 1px solid transparent;
+    color: #fff;
+    padding: 13px 26px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+  }
+  .btn-primary:hover { border-color: var(--gold); box-shadow: 0 0 20px var(--red-glow); }
+  .btn-secondary {
+    display: inline-block;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--gold);
+    padding: 13px 26px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+  }
+  .btn-secondary:hover { background: var(--gold-dim); color: var(--gold-h); }
+
+  /* ==== RESPONSIVE ==== */
+  @media (max-width: 1024px) {
+    .services-section { padding: 80px 24px; }
+    .services-menu { flex: 0 0 30%; }
+    .service-photo { height: 320px; }
+  }
+
+  @media (max-width: 768px) {
+    .section-header-simple .section-title { font-size: 24px; }
+    .services-container,
+    .services-container.residential,
+    .services-container.commercial {
+      flex-direction: column !important;
+    }
+    .services-menu {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 8px;
+      padding-bottom: 8px;
+    }
+    .service-item {
+      font-size: 12px;
+      white-space: nowrap;
+      border-left: none;
+      border-bottom: 3px solid transparent;
+    }
+    .services-container.commercial .service-item {
+      border-right: none;
+      border-bottom: 3px solid transparent;
+      text-align: left;
+    }
+    .service-item.active,
+    .services-container.commercial .service-item.active {
+      border-left-color: transparent;
+      border-right-color: transparent;
+      border-bottom-color: var(--gold);
+    }
+    .service-photo { height: 240px; }
+    .service-display .service-name { font-size: 24px; }
+  }
+
+  @media (max-width: 640px) {
+    .services-section { padding: 64px 20px; }
+  }
 </style>
