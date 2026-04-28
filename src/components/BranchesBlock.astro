@@ -1,0 +1,178 @@
+---
+// BranchesBlock.astro
+//
+// Reusable "Our Branches" list. Pulls all 8 branches (incl. pending phones)
+// from src/data/branches.ts. Rendering convention matches the homepage Hero
+// component verbatim — same class names, same icon/city/phone shape — so a
+// service page hero that drops this in reads as a continuation of the brand.
+//
+// NAP rule: this block intentionally renders only city + phone (no street
+// address). Service-area branches MUST never expose internalAddress publicly.
+
+import { BRANCHES, isPlaceholderPhone, type Branch } from '../data/branches';
+
+export interface Props {
+  /** Header text above the list */
+  title?: string;
+  /** Layout variant — list (one per line) or grid (responsive 2-col).
+   *  Default 'list' matches the homepage Hero. */
+  layout?: 'list' | 'grid';
+  /** Show "8 service territories" caption under the title */
+  showCount?: boolean;
+}
+
+const {
+  title = 'Our Branches',
+  layout = 'list',
+  showCount = true,
+} = Astro.props;
+
+// Display order matches the homepage Hero so narrative is consistent across
+// the page. Same slug list — kept here so this component is self-contained.
+const ORDER = [
+  'pasadena',
+  'west-hollywood',
+  'beverly-hills',
+  'los-angeles',
+  'thousand-oaks',
+  'irvine',
+  'rancho-cucamonga',
+  'temecula',
+];
+
+const branches: Branch[] = ORDER
+  .map((slug) => BRANCHES.find((b) => b.slug === slug))
+  .filter((b): b is Branch => b !== undefined);
+
+function telLink(phone: string): string {
+  return 'tel:+1' + phone.replace(/\D/g, '');
+}
+---
+
+<div class={`branches-block branches-block--${layout}`}>
+  <h3 class="branches-header">{title}</h3>
+  {showCount && (
+    <p class="branches-caption">{branches.length} service territories across Southern California</p>
+  )}
+  <div class="branches-list">
+    {branches.map((b) => {
+      const pending = isPlaceholderPhone(b.phone);
+      return (
+        <div class="branch-item-hero">
+          <span class="branch-icon" aria-hidden="true">📍</span>
+          <span class="branch-city">{b.name}</span>
+          <span class="branch-sep">—</span>
+          <a
+            href={telLink(b.phone)}
+            class={`branch-phone-hero${pending ? ' branch-phone--pending' : ''}`}
+            aria-label={`Call ${b.name} branch at ${b.phone}`}
+          >{b.phone}</a>
+        </div>
+      );
+    })}
+  </div>
+</div>
+
+<style>
+  .branches-block {
+    --bb-gold: #D4AF37;
+    --bb-text: #ffffff;
+    --bb-text2: #d4d4d4;
+    --bb-text3: #888888;
+    --bb-border: rgba(255, 255, 255, 0.10);
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: var(--bb-text2);
+    font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
+
+  .branches-header {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--bb-gold);
+    margin: 0 0 4px 0;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--bb-border);
+    font-weight: 600;
+  }
+  .branches-caption {
+    margin: 0 0 8px;
+    font-size: 11px;
+    color: var(--bb-text3);
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  .branches-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .branches-block--grid .branches-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 24px;
+  }
+
+  .branch-item-hero {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--bb-text3);
+    display: flex;
+    gap: 6px;
+    align-items: baseline;
+    flex-wrap: wrap;
+    margin-bottom: 4px;
+  }
+  .branch-icon {
+    flex-shrink: 0;
+    font-size: 12px;
+  }
+  .branch-city {
+    font-weight: 600;
+    color: var(--bb-text2);
+    font-size: 14px;
+    white-space: nowrap;
+  }
+  .branch-sep {
+    color: var(--bb-text3);
+  }
+  .branch-phone-hero {
+    color: var(--bb-gold);
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.3s;
+    white-space: nowrap;
+  }
+  .branch-phone-hero:hover,
+  .branch-phone-hero:focus-visible { color: #C8102E; }
+
+  /* Placeholder DIDs (RC, Temecula until Monday swap) — visually muted but
+     still clickable so the list reads complete. */
+  .branch-phone--pending {
+    color: rgba(212, 175, 55, 0.55);
+    font-style: italic;
+  }
+  .branch-phone--pending::after {
+    content: ' (pending)';
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: var(--bb-text3);
+    font-style: normal;
+    margin-left: 2px;
+  }
+
+  @media (max-width: 640px) {
+    .branches-block--grid .branches-list {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

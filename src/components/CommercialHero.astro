@@ -2,11 +2,16 @@
 /**
  * CommercialHero.astro
  * Unified hero block for /commercial/* pages.
- * Visual match to /services/garbage-disposal-repair/ reference, with B2B defaults:
- *   - "COMMERCIAL · ..." eyebrow
- *   - "Request Service" CTA
- *   - $120 diagnostic + 24/7 + COI + NSF trust items
+ *
+ * Default posture: NEUTRAL multi-county, B2B-tweaked. $120 diagnostic, 24/7,
+ * COI, NSF — and the same 8-branch list available via showBranches=true.
+ * NAP-compliant per branch-types-and-public-nap-rules.md.
  */
+
+import BranchesBlock from './BranchesBlock.astro';
+import { MAIN_PHONE } from '../data/branches';
+
+const MAIN_PHONE_HREF = 'tel:+1' + MAIN_PHONE.replace(/\D/g, '');
 
 export interface Props {
   eyebrow?: string;
@@ -21,27 +26,31 @@ export interface Props {
   heroImageTitle?: string;
   heroImageLocation?: string;
   trustBarItems?: string[];
+  /** When true, render the 8-branch list inside the hero content column.
+   *  Default true for the new neutral-hub posture. */
+  showBranches?: boolean;
 }
 
 const {
-  eyebrow = 'Commercial · Los Angeles · 90048 · 90046 · 90026 · 90036',
+  eyebrow = 'Commercial · LA · Orange · Ventura · San Bernardino · Riverside Counties',
   title,
   subtitle,
-  phone = '(424) 325-0520',
-  phoneHref = 'tel:+14243250520',
+  phone = MAIN_PHONE,
+  phoneHref = MAIN_PHONE_HREF,
   requestUrl = '/contact/',
   requestLabel = 'Request Service',
   reviewsRating = 4.6,
   reviewsCount = 37,
   heroImageTitle = title,
-  heroImageLocation = 'Los Angeles',
+  heroImageLocation = 'Southern California',
   trustBarItems = [
-    '🏅 CSLB Licensed #1138898',
+    '🏅 BHGS Licensed #A49573',
     '⚡ 24/7 Emergency Service',
     '📄 COI Available On Request',
     '✅ NSF-Certified Repairs',
     '💬 $120 Diagnostic — Waived With Repair',
   ],
+  showBranches = true,
 } = Astro.props;
 ---
 
@@ -59,6 +68,11 @@ const {
         <span class="stars">★★★★★</span>
         <span>{reviewsRating} · {reviewsCount} reviews · Google</span>
       </div>
+      {showBranches && (
+        <div class="hero-branches-wrap">
+          <BranchesBlock title="Our Branches" layout="grid" showCount={true} />
+        </div>
+      )}
     </div>
     <div class="hero-img-wrap">
       <div class="hero-img-placeholder">
@@ -156,6 +170,13 @@ const {
     color: #f59e0b;
     letter-spacing: 2px;
   }
+
+  .hero-branches-wrap {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+  }
+
   .hero-img-wrap {
     border-radius: 12px;
     overflow: hidden;
@@ -164,6 +185,7 @@ const {
     display: flex;
     align-items: center;
     justify-content: center;
+    align-self: start;
   }
   .hero-img-placeholder {
     color: rgba(255, 255, 255, .2);
