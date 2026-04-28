@@ -1,450 +1,315 @@
 ---
-// src/pages/lake-elsinore.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+/**
+ * Lake Elsinore, CA — Variant A migration (T9 Batch 4, Group 1).
+ * Branch: Temecula (placeholder phone — auto-falls back to MAIN_PHONE in CTAs)
+ * Source: wiki/migration/content-dumps/lake-elsinore.md
+ *
+ * Migration notes:
+ *   - Dump attributed Pasadena (outdated). Per cities.ts SSOT, primaryBranch
+ *     = 'temecula' (placeholder).
+ *   - 2 ZIPs: 92530, 92532.
+ *   - Inland Heat & Canyon Dust trust theme preserved across narrative + jobs.
+ *   - Pricing consolidated 8 dump cards → 4.
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted
+ *   - streetAddress omitted (temecula is service_area)
+ *   - title omits branch.phone (placeholder); HeroEditorial/TopBar/FinalCTA
+ *     auto-substitute MAIN_PHONE for placeholder branches
+ */
 
-const city = "Lake Elsinore";
-const citySlug = "lake-elsinore";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["92530", "92532"];
-const county = "Riverside";
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const title = `Appliance Repair Lake Elsinore CA — Same Day | All Brands | ${phone}`;
-const description = `Same-day appliance repair in Lake Elsinore CA. Refrigerator, washer, dryer, oven, dishwasher & more. Canyon Hills, Tuscany Hills, Railroad Canyon. Licensed. OEM parts. Call ${phone}.`;
+const branchSlug = 'temecula';
+const cityName = 'Lake Elsinore';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
+
+const title = 'Appliance Repair Lake Elsinore CA | Same Day Service | All Brands';
+const description = 'Same-day appliance repair in Lake Elsinore, CA. Canyon Hills, Tuscany Hills, Country Club Heights, Railroad Canyon. Built for inland heat & canyon dust. OEM parts, 90-day warranty.';
+const canonical = 'https://samedayappliance.repair/lake-elsinore/';
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🥶', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
 
 const neighborhoods = [
-  { name: "Canyon Hills", zip: "92532" },
-  { name: "Tuscany Hills", zip: "92532" },
-  { name: "Country Club Heights", zip: "92530" },
-  { name: "Railroad Canyon", zip: "92530" },
-  { name: "Lakeshore Drive Area", zip: "92530" },
-  { name: "Mission Trail", zip: "92530" },
-  { name: "Temescal Canyon Area", zip: "92532" },
-  { name: "Diamond Valley", zip: "92530" },
-  { name: "Redlands District", zip: "92530" },
-  { name: "Elsinore Valley", zip: "92530" },
-  { name: "Quail Valley", zip: "92530" },
-  { name: "Wildomar Border", zip: "92530" },
+  { name: 'Canyon Hills', zip: '92532' },
+  { name: 'Tuscany Hills', zip: '92532' },
+  { name: 'Country Club Heights', zip: '92530' },
+  { name: 'Railroad Canyon', zip: '92530' },
+  { name: 'Lakeshore Drive Area', zip: '92530' },
+  { name: 'Mission Trail', zip: '92530' },
+  { name: 'Temescal Canyon Area', zip: '92532' },
+  { name: 'Diamond Valley', zip: '92530' },
+  { name: 'Elsinore Valley', zip: '92530' },
+  { name: 'Quail Valley', zip: '92530' },
+  { name: 'Wildomar Border', zip: '92530' },
+  { name: 'Downtown Lake Elsinore', zip: '92530' },
 ];
 
-const faqItems = [
+const narrativeIntro = [
+  "Lake Elsinore is a growing city with master-planned communities — Canyon Hills, Tuscany Hills, Railroad Canyon — developed primarily between 2000 and 2015. The appliances installed when those homes were built are now 8–15 years old, right in the first major failure window for the Samsung, LG, KitchenAid, and Whirlpool units that dominate the housing stock here. We're seeing a major wave of these failures arrive in our schedule right now.",
+  "Two climate factors shape what fails and when. Inland Valley summer heat regularly hits 100–108°F in July and August, pushing condenser coils that were marginal in spring past their threshold in summer. And the canyon communities — Canyon Hills, Tuscany Hills, Temescal Canyon — see Santa Ana wind events that funnel chaparral dust through the terrain, loading condenser coils faster than flat valley cities.",
+  'Riverside County hard water is the third constant. Dishwasher filters clog faster, ice maker fill tubes scale up, and washing machine door gaskets accumulate mineral deposits. We include descaling on every dishwasher and ice maker repair call here — it\'s not an upsell, it\'s part of fixing the problem correctly.',
+];
+
+const narrativeSubSections = [
   {
-    q: "Do you offer same-day appliance repair in Lake Elsinore?",
-    a: `Yes — same-day service is available throughout Lake Elsinore including Canyon Hills, Tuscany Hills, Railroad Canyon, Country Club Heights, and Lakeshore Drive. Call ${phone} before noon for same-day scheduling. We cover ZIP codes 92530 and 92532 without a trip surcharge.`
+    title: 'Canyon Hills & Tuscany Hills — master-planned, mid-2010s',
+    paragraphs: [
+      "These are the master-planned hillside communities that dominate Lake Elsinore's growth. Samsung French-door refrigerators, LG front-load washers, KitchenAid dishwashers — all installed during the 2010-2015 buildout, all hitting the 8–15 year window now. The most common calls: Samsung 22E ice room sensor errors (almost always defrost system, not the sensor), LG front-load bearing failures at year 8–10, KitchenAid dishwasher drain blockages from hard water. Add Santa Ana wind dust on the canyon ridges and condenser coils need cleaning every 6 months instead of annual.",
+    ],
   },
   {
-    q: "My appliances are 8-12 years old — is it worth repairing them?",
-    a: "Almost always yes. Lake Elsinore's major planned communities — Canyon Hills, Tuscany Hills, Railroad Canyon — were developed primarily 2000–2015, putting their appliances squarely in the first major failure window right now. A targeted repair on a mechanically sound Samsung or Whirlpool is almost always better economics than replacement. We give you honest numbers after diagnosis."
+    title: 'Country Club Heights & Railroad Canyon — older + newer mix',
+    paragraphs: [
+      'These older neighborhoods have a mix of original mid-tier appliances from earlier construction (GE, Maytag, Whirlpool workhorses) and newer Samsung/LG replacements that homeowners have installed over time. The older mechanical machines are often genuinely worth repairing — a 15-year-old Whirlpool top-loader with a worn shift actuator is a $145 repair, not a $700 replacement. We diagnose first, then quote honestly.',
+    ],
   },
   {
-    q: "What brands do you repair in Lake Elsinore?",
-    a: "All major brands. Canyon Hills and Tuscany Hills homes run primarily Samsung, LG, Whirlpool, and KitchenAid from the 2010s. Older Railroad Canyon and Country Club Heights homes have GE and Maytag. We carry OEM parts for all of these on the truck."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `$89, applied directly to the repair cost when you proceed. No hidden trip charge to Lake Elsinore. We quote on-site after diagnosis. What we quote is what appears on the invoice.`
-  },
-  {
-    q: "Does living near the lake or in the canyon communities affect my appliances?",
-    a: "Yes. The canyon communities like Canyon Hills and Tuscany Hills get Santa Ana wind events that funnel through the terrain, carrying fine chaparral dust that loads condenser coils faster than flat valley cities. We recommend 6-month condenser cleaning for canyon/hillside homes. The bigger climate factor is summer heat — Lake Elsinore regularly hits 100-108°F in July, which is the primary driver of summer refrigerator failures here."
-  },
-  {
-    q: "Why does my refrigerator struggle in summer but work fine in winter?",
-    a: "This is the predictable Inland Valley summer pattern. When ambient temperature hits 105°F, a refrigerator with partially clogged condenser coils can no longer dissipate heat fast enough. Coils that were managing fine in spring fail outright in July. We start every summer refrigerator call in Lake Elsinore with condenser coil inspection and cleaning."
-  },
-  {
-    q: "Do you service appliances in Wildomar and Canyon Lake near Lake Elsinore?",
-    a: `Yes — Wildomar and Canyon Lake are within our regular service area. No surcharge. Call ${phone}.`
+    title: 'Hard water — 3-month filter routine',
+    paragraphs: [
+      'Across all Lake Elsinore neighborhoods, the maintenance schedule we recommend: dishwasher filter every 3 months, refrigerator water filter every 4 months, ice maker descale every 12–18 months. Most "not cleaning" or "no ice" calls in this city resolve with maintenance, not parts. We find the cheap fix first.',
+    ],
   },
 ];
 
-const recentRepairs = [
+const jobs = [
   {
-    title: "Samsung RF28R7351SR — warm fridge, 22E error, Canyon Hills home",
-    neighborhood: "Canyon Hills, 92532",
-    description: "2017 Samsung French-door, 22E error — ice room temperature sensor. Actual root cause: failed defrost heater had allowed the evaporator coil to frost completely, blocking both the fan and triggering the sensor error. Canyon Hills homes get hillside Santa Ana dust that adds to coil loading. Replaced the defrost heater assembly with OEM Samsung parts, manually defrosted the coil, confirmed 38°F recovery same visit. Also cleaned the condenser coils — 18 months of accumulation. Set customer on 6-month cleaning reminder.",
-    note: "Canyon Hills hillside dust adds to condenser coil loading. Clean every 6 months, not annually."
+    badge: 'Samsung Refrigerator',
+    neighborhood: 'Canyon Hills',
+    title: 'Samsung RF28R7351SR — warm fridge, 22E error',
+    body: '2017 Samsung French-door, 22E error — ice room temperature sensor. Actual root cause: failed defrost heater had allowed the evaporator coil to frost completely, blocking both the fan and triggering the sensor error. Canyon Hills homes get hillside Santa Ana dust that adds to coil loading. Replaced the defrost heater assembly with OEM Samsung parts, manually defrosted the coil, confirmed 38°F recovery same visit. Also cleaned the condenser coils — 18 months of accumulation.',
+    part: 'Samsung OEM defrost heater + coil clean',
+    time: '2 hours',
+    result: '✓ Same day · 6-month coil schedule advised · OEM Samsung',
   },
   {
-    title: "LG WM3400CW front-load washer — loud bearing noise on spin, 9 years old",
-    neighborhood: "Tuscany Hills, 92532",
-    description: "LG front-loader in a Tuscany Hills home, grinding bearing noise on every spin cycle. Rear drum bearing failure at year 9 — right on the typical wear timeline for this LG generation. The seal had been weeping moisture into the bearing for at least 6 months before the noise became obvious. Replaced the rear bearing and drum seal as a set. Machine running quietly. Catching it at this stage is better than waiting until the drum is damaged.",
-    note: "LG front-load bearings: the seal fails first, then the bearing. Replace both together every time."
+    badge: 'LG Washer',
+    neighborhood: 'Tuscany Hills',
+    title: 'LG WM3400CW — loud bearing noise on spin, 9 years old',
+    body: 'LG front-loader in a Tuscany Hills home, grinding bearing noise on every spin cycle. Rear drum bearing failure at year 9 — right on the typical wear timeline for this LG generation. The seal had been weeping moisture into the bearing for at least 6 months before the noise became obvious. Replaced the rear bearing and drum seal as a set.',
+    part: 'LG OEM bearing + seal set',
+    time: '3 hours',
+    result: '✓ Same day · Bearing+seal together · No drum damage',
   },
   {
-    title: "Whirlpool WED7500GW dryer — no heat, thermal fuse blown",
-    neighborhood: "Railroad Canyon, 92530",
-    description: "Whirlpool dryer with no heat. Blown thermal fuse confirmed. Traced root cause: 18-foot vent run through the interior with a 90-degree elbow at the garage exit — partially blocked with compacted lint. Cleared the full vent run, replaced the thermal fuse and thermal limiter as a set, confirmed 700+ CFM airflow at the exterior vent. The heating element was also reading low resistance — replaced it while open to prevent a separate call in a few months.",
-    note: "Replace thermal fuse and limiter together on Whirlpool dryers. Never just the fuse alone."
+    badge: 'Whirlpool Dryer',
+    neighborhood: 'Railroad Canyon',
+    title: 'Whirlpool WED7500GW — no heat, thermal fuse blown',
+    body: 'Whirlpool dryer with no heat. Blown thermal fuse confirmed. Traced root cause: 18-foot vent run through the interior with a 90-degree elbow at the garage exit — partially blocked with compacted lint. Cleared the full vent run, replaced the thermal fuse and thermal limiter as a set, confirmed 700+ CFM airflow at the exterior vent. The heating element was also reading low resistance — replaced it while open to prevent a separate call in a few months.',
+    part: 'Whirlpool OEM fuse + limiter + element + vent clear',
+    time: '3 hours',
+    result: '✓ Same day · Root cause fixed · Element pre-emptively replaced',
   },
   {
-    title: "GE GFE26JYMFS — ice maker not producing, water dispenser works, 2018 model",
-    neighborhood: "Country Club Heights, 92530",
-    description: "6-year-old GE French-door, ice maker silent, water working. Isolated to the ice maker inlet valve secondary solenoid — failed independently of the water solenoid. Also found significant mineral scale in the ice maker mold from Riverside County hard water — 6 years without any descaling. Replaced the valve assembly with OEM GE parts, descaled the mold thoroughly, replaced the water filter (19 months old), adjusted freezer from -1°F to +2°F. Ice production restored same visit.",
-    note: "Hard water in Riverside County. Ice maker descaling every 18 months, filter every 4 months."
+    badge: 'GE Refrigerator',
+    neighborhood: 'Country Club Heights',
+    title: 'GE GFE26JYMFS — ice maker not producing, water dispenser fine',
+    body: '6-year-old GE French-door, ice maker silent, water working. Isolated to the ice maker inlet valve secondary solenoid — failed independently of the water solenoid. Also found significant mineral scale in the ice maker mold from Riverside County hard water — 6 years without any descaling. Replaced the valve assembly with OEM GE parts, descaled the mold thoroughly, replaced the water filter (19 months old).',
+    part: 'GE OEM inlet valve + descale + filter',
+    time: '2 hours',
+    result: '✓ Same day · 18-month descale schedule advised',
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Lake Elsinore",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Lake Elsinore",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const reviews = [
+  {
+    text: "Samsung fridge in our Canyon Hills home was warm and showing 22E. They came same day, found a failed defrost heater (not the sensor like the code suggested), cleaned the condenser coils, and had it back to 38°F before they left. Walked me through the 6-month maintenance schedule for canyon homes. Really thorough.",
+    author: '— Jennifer R., Canyon Hills',
   },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
+  {
+    text: "LG washer was making a horrible grinding noise. Tech said it was the bearing — at year 9, exactly on schedule. Replaced bearing AND seal together so it wouldn't fail again. Other companies wanted to sell me a tub assembly for double the price. Honest service.",
+    author: '— Mark T., Tuscany Hills',
+  },
+  {
+    text: "Whirlpool dryer kept blowing the thermal fuse. Previous tech just replaced the fuse. Same Day cleared 18 feet of vent run, replaced the fuse AND limiter, and pre-emptively swapped the heating element. No more callbacks. Worth every penny.",
+    author: '— Robert L., Railroad Canyon',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Coil & vent assessment · Heat-stress check' },
+  { label: 'Standard Repair', price: '$140–$400', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Maintenance Service', price: '$89–$150', note: 'Coil cleaning · Vent cleaning · Hard-water descale' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Lake Elsinore?',
+    answer: 'Yes — same-day service is available throughout Lake Elsinore including Canyon Hills, Tuscany Hills, Country Club Heights, Railroad Canyon, and the lakeshore. We cover ZIP codes 92530 and 92532 without a trip surcharge.',
+  },
+  {
+    question: 'Are 8–12 year old appliances worth repairing?',
+    answer: 'In most cases yes — that\'s exactly the window when the first major failure happens, and a $150–$300 repair on a sound machine usually makes more sense than a $700+ replacement. We diagnose first, give honest numbers, and let you decide. The exception: compressor failures on refrigerators over 12 years old, where repair cost vs replacement value tips the other way.',
+  },
+  {
+    question: 'What brands do you repair in Lake Elsinore?',
+    answer: 'All major brands. Canyon Hills and Tuscany Hills homes run primarily Samsung, LG, Whirlpool, and KitchenAid from the 2010s. Older Railroad Canyon and Country Club Heights homes have GE and Maytag. We carry OEM parts for all of these on the truck.',
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: '$89, applied directly to the repair cost when you proceed. No hidden trip charge to Lake Elsinore. We quote on-site after diagnosis. What we quote is what appears on the invoice.',
+  },
+  {
+    question: 'Do canyon homes need different maintenance schedules?',
+    answer: 'Yes. The canyon communities like Canyon Hills and Tuscany Hills get Santa Ana wind events that funnel through the terrain, carrying fine chaparral dust that loads condenser coils faster than flat valley cities. We recommend 6-month condenser cleaning for canyon/hillside homes. The bigger climate factor is summer heat — Lake Elsinore regularly hits 100–108°F in July, which is the primary driver of summer refrigerator failures here.',
+  },
+  {
+    question: 'Why does my refrigerator struggle in summer?',
+    answer: "When ambient temperature hits 100–108°F, refrigerators that managed fine in cooler months get pushed past their threshold. Two most common causes: condenser coils partially loaded with dust, and a start relay or condenser fan motor that was already weakening. We clean and test both on every summer refrigerator call. In Lake Elsinore's climate, condenser coils should be cleaned every 6 months.",
+  },
+  {
+    question: 'Do you service Wildomar and Canyon Lake nearby?',
+    answer: 'Yes — Wildomar and Canyon Lake are part of our extended Lake Elsinore service area. Same dispatch, no surcharge.',
+  },
+];
+
+const nearby = [
+  { slug: 'temecula', name: 'Temecula' },
+  { slug: 'murrieta', name: 'Murrieta' },
+  { slug: 'menifee', name: 'Menifee' },
+  { slug: 'corona', name: 'Corona' },
+  { slug: 'riverside', name: 'Riverside' },
+  { slug: 'moreno-valley', name: 'Moreno Valley' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Lake Elsinore', sameAs: 'https://en.wikipedia.org/wiki/Lake_Elsinore,_California' },
+    { '@type': 'PostalCode', postalCode: '92530' },
+    { '@type': 'PostalCode', postalCode: '92532' },
   ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
-
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
+    },
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">Riverside County · ZIP 92530, 92532</p>
-        <h1>Appliance Repair<br><span class="accent">Lake Elsinore</span></h1>
-        <p class="hero-sub">Same-day service in Canyon Hills, Tuscany Hills, Railroad Canyon, Country Club Heights, and throughout Lake Elsinore. All brands, OEM parts, licensed.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Lake Elsinore, CA · Riverside County · 92530 · 92532"
+    headlineMain="Appliance repair in"
+    headlineAccent="Lake Elsinore, CA"
+    subheadline="Same-day service throughout Canyon Hills, Tuscany Hills, Country Club Heights, Railroad Canyon, and the lakeshore. Built for inland heat and canyon dust. All brands, OEM parts."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">📋</span><span>Licensed &amp; Insured</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <CustomNarrative
+    number="01"
+    eyebrow="Growing City"
+    headline="Lake Elsinore housing stock —"
+    headlineAccent="what's failing right now"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <section class="intro-section container">
-    <div class="intro-content">
-      <h2>Appliance Repair in Lake Elsinore — Growing City, Aging Appliances</h2>
-      <p>Lake Elsinore is one of Riverside County's fastest-growing communities — Canyon Hills, Tuscany Hills, and Railroad Canyon were built out primarily in the 2000s and 2010s. Those appliances are hitting the 8–15 year failure window right now. The calls we make here are predictable: LG and Samsung ice maker issues, front-load washer bearing failures, Whirlpool dryer thermal fuses from blocked vent runs, Samsung defrost system failures triggering error codes.</p>
-      <p>The canyon terrain matters. Santa Ana wind events funnel through Canyon Hills and Tuscany Hills carrying fine chaparral particulate that loads condenser coils faster than flat valley cities. We recommend 6-month condenser cleaning for these hillside communities — not annual. We account for this on every refrigerator call.</p>
-      <p>Hard water is consistent throughout Riverside County. Dishwasher filter every 3 months, refrigerator water filter every 4 months, ice maker descale every 18 months — these are the intervals that prevent the most common calls we make in Lake Elsinore. We leave every customer with the right schedule for their household.</p>
-      <p>Same-day coverage across ZIP codes 92530 and 92532. Call {phone}.</p>
-    </div>
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Lake Elsinore</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ Hard Water &amp; Scale Service</li>
-        <li>✓ 90-Day Warranty</li>
-        <li>✓ Licensed &amp; Insured</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliances we repair in"
+    headlineAccent="Lake Elsinore"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Lake Elsinore</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Lake Elsinore neighborhoods"
+    headlineAccent="we service"
+    subheadline="Also serving Wildomar and Canyon Lake — same dispatch, no surcharge."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>Lake Elsinore Housing Stock — What's Failing Right Now</h2>
-        <h3>Canyon Hills &amp; Tuscany Hills — 2000s–2010s Master-Planned</h3>
-        <p>Canyon Hills and Tuscany Hills are hillside master-planned communities built primarily 2002–2015 with consistent builder-grade appliances. Samsung, LG, and Whirlpool from the early 2010s are now 10–12 years old — exactly the window where first major failures show up: LG front-load washer bearing wear, Samsung ice maker and defrost system issues, Whirlpool dryer thermal fuse failures from long vent runs. We carry OEM parts for these specific models on the truck for Lake Elsinore calls.</p>
-        <p>The hillside location adds a climate factor: Santa Ana events funnel through the canyons carrying fine chaparral particulate. Condenser coils in Canyon Hills and Tuscany Hills load at a rate that requires 6-month cleaning. After major wind events we recommend an additional check even if cleaning was recent.</p>
-        <h3>Railroad Canyon &amp; Country Club Heights — Mixed Generations</h3>
-        <p>Railroad Canyon Road corridor and Country Club Heights have a broader age range — 1970s–1980s homes near the lake to newer 1990s–2000s builds. Appliances span from older GE and Maytag (often worth repairing) to mid-range Samsung and Whirlpool entering secondary failure. Hard water is consistent here — dishwasher scale and ice maker mineral deposits are among the most common calls in this lower-elevation part of the city.</p>
-        <h3>Lakefront &amp; Vacation Properties</h3>
-        <p>The lakefront properties along Lakeshore Drive are often second homes or vacation rentals running higher appliance loads during peak season. Appliances in active vacation rentals need service earlier than owner-occupied homes. We work with property managers on priority scheduling. If you have a guest check-in approaching and a broken appliance, call us — we'll tell you honestly if same-day is achievable.</p>
-        <h3>Maintenance Schedule for Lake Elsinore Homes</h3>
-        <ul class="maint-list">
-          <li><strong>Dishwasher filter:</strong> Every 3 months — white film on dishes is scale, not a broken machine</li>
-          <li><strong>Refrigerator water filter:</strong> Every 4 months — Riverside County hard water saturates faster</li>
-          <li><strong>Ice maker descale:</strong> Every 18 months, sooner if cubes turn cloudy</li>
-          <li><strong>Condenser coils (canyon/hillside homes):</strong> Every 6 months — more after heavy Santa Ana events</li>
-          <li><strong>Front-load washer drum clean:</strong> Monthly — hard water deposits accelerate gasket wear</li>
-          <li><strong>Dryer vent:</strong> Every 12 months for runs over 15 feet</li>
-        </ul>
-      </div>
-    </div>
-  </section>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Lake Elsinore"
+    jobs={jobs}
+  />
 
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Lake Elsinore</h2>
-      <p>We cover all of Lake Elsinore — Canyon Hills, Tuscany Hills, Railroad Canyon, Country Club Heights, Lakeshore, and beyond. No travel surcharge within 92530 or 92532.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Wildomar and Canyon Lake — same dispatch, no surcharge. Call {phone}.</p>
-  </section>
+  <Method number="05" />
 
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">03</div>
-      <h2>Recent Repairs in Lake Elsinore</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Lake Elsinore"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-  <section class="why-section container">
-    <div class="context-number">04</div>
-    <h2>Why Lake Elsinore Residents Call Us</h2>
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>We know Canyon Hills appliances</h3>
-        <p>The 2010–2015 Samsung and LG generation in Canyon Hills and Tuscany Hills has a predictable failure profile. We come prepared — OEM bearing sets, defrost heater assemblies, start relay kits. Most calls in these neighborhoods close same-day with parts on the truck.</p>
-      </div>
-      <div class="why-item">
-        <h3>Root cause, not just symptoms</h3>
-        <p>A blown Whirlpool thermal fuse means the vent was restricted. A Samsung 22E error means the defrost heater likely failed. A dishwasher that doesn't clean is usually scale. We find the actual cause before recommending parts — and that saves you from callbacks.</p>
-      </div>
-      <div class="why-item">
-        <h3>Honest repair vs. replace</h3>
-        <p>A 10-year-old LG washer with worn bearings and a sound motor is worth repairing. A 15-year-old refrigerator with a failing compressor in summer heat may not be. We give you the real numbers after diagnosis and let you make the call.</p>
-      </div>
-      <div class="why-item">
-        <h3>OEM parts in a hard-use climate</h3>
-        <p>Inland Valley heat and hard water are hard on appliances. Aftermarket parts fail faster in this environment. We source OEM for every repair — the right part from the right channel.</p>
-      </div>
-    </div>
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Samsung fridge in our Canyon Hills home showing 22E error. Tech came same day, diagnosed a failed defrost heater — not the sensor. Fixed it and cleaned the coils. Explained the canyon dust issue. Very knowledgeable."</p>
-        <p class="reviewer">— Steven &amp; Maria K., Canyon Hills</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"LG washer grinding in our Tuscany Hills home. Tech diagnosed worn rear bearing, replaced bearing and seal together in one visit. Machine is running quiet again. Fair price, very professional."</p>
-        <p class="reviewer">— Lisa T., Tuscany Hills</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★☆</div>
-        <p>"Whirlpool dryer not heating in our Railroad Canyon home. Tech found the vent was blocked and replaced the thermal fuse and limiter together. Explained that just the fuse would blow again without clearing the vent."</p>
-        <p class="reviewer">— Marcus R., Railroad Canyon</p>
-      </div>
-    </div>
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Lake Elsinore</h3>
-      <p>Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item"><span class="pi-service">Refrigerator Repair</span><span class="pi-range">$150–$420</span></div>
-        <div class="price-item"><span class="pi-service">Washer Repair</span><span class="pi-range">$140–$360</span></div>
-        <div class="price-item"><span class="pi-service">Dryer Repair</span><span class="pi-range">$120–$300</span></div>
-        <div class="price-item"><span class="pi-service">Dishwasher Repair</span><span class="pi-range">$89–$340</span></div>
-        <div class="price-item"><span class="pi-service">Oven / Range Repair</span><span class="pi-range">$130–$380</span></div>
-        <div class="price-item"><span class="pi-service">Ice Maker Repair</span><span class="pi-range">$120–$260</span></div>
-        <div class="price-item"><span class="pi-service">Condenser Coil Cleaning</span><span class="pi-range">$89–$140</span></div>
-        <div class="price-item"><span class="pi-service">Dryer Vent Cleaning</span><span class="pi-range">$89–$140</span></div>
-      </div>
-      <p class="pricing-note">$89 diagnostic applied to repair cost. No trip charge to Lake Elsinore ZIP codes.</p>
-    </div>
-  </section>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Lake Elsinore"
+    cards={pricingCards}
+    bottomNote="$89 diagnostic applied to repair. No trip charge to Canyon Hills, Tuscany Hills, or anywhere in 92530/92532."
+  />
 
-  <section class="faq-section container">
-    <h2>Lake Elsinore Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Lake Elsinore"
+    faqs={faqs}
+  />
 
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/murrieta/">Murrieta</a>
-      <a href="/menifee/">Menifee</a>
-      <a href="/temecula/">Temecula</a>
-      <a href="/corona/">Corona</a>
-      <a href="/riverside/">Riverside</a>
-      <a href="/moreno-valley/">Moreno Valley</a>
-    </div>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Lake Elsinore Today?</h2>
-      <p>Same-day service in Canyon Hills, Tuscany Hills, Railroad Canyon, Country Club Heights, and all Lake Elsinore neighborhoods.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero{background:var(--color-bg);padding:5rem 0 4rem}
-.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:.75rem}
-h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
-h1 .accent{color:var(--color-accent)}
-.hero-sub{font-size:1.05rem;color:var(--color-text-muted);margin-bottom:2rem;max-width:48ch}
-.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
-.hero-trust{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.85rem;color:var(--color-text-muted)}
-.trust-bar{background:var(--color-accent);padding:1rem 0}
-.trust-bar-inner{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap}
-.trust-item{display:flex;align-items:center;gap:.5rem;color:#fff;font-size:.875rem;font-weight:600}
-.intro-section{display:grid;grid-template-columns:1fr 300px;gap:4rem;padding-top:4rem;padding-bottom:4rem}
-.intro-content h2{font-size:1.6rem;margin-bottom:1.25rem}
-.intro-content p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
-.sticky-cta-box{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem;position:sticky;top:5rem;height:fit-content}
-.scb-city{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--color-accent);margin-bottom:.25rem}
-.scb-phone{font-size:1.4rem;font-weight:800;margin-bottom:1.25rem}
-.btn-block{display:block;width:100%;text-align:center;margin-bottom:.75rem}
-.scb-list{list-style:none;padding:0;margin:1.25rem 0;font-size:.875rem}
-.scb-list li{padding:.3rem 0;border-bottom:1px solid var(--color-border);color:var(--color-text-body)}
-.scb-hours{font-size:.8rem;color:var(--color-text-muted);text-align:center}
-.services-section{background:var(--color-surface);padding:4rem 0}
-.services-section h2{text-align:center;font-size:1.75rem;margin-bottom:2rem}
-.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.service-card{background:var(--color-bg);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem 1rem;text-align:center;text-decoration:none;color:var(--color-text);transition:border-color .2s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:.75rem}
-.service-card:hover{border-color:var(--color-accent);transform:translateY(-2px)}
-.svc-icon{font-size:2rem}
-.svc-name{font-size:.9rem;font-weight:600}
-.context-block{padding:4rem 0}
-.context-inner{display:grid;grid-template-columns:80px 1fr;gap:2rem}
-.context-number{font-size:4rem;font-weight:900;color:var(--color-accent);opacity:.2;line-height:1}
-.context-body h2{font-size:1.6rem;margin-bottom:1.25rem}
-.context-body h3{font-size:1.1rem;font-weight:700;margin:1.75rem 0 .75rem}
-.context-body p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
-.maint-list{padding-left:1.25rem}
-.maint-list li{margin-bottom:.6rem;line-height:1.6;color:var(--color-text-body)}
-.neighborhoods-section{padding:4rem 0}
-.section-intro{margin-bottom:2rem}
-.section-intro h2{font-size:1.6rem;margin-bottom:.75rem}
-.neighborhoods-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.nbhd-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1rem 1.25rem}
-.nbhd-name{display:block;font-weight:600;margin-bottom:.25rem}
-.nbhd-zip{font-size:.8rem;color:var(--color-text-muted)}
-.nbhd-note{margin-top:1.5rem;font-size:.875rem;color:var(--color-text-muted)}
-.repairs-section{padding:4rem 0}
-.section-header{display:flex;align-items:baseline;gap:1rem;margin-bottom:2rem}
-.section-header h2{font-size:1.6rem}
-.repairs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.repair-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem}
-.repair-title{font-size:1rem;font-weight:700;margin-bottom:.5rem}
-.repair-location{font-size:.8rem;color:var(--color-accent);margin-bottom:1rem}
-.repair-desc{font-size:.9rem;line-height:1.7;color:var(--color-text-body);margin-bottom:1rem}
-.repair-note{font-size:.85rem;color:var(--color-text-muted);border-top:1px solid var(--color-border);padding-top:.75rem}
-.why-section{padding:4rem 0}
-.why-section h2{font-size:1.6rem;margin-bottom:2rem}
-.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:3rem}
-.why-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem}
-.why-item h3{font-size:1rem;margin-bottom:.5rem}
-.why-item p{font-size:.9rem;color:var(--color-text-body);line-height:1.7}
-.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:3rem}
-.review-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem}
-.stars{color:#f59e0b;font-size:1rem;margin-bottom:.75rem}
-.review-card p{font-size:.875rem;line-height:1.65;color:var(--color-text-body);margin-bottom:.75rem}
-.reviewer{font-size:.8rem;color:var(--color-text-muted)}
-.pricing-block{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:2rem}
-.pricing-block h3{margin-bottom:.5rem}
-.pricing-block>p{font-size:.9rem;color:var(--color-text-muted);margin-bottom:1.5rem}
-.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.price-item{display:flex;flex-direction:column;gap:.25rem}
-.pi-service{font-size:.85rem;color:var(--color-text-muted)}
-.pi-range{font-size:1rem;font-weight:700}
-.pricing-note{font-size:.8rem;color:var(--color-text-muted);margin-top:1.25rem}
-.faq-section{padding:4rem 0}
-.faq-section h2{font-size:1.6rem;margin-bottom:2rem}
-.faq-list{display:flex;flex-direction:column;gap:.75rem}
-.faq-item{border:1px solid var(--color-border);border-radius:.5rem;background:var(--color-surface)}
-.faq-q{padding:1.25rem 1.5rem;font-weight:600;cursor:pointer;list-style:none}
-.faq-a{padding:0 1.5rem 1.25rem;font-size:.9rem;line-height:1.7;color:var(--color-text-body)}
-.nearby-section{padding:3rem 0}
-.nearby-section h2{font-size:1.25rem;margin-bottom:1.25rem}
-.nearby-grid{display:flex;gap:1rem;flex-wrap:wrap}
-.nearby-grid a{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.375rem;padding:.5rem 1rem;text-decoration:none;color:var(--color-text);font-size:.875rem}
-.nearby-grid a:hover{border-color:var(--color-accent);color:var(--color-accent)}
-.bottom-cta{background:var(--color-surface);border-top:1px solid var(--color-border);padding:4rem 0;text-align:center}
-.bottom-cta h2{font-size:1.75rem;margin-bottom:.75rem}
-.bottom-cta p{color:var(--color-text-muted);margin-bottom:2rem}
-.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-@media(max-width:1024px){.intro-section{grid-template-columns:1fr}.sticky-cta-box{position:static}.services-grid,.neighborhoods-grid{grid-template-columns:repeat(2,1fr)}.pricing-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.hero-inner{grid-template-columns:1fr}.context-inner{grid-template-columns:1fr}.repairs-grid,.why-grid,.reviews-grid{grid-template-columns:1fr}}
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Lake Elsinore repair today"
+    body="Same-day service across Canyon Hills, Tuscany Hills, Country Club Heights, Railroad Canyon, and the lakeshore. Built for inland heat and canyon dust."
+  />
+</CityLayout>

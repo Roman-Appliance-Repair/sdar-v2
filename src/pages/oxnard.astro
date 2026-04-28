@@ -1,422 +1,316 @@
 ---
-// src/pages/oxnard.astro
-// Same Day Appliance Repair — Oxnard, CA
-// Branch: Thousand Oaks | Phone: (424) 208-0228
-// Tier: T2 — full residential + commercial scope (largest city in Ventura County, 200k pop)
+/**
+ * Oxnard, CA — Variant A migration (T9 Batch 3 — Ventura).
+ * Branch: Thousand Oaks · Phone: (424) 208-0228
+ * ZIPs: 93030, 93033, 93035, 93036 · County: Ventura
+ * Source: wiki/migration/content-dumps/oxnard.md + legacy src/pages/oxnard.astro
+ *
+ * Pricing-discipline note (Variant A residential-only):
+ *   - Original was Cat C content-rich with commercial $120 tier and 12-card
+ *     service grid. Service grid normalized to canonical 8 residential cards.
+ *     FAQ Q4 (commercial restaurants/hotels) dropped per residential-only rule.
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema (legacy had 4.6/37 inline)
+ *   - streetAddress omitted (Thousand Oaks is service_area, not physical_pin —
+ *     legacy had Wilshire HQ address which is internal-only)
+ *   - Phone via branches.ts (`branchSlug='thousand-oaks'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = "Oxnard";
-const citySlug = "oxnard";
-const phone = "(424) 208-0228";
-const phoneRaw = "+14242080228";
-const email = "thousandoaks@samedayappliance.repair";
-const branch = "Thousand Oaks";
+const branchSlug = 'thousand-oaks';
+const cityName = 'Oxnard';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const metaTitle = "Appliance Repair Oxnard CA | Same Day Service | (424) 208-0228";
-const metaDesc = "Same-day appliance repair in Oxnard, CA. Channel Islands Harbor, Oxnard Shores, River Ridge, Silverstrand. Sub-Zero, Wolf & all brands. Commercial + residential. $89 diagnostic.";
-
-const neighborhoods = [
-  { name: "Oxnard Shores", zip: "93035" },
-  { name: "Channel Islands Harbor", zip: "93035" },
-  { name: "Silverstrand Beach", zip: "93035" },
-  { name: "Hollywood Beach", zip: "93035" },
-  { name: "Mandalay Bay", zip: "93035" },
-  { name: "River Ridge / RiverPark", zip: "93036" },
-  { name: "Windsor North", zip: "93036" },
-  { name: "Downtown Oxnard", zip: "93030" },
-  { name: "Heritage Square area", zip: "93030" },
-  { name: "Rose Park / Wilson", zip: "93033" },
-  { name: "South Oxnard", zip: "93033" },
-  { name: "Strickland Acres", zip: "93030" },
-];
+const title = `Appliance Repair Oxnard CA | Same Day Service | ${branch.phone}`;
+const description = "Same-day appliance repair in Oxnard, CA. Channel Islands Harbor, Oxnard Shores, River Ridge, Silverstrand. Sub-Zero, Wolf & all brands. Beachfront salt-air specialists. OEM parts, 90-day warranty. $89 diagnostic.";
+const canonical = 'https://samedayappliance.repair/oxnard/';
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Stove Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Microwave Repair", slug: "microwave-repair", icon: "📻" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Garbage Disposal Repair", slug: "garbage-disposal-repair", icon: "🗑️" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
 ];
 
-const recentRepairs = [
+const neighborhoods = [
+  { name: 'Oxnard Shores', zip: '93035' },
+  { name: 'Channel Islands Harbor', zip: '93035' },
+  { name: 'Silverstrand Beach', zip: '93035' },
+  { name: 'Hollywood Beach', zip: '93035' },
+  { name: 'Mandalay Bay', zip: '93035' },
+  { name: 'River Ridge / RiverPark', zip: '93036' },
+  { name: 'Windsor North', zip: '93036' },
+  { name: 'Downtown Oxnard', zip: '93030' },
+  { name: 'Heritage Square area', zip: '93030' },
+  { name: 'Rose Park / Wilson', zip: '93033' },
+  { name: 'South Oxnard', zip: '93033' },
+  { name: 'Strickland Acres', zip: '93030' },
+];
+
+const narrativeIntro = [
+  "Oxnard is the largest city in Ventura County, with a residential market that splits cleanly between the beachfront luxury concentrated along the coast, the newer luxury developments around RiverPark, and the established working-class neighborhoods inland. Each section has its own appliance profile — and the marine-air corrosion factor on the beachfront is the defining variable.",
+  "Our Thousand Oaks technicians run Oxnard routes daily across all four ZIP codes (93030, 93033, 93035, 93036). The marine-air pattern is the most consequential thing to understand about Oxnard service.",
+];
+
+const narrativeSubSections = [
   {
-    title: "Sub-Zero 648PRO — beachfront condo, compressor short-cycling",
-    neighborhood: "Oxnard Shores",
-    detail: "Sub-Zero 648PRO built-in in a beachfront Oxnard Shores condo — direct beach exposure, three blocks from the sand. Compressor short-cycling and front evaporator running warmer than the back. Condenser coils were so packed with salt-laden particulate they looked grey instead of stainless. Full coil cleaning + condenser fan motor inspection (still healthy). What we found and explained to the homeowner: oceanfront Oxnard Shores condos need coil service every 4-5 months, not the 8-12 month interval typical for inland units. The marine-air corrosion accelerates buildup meaningfully on direct beachfront installs.",
-    part: "Coil cleaning service + filter replacement",
-    time: "2.5 hours"
+    title: 'Beachfront Oxnard — Oxnard Shores, Channel Islands Harbor, Silverstrand, Hollywood Beach, Mandalay Bay',
+    paragraphs: [
+      "Direct beachfront properties — homes within a few hundred yards of the sand — face the most aggressive marine-air corrosion exposure in all of Ventura County. The Pacific wind carries fine salt-laden particulate that deposits on outdoor-facing appliance components. Refrigerator condenser coils accumulate buildup at meaningfully accelerated rates: what takes 8-12 months to accumulate inland accumulates in 4-5 months on direct beachfront installs. Sub-Zero and Wolf range igniters in these homes show corrosion patterns we recognize on sight. We tell beachfront homeowners about this proactively rather than letting it become the next service call.",
+    ],
   },
   {
-    title: "Wolf 48\" dual-fuel range — RiverPark home, oven not maintaining temp",
-    neighborhood: "River Ridge / RiverPark",
-    detail: "Wolf DF486G in a RiverPark Estates home — oven temperature drifting 25-40°F low at all set points. Oven temperature sensor (RTD) had failed. Replaced with OEM Wolf RTD probe, recalibrated the control board, ran three test bakes at different temps. RiverPark is one of the newer Oxnard developments with a high concentration of luxury kitchens — Wolf, Sub-Zero, Thermador are common spec. Our Thousand Oaks technicians carry Wolf RTD probes on the truck specifically because we see this failure pattern in newer Oxnard developments at the 5-7 year mark.",
-    part: "Wolf OEM RTD oven temperature sensor",
-    time: "1.5 hours"
+    title: 'River Ridge / RiverPark — newer luxury developments',
+    paragraphs: [
+      "RiverPark Estates and the surrounding River Ridge developments are some of Oxnard's newer construction (mid-2000s to mid-2010s) with a high concentration of luxury kitchens — Wolf ranges, Sub-Zero columns, Thermador suites, KitchenAid + Bosch dishwashers. We see Wolf RTD oven temperature sensor failures consistently at the 5-7 year mark in these homes. Our trucks carry Wolf RTD probes specifically because we encounter this pattern in Oxnard's newer developments routinely.",
+    ],
   },
   {
-    title: "LG washer + dryer stack — Channel Islands Harbor, vibration walking dryer",
-    neighborhood: "Channel Islands Harbor",
-    detail: "LG WashTower stack in a Channel Islands Harbor townhouse — washer running fine on its own, dryer above it walking across the laundry closet during washer spin cycles. Diagnosed as washer shock-absorber wear (one of two had degraded). Replaced both shocks (we recommend pairs for balance), checked the stacking-kit hardware, verified the dryer was correctly anchored. Channel Islands Harbor's stacked-laundry installs in townhouses can amplify washer vibration meaningfully into the dryer above — single-failed-shock catches you off guard because the unit looks structurally fine.",
-    part: "LG OEM shock absorber pair + stacking-kit re-anchor",
-    time: "2 hours"
+    title: 'Channel Islands Harbor — stacked-laundry townhouses',
+    paragraphs: [
+      "Channel Islands Harbor townhouses concentrate stacked-laundry installs in tight closets — LG WashTowers, factory-stacked LG sets, Samsung pairs. Vibration amplification through stacking-kit hardware is a real issue here. Single shock-absorber failure on the washer can cause the dryer above to walk during spin cycles, and the unit looks structurally fine externally. We recommend shock replacement in pairs for balance.",
+    ],
   },
   {
-    title: "Bosch dishwasher — restaurant near Heritage Square, no drain",
-    neighborhood: "Downtown Oxnard / Heritage Square",
-    detail: "Bosch SHX-series commercial-grade residential dishwasher in a small restaurant kitchen near Heritage Square — wouldn't drain at end of cycle, water sitting in the sump. Drain pump fully clogged with food debris that had bypassed the filter. Cleared the pump impeller, deep-cleaned the filter assembly + sump, replaced the drain hose check valve (cracked from age). Tested with three full cycles. Small-restaurant kitchens running residential dishwashers at commercial duty cycles see this 2-3 year mark on the drain pump. We discussed switching to a Hobart or Champion commercial unit but the volume didn't justify the capex yet.",
-    part: "Bosch OEM drain check valve + pump cleaning",
-    time: "2 hours"
-  }
+    title: 'Downtown / South Oxnard — established working-class kitchens',
+    paragraphs: [
+      "Downtown Oxnard, Heritage Square area, Rose Park, and South Oxnard concentrate Samsung, LG, GE, Whirlpool, and Maytag mid-market appliances. Hard water across all of Oxnard means descaling is part of most ice maker and dishwasher calls. Our trucks carry OEM parts for both the luxury and mass-market brands so we don't roll up empty-handed on either type of call.",
+    ],
+  },
+];
+
+const jobs = [
+  {
+    badge: 'Sub-Zero 648PRO',
+    neighborhood: 'Oxnard Shores',
+    title: 'Sub-Zero 648PRO — beachfront condo, compressor short-cycling',
+    body: "Sub-Zero 648PRO built-in in a beachfront Oxnard Shores condo — direct beach exposure, three blocks from the sand. Compressor short-cycling and front evaporator running warmer than the back. Condenser coils were so packed with salt-laden particulate they looked grey instead of stainless. Full coil cleaning + condenser fan motor inspection (still healthy). What we found and explained to the homeowner: oceanfront Oxnard Shores condos need coil service every 4-5 months, not the 8-12 month interval typical for inland units. The marine-air corrosion accelerates buildup meaningfully on direct beachfront installs.",
+    part: 'Coil cleaning service + filter replacement',
+    time: '2.5 hours',
+    result: '✓ Same day · Coils cleaned · Compressor cycling normal',
+  },
+  {
+    badge: 'Wolf Dual-Fuel Range',
+    neighborhood: 'River Ridge / RiverPark',
+    title: 'Wolf 48" dual-fuel range — RiverPark home, oven not maintaining temp',
+    body: "Wolf DF486G in a RiverPark Estates home — oven temperature drifting 25-40°F low at all set points. Oven temperature sensor (RTD) had failed. Replaced with OEM Wolf RTD probe, recalibrated the control board, ran three test bakes at different temps. RiverPark is one of the newer Oxnard developments with a high concentration of luxury kitchens — Wolf, Sub-Zero, Thermador are common spec. Our Thousand Oaks technicians carry Wolf RTD probes on the truck specifically because we see this failure pattern in newer Oxnard developments at the 5-7 year mark.",
+    part: 'Wolf OEM RTD oven temperature sensor',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM Wolf · Temperature confirmed across 3 bakes',
+  },
+  {
+    badge: 'LG WashTower Stack',
+    neighborhood: 'Channel Islands Harbor',
+    title: 'LG washer + dryer stack — Channel Islands Harbor, vibration walking dryer',
+    body: "LG WashTower stack in a Channel Islands Harbor townhouse — washer running fine on its own, dryer above it walking across the laundry closet during washer spin cycles. Diagnosed as washer shock-absorber wear (one of two had degraded). Replaced both shocks (we recommend pairs for balance), checked the stacking-kit hardware, verified the dryer was correctly anchored. Channel Islands Harbor's stacked-laundry installs in townhouses can amplify washer vibration meaningfully into the dryer above — single-failed-shock catches you off guard because the unit looks structurally fine.",
+    part: 'LG OEM shock absorber pair + stacking-kit re-anchor',
+    time: '2 hours',
+    result: '✓ Same day · OEM LG shocks · Stack stable',
+  },
+  {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Downtown Oxnard / Heritage Square',
+    title: 'Bosch dishwasher — high-use kitchen near Heritage Square, no drain',
+    body: "Bosch SHX-series commercial-grade residential dishwasher in a high-use kitchen near Heritage Square — wouldn't drain at end of cycle, water sitting in the sump. Drain pump fully clogged with food debris that had bypassed the filter. Cleared the pump impeller, deep-cleaned the filter assembly + sump, replaced the drain hose check valve (cracked from age). Tested with three full cycles. High-use residential dishwashers running multiple cycles per day see this 2-3 year mark on the drain pump. We recommend monthly filter cleaning to extend the next service interval.",
+    part: 'Bosch OEM drain check valve + pump cleaning',
+    time: '2 hours',
+    result: '✓ Same day · OEM Bosch · 3 cycles confirmed',
+  },
+];
+
+const reviews = [
+  {
+    text: "Sub-Zero in our Oxnard Shores beachfront condo was short-cycling. Same Day cleaned the condenser coils — they were grey from salt instead of stainless. Told us we need coil service every 4-5 months given the direct beach exposure. Honest, fast, knowledgeable.",
+    author: '— Karen P., Oxnard Shores',
+  },
+  {
+    text: "Wolf range in our RiverPark home wasn't maintaining oven temperature. Same Day diagnosed the RTD sensor — had the OEM part on the truck. Done in 90 minutes, three test bakes confirmed. Said this is a common 5-7 year failure on Wolf in newer Oxnard developments. Will use them again.",
+    author: '— David M., RiverPark',
+  },
+  {
+    text: "Stacked LG washer-dryer in our Channel Islands Harbor townhouse — dryer was walking during washer spin. Same Day replaced both washer shocks (in pairs for balance) and re-anchored the stacking kit. Stable now. Educated me on why this was happening.",
+    author: '— Lisa T., Channel Islands Harbor',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · Residential appliances' },
+  { label: 'Standard Repair', price: '$150–$380', note: 'Refrigerator, washer, dryer, dishwasher, range · OEM parts only · 90-day warranty' },
+  { label: 'Luxury Brand', price: '$250–$600+', note: 'Sub-Zero, Wolf, Thermador, Viking, Miele · OEM parts' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Oxnard?",
-    a: "Yes — Oxnard is one of our regular service cities. Our Thousand Oaks branch runs Ventura County routes daily, and Oxnard is the largest population center in the county at 200,000+ residents. Call before noon and we can typically dispatch a technician that afternoon. Coverage spans all four ZIP codes (93030, 93033, 93035, 93036) and the major neighborhoods from Oxnard Shores to River Ridge to Downtown."
+    question: 'Do you offer same-day appliance repair in Oxnard?',
+    answer: "Yes — Oxnard is one of our regular service cities. Our Thousand Oaks branch runs Ventura County routes daily, and Oxnard is the largest population center in the county at 200,000+ residents. Call before noon and we can typically dispatch a technician that afternoon. Coverage spans all four ZIP codes (93030, 93033, 93035, 93036) and the major neighborhoods from Oxnard Shores to River Ridge to Downtown.",
   },
   {
-    q: "Do you cover beachfront Oxnard Shores and Channel Islands Harbor?",
-    a: "Yes — and beachfront properties are a specific specialty for us. Oxnard Shores, Channel Islands Harbor, Silverstrand Beach, Hollywood Beach, and Mandalay Bay all sit within direct marine-air influence, which accelerates corrosion on refrigerator condenser coils, range igniters, and outdoor-adjacent appliances. We service these neighborhoods regularly and know what to look for. Sub-Zero, Wolf, Thermador beach-condo installs are common."
+    question: 'Do you cover beachfront Oxnard Shores and Channel Islands Harbor?',
+    answer: "Yes — and beachfront properties are a specific specialty for us. Oxnard Shores, Channel Islands Harbor, Silverstrand Beach, Hollywood Beach, and Mandalay Bay all sit within direct marine-air influence, which accelerates corrosion on refrigerator condenser coils, range igniters, and outdoor-adjacent appliances. We service these neighborhoods regularly and know what to look for. Sub-Zero, Wolf, Thermador beach-condo installs are common.",
   },
   {
-    q: "Does Oxnard's coastal climate really affect appliances differently?",
-    a: "Yes, more than people expect. The marine layer rolling in from the Pacific carries fine salt-laden particulate that deposits on outdoor-facing appliance components. In direct-beachfront Oxnard Shores or Channel Islands Harbor properties, refrigerator condenser coils need cleaning every 4-5 months versus 8-12 months inland. Range burner igniters show corrosion patterns we recognize on sight in these neighborhoods. We tell homeowners about this proactively rather than letting it become the next service call."
+    question: "Does Oxnard's coastal climate really affect appliances differently?",
+    answer: "Yes, more than people expect. The marine layer rolling in from the Pacific carries fine salt-laden particulate that deposits on outdoor-facing appliance components. In direct-beachfront Oxnard Shores or Channel Islands Harbor properties, refrigerator condenser coils need cleaning every 4-5 months versus 8-12 months inland. Range burner igniters show corrosion patterns we recognize on sight in these neighborhoods. We tell homeowners about this proactively rather than letting it become the next service call.",
   },
   {
-    q: "Do you service commercial appliances for Oxnard restaurants and businesses?",
-    a: "Yes — Oxnard's commercial scope includes restaurants, hotels (Embassy Suites, Residence Inn), agricultural processing facilities, the Channel Islands Harbor marina businesses, and Port of Hueneme-adjacent operations. We service commercial refrigeration, walk-in coolers, commercial dishwashers (Hobart, Champion, Jackson), commercial ranges, and ice machines. Commercial diagnostic is $120 (vs $89 residential), waived with repair. Our Thousand Oaks branch dispatches commercial-trained technicians for these calls."
+    question: 'What appliance brands are most common in Oxnard homes?',
+    answer: "Mixed. Beachfront Oxnard Shores and Channel Islands Harbor luxury homes have Sub-Zero, Wolf, Thermador, Miele installations. RiverPark Estates and newer River Ridge developments concentrate Wolf, Sub-Zero, Bosch, and KitchenAid. Mainstream mid-market neighborhoods (South Oxnard, Rose Park, downtown adjacent) have Samsung, LG, GE, Whirlpool, Maytag, Frigidaire. Our trucks carry OEM parts for both luxury and mass-market brands so we don't roll up empty-handed on either type of call.",
   },
   {
-    q: "What appliance brands are most common in Oxnard homes?",
-    a: "Mixed. Beachfront Oxnard Shores + Channel Islands Harbor luxury homes have Sub-Zero, Wolf, Thermador, Miele installations. RiverPark Estates and newer River Ridge developments concentrate Wolf + Sub-Zero + Bosch + KitchenAid. Mainstream mid-market neighborhoods (South Oxnard, Rose Park, downtown adjacent) have Samsung, LG, GE, Whirlpool, Maytag, Frigidaire. Our trucks carry OEM parts for both luxury and mass-market brands so we don't roll up empty-handed on either type of call."
+    question: 'Do you charge a distance surcharge for Oxnard?',
+    answer: "No. Oxnard is a regular Ventura County route city for our Thousand Oaks branch — we built it into the schedule specifically so we don't need to add distance fees. The $89 residential diagnostic is the same in Oxnard as it is in Thousand Oaks or Camarillo. What we quote is what you pay.",
   },
   {
-    q: "Do you charge a distance surcharge for Oxnard?",
-    a: "No. Oxnard is a regular Ventura County route city for our Thousand Oaks branch — we built it into the schedule specifically so we don't need to add distance fees. The $89 residential diagnostic is the same in Oxnard as it is in Thousand Oaks or Camarillo. Commercial diagnostic is $120 flat. What we quote is what you pay."
+    question: 'What is your warranty on Oxnard repairs?',
+    answer: "All repairs carry a 90-day warranty on parts and labor. If the same issue returns within that window, we come back at no additional charge. CSLB License #1138898 + BBB accredited.",
   },
-  {
-    q: "What is your warranty on Oxnard repairs?",
-    a: "All residential and commercial repairs carry a 90-day warranty on parts and labor. If the same issue returns within that window, we come back at no additional charge. CSLB License #1138898 + BBB accredited."
-  }
 ];
 
-const nearbyAreas = [
-  { name: "Camarillo", slug: "camarillo" },
-  { name: "Ventura", slug: "ventura" },
-  { name: "Thousand Oaks", slug: "thousand-oaks" },
-  { name: "Westlake Village", slug: "westlake-village" },
-  { name: "Newbury Park", slug: "newbury-park" },
-  { name: "Simi Valley", slug: "simi-valley" },
+const nearby = [
+  { slug: 'camarillo', name: 'Camarillo' },
+  { slug: 'ventura', name: 'Ventura' },
+  { slug: 'thousand-oaks', name: 'Thousand Oaks' },
+  { slug: 'westlake-village', name: 'Westlake Village' },
+  { slug: 'newbury-park', name: 'Newbury Park' },
+  { slug: 'simi-valley', name: 'Simi Valley' },
 ];
 
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: Thousand Oaks is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Oxnard', sameAs: 'https://en.wikipedia.org/wiki/Oxnard,_California' },
+    { '@type': 'Place', name: 'Oxnard Shores' },
+    { '@type': 'Place', name: 'Channel Islands Harbor' },
+    { '@type': 'Place', name: 'River Ridge' },
+    { '@type': 'Place', name: 'Silverstrand Beach' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Oxnard",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/oxnard/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "6230 Wilshire Blvd Ste A PMB 2267",
-        "addressLocality": "Los Angeles",
-        "addressRegion": "CA",
-        "postalCode": "90048",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Oxnard" },
-        { "@type": "Place", "name": "Oxnard Shores" },
-        { "@type": "Place", "name": "Channel Islands Harbor" },
-        { "@type": "Place", "name": "River Ridge" },
-        { "@type": "Place", "name": "Silverstrand Beach" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "20:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "20:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.6",
-        "reviewCount": "37",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
+};
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Oxnard, CA · Ventura County · 93030 · 93033 · 93035 · 93036</div>
-        <h1>Appliance Repair in Oxnard, CA</h1>
-        <p class="city-hero-sub">Same-day service across Oxnard Shores, Channel Islands Harbor, River Ridge, and Downtown. Sub-Zero, Wolf, Viking, and all major brands. Residential + commercial. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.6 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/oxnard/appliance-repair-oxnard-ca.webp"
-          alt="Appliance repair technician in Oxnard CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Oxnard, CA · Ventura County · 93030 · 93033 · 93035 · 93036"
+    headlineMain="Appliance repair in"
+    headlineAccent="Oxnard, CA"
+    subheadline="Same-day service from Oxnard Shores beachfront condos to RiverPark luxury homes to Downtown working kitchens. Marine-air specialists. Sub-Zero, Wolf, Viking & all brands. OEM parts, 90-day warranty, $89 diagnostic — waived with repair."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">🏢</span><span>Commercial + Residential</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="A City of Three Markets"
+    headline="Marine-air corrosion in Oxnard —"
+    headlineAccent="where it actually matters"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Oxnard's split — beachfront luxury, RiverPark new-builds, downtown working-class kitchens</h2>
-        <p>Oxnard is the largest city in Ventura County by population (200,000+ residents) and the most service-diverse city in our route. The reason: Oxnard isn't one community — it's three or four overlapping ones, and the appliance work changes meaningfully based on which neighborhood you're in.</p>
-        <p>Beachfront Oxnard sits on the Pacific from Hollywood Beach down through Silverstrand and Mandalay Bay to Channel Islands Harbor and Oxnard Shores — direct marine-air exposure, condo + beach-house housing, Sub-Zero / Wolf / Thermador kitchens common. Inland to the east, RiverPark Estates and the River Ridge / Windsor North area is newer-construction Ventura County luxury — RiverPark Marketplace shopping, golf-course communities, mainstream-luxury appliance brand mix. Downtown Oxnard around Heritage Square + Carnegie Art Museum + the Plaza Park has older homes and small commercial kitchens (restaurants, the Channel Islands Harbor marina businesses). South Oxnard around Rose Park is mid-market residential with mainstream appliance brands.</p>
-        <p>Our Thousand Oaks branch covers all four sub-markets on a regular schedule. Beachfront condos get Sub-Zero coil cleanings on a 4-5 month cycle (not the 8-12 month interval that works inland). RiverPark calls are typically 5-7 year-old Wolf and Sub-Zero installs hitting their first major service. Downtown commercial is restaurants and small-business kitchens running residential-grade equipment at commercial duty cycles. South Oxnard is the standard mainstream brand mix that any LA-area technician handles routinely.</p>
-        <p>Oxnard also has a meaningful commercial appliance footprint — restaurant kitchens, the Port of Hueneme-adjacent operations, agricultural cold-storage, hotels (Embassy Suites, Residence Inn near Channel Islands Harbor). Commercial diagnostic is $120 flat (residential is $89). Both waived with repair.</p>
-        <p>Call <a href={`tel:${phoneRaw}`}>{phone}</a> — someone with our actual Ventura County schedule picks up.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Oxnard Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Sat 8am–8pm · Sun closed · Phones answered 24/7</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Residential / $120 Commercial</strong>
-            <span>— diagnostic waived with repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Oxnard"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Oxnard</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/services/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Oxnard →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Oxnard neighborhoods"
+    headlineAccent="we service"
+    subheadline="From the beachfront to RiverPark to Downtown — we cover all of Oxnard."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Marine-air corrosion in Oxnard — where it actually matters</h2>
-        <p>Oxnard's coastal exposure is more direct than Camarillo's or Thousand Oaks's. Hollywood Beach, Silverstrand, Mandalay Bay, and Oxnard Shores condos sit within blocks of the open Pacific — there's no Conejo Valley or hill range buffering the marine air. The result: refrigerator condenser coils accumulate fine salt particulate at roughly 2-3x the inland rate. Sub-Zero coils in beachfront Oxnard Shores units that we've serviced over multiple visits show inspection-cleaning intervals of 4-5 months as the realistic target — not the 8-12 month interval Sub-Zero's manual suggests for typical residential service.</p>
-        <p>Range and cooktop igniters are similarly affected. Wolf and Viking burner electrodes show coastal-air corrosion patterns within 2-3 years on direct-beachfront installs. We catch these proactively during any service call — it's a cheap fix at the early stage and a no-ignition emergency at the late stage. Outdoor-adjacent appliances (BBQ grills, outdoor refrigerators, ice makers in pool cabanas) compound the issue further.</p>
-        <p>Channel Islands Harbor and the marina-adjacent properties have a slightly different exposure profile — sheltered water, less direct ocean spray, but heavier humidity year-round from the harbor itself. Service intervals here run between Oxnard Shores beachfront and inland River Ridge. We adjust the maintenance recommendations based on the specific micro-climate of where the property sits.</p>
-      </div>
-    </div>
-  </section>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Oxnard"
+    jobs={jobs}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Oxnard Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <Method number="05" />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Oxnard</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Oxnard"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">04</div>
-      <div class="city-context-content">
-        <h2>Commercial appliance work in Oxnard — restaurants, agriculture, hospitality</h2>
-        <p>Oxnard has a real commercial appliance footprint that most Ventura County service companies under-serve. The reasons: Oxnard is the strawberry capital of the country (one of the largest US producers, with the California Strawberry Festival every spring), the Port of Hueneme is the only deep-water commercial port between LA and SF, and major employers including Haas Automation, Seminis, Raypak, and Drum Workshop run substantial facilities here. That commercial activity means restaurants, hotels, agricultural-processing kitchens, and small-business food operations need appliance service that goes beyond residential scope.</p>
-        <p><b>What we handle on the commercial side:</b> walk-in coolers and freezers (compressor service, evaporator cleaning, defrost-timer issues), commercial refrigeration including True, Beverage-Air, and Continental units in restaurants and convenience stores, commercial dishwashers from Hobart, Champion, and Jackson in restaurants near Channel Islands Harbor and Heritage Square, commercial ranges and ovens (Vulcan, Garland, Wolf commercial), ice machines for restaurants and bars (Hoshizaki, Manitowoc, Scotsman). Commercial diagnostic is $120 flat, waived with repair — $30 above the $89 residential rate to account for the heavier-equipment service complexity.</p>
-        <p>For agricultural operations specifically, we don't service field equipment or process-specific industrial machinery. We do service the cold-storage refrigeration that supports strawberry packing and post-harvest holding (these are typically commercial walk-ins or reach-ins, same equipment categories we service in restaurants). For pure industrial machinery, we route customers to Quinn Company or specialty industrial service.</p>
-        <p>Oxnard hospitality customers — Embassy Suites Mandalay Bay, Residence Inn Channel Islands, smaller boutique properties downtown — get the same diagnostic + repair workflow as residential, just with the commercial pricing tier. We coordinate with property managers when units need to be off-line for service.</p>
-      </div>
-    </div>
-  </section>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Oxnard"
+    cards={pricingCards}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">05</div>
-      <h2>Why Oxnard Residents and Businesses Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>Coastal climate experience that matches Oxnard reality</h3>
-          <p>We know the difference between Oxnard Shores beachfront (4-5 month coil cycle), Channel Islands Harbor marina-adjacent (6-month cycle), and inland River Ridge (8-12 month cycle). When we recommend maintenance intervals, they're based on which Oxnard neighborhood you're actually in.</p>
-        </div>
-        <div class="why-item">
-          <h3>RiverPark and River Ridge luxury brand inventory</h3>
-          <p>Wolf, Sub-Zero, Thermador OEM parts on the Thousand Oaks truck. RiverPark Estates calls don't require waiting on a parts order from out-of-state distributors. Same applies to beachfront Oxnard Shores luxury condos.</p>
-        </div>
-        <div class="why-item">
-          <h3>Commercial appliance scope alongside residential</h3>
-          <p>Oxnard restaurants near Channel Islands Harbor + Heritage Square + the Plaza Park area get commercial dishwasher, walk-in cooler, and ice-machine service from the same dispatch as our residential customers. $120 commercial diagnostic, waived with repair.</p>
-        </div>
-        <div class="why-item">
-          <h3>No distance surcharge — Oxnard is on our regular route</h3>
-          <p>Thousand Oaks branch runs the Ventura County loop including Oxnard daily. The $89 residential diagnostic is the same in Oxnard as it is in Thousand Oaks or Westlake Village. What we quote is what you pay.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Oxnard"
+    faqs={faqs}
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Oxnard Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Sub-Zero in our beachfront unit was struggling. Three other companies told us we needed a new compressor. Same Day came out, cleaned the coils — apparently completely packed with salt-laden buildup that ten years of beachfront living put there — and said the compressor was fine. Saved us thousands."</p>
-          <div class="review-author">— David M., Oxnard Shores</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Wolf range stopped reaching temperature. Same Day's Thousand Oaks tech showed up the same afternoon, had the OEM RTD probe on the truck, replaced it, recalibrated. Two-hour service call. Other places quoted us a week-long parts order."</p>
-          <div class="review-author">— Jennifer L., RiverPark Estates</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Restaurant near the harbor — our walk-in stopped cooling on a Friday evening. Most appliance shops don't take commercial calls. Same Day did, came out Saturday morning, fixed the evaporator fan motor, got us back open before lunch service. They've been our service company since."</p>
-          <div class="review-author">— Carlos R., Channel Islands Harbor (restaurant operator)</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Oxnard</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Residential Diagnostic</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">No distance surcharge · Credited toward repair · Written estimate</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Commercial Diagnostic</div>
-          <div class="pricing-price">$120</div>
-          <div class="pricing-note">Restaurants, hotels, agricultural · Credited toward repair</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair Range</div>
-          <div class="pricing-price">$150–$350</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Thermador, Viking · OEM parts</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">06</div>
-      <h2>Frequently Asked Questions — Oxnard</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby Ventura County Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Oxnard Repair Today</h2>
-      <p>Same-day service across all four Oxnard ZIPs. Beachfront, RiverPark, downtown, commercial. No distance surcharge.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 residential diagnostic · $120 commercial · 90-day warranty · OEM parts · Oxnard, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Oxnard", "Oxnard Shores", "Channel Islands Harbor", "RiverPark", "Ventura County"]} />
-</Layout>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Oxnard repair today"
+    body="Same-day service from Oxnard Shores to RiverPark to Downtown. Marine-air expertise. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>
