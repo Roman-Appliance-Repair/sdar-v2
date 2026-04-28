@@ -1,698 +1,341 @@
 ---
-// src/pages/woodland-hills.astro
-// SDAR — samedayappliance.repair
-// Woodland Hills, CA · 91364 · 91367
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: same day appliance repair woodland hills — 38 показов, поз 20.8 (!)
-//      woodland hills fridge repair — 23 показов, поз 72
-//      appliance repair woodland hills ca — 1 показ, поз 61
-// Конкуренты: ACE Appliance (818-939-4882, CA Lic #959246, Joe, local 25yr,
-//              knows Walnut Acres/College Acres/Girard Tract/Carlson Park, $85),
-//             TruePro ($59 diagnostic, OEM, flat quotes, 90-day),
-//             All Trust ($85, CA Lic #50744)
-// Уникальный угол: hot Valley summers → condenser coil dust acceleration +
-//                  westernmost Valley suburb (Calabasas border) +
-//                  Walnut Acres / Girard Tract / Carlson Park neighbourhood specificity +
-//                  gated communities + LADWP hard water + suburban ranch homes
-// Апрель 2026
+/**
+ * Woodland Hills, CA — Variant A migration (T9 Tier 1).
+ * Branch: Los Angeles · ZIPs: 91364, 91367
+ * Source: wiki/migration/content-dumps/woodland-hills.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Los Angeles is service_area)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ *
+ * Tier 1: 3-tier service cards · 6 pricing cards (1 highlight) ·
+ * 4 jobs verbatim · 3 reviews verbatim · 7 FAQs · residential pricing only.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Woodland Hills",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91364", "91367"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "woodland-hills",
-};
+const branchSlug = 'los-angeles';
+const cityName = 'Woodland Hills';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Woodland Hills CA — Same Day | Walnut Acres · 91364 · 91367 | (323) 870-4790`;
-const description = `Same-day appliance repair in Woodland Hills, CA 91364 & 91367. Walnut Acres, Girard Tract, College Acres, Carlson Park. Samsung, LG, GE, Whirlpool, Sub-Zero, Wolf. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/woodland-hills/`;
+const title = `Appliance Repair Woodland Hills CA | Same Day Service | ${branch.phone}`;
+const description = "Same-day appliance repair in Woodland Hills, CA 91364 & 91367. Walnut Acres, Girard Tract, College Acres, Carlson Park. Valley heat + LADWP hard water specialists. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
+const canonical = 'https://samedayappliance.repair/woodland-hills/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Woodland Hills",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const services = [
+  {
+    icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator',
+    issues: ['Valley heat coil inspection', 'LADWP ice maker', 'Not cooling', 'Fan motor'],
+    brands: ['Samsung', 'LG', 'GE', 'Whirlpool', 'Sub-Zero', 'KitchenAid'],
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Woodland Hills", "sameAs": "https://en.wikipedia.org/wiki/Woodland_Hills,_Los_Angeles" },
-    { "@type": "Neighborhood", "name": "Walnut Acres" },
-    { "@type": "Neighborhood", "name": "Girard Tract" },
-    { "@type": "Neighborhood", "name": "College Acres" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    icon: '🫧', name: 'Washer Repair', slug: 'washer',
+    issues: ['OE / UE error', 'Not draining', 'Not spinning', 'Error codes'],
+    brands: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'Bosch', 'Speed Queen'],
+  },
+  {
+    icon: '💨', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer',
+    issues: ['Not heating', 'Thermal fuse', 'Vent buildup', 'Gas & electric'],
+    brands: ['LG', 'Samsung', 'GE', 'Maytag', 'Whirlpool', 'Electrolux'],
+  },
+  {
+    icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher',
+    issues: ['LADWP spray arm scale', 'E24', 'Not draining', 'Error codes'],
+    brands: ['Bosch', 'KitchenAid', 'Samsung', 'LG', 'GE', 'Miele'],
+  },
+  {
+    icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven',
+    issues: ['Not heating', 'Gas igniter', 'Temperature off', 'Element'],
+    brands: ['GE', 'Samsung', 'KitchenAid', 'Wolf', 'Thermador', 'Whirlpool'],
+  },
+  {
+    icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer',
+    issues: ['LADWP inlet valve', 'Valley heat stress', 'Not freezing', 'Frost buildup'],
+    brands: ['Samsung', 'LG', 'GE', 'Whirlpool', 'Sub-Zero', 'True'],
+  },
+  {
+    icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler',
+    issues: ['Temperature off', 'Valley heat stress', 'Compressor', 'Built-in'],
+    brands: ['True', 'U-Line', 'Liebherr', 'Sub-Zero', 'Dacor'],
+  },
+  {
+    icon: '♨️', name: 'Cooktop & Range Hood', slug: 'cooktop',
+    issues: ['Gas igniter', 'Burner', 'Induction not heating', 'Hood motor'],
+    brands: ['GE', 'Bosch', 'Samsung', 'Wolf', 'KitchenAid', 'Broan'],
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const neighborhoods = [
+  { name: 'Walnut Acres', zip: '91364' },
+  { name: 'Girard Tract', zip: '91364' },
+  { name: 'College Acres', zip: '91364' },
+  { name: 'Carlson Park', zip: '91367' },
+  { name: 'Vista De Oro', zip: '91364' },
+  { name: 'Woodland Hills Estates', zip: '91367' },
+  { name: 'Ventura Blvd corridor', zip: '91364' },
+  { name: 'Topanga Canyon Blvd corridor', zip: '91364' },
+  { name: 'De Soto Ave area', zip: '91367' },
+  { name: 'Canoga Ave area', zip: '91367' },
+];
+
+const narrativeParagraphs = [
+  "Woodland Hills sits where the Valley meets the foothills — and consistently records the highest summer temperatures in all of LA. 100°F-plus afternoons are routine from late June through September. That climate is the single biggest factor in how appliances age here, and it is the lens we work through on every Woodland Hills call.",
+  "Refrigerator compressors work measurably harder in a 100°F garage or a poorly-vented kitchen than in a 72°F coastal home. Condenser coils accumulate dust faster in the dry Valley air. If a Walnut Acres or Girard Tract refrigerator is running longer cycles and louder than usual in August, it is almost certainly due for coil cleaning — the single most common finding we make in this city. We see compressor failures on units that were never coil-serviced, and we see units pushing 20 years on a simple annual May coil cleaning. The difference is real.",
+  "Layered on top of the heat is LADWP hard water, 230–310 mg/L throughout 91364 and 91367. Ice maker inlet valves scale faster, dishwasher spray arms accumulate mineral deposits, and washing machine inlet screens collect calcium. The combination of Valley heat stress and LADWP scale means Woodland Hills refrigerators need more attention than the manufacturer's generic schedule. Pricing is straightforward: $89 diagnostic waived with repair, 90-day warranty on parts and labor, OEM parts only.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'Woodland Hills heat — the May coil cleaning',
+    paragraphs: [
+      "If your refrigerator starts cycling more frequently or running louder starting in late June and through September, this is the Valley heat load on dusty condenser coils — not a failing compressor. Annual coil cleaning in May, before the heat season starts, is the most cost-effective maintenance you can do for a refrigerator in Woodland Hills. We offer this as a standalone service call.",
+      "The pattern is easy to misread. The compressor sounds louder, runs longer, and the kitchen feels warmer near the fridge — those symptoms can equally describe a coil problem or a compressor failure. Coil cleaning costs a fraction of a compressor replacement, and a clean coil reverses the symptoms within an hour. We always check the coil first.",
+    ],
+  },
+  {
+    title: 'Walnut Acres, Girard Tract, College Acres',
+    paragraphs: [
+      "These three neighborhoods carry most of our 91364 volume. Larger lots, mature trees, and a higher percentage of premium brands — Sub-Zero, Wolf, Thermador, KitchenAid, Bosch — alongside the Samsung and LG mainstream. We carry OEM parts for all of these on the truck. Carlson Park (91367) reads similarly with a slightly newer construction profile and Bosch dishwashers in particular.",
+      "Bosch E24 errors are a recurring pattern in 91367 — almost always a combination of LADWP scale on the pump filter and a subtle drain hose kink behind a cabinet. Two of our recent calls in Carlson Park were repeat E24 errors on the same units after other companies had cleared the filter without finding the hose routing issue. The filter clean alone is incomplete.",
+    ],
+  },
+];
+
+const jobs = [
+  {
+    badge: 'Samsung French Door',
+    neighborhood: 'Walnut Acres',
+    title: 'Samsung fridge — running all day during the heat wave, electric bill doubled',
+    body: "Walnut Acres home during a July heat wave — Samsung French door running near-continuously for three weeks, visible on the energy bill. Condenser coils loaded with a full season of Valley dust and debris, plus the refrigerator was located against a wall with less than 2 inches of clearance in an uncooled pantry room. Deep coil cleaning, repositioned slightly for better clearance, confirmed stable cycling within 40 minutes of service. Recommended annual pre-summer coil cleaning each May before the heat season — Valley refrigerators need this, coastal ones generally do not.",
+    part: 'Deep coil cleaning + clearance repositioning',
+    time: '1.5 hours',
+    result: '✓ Same day · Coils cleaned · Cycling normalized · Annual May plan set',
+  },
+  {
+    badge: 'LG Washer',
+    neighborhood: 'College Acres',
+    title: 'LG washer — UE error on every load, shaking violently even half-full',
+    body: "College Acres home — LG front-loader UE unbalanced error on every cycle. Found two rear shock absorbers fully failed and two more significantly weakened — causing the drum to vibrate independently of the balance sensor's threshold. Replaced all four OEM LG shock absorbers, levelled the machine on the laundry room floor, ran three full spin cycles at maximum speed. Quiet and smooth from the first test load. Family had been running half-loads trying to prevent the shaking — the shocks were the issue regardless of load size.",
+    part: 'OEM LG shock absorbers (4) + level',
+    time: '2 hours',
+    result: '✓ Same day · OEM LG shocks all four · Levelled · Full spin confirmed',
+  },
+  {
+    badge: 'GE Gas Range',
+    neighborhood: 'Girard Tract',
+    title: "GE oven — igniter glowing but won't light, two weeks of trouble",
+    body: "Girard Tract home — GE freestanding gas range with classic igniter failure: glowing visually but drawing insufficient current to open the gas valve. OEM GE igniter replaced in under 30 minutes. Tested at 325°F, 375°F, and 450°F — all accurate. Also inspected the four surface igniter electrodes while on-site given the kitchen's proximity to the pool area where humidity and outdoor air can accelerate electrode degradation — all four surface igniters confirmed healthy.",
+    part: 'OEM GE oven igniter',
+    time: '1 hour',
+    result: '✓ Same day · OEM GE igniter · All temps accurate · Surface igniters confirmed',
+  },
+  {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Carlson Park',
+    title: "Bosch dishwasher — E24 drain error, third time in 18 months",
+    body: "Carlson Park home — Bosch 800 series E24 drain error occurring for the third time. Previous two visits (different companies) had cleared the pump filter each time without addressing the root cause. Found: pump filter accumulating LADWP mineral scale faster than average due to 91367 water hardness, and the drain hose routed through a cabinet with a subtle partial kink that restricted flow enough to allow debris buildup. Cleared the filter, re-routed the hose with proper clearance and high-loop, confirmed three drain cycles. Set on a 4-month filter cleaning reminder for LADWP hardness. No fourth occurrence since.",
+    part: 'Filter clean + drain hose re-route',
+    time: '2 hours',
+    result: '✓ Same day · E24 resolved · Root cause found · Hose re-routed · 4-month plan',
+  },
+];
+
+const reviews = [
+  {
+    text: "Samsung fridge running constantly through the July heat wave, electric bill doubled. Tech came out, cleaned the Valley dust off the coils, showed me the clearance issue in my pantry room, recommended annual pre-summer cleaning. Normal cycling within the hour. This is exactly the Woodland Hills-specific knowledge I needed.",
+    author: '— Linda T., Walnut Acres, 91364',
+  },
+  {
+    text: "Bosch dishwasher E24 error for the third time in 18 months — two other companies had cleared the filter without fixing anything. This tech found the hose kink and the LADWP hardness connection, re-routed the hose, put us on a 4-month filter plan. No fourth occurrence. Should have called them first.",
+    author: '— Frank M., Carlson Park, 91367',
+  },
+  {
+    text: "LG washer shaking violently every cycle no matter the load size. Tech replaced all four shock absorbers with OEM parts, levelled the machine, confirmed three cycles before leaving. First quiet wash in months. Very professional and explained exactly why the load size did not matter once the shocks are gone.",
+    author: '— Maria G., College Acres, 91364',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · Valley heat + LADWP assessment included' },
+  { label: 'Refrigerator + Valley Coil Check', price: '$150–$400', note: 'Coil cleaning · Inlet valve · Ice maker · Parts + labor', highlight: true },
+  { label: 'Washer / Dryer', price: '$150–$350', note: 'Parts + labor · Vent cleaning included on dryer calls · OEM parts' },
+  { label: 'Dishwasher', price: '$150–$320', note: 'LADWP descale included · Filter cleaning · Spray arm service' },
+  { label: 'Oven / Range', price: '$150–$400', note: 'Igniter · Element · Calibration · Parts + labor' },
+  { label: 'Sub-Zero / Wolf / Thermador', price: '$300–$700+', note: 'Built-in luxury · OEM parts · Calibration included' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Woodland Hills?',
+    answer: "Yes. We cover all of Woodland Hills — 91364 and 91367 — including Walnut Acres, Girard Tract, College Acres, Carlson Park, Vista De Oro, and the Ventura Blvd, Topanga Canyon Blvd, De Soto Ave, and Canoga Ave corridors. Call before noon for same-day afternoon service in most cases.",
+  },
+  {
+    question: 'Why does the hot Valley climate matter for appliance repair in Woodland Hills?',
+    answer: "Woodland Hills consistently records the highest summer temperatures in LA — 100°F-plus is routine from late June through September. Refrigerator condenser coils accumulate dust faster in the dry Valley air, and compressors work harder against the heat load. If your refrigerator starts cycling more frequently or running louder in late June through September, dusty condenser coils are almost certainly the cause — not a failing compressor. Annual coil cleaning in May, before the heat season starts, is the single most cost-effective maintenance step for a Woodland Hills refrigerator.",
+  },
+  {
+    question: 'Does LADWP hard water affect appliances in Woodland Hills?',
+    answer: "Yes. LADWP delivers water in the 230–310 mg/L hardness range across 91364 and 91367. Ice maker inlet valves scale, dishwasher spray arms accumulate mineral deposits, and washing machine inlet screens accumulate calcium. We check for this proactively on every relevant call. Refrigerator water filters should be replaced every 6 months in Woodland Hills, not the manufacturer-default 12.",
+  },
+  {
+    question: 'What appliance brands do you repair in Woodland Hills?',
+    answer: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, Electrolux, and luxury brands including Sub-Zero, Wolf, Thermador, and Miele common in Walnut Acres and Girard Tract. We carry OEM parts for the brands we see most often.",
+  },
+  {
+    question: 'Are you available on weekends in Woodland Hills?',
+    answer: "Yes. Saturday 8am–7pm and Sunday 9am–5pm. Weekend service is part of the regular schedule — not a premium add-on.",
+  },
+  {
+    question: 'What is your diagnostic fee in Woodland Hills?',
+    answer: "Our diagnostic fee is $89, waived when you proceed with the repair. We provide a written estimate before any work begins. Most Woodland Hills repairs run $150–$400 for standard appliances and $300–$700+ for Sub-Zero, Wolf, and Thermador.",
+  },
+  {
+    question: 'Do you also serve Calabasas, West Hills, and Tarzana?',
+    answer: "Yes — those are all part of our regular western Valley route. Same-day service, same pricing, same warranty. Calabasas (91302), West Hills (91307), and Tarzana (91356) are all covered out of the same dispatch.",
+  },
+];
+
+const nearby = [
+  { slug: 'calabasas', name: 'Calabasas' },
+  { slug: 'thousand-oaks', name: 'Thousand Oaks' },
+  { slug: 'encino', name: 'Encino' },
+  { slug: 'sherman-oaks', name: 'Sherman Oaks' },
+  { slug: 'studio-city', name: 'Studio City' },
+  { slug: 'tarzana', name: 'Tarzana' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'Place', name: 'Woodland Hills', sameAs: 'https://en.wikipedia.org/wiki/Woodland_Hills,_Los_Angeles' },
+    { '@type': 'PostalCode', name: '91364' },
+    { '@type': 'PostalCode', name: '91367' },
+    { '@type': 'Place', name: 'Walnut Acres' },
+    { '@type': 'Place', name: 'Girard Tract' },
+    { '@type': 'Place', name: 'College Acres' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Woodland Hills, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Woodland Hills — Walnut Acres, Girard Tract, College Acres, Carlson Park, Vista De Oro, and all of 91364 and 91367. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Does Woodland Hills' hot Valley climate affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Woodland Hills is one of the hottest neighborhoods in Los Angeles — summer temperatures regularly reach 100°F+. Refrigerator condenser coils work harder and accumulate dust and debris faster here than in coastal or temperate neighborhoods. We include a coil inspection on every Woodland Hills refrigerator call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does LADWP hard water affect appliances in Woodland Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Woodland Hills is LADWP territory at 230–310 mg/L hardness. Ice maker inlet valves and dishwasher spray arms accumulate mineral deposits faster than in soft-water areas. We check for this proactively on every relevant Woodland Hills call." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Woodland Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Thermador, and more. We carry OEM parts on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Woodland Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Woodland Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Woodland Hills repairs run $150–$400." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Calabasas, West Hills, and Tarzana?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Woodland Hills service extends to Calabasas, West Hills, Tarzana, Canoga Park, Chatsworth, and all of the western San Fernando Valley." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="wh-hero">
-    <div class="wh-hero__inner container">
-      <div class="wh-hero__content">
-        <div class="wh-hero__eyebrow">Woodland Hills · 91364 & 91367 · Walnut Acres · Girard Tract · College Acres · Carlson Park</div>
-        <h1 class="wh-hero__h1">
-          Appliance Repair<br>
-          <span class="wh-hero__accent">Woodland Hills, CA</span>
-        </h1>
-        <p class="wh-hero__sub">
-          Where the Valley meets the foothills — one of LA's hottest summer
-          neighbourhoods, with the appliance wear to prove it. Hot Valley
-          summers push refrigerator coils hard. LADWP hard water hits
-          ice makers. We cover both. Same-day, OEM parts, 90-day warranty.
-          All of 91364 and 91367.
-        </p>
-        <div class="wh-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="wh-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="wh-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-woodland-hills-ca.webp"
-          alt="Appliance repair in Woodland Hills CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Woodland Hills, CA · 91364 & 91367 · Walnut Acres · Girard Tract · College Acres · Carlson Park"
+    headlineMain="Appliance repair in"
+    headlineAccent="Woodland Hills, CA"
+    subheadline="Where the Valley meets the foothills — one of LA's hottest summer neighbourhoods, with the appliance wear to prove it. Hot Valley summers push refrigerator coils hard. LADWP hard water hits ice makers. We cover both. Same-day, OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="The Valley Heat Factor"
+    headline="The hottest summers in LA —"
+    headlineAccent="and what that does to appliances"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="wh-intro">
-    <div class="container wh-intro__inner">
-      <div class="wh-intro__text">
-        <h2>Appliance Repair in Woodland Hills — The Valley Heat Factor</h2>
-        <p>
-          Woodland Hills consistently records some of the highest temperatures
-          in Los Angeles — summer days hitting 100°F and above are routine, not
-          exceptional. That heat matters for appliances in a specific way:
-          refrigerator compressors work significantly harder in a 100°F garage or
-          poorly ventilated kitchen than in a 72°F coastal home, and condenser
-          coils accumulate dust and debris faster in the dry Valley air. A
-          refrigerator in Walnut Acres or Girard Tract that's running longer
-          cycles and sounding louder than usual in August is almost certainly
-          due for a coil cleaning. We include this inspection on every Woodland
-          Hills refrigerator call — it's the single most common finding in
-          this area.
-        </p>
-        <p>
-          LADWP hard water compounds the issue: 230–310 mg/L throughout all of
-          91364 and 91367. Ice maker inlet valves scale faster than national
-          average. Dishwasher spray arms accumulate mineral deposits. We test
-          for this proactively. The combination of Valley heat stress on coils
-          and LADWP scale on water-fed components means Woodland Hills
-          refrigerators need more attention than the manufacturer's generic
-          maintenance schedule assumes.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written
-          estimate before we start. <strong>90-day warranty</strong>. All of
-          91364 and 91367. Weekends available.
-        </p>
-        <div class="wh-tip">
-          <div class="wh-tip__icon">🌡️</div>
-          <div class="wh-tip__text">
-            <strong>Woodland Hills heat tip:</strong> If your refrigerator starts
-            cycling more frequently or running louder starting in late June and
-            through September, this is the Valley heat load on dusty condenser
-            coils — not a failing compressor. Annual coil cleaning in May,
-            before the heat season starts, is the most cost-effective maintenance
-            you can do for a refrigerator in Woodland Hills. We offer this as a
-            standalone service call.
-          </div>
-        </div>
-      </div>
-      <div class="wh-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Woodland Hills Service</div>
-          <div class="cta-box__sub">91364 · 91367 · Valley heat aware · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Woodland Hills"
+    services={services}
+    cardStructure="3-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="wh-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Woodland Hills</h2>
-      <p class="section-sub">All brands · Valley heat + LADWP hard water aware · 91364 & 91367</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Woodland Hills neighborhoods"
+    headlineAccent="we service"
+    subheadline="All of 91364 and 91367 — Walnut Acres, Girard Tract, College Acres, Carlson Park and the major corridors."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/woodland-hills/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Valley heat coil inspection · LADWP ice maker · Not cooling · Fan motor</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Woodland Hills"
+    jobs={jobs}
+  />
 
-        <a href="/woodland-hills/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Error codes</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/woodland-hills/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Woodland Hills"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/woodland-hills/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">LADWP spray arm scale · E24 · Not draining · Error codes</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Woodland Hills"
+    cards={pricingCards}
+    bottomNote="Residential pricing only. Parts and labor included in the repair quote — no surprise add-ons."
+  />
 
-        <a href="/woodland-hills/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Element</div>
-          <div class="service-card__brands">GE · Samsung · KitchenAid · Wolf · Thermador · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Woodland Hills"
+    faqs={faqs}
+  />
 
-        <a href="/woodland-hills/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">LADWP inlet valve · Valley heat stress · Not freezing · Frost</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/woodland-hills/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Valley heat stress · Compressor · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Sub-Zero · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/woodland-hills/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · KitchenAid · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="wh-neighborhoods">
-    <div class="container">
-      <h2>All of Woodland Hills — 91364 & 91367</h2>
-      <p class="section-sub">From Walnut Acres to the Ventura corridor — every neighbourhood covered</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">WH Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Walnut Acres (91364)</div>
-            <div class="nh-item featured">Girard Tract</div>
-            <div class="nh-item featured">College Acres</div>
-            <div class="nh-item">Carlson Park</div>
-            <div class="nh-item">Vista De Oro</div>
-            <div class="nh-item">Woodland Hills Estates</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Ventura Blvd</div>
-            <div class="nh-item">Topanga Canyon Blvd</div>
-            <div class="nh-item">Mulholland Dr (west)</div>
-            <div class="nh-item">De Soto Ave</div>
-            <div class="nh-item">Canoga Ave</div>
-            <div class="nh-item">Valley Circle Blvd</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Calabasas (91302)</div>
-            <div class="nh-item">West Hills (91307)</div>
-            <div class="nh-item">Tarzana (91356)</div>
-            <div class="nh-item">Canoga Park (91303)</div>
-            <div class="nh-item">Chatsworth (91311)</div>
-            <div class="nh-item">Thousand Oaks (91360)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="wh-recent">
-    <div class="container">
-      <h2>Recent Jobs in Woodland Hills</h2>
-      <p class="section-sub">Real calls from 91364 and 91367 — Valley heat stress, LADWP hard water, all appliances.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung French Door</span>
-            <span class="recent-location">Walnut Acres, 91364</span>
-          </div>
-          <div class="recent-card__title">"Running all day during the heat wave — electric bill doubled"</div>
-          <div class="recent-card__desc">
-            Walnut Acres home during a July heat wave — Samsung French door
-            running near-continuously for three weeks, visible on the energy
-            bill. Condenser coils loaded with a full season of Valley dust and
-            debris, plus the refrigerator was located against a wall with less
-            than 2 inches of clearance in an uncooled pantry room. Deep coil
-            cleaning, repositioned slightly for better clearance, confirmed
-            stable cycling within 40 minutes of service. Recommended annual
-            pre-summer coil cleaning each May before the heat season — Valley
-            refrigerators need this, coastal ones generally don't.
-          </div>
-          <div class="recent-card__result">✓ Same day · Coils cleaned · Cycling normalized · Annual May plan set</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Washer</span>
-            <span class="recent-location">College Acres, 91364</span>
-          </div>
-          <div class="recent-card__title">"UE error on every load — shaking violently even half-full"</div>
-          <div class="recent-card__desc">
-            College Acres home — LG front-loader UE unbalanced error on
-            every cycle. Found two rear shock absorbers fully failed and
-            two more significantly weakened — causing the drum to vibrate
-            independently of the balance sensor's threshold. Replaced all
-            four OEM LG shock absorbers, levelled the machine on the laundry
-            room floor, ran three full spin cycles at maximum speed. Quiet
-            and smooth from the first test load. Family had been running
-            half-loads trying to prevent the shaking — the shocks were the
-            issue regardless of load size.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM LG shocks all four · Levelled · Full spin confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">GE Gas Range</span>
-            <span class="recent-location">Girard Tract, 91364</span>
-          </div>
-          <div class="recent-card__title">"Oven igniter glowing but won't light — been two weeks"</div>
-          <div class="recent-card__desc">
-            Girard Tract home — GE freestanding gas range with classic
-            igniter failure: glowing visually but drawing insufficient
-            current to open the gas valve. OEM GE igniter replaced in
-            under 30 minutes. Tested at 325°F, 375°F, and 450°F — all
-            accurate. Also inspected the four surface igniter electrodes
-            while on-site given the kitchen's proximity to the pool
-            area where humidity and outdoor air can accelerate electrode
-            degradation — all four surface igniters confirmed healthy.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM GE igniter · All temps accurate · Surface igniters confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Carlson Park, 91367</span>
-          </div>
-          <div class="recent-card__title">"E24 drain error — third time in 18 months"</div>
-          <div class="recent-card__desc">
-            Carlson Park home — Bosch 800 series E24 drain error occurring
-            for the third time. Previous two visits (different companies)
-            had cleared the pump filter each time without addressing the
-            root cause. Found: pump filter accumulating LADWP mineral scale
-            faster than average due to 91367 water hardness, and the drain
-            hose routed through a cabinet with a subtle partial kink that
-            restricted flow enough to allow debris buildup. Cleared the
-            filter, re-routed the hose with proper clearance and high-loop,
-            confirmed three drain cycles. Set on a 4-month filter cleaning
-            reminder for LADWP hardness. No fourth occurrence since.
-          </div>
-          <div class="recent-card__result">✓ Same day · E24 resolved · Root cause found · Hose re-routed · 4-month plan</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="wh-why">
-    <div class="container">
-      <h2>Why Woodland Hills Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🌡️</div>
-          <div class="why-title">Valley Heat Specialists</div>
-          <div class="why-text">Woodland Hills is one of LA's hottest neighbourhoods — 100°F+ summer days are routine. Refrigerator compressors work harder and coils accumulate dust faster here than anywhere on the coast. We include a coil inspection on every Woodland Hills refrigerator call and recommend pre-season cleaning each May.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">LADWP Hard Water Aware</div>
-          <div class="why-text">LADWP runs 230–310 mg/L throughout 91364 and 91367. Ice maker inlet valves and dishwasher spray arms scale faster here than national average. We test for mineral deposits proactively on every relevant call and address the root cause, not just the symptom.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📍</div>
-          <div class="why-title">Every Neighbourhood</div>
-          <div class="why-text">Walnut Acres, Girard Tract, College Acres, Carlson Park, Vista De Oro — we cover all of it. Woodland Hills is a regular stop on our western Valley route alongside Calabasas and Thousand Oaks. Never a special trip.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="wh-reviews">
-    <div class="container">
-      <h2>What Woodland Hills Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Samsung fridge running constantly through the July heat wave, electric bill doubled. Tech came out, cleaned the Valley dust off the coils, showed me the clearance issue in my pantry room, recommended annual pre-summer cleaning. Normal cycling within the hour. This is exactly the Woodland Hills-specific knowledge I needed."</div>
-          <div class="review-author">— Linda T., Walnut Acres, 91364</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Bosch dishwasher E24 error for the third time in 18 months — two other companies had cleared the filter without fixing anything. This tech found the hose kink and the LADWP hardness connection, re-routed the hose, put us on a 4-month filter plan. No fourth occurrence. Should have called them first."</div>
-          <div class="review-author">— Frank M., Carlson Park, 91367</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG washer shaking violently every cycle no matter the load size. Tech replaced all four shock absorbers with OEM parts, levelled the machine, confirmed three cycles before leaving. First quiet wash in months. Very professional and explained exactly why the load size didn't matter once the shocks are gone."</div>
-          <div class="review-author">— Maria G., College Acres, 91364</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="wh-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Woodland Hills</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator + Valley Coil Check</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Heat season inspection · LADWP ice maker · Fan motor</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Shock absorbers · Drain pump · Thermal fuse · Vent</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">LADWP scale · E24 drain · Hose routing · Spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Walnut Acres estates</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="wh-faq">
-    <div class="container">
-      <h2>Questions Woodland Hills Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Woodland Hills, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Woodland Hills — Walnut Acres, Girard Tract, College Acres, Carlson Park, Vista De Oro, and all of 91364 and 91367. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does Woodland Hills' hot Valley climate affect appliances?</summary><div class="faq-answer">Yes. 100°F+ summer days put refrigerator compressors under significant load and accelerate condenser coil dust buildup. We include a coil inspection on every Woodland Hills refrigerator call and recommend annual pre-summer cleaning each May.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does LADWP hard water affect appliances in Woodland Hills?</summary><div class="faq-answer">Yes. LADWP runs 230–310 mg/L throughout 91364 and 91367. Ice maker inlet valves and dishwasher spray arms scale faster here. We check proactively on every relevant call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Woodland Hills?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Woodland Hills?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Thermador, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Woodland Hills?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Woodland Hills repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Calabasas, West Hills, and Tarzana?</summary><div class="faq-answer">Yes. Our Woodland Hills service extends to Calabasas, West Hills, Tarzana, Canoga Park, Chatsworth, and all of the western San Fernando Valley.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="wh-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/calabasas/" class="nearby-link">Calabasas</a>
-        <a href="/thousand-oaks/" class="nearby-link">Thousand Oaks</a>
-        <a href="/encino/" class="nearby-link">Encino</a>
-        <a href="/sherman-oaks/" class="nearby-link">Sherman Oaks</a>
-        <a href="/studio-city/" class="nearby-link">Studio City</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="wh-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Woodland Hills?</h2>
-          <p>Walnut Acres · Girard Tract · College Acres · Carlson Park · Valley heat + LADWP hard water aware. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Woodland Hills, CA 91364 · 91367</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --wh-red: #C8102E; --wh-black: #0a0a0a; --wh-gray: #f5f5f5; --wh-border: #e2e2e2; --wh-text: #1a1a1a; --wh-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .wh-hero { background: var(--wh-black); color: white; padding: 80px 0 60px; }
-  .wh-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .wh-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--wh-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .wh-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .wh-hero__accent { color: var(--wh-red); }
-  .wh-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .wh-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .wh-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .wh-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--wh-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .wh-bottom-cta .btn-secondary { color: var(--wh-text); border-color: var(--wh-border); }
-  .trust-bar { background: var(--wh-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .wh-intro { padding: 72px 0; background: white; }
-  .wh-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .wh-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--wh-black); margin-bottom: 20px; }
-  .wh-intro__text p { font-size: 16px; line-height: 1.7; color: var(--wh-text); margin-bottom: 16px; }
-  .wh-tip { display: flex; gap: 14px; background: #fdf4e7; border: 1px solid #e8c97a; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .wh-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .wh-tip__text { font-size: 14px; color: var(--wh-text); line-height: 1.6; }
-  .cta-box { background: var(--wh-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--wh-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--wh-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--wh-muted); text-align: center; margin-bottom: 40px; }
-  .wh-services { padding: 72px 0; background: var(--wh-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--wh-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--wh-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--wh-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--wh-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--wh-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--wh-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--wh-red); font-weight: 500; }
-  .wh-neighborhoods { padding: 72px 0; background: white; }
-  .wh-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--wh-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--wh-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--wh-text); padding: 8px 12px; background: var(--wh-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--wh-red); color: var(--wh-black); font-weight: 500; }
-  .wh-recent { padding: 72px 0; background: var(--wh-gray); }
-  .wh-recent h2 { font-size: 30px; font-weight: 700; color: var(--wh-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--wh-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--wh-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--wh-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--wh-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--wh-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .wh-why { padding: 72px 0; background: white; }
-  .wh-why h2 { font-size: 30px; font-weight: 700; color: var(--wh-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--wh-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--wh-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--wh-muted); line-height: 1.6; }
-  .wh-reviews { padding: 72px 0; background: var(--wh-gray); }
-  .wh-reviews h2 { font-size: 30px; font-weight: 700; color: var(--wh-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--wh-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--wh-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--wh-muted); font-weight: 500; }
-  .wh-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--wh-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--wh-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--wh-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--wh-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--wh-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--wh-red); }
-  .pricing-card__note { font-size: 13px; color: var(--wh-muted); }
-  .wh-faq { padding: 72px 0; background: var(--wh-gray); }
-  .wh-faq h2 { font-size: 30px; font-weight: 700; color: var(--wh-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--wh-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--wh-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--wh-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--wh-text); }
-  .wh-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--wh-border); }
-  .wh-nearby h2 { font-size: 20px; font-weight: 600; color: var(--wh-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--wh-border); border-radius: 20px; font-size: 14px; color: var(--wh-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--wh-red); color: var(--wh-red); }
-  .wh-bottom-cta { padding: 72px 0; background: var(--wh-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .wh-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .wh-hero__inner { grid-template-columns: 1fr; } .wh-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .wh-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Woodland Hills repair today"
+    body="Same-day service across Walnut Acres, Girard Tract, College Acres, Carlson Park — all of 91364 and 91367. Valley heat + LADWP hard water aware. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>

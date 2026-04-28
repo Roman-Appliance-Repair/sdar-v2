@@ -1,694 +1,337 @@
 ---
-// src/pages/tarzana.astro
-// SDAR — samedayappliance.repair
-// Tarzana, CA · 91356
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: нет данных — новый город
-// Конкуренты: All Trust Appliance ($85, CA Lic #50744, knows hillside+well water combo),
-//             DNE Appliance Repair (18850 Hatteras St #7, 91356, physical address,
-//               closed Sundays — weakness),
-//             Appliance Repair Clinic (818-791-0445, local, Jenn-Air/Bertazzoni),
-//             Royal Sub-Zero (knows Caballero Canyon + El Caballero CC)
-// Уникальный угол: Tarzan history hook + El Caballero CC / Caballero Canyon area +
-//                  hot Valley summers → coil dust + LADWP hard water +
-//                  hillside homes (some with well water supplement) +
-//                  DNE weakness: closed Sundays → our weekend advantage
-// Апрель 2026
+/**
+ * Tarzana, CA — Variant A migration (T9 Tier 1).
+ * Branch: Los Angeles · ZIP: 91356
+ * Source: wiki/migration/content-dumps/tarzana.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Los Angeles is service_area)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ *
+ * Tier 1: 3-tier service cards · 6 pricing cards (1 highlight) ·
+ * 4 jobs verbatim · 3 reviews verbatim · 7 FAQs · residential pricing only.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Tarzana",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91356"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "tarzana",
-};
+const branchSlug = 'los-angeles';
+const cityName = 'Tarzana';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Tarzana CA 91356 — Same Day | El Caballero · Caballero Canyon · Valley | (323) 870-4790`;
-const description = `Same-day appliance repair in Tarzana, CA 91356. El Caballero area, Caballero Canyon, all of Tarzana. Samsung, LG, GE, Whirlpool, Sub-Zero, Wolf. Licensed, OEM parts, 90-day warranty. Weekends available. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/tarzana/`;
+const title = `Appliance Repair Tarzana CA | Same Day Service | ${branch.phone}`;
+const description = "Same-day appliance repair in Tarzana, CA 91356. El Caballero, Caballero Canyon, Ventura Blvd, Reseda Blvd. Valley heat + LADWP hard water specialists. Open Sundays. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
+const canonical = 'https://samedayappliance.repair/tarzana/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Tarzana",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const services = [
+  {
+    icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator',
+    issues: ['Valley heat coil inspection', 'LADWP ice maker', 'Not cooling', 'Fan motor'],
+    brands: ['Samsung', 'LG', 'GE', 'Whirlpool', 'Sub-Zero', 'KitchenAid'],
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Tarzana", "sameAs": "https://en.wikipedia.org/wiki/Tarzana,_Los_Angeles" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    icon: '🫧', name: 'Washer Repair', slug: 'washer',
+    issues: ['OE / UE error', 'Not draining', 'Not spinning', 'Error codes'],
+    brands: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'Bosch', 'Speed Queen'],
+  },
+  {
+    icon: '💨', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer',
+    issues: ['Not heating', 'Thermal fuse', 'Flow sense', 'Vent buildup'],
+    brands: ['LG', 'Samsung', 'GE', 'Maytag', 'Whirlpool', 'Electrolux'],
+  },
+  {
+    icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher',
+    issues: ['LADWP spray arm scale', 'E24', 'Not draining', 'Error codes'],
+    brands: ['Bosch', 'KitchenAid', 'Samsung', 'LG', 'GE', 'Miele'],
+  },
+  {
+    icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven',
+    issues: ['Not heating', 'Gas igniter', 'Temperature off', 'Element'],
+    brands: ['Jenn-Air', 'Wolf', 'Bertazzoni', 'KitchenAid', 'GE', 'Samsung'],
+  },
+  {
+    icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer',
+    issues: ['LADWP inlet valve', 'Valley heat stress', 'Not freezing', 'Frost buildup'],
+    brands: ['Samsung', 'LG', 'GE', 'Whirlpool', 'Sub-Zero', 'True'],
+  },
+  {
+    icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler',
+    issues: ['Temperature off', 'Valley heat stress', 'Compressor', 'Built-in'],
+    brands: ['True', 'U-Line', 'Liebherr', 'Sub-Zero', 'Dacor'],
+  },
+  {
+    icon: '♨️', name: 'Cooktop & Range Hood', slug: 'cooktop',
+    issues: ['Gas igniter', 'Burner', 'Induction not heating', 'Hood motor'],
+    brands: ['GE', 'Bosch', 'Samsung', 'Jenn-Air', 'Wolf', 'Bertazzoni'],
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const neighborhoods = [
+  { name: 'El Caballero Country Club area', zip: '91356' },
+  { name: 'Caballero Canyon hillside', zip: '91356' },
+  { name: 'Ventura Blvd corridor', zip: '91356' },
+  { name: 'Reseda Blvd corridor', zip: '91356' },
+  { name: 'Vanalden Ave area', zip: '91356' },
+  { name: 'Tampa Ave corridor', zip: '91356' },
+  { name: 'Avenida Oriente area', zip: '91356' },
+  { name: 'Topanga Canyon Blvd corridor', zip: '91356' },
+];
+
+const narrativeParagraphs = [
+  "Tarzana has its own character in the western Valley — named for Tarzan, built around Edgar Rice Burroughs' 1919 ranch. The city splits between the El Caballero Country Club area and the Caballero Canyon hillside on the premium end, and the Ventura Blvd and Reseda Blvd corridors carrying mid-Valley standard residential. The appliance mix tracks the geography: Sub-Zero, Wolf, and Jenn-Air are common in El Caballero homes; Samsung, LG, GE, and Whirlpool dominate the corridor housing.",
+  "What hits Tarzana hardest are two simultaneous environmental factors. Valley summers regularly top 100°F — refrigerator condenser coils accumulate dust faster than coastal homes, and compressors work harder against the heat load. At the same time, LADWP delivers water in the 230–310 mg/L hardness range across all of 91356. Ice maker inlet valves scale, dishwasher spray arm jets clog, washing machine inlet screens accumulate calcium. Some hillside Caballero Canyon properties also run on supplemental well water — a third factor.",
+  "Pricing is straightforward — $89 diagnostic waived with repair, OEM parts, 90-day warranty on parts and labor. We are open Sundays in Tarzana, which matters: most local competitors are closed on Sunday. If your fridge fails Saturday night, that gap is real.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'Tarzana heat + water — the dual pattern',
+    paragraphs: [
+      "If your refrigerator starts cycling more frequently in July and your ice maker has been gradually slowing down, these are two separate issues happening simultaneously in Tarzana. The cycling is Valley heat on dusty condenser coils. The declining ice is LADWP mineral scale on the inlet valve. Both are fixable in a single visit.",
+      "Annual coil cleaning before summer and a 6-month filter replacement cycle are the two most effective maintenance steps for a Tarzana refrigerator. Manufacturer schedules assume temperate conditions and softer water — neither applies here. We explain this on every relevant call.",
+    ],
+  },
+  {
+    title: 'El Caballero and Caballero Canyon — luxury depth',
+    paragraphs: [
+      "We carry OEM parts for Sub-Zero, Wolf, Jenn-Air, Bertazzoni, and Bosch on the truck. El Caballero kitchens lean toward built-in columns, dual-fuel ranges, and panel-ready dishwashers. Caballero Canyon hillside homes add a complication: longer dryer vent runs through hillside walls accumulate lint faster, and the supplemental well water on some properties brings sediment that LADWP municipal supply does not.",
+      "Calibration matters on this equipment. A Wolf oven that has drifted 20°F low after a few years of cooking is not unusual, and a calibration after an igniter replacement is part of the job — not an extra.",
+    ],
+  },
+];
+
+const jobs = [
+  {
+    badge: 'LG French Door Fridge',
+    neighborhood: 'El Caballero area',
+    title: 'LG fridge — running constantly in summer, ice maker almost nothing',
+    body: "El Caballero area home during an August heat stretch — LG French door with two problems presenting simultaneously. Condenser coils loaded with Valley dust from a full summer season, plus the water inlet valve scaled by LADWP minerals down to roughly 15% flow. Deep coil cleaning first, then inlet valve replacement with OEM LG part. Cycling normalised within 45 minutes, full ice production confirmed next morning. Both issues in one visit — explained to the homeowner that the timing (both worsening in summer) is a Tarzana-specific pattern: heat stresses the coils while water usage increases, accelerating scale on the valve.",
+    part: 'OEM LG inlet valve + deep coil cleaning',
+    time: '2 hours',
+    result: '✓ Same day · Coils + inlet valve · OEM LG · Both issues one visit',
+  },
+  {
+    badge: 'Whirlpool Gas Dryer',
+    neighborhood: 'Caballero Canyon',
+    title: "Whirlpool dryer — no heat, two cycles to dry anything, started last week",
+    body: "Caballero Canyon hillside home — Whirlpool gas dryer with thermal fuse blown from a vent run that had been gradually accumulating lint inside a long flexible section snaking through the hillside wall. Found approximately 60% blockage. Replaced the thermal fuse, cleared the full vent run to the exterior, replaced the warped plastic exterior cap with a proper metal backdraft damper. Single-cycle drying confirmed on the first test load. Hillside vent runs in Tarzana tend to be longer than Valley floor properties — worth annual inspection given the lint accumulation rate.",
+    part: 'Whirlpool OEM thermal fuse + metal vent cap',
+    time: '2 hours',
+    result: '✓ Same day · Thermal fuse · Vent cleared · Metal cap · Single cycle',
+  },
+  {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Ventura Blvd area',
+    title: "Bosch dishwasher — E24 drain error, dishes not clean either, white film on everything",
+    body: "Ventura Blvd corridor home — Bosch 500 series E24 drain error combined with white mineral film on dishes. LADWP hard water had scaled both the drain pump filter and the spray arm jets. The pump filter was restricting drain flow (causing E24) while the scaled spray arm jets were reducing wash pressure enough to leave residue. Cleared both, ran the Bosch diagnostic cycle, confirmed clean drain and full spray pressure on three test loads — spotless dishes. Set on a 4-month filter cleaning and quarterly descale cycle appropriate for LADWP hardness.",
+    part: 'Spray arm + filter descale + diagnostic cycle',
+    time: '1.5 hours',
+    result: '✓ Same day · E24 resolved · Spray arms descaled · LADWP plan set',
+  },
+  {
+    badge: 'Samsung Washer',
+    neighborhood: 'Reseda Blvd corridor',
+    title: "Samsung washer — 4E error, water not filling, machine stopped mid-cycle",
+    body: "Tarzana home near Reseda Blvd — Samsung front-loader 4E water supply error. Found the inlet valve inlet screen partially blocked by a combination of LADWP mineral debris and fine sediment — a pattern consistent with this water supply. Cleaned the inlet screen thoroughly, tested inlet valve solenoid function (still good), ran a full wash cycle — 4E clear. Also found the hot water supply pressure slightly low from a partially closed shutoff valve behind the unit — opened it fully. Explained the LADWP sediment factor and recommended cleaning the inlet screen annually.",
+    part: 'Inlet screen clean + shutoff correction',
+    time: '1 hour',
+    result: '✓ Same day · 4E resolved · Inlet screen cleaned · Shutoff corrected',
+  },
+];
+
+const reviews = [
+  {
+    text: "LG fridge running constantly in August heat and ice maker barely producing. Tech found both issues in one visit — dirty coils and scaled inlet valve — fixed both, explained why they happen together in Tarzana summer. Cycling normal and full ice the next morning. Efficient, honest, and actually understood the local water.",
+    author: '— Robert H., El Caballero area, Tarzana',
+  },
+  {
+    text: "Needed a Sunday appointment — called Same Day because other companies were closed. Tech came out Sunday afternoon, fixed the Bosch E24 error, descaled the spray arms, set up a maintenance plan for our LADWP water. Spotless dishes from the first load. Really appreciated that Sunday availability.",
+    author: '— Karen S., Ventura Blvd area, Tarzana 91356',
+  },
+  {
+    text: "Whirlpool dryer no heat in our Caballero Canyon home. Tech found the lint-blocked hillside vent run, replaced the thermal fuse, installed a proper metal vent cap, confirmed single-cycle drying. Mentioned that hillside vent runs need annual checking — nobody had ever told us that before. Preventive and professional.",
+    author: '— Michael T., Caballero Canyon, Tarzana',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · Valley heat + LADWP assessment included' },
+  { label: 'Refrigerator + Valley Coil + LADWP Check', price: '$150–$400', note: 'Coil cleaning · Inlet valve · Ice maker · Parts + labor', highlight: true },
+  { label: 'Washer / Dryer', price: '$150–$350', note: 'Parts + labor · Vent cleaning included on dryer calls · OEM parts' },
+  { label: 'Dishwasher', price: '$150–$320', note: 'LADWP descale included · Filter cleaning · Spray arm service' },
+  { label: 'Oven / Range', price: '$150–$400', note: 'Igniter · Element · Calibration · Parts + labor' },
+  { label: 'Sub-Zero / Wolf / Jenn-Air', price: '$300–$700+', note: 'Built-in luxury · OEM parts · Calibration included' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Tarzana?',
+    answer: "Yes. We cover all of Tarzana 91356 — El Caballero, Caballero Canyon, Ventura Blvd corridor, Reseda Blvd corridor, Vanalden, Tampa, and the Topanga Canyon Blvd area. Call before noon for same-day afternoon service in most cases. We are open Sundays in Tarzana — most local competitors are not.",
+  },
+  {
+    question: "Why does the Valley climate matter for appliance repair in Tarzana?",
+    answer: "Tarzana summers regularly top 100°F. Refrigerator condenser coils accumulate dust faster than coastal homes, and compressors work harder against the heat load. If your fridge starts cycling more frequently or running louder in late June through September, dusty condenser coils are almost certainly the cause — not a failing compressor. Annual coil cleaning before summer is the most cost-effective maintenance step for a Tarzana refrigerator.",
+  },
+  {
+    question: 'Does LADWP hard water affect appliances in Tarzana?',
+    answer: "Yes. LADWP delivers water in the 230–310 mg/L hardness range across 91356. Ice maker inlet valves scale, dishwasher spray arm jets clog, washing machine inlet screens accumulate calcium. Some Caballero Canyon hillside properties also run on supplemental well water, which adds sediment to the picture. Refrigerator water filters should be changed every 6 months in Tarzana, not the manufacturer-default 12.",
+  },
+  {
+    question: 'Are you open on Sundays in Tarzana?',
+    answer: "Yes. Saturday 8am–7pm and Sunday 9am–5pm. Sunday availability is part of the regular Tarzana schedule — not a premium add-on. If your appliance fails Saturday night, you do not have to wait until Monday.",
+  },
+  {
+    question: 'What appliance brands do you repair in Tarzana?',
+    answer: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, Electrolux, and luxury brands including Sub-Zero, Wolf, Jenn-Air, Bertazzoni, and Miele common in El Caballero and Caballero Canyon. We carry OEM parts for the brands we see most often.",
+  },
+  {
+    question: 'What is your diagnostic fee in Tarzana?',
+    answer: "Our diagnostic fee is $89, waived when you proceed with the repair. We provide a written estimate before any work begins. Most Tarzana repairs run $150–$400 for standard appliances and $300–$700+ for Sub-Zero, Wolf, and Jenn-Air.",
+  },
+  {
+    question: 'Do you also serve Encino, Woodland Hills, and Reseda?',
+    answer: "Yes — those are all part of our regular western Valley route. Same-day service, same pricing, same warranty. Encino (91316), Woodland Hills (91364 / 91367), and Reseda (91335) are all covered out of the same dispatch.",
+  },
+];
+
+const nearby = [
+  { slug: 'encino', name: 'Encino' },
+  { slug: 'woodland-hills', name: 'Woodland Hills' },
+  { slug: 'sherman-oaks', name: 'Sherman Oaks' },
+  { slug: 'calabasas', name: 'Calabasas' },
+  { slug: 'studio-city', name: 'Studio City' },
+  { slug: 'thousand-oaks', name: 'Thousand Oaks' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'Place', name: 'Tarzana', sameAs: 'https://en.wikipedia.org/wiki/Tarzana,_Los_Angeles' },
+    { '@type': 'PostalCode', name: '91356' },
+    { '@type': 'Place', name: 'El Caballero' },
+    { '@type': 'Place', name: 'Caballero Canyon' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Tarzana, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Tarzana 91356 — El Caballero area, Caballero Canyon homes, Ventura Boulevard corridor, Reseda Boulevard, and every residential street. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Does Tarzana's hot Valley climate affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tarzana regularly hits 100°F+ in summer — one of the hottest neighborhoods in LA. Refrigerator condenser coils accumulate dust and work harder in the Valley heat than in coastal neighborhoods. We include a coil inspection on every Tarzana refrigerator call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does LADWP hard water affect appliances in Tarzana?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tarzana is LADWP territory at 230–310 mg/L hardness. Some hillside properties also supplement with well water, which can be even harder. Ice maker inlet valves and dishwasher spray arms accumulate mineral deposits faster here. We check for this proactively on every relevant call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on Sundays in Tarzana?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. We're available Sunday 9am–5pm. Several Tarzana appliance repair companies close on Sundays — we don't." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Tarzana?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Jenn-Air, Bertazzoni, and more. We carry OEM parts on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Tarzana?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Tarzana repairs run $150–$400." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Encino, Woodland Hills, and Reseda?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Tarzana service extends to Encino, Woodland Hills, Reseda, Canoga Park, West Hills, and all of the western San Fernando Valley." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="tz-hero">
-    <div class="tz-hero__inner container">
-      <div class="tz-hero__content">
-        <div class="tz-hero__eyebrow">Tarzana · 91356 · El Caballero · Caballero Canyon · Ventura Blvd · Reseda Blvd</div>
-        <h1 class="tz-hero__h1">
-          Appliance Repair<br>
-          <span class="tz-hero__accent">Tarzana, CA</span>
-        </h1>
-        <p class="tz-hero__sub">
-          Named for Tarzan, built around Edgar Rice Burroughs' 1919 ranch — Tarzana
-          has its own character in the western Valley. Hot summers, LADWP hard
-          water, and a mix of El Caballero hillside estates and well-kept Valley
-          homes. Same-day service, OEM parts, 90-day warranty. Open Sundays.
-        </p>
-        <div class="tz-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="tz-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="tz-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-tarzana-ca.webp"
-          alt="Appliance repair in Tarzana CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Tarzana, CA · 91356 · El Caballero · Caballero Canyon · Ventura Blvd · Reseda Blvd"
+    headlineMain="Appliance repair in"
+    headlineAccent="Tarzana, CA"
+    subheadline="Same-day service across all of Tarzana. El Caballero estates, Caballero Canyon hillside, Ventura and Reseda Blvd corridors. Valley heat + LADWP hard water specialists. Open Sundays. OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Open Sundays</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Heat & Water"
+    headline="Valley heat, LADWP hard water,"
+    headlineAccent="and the Caballero hillside"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="tz-intro">
-    <div class="container tz-intro__inner">
-      <div class="tz-intro__text">
-        <h2>Appliance Repair in Tarzana — The Local Reality</h2>
-        <p>
-          Tarzana is one of those Valley neighbourhoods that has stayed genuinely
-          residential — not particularly flashy, not anonymous. The El Caballero
-          area and the hillside streets near Caballero Canyon have larger homes
-          with premium kitchens. The Ventura Blvd and Reseda Blvd corridors
-          have the established mid-Valley homes where LG, Samsung, GE, and
-          Whirlpool need reliable same-day service.
-        </p>
-        <p>
-          Two environmental factors apply consistently across all of 91356.
-          First, Valley heat: Tarzana sees 100°F+ summer days regularly, which
-          means refrigerator compressors work harder and condenser coils
-          accumulate dust and debris faster than in coastal neighbourhoods.
-          We include a coil inspection on every Tarzana refrigerator call.
-          Second, LADWP hard water at 230–310 mg/L — some hillside properties
-          also supplement with well water, which can compound the mineral
-          content further. Ice maker inlet valves and dishwasher spray arms
-          scale faster here. We check for both on every relevant call.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written
-          estimate before we start. <strong>90-day warranty</strong>. Weekends
-          available — including Sundays.
-        </p>
-        <div class="tz-tip">
-          <div class="tz-tip__icon">🌡️</div>
-          <div class="tz-tip__text">
-            <strong>Tarzana heat + water tip:</strong> If your refrigerator
-            starts cycling more frequently in July and your ice maker has been
-            gradually slowing down — these are two separate issues happening
-            simultaneously in Tarzana. The cycling is Valley heat on dusty
-            condenser coils. The declining ice is LADWP mineral scale on the
-            inlet valve. Both are fixable in a single visit. Annual coil
-            cleaning before summer and a 6-month filter replacement cycle are
-            the two most effective maintenance steps for a Tarzana refrigerator.
-          </div>
-        </div>
-      </div>
-      <div class="tz-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Tarzana Service</div>
-          <div class="cta-box__sub">91356 · Valley heat aware · Open Sundays</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Tarzana"
+    services={services}
+    cardStructure="3-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="tz-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Tarzana</h2>
-      <p class="section-sub">All brands · Valley heat + LADWP hard water aware · All of 91356</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Tarzana neighborhoods"
+    headlineAccent="we service"
+    subheadline="All of 91356 — from El Caballero estates and Caballero Canyon hillside to the Ventura and Reseda Blvd corridors."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/tarzana/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Valley heat coil inspection · LADWP ice maker · Not cooling · Fan</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Tarzana"
+    jobs={jobs}
+  />
 
-        <a href="/tarzana/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Error codes</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/tarzana/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Flow sense · Vent buildup</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Tarzana"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/tarzana/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">LADWP spray arm scale · E24 · Not draining · Error codes</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Tarzana"
+    cards={pricingCards}
+    bottomNote="Residential pricing only. Parts and labor included in the repair quote — no surprise add-ons."
+  />
 
-        <a href="/tarzana/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Jenn-Air · Wolf</div>
-          <div class="service-card__brands">GE · Samsung · Jenn-Air · Wolf · Bertazzoni · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Tarzana"
+    faqs={faqs}
+  />
 
-        <a href="/tarzana/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">LADWP inlet valve · Valley heat stress · Not freezing · Frost</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/tarzana/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Valley heat stress · Compressor · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Sub-Zero · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/tarzana/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Jenn-Air · Wolf · Bertazzoni</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="tz-neighborhoods">
-    <div class="container">
-      <h2>All of Tarzana — 91356</h2>
-      <p class="section-sub">From El Caballero hillsides to the Ventura corridor — every street in Tarzana</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Key Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">El Caballero Country Club area</div>
-            <div class="nh-item featured">Caballero Canyon hillside</div>
-            <div class="nh-item">Ventura Blvd corridor</div>
-            <div class="nh-item">Reseda Blvd corridor</div>
-            <div class="nh-item">Vanalden Ave area</div>
-            <div class="nh-item">Tampa Ave corridor</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Ventura Blvd</div>
-            <div class="nh-item">Reseda Blvd</div>
-            <div class="nh-item">Avenida Oriente</div>
-            <div class="nh-item">Vanalden Ave</div>
-            <div class="nh-item">Tampa Ave</div>
-            <div class="nh-item">Topanga Canyon Blvd</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Encino (91316)</div>
-            <div class="nh-item">Woodland Hills (91364)</div>
-            <div class="nh-item">Reseda (91335)</div>
-            <div class="nh-item">West Hills (91307)</div>
-            <div class="nh-item">Canoga Park (91303)</div>
-            <div class="nh-item">Sherman Oaks (91403)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="tz-recent">
-    <div class="container">
-      <h2>Recent Jobs in Tarzana</h2>
-      <p class="section-sub">Real calls from 91356 — Valley heat, LADWP hard water, all neighbourhoods.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG French Door Fridge</span>
-            <span class="recent-location">El Caballero area, 91356</span>
-          </div>
-          <div class="recent-card__title">"Running constantly in summer, ice maker almost nothing"</div>
-          <div class="recent-card__desc">
-            El Caballero area home during an August heat stretch — LG French
-            door with two problems presenting simultaneously. Condenser coils
-            loaded with Valley dust from a full summer season, plus the water
-            inlet valve scaled by LADWP minerals down to roughly 15% flow.
-            Deep coil cleaning first, then inlet valve replacement with OEM
-            LG part. Cycling normalised within 45 minutes, full ice production
-            confirmed next morning. Both issues in one visit — explained to
-            the homeowner that the timing (both worsening in summer) is a
-            Tarzana-specific pattern: heat stress the coils while water usage
-            increases, accelerating scale on the valve.
-          </div>
-          <div class="recent-card__result">✓ Same day · Coils + inlet valve · OEM LG · Both issues one visit</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Whirlpool Gas Dryer</span>
-            <span class="recent-location">Caballero Canyon, 91356</span>
-          </div>
-          <div class="recent-card__title">"No heat — two cycles to dry anything, this started last week"</div>
-          <div class="recent-card__desc">
-            Caballero Canyon hillside home — Whirlpool gas dryer with
-            thermal fuse blown from a vent run that had been gradually
-            accumulating lint inside a long flexible section snaking
-            through the hillside wall. Found approximately 60% blockage.
-            Replaced the thermal fuse, cleared the full vent run to the
-            exterior, replaced the warped plastic exterior cap with a
-            proper metal backdraft damper. Single-cycle drying confirmed
-            on the first test load. Hillside vent runs in Tarzana tend
-            to be longer than Valley floor properties — worth annual
-            inspection given the lint accumulation rate.
-          </div>
-          <div class="recent-card__result">✓ Same day · Thermal fuse · Vent cleared · Metal cap · Single cycle</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Ventura Blvd area, 91356</span>
-          </div>
-          <div class="recent-card__title">"E24 drain error — dishes not clean either, white film on everything"</div>
-          <div class="recent-card__desc">
-            Ventura Blvd corridor home — Bosch 500 series E24 drain error
-            combined with white mineral film on dishes. LADWP hard water
-            had scaled both the drain pump filter and the spray arm jets.
-            The pump filter was restricting drain flow (causing E24) while
-            the scaled spray arm jets were reducing wash pressure enough
-            to leave residue. Cleared both, ran the Bosch diagnostic
-            cycle, confirmed clean drain and full spray pressure on three
-            test loads — spotless dishes. Set on a 4-month filter cleaning
-            and quarterly descale cycle appropriate for LADWP hardness.
-          </div>
-          <div class="recent-card__result">✓ Same day · E24 resolved · Spray arms descaled · LADWP plan set</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Washer</span>
-            <span class="recent-location">Reseda Blvd corridor, 91356</span>
-          </div>
-          <div class="recent-card__title">"4E error — water not filling, machine stopped mid-cycle"</div>
-          <div class="recent-card__desc">
-            Tarzana home near Reseda Blvd — Samsung front-loader 4E
-            water supply error. Found the inlet valve inlet screen
-            partially blocked by a combination of LADWP mineral debris
-            and fine sediment — a pattern consistent with this water
-            supply. Cleaned the inlet screen thoroughly, tested inlet
-            valve solenoid function (still good), ran a full wash cycle
-            — 4E clear. Also found the hot water supply pressure slightly
-            low from a partially closed shutoff valve behind the unit —
-            opened it fully. Explained the LADWP sediment factor and
-            recommended cleaning the inlet screen annually.
-          </div>
-          <div class="recent-card__result">✓ Same day · 4E resolved · Inlet screen cleaned · Shutoff corrected</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="tz-why">
-    <div class="container">
-      <h2>Why Tarzana Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🌡️</div>
-          <div class="why-title">Valley Heat + LADWP Aware</div>
-          <div class="why-text">Tarzana's 100°F+ summers stress refrigerator compressors and load condenser coils with dust. LADWP hard water scales ice maker valves and dishwasher spray arms. We address both in a single visit when both are present — and explain the combined pattern so you understand what to watch for.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📅</div>
-          <div class="why-title">Open Sundays</div>
-          <div class="why-text">Saturday 8am–7pm and Sunday 9am–5pm. Several Tarzana appliance repair companies close on Sundays. We don't. Weekend appliance failures don't wait for Monday, and neither do we.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📍</div>
-          <div class="why-title">Western Valley Route</div>
-          <div class="why-text">Tarzana is on the same western Valley route as Encino, Woodland Hills, and Calabasas. Call before noon and we're typically there that afternoon — never a special trip, never an extra charge for being in 91356.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="tz-reviews">
-    <div class="container">
-      <h2>What Tarzana Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG fridge running constantly in August heat and ice maker barely producing. Tech found both issues in one visit — dirty coils and scaled inlet valve — fixed both, explained why they happen together in Tarzana summer. Cycling normal and full ice the next morning. Efficient, honest, and actually understood the local water."</div>
-          <div class="review-author">— Robert H., El Caballero area, Tarzana</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Needed a Sunday appointment — called Same Day because other companies were closed. Tech came out Sunday afternoon, fixed the Bosch E24 error, descaled the spray arms, set up a maintenance plan for our LADWP water. Spotless dishes from the first load. Really appreciated that Sunday availability."</div>
-          <div class="review-author">— Karen S., Ventura Blvd area, Tarzana 91356</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Whirlpool dryer no heat in our Caballero Canyon home. Tech found the lint-blocked hillside vent run, replaced the thermal fuse, installed a proper metal vent cap, confirmed single-cycle drying. Mentioned that hillside vent runs need annual checking — nobody had ever told us that before. Preventive and professional."</div>
-          <div class="review-author">— Michael T., Caballero Canyon, Tarzana</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="tz-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Tarzana</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator + Valley Coil + LADWP Check</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Both heat and water factors addressed in one visit</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Inlet screen · Drain pump · Thermal fuse · Vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">LADWP scale · E24 · Spray arm descale · Filter</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Jenn-Air · Temperature</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · El Caballero estates</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="tz-faq">
-    <div class="container">
-      <h2>Questions Tarzana Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Tarzana, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Tarzana 91356 — El Caballero area, Caballero Canyon, Ventura Blvd, Reseda Blvd, and every residential street. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does Tarzana's hot Valley climate affect appliances?</summary><div class="faq-answer">Yes. 100°F+ summer days put refrigerator compressors under load and accelerate condenser coil dust buildup. We include a coil inspection on every Tarzana refrigerator call and offer pre-summer annual cleaning.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does LADWP hard water affect appliances in Tarzana?</summary><div class="faq-answer">Yes. LADWP runs 230–310 mg/L in 91356. Some hillside properties also supplement with well water, compounding the hardness. Ice makers and dishwashers scale faster here. We check proactively on every relevant call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on Sundays in Tarzana?</summary><div class="faq-answer">Yes. Sunday 9am–5pm. Several Tarzana appliance repair companies close on Sundays — we don't.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Tarzana?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Jenn-Air, Bertazzoni, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Tarzana?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Tarzana repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Encino, Woodland Hills, and Reseda?</summary><div class="faq-answer">Yes. Our Tarzana service extends to Encino, Woodland Hills, Reseda, Canoga Park, West Hills, and all of the western San Fernando Valley.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="tz-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/encino/" class="nearby-link">Encino</a>
-        <a href="/woodland-hills/" class="nearby-link">Woodland Hills</a>
-        <a href="/sherman-oaks/" class="nearby-link">Sherman Oaks</a>
-        <a href="/calabasas/" class="nearby-link">Calabasas</a>
-        <a href="/thousand-oaks/" class="nearby-link">Thousand Oaks</a>
-        <a href="/studio-city/" class="nearby-link">Studio City</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="tz-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Tarzana?</h2>
-          <p>El Caballero · Caballero Canyon · Valley heat + LADWP hard water aware · Open Sundays · All of 91356. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Tarzana, CA 91356</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --tz-red: #C8102E; --tz-black: #0a0a0a; --tz-gray: #f5f5f5; --tz-border: #e2e2e2; --tz-text: #1a1a1a; --tz-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .tz-hero { background: var(--tz-black); color: white; padding: 80px 0 60px; }
-  .tz-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .tz-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--tz-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .tz-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .tz-hero__accent { color: var(--tz-red); }
-  .tz-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .tz-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .tz-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .tz-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--tz-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .tz-bottom-cta .btn-secondary { color: var(--tz-text); border-color: var(--tz-border); }
-  .trust-bar { background: var(--tz-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .tz-intro { padding: 72px 0; background: white; }
-  .tz-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .tz-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--tz-black); margin-bottom: 20px; }
-  .tz-intro__text p { font-size: 16px; line-height: 1.7; color: var(--tz-text); margin-bottom: 16px; }
-  .tz-tip { display: flex; gap: 14px; background: #fdf4e7; border: 1px solid #e8c97a; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .tz-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .tz-tip__text { font-size: 14px; color: var(--tz-text); line-height: 1.6; }
-  .cta-box { background: var(--tz-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--tz-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--tz-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--tz-muted); text-align: center; margin-bottom: 40px; }
-  .tz-services { padding: 72px 0; background: var(--tz-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--tz-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--tz-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--tz-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--tz-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--tz-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--tz-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--tz-red); font-weight: 500; }
-  .tz-neighborhoods { padding: 72px 0; background: white; }
-  .tz-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--tz-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--tz-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--tz-text); padding: 8px 12px; background: var(--tz-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--tz-red); color: var(--tz-black); font-weight: 500; }
-  .tz-recent { padding: 72px 0; background: var(--tz-gray); }
-  .tz-recent h2 { font-size: 30px; font-weight: 700; color: var(--tz-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--tz-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--tz-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--tz-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--tz-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--tz-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .tz-why { padding: 72px 0; background: white; }
-  .tz-why h2 { font-size: 30px; font-weight: 700; color: var(--tz-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--tz-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--tz-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--tz-muted); line-height: 1.6; }
-  .tz-reviews { padding: 72px 0; background: var(--tz-gray); }
-  .tz-reviews h2 { font-size: 30px; font-weight: 700; color: var(--tz-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--tz-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--tz-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--tz-muted); font-weight: 500; }
-  .tz-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--tz-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--tz-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--tz-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--tz-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--tz-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--tz-red); }
-  .pricing-card__note { font-size: 13px; color: var(--tz-muted); }
-  .tz-faq { padding: 72px 0; background: var(--tz-gray); }
-  .tz-faq h2 { font-size: 30px; font-weight: 700; color: var(--tz-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--tz-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--tz-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--tz-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--tz-text); }
-  .tz-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--tz-border); }
-  .tz-nearby h2 { font-size: 20px; font-weight: 600; color: var(--tz-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--tz-border); border-radius: 20px; font-size: 14px; color: var(--tz-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--tz-red); color: var(--tz-red); }
-  .tz-bottom-cta { padding: 72px 0; background: var(--tz-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .tz-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .tz-hero__inner { grid-template-columns: 1fr; } .tz-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .tz-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Tarzana repair today"
+    body="Same-day service across all of 91356. El Caballero, Caballero Canyon, Ventura Blvd, Reseda Blvd. Open Sundays. $89 diagnostic · 90-day warranty · OEM parts on the truck."
+  />
+</CityLayout>

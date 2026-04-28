@@ -1,696 +1,305 @@
 ---
-// src/pages/la-canada-flintridge.astro
-// SDAR — samedayappliance.repair
-// La Cañada Flintridge, CA 91011
-// Филиал: Pasadena · (626) 376-4458
-// GSC: нет данных — новый город
-// Конкуренты: LCF Appliance Repair Experts (generic clone), Box Refrigeration (real, Sub-Zero/Viking),
-//             Sears (corporate), Reliable (fake reviews), American Appliance (Sub-Zero only)
-// Уникальный угол: JPL/aerospace community + hillside canyon lots + LADWP hard water
-//                  + Verdugo Mountains terrain = complex vent runs + luxury estate kitchens
-// Апрель 2026
+/**
+ * La Canada Flintridge, CA — Variant A migration (T9 Batch 7, Group 3 Pasadena).
+ * Branch: Pasadena · ZIPs: 91011 · Source: wiki/migration/content-dumps/la-canada-flintridge.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Pasadena is service_area)
+ *   - Phone via branches.ts (`branchSlug='pasadena'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "La Cañada Flintridge",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91011"],
-  phone: "(626) 376-4458",
-  phoneRaw: "+16263764458",
-  email: "pasadena@samedayappliance.repair",
-  branch: "Pasadena",
-  slug: "la-canada-flintridge",
-};
+const branchSlug = 'pasadena';
+const cityName = 'La Canada Flintridge';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair La Cañada Flintridge CA 91011 — Same Day | Sub-Zero · Wolf | (626) 376-4458`;
-const description = `Same-day appliance repair in La Cañada Flintridge, CA 91011. Foothill Blvd corridor, Verdugo Mountains hillside homes, JPL-adjacent community. Sub-Zero, Wolf, Samsung, LG. Licensed, OEM parts, 90-day warranty. Call (626) 376-4458.`;
-const canonical = `https://samedayappliance.repair/la-canada-flintridge/`;
+const title = 'Appliance Repair La Canada Flintridge CA | Same Day Service | All Brands';
+const description = 'Same-day appliance repair in La Canada Flintridge, CA 91011. Verdugo Mountains hillside homes, JPL corridor, Foothill Blvd. LADWP hard water, canyon dryer vents, Sub-Zero & Wolf experts. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/la-canada-flintridge/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — La Cañada Flintridge",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "55 S Lake Ave",
-    "addressLocality": "Pasadena",
-    "addressRegion": "CA",
-    "postalCode": "91101",
-    "addressCountry": "US"
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🥶', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+];
+
+const neighborhoods = [
+  { name: 'Foothill Blvd corridor', zip: '91011' },
+  { name: 'Verdugo Mountains hillside', zip: '91011' },
+  { name: 'JPL / Berkshire area', zip: '91011' },
+  { name: 'Palm Drive neighborhood', zip: '91011' },
+  { name: 'Hampstead Road area', zip: '91011' },
+  { name: 'Angeles Crest corridor', zip: '91011' },
+  { name: 'Encinas Drive area', zip: '91011' },
+  { name: 'Flintridge (south)', zip: '91011' },
+];
+
+const narrativeIntro = [
+  "La Canada Flintridge sits up against the Verdugo Mountains in a stretch of Los Angeles County that has its own distinct character — JPL and aerospace families, hillside canyon lots, larger homes with serious kitchens, and an appliance mix that runs heavily toward Sub-Zero, Wolf, Viking, and Thermador. We've been working in 91011 long enough to know that the calls here are not the same as the calls in Pasadena or Glendale a few miles away.",
+  "Three things shape almost every service call we run in LCF: the canyon and hillside geometry of the homes, the LADWP water supply, and the prevalence of professional-grade and built-in appliances. Each one demands a different awareness — and each one is something we check for proactively, not as an upsell, but because it is what good service in this city looks like.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'Hillside canyon properties and complex vent runs',
+    paragraphs: [
+      "Many LCF homes sit on canyon lots above Foothill or up into the Verdugo Mountains. Laundry rooms are often on a lower level, dryer vents run horizontally before turning up through a wall cavity, and the exit point may be on a different grade than the appliance itself. These long, angled vent runs accumulate lint at the bends, and a partially blocked vent shows up as multi-cycle drying, climbing electricity bills, and — if neglected long enough — a real fire risk.",
+      "We check airflow at the exterior cap and inspect the full run on every LCF dryer call. If your dryer is taking more than one cycle to finish a load, or the exterior vent cap exhausts weakly, the most likely cause in a Verdugo Mountains hillside home is exactly this. It is included in the visit, not extra.",
+    ],
   },
-  "areaServed": [
-    { "@type": "City", "name": "La Cañada Flintridge", "sameAs": "https://en.wikipedia.org/wiki/La_Ca%C3%B1ada_Flintridge,_California" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    title: 'LADWP hard water — distinct from neighboring SGV cities',
+    paragraphs: [
+      "La Canada Flintridge is on the LADWP supply, not SGVMWD, and the water profile here is its own thing. Hardness runs 230-310 mg/L, and the older Verdugo foothill homes with original galvanized supply lines can add iron on top of that. The combination shows up first in refrigerator ice makers, then in dishwasher spray arms and washer inlet screens.",
+      "On every relevant call we check the inlet valve, flush the line, and replace the in-door filter if it is overdue. We recommend a 6-month filter cycle in LCF rather than the manufacturer-default 12, monthly dishwasher descaling tablets, and an annual ice-maker inlet valve inspection on units more than four years old.",
+    ],
+  },
+  {
+    title: 'Larger homes, serious kitchens — Sub-Zero, Wolf, Viking, Thermador',
+    paragraphs: [
+      "The kitchens in La Canada Flintridge skew professional. Sub-Zero 48-inch built-ins, Wolf dual-fuel ranges, Viking and Thermador cooktops, dedicated wine columns. We carry OEM parts for all of them on our trucks — Sub-Zero inlet valves, Wolf oven igniters and surface electrodes, Viking thermocouples — and our techs know these platforms cold. That matters in this city: these appliances are expensive to replace, and they almost always reward a competent repair.",
+    ],
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'LG Dryer',
+    neighborhood: 'Verdugo hillside',
+    title: 'LG dryer — two cycles for every load, electricity bill climbing',
+    body: "Canyon lot above Foothill — the dryer vent ran from a laundry room on the lower floor, across a horizontal run, then up through the hillside wall before exiting on the upper grade. A long, complex path common on Verdugo canyon lots. Heavy lint accumulation at two bends; airflow at the exterior cap was barely detectable. Cleared the full run, replaced the blown thermal fuse, confirmed strong airflow at the exterior termination. Single-cycle drying from the first test after. Homeowner remarked their electricity bill had been climbing — consistent with a restricted vent.",
+    part: 'Thermal fuse + full vent clearance',
+    time: '2 hours',
+    result: '✓ Same day · Canyon vent cleared · Single cycle restored',
+  },
+  {
+    badge: 'Sub-Zero Refrigerator',
+    neighborhood: 'Berkshire Ave area',
+    title: 'Sub-Zero — ice maker barely producing, maybe 4-5 cubes a day',
+    body: "Sub-Zero 48-inch built-in — gradual ice decline is the consistent LADWP hard water pattern in LCF. Mineral scale on the inlet valve was restricting flow to roughly 20% of normal. Replaced with an OEM Sub-Zero inlet valve, flushed the full water line, replaced the in-door filter (two years old, significantly past replacement). Full production within 24 hours. Explained the LADWP water hardness situation specific to La Canada and set a 6-month filter replacement reminder.",
+    part: 'OEM Sub-Zero inlet valve + filter',
+    time: '2 hours',
+    result: '✓ Same day · OEM Sub-Zero · Full production restored',
+  },
+  {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Palm Drive',
+    title: 'Bosch dishwasher — glasses spotty, machine not draining completely',
+    body: "Bosch 500 series — spray arm ports blocked by LADWP mineral scale (classic hard water dishwasher presentation), and the drain filter was significantly clogged. The combination of partially blocked spray arms and a restricted filter had left standing water after cycles. Descaled both spray arms, deep-cleaned the filter assembly, ran a citric acid cycle, confirmed full spray rotation and clean drain. Advised monthly dishwasher tablet maintenance given the LCF water hardness — makes a material difference.",
+    part: 'Spray arm descale + filter clean',
+    time: '1.5 hours',
+    result: '✓ Same day · Scale cleared · Full drain confirmed',
+  },
+  {
+    badge: 'Wolf Range',
+    neighborhood: 'Hampstead Rd',
+    title: 'Wolf 36-inch — oven runs low, two burners clicking and not lighting',
+    body: "Wolf 36-inch dual-fuel — weak oven igniter (classic Wolf failure: draws insufficient current to open the gas valve despite glowing), two surface igniter electrodes corroded from kitchen moisture. Replaced the oven igniter and both surface electrodes with OEM Wolf parts, calibrated the oven temperature (running 22F low). Tested all six burners and both oven functions before leaving. Family had been cooking on the stovetop only for two weeks — kitchen back to full use same afternoon.",
+    part: 'OEM Wolf oven igniter + 2 electrodes',
+    time: '2 hours',
+    result: '✓ Same day · OEM Wolf · Oven calibrated',
+  },
+];
+
+const reviews = [
+  {
+    text: "Dryer had been taking forever — two full cycles for one load. They came out, found the long vent run on our hillside property completely clogged at two bends, cleared it all, replaced the blown fuse. Single cycle now and my electricity bill already dropped. Wish I'd called sooner.",
+    author: '— Karen M., Verdugo hillside',
+  },
+  {
+    text: "Sub-Zero barely making ice. Tech came same day, identified the hard water mineral buildup on the inlet valve right away, replaced it with an OEM part, explained the LADWP water hardness issue specific to LCF. Full ice production next morning. Very knowledgeable, very efficient.",
+    author: '— David C., Berkshire Ave',
+  },
+  {
+    text: "Wolf range — oven temperature way off and two burners dead. They came out same day, had all the OEM Wolf parts, recalibrated the oven, replaced the igniters. Kitchen back to full use same afternoon. Tech knew Wolf equipment inside and out. Exactly the kind of service this city deserves.",
+    author: '— Jennifer L., Hampstead Rd',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · LADWP hard water assessment included' },
+  { label: 'Standard Repair', price: '$150–$420', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Luxury Brand Repair', price: '$300–$700+', note: 'Sub-Zero, Wolf, Viking, Thermador · OEM parts' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in La Canada Flintridge?',
+    answer: 'Yes. Our technicians cover all of La Canada Flintridge — 91011 — including the Foothill Blvd corridor, the Verdugo Mountains hillside, the JPL and Berkshire area, Palm Drive, Hampstead Road, and the Angeles Crest corridor. Call before noon for same-day afternoon service in most cases.',
+  },
+  {
+    question: 'Are hillside canyon vent runs really a different problem in LCF?',
+    answer: "Yes. Many LCF homes sit on canyon lots with laundry rooms on a lower floor and dryer vents that run horizontally before turning up through a wall cavity. These long, angled runs accumulate lint at the bends much faster than a short straight vent in a flat lot. Multi-cycle drying, climbing electricity bills, and reduced exterior airflow are the symptoms — and a blocked vent is also a real fire risk. We check airflow and inspect the full vent run on every LCF dryer call.",
+  },
+  {
+    question: 'Does LADWP hard water in La Canada really affect appliances differently than nearby SGV cities?',
+    answer: 'Yes. La Canada Flintridge is supplied by LADWP, not SGVMWD, and hardness here runs 230-310 mg/L. Older Verdugo foothill homes with galvanized supply lines also add iron to the mix. The result: refrigerator ice maker inlet valves scale faster, dishwasher spray arms clog faster, and washer inlet screens clog faster than in softer-water areas. We recommend a 6-month filter replacement cycle, monthly dishwasher descaling tablets, and annual ice-maker inlet valve inspection on older units.',
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, Viking, and Thermador appliances in La Canada Flintridge?',
+    answer: 'Yes — these are bread-and-butter brands in this city. Our techs are trained on Sub-Zero built-in refrigeration, Wolf dual-fuel and gas ranges, Viking professional ranges and cooktops, and Thermador wall ovens and cooktops. We carry OEM parts for all of them on our trucks, including Sub-Zero inlet valves, Wolf oven igniters and surface electrodes, and Viking thermocouples.',
+  },
+  {
+    question: 'Are you available on weekends in La Canada Flintridge?',
+    answer: 'Yes. Saturday 8am-7pm and Sunday 9am-5pm. Weekend appointments are common in LCF and we keep them on the regular Pasadena route.',
+  },
+  {
+    question: 'What is your diagnostic fee in La Canada Flintridge?',
+    answer: 'Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice. Standard residential repairs in LCF run $150-$420; Sub-Zero, Wolf, Viking, and Thermador work runs $300-$700+ depending on the part.',
+  },
+  {
+    question: 'Do you also serve nearby Pasadena, Glendale, and the Verdugo cities?',
+    answer: 'Yes — Pasadena, Glendale, Burbank, Altadena, and the rest of the Verdugo and SGV foothill cities are all part of our regular service area out of the Pasadena branch. Same-day service, same pricing, same warranty.',
+  },
+];
+
+const nearby = [
+  { slug: 'pasadena', name: 'Pasadena' },
+  { slug: 'glendale', name: 'Glendale' },
+  { slug: 'burbank', name: 'Burbank' },
+  { slug: 'south-pasadena', name: 'South Pasadena' },
+  { slug: 'arcadia', name: 'Arcadia' },
+  { slug: 'san-marino', name: 'San Marino' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'La Canada Flintridge', sameAs: 'https://en.wikipedia.org/wiki/La_Ca%C3%B1ada_Flintridge,_California' },
+    { '@type': 'PostalCode', name: '91011' },
+    { '@type': 'Place', name: 'Verdugo Mountains hillside' },
+    { '@type': 'Place', name: 'JPL / Berkshire area' },
+    { '@type': 'Place', name: 'Foothill Blvd corridor' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in La Cañada Flintridge, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of La Cañada Flintridge 91011 — the Foothill Boulevard corridor, the hillside canyon homes above Foothill, Palm Drive, Berkshire Avenue, Hampstead Road, and all streets in the city. Call before noon for same-day afternoon service. We're also available Saturdays and Sundays." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Does LADWP hard water affect appliances in La Cañada Flintridge?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Unlike many neighboring SGV cities, La Cañada Flintridge is served by LADWP, which delivers water at 230–310 mg/L hardness in this area. Older homes in the Verdugo Mountains foothills may have additional mineral content from aging supply lines. Ice maker inlet valves, dishwasher spray arms, and washing machine inlet screens accumulate scale faster than in softer-water areas. We check for this proactively on every relevant LCF call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do hillside canyon properties in La Cañada Flintridge create appliance service challenges?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Homes on the Verdugo Mountains canyon lots often have longer, more complex dryer vent runs than flat-lot properties — vents that route through walls and across hillside grade changes before reaching an exterior termination. These accumulate lint faster and require more thorough cleaning. We come prepared for hillside property configurations on every La Cañada Flintridge dryer call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, and Viking appliances in La Cañada Flintridge?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. La Cañada Flintridge's larger homes consistently have Sub-Zero refrigerators, Wolf ranges, Viking and Thermador appliances. Our technicians carry OEM parts for these brands on every service vehicle and are trained on their specific systems and failure modes." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in La Cañada Flintridge?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most La Cañada Flintridge repairs run $150–$400 depending on the appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in La Cañada Flintridge?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm. If your appliance breaks on a weekend, you don't have to wait until Monday." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve La Crescenta, Montrose, Glendale, and Pasadena?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our La Cañada Flintridge service area extends to La Crescenta, Montrose, Glendale, Burbank, Pasadena, and Altadena. All are within our regular service route from the Pasadena branch." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="lcf-hero">
-    <div class="lcf-hero__inner container">
-      <div class="lcf-hero__content">
-        <div class="lcf-hero__eyebrow">La Cañada Flintridge, CA · 91011 · Foothill Blvd · Verdugo Mountains · JPL Corridor</div>
-        <h1 class="lcf-hero__h1">
-          Appliance Repair<br>
-          <span class="lcf-hero__accent">La Cañada Flintridge, CA</span>
-        </h1>
-        <p class="lcf-hero__sub">
-          Hillside canyon homes, luxury estate kitchens, and the appliance challenges
-          that come with both — Sub-Zero, Wolf, Viking, Samsung, LG. We cover all of
-          La Cañada Flintridge 91011. Same-day service, OEM parts, 90-day warranty.
-          Weekends available.
-        </p>
-        <div class="lcf-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="lcf-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="lcf-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-la-canada-flintridge-ca.webp"
-          alt="Appliance repair in La Cañada Flintridge CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="La Canada Flintridge, CA · Los Angeles County · 91011"
+    headlineMain="Appliance repair in"
+    headlineAccent="La Canada Flintridge, CA"
+    subheadline="Same-day service across all of LCF. Hillside canyon vent runs, LADWP hard water, Sub-Zero and Wolf experts. OEM parts, 90-day warranty. $89 diagnostic — waived with repair."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Three Things That Matter Here"
+    headline="Canyon homes, LADWP water,"
+    headlineAccent="and serious kitchens"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="lcf-intro">
-    <div class="container lcf-intro__inner">
-      <div class="lcf-intro__text">
-        <h2>Appliance Repair in La Cañada Flintridge — Three Things That Matter Here</h2>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliances we repair in"
+    headlineAccent="La Canada Flintridge"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-        <h3>Hillside Canyon Properties</h3>
-        <p>
-          La Cañada Flintridge climbs into the Verdugo Mountains, and a significant
-          portion of the city sits on canyon lots with irregular grades and older
-          construction. Dryer vents in these homes frequently run longer, more
-          complex paths than flat-lot properties — routing through walls, across
-          grade changes, and sometimes over extended horizontal runs before reaching
-          an exterior termination. These vents accumulate lint faster and need more
-          thorough attention. On every La Cañada Flintridge dryer call, we assess
-          the full vent run and airflow, not just the machine itself.
-        </p>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="La Canada Flintridge neighborhoods"
+    headlineAccent="we service"
+    subheadline="Foothill Blvd to the Verdugo Mountains hillside — flat lots and canyon properties across 91011."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <h3>LADWP Hard Water</h3>
-        <p>
-          Unlike neighboring cities served by the San Gabriel Valley Municipal Water
-          District, La Cañada Flintridge is an LADWP customer — and LADWP delivers
-          water at 230–310 mg/L hardness in this area. Older homes in the Verdugo
-          foothills can add additional mineral content from aging supply lines. The
-          result: ice maker inlet valves, dishwasher spray arms, and washing machine
-          inlet screens that scale up faster than national average. We test for
-          mineral deposits on every relevant LCF call involving ice makers and
-          dishwashers.
-        </p>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="La Canada Flintridge"
+    jobs={jobs}
+  />
 
-        <h3>Larger Homes, Serious Kitchens</h3>
-        <p>
-          La Cañada Flintridge's residential stock runs toward larger, well-maintained
-          family homes and estates — many with kitchens that have been renovated to
-          include Sub-Zero refrigerators, Wolf ranges, Viking appliances, and Thermador
-          equipment. Our technicians carry OEM parts for these brands on every vehicle
-          and are trained on their specific systems.
-        </p>
+  <Method number="05" />
 
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong> on all parts and labor.
-          Available <strong>Saturdays and Sundays</strong>.
-        </p>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What La Canada Flintridge"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <div class="lcf-tip">
-          <div class="lcf-tip__icon">🔥</div>
-          <div class="lcf-tip__text">
-            <strong>Dryer vent tip for LCF canyon homes:</strong> If your dryer is
-            taking more than one cycle, or if the exterior vent cap seems to exhaust
-            weakly, the most likely cause in a Verdugo Mountains hillside home is
-            lint accumulation in a long or angled vent run. A blocked vent is both
-            an efficiency problem and a fire risk. We check airflow and inspect the
-            full run on every LCF dryer call — it's included, not extra.
-          </div>
-        </div>
-      </div>
-      <div class="lcf-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">La Cañada Flintridge</div>
-          <div class="cta-box__sub">91011 · Hillside & flat · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="La Canada Flintridge"
+    cards={pricingCards}
+    bottomNote="Residential pricing only. Parts and labor included in the repair quote — no surprise add-ons."
+  />
 
-  <!-- SERVICES -->
-  <section class="lcf-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in La Cañada Flintridge</h2>
-      <p class="section-sub">All brands · Canyon hillside aware · LADWP hard water · 91011</p>
-      <div class="services-grid">
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="La Canada Flintridge"
+    faqs={faqs}
+  />
 
-        <a href="/la-canada-flintridge/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Hard water ice maker · Not cooling · Fan motor · Sub-Zero built-in</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · Wolf</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/la-canada-flintridge/dryer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Canyon vent runs · Not heating · Fire hazard · Thermal fuse</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/la-canada-flintridge/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Hard water inlet screens · Not draining · Not spinning · Error codes</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/la-canada-flintridge/dishwasher-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Hard water spray arm scale · Not draining · Error codes · Spots</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · Miele · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/la-canada-flintridge/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Wolf & Viking</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · GE · Samsung · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/la-canada-flintridge/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker</div>
-          <div class="service-card__issues">Hard water inlet valve · Not freezing · Ice stopped · Frost</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/la-canada-flintridge/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Built-in · Under-counter</div>
-          <div class="service-card__brands">Sub-Zero · True · U-Line · Liebherr · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/la-canada-flintridge/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter · Gas burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">Wolf · Viking · GE · Bosch · Samsung · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="lcf-neighborhoods">
-    <div class="container">
-      <h2>All of La Cañada Flintridge — 91011</h2>
-      <p class="section-sub">Foothill corridor to Verdugo hillside — every part of the city</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">LCF Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Foothill Blvd corridor</div>
-            <div class="nh-item featured">Verdugo Mountains hillside</div>
-            <div class="nh-item featured">JPL / Berkshire area</div>
-            <div class="nh-item">Palm Drive neighborhood</div>
-            <div class="nh-item">Hampstead Road area</div>
-            <div class="nh-item">Angeles Crest corridor</div>
-            <div class="nh-item">Encinas Drive area</div>
-            <div class="nh-item">Flintridge (south)</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Foothill Blvd</div>
-            <div class="nh-item">Angeles Crest Hwy</div>
-            <div class="nh-item">Berkshire Ave</div>
-            <div class="nh-item">Palm Drive</div>
-            <div class="nh-item">Hampstead Rd</div>
-            <div class="nh-item">Starlight Crest Dr</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">La Crescenta (91214)</div>
-            <div class="nh-item">Montrose (91020)</div>
-            <div class="nh-item">Glendale (91201–08)</div>
-            <div class="nh-item">Burbank (91501–06)</div>
-            <div class="nh-item">Pasadena (91101–09)</div>
-            <div class="nh-item">Altadena (91001)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="lcf-recent">
-    <div class="container">
-      <h2>Recent Jobs in La Cañada Flintridge</h2>
-      <p class="section-sub">Real calls from 91011 — hillside homes, canyon vent runs, LADWP hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Dryer</span>
-            <span class="recent-location">Verdugo hillside, 91011</span>
-          </div>
-          <div class="recent-card__title">"Two cycles for every load — been this way for months"</div>
-          <div class="recent-card__desc">
-            Canyon lot property above Foothill — the dryer vent ran from a laundry room
-            on the lower floor, across a horizontal run, then up through the hillside
-            wall before exiting on the upper grade. A long, complex path common on
-            Verdugo canyon lots. Heavy lint accumulation at two bends; airflow at the
-            exterior cap was barely detectable. Cleared the full run, replaced the
-            blown thermal fuse, confirmed strong airflow at the exterior termination.
-            Single-cycle drying from the first test after. Homeowner remarked their
-            electricity bill had been climbing — consistent with a restricted vent.
-          </div>
-          <div class="recent-card__result">✓ Same day · Canyon vent fully cleared · Thermal fuse · Single cycle</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Refrigerator</span>
-            <span class="recent-location">Berkshire Ave area, 91011</span>
-          </div>
-          <div class="recent-card__title">"Ice maker barely producing — maybe 4–5 cubes a day"</div>
-          <div class="recent-card__desc">
-            Sub-Zero 48-inch built-in — gradual ice decline is the consistent LADWP
-            hard water pattern in LCF. Mineral scale on the inlet valve was restricting
-            flow to roughly 20% of normal. Replaced with an OEM Sub-Zero inlet valve,
-            flushed the full water line, replaced the in-door filter (two years old,
-            significantly past replacement). Full production within 24 hours.
-            Explained the LADWP water hardness situation specific to La Cañada and
-            set a 6-month filter replacement reminder.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Sub-Zero inlet valve · LADWP water cause explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Palm Drive, 91011</span>
-          </div>
-          <div class="recent-card__title">"Glasses spotty, machine not draining completely"</div>
-          <div class="recent-card__desc">
-            Bosch 500 series — spray arm ports blocked by LADWP mineral scale (classic
-            hard water dishwasher presentation), and the drain filter was significantly
-            clogged. The combination of partially blocked spray arms and a restricted
-            filter had left standing water after cycles. Descaled both spray arms,
-            deep-cleaned the filter assembly, ran a citric acid cycle, confirmed
-            full spray rotation and clean drain. Advised monthly dishwasher tablet
-            maintenance given the LCF water hardness — makes a material difference.
-          </div>
-          <div class="recent-card__result">✓ Same day · Scale cleared · Full drain confirmed · Maintenance explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Range</span>
-            <span class="recent-location">Hampstead Rd, 91011</span>
-          </div>
-          <div class="recent-card__title">"Oven runs low, two burners clicking and not lighting"</div>
-          <div class="recent-card__desc">
-            Wolf 36-inch dual-fuel — weak oven igniter (classic Wolf failure: draws
-            insufficient current to open the gas valve despite glowing), two surface
-            igniter electrodes corroded from kitchen moisture. Replaced the oven
-            igniter and both surface electrodes with OEM Wolf parts, calibrated the
-            oven temperature (running 22°F low). Tested all six burners and both
-            oven functions before leaving. Family had been cooking on the stovetop
-            only for two weeks — kitchen back to full use same afternoon.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Wolf · All burners · Oven calibrated</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="lcf-why">
-    <div class="container">
-      <h2>Why La Cañada Flintridge Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🏔️</div>
-          <div class="why-title">Hillside Vent Run Experts</div>
-          <div class="why-text">Canyon lot homes in the Verdugo Mountains have longer, more complex dryer vent runs than flat properties. We assess the full run and airflow on every LCF dryer call — not just the machine. A restricted vent in a hillside home is both an efficiency problem and a fire risk.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">LADWP Hard Water Aware</div>
-          <div class="why-text">La Cañada Flintridge uses LADWP at 230–310 mg/L hardness — different from neighboring SGV cities on other water systems. Ice makers and dishwashers scale up faster here. We test inlet valves and check for mineral deposits on every relevant LCF call.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🔧</div>
-          <div class="why-title">Sub-Zero · Wolf · Viking</div>
-          <div class="why-text">La Cañada's larger homes have serious kitchens. We carry OEM parts for Sub-Zero, Wolf, Viking, and Thermador on every service vehicle. Trained on their specific systems — not a general company that handles luxury brands occasionally.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty · Weekends</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. OEM parts only. $89 diagnostic waived with repair. Available Saturday 8am–7pm and Sunday 9am–5pm. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="lcf-reviews">
-    <div class="container">
-      <h2>What La Cañada Flintridge Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Dryer had been taking forever — two full cycles for one load. They came out, found the long vent run on our hillside property completely clogged at two bends, cleared it all, replaced the blown fuse. Single cycle now and my electricity bill already dropped. Wish I'd called sooner."</div>
-          <div class="review-author">— Karen M., Verdugo hillside, La Cañada Flintridge</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero barely making ice. Tech came same day, identified the hard water mineral buildup on the inlet valve right away, replaced it with an OEM part, explained the LADWP water hardness issue specific to LCF. Full ice production next morning. Very knowledgeable, very efficient."</div>
-          <div class="review-author">— David C., Berkshire Ave, La Cañada Flintridge</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Wolf range — oven temperature way off and two burners dead. Same Day came out, had all the OEM Wolf parts, recalibrated the oven, replaced the igniters. Kitchen back to full use same afternoon. Tech knew Wolf equipment inside and out. Exactly the kind of service this city deserves."</div>
-          <div class="review-author">— Jennifer L., Hampstead Rd, La Cañada Flintridge</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="lcf-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in La Cañada Flintridge</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Dryer + Vent Cleaning</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Canyon vent run inspection · Thermal fuse · Full airflow check</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $450</div>
-          <div class="pricing-card__note">LADWP hard water inlet valve · Fan motor · Sub-Zero OEM</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf / Viking</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Built-in kitchen · Calibration included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Hard water descaling + drain pump + spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $420</div>
-          <div class="pricing-card__note">Igniter, element, Wolf/Viking calibration · OEM</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="lcf-faq">
-    <div class="container">
-      <h2>Questions La Cañada Flintridge Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in La Cañada Flintridge, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of La Cañada Flintridge 91011 — Foothill Blvd corridor, Verdugo Mountains hillside homes, Berkshire Ave, Palm Drive, Hampstead Road, and all streets in the city. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do hillside canyon properties in LCF create appliance service challenges?</summary><div class="faq-answer">Yes. Verdugo Mountains canyon lots often have long, complex dryer vent runs that accumulate lint faster than flat properties. We assess the full vent run and airflow on every LCF dryer call. A restricted vent is both an efficiency problem and a fire risk.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does LADWP hard water affect appliances in La Cañada Flintridge?</summary><div class="faq-answer">Yes. LCF uses LADWP at 230–310 mg/L hardness — unlike neighboring cities on the SGVMWD. Ice maker inlet valves and dishwasher spray arms scale faster here. We test for mineral deposits proactively on every relevant LCF call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero, Wolf, and Viking appliances in La Cañada Flintridge?</summary><div class="faq-answer">Yes. LCF's larger homes consistently have Sub-Zero, Wolf, Viking, and Thermador appliances. We carry OEM parts for these brands and are trained on their specific systems.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in La Cañada Flintridge?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm. If your appliance breaks on a weekend, you don't have to wait until Monday.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in La Cañada Flintridge?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most LCF repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve La Crescenta, Montrose, Glendale, and Pasadena?</summary><div class="faq-answer">Yes. Our LCF service area extends to La Crescenta, Montrose, Glendale, Burbank, Pasadena, and Altadena. All within our regular service route from the Pasadena branch.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="lcf-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-        <a href="/north-hollywood/" class="nearby-link">North Hollywood</a>
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-        <a href="/arcadia/" class="nearby-link">Arcadia</a>
-        <a href="/south-pasadena/" class="nearby-link">South Pasadena</a>
-        <a href="/silver-lake/" class="nearby-link">Silver Lake</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="lcf-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in La Cañada Flintridge?</h2>
-          <p>Canyon hillside · LADWP hard water · Sub-Zero · Wolf · Viking. 91011. $89 diagnostic waived with repair. 90-day warranty. Weekends available.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — La Cañada Flintridge, CA 91011</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --lcf-red: #C8102E; --lcf-black: #0a0a0a; --lcf-gray: #f5f5f5; --lcf-border: #e2e2e2; --lcf-text: #1a1a1a; --lcf-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .lcf-hero { background: var(--lcf-black); color: white; padding: 80px 0 60px; }
-  .lcf-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .lcf-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--lcf-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .lcf-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .lcf-hero__accent { color: var(--lcf-red); }
-  .lcf-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .lcf-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .lcf-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .lcf-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--lcf-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .lcf-bottom-cta .btn-secondary { color: var(--lcf-text); border-color: var(--lcf-border); }
-  .trust-bar { background: var(--lcf-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .lcf-intro { padding: 72px 0; background: white; }
-  .lcf-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .lcf-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--lcf-black); margin-bottom: 24px; }
-  .lcf-intro__text h3 { font-size: 17px; font-weight: 700; color: var(--lcf-black); margin: 24px 0 10px; }
-  .lcf-intro__text p { font-size: 16px; line-height: 1.7; color: var(--lcf-text); margin-bottom: 12px; }
-  .lcf-tip { display: flex; gap: 14px; background: #fff8e7; border: 1px solid #f0d070; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .lcf-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .lcf-tip__text { font-size: 14px; color: var(--lcf-text); line-height: 1.6; }
-  .cta-box { background: var(--lcf-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--lcf-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--lcf-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--lcf-muted); text-align: center; margin-bottom: 40px; }
-  .lcf-services { padding: 72px 0; background: var(--lcf-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--lcf-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--lcf-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--lcf-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--lcf-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--lcf-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--lcf-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--lcf-red); font-weight: 500; }
-  .lcf-neighborhoods { padding: 72px 0; background: white; }
-  .lcf-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--lcf-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--lcf-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--lcf-text); padding: 8px 12px; background: var(--lcf-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--lcf-red); color: var(--lcf-black); font-weight: 500; }
-  .lcf-recent { padding: 72px 0; background: var(--lcf-gray); }
-  .lcf-recent h2 { font-size: 30px; font-weight: 700; color: var(--lcf-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--lcf-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--lcf-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--lcf-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--lcf-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--lcf-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .lcf-why { padding: 72px 0; background: white; }
-  .lcf-why h2 { font-size: 30px; font-weight: 700; color: var(--lcf-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--lcf-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--lcf-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--lcf-muted); line-height: 1.6; }
-  .lcf-reviews { padding: 72px 0; background: var(--lcf-gray); }
-  .lcf-reviews h2 { font-size: 30px; font-weight: 700; color: var(--lcf-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--lcf-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--lcf-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--lcf-muted); font-weight: 500; }
-  .lcf-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--lcf-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--lcf-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--lcf-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--lcf-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--lcf-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--lcf-red); }
-  .pricing-card__note { font-size: 13px; color: var(--lcf-muted); }
-  .lcf-faq { padding: 72px 0; background: var(--lcf-gray); }
-  .lcf-faq h2 { font-size: 30px; font-weight: 700; color: var(--lcf-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--lcf-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--lcf-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--lcf-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--lcf-text); }
-  .lcf-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--lcf-border); }
-  .lcf-nearby h2 { font-size: 20px; font-weight: 600; color: var(--lcf-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--lcf-border); border-radius: 20px; font-size: 14px; color: var(--lcf-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--lcf-red); color: var(--lcf-red); }
-  .lcf-bottom-cta { padding: 72px 0; background: var(--lcf-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .lcf-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .lcf-hero__inner { grid-template-columns: 1fr; } .lcf-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .lcf-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="La Canada Flintridge repair today"
+    body="Same-day service from our Pasadena branch. Hillside canyon homes, LADWP hard water, Sub-Zero and Wolf — all of 91011. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>

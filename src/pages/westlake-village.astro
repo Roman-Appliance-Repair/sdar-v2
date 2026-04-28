@@ -1,685 +1,300 @@
 ---
-// src/pages/westlake-village.astro
-// SDAR — samedayappliance.repair
-// Westlake Village, CA · 91361 · 91362
-// Филиал: Thousand Oaks · (424) 208-0228
-// GSC: appliance repair westlake village — 7 показов, позиция 30
-// Конкуренты: A&Y Appliances (strong — LVMWD, lakeside, Sub-Zero, 39 repairs data),
-//             InstaFix (3835 E TO Blvd, WLV 91362, local physical address, 31yr),
-//             Krupo/Rodeo (Sub-Zero brand-specific)
-// Уникальный угол: lake community identity (Westlake Lake / Lake Sherwood) +
-//                  LVMWD hard water (200-250 mg/L) + luxury lakeside estates +
-//                  Conejo dry climate dust (shared с TO) + gated communities
-// Апрель 2026
+/**
+ * Westlake Village, CA — Variant A migration (T9 Batch 9, Group 3 finishing).
+ * Branch: Thousand Oaks · ZIPs: 91361, 91362 · Source: wiki/migration/content-dumps/westlake-village.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Thousand Oaks is service_area)
+ *   - Phone via branches.ts (`branchSlug='thousand-oaks'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Westlake Village",
-  state: "CA",
-  county: "Los Angeles / Ventura",
-  zips: ["91361", "91362"],
-  phone: "(424) 208-0228",
-  phoneRaw: "+14242080228",
-  email: "thousandoaks@samedayappliance.repair",
-  branch: "Thousand Oaks",
-  slug: "westlake-village",
-};
+const branchSlug = 'thousand-oaks';
+const cityName = 'Westlake Village';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Westlake Village CA — Same Day | Lake Sherwood · Westlake Lake · Gated Estates | (424) 208-0228`;
-const description = `Same-day appliance repair in Westlake Village, CA 91361 & 91362. Lakeside estates, gated communities, all neighborhoods. Sub-Zero, Wolf, Thermador, Miele, Samsung, LG. Licensed, OEM parts, 90-day warranty. Call (424) 208-0228.`;
-const canonical = `https://samedayappliance.repair/westlake-village/`;
+const title = 'Appliance Repair Westlake Village CA | Luxury Brand Specialists | Same Day';
+const description = 'Same-day appliance repair in Westlake Village, CA. Westlake Lake, Lake Sherwood, North Ranch. LVMWD hard-water expertise. Sub-Zero, Wolf, Thermador, Miele. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/westlake-village/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Westlake Village",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Thousand Oaks",
-    "addressRegion": "CA",
-    "postalCode": "91360",
-    "addressCountry": "US"
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🔥', name: 'Oven, Range & Pro Range', slug: 'oven' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer' },
+  { icon: '🧊', name: 'Freezer & Ice Maker Repair', slug: 'freezer' },
+  { icon: '🍷', name: 'Wine Cellar & Cooler Repair', slug: 'wine-cooler' },
+  { icon: '♨️', name: 'Cooktop & Range Hood', slug: 'cooktop' },
+];
+
+const neighborhoods = [
+  { name: 'Westlake Lake waterfront', zip: '91361' },
+  { name: 'Lake Sherwood estates', zip: '91361' },
+  { name: 'North Ranch', zip: '91362' },
+  { name: 'The Promenade area', zip: '91362' },
+  { name: 'Westlake Trails', zip: '91362' },
+  { name: 'Lakeview Canyon', zip: '91362' },
+  { name: 'Bridgeport', zip: '91361' },
+  { name: 'Three Springs', zip: '91362' },
+];
+
+const narrativeParagraphs = [
+  "Westlake Village is built around water — Westlake Lake at the center, Lake Sherwood to the south, the Conejo Creek corridor running through. The lakefront and lakeside estates lean heavily luxury: Sub-Zero 48-inch built-ins, Wolf dual-fuel ranges, Thermador pro suites, Miele G 7000-series dishwashers, EuroCave wine cellars. Our Thousand Oaks branch covers all of it — gated communities, panel-integrated appliances, and the OEM parts to match.",
+  "Two factors set Westlake Village apart from neighboring Thousand Oaks. The Las Virgenes Municipal Water District delivers harder water here (200–250 mg/L) than most of the Conejo Valley, which accelerates mineral scale on dishwasher inlet valves, refrigerator ice makers, and washer pump filters. And the same hillside dust load as Dos Vientos and North Ranch piles onto refrigerator condenser coils — particularly for properties facing open hillsides. We address both on every relevant call.",
+];
+
+const narrativeSubSections = [
+  {
+    title: "LVMWD water tip for Westlake Village",
+    paragraphs: [
+      "Las Virgenes Municipal Water District delivers 200–250 mg/L throughout Westlake Village. If your refrigerator's ice maker output has been declining gradually over months, LVMWD mineral scale on the inlet valve is almost certainly the cause — not a failing compressor or a faulty module. Replacing your refrigerator's in-door filter every 6 months (not 12) meaningfully slows accumulation. Same goes for your dishwasher's spray arm ports — they need a vinegar descale cycle every 3 to 4 months in this water district.",
+    ],
   },
-  "areaServed": [
-    { "@type": "City", "name": "Westlake Village", "sameAs": "https://en.wikipedia.org/wiki/Westlake_Village,_California" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    title: "Lakefront estates, gated communities, panel-integrated kitchens",
+    paragraphs: [
+      "We coordinate gate access with property managers ahead of arrival, every time. The kitchens we see along Westlake Lake, Lake Sherwood, and through North Ranch tend toward 48-inch Sub-Zero built-ins, Wolf 48-inch dual-fuel ranges, Thermador star-burner cooktops, Miele G 7000-series panel-integrated dishwashers, and EuroCave or Sub-Zero wine cellars. Panel-integrated appliances mean the cabinetry has to come off and go back on without a mark. We do that work routinely — and we know the OEM Sub-Zero, Wolf, Thermador, and Miele parts that don't always show up on independent appliance trucks.",
+    ],
+  },
+  {
+    title: "Conejo Valley hillside dust on the coils",
+    paragraphs: [
+      "Westlake Village shares the dry-summer hillside dust load with Thousand Oaks. Properties along Lakeview Canyon, the western edge of North Ranch, and the upper Lake Sherwood estates see the most accumulation. Our 6 to 9 month coil-inspection schedule applies here too — and we'll often combine the LVMWD inlet valve check with the coil cleaning into one visit, since both are due on roughly the same interval.",
+    ],
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'Sub-Zero Built-In',
+    neighborhood: 'Westlake Lake waterfront',
+    title: 'Sub-Zero — ice maker producing almost nothing for three months',
+    body: "Lakefront home on Westlake Lake — Sub-Zero 48-inch built-in with both LVMWD mineral scale and Conejo dust load on the condenser coils. Two issues in one call: inlet valve almost completely blocked by mineral deposits, and coils overloaded with fine hillside particulate making the compressor work harder. Replaced the OEM Sub-Zero inlet valve, thoroughly cleaned the coil assembly, confirmed stable temperatures. Full ice production the next morning. Placed on a combined 6-month schedule: inlet valve filter check and coil inspection.",
+    part: 'OEM Sub-Zero inlet valve + coil clean',
+    time: '2.5 hours',
+    result: '✓ Same day · OEM Sub-Zero · 6-month combined plan',
+  },
+  {
+    badge: 'Thermador Pro Range',
+    neighborhood: 'North Ranch',
+    title: "Thermador — oven igniter glowing but won't light, second time this year",
+    body: "North Ranch estate — Thermador 48-inch pro range. Oven igniter drawing weak current, visually glowing but failing to open the gas valve — classic igniter failure pattern. Second occurrence within 12 months on this unit. Replaced with OEM Thermador igniter, tested both oven cavities at 325°F, 375°F, and 450°F — accurate within 5 degrees. Given the repeat failure, recommended checking the igniter at 12-month intervals as a maintenance item on this heavily-used kitchen range.",
+    part: 'OEM Thermador oven igniter',
+    time: '1.5 hours',
+    result: '✓ Same day · Both cavities verified · 12-month plan',
+  },
+  {
+    badge: 'Miele Dishwasher',
+    neighborhood: 'Lake Sherwood',
+    title: 'Miele G 7000 — F70 flood error, machine completely locked out',
+    body: "Lake Sherwood estate — Miele G 7000 panel-integrated with F70 base pan flood error. Found the water inlet connection had developed a slow weep from vibration over time — water had accumulated in the base pan triggering the flood protection. Cleared the base pan, reseated and properly sealed the inlet connection, ran the Miele anti-flood reset procedure, tested three full cycles. Panel cabinetry pulled and reinstalled without a mark. All clear on the Miele diagnostics.",
+    part: 'Inlet reseat + Miele F70 reset',
+    time: '2 hours',
+    result: '✓ Same day · F70 cleared · Panel intact',
+  },
+  {
+    badge: 'LG Washer',
+    neighborhood: 'Westlake Trails',
+    title: 'LG front-loader — LE motor error and pump filter blocked by LVMWD scale',
+    body: "LG front-loader — LE motor error (hall sensor fault) presenting alongside a secondary OE drain issue. Ran SmartDiagnosis through the app first: confirmed hall sensor failure as primary, pump filter blockage as secondary. Replaced the hall sensor with OEM LG part, cleared the pump filter packed with LVMWD mineral scale and lint. Two problems, one trip. Tested three cycles — no LE, no OE. Homeowner wasn't aware LVMWD water accelerates pump filter buildup; explained the quarterly cleaning routine.",
+    part: 'OEM LG hall sensor + pump filter clear',
+    time: '2 hours',
+    result: '✓ Same day · OEM LG · Two issues, one trip',
+  },
+];
+
+const reviews = [
+  {
+    text: "Sub-Zero on our lakefront home had two problems — LVMWD scale on the inlet valve and Conejo dust on the coils. Same Day found both, fixed both in one visit, put us on a 6-month plan appropriate for a lakefront hillside property. This is exactly the local expertise Westlake Village homes need.",
+    author: '— Robert K., Westlake Lake',
+  },
+  {
+    text: "Thermador range oven igniter failing again — second time in a year. Tech came same day, replaced with OEM Thermador part, tested both cavities accurately, explained the maintenance interval for a heavily-used range. We appreciate a tech who thinks about prevention, not just the immediate fix.",
+    author: '— Jennifer N., North Ranch',
+  },
+  {
+    text: "Miele dishwasher F70 error in our Lake Sherwood home. Tech cleared it, found the actual inlet connection issue, reinstalled the panel cabinetry perfectly, ran through the full Miele diagnostics before leaving. Professional, thorough, and careful with a kitchen we care about. Would absolutely use again.",
+    author: '— Diana W., Lake Sherwood',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · LVMWD + dust check included' },
+  { label: 'Standard Repair', price: '$150–$500', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Luxury Brand Repair', price: '$300–$800+', note: 'Sub-Zero, Wolf, Gaggenau, Thermador, Miele · OEM parts' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Westlake Village?',
+    answer: 'Yes — Westlake Village is on our daily Thousand Oaks branch route. We cover both ZIPs (91361 and 91362) and serve Westlake Lake waterfront, Lake Sherwood, North Ranch, The Promenade, Westlake Trails, and Lakeview Canyon. Call before noon for same-day service in most cases.',
+  },
+  {
+    question: 'Does LVMWD hard water actually affect appliances in Westlake Village?',
+    answer: 'Yes — significantly. Las Virgenes Municipal Water District delivers 200 to 250 mg/L throughout Westlake Village, which is harder than most of the Conejo Valley. The practical impact: dishwasher spray arm ports clog with scale, refrigerator inlet valves accumulate mineral deposits and reduce ice production, and washer pump filters catch mineral buildup along with lint. We address all of this on relevant service calls and recommend a quarterly maintenance routine appropriate for this water district.',
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, Thermador, and Miele in Westlake Village?',
+    answer: 'Yes. Westlake Lake, Lake Sherwood, and North Ranch are heavy on Sub-Zero 48-inch built-ins, Wolf dual-fuel ranges, Thermador star-burner cooktops, Miele G 7000-series panel-integrated dishwashers, EuroCave wine cellars, and Gaggenau cooktops. We carry OEM parts for these brands on our Thousand Oaks trucks.',
+  },
+  {
+    question: 'Do you service gated communities in Westlake Village?',
+    answer: 'Yes — Lake Sherwood, North Ranch, and the Westlake Lake gated estate sections are part of our routine work. We coordinate gate access with property managers or estate managers ahead of arrival. We also handle panel-integrated cabinetry routinely — the panel comes off and goes back on without a mark.',
+  },
+  {
+    question: 'Do you work weekends in Westlake Village?',
+    answer: 'Yes. We operate seven days a week, 7am to 9pm. Saturday and Sunday availability is the same as weekdays — same diagnostic fee, same OEM parts, same 90-day warranty.',
+  },
+  {
+    question: 'What is your diagnostic fee in Westlake Village?',
+    answer: 'Our diagnostic fee is $89. It covers the trip, complete inspection, and a written estimate with itemized parts and labor. If you approve the repair, the $89 is credited toward your invoice. Standard repair range $150–$500 depending on parts.',
+  },
+  {
+    question: 'What other Conejo Valley areas do you cover?',
+    answer: 'We work the same Thousand Oaks route through Thousand Oaks, Agoura Hills, Calabasas, Oak Park, Newbury Park, and Moorpark. Same-day availability across all of these.',
+  },
+];
+
+const nearby = [
+  { slug: 'thousand-oaks', name: 'Thousand Oaks' },
+  { slug: 'agoura-hills', name: 'Agoura Hills' },
+  { slug: 'calabasas', name: 'Calabasas' },
+  { slug: 'malibu', name: 'Malibu' },
+  { slug: 'oak-park', name: 'Oak Park' },
+  { slug: 'newbury-park', name: 'Newbury Park' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Westlake Village', sameAs: 'https://en.wikipedia.org/wiki/Westlake_Village,_California' },
+    { '@type': 'Place', name: 'Westlake Lake' },
+    { '@type': 'Place', name: 'Lake Sherwood' },
+    { '@type': 'Place', name: 'North Ranch' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Westlake Village, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Thousand Oaks branch covers all of Westlake Village — lakeside communities around Westlake Lake, Lake Sherwood estates, North Ranch, the Promenade area, and all ZIP codes 91361 and 91362. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Does the Las Virgenes water in Westlake Village affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Westlake Village is served by Las Virgenes Municipal Water District at approximately 200–250 mg/L hardness. Ice maker inlet valves and dishwasher spray arms accumulate mineral deposits faster than in soft-water cities. We test for this proactively on every relevant Westlake Village call involving ice makers and dishwashers." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, Thermador, and Miele appliances in Westlake Village?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Sub-Zero, Wolf, Thermador, Miele, and Viking are standard throughout Westlake Village's lakeside and estate homes. Our technicians carry OEM parts for these brands on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "Can you service appliances in Westlake Village's gated communities?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Westlake Village has several gated communities with guard gate access. We coordinate entry in advance and work with property managers and estate staff as needed." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Westlake Village?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Westlake Village?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Westlake Village repairs run $150–$500 depending on brand and appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Thousand Oaks, Calabasas, and Agoura Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Westlake Village service extends to Thousand Oaks, Calabasas, Agoura Hills, Oak Park, Newbury Park, and all of the Conejo Valley." }
-    }
-  ]
+  ],
+  priceRange: '$$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="wv-hero">
-    <div class="wv-hero__inner container">
-      <div class="wv-hero__content">
-        <div class="wv-hero__eyebrow">Westlake Village, CA · 91361 & 91362 · Westlake Lake · Lake Sherwood · North Ranch</div>
-        <h1 class="wv-hero__h1">
-          Appliance Repair<br>
-          <span class="wv-hero__accent">Westlake Village, CA</span>
-        </h1>
-        <p class="wv-hero__sub">
-          Lakeside luxury living at the edge of the Conejo Valley — Sub-Zero, Wolf,
-          Thermador are the standard here, and they deserve service that matches.
-          Same-day, OEM parts, 90-day warranty. Gated communities welcome.
-          Local Thousand Oaks branch.
-        </p>
-        <div class="wv-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="wv-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="wv-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-westlake-village-ca.webp"
-          alt="Appliance repair in Westlake Village CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Westlake Village, CA · 91361 · 91362 · Westlake Lake · Lake Sherwood · North Ranch"
+    headlineMain="Appliance repair in"
+    headlineAccent="Westlake Village, CA"
+    subheadline="Same-day service across all of Westlake Village. Lakefront luxury, LVMWD hard-water expertise, gated community access. Sub-Zero, Wolf, Thermador, Miele. OEM parts, 90-day warranty, $89 diagnostic waived with repair."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Gated Community Ready</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Lakeside & LVMWD"
+    headline="Lakefront estates, hard water,"
+    headlineAccent="and Conejo Valley dust"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="wv-intro">
-    <div class="container wv-intro__inner">
-      <div class="wv-intro__text">
-        <h2>Appliance Repair in Westlake Village — What This Community Calls For</h2>
-        <p>
-          Westlake Village is built around its lakes — Westlake Lake and Lake Sherwood
-          anchor communities where the homes are serious and the kitchens reflect that.
-          Sub-Zero refrigeration, Wolf ranges, Thermador wall ovens, Miele dishwashers —
-          these are standard in the lakeside estates, the gated hillside communities,
-          and the North Ranch homes. Our technicians carry OEM parts for all of them
-          on every service vehicle.
-        </p>
-        <p>
-          Water quality is a specific factor in Westlake Village. Served by Las Virgenes
-          Municipal Water District at approximately 200–250 mg/L hardness, the
-          mineral content here is meaningful — ice maker inlet valves and dishwasher
-          spray arms accumulate scale faster than in soft-water cities. We test for
-          this proactively on every relevant call. A&Y notes this; we check it on
-          every job rather than only when it's obvious.
-        </p>
-        <p>
-          The Conejo Valley climate adds a second factor shared with neighbouring
-          Thousand Oaks: hot, dry summers with hillside particulate load on
-          condenser coils. Refrigerators in Westlake Village — particularly in
-          the hillside communities — benefit from coil cleaning every 6–9 months
-          rather than the 12-month recommendation written for temperate climates.
-          We include this inspection on every Westlake Village refrigerator call.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong>. Weekends available.
-        </p>
-        <div class="wv-tip">
-          <div class="wv-tip__icon">💧</div>
-          <div class="wv-tip__text">
-            <strong>LVMWD water tip for Westlake Village:</strong> Las Virgenes
-            Municipal Water District delivers 200–250 mg/L throughout Westlake Village.
-            If your ice maker output has been declining gradually over months, LVMWD
-            mineral scale on the inlet valve is almost certainly the cause — not a
-            failing compressor or a faulty module. Replacing your refrigerator's
-            in-door filter every 6 months (not 12) meaningfully slows the
-            accumulation rate.
-          </div>
-        </div>
-      </div>
-      <div class="wv-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Westlake Village Service</div>
-          <div class="cta-box__sub">91361 · 91362 · Local TO branch · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Westlake Village"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="wv-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Westlake Village</h2>
-      <p class="section-sub">Luxury & all brands · LVMWD hard water aware · 91361 & 91362</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Westlake Village neighborhoods"
+    headlineAccent="we service"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/westlake-village/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">LVMWD hard water ice maker · Sub-Zero built-in · Not cooling · Coil inspection</div>
-          <div class="service-card__brands">Sub-Zero · Wolf · Samsung · LG · GE · Thermador</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Westlake Village"
+    jobs={jobs}
+  />
 
-        <a href="/westlake-village/oven-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Pro Range</div>
-          <div class="service-card__issues">Wolf dual-fuel · Thermador star burner · Gas igniter · Temperature off</div>
-          <div class="service-card__brands">Wolf · Thermador · Viking · GE · Samsung · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/westlake-village/dishwasher-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Miele · LVMWD scale · Panel-ready · Not draining · Error codes</div>
-          <div class="service-card__brands">Miele · Bosch · Thermador · KitchenAid · Samsung · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Westlake Village"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/westlake-village/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Error codes</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Westlake Village"
+    cards={pricingCards}
+  />
 
-        <a href="/westlake-village/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Westlake Village"
+    faqs={faqs}
+  />
 
-        <a href="/westlake-village/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">LVMWD inlet valve scale · Not freezing · Ice stopped · Sub-Zero</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · True · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/westlake-village/wine-cellar-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cellar & Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · WhisperKOOL · Sub-Zero wine · EuroCave</div>
-          <div class="service-card__brands">Sub-Zero · EuroCave · True · WhisperKOOL · Liebherr</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/westlake-village/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Wolf star burner · Thermador igniter · Induction · Hood motor</div>
-          <div class="service-card__brands">Wolf · Thermador · Gaggenau · Miele · Viking · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="wv-neighborhoods">
-    <div class="container">
-      <h2>All of Westlake Village — 91361 & 91362</h2>
-      <p class="section-sub">Lakeside communities to hillside estates — every neighborhood</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">WLV Communities</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Westlake Lake waterfront</div>
-            <div class="nh-item featured">Lake Sherwood estates</div>
-            <div class="nh-item featured">North Ranch</div>
-            <div class="nh-item">The Promenade area</div>
-            <div class="nh-item">Westlake Trails</div>
-            <div class="nh-item">Lakeview Canyon</div>
-            <div class="nh-item">Bridgeport</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Roads</div>
-          <div class="nh-list">
-            <div class="nh-item">Lakeview Canyon Rd</div>
-            <div class="nh-item">Thousand Oaks Blvd</div>
-            <div class="nh-item">Westlake Blvd</div>
-            <div class="nh-item">Lake Sherwood Dr</div>
-            <div class="nh-item">Lindero Canyon Rd</div>
-            <div class="nh-item">Via Colinas</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Thousand Oaks (91360–62)</div>
-            <div class="nh-item">Calabasas (91302)</div>
-            <div class="nh-item">Agoura Hills (91301)</div>
-            <div class="nh-item">Oak Park (91377)</div>
-            <div class="nh-item">Newbury Park (91320)</div>
-            <div class="nh-item">Moorpark (93021)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="wv-recent">
-    <div class="container">
-      <h2>Recent Jobs in Westlake Village</h2>
-      <p class="section-sub">Real calls from 91361 and 91362 — lakeside estates, luxury brands, LVMWD hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Built-In</span>
-            <span class="recent-location">Westlake Lake waterfront, 91361</span>
-          </div>
-          <div class="recent-card__title">"Ice maker producing almost nothing for three months"</div>
-          <div class="recent-card__desc">
-            Lakefront home on Westlake Lake — Sub-Zero 48-inch built-in with both
-            LVMWD mineral scale and Conejo Valley dust load on the condenser coils.
-            Two issues in one call: inlet valve almost completely blocked by mineral
-            deposits, and coils overloaded with fine hillside particulate making
-            the compressor work harder. Replaced the OEM Sub-Zero inlet valve,
-            thoroughly cleaned the coil assembly, confirmed stable temperatures.
-            Full ice production the next morning. Placed on a combined 6-month
-            schedule: inlet valve filter check and coil inspection.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Sub-Zero · Inlet valve + coils · 6-month plan</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Thermador Pro Range</span>
-            <span class="recent-location">North Ranch, 91362</span>
-          </div>
-          <div class="recent-card__title">"Oven igniter glowing but won't light — second time this year"</div>
-          <div class="recent-card__desc">
-            North Ranch estate — Thermador 48-inch pro range. Oven igniter drawing
-            weak current, visually glowing but failing to open the gas valve —
-            classic igniter failure pattern. Second occurrence within 12 months on
-            this unit. Replaced with OEM Thermador igniter, tested both oven
-            cavities at 325°F, 375°F, and 450°F — accurate within 5 degrees.
-            Given the repeat failure, recommended checking the igniter at 12-month
-            intervals as a maintenance item on this heavily-used kitchen range.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Thermador · Both cavities confirmed · 12-month plan</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Miele Dishwasher</span>
-            <span class="recent-location">Lake Sherwood, 91361</span>
-          </div>
-          <div class="recent-card__title">"F70 flood error — machine completely locked out"</div>
-          <div class="recent-card__desc">
-            Lake Sherwood estate — Miele G 7000 panel-integrated with F70 base
-            pan flood error. Found the water inlet connection had developed a slow
-            weep from vibration over time — water had accumulated in the base pan
-            triggering the flood protection. Cleared the base pan, reseated and
-            properly sealed the inlet connection, ran the Miele anti-flood reset
-            procedure, tested three full cycles. Panel cabinetry pulled and
-            reinstalled without a mark. All clear on the Miele diagnostics.
-          </div>
-          <div class="recent-card__result">✓ Same day · Miele F70 resolved · Panel intact · Diagnostics clear</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Washer</span>
-            <span class="recent-location">Westlake Trails, 91362</span>
-          </div>
-          <div class="recent-card__title">"LE motor error — LVMWD scale blocking the pump filter too"</div>
-          <div class="recent-card__desc">
-            LG front-loader — LE motor error (hall sensor fault) presenting alongside
-            a secondary OE drain issue. Ran SmartDiagnosis through the app first:
-            confirmed hall sensor failure as primary, pump filter blockage as
-            secondary. Replaced the hall sensor with OEM LG part, cleared the
-            pump filter packed with LVMWD mineral scale and lint. Two problems,
-            one trip. Tested three cycles — no LE, no OE. Homeowner wasn't
-            aware LVMWD water accelerates pump filter buildup; explained the
-            quarterly cleaning routine.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM LG hall sensor · Pump filter cleared · LVMWD explained</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="wv-why">
-    <div class="container">
-      <h2>Why Westlake Village Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">LVMWD Hard Water Aware</div>
-          <div class="why-text">Las Virgenes Municipal Water District delivers 200–250 mg/L throughout Westlake Village. Ice maker inlet valves and dishwasher spray arms scale faster here than in soft-water cities. We test for mineral deposits proactively on every relevant call — not just when a customer mentions it.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🌡️</div>
-          <div class="why-title">Conejo Valley Climate Aware</div>
-          <div class="why-text">The same hot, dry hillside particulate that affects Thousand Oaks condenser coils applies to Westlake Village's hillside communities. We include a coil inspection on every Westlake Village refrigerator call — especially in the elevated lake communities with active landscaping.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🔐</div>
-          <div class="why-title">Gated Community Ready</div>
-          <div class="why-text">Westlake Village has several gated communities and lakefront estates that require coordinated access. We handle the logistics professionally — gate coordination, estate staff, property managers — and arrive on time.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts for Sub-Zero, Wolf, Thermador, Miele — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. Local Thousand Oaks branch, California licensed, BBB A+.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="wv-reviews">
-    <div class="container">
-      <h2>What Westlake Village Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero on our lakefront home had two problems — LVMWD scale on the inlet valve and Conejo dust on the coils. Same Day found both, fixed both in one visit, put us on a 6-month plan appropriate for a lakefront hillside property. This is exactly the local expertise Westlake Village homes need."</div>
-          <div class="review-author">— Robert K., Westlake Lake, Westlake Village</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Thermador range oven igniter failing again — second time in a year. Tech came same day, replaced with OEM Thermador part, tested both cavities accurately, explained the maintenance interval for a heavily-used range. We appreciate a tech who thinks about prevention, not just the immediate fix."</div>
-          <div class="review-author">— Jennifer N., North Ranch, Westlake Village</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Miele dishwasher F70 error in our Lake Sherwood home. Tech cleared it, found the actual inlet connection issue, reinstalled the panel cabinetry perfectly, ran through the full Miele diagnostics before leaving. Professional, thorough, and careful with a kitchen we care about. Would absolutely use again."</div>
-          <div class="review-author">— Diana W., Lake Sherwood, Westlake Village</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="wv-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Westlake Village</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf / Gaggenau</div>
-          <div class="pricing-card__range">$300 – $800+</div>
-          <div class="pricing-card__note">OEM parts · LVMWD coil + inlet check · Lakeside estates</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Thermador / Miele / Viking</div>
-          <div class="pricing-card__range">$250 – $600+</div>
-          <div class="pricing-card__note">OEM parts · Panel-ready · Pro-style ranges · North Ranch</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator (standard)</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">LVMWD inlet valve · Conejo dust coil · Fan motor</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Hall sensor · Drain pump · Thermal fuse · Vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher / Oven</div>
-          <div class="pricing-card__range">$150 – $450</div>
-          <div class="pricing-card__note">Miele error codes · Gas igniter · Scale · Calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="wv-faq">
-    <div class="container">
-      <h2>Questions Westlake Village Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Westlake Village, CA?</summary><div class="faq-answer">Yes. Our Thousand Oaks branch covers all of Westlake Village — Westlake Lake, Lake Sherwood, North Ranch, Westlake Trails, and all of 91361 and 91362. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does the Las Virgenes water in Westlake Village affect appliances?</summary><div class="faq-answer">Yes. LVMWD delivers 200–250 mg/L hardness throughout Westlake Village. Ice maker inlet valves and dishwasher spray arms accumulate mineral deposits faster here. We test for this proactively on every relevant call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero, Wolf, Thermador, and Miele appliances in Westlake Village?</summary><div class="faq-answer">Yes. Sub-Zero, Wolf, Thermador, Miele, and Viking are standard throughout Westlake Village's lake and estate homes. We carry OEM parts for these brands on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">Can you service appliances in Westlake Village's gated communities?</summary><div class="faq-answer">Yes. We coordinate gate access in advance for Westlake Village's gated communities and work with estate managers and property managers as needed.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Westlake Village?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Westlake Village?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Westlake Village repairs run $150–$500.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Thousand Oaks, Calabasas, and Agoura Hills?</summary><div class="faq-answer">Yes. Our Westlake Village service extends to Thousand Oaks, Calabasas, Agoura Hills, Oak Park, Newbury Park, and all of the Conejo Valley.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="wv-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/thousand-oaks/" class="nearby-link">Thousand Oaks</a>
-        <a href="/calabasas/" class="nearby-link">Calabasas</a>
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-        <a href="/bel-air/" class="nearby-link">Bel Air</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/pacific-palisades/" class="nearby-link">Pacific Palisades</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="wv-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Westlake Village?</h2>
-          <p>Westlake Lake · Lake Sherwood · North Ranch · LVMWD hard water aware · Sub-Zero · Wolf · Miele. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Westlake Village, CA 91361 · 91362</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --wv-red: #C8102E; --wv-black: #0a0a0a; --wv-gray: #f5f5f5; --wv-border: #e2e2e2; --wv-text: #1a1a1a; --wv-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .wv-hero { background: var(--wv-black); color: white; padding: 80px 0 60px; }
-  .wv-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .wv-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--wv-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .wv-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .wv-hero__accent { color: var(--wv-red); }
-  .wv-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .wv-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .wv-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .wv-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--wv-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .wv-bottom-cta .btn-secondary { color: var(--wv-text); border-color: var(--wv-border); }
-  .trust-bar { background: var(--wv-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .wv-intro { padding: 72px 0; background: white; }
-  .wv-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .wv-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--wv-black); margin-bottom: 20px; }
-  .wv-intro__text p { font-size: 16px; line-height: 1.7; color: var(--wv-text); margin-bottom: 16px; }
-  .wv-tip { display: flex; gap: 14px; background: #eef6ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .wv-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .wv-tip__text { font-size: 14px; color: var(--wv-text); line-height: 1.6; }
-  .cta-box { background: var(--wv-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--wv-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--wv-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--wv-muted); text-align: center; margin-bottom: 40px; }
-  .wv-services { padding: 72px 0; background: var(--wv-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--wv-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--wv-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--wv-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--wv-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--wv-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--wv-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--wv-red); font-weight: 500; }
-  .wv-neighborhoods { padding: 72px 0; background: white; }
-  .wv-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--wv-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--wv-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--wv-text); padding: 8px 12px; background: var(--wv-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--wv-red); color: var(--wv-black); font-weight: 500; }
-  .wv-recent { padding: 72px 0; background: var(--wv-gray); }
-  .wv-recent h2 { font-size: 30px; font-weight: 700; color: var(--wv-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--wv-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--wv-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--wv-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--wv-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--wv-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .wv-why { padding: 72px 0; background: white; }
-  .wv-why h2 { font-size: 30px; font-weight: 700; color: var(--wv-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--wv-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--wv-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--wv-muted); line-height: 1.6; }
-  .wv-reviews { padding: 72px 0; background: var(--wv-gray); }
-  .wv-reviews h2 { font-size: 30px; font-weight: 700; color: var(--wv-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--wv-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--wv-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--wv-muted); font-weight: 500; }
-  .wv-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--wv-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--wv-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--wv-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--wv-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--wv-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--wv-red); }
-  .pricing-card__note { font-size: 13px; color: var(--wv-muted); }
-  .wv-faq { padding: 72px 0; background: var(--wv-gray); }
-  .wv-faq h2 { font-size: 30px; font-weight: 700; color: var(--wv-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--wv-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--wv-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--wv-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--wv-text); }
-  .wv-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--wv-border); }
-  .wv-nearby h2 { font-size: 20px; font-weight: 600; color: var(--wv-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--wv-border); border-radius: 20px; font-size: 14px; color: var(--wv-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--wv-red); color: var(--wv-red); }
-  .wv-bottom-cta { padding: 72px 0; background: var(--wv-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .wv-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .wv-hero__inner { grid-template-columns: 1fr; } .wv-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .wv-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Appliance broken in"
+    headlineAccent="Westlake Village?"
+    body="Same-day service across Westlake Lake, Lake Sherwood, North Ranch, and all of the Conejo Valley. LVMWD scale and luxury brand expertise. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>

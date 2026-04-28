@@ -1,653 +1,304 @@
 ---
-// src/pages/costa-mesa.astro
-// SDAR — samedayappliance.repair
-// Costa Mesa, CA · 92626 · 92627 · 92628
-// Филиал: Irvine · (213) 401-9019
-// GSC: нет данных — новый город
-// Конкуренты: Advanced Appliance Repair Works (949-866-5707, generic),
-//             aplceappliance.com (966 Cheyenne St CM, physical addr),
-//             Ambulance Appliance (Irvine clone), DryerFix (mentions Segerstrom/SCP)
-// Уникальный угол: Eastside CM (Newport Beach adjacent, luxury), Mesa Verde (family suburban),
-//                  17th St/The Triangle creative corridor, moderate coastal proximity,
-//                  South Coast Plaza area calls
-// Апрель 2026
+/**
+ * Costa Mesa, CA — Variant A migration (T9 Batch 8, Group 3 OC).
+ * Branch: Irvine · ZIPs: 92626, 92627, 92628 · Source: wiki/migration/content-dumps/costa-mesa.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Irvine is service_area)
+ *   - Phone via branches.ts (`branchSlug='irvine'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Costa Mesa",
-  state: "CA",
-  county: "Orange",
-  zips: ["92626", "92627", "92628"],
-  phone: "(213) 401-9019",
-  phoneRaw: "+12134019019",
-  email: "irvine@samedayappliance.repair",
-  branch: "Irvine",
-  slug: "costa-mesa",
-};
+const branchSlug = 'irvine';
+const cityName = 'Costa Mesa';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Costa Mesa CA — Same Day | Eastside · Mesa Verde · 17th St | (213) 401-9019`;
-const description = `Same-day appliance repair in Costa Mesa, CA. Eastside Costa Mesa, Mesa Verde, 17th Street corridor, South Coast Plaza area. All ZIP codes 92626, 92627, 92628. Sub-Zero, Wolf, Samsung, LG. Licensed, OEM parts, 90-day warranty. Call (213) 401-9019.`;
-const canonical = `https://samedayappliance.repair/costa-mesa/`;
+const title = 'Appliance Repair Costa Mesa CA | Same Day Service | All Brands';
+const description = 'Same-day appliance repair in Costa Mesa, CA. Eastside, Mesa Verde, 17th Street, South Coast Plaza. All brands including Sub-Zero, Wolf, Miele. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/costa-mesa/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Costa Mesa",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Irvine",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🥶', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+];
+
+const neighborhoods = [
+  { name: 'Eastside Costa Mesa', zip: '92627' },
+  { name: 'Mesa Verde', zip: '92626' },
+  { name: '17th Street Corridor', zip: '92627' },
+  { name: 'The Triangle', zip: '92627' },
+  { name: 'Westside Costa Mesa', zip: '92627' },
+  { name: 'South Coast Plaza area', zip: '92626' },
+  { name: 'Back Bay area', zip: '92627' },
+  { name: 'Mesa North', zip: '92626' },
+  { name: 'Halecrest', zip: '92626' },
+  { name: 'College Park', zip: '92626' },
+  { name: 'Wimbledon Village', zip: '92626' },
+  { name: 'Newport Heights border', zip: '92627' },
+];
+
+const narrativeParagraphs = [
+  "Costa Mesa is two or three different cities sharing a zip — Eastside borders Newport Beach with Sub-Zero kitchens and updated remodels, Mesa Verde is established suburban with mature trees and long-time residents, and the 17th Street / Triangle corridor is denser, younger, with apartments, townhomes, and an active arts scene. Our technicians work in all of these — a Sub-Zero call before a dinner party in Eastside one morning, a Whirlpool dryer in Mesa Verde Sunday afternoon, an LG OE-error apartment near 17th Street the next day.",
+  "Coastal proximity in Costa Mesa is moderate, not aggressive. Eastside and Westside neighborhoods that back onto the Back Bay get more salt air than the inland blocks near South Coast Plaza, but it's nothing like Newport Beach or Laguna proper. We still check condenser coils on every refrigerator call in the 92627 zip — older units that have never had a coil service tend to show buildup that affects compressor cycling.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'Eastside — Newport Beach adjacent',
+    paragraphs: [
+      "Eastside Costa Mesa borders Newport Beach and the Back Bay. Larger homes, updated kitchens, Sub-Zero built-ins, Wolf ranges, and Miele dishwashers are common. Service profile here is closer to Newport Beach than to the rest of Costa Mesa — luxury OEM parts on the truck, panel-ready dishwasher experience, salt air coil awareness for properties near the Back Bay.",
+    ],
   },
-  "areaServed": [
-    { "@type": "City", "name": "Costa Mesa", "sameAs": "https://en.wikipedia.org/wiki/Costa_Mesa,_California" },
-    { "@type": "Neighborhood", "name": "Eastside Costa Mesa" },
-    { "@type": "Neighborhood", "name": "Mesa Verde" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    title: 'Mesa Verde — established suburban',
+    paragraphs: [
+      "Mesa Verde is the family suburban core — single-family homes, mature trees, multi-decade residents. Brands skew GE, Whirlpool, LG, Samsung. The calls here are the bread-and-butter of residential appliance repair: dryer thermal fuses, dishwasher E24 drain errors, refrigerator ice maker valves. We know these failure patterns cold.",
+    ],
+  },
+  {
+    title: '17th Street · The Triangle · Westside — creative corridor',
+    paragraphs: [
+      "Denser, younger, mix of apartments, townhomes, and small single-family. Active arts community around The Triangle and 17th Street. Standard and mid-range brands — LG, Samsung, Whirlpool — and stackable washer-dryer units in the apartment buildings. Drain hose routing matters here; we re-route hoses regularly because the original installations rarely accounted for cabinet edges.",
+    ],
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'Sub-Zero Refrigerator',
+    neighborhood: 'Eastside, 92627',
+    title: 'Sub-Zero 36" built-in — fresh food section warm morning of a dinner party',
+    body: "Eastside home backing onto the Back Bay — Sub-Zero 36-inch built-in column. Evaporator fan motor on the fresh food section had failed overnight, leaving no cold airflow. Called before 10am; technician arrived by 1pm. Replaced the OEM Sub-Zero fan motor, verified temperatures in both sections, confirmed stable at 37°F fresh food and 0°F freezer before leaving. Host had three hours before guests arrived — plenty of time.",
+    part: 'Sub-Zero OEM evaporator fan motor',
+    time: '2 hours',
+    result: '✓ Same day · OEM Sub-Zero motor · Temps stable · Dinner party saved',
+  },
+  {
+    badge: 'LG Front-Load Washer',
+    neighborhood: '17th Street, 92627',
+    title: 'LG washer — OE error, standing water, can\'t finish a cycle',
+    body: 'Second-floor apartment unit on 17th — LG front-loader OE drain error from a blocked pump filter combined with a partial kink in the drain hose behind the unit where it ran up and over a cabinet edge. Cleared the pump filter, re-routed the drain hose with proper slack and loop, ran three full drain cycles. No further OE codes. Explained why drain hose routing matters for stackable and apartment installs — a detail that gets missed in a lot of initial installations.',
+    part: 'Drain hose re-route + pump filter clean',
+    time: '1.5 hours',
+    result: '✓ Same day · OE resolved · Drain hose re-routed · Cause explained',
+  },
+  {
+    badge: 'Whirlpool Dryer',
+    neighborhood: 'Mesa Verde, 92626',
+    title: 'Whirlpool electric dryer — no heat, completely cold air',
+    body: 'Mesa Verde single-family — Whirlpool electric dryer with thermal fuse blown from a clogged vent run terminating at the side of the house. The original plastic flap vent cap had warped and partially collapsed inward over the years, restricting airflow to about 25%. Replaced the thermal fuse, swapped the collapsed plastic cap for a proper metal backdraft damper, confirmed strong airflow at the exterior. Single-cycle drying confirmed on the first test load. Family had been double-cycling for months before the fuse finally failed.',
+    part: 'Whirlpool OEM thermal fuse + metal vent cap',
+    time: '2 hours',
+    result: '✓ Same day · Thermal fuse · Metal vent cap · Single cycle confirmed',
+  },
+  {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Mesa Verde, 92626',
+    title: 'Bosch 500 series — E24 drain error, started suddenly mid-cycle',
+    body: 'Bosch 500 series in a Mesa Verde kitchen — E24 drain error with standing water. Combined issue: drain pump partially blocked by food debris that had bypassed the filter, and the filter itself overdue for cleaning. Cleared the drain pump housing, deep-cleaned the filter assembly, ran the Bosch diagnostic cycle, confirmed full drain on three consecutive cycles. Also checked the drain hose connection to the garbage disposal — the knockout plug had never been removed at installation, partially restricting drain flow. Removed it. First full cycle post-repair was completely clean.',
+    part: 'Drain pump clean + disposal knockout removal',
+    time: '1.5 hours',
+    result: '✓ Same day · E24 resolved · Disposal knockout removed · Full drain confirmed',
+  },
+];
+
+const reviews = [
+  {
+    text: "Sub-Zero stopped cooling the morning before I was hosting. Called Same Day, technician arrived by 1pm, replaced the fan motor with OEM Sub-Zero parts, confirmed temps before leaving. Had three hours to spare before guests arrived. This is exactly the service you need in a time-sensitive situation.",
+    author: '— Rebecca T., Eastside Costa Mesa',
+  },
+  {
+    text: "LG washer with OE error in my 17th Street apartment. Tech came same day, fixed the drain, but also re-routed the hose and explained why it keeps happening in apartment installs. No other company I've used has ever explained the cause — just fixed the symptom. Really knowledgeable.",
+    author: '— Marcus L., 17th Street, Costa Mesa',
+  },
+  {
+    text: "Bosch dishwasher with E24 error. Tech cleared the pump, cleaned the filter, and also found the garbage disposal knockout plug that was never removed at installation — partial restriction for who knows how long. Fixed two problems, charged for one call. Very thorough, very professional.",
+    author: '— Diane W., Mesa Verde, Costa Mesa',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · Coil check on coastal-adjacent calls' },
+  { label: 'Standard Repair', price: '$150–$400', note: 'Parts + labor · OEM parts only · 90-day warranty' },
+  { label: 'Luxury Brand Repair', price: '$300–$700+', note: 'Sub-Zero, Wolf, Miele, Thermador · OEM parts · Eastside specialty' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback if same issue returns', highlight: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Costa Mesa?',
+    answer: 'Yes — we cover all of Costa Mesa including Eastside, Mesa Verde, 17th Street, the Westside, and the South Coast Plaza area. Call before noon and we can typically be at your door that afternoon. Our OC technicians run routes through Costa Mesa daily.',
+  },
+  {
+    question: 'Do you service Sub-Zero, Wolf, and Miele in Eastside Costa Mesa?',
+    answer: 'Yes. Eastside Costa Mesa borders Newport Beach and the Back Bay, and we see Sub-Zero built-ins, Wolf ranges, and Miele dishwashers in the remodeled homes regularly. Our trucks carry OEM parts for these brands. Same diagnostic, same warranty, same Irvine-based service team.',
+  },
+  {
+    question: 'Does coastal proximity affect appliances in Costa Mesa?',
+    answer: 'It does — moderately. The closer you are to the Back Bay or Newport Beach border, the more salt-laden air reaches your condenser coils. We check condenser coils on every refrigerator call in the 92627 zip. It\'s nowhere near as aggressive as Newport Beach proper or Huntington Harbour, but a unit that has never had coil service will show buildup affecting compressor cycling.',
+  },
+  {
+    question: 'Are you available on weekends in Costa Mesa?',
+    answer: 'Yes. Saturday hours are 8am–7pm, Sunday 9am–5pm. We schedule weekend calls in Costa Mesa regularly — appliances don\'t fail only Monday through Friday.',
+  },
+  {
+    question: 'What appliance brands do you repair in Costa Mesa?',
+    answer: 'All major brands — Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire — plus luxury brands including Sub-Zero, Wolf, Thermador, Miele, and Viking common in Eastside Costa Mesa. OEM parts on the truck for everything we see most often.',
+  },
+  {
+    question: 'What is your diagnostic fee in Costa Mesa?',
+    answer: 'Our diagnostic fee is $89. It covers the trip to your home, full inspection of the appliance, and a written estimate with itemized parts and labor. If you approve the repair, the $89 is credited against your invoice.',
+  },
+  {
+    question: 'Do you also serve Newport Beach, Huntington Beach, and Irvine?',
+    answer: `Yes — all three. Costa Mesa is part of our Irvine branch service area, and we route between Newport Beach, Huntington Beach, Irvine, and Costa Mesa daily. Same Irvine technicians, same ${branch.phone} dispatch line.`,
+  },
+];
+
+const nearby = [
+  { slug: 'newport-beach', name: 'Newport Beach' },
+  { slug: 'huntington-beach', name: 'Huntington Beach' },
+  { slug: 'irvine', name: 'Irvine' },
+  { slug: 'tustin', name: 'Tustin' },
+  { slug: 'anaheim', name: 'Anaheim' },
+  { slug: 'fullerton', name: 'Fullerton' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Costa Mesa', sameAs: 'https://en.wikipedia.org/wiki/Costa_Mesa,_California' },
+    { '@type': 'Place', name: 'Eastside Costa Mesa' },
+    { '@type': 'Place', name: 'Mesa Verde' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Costa Mesa, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Costa Mesa — Eastside, Mesa Verde, the 17th Street corridor, Westside, and all ZIP codes 92626, 92627, and 92628. Call before noon for same-day afternoon service. We're also available Saturdays and Sundays." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero and luxury appliances in Eastside Costa Mesa?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Eastside Costa Mesa borders Newport Beach and shares a similar housing profile — larger homes with Sub-Zero, Wolf, Thermador, and Miele kitchens are common. Our technicians carry OEM parts for all luxury brands on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does the coastal proximity in Costa Mesa affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Moderately. Costa Mesa sits 2–3 miles from the Pacific — less direct salt air exposure than Newport Beach or Huntington Harbour, but Westside and Eastside properties near the Back Bay can see some accelerated coil wear on refrigerators. We check for this on relevant calls, particularly for older refrigerators in coastal-facing properties." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Costa Mesa?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, Sub-Zero, Wolf, Viking, Thermador, Miele, and more. We carry OEM parts on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Costa Mesa?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Costa Mesa?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Costa Mesa repairs run $150–$400 depending on the appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Newport Beach, Huntington Beach, and Irvine?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Costa Mesa service area extends to Newport Beach, Huntington Beach, Irvine, Fountain Valley, and all of coastal and central Orange County." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="cm-hero">
-    <div class="cm-hero__inner container">
-      <div class="cm-hero__content">
-        <div class="cm-hero__eyebrow">Costa Mesa, CA · 92626 · 92627 · 92628 · Eastside · Mesa Verde · 17th St · South Coast Plaza</div>
-        <h1 class="cm-hero__h1">
-          Appliance Repair<br>
-          <span class="cm-hero__accent">Costa Mesa, CA</span>
-        </h1>
-        <p class="cm-hero__sub">
-          From Eastside luxury homes bordering Newport Beach to family neighborhoods
-          in Mesa Verde — Costa Mesa covers a lot of ground. We cover all of it.
-          Samsung, LG, Sub-Zero, Wolf, all brands. Same-day, OEM parts, 90-day warranty.
-        </p>
-        <div class="cm-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="cm-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="cm-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-costa-mesa-ca.webp"
-          alt="Appliance repair in Costa Mesa CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Costa Mesa, CA · Orange County · 92626 · 92627 · 92628"
+    headlineMain="Appliance repair in"
+    headlineAccent="Costa Mesa, CA"
+    subheadline="From Eastside luxury homes bordering Newport Beach to family neighborhoods in Mesa Verde — Costa Mesa covers a lot of ground. We cover all of it. Samsung, LG, Sub-Zero, Wolf, all brands. Same-day, OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Three Costa Mesas"
+    headline="Eastside to Westside —"
+    headlineAccent="all of it"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="cm-intro">
-    <div class="container cm-intro__inner">
-      <div class="cm-intro__text">
-        <h2>Appliance Repair in Costa Mesa — All of It</h2>
-        <p>
-          Costa Mesa is genuinely two or three different cities sharing a zip code.
-          Eastside Costa Mesa borders Newport Beach along the Back Bay — large homes,
-          updated kitchens, Sub-Zero and Wolf common. Mesa Verde is established
-          suburban: well-maintained single-family homes, families who've been here
-          for decades. The 17th Street corridor and areas near The Triangle lean
-          younger, denser, creative — apartments and townhomes alongside older
-          ranch homes.
-        </p>
-        <p>
-          We work in all of these. The Eastside call where a Sub-Zero built-in
-          stopped cooling before a dinner party. The Mesa Verde home where the
-          Whirlpool dryer thermal fuse blew on a Sunday morning. The 17th Street
-          apartment where the LG washer is showing an OE drain error. Same day,
-          same quality, same $89 diagnostic waived with repair.
-        </p>
-        <p>
-          Coastal proximity is a factor in Costa Mesa — not as aggressive as
-          Newport Beach or Huntington Harbour, but properties near the Back Bay
-          and Westside homes facing the ocean can see moderately accelerated
-          condenser coil wear on older refrigerators. We check on relevant calls.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong>. Weekends available.
-        </p>
-      </div>
-      <div class="cm-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Costa Mesa Service</div>
-          <div class="cta-box__sub">92626 · 92627 · 92628 · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Costa Mesa"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <!-- CM NEIGHBORHOODS -->
-  <section class="cm-areas">
-    <div class="container">
-      <h2 class="section-title">Costa Mesa — Eastside to Westside</h2>
-      <p class="section-sub">Different neighborhoods, same same-day commitment across all three ZIP codes.</p>
-      <div class="area-grid">
-        <div class="area-card area-card--featured">
-          <div class="area-label">Eastside</div>
-          <div class="area-name">Eastside Costa Mesa</div>
-          <div class="area-desc">Borders Newport Beach and Back Bay. Larger homes, updated kitchens. Sub-Zero, Wolf, Miele common. Newport-adjacent service profile.</div>
-          <div class="area-zip">92627</div>
-        </div>
-        <div class="area-card">
-          <div class="area-label">Central</div>
-          <div class="area-name">Mesa Verde</div>
-          <div class="area-desc">Established suburban neighborhood. Single-family homes, mature trees, long-time residents. GE, Whirlpool, LG, Samsung common.</div>
-          <div class="area-zip">92626</div>
-        </div>
-        <div class="area-card">
-          <div class="area-label">Creative Corridor</div>
-          <div class="area-name">17th St · The Triangle · Westside</div>
-          <div class="area-desc">Denser, younger, mix of apartments and townhomes. Active arts community. Standard and mid-range brands. Stackable units common.</div>
-          <div class="area-zip">92627 · 92626</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Costa Mesa neighborhoods"
+    headlineAccent="we service"
+    subheadline="Different neighborhoods, same same-day commitment across all three ZIP codes."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <!-- SERVICES -->
-  <section class="cm-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Costa Mesa</h2>
-      <p class="section-sub">All brands · All neighborhoods · 92626 · 92627 · 92628</p>
-      <div class="services-grid">
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Costa Mesa"
+    jobs={jobs}
+  />
 
-        <a href="/costa-mesa/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Ice maker · Sub-Zero built-in · Coastal coil check</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/costa-mesa/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Stackable</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Bosch · Maytag · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Costa Mesa"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/costa-mesa/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent cleaning · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Costa Mesa"
+    cards={pricingCards}
+  />
 
-        <a href="/costa-mesa/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Error codes · Panel-ready · Miele</div>
-          <div class="service-card__brands">Bosch · Miele · KitchenAid · Samsung · LG · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Costa Mesa"
+    faqs={faqs}
+  />
 
-        <a href="/costa-mesa/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Wolf & Viking</div>
-          <div class="service-card__brands">Wolf · GE · Samsung · Bosch · Viking · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/costa-mesa/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Not freezing · Ice stopped · Frost buildup · Sub-Zero</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/costa-mesa/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Built-in · Under-counter</div>
-          <div class="service-card__brands">Sub-Zero · True · U-Line · Liebherr · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/costa-mesa/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter · Gas burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">Wolf · Thermador · GE · Bosch · Samsung · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="cm-recent">
-    <div class="container">
-      <h2>Recent Jobs in Costa Mesa</h2>
-      <p class="section-sub">Real calls from 92626, 92627, and 92628 — Eastside estates to Mesa Verde homes to 17th St apartments.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero 36" Built-In</span>
-            <span class="recent-location">Eastside CM, 92627</span>
-          </div>
-          <div class="recent-card__title">"Fresh food section warm — noticed it the morning before hosting"</div>
-          <div class="recent-card__desc">
-            Eastside home backing onto the Back Bay — Sub-Zero 36-inch built-in
-            column. Evaporator fan motor on the fresh food section had failed overnight,
-            leaving no cold airflow. Called before 10am; technician arrived by 1pm.
-            Replaced the OEM Sub-Zero fan motor, verified temperatures in both sections,
-            confirmed stable at 37°F fresh food and 0°F freezer before leaving. Host
-            had three hours before guests arrived — plenty of time.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Sub-Zero motor · Temps stable · Dinner party saved</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Front-Load Washer</span>
-            <span class="recent-location">17th St corridor, 92627</span>
-          </div>
-          <div class="recent-card__title">"OE error — standing water, can't finish a cycle"</div>
-          <div class="recent-card__desc">
-            Second-floor apartment unit on 17th — LG front-loader OE drain error
-            from a blocked pump filter combined with a partial kink in the drain
-            hose behind the unit where it ran up and over a cabinet edge. Cleared
-            the pump filter, re-routed the drain hose with proper slack and loop,
-            ran three full drain cycles. No further OE codes. Explained why drain
-            hose routing matters for stackable and apartment installs — a detail
-            that gets missed in a lot of initial installations.
-          </div>
-          <div class="recent-card__result">✓ Same day · OE resolved · Drain hose re-routed · Cause explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Whirlpool Dryer</span>
-            <span class="recent-location">Mesa Verde, 92626</span>
-          </div>
-          <div class="recent-card__title">"No heat — completely cold air, clothes just tumbling wet"</div>
-          <div class="recent-card__desc">
-            Mesa Verde single-family — Whirlpool electric dryer with thermal fuse
-            blown from a clogged vent run terminating at the side of the house.
-            The original plastic flap vent cap had warped and partially collapsed
-            inward over the years, restricting airflow to about 25%. Replaced the
-            thermal fuse, swapped the collapsed plastic cap for a proper metal
-            backdraft damper, confirmed strong airflow at the exterior. Single-cycle
-            drying confirmed on the first test load. Family had been double-cycling
-            for months before the fuse finally failed.
-          </div>
-          <div class="recent-card__result">✓ Same day · Thermal fuse · Metal vent cap installed · Single cycle confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Mesa Verde, 92626</span>
-          </div>
-          <div class="recent-card__title">"E24 drain error — started suddenly mid-cycle"</div>
-          <div class="recent-card__desc">
-            Bosch 500 series in a Mesa Verde kitchen — E24 drain error with standing
-            water. Combined issue: drain pump partially blocked by food debris that
-            had bypassed the filter, and the filter itself overdue for cleaning.
-            Cleared the drain pump housing, deep-cleaned the filter assembly, ran
-            the Bosch diagnostic cycle, confirmed full drain on three consecutive
-            cycles. Also checked the drain hose connection to the garbage disposal —
-            the knockout plug had never been removed at installation, partially
-            restricting drain flow. Removed it. First full cycle post-repair was
-            completely clean.
-          </div>
-          <div class="recent-card__result">✓ Same day · E24 resolved · Disposal knockout removed · Full drain confirmed</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="cm-why">
-    <div class="container">
-      <h2>Why Costa Mesa Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🏡</div>
-          <div class="why-title">Eastside to Mesa Verde</div>
-          <div class="why-text">Eastside Sub-Zero estates. Mesa Verde family homes. 17th Street apartments. We carry parts for all of these and don't default to a different level of service based on the address. Same OEM parts, same 90-day warranty, same written estimate before we start.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">⏱️</div>
-          <div class="why-title">Actually Same Day</div>
-          <div class="why-text">Costa Mesa is a regular part of our OC route — not a special trip. Call before noon and we're typically there that afternoon. We don't route calls through a national dispatch center. We're local to Orange County and cover CM consistently.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📅</div>
-          <div class="why-title">Weekends Available</div>
-          <div class="why-text">Saturday 8am–7pm and Sunday 9am–5pm. Appliances don't break on schedule, and we don't limit service to weekdays. Weekend calls in Costa Mesa are covered the same as any other day.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="cm-reviews">
-    <div class="container">
-      <h2>What Costa Mesa Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero stopped cooling the morning before I was hosting. Called Same Day, technician arrived by 1pm, replaced the fan motor with OEM Sub-Zero parts, confirmed temps before leaving. Had three hours to spare before guests arrived. This is exactly the service you need in a time-sensitive situation."</div>
-          <div class="review-author">— Rebecca T., Eastside Costa Mesa</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG washer with OE error in my 17th Street apartment. Tech came same day, fixed the drain, but also re-routed the hose and explained why it keeps happening in apartment installs. No other company I've used has ever explained the cause — just fixed the symptom. Really knowledgeable."</div>
-          <div class="review-author">— Marcus L., 17th St, Costa Mesa</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Bosch dishwasher with E24 error. Tech cleared the pump, cleaned the filter, and also found the garbage disposal knockout plug that was never removed at installation — partial restriction for who knows how long. Fixed two problems, charged for one call. Very thorough, very professional."</div>
-          <div class="review-author">— Diane W., Mesa Verde, Costa Mesa</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="cm-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Costa Mesa</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf / Thermador</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Eastside estates · Built-in kitchen configs</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator (standard)</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Fan motor · Ice maker · Thermostat · Back Bay coil check</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump · Thermal fuse · Vent cleaning · Stackable</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Drain pump · Error codes · Panel-ready · Filter clean</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="cm-faq">
-    <div class="container">
-      <h2>Questions Costa Mesa Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Costa Mesa, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Costa Mesa — Eastside, Mesa Verde, the 17th Street corridor, and all ZIP codes 92626, 92627, and 92628. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero and luxury appliances in Eastside Costa Mesa?</summary><div class="faq-answer">Yes. Eastside Costa Mesa borders Newport Beach — Sub-Zero, Wolf, Thermador, and Miele are common in this area. We carry OEM parts for these brands on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does the coastal proximity in Costa Mesa affect appliances?</summary><div class="faq-answer">Moderately. CM sits 2–3 miles from the coast. Less aggressive than Newport Beach or Huntington Harbour, but Back Bay-adjacent properties can see some accelerated coil wear. We check on relevant calls.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Costa Mesa?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Costa Mesa?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, Bosch, KitchenAid, Sub-Zero, Wolf, Viking, Thermador, Miele, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Costa Mesa?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Costa Mesa repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Newport Beach, Huntington Beach, and Irvine?</summary><div class="faq-answer">Yes. Our Costa Mesa service extends to Newport Beach, Huntington Beach, Irvine, Fountain Valley, and all of coastal and central Orange County.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="cm-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/newport-beach/" class="nearby-link">Newport Beach</a>
-        <a href="/huntington-beach/" class="nearby-link">Huntington Beach</a>
-        <a href="/irvine/" class="nearby-link">Irvine</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-        <a href="/manhattan-beach/" class="nearby-link">Manhattan Beach</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="cm-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Costa Mesa?</h2>
-          <p>Eastside · Mesa Verde · 17th St · All of 92626, 92627, 92628. $89 diagnostic waived with repair. 90-day warranty. Weekends available.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Costa Mesa, CA 92626 · 92627 · 92628</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --cm-red: #C8102E; --cm-black: #0a0a0a; --cm-gray: #f5f5f5; --cm-border: #e2e2e2; --cm-text: #1a1a1a; --cm-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .cm-hero { background: var(--cm-black); color: white; padding: 80px 0 60px; }
-  .cm-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .cm-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--cm-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .cm-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .cm-hero__accent { color: var(--cm-red); }
-  .cm-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .cm-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .cm-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .cm-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--cm-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .cm-bottom-cta .btn-secondary { color: var(--cm-text); border-color: var(--cm-border); }
-  .trust-bar { background: var(--cm-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .cm-intro { padding: 72px 0; background: white; }
-  .cm-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .cm-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--cm-black); margin-bottom: 20px; }
-  .cm-intro__text p { font-size: 16px; line-height: 1.7; color: var(--cm-text); margin-bottom: 16px; }
-  .cta-box { background: var(--cm-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--cm-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .cm-areas { padding: 72px 0; background: var(--cm-gray); }
-  .area-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .area-card { background: white; border: 1px solid var(--cm-border); border-radius: 12px; padding: 24px; }
-  .area-card--featured { border-color: var(--cm-red); background: #fff5f7; }
-  .area-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--cm-muted); margin-bottom: 6px; }
-  .area-name { font-size: 16px; font-weight: 600; color: var(--cm-black); margin-bottom: 10px; }
-  .area-desc { font-size: 14px; color: var(--cm-muted); line-height: 1.6; margin-bottom: 12px; }
-  .area-zip { font-size: 12px; font-weight: 500; color: var(--cm-red); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--cm-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--cm-muted); text-align: center; margin-bottom: 40px; }
-  .cm-services { padding: 72px 0; background: white; }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--cm-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--cm-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--cm-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--cm-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--cm-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--cm-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--cm-red); font-weight: 500; }
-  .cm-recent { padding: 72px 0; background: var(--cm-gray); }
-  .cm-recent h2 { font-size: 30px; font-weight: 700; color: var(--cm-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--cm-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--cm-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--cm-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--cm-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--cm-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .cm-why { padding: 72px 0; background: white; }
-  .cm-why h2 { font-size: 30px; font-weight: 700; color: var(--cm-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--cm-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--cm-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--cm-muted); line-height: 1.6; }
-  .cm-reviews { padding: 72px 0; background: var(--cm-gray); }
-  .cm-reviews h2 { font-size: 30px; font-weight: 700; color: var(--cm-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--cm-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--cm-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--cm-muted); font-weight: 500; }
-  .cm-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--cm-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--cm-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--cm-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--cm-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--cm-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--cm-red); }
-  .pricing-card__note { font-size: 13px; color: var(--cm-muted); }
-  .cm-faq { padding: 72px 0; background: var(--cm-gray); }
-  .cm-faq h2 { font-size: 30px; font-weight: 700; color: var(--cm-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--cm-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--cm-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--cm-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--cm-text); }
-  .cm-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--cm-border); }
-  .cm-nearby h2 { font-size: 20px; font-weight: 600; color: var(--cm-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--cm-border); border-radius: 20px; font-size: 14px; color: var(--cm-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--cm-red); color: var(--cm-red); }
-  .cm-bottom-cta { padding: 72px 0; background: var(--cm-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .cm-intro__inner { grid-template-columns: 1fr; } .area-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .cm-hero__inner { grid-template-columns: 1fr; } .cm-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .cm-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Costa Mesa repair today"
+    body="Eastside · Mesa Verde · 17th Street · all of 92626, 92627, 92628. $89 diagnostic waived with repair · 90-day warranty · OEM parts."
+  />
+</CityLayout>

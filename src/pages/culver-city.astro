@@ -1,804 +1,301 @@
 ---
-// src/pages/culver-city.astro
-// SDAR — samedayappliance.repair
-// Culver City, CA 90230/90232 — Волна 2
-// Филиал: Los Angeles · (424) 325-0520
-// GSC: appliane repair culver city ca — 92 показа, позиция 20.3 (страница уже есть, слабая)
-//      appliance repair culver city — 15 показов, позиция 39.2
-// Существующая страница /culver-city/ — переписываем полностью
-// Апрель 2026
+/**
+ * Culver City, CA — Variant A migration (T9 Batch 12, Group 2 LA Beach/South).
+ * Branch: Los Angeles · ZIPs: 90230, 90232 · Source: wiki/migration/content-dumps/culver-city.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (LA is service_area)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ *   - Replaced hardcoded WeHo phone (323) 870-4790 with `branch.phone` (LA = (424) 325-0520)
+ *
+ * Pricing-discipline note:
+ *   - Source dump had a 6-card grid with $120 commercial diagnostic — DROPPED.
+ *     Normalized to canonical 4-card residential pricing (residential city page).
+ *   - FAQ Q5 about commercial appliances reframed to honest residential-only.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Culver City",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90230", "90232"],
-  phone: "(424) 325-0520",
-  phoneRaw: "+14243250520",
-  email: "info@samedayappliance.repair",
-  branch: "Los Angeles",
-  slug: "culver-city",
-};
+const branchSlug = 'los-angeles';
+const cityName = 'Culver City';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Culver City CA — Same Day | Hayden Tract · Fox Hills · (424) 325-0520`;
-const description = `Same-day appliance repair in Culver City, CA 90230 & 90232. Hayden Tract, Arts District, Fox Hills, Blair Hills, Sony Pictures area. DCS, Fisher & Paykel specialists. Licensed, OEM parts, 90-day warranty. Call (424) 325-0520.`;
-const canonical = `https://samedayappliance.repair/culver-city/`;
+const title = `Appliance Repair Culver City CA | DCS & Fisher & Paykel | All Brands`;
+const description = 'Same-day appliance repair in Culver City, CA. Hayden Tract, Arts District, Fox Hills, Sony Pictures area. DCS and Fisher & Paykel specialists. OEM parts, 90-day warranty, $89 diagnostic.';
+const canonical = 'https://samedayappliance.repair/culver-city/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Culver City",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Los Angeles",
-    "addressLocality": "Los Angeles",
-    "addressRegion": "CA",
-    "postalCode": "90001",
-    "addressCountry": "US"
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven, Range & DCS Repair', slug: 'oven' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '♨️', name: 'Cooktop & Range Hood', slug: 'cooktop' },
+  { icon: '🍷', name: 'Wine & Beverage Cooler', slug: 'wine-cooler' },
+];
+
+const neighborhoods = [
+  { name: 'Hayden Tract', zip: '90232' },
+  { name: 'Arts District', zip: '90232' },
+  { name: 'Downtown Culver City', zip: '90230' },
+  { name: 'Fox Hills', zip: '90230' },
+  { name: 'Blair Hills', zip: '90232' },
+  { name: 'Culver Crest', zip: '90230' },
+  { name: 'McManus', zip: '90232' },
+  { name: 'Lucerne-Higuera', zip: '90232' },
+  { name: 'Sony Pictures area', zip: '90232' },
+  { name: 'Amazon / Apple campus area', zip: '90232' },
+];
+
+const narrativeIntro = [
+  "Culver City has changed faster than almost any city on the Westside. The Hayden Tract — once a stretch of light-industrial warehouses — now houses Amazon Studios, Apple offices, and a dense cluster of tech and entertainment workspaces. Downtown Culver City has gone from a sleepy lunch destination to a destination dining and residential hub. The Arts District just east of Sony Pictures has filled in with creative-industry condos and lofts.",
+  "What hasn't changed: a lot of the residential stock is still 1940s–1960s single-family homes with original kitchens that have been remodeled once or twice. So a typical service week here looks like a Sub-Zero column in a renovated Hayden Tract loft, a Whirlpool top-load in a 1950s Fox Hills bungalow, a Fisher & Paykel DishDrawer in a new Arts District condo, and a DCS commercial-grade range in a Sony-area chef's kitchen. We see the full spread.",
+  "Most of our Culver City clients are working from home — at least part of the week — and a broken appliance during the work day is a real problem. Our diagnostic fee is $89 and is credited toward the repair. 90-day warranty on parts and labor. OEM parts on the truck. We schedule around your video calls when we can.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'DCS & Fisher & Paykel — what makes Culver City unusual',
+    paragraphs: [
+      "We see a higher concentration of DCS ranges and Fisher & Paykel appliances in Culver City than almost anywhere else in our service area, and it's directly tied to the entertainment-industry kitchens here. DCS commercial-grade gas valves and surface igniters are not the same as Wolf or Viking — different parts, different disassembly, different calibration procedure. Two of the most common Culver City calls we get are: 'two other companies told me they don't service DCS,' and 'the F&P drawer dishwasher is throwing a fault code and nobody else has the parts.'",
+      "We service the full Fisher & Paykel residential range — DishDrawer single and double-drawer dishwashers, the Active Smart and CoolDrawer refrigerator lines, F&P washers and dryers, and F&P induction cooktops. OEM Fisher & Paykel parts on every service truck. Same for DCS — OEM igniter modules, gas valves, oven control boards.",
+    ],
   },
-  "areaServed": [
-    { "@type": "City", "name": "Culver City", "sameAs": "https://en.wikipedia.org/wiki/Culver_City,_California" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'DCS Range',
+    neighborhood: 'Hayden Tract, 90232',
+    title: 'DCS 48-inch — two burners won\'t ignite, oven running 18°F low',
+    body: "DCS 48-inch dual-fuel in a renovated commercial conversion near the Hayden Tract. Two surface igniter modules had failed — DCS-specific components that require the correct OEM parts and the right disassembly procedure for the DCS chassis. Replaced both igniters, calibrated the oven (running 18°F low), tested all eight burners and the broiler. The owner had been told by two other companies they \"don't work on DCS.\" We do.",
+    part: 'OEM DCS surface igniter modules x2',
+    time: '2.5 hours',
+    result: '✓ Same day · OEM DCS parts · Oven calibrated',
+  },
+  {
+    badge: 'LG Front-Load Washer',
+    neighborhood: 'Fox Hills, 90230',
+    title: 'LG washer — LE error constantly, won\'t complete a cycle',
+    body: "LG LE error — motor or rotor sensor fault. Found a hairpin lodged in the rotor position sensor causing intermittent motor stall. Removed the obstruction, tested sensor function, ran four full cycles including heavy load and spin-only. Working perfectly. Call came in at 9am from someone working from home who needed laundry done before a 2pm video call. We were there and done by noon.",
+    part: 'Rotor sensor cleared (no parts)',
+    time: '1.5 hours',
+    result: '✓ Same day · Done before noon · Laundry in time',
+  },
+  {
+    badge: 'Samsung French Door',
+    neighborhood: 'Downtown Culver City, 90230',
+    title: 'Samsung — ice maker stopped, fridge section warm at the top',
+    body: "Classic Samsung dual-evaporator failure — upper refrigerator fan motor seized, causing warm spots at the top while the lower section and freezer stayed cold. Ice maker had also stopped because the inlet valve had partially clogged. Replaced the fan motor and inlet valve, both OEM Samsung parts, cleared the drain, confirmed even temperatures throughout. New construction condo — brand-new kitchen, appliance hadn't even been registered for warranty yet.",
+    part: 'OEM Samsung fan motor + inlet valve',
+    time: '2 hours',
+    result: '✓ Same day · OEM Samsung parts · Warranty unaffected',
+  },
+  {
+    badge: 'Fisher & Paykel DishDrawer',
+    neighborhood: 'Arts District, 90232',
+    title: 'F&P drawer dishwasher — bottom drawer fault, leaking from front',
+    body: "Fisher & Paykel DishDrawer — fault code on the bottom drawer with a slow leak from the door seal. The seal had compressed unevenly from heavy use, and the drawer latch mechanism had a worn spring allowing slight door flex under pressure. Replaced the door seal and latch spring with OEM F&P parts, rebalanced the drawer, ran three full cycles per drawer. No leak, no fault code. The homeowner appreciated that we actually had the parts and knew the product.",
+    part: 'OEM F&P door seal + latch spring',
+    time: '2 hours',
+    result: '✓ Same day · OEM Fisher & Paykel parts · Both drawers tested',
+  },
+];
+
+const reviews = [
+  {
+    text: "Had a DCS range in our Hayden Tract home that two companies refused to touch. Same Day came out same day, had the OEM DCS parts, fixed both burners and calibrated the oven. First repair company I've found in LA that actually knows the brand.",
+    author: '— Chris M., Hayden Tract',
+  },
+  {
+    text: "Work from home and my washer broke mid-morning. Called Same Day, they were there by noon, fixed the LG error on the spot. Done in time for my afternoon calls. This is exactly the kind of quick, reliable service I needed.",
+    author: '— Sarah K., Fox Hills',
+  },
+  {
+    text: "Fisher & Paykel DishDrawer was leaking and showing a fault code. Technician came same afternoon, had OEM Fisher & Paykel parts, replaced the seal and latch spring, tested both drawers thoroughly. No more leak, no more code. Really impressive that they knew this product.",
+    author: '— Amanda L., Arts District',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · All residential appliances' },
+  { label: 'Standard Repair', price: '$150–$420', note: 'Refrigerator, washer, dryer, dishwasher, range · OEM parts · 90-day warranty' },
+  { label: 'DCS & Fisher & Paykel', price: '$200–$500', note: 'OEM DCS / F&P parts · Drawer dishwashers · Commercial-grade ranges', highlight: true },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Culver City?',
+    answer: `Yes. Call ${branch.phone} before noon and we can typically schedule same-day service across all of Culver City — Hayden Tract, Arts District, Downtown Culver City, Fox Hills, Blair Hills, Culver Crest, and the Sony Pictures area. Our LA technicians cover Culver City multiple times per day.`,
+  },
+  {
+    question: 'Do you actually repair DCS and Fisher & Paykel appliances?',
+    answer: 'Yes — and we get this question a lot in Culver City because most companies don\'t carry OEM DCS or Fisher & Paykel parts. Our technicians are trained on DCS commercial-grade ranges and cooktops, and the full Fisher & Paykel residential lineup including DishDrawer dishwashers, Active Smart and CoolDrawer refrigerators, F&P washers and dryers, and induction cooktops. OEM parts on every service truck.',
+  },
+  {
+    question: 'My home is from the 1950s and the kitchen has been remodeled. Do you handle that?',
+    answer: 'Yes. A lot of our Culver City work is exactly this profile — older homes (Fox Hills, Blair Hills, McManus) with new appliances installed during a remodel. We routinely service Sub-Zero, Wolf, Bosch, Miele, KitchenAid, and Thermador units in older Culver City homes. The cabinetry is often tight; our technicians know how to work in those spaces without damage.',
+  },
+  {
+    question: 'What is your diagnostic fee in Culver City?',
+    answer: 'Our diagnostic fee is $89 for residential appliances. It covers the service call, full inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice. No hidden fees, no upsells.',
+  },
+  {
+    question: 'I work from home — can you schedule around my video calls?',
+    answer: 'Yes. A large portion of our Culver City clients are working from home at least part of the week. Tell us when your meetings are and we\'ll schedule around them when possible. Most diagnostic visits take 30–60 minutes and most repairs are complete in one trip with parts on the truck.',
+  },
+  {
+    question: 'Do you offer a warranty on repairs in Culver City?',
+    answer: 'Yes. All repairs include a 90-day warranty on parts and labor. We use OEM parts where available — never aftermarket substitutes. If the same issue returns within 90 days, we come back at no charge.',
+  },
+  {
+    question: 'Do you also serve nearby Mar Vista, Venice, and Playa del Rey?',
+    answer: 'Yes. From our Culver City service window we cover Mar Vista (90066), Venice (90291), Playa del Rey (90293), Westchester (90045), Ladera Heights (90056), Marina del Rey, Santa Monica, and West Los Angeles. Same-day service across the Westside in most cases.',
+  },
+];
+
+const nearby = [
+  { slug: 'santa-monica', name: 'Santa Monica' },
+  { slug: 'marina-del-rey', name: 'Marina Del Rey' },
+  { slug: 'west-los-angeles', name: 'West Los Angeles' },
+  { slug: 'el-segundo', name: 'El Segundo' },
+  { slug: 'manhattan-beach', name: 'Manhattan Beach' },
+  { slug: 'los-angeles', name: 'Los Angeles' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Culver City', sameAs: 'https://en.wikipedia.org/wiki/Culver_City,_California' },
+    { '@type': 'PostalCode', name: '90230' },
+    { '@type': 'PostalCode', name: '90232' },
+    { '@type': 'Place', name: 'Hayden Tract' },
+    { '@type': 'Place', name: 'Arts District' },
+    { '@type': 'Place', name: 'Downtown Culver City' },
+    { '@type': 'Place', name: 'Fox Hills' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Culver City, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Culver City — Downtown, Hayden Tract, Arts District, Fox Hills, Blair Hills, Culver Crest, McManus, Lucerne-Higuera, Clarkdale, and the Sony Pictures area. We serve both 90230 and 90232 ZIP codes. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Do you repair DCS and Fisher & Paykel appliances in Culver City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. DCS and Fisher & Paykel appliances appear in Culver City homes more often than in most LA neighborhoods — partly because of the area's design-forward housing stock and proximity to the entertainment industry. Our technicians are trained on both brands and carry OEM Fisher & Paykel and DCS parts on our service vehicles." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you work on both older homes and new construction in Culver City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Culver City has everything from 1940s bungalows to brand-new construction along the Hayden Tract and in the Arts District area. The older homes often have kitchens that have been updated piece by piece — one newer appliance brand sitting next to an older one. Our technicians work on all of it, all brands, all ages." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Culver City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. No hidden fees — the price we quote is the price on the invoice." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair commercial appliances in Culver City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Culver City's restaurant corridor along Washington Blvd and Culver Blvd, plus the studio commissaries and corporate cafeterias in the Hayden Tract, generate regular commercial appliance repair calls. We repair commercial refrigerators, commercial ovens, and restaurant kitchen equipment. Commercial diagnostic fee is $120, waived with repair." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Culver City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no charge. We use genuine OEM parts only." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Mar Vista, Venice, and Playa del Rey from Culver City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Culver City service area extends to Mar Vista, Venice, Playa del Rey, Marina del Rey, Westchester, Baldwin Hills, and Ladera Heights. All are within our regular coverage area from Culver City." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="cc-hero">
-    <div class="cc-hero__inner container">
-      <div class="cc-hero__content">
-        <div class="cc-hero__eyebrow">Culver City, CA · 90230 · 90232 · Hayden Tract · Arts District · Fox Hills · Sony Pictures</div>
-        <h1 class="cc-hero__h1">
-          Appliance Repair<br>
-          <span class="cc-hero__accent">Culver City, CA</span>
-        </h1>
-        <p class="cc-hero__sub">
-          Culver City's mix of tech offices, studio lots, 1940s bungalows, and new
-          construction means every appliance repair call here is different. Our technicians
-          work across all of it — and we're one of the few in the area that services DCS
-          and Fisher & Paykel. Same-day service, OEM parts, 90-day warranty.
-        </p>
-        <div class="cc-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="cc-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="cc-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-culver-city-ca.webp"
-          alt="Appliance repair in Culver City CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Culver City, CA · 90230 · 90232 · Hayden Tract · Arts District · Fox Hills · Sony Pictures"
+    headlineMain="Appliance repair in"
+    headlineAccent="Culver City, CA"
+    subheadline="Same-day service across all of Culver City. DCS and Fisher & Paykel specialists. WFH-friendly scheduling. OEM parts, 90-day warranty, $89 diagnostic — waived with repair."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Same-Day Service</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>90-Day Warranty</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>OEM Parts</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Licensed & Insured</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>85% First-Visit Fix Rate</span>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="A Westside city that changed fast"
+    headline="Culver City — old residential blocks,"
+    headlineAccent="new tech kitchens"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="cc-intro">
-    <div class="container cc-intro__inner">
-      <div class="cc-intro__text">
-        <h2>Appliance Repair in Culver City — Why This City Is Different</h2>
-        <p>
-          Culver City went through a real transformation when Amazon, Apple, and a wave
-          of tech companies moved into the Hayden Tract. What used to be a quiet studio
-          town is now a mix of creative offices, production facilities, and a housing
-          market that followed the money — new construction condos with Samsung French
-          doors and Bosch dishwashers sitting a few blocks from 1940s bungalows where
-          the kitchen has been updated one appliance at a time.
-        </p>
-        <p>
-          A lot of our Culver City calls come from people who work from home — creative
-          professionals, tech workers with hybrid schedules. When the washer breaks or
-          the fridge stops cooling, it's not just inconvenient — it's happening in a home
-          that's also a workspace. Getting same-day same day appliance repair in Culver City
-          isn't a luxury for these customers, it's a practical need.
-        </p>
-        <p>
-          One thing that makes Culver City specific for us: the area has a higher-than-average
-          concentration of DCS and Fisher & Paykel appliances — partly from the entertainment
-          industry connection, partly from the design-conscious renovations in the older
-          housing stock. We service both brands and carry OEM parts for them on our trucks.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before
-          we start. <strong>90-day warranty</strong> on parts and labor.
-        </p>
-      </div>
-      <div class="cc-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Culver City Service Team</div>
-          <div class="cta-box__sub">90230 · 90232 · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Culver City"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="cc-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Culver City</h2>
-      <p class="section-sub">All brands · All ages of housing · Residential & commercial · 90230 & 90232</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Culver City neighborhoods"
+    headlineAccent="we service"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/culver-city/refrigerator-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Ice maker · Fan motor · Leaking · French door</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Fisher & Paykel</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Culver City"
+    jobs={jobs}
+  />
 
-        <a href="/culver-city/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Not draining · Not spinning · Shaking · Error codes · Stackable</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Bosch · Miele · Maytag</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/culver-city/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Takes too long · Dryer vent cleaning · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Culver City"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/culver-city/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Not cleaning · Leaking · Error codes</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · Fisher & Paykel · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Culver City"
+    cards={pricingCards}
+  />
 
-        <a href="/culver-city/oven-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & DCS Repair</div>
-          <div class="service-card__issues">DCS indoor/outdoor · Not heating · Igniter · Gas valve · Calibration</div>
-          <div class="service-card__brands">DCS · Fisher & Paykel · Wolf · Thermador · GE · Samsung</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Culver City"
+    faqs={faqs}
+  />
 
-        <a href="/culver-city/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer Repair</div>
-          <div class="service-card__issues">Not freezing · Temperature off · Frost buildup · Ice maker</div>
-          <div class="service-card__brands">GE · Samsung · LG · Whirlpool · Sub-Zero · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/culver-city/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood Repair</div>
-          <div class="service-card__issues">Burner issues · Induction · Hood motor · DCS outdoor</div>
-          <div class="service-card__brands">DCS · Dacor · Wolf · Thermador · Samsung · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/culver-city/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine & Beverage Cooler Repair</div>
-          <div class="service-card__issues">Not cooling · Temperature off · Compressor · Beverage center</div>
-          <div class="service-card__brands">Sub-Zero · True · Liebherr · Dacor · Jenn-Air · Marvel</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="cc-neighborhoods">
-    <div class="container">
-      <h2>We Cover All of Culver City — 90230 & 90232</h2>
-      <p class="section-sub">Studio town, tech hub, classic bungalows — every corner of the city</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Culver City Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Hayden Tract</div>
-            <div class="nh-item featured">Arts District</div>
-            <div class="nh-item featured">Downtown Culver City</div>
-            <div class="nh-item">Fox Hills</div>
-            <div class="nh-item">Blair Hills</div>
-            <div class="nh-item">Culver Crest</div>
-            <div class="nh-item">McManus</div>
-            <div class="nh-item">Lucerne-Higuera</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Areas & Landmarks</div>
-          <div class="nh-list">
-            <div class="nh-item">Sony Pictures area</div>
-            <div class="nh-item">Amazon / Apple campus</div>
-            <div class="nh-item">Washington Blvd corridor</div>
-            <div class="nh-item">Culver Blvd</div>
-            <div class="nh-item">Sepulveda Blvd</div>
-            <div class="nh-item">Baldwin Hills adj.</div>
-            <div class="nh-item">Clarkdale</div>
-            <div class="nh-item">Jefferson Blvd area</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Mar Vista (90066)</div>
-            <div class="nh-item">Venice (90291)</div>
-            <div class="nh-item">Marina del Rey (90292)</div>
-            <div class="nh-item">Playa del Rey (90293)</div>
-            <div class="nh-item">Westchester (90045)</div>
-            <div class="nh-item">Ladera Heights (90056)</div>
-            <div class="nh-item">Santa Monica</div>
-            <div class="nh-item">West Los Angeles</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- DCS / FISHER & PAYKEL SPOTLIGHT -->
-  <section class="cc-dcs">
-    <div class="container">
-      <div class="dcs-inner">
-        <div class="dcs-text">
-          <div class="dcs-eyebrow">DCS & Fisher & Paykel Specialists</div>
-          <h2>DCS and Fisher & Paykel Appliance Repair in Culver City</h2>
-          <p>
-            Fisher & Paykel — the New Zealand brand behind both F&P appliances and
-            the DCS professional cooking line — shows up in Culver City kitchens more
-            often than in most LA neighborhoods. The entertainment industry connection
-            runs deep here: production designers and set decorators who know quality
-            appliances, combined with the design-forward renovations that happen when
-            creative professionals buy the older Culver City housing stock.
-          </p>
-          <p>
-            DCS ranges, cooktops, and outdoor cooking units are a different animal than
-            standard American brands. The commercial-grade gas valve systems, the specific
-            burner configurations, and the DCS ignition design require technicians who have
-            actually worked on them — not guesswork from someone who's only seen a Wolf.
-            Our technicians carry OEM Fisher & Paykel and DCS parts and are trained on
-            the full product line.
-          </p>
-          <p>
-            We also service the broader Fisher & Paykel range: their drawer dishwashers
-            (a F&P specialty), their refrigerators, and their laundry appliances.
-          </p>
-          <div class="dcs-brands">
-            <div class="db-item db-item--featured">DCS Ranges & Cooktops</div>
-            <div class="db-item db-item--featured">Fisher & Paykel</div>
-            <div class="db-item">F&P Drawer Dishwashers</div>
-            <div class="db-item">DCS Outdoor Kitchen</div>
-            <div class="db-item">F&P Refrigerators</div>
-            <div class="db-item">F&P Laundry</div>
-          </div>
-        </div>
-        <div class="dcs-cta">
-          <div class="dcs-cta__title">DCS or Fisher & Paykel not working?</div>
-          <div class="dcs-cta__sub">We carry OEM parts and know the brand</div>
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">{city.phone}</a>
-          <div class="dcs-cta__note">$89 diagnostic · Waived with repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="cc-recent">
-    <div class="container">
-      <h2>Jobs Our Team Did in Culver City</h2>
-      <p class="section-sub">Real calls from real Culver City neighborhoods.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">DCS Range</span>
-            <span class="recent-location">Hayden Tract, 90232</span>
-          </div>
-          <div class="recent-card__title">"Two burners won't ignite, oven running low"</div>
-          <div class="recent-card__desc">
-            DCS 48-inch dual-fuel in a renovated commercial conversion near the Hayden Tract.
-            Two surface igniter modules had failed — DCS-specific components that require the
-            correct OEM parts and the right disassembly procedure for the DCS chassis.
-            Replaced both igniters, calibrated the oven (running 18°F low), tested all
-            eight burners and the broiler. The owner had been told by two other companies
-            they "don't work on DCS." We do.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM DCS parts · Oven calibrated</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Front-Load Washer</span>
-            <span class="recent-location">Fox Hills, 90232</span>
-          </div>
-          <div class="recent-card__title">"LE error constantly, won't complete a cycle"</div>
-          <div class="recent-card__desc">
-            LG LE error — motor or rotor sensor fault. Found a hairpin lodged in the rotor
-            position sensor, causing intermittent motor stall. Removed the obstruction,
-            tested sensor function, ran four full cycles including heavy load and spin-only.
-            Working perfectly. Call came in at 9am from someone working from home who
-            needed laundry done before a 2pm video call. We were there and done by noon.
-          </div>
-          <div class="recent-card__result">✓ Same day · Done before noon · Laundry in time</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung French Door</span>
-            <span class="recent-location">Downtown Culver City, 90230</span>
-          </div>
-          <div class="recent-card__title">"Ice maker stopped, fridge section getting warm at the top"</div>
-          <div class="recent-card__desc">
-            Classic Samsung dual-evaporator failure — upper refrigerator fan motor seized,
-            causing warm spots at the top while the lower section and freezer stayed cold.
-            Ice maker had also stopped because the inlet valve had partially clogged.
-            Replaced the fan motor and inlet valve, both OEM Samsung parts, cleared the
-            drain, confirmed even temperatures throughout. New construction condo —
-            brand-new kitchen, appliance hadn't even been registered for warranty yet.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung parts · Warranty unaffected</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Fisher & Paykel Drawer Dishwasher</span>
-            <span class="recent-location">Arts District, 90232</span>
-          </div>
-          <div class="recent-card__title">"Bottom drawer error code, leaking from front"</div>
-          <div class="recent-card__desc">
-            Fisher & Paykel DishDrawer — fault code on the bottom drawer with a slow leak
-            from the door seal. The seal had compressed unevenly from heavy use, and the
-            drawer latch mechanism had a worn spring allowing slight door flex under pressure.
-            Replaced the door seal and latch spring with OEM F&P parts, rebalanced the
-            drawer, ran three full cycles per drawer. No leak, no fault code. The homeowner
-            appreciated that we actually had the parts and knew the product.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Fisher & Paykel parts · Both drawers tested</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="cc-why">
-    <div class="container">
-      <h2>Why Culver City Customers Call Us</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🔧</div>
-          <div class="why-title">We Actually Know DCS & F&P</div>
-          <div class="why-text">DCS and Fisher & Paykel are common in Culver City and almost nobody services them. We carry OEM parts, know the product line, and don't tell you we "don't work on that brand."</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">Old Houses, New Appliances — All of It</div>
-          <div class="why-text">Culver City's 1940s bungalows often have kitchens updated one appliance at a time. New condos have brand-new tech appliances. We work on both ends of the spectrum and everything in between.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">⏱️</div>
-          <div class="why-title">WFH Scheduling</div>
-          <div class="why-text">A lot of Culver City residents work from home. When the washer breaks during your workday, you need someone who actually shows up on time and gets it done — not a 4-hour window that stretches to 6.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts — no aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="cc-reviews">
-    <div class="container">
-      <h2>What Culver City Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Had a DCS range in our Hayden Tract home that two companies refused to touch. Same Day Appliance came out same day, had the OEM DCS parts, fixed both burners and calibrated the oven. First repair company I've found in LA that actually knows the brand."</div>
-          <div class="review-author">— Chris M., Hayden Tract, Culver City</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Work from home and my washer broke mid-morning. Called Same Day Appliance Repair, they were there by noon, fixed the LG error on the spot. Done in time for my afternoon calls. This is exactly the kind of quick, reliable service I needed. Will definitely use again."</div>
-          <div class="review-author">— Sarah K., Fox Hills, Culver City</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Fisher & Paykel DishDrawer was leaking and showing a fault code. Technician came same afternoon, had OEM Fisher & Paykel parts, replaced the seal and latch spring, tested both drawers thoroughly. No more leak, no more code. Really impressive that they knew this product."</div>
-          <div class="review-author">— Amanda L., Arts District, Culver City</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="cc-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Culver City</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Fan motor, ice maker, compressor relay, thermostat</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">DCS / Fisher & Paykel</div>
-          <div class="pricing-card__range">$200 – $500</div>
-          <div class="pricing-card__note">OEM parts · All F&P and DCS product lines</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump, heating element, thermal fuse, drum</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$175 – $420</div>
-          <div class="pricing-card__note">Igniter, element, gas valve, calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Drain pump, door seal, control board, spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="cc-faq">
-    <div class="container">
-      <h2>Questions Culver City Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item">
-          <summary class="faq-question">Do you offer same-day appliance repair in Culver City, CA?</summary>
-          <div class="faq-answer">Yes. Our technicians cover all of Culver City — Downtown, Hayden Tract, Arts District, Fox Hills, Blair Hills, Culver Crest, McManus, Lucerne-Higuera, Clarkdale, and the Sony Pictures area. We serve both 90230 and 90232 ZIP codes. Call before noon for same-day afternoon service.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair DCS and Fisher & Paykel appliances in Culver City?</summary>
-          <div class="faq-answer">Yes. DCS and Fisher & Paykel appliances appear in Culver City homes more often than in most LA neighborhoods. Our technicians are trained on both brands and carry OEM Fisher & Paykel and DCS parts on our service vehicles.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you work on both older homes and new construction in Culver City?</summary>
-          <div class="faq-answer">Yes. Culver City has everything from 1940s bungalows to brand-new construction along the Hayden Tract. The older homes often have kitchens updated one appliance at a time. Our technicians work on all of it, all brands, all ages.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">What is your diagnostic fee in Culver City?</summary>
-          <div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. No hidden fees.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair commercial appliances in Culver City?</summary>
-          <div class="faq-answer">Yes. Culver City's restaurant corridor and the studio commissaries in the Hayden Tract generate regular commercial calls. We repair commercial refrigerators, commercial ovens, and restaurant kitchen equipment. Commercial diagnostic fee is $120, waived with repair.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">What warranty do you offer on appliance repairs in Culver City?</summary>
-          <div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no charge. We use genuine OEM parts only.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you also serve Mar Vista, Venice, and Playa del Rey?</summary>
-          <div class="faq-answer">Yes. Our Culver City service area extends to Mar Vista, Venice, Playa del Rey, Marina del Rey, Westchester, Baldwin Hills, and Ladera Heights. All are within our regular coverage area from Culver City.</div>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="cc-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/marina-del-rey/" class="nearby-link">Marina del Rey</a>
-        <a href="/los-angeles/" class="nearby-link">West LA</a>
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="cc-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Culver City?</h2>
-          <p>DCS · Fisher & Paykel · All brands · Old houses & new condos. $89 diagnostic waived with repair. 90-day warranty. Same day in 90230 & 90232.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Culver City, CA 90230 · 90232</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</Layout>
-
-<style>
-  :root {
-    --cc-red: #C8102E;
-    --cc-black: #0a0a0a;
-    --cc-gray: #f5f5f5;
-    --cc-border: #e2e2e2;
-    --cc-text: #1a1a1a;
-    --cc-muted: #6b6b6b;
-  }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  .cc-hero { background: var(--cc-black); color: white; padding: 80px 0 60px; }
-  .cc-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .cc-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--cc-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .cc-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .cc-hero__accent { color: var(--cc-red); }
-  .cc-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .cc-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .cc-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .cc-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--cc-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .cc-bottom-cta .btn-secondary { color: var(--cc-text); border-color: var(--cc-border); }
-
-  .trust-bar { background: var(--cc-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-
-  .cc-intro { padding: 72px 0; background: white; }
-  .cc-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .cc-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--cc-black); margin-bottom: 20px; }
-  .cc-intro__text p { font-size: 16px; line-height: 1.7; color: var(--cc-text); margin-bottom: 16px; }
-  .cta-box { background: var(--cc-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--cc-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-
-  .section-title { font-size: 30px; font-weight: 700; color: var(--cc-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--cc-muted); text-align: center; margin-bottom: 40px; }
-
-  .cc-services { padding: 72px 0; background: var(--cc-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--cc-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--cc-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--cc-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--cc-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--cc-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--cc-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--cc-red); font-weight: 500; }
-
-  .cc-neighborhoods { padding: 72px 0; background: white; }
-  .cc-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--cc-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--cc-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--cc-text); padding: 8px 12px; background: var(--cc-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--cc-red); color: var(--cc-black); font-weight: 500; }
-
-  /* DCS SPOTLIGHT */
-  .cc-dcs { padding: 72px 0; background: var(--cc-black); color: white; }
-  .dcs-inner { display: grid; grid-template-columns: 1fr 260px; gap: 60px; align-items: start; }
-  .dcs-eyebrow { font-size: 13px; font-weight: 500; color: var(--cc-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .dcs-text h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px; }
-  .dcs-text p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.75); margin-bottom: 16px; }
-  .dcs-brands { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
-  .db-item { padding: 6px 14px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-size: 13px; color: rgba(255,255,255,0.8); }
-  .db-item--featured { border-color: var(--cc-red); color: white; font-weight: 600; background: rgba(200,16,46,0.15); }
-  .dcs-cta { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 28px; text-align: center; position: sticky; top: 80px; }
-  .dcs-cta__title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 8px; }
-  .dcs-cta__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .dcs-cta .btn-primary { width: 100%; justify-content: center; margin-bottom: 12px; }
-  .dcs-cta__note { font-size: 12px; color: rgba(255,255,255,0.4); }
-
-  .cc-recent { padding: 72px 0; background: var(--cc-gray); }
-  .cc-recent h2 { font-size: 30px; font-weight: 700; color: var(--cc-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--cc-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--cc-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--cc-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--cc-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--cc-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-
-  .cc-why { padding: 72px 0; background: white; }
-  .cc-why h2 { font-size: 30px; font-weight: 700; color: var(--cc-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--cc-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--cc-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--cc-muted); line-height: 1.6; }
-
-  .cc-reviews { padding: 72px 0; background: var(--cc-gray); }
-  .cc-reviews h2 { font-size: 30px; font-weight: 700; color: var(--cc-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--cc-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--cc-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--cc-muted); font-weight: 500; }
-
-  .cc-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--cc-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--cc-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--cc-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--cc-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--cc-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--cc-red); }
-  .pricing-card__note { font-size: 13px; color: var(--cc-muted); }
-
-  .cc-faq { padding: 72px 0; background: var(--cc-gray); }
-  .cc-faq h2 { font-size: 30px; font-weight: 700; color: var(--cc-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--cc-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--cc-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--cc-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--cc-text); }
-
-  .cc-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--cc-border); }
-  .cc-nearby h2 { font-size: 20px; font-weight: 600; color: var(--cc-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--cc-border); border-radius: 20px; font-size: 14px; color: var(--cc-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--cc-red); color: var(--cc-red); }
-
-  .cc-bottom-cta { padding: 72px 0; background: var(--cc-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-
-  @media (max-width: 1024px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-grid { grid-template-columns: repeat(2, 1fr); }
-    .reviews-grid { grid-template-columns: 1fr 1fr; }
-    .dcs-inner { grid-template-columns: 1fr; }
-    .cc-intro__inner { grid-template-columns: 1fr; }
-    .nh-columns { grid-template-columns: 1fr 1fr; }
-    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .cc-hero__inner { grid-template-columns: 1fr; }
-    .cc-hero__img-wrap { display: none; }
-    .recent-grid { grid-template-columns: 1fr; }
-    .reviews-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr 1fr; }
-    .nh-columns { grid-template-columns: 1fr; }
-    .trust-bar__inner { justify-content: center; }
-  }
-  @media (max-width: 480px) {
-    .services-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; }
-    .cc-hero { padding: 48px 0 40px; }
-    .bottom-cta__text h2 { font-size: 26px; }
-  }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Need appliance repair in"
+    headlineAccent="Culver City today?"
+    body="Same-day service across Hayden Tract, Arts District, Fox Hills, and downtown. DCS and Fisher & Paykel specialists. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>

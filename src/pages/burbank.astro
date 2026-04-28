@@ -1,863 +1,307 @@
 ---
-// src/pages/burbank.astro
-// SDAR — samedayappliance.repair
-// Burbank, CA — Волна 2
-// Филиал: Pasadena · (626) 376-4458
-// GSC аномалия: 15,516 показов · 3 клика · CTR 0.02%
-// Апрель 2026
+/**
+ * Burbank, CA — Variant A migration (T9 Batch 11, Group 2 LA Valley).
+ * Branch: Los Angeles · ZIPs: 91501, 91502, 91504, 91505, 91506 · Source: wiki/migration/content-dumps/burbank.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (LA is service_area)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ *   - Replaced original Pasadena branch (626) 376-4458 with LA `branch.phone`
+ *     per Batch 11 brief (all 5 LA Valley pages → LA branch).
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Burbank",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91501", "91502", "91505", "91506"],
-  phone: "(626) 376-4458",
-  phoneRaw: "+16263764458",
-  email: "pasadena@samedayappliance.repair",
-  branch: "Pasadena",
-  slug: "burbank",
-  neighborhoods: [
-    "Magnolia Park", "Rancho Equestrian District", "Toluca Lake",
-    "Downtown Burbank", "Burbank Hills", "Empire Center Area",
-    "Media District", "Burbank Town Center Area", "Chandler Park"
-  ],
-  streets: [
-    "Magnolia Blvd", "Victory Blvd", "Olive Ave",
-    "San Fernando Blvd", "Alameda Ave", "Glenoaks Blvd"
-  ],
-  nearbyAreas: ["Glendale", "North Hollywood", "Pasadena", "Studio City"],
-};
+const branchSlug = 'los-angeles';
+const cityName = 'Burbank';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Burbank CA — Same Day Service | (626) 376-4458`;
-const description = `Same-day appliance repair in Burbank, CA. Refrigerator, washer, dryer, oven, dishwasher. Licensed techs, OEM parts, 90-day warranty. ZIP 91501, 91502. Call (626) 376-4458.`;
-const canonical = `https://samedayappliance.repair/burbank/`;
+const title = 'Appliance Repair Burbank CA | Same Day Service | All Brands';
+const description = 'Same-day appliance repair in Burbank, CA. Magnolia Park, Rancho Equestrian District, Toluca Lake, Media District, Downtown Burbank. OEM parts, 90-day warranty, $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/burbank/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Burbank",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "55 S Lake Ave",
-    "addressLocality": "Pasadena",
-    "addressRegion": "CA",
-    "postalCode": "91101",
-    "addressCountry": "US"
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '♨️', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Stove Repair', slug: 'oven' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔆', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '💨', name: 'Range Hood Repair', slug: 'range-hood' },
+];
+
+const neighborhoods = [
+  { name: 'Magnolia Park', zip: '91506' },
+  { name: 'Rancho Equestrian District', zip: '91506' },
+  { name: 'Toluca Lake', zip: '91505' },
+  { name: 'Media District', zip: '91505' },
+  { name: 'Downtown Burbank', zip: '91502' },
+  { name: 'Burbank Hills', zip: '91501' },
+  { name: 'Empire Center Area', zip: '91504' },
+  { name: 'Burbank Town Center', zip: '91502' },
+  { name: 'Chandler Park Area', zip: '91501' },
+];
+
+const narrativeParagraphs = [
+  "We get a lot of calls from Burbank because people in Burbank are busy. Studio shifts at Warner Bros. and Disney don't pause for a broken dryer, and a family in Magnolia Park can't sit through a four-day service window for a fridge that quit on Sunday. We schedule early-morning, evening, and weekend slots specifically because that's what Burbank actually needs.",
+  "We've worked every corner of this city — Craftsman bungalows off Magnolia Blvd with appliances older than the Dodgers, newer condos near Burbank Town Center loaded with Samsung and LG, and the hill homes up toward La Tuna Canyon. It's a varied city, and we know it well.",
+  "The diagnostic fee is $89 and it goes away the moment you move forward with the repair. We give you a written estimate before any work begins, and every repair carries a 90-day warranty on parts and labor.",
+];
+
+const narrativeSubSections = [
+  {
+    title: "A city that works around the clock — so do we",
+    paragraphs: [
+      "Many Burbank residents work in entertainment, and entertainment schedules are unlike a 9-to-5. Dryer dies at 6am before a shoot day. Fridge fails Sunday evening. We take those calls — same price, same techs, same 90-day warranty. Saturday and Sunday are not premium days for us.",
+      "Burbank's housing is also genuinely diverse. We've serviced 1940s Maytag washers in Magnolia Park (still going strong — credit to the original engineering), and brand-new Samsung smart fridges in Media District condos that need a laptop to diagnose. The team carries OEM parts for the brands we see most often: Samsung, LG, Whirlpool, GE, KitchenAid, Bosch, and the luxury lines for the hillside homes.",
+    ],
   },
-  "areaServed": {
-    "@type": "City",
-    "name": "Burbank",
-    "sameAs": "https://en.wikipedia.org/wiki/Burbank,_California"
+  {
+    title: "Dust on coils — a Burbank constant",
+    paragraphs: [
+      "We mention condenser coil cleaning on virtually every Burbank refrigerator call. The dry, dusty climate — especially up against the hills — is hard on coils. A coated condenser makes the compressor run longer and hotter, and over a few years that shortens compressor life. Annual coil cleaning costs almost nothing and prevents the single most expensive refrigerator repair we see.",
+    ],
   },
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  },
-  "hasOfferCatalog": {
-    "@type": "OfferCatalog",
-    "name": "Appliance Repair Services Burbank",
-    "itemListElement": [
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Refrigerator Repair Burbank CA" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Washer Repair Burbank CA" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Dryer Repair Burbank CA" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Oven Repair Burbank CA" } },
-      { "@type": "Offer", "itemOffered": { "@type": "Service", "name": "Dishwasher Repair Burbank CA" } }
-    ]
-  }
-};
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'Samsung Refrigerator',
+    neighborhood: 'Magnolia Park, 91506',
+    title: 'Samsung fridge — freezer is fine but the fridge section stopped cooling',
+    body: "Samsung French door with a failed evaporator fan — fridge side warms up but the freezer keeps working. Very common on this model. Replaced the fan motor with an OEM Samsung part, cleared the blocked defrost drain, and ran a full defrost cycle. Back to 37°F before the end of the visit.",
+    part: 'OEM Samsung evaporator fan + drain clear',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM Samsung part · 37°F confirmed',
+  },
+  {
+    badge: 'LG Front-Load Washer',
+    neighborhood: 'Toluca Lake, 91505',
+    title: 'LG washer — UE error, shaking so hard it walks across the floor',
+    body: "UE on LG usually means a balance or bearing issue. This one had worn shock absorbers — the drum was moving too freely during spin. Replaced both shocks with OEM LG parts and recalibrated the drum. Ran three test cycles back-to-back. Quiet and balanced. Customer said it hadn't run that well in two years.",
+    part: 'OEM LG shock absorbers x2',
+    time: '2 hours',
+    result: '✓ Same day · OEM LG parts · Three test cycles confirmed',
+  },
+  {
+    badge: 'GE Gas Range',
+    neighborhood: 'Downtown Burbank, 91502',
+    title: 'GE gas range — two burners click but won\'t light',
+    body: "Classic igniter wear — the ceramic igniter tips were cracked and not making contact. Replaced both igniter assemblies, checked the gas valve operation, and cleaned all five burner ports while there. The other three burners were fine. Customer asked about a maintenance schedule — we gave them some basic tips before heading out.",
+    part: 'OEM GE igniters x2 + burner port cleaning',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM GE igniters · Full burner check',
+  },
+  {
+    badge: 'Whirlpool Dryer',
+    neighborhood: 'Rancho District, 91506',
+    title: 'Whirlpool dryer — electric dryer stopped heating completely',
+    body: "Thermal fuse was blown — but we always check why it blew, not just replace it and leave. Found a partially crushed vent duct behind the dryer that had been restricting airflow for months. Replaced the thermal fuse, swapped the heating element as a precaution since it was running hot, and cleared the vent duct. A blocked dryer vent isn't just an appliance issue — it's a fire hazard. Tested heat output and airflow before leaving.",
+    part: 'OEM thermal fuse + heating element + vent clear',
+    time: '2.5 hours',
+    result: '✓ Same day · Root cause found and fixed',
+  },
+];
+
+const reviews = [
+  {
+    text: "My fridge stopped cooling the day before a family gathering. Within two hours of calling, a tech was at my door in Magnolia Park. He fixed it on the spot — had the part on his truck. I've already recommended these guys to three neighbors.",
+    author: '— Tom A., Magnolia Park, Burbank',
+  },
+  {
+    text: "I was nervous nobody would bother with my old Whirlpool washer. The technician not only knew exactly what was wrong, he explained it clearly and fixed it same day. I was expecting to buy a new one — instead I paid a reasonable repair bill. Really appreciated the honesty.",
+    author: '— Patricia M., Rancho District, Burbank',
+  },
+  {
+    text: "Dryer quit on Sunday morning with three loads of wet laundry. Called Same Day Appliance Repair not really expecting much on a Sunday. Tech arrived early afternoon, diagnosed it fast, had the part, tested it before leaving. Sunday service with no extra charge — that's rare.",
+    author: '— James R., Toluca Lake, Burbank',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · Coil inspection included' },
+  { label: 'Standard Repair', price: '$150–$420', note: 'Refrigerator, washer, dryer, dishwasher, range · OEM parts · 90-day warranty' },
+  { label: 'Luxury Brand Repair', price: '$300–$700+', note: 'Sub-Zero, Viking, Wolf, Thermador · OEM parts only' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Burbank?',
+    answer: 'Yes. Burbank is on our regular Los Angeles route — we service Magnolia Park, Rancho Equestrian District, Toluca Lake, Media District, Downtown Burbank, and the hill neighborhoods every day. Call before noon for same-day afternoon service in most cases. Saturday and Sunday slots are available at the same rate.',
+  },
+  {
+    question: 'What ZIP codes do you cover in Burbank?',
+    answer: 'All Burbank ZIP codes — 91501, 91502, 91504, 91505, and 91506. That maps to Burbank Hills and Chandler Park (91501), Downtown Burbank and the Town Center (91502), Empire Center area (91504), Toluca Lake and the Media District (91505), and Magnolia Park / Rancho District (91506).',
+  },
+  {
+    question: 'What is your diagnostic fee in Burbank?',
+    answer: 'Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice — no double charges.',
+  },
+  {
+    question: 'What appliance brands do you repair in Burbank?',
+    answer: 'All major brands: Samsung, LG, Whirlpool, GE, Maytag, Bosch, KitchenAid, Frigidaire, Electrolux, Kenmore, Amana, Speed Queen, Fisher & Paykel — plus luxury brands Sub-Zero, Viking, Thermador, Miele, and Dacor for the Burbank Hills and Toluca Lake homes that have them. GE and KitchenAid are among the most common brands our Burbank technicians service — parts for both on every truck.',
+  },
+  {
+    question: 'Do you offer a warranty on repairs in Burbank?',
+    answer: 'All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.',
+  },
+  {
+    question: 'How quickly can you get to Burbank?',
+    answer: "Burbank is one of our highest-volume areas. Our technicians are typically in or near Burbank multiple times per day — most calls placed before noon get an afternoon arrival window. For evening or weekend slots, we recommend booking at least one day ahead when possible.",
+  },
+  {
+    question: 'Do you also service Toluca Lake and the Media District?',
+    answer: 'Yes — both are part of the regular Burbank route. Toluca Lake (91505) and the Media District (91505) get the same same-day service, same pricing, same warranty as the rest of Burbank. We see a lot of newer condos in the Media District with Samsung and LG smart appliances, and we carry OEM parts for both.',
+  },
+];
+
+const nearby = [
+  { slug: 'glendale', name: 'Glendale' },
+  { slug: 'pasadena', name: 'Pasadena' },
+  { slug: 'north-hollywood', name: 'North Hollywood' },
+  { slug: 'toluca-lake', name: 'Toluca Lake' },
+  { slug: 'studio-city', name: 'Studio City' },
+  { slug: 'los-angeles', name: 'Los Angeles' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Burbank', sameAs: 'https://en.wikipedia.org/wiki/Burbank,_California' },
+    { '@type': 'PostalCode', name: '91501' },
+    { '@type': 'PostalCode', name: '91502' },
+    { '@type': 'PostalCode', name: '91504' },
+    { '@type': 'PostalCode', name: '91505' },
+    { '@type': 'PostalCode', name: '91506' },
+    { '@type': 'Place', name: 'Magnolia Park' },
+    { '@type': 'Place', name: 'Rancho Equestrian District' },
+    { '@type': 'Place', name: 'Toluca Lake' },
+    { '@type': 'Place', name: 'Media District' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Burbank, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. We offer same-day appliance repair throughout Burbank including Magnolia Park, Rancho, Toluca Lake, and the Media District. Call before noon and our technician can typically arrive the same day. We serve ZIP codes 91501, 91502, 91505, and 91506." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "What appliances do you repair in Burbank?",
-      "acceptedAnswer": { "@type": "Answer", "text": "We repair all major home appliances in Burbank: refrigerators, washers, dryers, ovens, stoves, dishwashers, cooktops, freezers, wine coolers, microwaves, and range hoods. We service all brands including Samsung, LG, Whirlpool, GE, Bosch, Sub-Zero, and Thermador." }
-    },
-    {
-      "@type": "Question",
-      "name": "What are your ZIP codes in Burbank?",
-      "acceptedAnswer": { "@type": "Answer", "text": "We serve all Burbank ZIP codes: 91501 (Downtown Burbank, Magnolia Park), 91502 (Burbank Town Center area), 91505 (Media District, Toluca Lake border), and 91506 (Rancho Equestrian District, Burbank Hills)." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Burbank?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, which is waived when you proceed with the repair. We provide a complete written estimate before any work begins. No hidden fees, no surprise charges." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Burbank?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs carry a 90-day warranty on both parts and labor. If the same issue returns within 90 days, we come back and fix it at no charge. We use genuine OEM parts for all major brands." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you service commercial appliances in Burbank?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. We repair commercial refrigerators, ovens, dishwashers, washers, dryers, and walk-in coolers for Burbank restaurants, studios, and businesses. Diagnostic fee for commercial repairs is $120, waived with repair." }
-    },
-    {
-      "@type": "Question",
-      "name": "How quickly can you come to Burbank?",
-      "acceptedAnswer": { "@type": "Answer", "text": "In most cases, we can send a technician to your Burbank home the same day you call. For urgent situations like a refrigerator that has stopped cooling or a washer flooding, call early and we prioritize your appointment." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- =====================================================================
-       HERO
-       ===================================================================== -->
-  <section class="bk-hero">
-    <div class="bk-hero__inner container">
-      <div class="bk-hero__content">
-        <div class="bk-hero__eyebrow">Burbank, CA · 91501 · 91502 · 91505 · 91506</div>
-        <h1 class="bk-hero__h1">
-          Appliance Repair<br>
-          <span class="bk-hero__accent">Burbank, CA</span>
-        </h1>
-        <p class="bk-hero__sub">
-          Same-day service for all major appliances in Burbank — refrigerators, washers, dryers, ovens,
-          dishwashers and more. Licensed technicians, OEM parts, 90-day warranty.
-          Magnolia Park, Rancho, Toluca Lake, Media District.
-        </p>
-        <div class="bk-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="bk-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+</span>
-        </div>
-      </div>
-      <div class="bk-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-burbank-ca.webp"
-          alt="Appliance repair technician in Burbank CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Burbank, CA · 91501 · 91502 · 91504 · 91505 · 91506"
+    headlineMain="Appliance repair in"
+    headlineAccent="Burbank, CA"
+    subheadline="Same-day service for all major appliances in Burbank — refrigerators, washers, dryers, ovens, dishwashers and more. Licensed technicians, OEM parts, 90-day warranty. Magnolia Park, Rancho, Toluca Lake, Media District."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- =====================================================================
-       TRUST BAR
-       ===================================================================== -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Same-Day Service</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>90-Day Warranty</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>OEM Parts</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Licensed & Insured</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>85% First-Visit Fix Rate</span>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Our Team Is in Burbank Every Day"
+    headline="A city that works around the clock —"
+    headlineAccent="so do we"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- =====================================================================
-       INTRO
-       ===================================================================== -->
-  <section class="bk-intro">
-    <div class="container bk-intro__inner">
-      <div class="bk-intro__text">
-        <h2>Our Team Is in Burbank Every Day</h2>
-        <p>
-          We get a lot of calls from Burbank — and not just because appliances break. It's because
-          people here are busy. Studio shifts at Warner Bros. and Disney don't pause for a broken
-          dryer. A family in Magnolia Park with two kids can't wait four days for a service window.
-          Our technicians know this, and we build our schedule around it — early slots, evening slots,
-          and yes, weekends.
-        </p>
-        <p>
-          We've worked in every corner of this city: the Craftsman bungalows off Magnolia Blvd where
-          the appliances are older and need someone who actually knows how to fix them, the newer
-          condos near Burbank Town Center with Samsung and LG units, the homes up in the hills.
-          We show up knowing what we're walking into, with the parts to handle it.
-        </p>
-        <p>
-          Diagnostic fee is <strong>$89</strong> — gone the moment you move forward with the repair.
-          Written estimate before anything starts. <strong>90-day warranty</strong> on every job.
-        </p>
-      </div>
-      <div class="bk-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Book Same-Day Service</div>
-          <div class="cta-box__sub">Burbank, CA · Available Today</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">
-            Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Burbank"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <!-- =====================================================================
-       SERVICES GRID
-       ===================================================================== -->
-  <section class="bk-services">
-    <div class="container">
-      <h2 class="section-title">Appliances We Repair in Burbank</h2>
-      <p class="section-sub">All major brands · Gas & electric · Residential & commercial</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Burbank neighborhoods"
+    headlineAccent="we service"
+    subheadline="91501 · 91502 · 91504 · 91505 · 91506 — every neighborhood, every day."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/burbank/refrigerator-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Leaking · Ice maker broken · Noisy compressor</div>
-          <div class="service-card__brands">Samsung · LG · Whirlpool · GE · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Burbank"
+    jobs={jobs}
+  />
 
-        <a href="/burbank/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Not spinning · Not draining · Leaking · Shaking violently</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/burbank/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Not spinning · Takes too long · Dryer vent cleaning · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Burbank"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/burbank/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven & Stove Repair</div>
-          <div class="service-card__issues">Not heating · Uneven temp · Igniter issues · Gas or electric</div>
-          <div class="service-card__brands">GE · Whirlpool · Samsung · Bosch · Viking</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Burbank"
+    cards={pricingCards}
+    bottomNote="Sub-Zero, Viking, Thermador and other luxury brands may cost more due to OEM part pricing. All prices include labor — no hidden fees. Residential pricing only."
+  />
 
-        <a href="/burbank/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not cleaning · Not draining · Leaking · Error codes</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Burbank"
+    faqs={faqs}
+  />
 
-        <a href="/burbank/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop Repair</div>
-          <div class="service-card__issues">Burner not working · Sparking · Induction issues</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Whirlpool · Thermador</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/burbank/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer Repair</div>
-          <div class="service-card__issues">Not freezing · Frost buildup · Noisy · Temperature off</div>
-          <div class="service-card__brands">Whirlpool · GE · Samsung · LG · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/burbank/range-hood-repair/" class="service-card">
-          <div class="service-card__icon">💨</div>
-          <div class="service-card__name">Range Hood Repair</div>
-          <div class="service-card__issues">Fan not working · Lights out · Motor failure · Noisy</div>
-          <div class="service-card__brands">Broan · KitchenAid · Zephyr · GE · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================================================================
-       BURBANK NEIGHBORHOODS
-       ===================================================================== -->
-  <section class="bk-neighborhoods">
-    <div class="container">
-      <h2>We Serve All Burbank Neighborhoods</h2>
-      <p class="section-sub">ZIP codes 91501 · 91502 · 91505 · 91506 — full coverage across the city</p>
-
-      <div class="neighborhoods-grid">
-        <div class="nh-card featured">
-          <div class="nh-name">Magnolia Park</div>
-          <div class="nh-zip">91506</div>
-        </div>
-        <div class="nh-card featured">
-          <div class="nh-name">Rancho Equestrian District</div>
-          <div class="nh-zip">91506</div>
-        </div>
-        <div class="nh-card featured">
-          <div class="nh-name">Toluca Lake</div>
-          <div class="nh-zip">91505</div>
-        </div>
-        <div class="nh-card">
-          <div class="nh-name">Media District</div>
-          <div class="nh-zip">91505</div>
-        </div>
-        <div class="nh-card">
-          <div class="nh-name">Downtown Burbank</div>
-          <div class="nh-zip">91502</div>
-        </div>
-        <div class="nh-card">
-          <div class="nh-name">Burbank Hills</div>
-          <div class="nh-zip">91501</div>
-        </div>
-        <div class="nh-card">
-          <div class="nh-name">Empire Center Area</div>
-          <div class="nh-zip">91504</div>
-        </div>
-        <div class="nh-card">
-          <div class="nh-name">Burbank Town Center</div>
-          <div class="nh-zip">91502</div>
-        </div>
-        <div class="nh-card">
-          <div class="nh-name">Chandler Park Area</div>
-          <div class="nh-zip">91501</div>
-        </div>
-      </div>
-
-      <div class="streets-list">
-        <span class="streets-label">Key streets:</span>
-        <span>Magnolia Blvd · Victory Blvd · Olive Ave · San Fernando Blvd · Alameda Ave · Glenoaks Blvd · Burbank Blvd</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================================================================
-       BURBANK CONTEXT — Media City специфика
-       ===================================================================== -->
-  <section class="bk-context">
-    <div class="container">
-      <div class="context-inner">
-        <div class="context-text">
-          <div class="context-eyebrow">Why Burbank Is Different</div>
-          <h2>A City That Works Around the Clock — So Do We</h2>
-          <p>
-            A lot of Burbank residents work in entertainment — which means their schedules look nothing
-            like a regular 9-to-5. When a dryer stops working at 6am before a long shoot day, or a
-            refrigerator dies on a Sunday evening, that's when our phones ring. We take those calls.
-            Early mornings, evenings, weekends — same price, same technicians, same service.
-          </p>
-          <p>
-            Burbank housing is genuinely diverse. Our techs have worked on 1940s Maytag washers in
-            Magnolia Park that their owners refuse to replace — and honestly, good for them, those
-            machines are built to last. We've also serviced brand-new Samsung smart fridges in Media
-            District condos that need a laptop to diagnose. We handle both without blinking.
-          </p>
-          <p>
-            One thing our technicians mention on almost every Burbank refrigerator call: condenser coil
-            cleaning. Burbank's dry, dusty climate is hard on coils — especially in homes near the
-            hills. Dust buildup makes the compressor work harder and shortens its life. A quick coil
-            cleaning once a year prevents one of the most expensive repairs we see.
-          </p>
-          <div class="context-stats">
-            <div class="cstat">
-              <div class="cstat-num">85%</div>
-              <div class="cstat-label">First-visit fix rate</div>
-            </div>
-            <div class="cstat">
-              <div class="cstat-num">90</div>
-              <div class="cstat-label">Day warranty</div>
-            </div>
-            <div class="cstat">
-              <div class="cstat-num">$89</div>
-              <div class="cstat-label">Diagnostic fee</div>
-            </div>
-            <div class="cstat">
-              <div class="cstat-num">7</div>
-              <div class="cstat-label">Days a week</div>
-            </div>
-          </div>
-        </div>
-        <div class="context-brands">
-          <div class="brands-label">All brands we repair in Burbank</div>
-          <div class="brands-grid">
-            <span>Samsung</span><span>LG</span><span>Whirlpool</span>
-            <span>GE</span><span>Maytag</span><span>Bosch</span>
-            <span>KitchenAid</span><span>Frigidaire</span><span>Electrolux</span>
-            <span>Sub-Zero</span><span>Viking</span><span>Thermador</span>
-            <span>Miele</span><span>Kenmore</span><span>Amana</span>
-            <span>Speed Queen</span><span>Fisher & Paykel</span><span>Dacor</span>
-          </div>
-          <div class="brands-note">GE and KitchenAid are among the most common brands our Burbank technicians service — parts for both on every truck.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================================================================
-       RECENT LOCAL REPAIRS
-       ===================================================================== -->
-  <section class="bk-recent">
-    <div class="container">
-      <h2>Jobs We Did in Burbank — Actual Calls, Not Examples</h2>
-      <p class="section-sub">Our technicians handled these. This is what a typical week looks like for our Burbank team.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Magnolia Park, 91506</span>
-          </div>
-          <div class="recent-card__title">"Freezer is fine but the fridge section stopped cooling"</div>
-          <div class="recent-card__desc">Samsung French door with a failed evaporator fan — the fridge side warms up but the freezer keeps working. Very common on this model. Our tech replaced the fan motor with an OEM Samsung part, cleared the blocked defrost drain, and ran a full defrost cycle. Back to 37°F before the end of the visit.</div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung part</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Front-Load Washer</span>
-            <span class="recent-location">Toluca Lake, 91505</span>
-          </div>
-          <div class="recent-card__title">"UE error, shaking so hard it walks across the floor"</div>
-          <div class="recent-card__desc">UE on LG usually means a balance or bearing issue. This one had worn shock absorbers — the drum was moving too freely during spin. Replaced both shock absorbers with OEM LG parts, recalibrated the drum. Ran three test cycles back-to-back. Quiet and balanced. Customer said it hadn't run that well in two years.</div>
-          <div class="recent-card__result">✓ Same day · OEM LG parts · Three test cycles confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">GE Gas Range</span>
-            <span class="recent-location">Downtown Burbank, 91502</span>
-          </div>
-          <div class="recent-card__title">"Two burners click but won't light"</div>
-          <div class="recent-card__desc">Classic igniter wear — the ceramic igniter tips were cracked and not making contact. Our tech replaced both igniter assemblies, checked the gas valve operation and cleaned all five burner ports while there. Tested everything before leaving. The other three burners were fine. Customer asked about a maintenance schedule — we gave them some tips before heading out.</div>
-          <div class="recent-card__result">✓ Same day · OEM GE igniters · Full burner check</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Whirlpool Dryer</span>
-            <span class="recent-location">Rancho District, 91506</span>
-          </div>
-          <div class="recent-card__title">"Electric dryer stopped heating completely"</div>
-          <div class="recent-card__desc">Thermal fuse was blown — but we always check why it blew, not just replace it and leave. Found a partially crushed vent duct behind the dryer that had been restricting airflow for months. Replaced the thermal fuse, swapped the heating element as a precaution since it was running hot, and cleared the vent duct. A blocked dryer vent isn't just an appliance issue — it's a fire hazard. We tested heat output and airflow before leaving and walked the customer through a simple annual dryer vent inspection they can do themselves.</div>
-          <div class="recent-card__result">✓ Same day · Root cause found and fixed</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================================================================
-       WHY US
-       ===================================================================== -->
-  <section class="bk-why">
-    <div class="container">
-      <h2>What Working With Our Burbank Team Actually Looks Like</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div class="why-title">We Fit Around Your Schedule</div>
-          <div class="why-text">Early morning, evening, Saturday, Sunday — our Burbank technicians work around studio schedules and family routines. Call before noon and we're usually there same day. No four-day waits.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <div class="why-title">We Fix the Actual Problem</div>
-          <div class="why-text">When a thermal fuse blows, we don't just swap it and leave. We find out why it blew. Our technicians look for the root cause — that's why 85% of our Burbank repairs are never called back.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-          </div>
-          <div class="why-title">The Price You Hear Is the Price You Pay</div>
-          <div class="why-text">We give you a full written estimate before we start. The $89 diagnostic fee disappears when you approve the repair. What we quote is what appears on the invoice. No surprises.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="why-title">We've Seen Every Burbank Appliance</div>
-          <div class="why-text">From the vintage Maytag washers in Magnolia Park that owners refuse to part with (rightfully so) to the latest Samsung smart fridge in a Media District condo. We come prepared for what Burbank actually has.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="bk-reviews">
-    <div class="container">
-      <h2>What Burbank Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"My fridge stopped cooling the day before a family gathering. Within two hours of calling, a tech was at my door in Magnolia Park. He fixed it on the spot — had the part on his truck. I've already recommended these guys to three neighbors."</div>
-          <div class="review-author">— Tom A., Magnolia Park, Burbank</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"I was nervous nobody would bother with my old Whirlpool washer. The technician not only knew exactly what was wrong, he explained it clearly and fixed it same day. I was expecting to buy a new one — instead I paid a reasonable repair bill. Really appreciated the honesty."</div>
-          <div class="review-author">— Patricia M., Rancho District, Burbank</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Dryer quit on Sunday morning with three loads of wet laundry. Called Same Day Appliance Repair not really expecting much on a Sunday. Tech arrived early afternoon, diagnosed it fast, had the part, tested it before leaving. Sunday service with no extra charge — that's rare."</div>
-          <div class="review-author">— James R., Toluca Lake, Burbank</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="bk-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Burbank</h2>
-      <p class="section-sub">Written estimate before we start. Diagnostic fee $89 — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Evaporator fan, compressor relay, thermostat, ice maker</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump, lid switch, shock absorbers, control board</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dryer</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Heating element, thermal fuse, drum roller, vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$175 – $420</div>
-          <div class="pricing-card__note">Igniter, bake element, gas valve, control board</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Drain pump, door latch, wash motor, spray arm</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-      <p class="pricing-note">Sub-Zero, Viking, Thermador and other luxury brands may cost more due to OEM part pricing. Commercial appliance diagnostic: $120, waived with repair. All prices include labor — no hidden fees.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="bk-faq">
-    <div class="container">
-      <h2>Frequently Asked Questions — Appliance Repair Burbank</h2>
-      <div class="faq-list">
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you offer same-day appliance repair in Burbank, CA?</summary>
-          <div class="faq-answer">Yes. We offer same-day appliance repair throughout Burbank including Magnolia Park, Rancho, Toluca Lake, and the Media District. Call before noon and our technician can typically arrive the same day. We serve ZIP codes 91501, 91502, 91505, and 91506.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What appliances do you repair in Burbank?</summary>
-          <div class="faq-answer">We repair all major home appliances in Burbank: refrigerators, washers, dryers, ovens, stoves, dishwashers, cooktops, freezers, wine coolers, microwaves, and range hoods. We service all brands including Samsung, LG, Whirlpool, GE, Bosch, Sub-Zero, and Thermador.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What ZIP codes do you cover in Burbank?</summary>
-          <div class="faq-answer">We serve all Burbank ZIP codes: 91501 (Downtown Burbank, Magnolia Park), 91502 (Burbank Town Center area), 91505 (Media District, Toluca Lake border), and 91506 (Rancho Equestrian District, Burbank Hills).</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What is your diagnostic fee in Burbank?</summary>
-          <div class="faq-answer">Our diagnostic fee is $89, which is waived when you proceed with the repair. We provide a complete written estimate before any work begins. No hidden fees, no surprise charges.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What warranty do you offer on appliance repairs in Burbank?</summary>
-          <div class="faq-answer">All repairs carry a 90-day warranty on both parts and labor. If the same issue returns within 90 days, we come back and fix it at no charge. We use genuine OEM parts for all major brands.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you service commercial appliances in Burbank?</summary>
-          <div class="faq-answer">Yes. We repair commercial refrigerators, ovens, dishwashers, washers, dryers, and walk-in coolers for Burbank restaurants, studios, and businesses. Diagnostic fee for commercial repairs is $120, waived with repair.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">How quickly can you come to Burbank?</summary>
-          <div class="faq-answer">In most cases, we can send a technician to your Burbank home the same day you call. For urgent situations like a refrigerator that has stopped cooling or a washer flooding, call early and we prioritize your appointment.</div>
-        </details>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================================================================
-       NEARBY
-       ===================================================================== -->
-  <section class="bk-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/north-hollywood/" class="nearby-link">North Hollywood</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/la-canada-flintridge/" class="nearby-link">La Cañada Flintridge</a>
-        <a href="/hollywood/" class="nearby-link">Hollywood</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================================================================
-       BOTTOM CTA
-       ===================================================================== -->
-  <section class="bk-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Need Appliance Repair in Burbank Today?</h2>
-          <p>Call now — same-day service available for most repairs. Diagnostic fee $89, waived with repair. 90-day warranty on all work.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Burbank, CA</span>
-          <span>·</span>
-          <span>Serving 91501 · 91502 · 91505 · 91506</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</Layout>
-
-<style>
-  :root {
-    --bk-red: #C8102E;
-    --bk-black: #0a0a0a;
-    --bk-gray: #f5f5f5;
-    --bk-border: #e2e2e2;
-    --bk-text: #1a1a1a;
-    --bk-muted: #6b6b6b;
-  }
-
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  /* HERO */
-  .bk-hero { background: var(--bk-black); color: white; padding: 80px 0 60px; }
-  .bk-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .bk-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--bk-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .bk-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .bk-hero__accent { color: var(--bk-red); }
-  .bk-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .bk-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .bk-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .bk-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-
-  /* BUTTONS */
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--bk-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); transition: border-color 0.2s, background 0.2s; }
-  .btn-secondary:hover { border-color: white; background: rgba(255,255,255,0.08); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .bk-bottom-cta .btn-secondary { color: var(--bk-text); border-color: var(--bk-border); }
-  .bk-bottom-cta .btn-secondary:hover { background: var(--bk-gray); }
-
-  /* TRUST BAR */
-  .trust-bar { background: var(--bk-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-
-  /* INTRO */
-  .bk-intro { padding: 72px 0; background: white; }
-  .bk-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .bk-intro__text h2 { font-size: 30px; font-weight: 700; color: var(--bk-black); margin-bottom: 20px; }
-  .bk-intro__text p { font-size: 16px; line-height: 1.7; color: var(--bk-text); margin-bottom: 16px; }
-  .cta-box { background: var(--bk-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--bk-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; transition: background 0.2s; }
-  .cta-box__book:hover { background: rgba(255,255,255,0.08); }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-
-  /* SECTION */
-  .section-title { font-size: 30px; font-weight: 700; color: var(--bk-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--bk-muted); text-align: center; margin-bottom: 40px; }
-
-  /* SERVICES */
-  .bk-services { padding: 72px 0; background: var(--bk-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--bk-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--bk-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--bk-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--bk-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--bk-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--bk-red); font-weight: 500; }
-
-  /* NEIGHBORHOODS */
-  .bk-neighborhoods { padding: 72px 0; background: white; }
-  .bk-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--bk-black); margin-bottom: 8px; text-align: center; }
-  .neighborhoods-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 24px; }
-  .nh-card { background: var(--bk-gray); border: 1px solid var(--bk-border); border-radius: 8px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; }
-  .nh-card.featured { border-color: var(--bk-red); background: #fff5f7; }
-  .nh-name { font-size: 15px; font-weight: 500; color: var(--bk-black); }
-  .nh-zip { font-size: 13px; color: var(--bk-muted); }
-  .streets-list { font-size: 14px; color: var(--bk-muted); text-align: center; padding: 16px; background: var(--bk-gray); border-radius: 8px; }
-  .streets-label { font-weight: 600; color: var(--bk-black); margin-right: 8px; }
-
-  /* CONTEXT */
-  .bk-context { padding: 72px 0; background: var(--bk-black); color: white; }
-  .context-inner { display: grid; grid-template-columns: 1fr 320px; gap: 60px; align-items: start; }
-  .context-eyebrow { font-size: 13px; font-weight: 500; color: var(--bk-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .context-text h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px; }
-  .context-text p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.75); margin-bottom: 16px; }
-  .context-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 28px; }
-  .cstat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; text-align: center; }
-  .cstat-num { font-size: 30px; font-weight: 700; color: var(--bk-red); margin-bottom: 4px; }
-  .cstat-label { font-size: 12px; color: rgba(255,255,255,0.6); }
-  .context-brands { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 28px; }
-  .brands-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .brands-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-  .brands-grid span { padding: 5px 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 13px; color: rgba(255,255,255,0.75); }
-
-  /* RECENT */
-  .brands-note { font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 12px; font-style: italic; }
-  .bk-pricing { padding: 72px 0; background: var(--bk-gray); }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: white; border-radius: 10px; padding: 20px 24px; border: 1px solid var(--bk-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--bk-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--bk-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 24px; font-weight: 700; color: var(--bk-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--bk-red); }
-  .pricing-card__note { font-size: 13px; color: var(--bk-muted); }
-  .pricing-note { font-size: 14px; color: var(--bk-muted); text-align: center; max-width: 640px; margin: 0 auto; }
-  .bk-recent { padding: 72px 0; background: white; }
-  .bk-recent h2 { font-size: 30px; font-weight: 700; color: var(--bk-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { border: 1px solid var(--bk-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-  .recent-badge { background: var(--bk-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--bk-muted); }
-  .recent-card__title { font-size: 16px; font-weight: 600; color: var(--bk-black); margin-bottom: 10px; }
-  .recent-card__desc { font-size: 14px; color: var(--bk-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-
-  /* WHY */
-  .bk-why { padding: 72px 0; background: var(--bk-gray); }
-  .bk-why h2 { font-size: 30px; font-weight: 700; color: var(--bk-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: white; border: 1px solid var(--bk-border); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { width: 48px; height: 48px; background: #fff5f7; border-radius: 10px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; color: var(--bk-red); }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--bk-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--bk-muted); line-height: 1.6; }
-
-  /* REVIEWS */
-  .bk-reviews { padding: 72px 0; background: white; }
-  .bk-reviews h2 { font-size: 30px; font-weight: 700; color: var(--bk-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { border: 1px solid var(--bk-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--bk-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--bk-muted); font-weight: 500; }
-
-  /* FAQ */
-  .bk-faq { padding: 72px 0; background: var(--bk-gray); }
-  .bk-faq h2 { font-size: 30px; font-weight: 700; color: var(--bk-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--bk-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--bk-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--bk-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--bk-text); }
-
-  /* NEARBY */
-  .bk-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--bk-border); }
-  .bk-nearby h2 { font-size: 20px; font-weight: 600; color: var(--bk-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--bk-border); border-radius: 20px; font-size: 14px; color: var(--bk-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--bk-red); color: var(--bk-red); }
-
-  /* BOTTOM CTA */
-  .bk-bottom-cta { padding: 72px 0; background: var(--bk-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-
-  /* RESPONSIVE */
-  @media (max-width: 1024px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-grid { grid-template-columns: repeat(2, 1fr); }
-    .reviews-grid { grid-template-columns: 1fr 1fr; }
-    .context-inner { grid-template-columns: 1fr; }
-    .context-stats { grid-template-columns: repeat(4, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .bk-hero__inner { grid-template-columns: 1fr; }
-    .bk-hero__img-wrap { display: none; }
-    .bk-intro__inner { grid-template-columns: 1fr; }
-    .recent-grid { grid-template-columns: 1fr; }
-    .neighborhoods-grid { grid-template-columns: 1fr 1fr; }
-    .reviews-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr 1fr; }
-    .context-stats { grid-template-columns: repeat(2, 1fr); }
-    .trust-bar__inner { justify-content: center; }
-  }
-  @media (max-width: 480px) {
-    .services-grid { grid-template-columns: 1fr; }
-    .neighborhoods-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .bk-hero { padding: 48px 0 40px; }
-  }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Need appliance repair in"
+    headlineAccent="Burbank today?"
+    body="Same-day service available for most repairs across all of Burbank. $89 diagnostic — waived with repair. 90-day warranty on parts and labor. Serving 91501 · 91502 · 91504 · 91505 · 91506."
+  />
+</CityLayout>
