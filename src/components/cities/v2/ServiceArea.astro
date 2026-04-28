@@ -5,19 +5,23 @@ export interface Neighborhood { name: string; zip: string; featured?: boolean; }
 
 export interface Props {
   cityName: string;
+  /** Short form used inside the subheadline ("WeHo", "Mission Viejo", etc.).
+   *  Defaults to cityName if not provided. */
+  cityShortName?: string;
   zips: string[];
   neighborhoods: Neighborhood[];
   keyStreets: string[];
 }
 
-const { cityName, zips, neighborhoods, keyStreets } = Astro.props;
+const { cityName, cityShortName, zips, neighborhoods, keyStreets } = Astro.props;
+const shortName = cityShortName ?? cityName;
 ---
 
 <section class="v2-area">
   <div class="v2-container">
     <h2 class="v2-section-title">We Serve All of {cityName}</h2>
     <p class="v2-section-sub">
-      Our technicians cover every neighborhood and street — ZIP codes {zips.join(', ')}.
+      Our technicians cover every neighborhood and street in {shortName} — ZIP codes {zips.join(', ')}.
     </p>
     <div class="v2-area__grid">
       {neighborhoods.map((n) => (
