@@ -1,526 +1,350 @@
 ---
-// src/pages/corona.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = "Corona";
-const citySlug = "corona";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["92879", "92880", "92881", "92882", "92883"];
-const county = "Riverside";
+const citySlug = 'corona';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Corona';
+const zips = ['92879', '92880', '92881', '92882', '92883'];
+
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
 const title = `Appliance Repair Corona CA — Same Day | All Brands | ${phone}`;
 const description = `Same-day appliance repair in Corona CA. Refrigerator, washer, dryer, oven, dishwasher & more. Sycamore Creek, Eagle Glen, Terramor, Dos Lagos. Licensed. OEM parts. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/corona/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Corona', sameAs: 'https://en.wikipedia.org/wiki/Corona,_California' },
+    { '@type': 'PostalCode', postalCode: '92879' },
+    { '@type': 'PostalCode', postalCode: '92880' },
+    { '@type': 'PostalCode', postalCode: '92881' },
+    { '@type': 'PostalCode', postalCode: '92882' },
+    { '@type': 'PostalCode', postalCode: '92883' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Corona is one of the most varied cities we service in the Inland Empire. Drive through enough of it and you'll see what we mean: mid-century homes near Circle City and Lincoln Avenue with 20-year-old Whirlpool and GE appliances still running strong; planned communities like Sycamore Creek and Eagle Glen with mid-2010s Samsung and LG hitting their first major failures; and the newer luxury developments at Terramor and The Retreat where Sub-Zero columns and Wolf ranges are standard. Our technicians work across all three of these worlds in the same week.",
+  "Corona's climate runs hot. The city sits at the junction of the Santa Ana Mountains and the Inland Valley, and summer heat in the 95–108°F range is routine. That load matters for appliances. Condenser coils on refrigerators and freezers clog faster with the fine dust that comes off the dry hillsides, especially during Santa Ana wind events. We see a predictable surge of refrigerator calls every June and July — appliances that were managing fine all spring finally push past their threshold when the heat arrives.",
+  "Hard water is a consistent factor throughout Corona and the broader Riverside County corridor. Dishwasher filters clog faster, ice maker fill tubes scale up, and washing machine door gaskets accumulate mineral deposits that accelerate mold growth. We include descaling as part of every dishwasher and ice maker repair call in this market.",
+  `We dispatch to Corona with same-day coverage across all five ZIP codes — 92879, 92880, 92881, 92882, 92883. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
+];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🫧', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🍳', name: 'Stove & Cooktop Repair', slug: 'cooktop' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
+
+const housingStockNarrative = {
+  headline: "Corona's Housing Stock — What's in Each Part of the City",
+  paragraphs: [
+    "Corona is unusual in the IE because it has genuine housing diversity — older stock, mid-range planned communities, and high-end new development all within the same city limits. The appliance profile varies significantly by neighborhood, and our technicians come prepared for what's actually there.",
+  ],
+  subSections: [
+    {
+      title: 'Downtown & North Corona — Circle City, Lincoln Ave (92879, 92880)',
+      paragraphs: [
+        "Corona's original neighborhoods near the historic circle and Lincoln Avenue corridor are older stock — homes built 1950s through 1980s, with appliances ranging from 15 to 25 years old. This is Whirlpool, GE, Maytag, and Kenmore territory. These machines are mechanically straightforward — fewer control boards, more physical components — and they're often genuinely worth repairing even at advanced age. A 20-year-old Whirlpool top-loader with a worn drive coupling is a $120 repair, not a replacement. We tell you which way the math goes after diagnosis.",
+        "Rental properties are common in this part of Corona. We work with landlords on priority scheduling and understand that a tenant without a working washer or refrigerator creates urgency. Tell us it's a rental when you call — we factor that in.",
+      ],
+    },
+    {
+      title: 'Sycamore Creek, Eagle Glen & Green River — Mid-Range Planned (92882, 92883)',
+      paragraphs: [
+        "These master-planned communities were built primarily in the 1990s and 2000s, and the appliances installed in them are now 15–25 years into their lifespan — or have been replaced with mid-range Samsung, LG, and KitchenAid in the last decade. This is the most active repair window in Corona. LG French-door refrigerators with linear inverter compressor issues, Samsung ice maker failures, KitchenAid dishwasher drain errors, front-load washer bearing wear — these are the calls we make here constantly. We keep the most common OEM parts for this generation on the truck.",
+      ],
+    },
+    {
+      title: 'Terramor, The Retreat & South Corona — Luxury New Development (92883)',
+      paragraphs: [
+        "South Corona's newer master-planned communities are bringing a different appliance profile to the city. Terramor in particular is a high-end development where Sub-Zero, Wolf, and Thermador are standard equipment. We service these exactly as we service our Beverly Hills and Bel Air calls — OEM parts only, careful handling, verified calibration after repair. The Terramor area also has elevated dust levels during the ongoing construction buildout, which means condenser coils on Sub-Zero units here need cleaning every 4–5 months rather than the standard 6.",
+      ],
+    },
+    {
+      title: 'Dos Lagos & Corona Hills — Mixed Mid-Tier',
+      paragraphs: [
+        "The Dos Lagos area and the Corona Hills neighborhoods run a consistent mid-range appliance profile — Samsung, LG, Whirlpool, Bosch — mostly from the 2010s, now entering the 8–12 year failure window. Heat is a specific issue here. The Dos Lagos corridor sits in a bowl that traps heat in summer, and appliances in homes without good ventilation around them run hotter than they should. We find condenser coil loading that's proportionally heavier here than in better-ventilated parts of the city.",
+      ],
+    },
+    {
+      title: 'Hard Water Across All of Corona',
+      paragraphs: [
+        "Riverside County water is consistently hard — dissolved calcium and magnesium levels that accelerate scale in dishwashers, ice makers, and washing machines. The maintenance schedule we recommend for Corona homes: dishwasher filter every 3 months, refrigerator water filter every 4 months, ice maker descale every 12–18 months. We include descaling in every dishwasher and ice maker repair call as standard — it's not an upsell, it's part of fixing the problem correctly.",
+      ],
+    },
+  ],
+};
 
 const neighborhoods = [
-  { name: "Sycamore Creek", zip: "92883" },
-  { name: "Eagle Glen", zip: "92883" },
-  { name: "Terramor", zip: "92883" },
-  { name: "The Retreat", zip: "92883" },
-  { name: "Dos Lagos", zip: "92882" },
-  { name: "Green River", zip: "92882" },
-  { name: "Corona Hills", zip: "92882" },
-  { name: "Montecito", zip: "92881" },
-  { name: "South Corona", zip: "92882" },
-  { name: "Sierra Del Oro", zip: "92882" },
-  { name: "Downtown / Circle City", zip: "92879" },
-  { name: "Lincoln Ave Corridor", zip: "92882" },
+  { name: 'Sycamore Creek', zip: '92883', featured: true },
+  { name: 'Eagle Glen', zip: '92883', featured: true },
+  { name: 'Terramor', zip: '92883', featured: true },
+  { name: 'The Retreat', zip: '92883' },
+  { name: 'Dos Lagos', zip: '92882' },
+  { name: 'Green River', zip: '92882' },
+  { name: 'Corona Hills', zip: '92882' },
+  { name: 'Montecito', zip: '92881' },
+  { name: 'South Corona', zip: '92882' },
+  { name: 'Sierra Del Oro', zip: '92882' },
+  { name: 'Downtown / Circle City', zip: '92879' },
+  { name: 'Lincoln Ave Corridor', zip: '92882' },
 ];
 
-const faqItems = [
+const recentJobs = [
   {
-    q: "Do you offer same-day appliance repair in Corona?",
-    a: `Yes — same-day service is available throughout Corona including Sycamore Creek, Eagle Glen, Terramor, Dos Lagos, South Corona, and Downtown. Call ${phone} before noon for same-day availability. We cover all five Corona ZIP codes — 92879, 92880, 92881, 92882, and 92883 — without a trip surcharge.`
+    appliance: 'Sub-Zero BI-48S',
+    location: 'Terramor, 92883',
+    quote: 'Not cooling in July, compressor running constantly',
+    description: "48-inch Sub-Zero built-in, compressor running without stopping, fridge compartment at 58°F. First call of the summer season — same pattern we see every July in south Corona. Pulled the unit and found the condenser coils completely packed with fine particulate from the construction dust that's still heavy in the Terramor area as the community builds out. Cleaned the coils thoroughly, tested the compressor load — within normal range once the coils were clear. Also found the door gasket on the left door had a hairline crack at the bottom corner, allowing warm air infiltration. Replaced the gasket with an OEM Sub-Zero part. Unit holding 38°F within two hours. New construction neighborhoods like Terramor have elevated dust levels for years during buildout. Condenser cleaning every 4–5 months, not 6.",
+    outcome: '✓ Same day · Coil cleaning + OEM Sub-Zero gasket · Holding 38°F',
   },
   {
-    q: "My refrigerator runs fine in winter but struggles every summer — what's happening?",
-    a: "This is one of the most predictable patterns we see in Corona. When ambient temperature hits 100–108°F in July and August, refrigerators that were managing fine in cooler months get pushed past their threshold. The two most common causes: condenser coils that are partially loaded with dust (common in Corona's dry, dusty summers) and a start relay or condenser fan motor that was already weakening. We clean and test both on every summer refrigerator call. In Corona's climate, condenser coils should be cleaned every 6 months — not once a year."
+    appliance: 'Whirlpool WTW5000DW Washer',
+    location: 'Downtown Corona / Circle City, 92879',
+    quote: "Won't agitate, spins fine, 2004 model",
+    description: "22-year-old top-load Whirlpool, still structurally solid. No agitation but spin cycle works. Classic transmission mode shift failure — the dogs in the transmission that shift between agitate and spin mode had worn down. On a machine this old, a full transmission replacement doesn't make economic sense. But the shift actuator and transmission dogs were still available as OEM parts. Replaced the actuator assembly, confirmed full agitate function. $145 parts and labor on a machine that's been running since 2004. Owner had been ready to replace it — didn't need to. Old-stock Whirlpool top-loaders are often worth repairing. Mechanical components, no circuit boards to fail.",
+    outcome: '✓ Same day · OEM shift actuator · $145 vs. new washer',
   },
   {
-    q: "What brands do you repair in Corona?",
-    a: "All of them. Downtown and older Corona neighborhoods have Whirlpool, GE, and Maytag workhorses that have been running for 15–20 years. The mid-range planned communities like Sycamore Creek and Eagle Glen run Samsung, LG, and KitchenAid from the 2010s. Terramor and The Retreat have Sub-Zero, Wolf, and Thermador as standard. We carry OEM parts for all of these and don't use aftermarket substitutes."
+    appliance: 'LG LRMVS3006S',
+    location: 'Eagle Glen, 92883',
+    quote: 'Clicking on startup, not cooling, 2017 model',
+    description: "2017 LG French-door, exactly the linear inverter compressor generation with documented start relay failures. Customer had been quoted $490 for a compressor replacement by another company without a proper diagnosis. We tested the start relay — open circuit failure confirmed. Replaced the relay ($18 part), confirmed normal compressor startup under ambient conditions, unit at 38°F within 45 minutes. Total cost: $89 diagnostic + $95 labor and parts. Saved the customer $300+ and a week of waiting for a compressor order. LG 2014–2019 French-door: always test the start relay before the compressor. Same symptoms, $18 vs. $450.",
+    outcome: '✓ Same day · Start relay (not compressor) · $89 + $95',
   },
   {
-    q: "What is your diagnostic fee?",
-    a: `$89 for residential, applied directly to the repair when you proceed. No hidden trip charge to any Corona ZIP code. We quote on-site after diagnosis — not over the phone based on symptoms. What we quote is what appears on the invoice.`
-  },
-  {
-    q: "Is it worth repairing an older appliance in Downtown or North Corona?",
-    a: "Usually yes, if the core mechanical components are sound. A 20-year-old Whirlpool washer with a worn drive coupling or a GE refrigerator with a failing defrost heater are both worth repairing if the motor and compressor are healthy. The exception: compressor failures on refrigerators over 15 years old, where repair cost versus replacement value stops making sense. We give you the honest numbers after diagnosis."
-  },
-  {
-    q: "My Samsung washer shows an error code and won't start — do you repair that?",
-    a: "Yes. Samsung error codes on the newer front-load and top-load models are usually pointing to specific component failures — door latch, water inlet valve, drain pump, or control board. We diagnose the actual cause before recommending parts. In most cases the error code identifies the symptom, not the root cause — and the root cause is cheaper to fix than the part the code points to."
-  },
-  {
-    q: "Do you service appliances in Eastvale and Norco near Corona?",
-    a: `Yes — we service Eastvale and Norco as part of our Corona area coverage. Call ${phone} for availability. No surcharge for these areas.`
-  },
-];
-
-const recentRepairs = [
-  {
-    title: "Sub-Zero BI-48S — not cooling in July, compressor running constantly",
-    neighborhood: "Terramor, 92883",
-    description: "48-inch Sub-Zero built-in, compressor running without stopping, fridge compartment at 58°F. First call of the summer season — same pattern we see every July in south Corona. Pulled the unit and found the condenser coils completely packed with fine particulate from the construction dust that's still heavy in the Terramor area as the community builds out. Cleaned the coils thoroughly, tested the compressor load — within normal range once the coils were clear. Also found the door gasket on the left door had a hairline crack at the bottom corner, allowing warm air infiltration. Replaced the gasket with an OEM Sub-Zero part. Unit holding 38°F within two hours.",
-    note: "New construction neighborhoods like Terramor have elevated dust levels for years during buildout. Condenser cleaning every 4–5 months, not 6."
-  },
-  {
-    title: "Whirlpool WTW5000DW washer — won't agitate, spins fine, 2004 model",
-    neighborhood: "Downtown Corona / Circle City, 92879",
-    description: "22-year-old top-load Whirlpool, still structurally solid. No agitation but spin cycle works. Classic transmission mode shift failure — the dogs in the transmission that shift between agitate and spin mode had worn down. On a machine this old, a full transmission replacement doesn't make economic sense. But the shift actuator and transmission dogs were still available as OEM parts. Replaced the actuator assembly, confirmed full agitate function. $145 parts and labor on a machine that's been running since 2004. Owner had been ready to replace it — didn't need to.",
-    note: "Old-stock Whirlpool top-loaders are often worth repairing. Mechanical components, no circuit boards to fail."
-  },
-  {
-    title: "LG LRMVS3006S — clicking on startup, not cooling, 2017 model",
-    neighborhood: "Eagle Glen, 92883",
-    description: "2017 LG French-door, exactly the linear inverter compressor generation with documented start relay failures. Customer had been quoted $490 for a compressor replacement by another company without a proper diagnosis. We tested the start relay — open circuit failure confirmed. Replaced the relay ($18 part), confirmed normal compressor startup under ambient conditions, unit at 38°F within 45 minutes. Total cost: $89 diagnostic + $95 labor and parts. Saved the customer $300+ and a week of waiting for a compressor order.",
-    note: "LG 2014–2019 French-door: always test the start relay before the compressor. Same symptoms, $18 vs. $450."
-  },
-  {
-    title: "KitchenAid KDTM354DSS — not cleaning top rack, E1 F9 error",
-    neighborhood: "Sycamore Creek, 92883",
-    description: "E1 F9 on KitchenAid dishwashers is a flood switch error, but in this case it was triggered by a slow drain — water backing up into the base pan. Root cause: the drain pump impeller was partially blocked with mineral scale from Riverside County hard water. The upper spray arm ports were also 60% blocked. Cleared the pump impeller, descaled the spray arms, cleaned the filter assembly, reset the flood switch. Running clean on full cycles. We put the customer on a 3-month filter cleaning schedule — the hard water here is hard enough that annual maintenance isn't sufficient.",
-    note: "E1 F9 is often a hard water maintenance issue, not a component failure. Diagnose before replacing the pump."
+    appliance: 'KitchenAid KDTM354DSS',
+    location: 'Sycamore Creek, 92883',
+    quote: 'Not cleaning top rack, E1 F9 error',
+    description: "E1 F9 on KitchenAid dishwashers is a flood switch error, but in this case it was triggered by a slow drain — water backing up into the base pan. Root cause: the drain pump impeller was partially blocked with mineral scale from Riverside County hard water. The upper spray arm ports were also 60% blocked. Cleared the pump impeller, descaled the spray arms, cleaned the filter assembly, reset the flood switch. Running clean on full cycles. We put the customer on a 3-month filter cleaning schedule — the hard water here is hard enough that annual maintenance isn't sufficient. E1 F9 is often a hard water maintenance issue, not a component failure. Diagnose before replacing the pump.",
+    outcome: '✓ Same day · Hard water descale · 3-month plan',
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Corona",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Corona",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'We cover all of Corona — old and new',
+    body: "From a 1975 Whirlpool in Circle City to a Sub-Zero in Terramor, we service every generation of appliance in this city. We don't specialize in only new or only old — we come prepared for whatever's actually in your home.",
   },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    iconKey: 'shield' as const,
+    title: 'Diagnosis before the quote',
+    body: "The $89 diagnostic fee means we look at the appliance before recommending anything. An LG refrigerator clicking could be an $18 relay or a $450 compressor. We find out which before quoting. What we quote is what appears on the invoice — no surprises.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Honest repair vs. replace guidance',
+    body: "A 22-year-old washer with a worn coupling is often worth repairing. A 16-year-old refrigerator with a failing compressor might not be. We give you the real economics after diagnosis and let you decide. We don't push repairs that don't make financial sense.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'OEM parts, not aftermarket',
+    body: "In a hot climate with hard water, appliances are already working harder than they should be. Using the correct OEM parts matters more here than in milder markets. We don't use aftermarket parts — they fail faster and can void warranties on newer units.",
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
-};
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Sub-Zero stopped cooling in July and I was convinced we needed a major repair. Tech came out, cleaned the condenser coils — packed with dust from the Terramor construction — and replaced a door gasket. Done in two hours. Much less than I expected."',
+    author: '— Katherine B., Terramor',
+  },
+  {
+    stars: 5,
+    text: '"Old Whirlpool washer in our rental property near Lincoln Ave stopped agitating. They came same day, diagnosed a transmission actuator, fixed it for $145. Tenant was happy and I didn\'t have to buy a new machine. Very fair and professional."',
+    author: '— James O., North Corona landlord',
+  },
+  {
+    stars: 5,
+    text: '"KitchenAid dishwasher was showing an error code and another company said I needed a new pump. Same Day diagnosed it as a hard water blockage, cleaned everything out, and it\'s been running perfectly. Saved me $250 and a lot of hassle."',
+    author: '— Rachel & Mike T., Sycamore Creek',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator Repair', range: '$150–$450', note: 'Coil cleaning · Door gasket · Inlet valve · Fan motor' },
+  { appliance: 'Washer Repair', range: '$140–$380', note: 'Drum · Drain pump · Transmission actuator · Door boot' },
+  { appliance: 'Dryer Repair', range: '$120–$320', note: 'Thermal fuse · Vent cleaning · Element · Belt' },
+  { appliance: 'Dishwasher Repair', range: '$89–$360', note: 'Hard water descale · E1 F9 · Spray arm · Pump' },
+  { appliance: 'Oven / Range', range: '$140–$400', note: 'Igniter · Element · Temperature calibration' },
+  { appliance: 'Sub-Zero', range: '$250–$650', note: 'OEM parts · Built-in column · Estate handling', featured: true },
+  { appliance: 'Ice Maker Repair', range: '$120–$280', note: 'Inlet valve · Mold descale · Solenoid' },
+  { appliance: 'Condenser Coil Cleaning', range: '$89–$150', note: 'Standalone service · Pre-summer · Construction dust' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Corona?',
+    answer: `Yes — same-day service is available throughout Corona including Sycamore Creek, Eagle Glen, Terramor, Dos Lagos, South Corona, and Downtown. Call ${phone} before noon for same-day availability. We cover all five Corona ZIP codes — 92879, 92880, 92881, 92882, and 92883 — without a trip surcharge.`,
+  },
+  {
+    question: "My refrigerator runs fine in winter but struggles every summer — what's happening?",
+    answer: "This is one of the most predictable patterns we see in Corona. When ambient temperature hits 100–108°F in July and August, refrigerators that were managing fine in cooler months get pushed past their threshold. The two most common causes: condenser coils that are partially loaded with dust (common in Corona's dry, dusty summers) and a start relay or condenser fan motor that was already weakening. We clean and test both on every summer refrigerator call. In Corona's climate, condenser coils should be cleaned every 6 months — not once a year.",
+  },
+  {
+    question: 'What brands do you repair in Corona?',
+    answer: "All of them. Downtown and older Corona neighborhoods have Whirlpool, GE, and Maytag workhorses that have been running for 15–20 years. The mid-range planned communities like Sycamore Creek and Eagle Glen run Samsung, LG, and KitchenAid from the 2010s. Terramor and The Retreat have Sub-Zero, Wolf, and Thermador as standard. We carry OEM parts for all of these and don't use aftermarket substitutes.",
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: "$89 for residential, applied directly to the repair when you proceed. No hidden trip charge to any Corona ZIP code. We quote on-site after diagnosis — not over the phone based on symptoms. What we quote is what appears on the invoice.",
+  },
+  {
+    question: 'Is it worth repairing an older appliance in Downtown or North Corona?',
+    answer: "Usually yes, if the core mechanical components are sound. A 20-year-old Whirlpool washer with a worn drive coupling or a GE refrigerator with a failing defrost heater are both worth repairing if the motor and compressor are healthy. The exception: compressor failures on refrigerators over 15 years old, where repair cost versus replacement value stops making sense. We give you the honest numbers after diagnosis.",
+  },
+  {
+    question: 'My Samsung washer shows an error code and won\'t start — do you repair that?',
+    answer: "Yes. Samsung error codes on the newer front-load and top-load models are usually pointing to specific component failures — door latch, water inlet valve, drain pump, or control board. We diagnose the actual cause before recommending parts. In most cases the error code identifies the symptom, not the root cause — and the root cause is cheaper to fix than the part the code points to.",
+  },
+  {
+    question: 'Do you service appliances in Eastvale and Norco near Corona?',
+    answer: `Yes — we service Eastvale and Norco as part of our Corona area coverage. Call ${phone} for availability. No surcharge for these areas.`,
+  },
+];
+
+const nearbyCities = [
+  { name: 'Riverside', slug: 'riverside' },
+  { name: 'Rancho Cucamonga', slug: 'rancho-cucamonga' },
+  { name: 'Chino Hills', slug: 'chino-hills' },
+  { name: 'Murrieta', slug: 'murrieta' },
+  { name: 'Menifee', slug: 'menifee' },
+  { name: 'Upland', slug: 'upland' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Corona, CA"
+    subheadline="Same-day service in Sycamore Creek, Eagle Glen, Terramor, Dos Lagos, South Corona, and throughout the city. All appliances, all brands, OEM parts. Licensed."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">Riverside County · ZIP 92879–92883</p>
-        <h1>Appliance Repair<br><span class="accent">Corona</span></h1>
-        <p class="hero-sub">Same-day service in Sycamore Creek, Eagle Glen, Terramor, Dos Lagos, South Corona, and throughout the city. All appliances, all brands, OEM parts. Licensed.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-      <div class="hero-img">
-        <img src="/images/cities/corona-appliance-repair.jpg" alt="Appliance repair in Corona CA" width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">📋</span><span>Licensed &amp; Insured</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Corona — Three Generations of Housing, One Service Area"
+    paragraphs={introParagraphs}
+    bookingTitle="Corona Service"
+    bookingSub="92879 · 92880 · 92881 · 92882 · 92883 · Same-day"
+  />
 
-  <!-- INTRO + SIDEBAR -->
-  <section class="intro-section container">
-    <div class="intro-content">
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Corona"
+    services={services}
+  />
 
-      <h2>Appliance Repair in Corona — Three Generations of Housing, One Service Area</h2>
+  <CustomNarrative
+    headline={housingStockNarrative.headline}
+    paragraphs={housingStockNarrative.paragraphs}
+    subSections={housingStockNarrative.subSections}
+    background="white"
+  />
 
-      <p>Corona is one of the most varied cities we service in the Inland Empire. Drive through enough of it and you'll see what we mean: mid-century homes near Circle City and Lincoln Avenue with 20-year-old Whirlpool and GE appliances still running strong; planned communities like Sycamore Creek and Eagle Glen with mid-2010s Samsung and LG hitting their first major failures; and the newer luxury developments at Terramor and The Retreat where Sub-Zero columns and Wolf ranges are standard. Our technicians work across all three of these worlds in the same week.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Neighborhoods We Service in Corona"
+    subheadline="Also serving Norco and Eastvale — same dispatch, no surcharge."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>Corona's climate runs hot. The city sits at the junction of the Santa Ana Mountains and the Inland Valley, and summer heat in the 95–108°F range is routine. That load matters for appliances. Condenser coils on refrigerators and freezers clog faster with the fine dust that comes off the dry hillsides, especially during Santa Ana wind events. We see a predictable surge of refrigerator calls every June and July — appliances that were managing fine all spring finally push past their threshold when the heat arrives.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Corona"
+    jobs={recentJobs}
+  />
 
-      <p>Hard water is a consistent factor throughout Corona and the broader Riverside County corridor. Dishwasher filters clog faster, ice maker fill tubes scale up, and washing machine door gaskets accumulate mineral deposits that accelerate mold growth. We include descaling as part of every dishwasher and ice maker repair call in this market.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Corona Residents Call Us"
+    reasons={whyReasons}
+  />
 
-      <p>We dispatch from our Pasadena branch for Corona. Same-day coverage across all five ZIP codes — 92879, 92880, 92881, 92882, 92883. Call {phone}.</p>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Corona Clients Say"
+    testimonials={testimonials}
+  />
 
-    </div>
+  <PricingCards
+    cityName={cityName}
+    headline="Typical Repair Pricing in Corona"
+    subhead="$89 diagnostic applied to repair. No trip charge to any Corona ZIP code."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Corona</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ Hard Water &amp; Scale Service</li>
-        <li>✓ 90-Day Warranty</li>
-        <li>✓ Licensed &amp; Insured</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Corona Appliance Repair — FAQ"
+    faqs={faqs}
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Corona</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-  <!-- HOUSING STOCK BLOCK -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>Corona's Housing Stock — What's in Each Part of the City</h2>
-
-        <p>Corona is unusual in the IE because it has genuine housing diversity — older stock, mid-range planned communities, and high-end new development all within the same city limits. The appliance profile varies significantly by neighborhood, and our technicians come prepared for what's actually there.</p>
-
-        <h3>Downtown &amp; North Corona — Circle City, Lincoln Ave (92879, 92880)</h3>
-        <p>Corona's original neighborhoods near the historic circle and Lincoln Avenue corridor are older stock — homes built 1950s through 1980s, with appliances ranging from 15 to 25 years old. This is Whirlpool, GE, Maytag, and Kenmore territory. These machines are mechanically straightforward — fewer control boards, more physical components — and they're often genuinely worth repairing even at advanced age. A 20-year-old Whirlpool top-loader with a worn drive coupling is a $120 repair, not a replacement. We tell you which way the math goes after diagnosis.</p>
-
-        <p>Rental properties are common in this part of Corona. We work with landlords on priority scheduling and understand that a tenant without a working washer or refrigerator creates urgency. Tell us it's a rental when you call — we factor that in.</p>
-
-        <h3>Sycamore Creek, Eagle Glen &amp; Green River — Mid-Range Planned (92882, 92883)</h3>
-        <p>These master-planned communities were built primarily in the 1990s and 2000s, and the appliances installed in them are now 15–25 years into their lifespan — or have been replaced with mid-range Samsung, LG, and KitchenAid in the last decade. This is the most active repair window in Corona. LG French-door refrigerators with linear inverter compressor issues, Samsung ice maker failures, KitchenAid dishwasher drain errors, front-load washer bearing wear — these are the calls we make here constantly. We keep the most common OEM parts for this generation on the truck.</p>
-
-        <h3>Terramor, The Retreat &amp; South Corona — Luxury New Development (92883)</h3>
-        <p>South Corona's newer master-planned communities are bringing a different appliance profile to the city. Terramor in particular is a high-end development where Sub-Zero, Wolf, and Thermador are standard equipment. We service these exactly as we service our Beverly Hills and Bel Air calls — OEM parts only, careful handling, verified calibration after repair. The Terramor area also has elevated dust levels during the ongoing construction buildout, which means condenser coils on Sub-Zero units here need cleaning every 4–5 months rather than the standard 6.</p>
-
-        <h3>Dos Lagos &amp; Corona Hills — Mixed Mid-Tier</h3>
-        <p>The Dos Lagos area and the Corona Hills neighborhoods run a consistent mid-range appliance profile — Samsung, LG, Whirlpool, Bosch — mostly from the 2010s, now entering the 8–12 year failure window. Heat is a specific issue here. The Dos Lagos corridor sits in a bowl that traps heat in summer, and appliances in homes without good ventilation around them run hotter than they should. We find condenser coil loading that's proportionally heavier here than in better-ventilated parts of the city.</p>
-
-        <h3>Hard Water Across All of Corona</h3>
-        <p>Riverside County water is consistently hard — dissolved calcium and magnesium levels that accelerate scale in dishwashers, ice makers, and washing machines. The maintenance schedule we recommend for Corona homes: dishwasher filter every 3 months, refrigerator water filter every 4 months, ice maker descale every 12–18 months. We include descaling in every dishwasher and ice maker repair call as standard — it's not an upsell, it's part of fixing the problem correctly.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Corona</h2>
-      <p>We cover all of Corona — from Downtown and Circle City to Sycamore Creek, Eagle Glen, Terramor, and South Corona. No travel surcharge to any address in the five Corona ZIP codes.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Norco and Eastvale — same dispatch, no surcharge. Call {phone}.</p>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">03</div>
-      <h2>Recent Repairs in Corona</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- WHY US + REVIEWS + PRICING -->
-  <section class="why-section container">
-    <div class="context-number">04</div>
-    <h2>Why Corona Residents Call Us</h2>
-
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>We cover all of Corona — old and new</h3>
-        <p>From a 1975 Whirlpool in Circle City to a Sub-Zero in Terramor, we service every generation of appliance in this city. We don't specialize in only new or only old — we come prepared for whatever's actually in your home.</p>
-      </div>
-      <div class="why-item">
-        <h3>Diagnosis before the quote</h3>
-        <p>The $89 diagnostic fee means we look at the appliance before recommending anything. An LG refrigerator clicking could be an $18 relay or a $450 compressor. We find out which before quoting. What we quote is what appears on the invoice — no surprises.</p>
-      </div>
-      <div class="why-item">
-        <h3>Honest repair vs. replace guidance</h3>
-        <p>A 22-year-old washer with a worn coupling is often worth repairing. A 16-year-old refrigerator with a failing compressor might not be. We give you the real economics after diagnosis and let you decide. We don't push repairs that don't make financial sense.</p>
-      </div>
-      <div class="why-item">
-        <h3>OEM parts, not aftermarket</h3>
-        <p>In a hot climate with hard water, appliances are already working harder than they should be. Using the correct OEM parts matters more here than in milder markets. We don't use aftermarket parts — they fail faster and can void warranties on newer units.</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Sub-Zero stopped cooling in July and I was convinced we needed a major repair. Tech came out, cleaned the condenser coils — packed with dust from the Terramor construction — and replaced a door gasket. Done in two hours. Much less than I expected."</p>
-        <p class="reviewer">— Katherine B., Terramor</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Old Whirlpool washer in our rental property near Lincoln Ave stopped agitating. They came same day, diagnosed a transmission actuator, fixed it for $145. Tenant was happy and I didn't have to buy a new machine. Very fair and professional."</p>
-        <p class="reviewer">— James O., North Corona landlord</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"KitchenAid dishwasher was showing an error code and another company said I needed a new pump. Same Day diagnosed it as a hard water blockage, cleaned everything out, and it's been running perfectly. Saved me $250 and a lot of hassle."</p>
-        <p class="reviewer">— Rachel &amp; Mike T., Sycamore Creek</p>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Corona</h3>
-      <p>Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item">
-          <span class="pi-service">Refrigerator Repair</span>
-          <span class="pi-range">$150–$450</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Washer Repair</span>
-          <span class="pi-range">$140–$380</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Repair</span>
-          <span class="pi-range">$120–$320</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Repair</span>
-          <span class="pi-range">$89–$360</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Oven / Range Repair</span>
-          <span class="pi-range">$140–$400</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Sub-Zero Repair</span>
-          <span class="pi-range">$250–$650</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Ice Maker Repair</span>
-          <span class="pi-range">$120–$280</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Condenser Coil Cleaning</span>
-          <span class="pi-range">$89–$150</span>
-        </div>
-      </div>
-      <p class="pricing-note">$89 diagnostic applied to repair. No trip charge to any Corona ZIP code.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq-section container">
-    <h2>Corona Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/riverside/">Riverside</a>
-      <a href="/rancho-cucamonga/">Rancho Cucamonga</a>
-      <a href="/chino-hills/">Chino Hills</a>
-      <a href="/murrieta/">Murrieta</a>
-      <a href="/menifee/">Menifee</a>
-      <a href="/upland/">Upland</a>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Corona Today?</h2>
-      <p>Same-day service across Sycamore Creek, Eagle Glen, Terramor, Dos Lagos, South Corona, Downtown, and all Corona ZIP codes.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
-.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
-h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
-h1 .accent { color: var(--color-accent); }
-.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
-.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
-
-.trust-bar { background: var(--color-accent); padding: 1rem 0; }
-.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
-
-.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
-.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-
-.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
-.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
-.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
-.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
-.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
-.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
-
-.services-section { background: var(--color-surface); padding: 4rem 0; }
-.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
-.svc-icon { font-size: 2rem; }
-.svc-name { font-size: .9rem; font-weight: 600; }
-
-.context-block { padding: 4rem 0; }
-.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
-.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; }
-.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
-.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-
-.neighborhoods-section { padding: 4rem 0; }
-.section-intro { margin-bottom: 2rem; }
-.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
-.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
-.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
-.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
-.nbhd-note { margin-top: 1.5rem; font-size: .875rem; color: var(--color-text-muted); }
-
-.repairs-section { padding: 4rem 0; }
-.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
-.section-header h2 { font-size: 1.6rem; }
-.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
-.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
-.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
-.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
-.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
-
-.why-section { padding: 4rem 0; }
-.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
-.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
-
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
-.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
-.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
-.reviewer { font-size: .8rem; color: var(--color-text-muted); }
-
-.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
-.pricing-block h3 { margin-bottom: .5rem; }
-.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.price-item { display: flex; flex-direction: column; gap: .25rem; }
-.pi-service { font-size: .85rem; color: var(--color-text-muted); }
-.pi-range { font-size: 1rem; font-weight: 700; }
-.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
-
-.faq-section { padding: 4rem 0; }
-.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.faq-list { display: flex; flex-direction: column; gap: .75rem; }
-.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
-.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
-.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
-
-.nearby-section { padding: 3rem 0; }
-.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
-.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
-.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
-.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
-
-.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
-.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
-.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
-.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-
-@media (max-width: 1024px) {
-  .intro-section { grid-template-columns: 1fr; }
-  .sticky-cta-box { position: static; }
-  .services-grid, .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-img { display: none; }
-  .context-inner { grid-template-columns: 1fr; }
-  .repairs-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Corona Today?"
+    body="Same-day service across Sycamore Creek, Eagle Glen, Terramor, Dos Lagos, South Corona, Downtown, and all Corona ZIP codes."
+  />
+</CityLayoutV2>

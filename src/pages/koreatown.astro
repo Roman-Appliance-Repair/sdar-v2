@@ -1,742 +1,321 @@
 ---
-// src/pages/koreatown.astro
-// SDAR — samedayappliance.repair
-// Koreatown, Los Angeles CA · 90005 · 90006 · 90020
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: commercial refrigerator repair koreatown — 12 показов, поз 47
-//      commercial refrigeration repair koreatown — 4 показа, поз 31
-//      (нет residential запросов — высокая конкуренция, отсутствие dedicated страницы)
-// Конкуренты: Top Notch LA (323-827-7237, knows "high-density apartments/mixed-use",
-//              real KTown reviews), Pacific Appliance (commercial+residential),
-//             Lafixit (commercial focus)
-// Уникальный угол: high-density apartments + Korean restaurant commercial corridor +
-//                  stackable/in-unit washer context + tenant diagnostic reports +
-//                  LADWP hard water in older buildings + Wilshire/Vermont/6th corridor
-// Апрель 2026
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
+const citySlug = 'koreatown';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = {
-  name: "Koreatown",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90005", "90006", "90020"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "koreatown",
-};
+const cityName = 'Koreatown';
+const zips = ['90005', '90006', '90020'];
 
-const title = `Appliance Repair Koreatown Los Angeles CA — Same Day | Apartments · Restaurants · Wilshire · Vermont | (323) 870-4790`;
-const description = `Same-day appliance repair in Koreatown, Los Angeles CA 90005 & 90006. Apartments, condos, restaurants. Samsung, LG, GE, commercial refrigeration. Licensed, OEM parts, 90-day warranty. Written tenant diagnostics. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/koreatown/`;
+const title = `Appliance Repair Koreatown LA | Apartments + Commercial Refrigeration | ${branch.phone}`;
+const description = "Same-day appliance repair in Koreatown, Los Angeles. Apartments, condos, restaurant commercial refrigeration. Written tenant reports. LADWP hard water aware. OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/koreatown/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Koreatown",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'Place', name: 'Koreatown', sameAs: 'https://en.wikipedia.org/wiki/Koreatown,_Los_Angeles' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Koreatown", "sameAs": "https://en.wikipedia.org/wiki/Koreatown,_Los_Angeles" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const introParagraphs = [
+  "Koreatown is one of the densest neighborhoods in LA — high-density apartments and condos along Wilshire, Vermont, and the cross streets, layered over an exceptionally active commercial restaurant corridor. The appliance work here covers both worlds: in-unit stackable washers in apartment laundry closets, compact galley kitchens, and the commercial refrigeration that the restaurant density along 6th Street and Wilshire depends on.",
+  "Tenants and building managers are most of our residential calls. The pattern we see often: a tenant's appliance breaks, the landlord needs documentation to authorize the repair, and the diagnostic report has to be in writing. We provide written tenant reports as standard — brand, model, what failed, what the repair involves, and the cost. Most property managers accept this as the basis for repair approval.",
+  "On the commercial side — Wilshire, 6th Street, Vermont — Koreatown's restaurant density means commercial refrigeration calls move quickly. A reach-in cooler holding at 48°F isn't an inconvenience; it's a food-safety threshold and a lost-product clock. We treat these calls accordingly.",
+  `LADWP water hardness across 90005, 90006, and 90020 runs 230–310 mg/L, and many of the older Koreatown buildings have galvanized supply lines that add iron to the baseline. The combined effect on dishwasher filters, washing machine pump filters, and ice maker inlet valves is real and consistent. Diagnostic fee is $89, credited toward repair. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for same-day service.`,
+  "<strong>Tenant tip for Koreatown:</strong> If your appliance is in a rental unit and your landlord needs to authorise the repair, call us first for the diagnostic. We'll give you a written report you can forward directly — brand, model, what failed, what the repair involves, and the cost. Most property managers accept this as the basis for repair approval. The $89 diagnostic fee is waived when the repair proceeds.",
+];
+
+const twoContextsNarrative = {
+  headline: 'Two Koreatown Contexts',
+  paragraphs: [
+    "Residential apartments and the restaurant corridor — we serve both.",
+  ],
+  subSections: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Koreatown, LA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Koreatown — Wilshire Boulevard corridor, Vermont Avenue, 6th Street, Western Avenue, and every residential and commercial address in 90005 and 90006. Call before noon for same-day afternoon service." }
+      title: 'Residential — Apartments & Condos',
+      paragraphs: [
+        "In-unit stackable washers, compact galley kitchens, older building plumbing — the appliance landscape in Koreatown's residential buildings requires care with space and documentation. We work in tight spaces and provide written tenant diagnostic reports as standard. Samsung, LG, GE, Whirlpool — OEM parts on every vehicle.",
+        "Written tenant reports · Compact kitchens · Stackable units.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Do you repair appliances in Koreatown apartments and high-rise buildings?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Koreatown has a high concentration of apartment buildings, condos, and mixed-use properties. Our technicians are experienced working in in-unit and stackable washer-dryer configurations, compact kitchen layouts, and coordinating building access. We also provide written diagnostic reports for tenants to share with property managers." }
+      title: 'Commercial — Restaurant Corridor',
+      paragraphs: [
+        "Wilshire Blvd, 6th Street, Vermont Ave — Koreatown's restaurant density is among the highest in LA. When a reach-in cooler or commercial refrigerator fails during service, the cost of lost product exceeds the repair. We service commercial refrigeration in restaurant settings throughout the Koreatown corridor.",
+        "Commercial refrigeration · Restaurant priority · Same day.",
+      ],
     },
-    {
-      "@type": "Question",
-      "name": "Do you repair commercial refrigerators and restaurant equipment in Koreatown?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Koreatown restaurant corridor on Wilshire, 6th Street, and Vermont Avenue has extensive commercial refrigeration. We service commercial refrigerators, reach-in coolers, and under-counter refrigeration units in restaurant settings. Call with your equipment brand and symptoms for availability." }
-    },
-    {
-      "@type": "Question",
-      "name": "Can you provide a written diagnostic report for my landlord in Koreatown?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tenant situations in Koreatown often require a written diagnostic report for the property manager or landlord. We provide clear written documentation of what failed, what the repair involves, and the cost — suitable for forwarding to your building management." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Koreatown?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Koreatown?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Koreatown residential repairs run $150–$400." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Mid-Wilshire, Hancock Park, and Silver Lake?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Koreatown service extends to Mid-Wilshire, Hancock Park, Hollywood, Echo Park, Silver Lake, West Hollywood, and all of central Los Angeles." }
-    }
-  ]
+  ],
 };
+
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'LADWP ice maker · Not cooling · Commercial reach-in · Fan motor', brands: 'Samsung · LG · GE · Whirlpool · True · Turbo Air' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'In-unit stackable · OE error · Not draining · Compact kitchen', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Electrolux' },
+  { icon: '💨', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · In-unit vent · Gas & electric', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'LADWP scale · Not draining · E24 · Older building plumbing', brands: 'Bosch · Samsung · LG · GE · KitchenAid · Whirlpool' },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven', issues: 'Not heating · Gas igniter · Temperature off · Compact range', brands: 'GE · Samsung · LG · KitchenAid · Whirlpool · Bosch' },
+  { icon: '🧊', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'LADWP inlet valve · Not freezing · Ice stopped · Commercial', brands: 'Samsung · LG · GE · Whirlpool · True · Manitowoc' },
+  { icon: '🏪', name: 'Commercial Refrigeration', slug: 'commercial-refrigerator', issues: 'Reach-in cooler · Restaurant priority · Not cooling · Condenser', brands: 'True · Turbo Air · Beverage-Air · Hoshizaki · Manitowoc' },
+  { icon: '♨️', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Gas igniter · Burner · Induction · Hood motor', brands: 'GE · Samsung · Bosch · KitchenAid · LG · Broan' },
+];
+
+const neighborhoods = [
+  { name: 'Wilshire Blvd corridor', zip: '90005', featured: true },
+  { name: 'Vermont Ave corridor', zip: '90006', featured: true },
+  { name: '6th Street restaurant row', zip: '90005', featured: true },
+  { name: 'Western Ave area', zip: '90005' },
+  { name: 'Oxford Ave / Serrano Ave', zip: '90020' },
+  { name: 'Olympic Blvd corridor', zip: '90006' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'LG Stackable Washer',
+    location: 'Wilshire corridor, 90005',
+    quote: 'OE error — machine stopped mid-cycle, laundry room flooded',
+    description: "Mid-rise apartment on the Wilshire corridor — LG stackable unit in a narrow in-unit laundry closet, OE drain error with standing water. Access was tight but manageable. Cleared the pump filter packed with LADWP mineral scale and lint, confirmed drain on three cycles. The galvanized supply lines in this 1960s building added iron to the LADWP baseline — explained to the tenant that quarterly filter cleaning matters more in this building than a newer one. Provided a written diagnostic summary at the tenant's request for the building manager.",
+    outcome: '✓ Same day · OE resolved · Written report · Quarterly plan explained',
+  },
+  {
+    appliance: 'True Reach-In Cooler',
+    location: '6th Street restaurant, 90005',
+    quote: 'Not holding temp — holding at 48°F, need it fixed today',
+    description: "Korean BBQ restaurant on 6th Street — True T-49 reach-in with condenser coils loaded from the kitchen environment and a condenser fan motor starting to fail. Temperature had drifted to 48°F — above the 41°F food safety threshold. Cleaned the condenser coils thoroughly, replaced the condenser fan motor with an OEM True part. Unit confirmed at 38°F within 90 minutes. Restaurant stayed open. Lost product avoided. Recommended a quarterly coil cleaning schedule — commercial kitchen environments load coils significantly faster than residential.",
+    outcome: '✓ Same day · 38°F confirmed · Restaurant open · Quarterly plan',
+  },
+  {
+    appliance: 'Samsung Refrigerator',
+    location: 'Vermont Ave area, 90006',
+    quote: 'Ice maker not working — tenant needs written report for landlord',
+    description: "Vermont Ave condo — Samsung French door with no ice production. LADWP mineral scale on the inlet valve had restricted flow completely. Replaced with OEM Samsung inlet valve, confirmed full production. Tenant specifically needed a written diagnostic report — their lease specifies the landlord is responsible for appliance repairs. Provided full written documentation: brand/model, failure cause (LADWP mineral scale), repair performed, parts cost, labor cost, total. Tenant forwarded to property management same day.",
+    outcome: '✓ Same day · OEM Samsung · Full production · Written report for landlord',
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'Oxford Ave, 90005',
+    quote: 'E24 drain error — older building, not sure about the pipes',
+    description: "Oxford Ave apartment — Bosch 300 series E24 drain error in a 1950s building with original galvanized supply and drain connections. Found: pump filter scaled by LADWP mineral content compounded by iron from the building's galvanized pipes, and a partial drain hose restriction from a connection fitting that had partially corroded. Cleared the filter, replaced the corroded drain hose fitting, confirmed three full drain cycles. Explained the dual water quality factor — this building's plumbing adds to the baseline LADWP hardness in every appliance it feeds.",
+    outcome: '✓ Same day · E24 resolved · Corroded fitting replaced · Dual factor explained',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'shield' as const,
+    title: 'Written Tenant Reports',
+    body: "When a tenant's appliance breaks and the landlord needs documentation to authorize the repair, we provide written diagnostic reports as standard — brand, model, failure cause, repair scope, parts and labor cost. Most Koreatown property managers accept these as the basis for approval.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Apartment & Dense Building Experience',
+    body: "Compact kitchens, stackable laundry closets, narrow access, building manager coordination — we work in dense Koreatown buildings every day. We know the older 1950s and 60s buildings, the galvanized plumbing that compounds LADWP hardness, and the access logistics that make these calls run smoothly.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Restaurant Refrigeration',
+    body: "When a reach-in cooler fails during service, the lost-product clock starts immediately and food-safety thresholds matter. We service True, Turbo Air, Beverage-Air, Hoshizaki, and Manitowoc commercial refrigeration in Koreatown restaurants with the urgency these calls require.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair we do in Koreatown carries a 90-day warranty on parts and labor. We use OEM parts on every job — residential and commercial. Same issue returns within 90 days — we come back at no charge.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"LG washer OE error in my Wilshire corridor apartment — tight laundry closet. Tech worked in the space without damaging anything, fixed the drain, gave me a written report for my building manager, explained the LADWP water issue in our older building. Professional from start to finish."',
+    author: '— Jennifer K., Wilshire corridor, Koreatown 90005',
+  },
+  {
+    stars: 5,
+    text: '"True reach-in cooler at our restaurant on 6th Street holding at 48°F on a Saturday. Called Same Day, they came same afternoon. Cleaned the coils, replaced the fan motor, confirmed 38°F before leaving. Restaurant stayed open, no product lost. This is what commercial refrigeration service needs to look like."',
+    author: '— (restaurant owner), 6th Street, Koreatown',
+  },
+  {
+    stars: 5,
+    text: '"My Samsung fridge ice maker stopped and I needed a written report for my landlord. Tech fixed the inlet valve with OEM parts and gave me a complete written diagnostic document I could forward directly. Landlord approved the repair cost immediately. Exactly the process I needed."',
+    author: '— David P., Vermont Ave, Koreatown 90006',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator / Ice Maker', range: '$150–$400', note: 'LADWP inlet valve · Ice maker module · Fan motor · Coil cleaning', featured: true },
+  { appliance: 'Commercial Reach-In Cooler', range: '$200–$600+', note: 'OEM parts · Restaurant priority · Coil cleaning · Condenser fan', featured: true },
+  { appliance: 'Washer / Dryer (incl. stackable)', range: '$150–$350', note: 'OE error · Pump filter · Vent cleaning · Compact units' },
+  { appliance: 'Dishwasher', range: '$150–$320', note: 'LADWP descale · E24 · Drain hose · Older buildings' },
+  { appliance: 'Oven / Range', range: '$150–$400', note: 'Igniter · Element · Compact range · Gas & electric' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Koreatown?',
+    answer: "Yes — we cover all of Koreatown including the Wilshire Blvd, Vermont Ave, 6th Street, and Western Ave corridors. Call before noon for same-day service across 90005, 90006, and 90020.",
+  },
+  {
+    question: 'Do you work in apartment buildings and high-rises in Koreatown?',
+    answer: "Yes — most of our Koreatown residential work is in apartments and condos. We work with tenants, landlords, and building managers across the dense building stock here. We coordinate building access, work in compact kitchens and narrow laundry closets, and provide written diagnostic reports when a tenant needs documentation for the landlord.",
+  },
+  {
+    question: 'Do you repair commercial refrigeration for Koreatown restaurants?',
+    answer: "Yes. We service commercial reach-in coolers, freezers, and refrigeration units in restaurant settings throughout the Koreatown corridor — Wilshire Boulevard, Vermont Avenue, 6th Street, Western Avenue. Call with your equipment brand and symptoms for same-day availability.",
+  },
+  {
+    question: "Can you provide a written diagnostic report I can forward to my landlord?",
+    answer: "Yes — written tenant reports are standard in Koreatown. After the diagnostic, we provide a document with brand, model, failure cause, repair scope, and itemized parts and labor cost. Most property managers accept this as the basis for repair authorization. The $89 diagnostic fee is waived when the repair proceeds.",
+  },
+  {
+    question: 'Are weekend appointments available in Koreatown?',
+    answer: "Yes — we offer Saturday appointments. Commercial refrigeration is prioritized including weekends. Sunday appointments are limited but we answer the phone every day.",
+  },
+  {
+    question: 'What is your diagnostic fee in Koreatown?',
+    answer: "Our diagnostic fee is $89. It covers the trip, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice. We service commercial appliances — call us for commercial pricing.",
+  },
+  {
+    question: 'Do you also serve Mid-Wilshire, Hancock Park, and Silver Lake from Koreatown?',
+    answer: "Yes — our Koreatown-area routes also cover Mid-Wilshire, Hancock Park, Hollywood, Silver Lake, Echo Park, and West Hollywood. Same-day service is typically available across this corridor.",
+  },
+];
+
+const nearbyCities = [
+  { name: 'Silver Lake', slug: 'silver-lake' },
+  { name: 'Los Feliz', slug: 'los-feliz' },
+  { name: 'Hollywood', slug: 'hollywood' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+  { name: 'Brentwood', slug: 'brentwood' },
+  { name: 'Culver City', slug: 'culver-city' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Koreatown, LA"
+    subheadline="One of LA's densest and most vibrant neighbourhoods — apartments, condos, restaurants, and a community that runs on appliances that work. In-unit washers, compact kitchens, commercial refrigeration. Same-day, written tenant reports, OEM parts, 90-day warranty."
+    zips={zips}
+    tier={1}
+  />
 
-  <!-- HERO -->
-  <section class="kt-hero">
-    <div class="kt-hero__inner container">
-      <div class="kt-hero__content">
-        <div class="kt-hero__eyebrow">Koreatown · 90005 & 90006 · Wilshire Blvd · Vermont Ave · 6th St · Western Ave</div>
-        <h1 class="kt-hero__h1">
-          Appliance Repair<br>
-          <span class="kt-hero__accent">Koreatown, LA</span>
-        </h1>
-        <p class="kt-hero__sub">
-          One of LA's densest and most vibrant neighbourhoods — apartments,
-          condos, restaurants, and a community that runs on appliances that
-          work. In-unit washers, compact kitchens, commercial refrigeration.
-          Same-day service, written tenant reports, OEM parts, 90-day warranty.
-        </p>
-        <div class="kt-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="kt-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="kt-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-koreatown-ca.webp"
-          alt="Appliance repair in Koreatown Los Angeles"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>Written Tenant Reports</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Koreatown — Built for This Neighbourhood"
+    paragraphs={introParagraphs}
+    bookingTitle="Koreatown Service"
+    bookingSub="90005 · 90006 · 90020 · Tenant reports · Same day"
+  />
 
-  <!-- INTRO -->
-  <section class="kt-intro">
-    <div class="container kt-intro__inner">
-      <div class="kt-intro__text">
-        <h2>Appliance Repair in Koreatown — Built for This Neighbourhood</h2>
-        <p>
-          Koreatown is one of LA's most densely populated neighbourhoods, and
-          the appliance repair needs here reflect that density. Most residents
-          are in apartments or condos — often with in-unit stackable washers,
-          compact kitchens, and galley layouts. These aren't the open-plan
-          kitchens of the west side; our technicians know how to work in
-          tight spaces without damaging tile, cabinetry, or flooring.
-        </p>
-        <p>
-          The tenant situation matters here more than in most parts of LA.
-          Many Koreatown residents are renters who need a written diagnostic
-          report to share with a property manager or landlord before the
-          repair is authorised. We provide this documentation as a matter
-          of course — clear written summary of what failed, what the repair
-          involves, and the cost estimate. Ready to forward.
-        </p>
-        <p>
-          The Korean restaurant corridor along Wilshire, 6th Street, and
-          Vermont Avenue is one of the densest restaurant districts in
-          Los Angeles. Commercial refrigeration failures in a restaurant
-          setting are urgent — lost product costs more than the repair.
-          We service commercial reach-in coolers and refrigeration units
-          in restaurant settings throughout Koreatown. Call with your
-          equipment brand and describe the symptoms.
-        </p>
-        <p>
-          LADWP hard water (230–310 mg/L) runs throughout Koreatown,
-          and many of the older apartment buildings in 90005 and 90006
-          still have original galvanized pipes that compound the mineral
-          content. Ice makers and dishwashers scale faster here.
-          Diagnostic fee: <strong>$89</strong> — waived with repair.
-          Written estimate before we start. <strong>90-day warranty</strong>.
-        </p>
-        <div class="kt-tip">
-          <div class="kt-tip__icon">📋</div>
-          <div class="kt-tip__text">
-            <strong>Tenant tip for Koreatown:</strong> If your appliance
-            is in a rental unit and your landlord needs to authorise the
-            repair, call us first for the diagnostic. We'll give you a
-            written report you can forward directly — brand, model, what
-            failed, what the repair involves, and the cost. Most property
-            managers accept this as the basis for repair approval.
-            The $89 diagnostic fee is waived when the repair proceeds.
-          </div>
-        </div>
-      </div>
-      <div class="kt-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Koreatown Service</div>
-          <div class="cta-box__sub">90005 · 90006 · Residential & commercial</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={twoContextsNarrative.headline}
+    paragraphs={twoContextsNarrative.paragraphs}
+    subSections={twoContextsNarrative.subSections}
+    background="gray"
+  />
 
-  <!-- TWO CONTEXTS -->
-  <section class="kt-contexts">
-    <div class="container">
-      <h2 class="section-title">Two Koreatown Contexts</h2>
-      <p class="section-sub">Residential apartments and the restaurant corridor — we serve both.</p>
-      <div class="context-grid">
-        <div class="context-card context-card--residential">
-          <div class="context-icon">🏢</div>
-          <div class="context-name">Residential — Apartments & Condos</div>
-          <div class="context-desc">
-            In-unit stackable washers, compact galley kitchens, older building
-            plumbing — the appliance landscape in Koreatown's residential
-            buildings requires care with space and documentation. We work in
-            tight spaces and provide written tenant diagnostic reports as
-            standard. Samsung, LG, GE, Whirlpool — OEM parts on every vehicle.
-          </div>
-          <div class="context-note">Written tenant reports · Compact kitchens · Stackable units</div>
-        </div>
-        <div class="context-card context-card--commercial">
-          <div class="context-icon">🍽️</div>
-          <div class="context-name">Commercial — Restaurant Corridor</div>
-          <div class="context-desc">
-            Wilshire Blvd, 6th Street, Vermont Ave — Koreatown's restaurant
-            density is among the highest in LA. When a reach-in cooler or
-            commercial refrigerator fails during service, the cost of lost
-            product exceeds the repair. We service commercial refrigeration
-            in restaurant settings throughout the Koreatown corridor.
-          </div>
-          <div class="context-note">Commercial refrigeration · Restaurant priority · Same day</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Koreatown"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="kt-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Koreatown</h2>
-      <p class="section-sub">Residential & commercial · LADWP hard water aware · 90005 & 90006</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="Koreatown Areas We Service"
+    subheadline="From the Wilshire and Vermont corridors to the 6th Street restaurant row — every part of 90005, 90006, and 90020."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={['Wilshire Blvd', 'Vermont Ave', '6th St', 'Western Ave', '8th St', 'Olympic Blvd']}
+  />
 
-        <a href="/koreatown/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">LADWP ice maker · Not cooling · Commercial reach-in · Fan motor</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · True · Turbo Air</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Koreatown"
+    jobs={recentJobs}
+  />
 
-        <a href="/koreatown/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">In-unit stackable · OE error · Not draining · Compact kitchen</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Koreatown Residents and Restaurants Call Us"
+    reasons={whyReasons}
+  />
 
-        <a href="/koreatown/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · In-unit vent · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Koreatown Clients Say"
+    testimonials={testimonials}
+  />
 
-        <a href="/koreatown/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">LADWP scale · Not draining · E24 · Older building plumbing</div>
-          <div class="service-card__brands">Bosch · Samsung · LG · GE · KitchenAid · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Koreatown"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/koreatown/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Compact range</div>
-          <div class="service-card__brands">GE · Samsung · LG · KitchenAid · Whirlpool · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Koreatown"
+    faqs={faqs}
+  />
 
-        <a href="/koreatown/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">LADWP inlet valve · Not freezing · Ice stopped · Commercial</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · True · Manitowoc</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-        <a href="/koreatown/commercial-refrigeration/" class="service-card service-card--commercial">
-          <div class="service-card__icon">🏪</div>
-          <div class="service-card__name">Commercial Refrigeration</div>
-          <div class="service-card__issues">Reach-in cooler · Restaurant priority · Not cooling · Condenser</div>
-          <div class="service-card__brands">True · Turbo Air · Beverage-Air · Hoshizaki · Manitowoc</div>
-          <div class="service-card__cta">Call for availability →</div>
-        </a>
-
-        <a href="/koreatown/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction · Hood motor</div>
-          <div class="service-card__brands">GE · Samsung · Bosch · KitchenAid · LG · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="kt-neighborhoods">
-    <div class="container">
-      <h2>All of Koreatown — 90005 & 90006</h2>
-      <p class="section-sub">Wilshire to Olympic — every street and building type we serve</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">KTown Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Wilshire Blvd corridor</div>
-            <div class="nh-item featured">Vermont Ave corridor</div>
-            <div class="nh-item featured">6th Street restaurant row</div>
-            <div class="nh-item">Western Ave area</div>
-            <div class="nh-item">Oxford Ave / Serrano Ave</div>
-            <div class="nh-item">Olympic Blvd corridor</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Wilshire Blvd</div>
-            <div class="nh-item">Vermont Ave</div>
-            <div class="nh-item">6th St</div>
-            <div class="nh-item">Western Ave</div>
-            <div class="nh-item">8th St</div>
-            <div class="nh-item">Olympic Blvd</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Mid-Wilshire (90036)</div>
-            <div class="nh-item">Hancock Park (90004)</div>
-            <div class="nh-item">Hollywood (90028)</div>
-            <div class="nh-item">Silver Lake (90026)</div>
-            <div class="nh-item">Echo Park (90026)</div>
-            <div class="nh-item">West Hollywood (90046)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="kt-recent">
-    <div class="container">
-      <h2>Recent Jobs in Koreatown</h2>
-      <p class="section-sub">Real calls from 90005 and 90006 — apartments, restaurants, LADWP hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Stackable Washer</span>
-            <span class="recent-location">Wilshire corridor, 90005</span>
-          </div>
-          <div class="recent-card__title">"OE error — machine stopped mid-cycle, laundry room flooded"</div>
-          <div class="recent-card__desc">
-            Mid-rise apartment on the Wilshire corridor — LG stackable unit
-            in a narrow in-unit laundry closet, OE drain error with standing
-            water. Access was tight but manageable. Cleared the pump filter
-            packed with LADWP mineral scale and lint, confirmed drain on three
-            cycles. The galvanized supply lines in this 1960s building added
-            iron to the LADWP baseline — explained to the tenant that quarterly
-            filter cleaning matters more in this building than a newer one.
-            Provided a written diagnostic summary at the tenant's request for
-            the building manager.
-          </div>
-          <div class="recent-card__result">✓ Same day · OE resolved · Written report · Quarterly plan explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">True Reach-In Cooler</span>
-            <span class="recent-location">6th Street restaurant, 90005</span>
-          </div>
-          <div class="recent-card__title">"Not holding temp — holding at 48°F, need it fixed today"</div>
-          <div class="recent-card__desc">
-            Korean BBQ restaurant on 6th Street — True T-49 reach-in
-            with condenser coils loaded from the kitchen environment and
-            a condenser fan motor starting to fail. Temperature had drifted
-            to 48°F — above the 41°F food safety threshold. Cleaned the
-            condenser coils thoroughly, replaced the condenser fan motor
-            with an OEM True part. Unit confirmed at 38°F within 90 minutes.
-            Restaurant stayed open. Lost product avoided. Recommended a
-            quarterly coil cleaning schedule — commercial kitchen environments
-            load coils significantly faster than residential.
-          </div>
-          <div class="recent-card__result">✓ Same day · 38°F confirmed · Restaurant open · Quarterly plan</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Vermont Ave area, 90006</span>
-          </div>
-          <div class="recent-card__title">"Ice maker not working — tenant needs written report for landlord"</div>
-          <div class="recent-card__desc">
-            Vermont Ave condo — Samsung French door with no ice production.
-            LADWP mineral scale on the inlet valve had restricted flow
-            completely. Replaced with OEM Samsung inlet valve, confirmed full
-            production. Tenant specifically needed a written diagnostic report
-            — their lease specifies the landlord is responsible for appliance
-            repairs. Provided full written documentation: brand/model, failure
-            cause (LADWP mineral scale), repair performed, parts cost, labor
-            cost, total. Tenant forwarded to property management same day.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung · Full production · Written report for landlord</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Oxford Ave, 90005</span>
-          </div>
-          <div class="recent-card__title">"E24 drain error — older building, not sure about the pipes"</div>
-          <div class="recent-card__desc">
-            Oxford Ave apartment — Bosch 300 series E24 drain error in a
-            1950s building with original galvanized supply and drain
-            connections. Found: pump filter scaled by LADWP mineral content
-            compounded by iron from the building's galvanized pipes, and a
-            partial drain hose restriction from a connection fitting that had
-            partially corroded. Cleared the filter, replaced the corroded
-            drain hose fitting, confirmed three full drain cycles. Explained
-            the dual water quality factor — this building's plumbing adds to
-            the baseline LADWP hardness in every appliance it feeds.
-          </div>
-          <div class="recent-card__result">✓ Same day · E24 resolved · Corroded fitting replaced · Dual factor explained</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="kt-why">
-    <div class="container">
-      <h2>Why Koreatown Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">📋</div>
-          <div class="why-title">Written Tenant Reports</div>
-          <div class="why-text">Many Koreatown residents are renters who need documentation for their landlord or property manager. We provide clear written diagnostic reports as standard — brand, model, failure cause, repair description, cost breakdown. Ready to forward, no extra charge.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏢</div>
-          <div class="why-title">Apartment & Dense Building Experience</div>
-          <div class="why-text">Koreatown's high-rise and mid-rise apartments have in-unit stackables, compact galley kitchens, and challenging access. We work carefully in tight spaces, protect original finishes, and coordinate building access professionally.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🍽️</div>
-          <div class="why-title">Restaurant Refrigeration</div>
-          <div class="why-text">The Koreatown restaurant corridor is dense and busy. Commercial reach-in cooler failures are urgent — we treat them that way. Same-day priority for commercial refrigeration when product is at risk. Call with your brand and symptoms.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="kt-reviews">
-    <div class="container">
-      <h2>What Koreatown Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG washer OE error in my Wilshire corridor apartment — tight laundry closet. Tech worked in the space without damaging anything, fixed the drain, gave me a written report for my building manager, explained the LADWP water issue in our older building. Professional from start to finish."</div>
-          <div class="review-author">— Jennifer K., Wilshire corridor, Koreatown 90005</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"True reach-in cooler at our restaurant on 6th Street holding at 48°F on a Saturday. Called Same Day, they came same afternoon. Cleaned the coils, replaced the fan motor, confirmed 38°F before leaving. Restaurant stayed open, no product lost. This is what commercial refrigeration service needs to look like."</div>
-          <div class="review-author">— (restaurant owner), 6th Street, Koreatown</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"My Samsung fridge ice maker stopped and I needed a written report for my landlord. Tech fixed the inlet valve with OEM parts and gave me a complete written diagnostic document I could forward directly. Landlord approved the repair cost immediately. Exactly the process I needed."</div>
-          <div class="review-author">— David P., Vermont Ave, Koreatown 90006</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="kt-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Koreatown</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">LADWP inlet valve · Galvanized pipe factor · Fan motor</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Commercial Reach-In Cooler</div>
-          <div class="pricing-card__range">$200 – $600+</div>
-          <div class="pricing-card__note">Restaurant priority · True / Turbo Air · OEM parts</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer (incl. stackable)</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">In-unit · OE drain · Thermal fuse · Compact space</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">LADWP scale · E24 · Galvanized pipe · Filter</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived with repair · Written report included</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="kt-faq">
-    <div class="container">
-      <h2>Questions Koreatown Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Koreatown, LA?</summary><div class="faq-answer">Yes. Our technicians cover all of Koreatown — Wilshire Blvd, Vermont Ave, 6th Street, Western Ave, and every residential and commercial address in 90005 and 90006. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair appliances in Koreatown apartments and high-rise buildings?</summary><div class="faq-answer">Yes. We're experienced with in-unit stackable units, compact galley kitchens, and building access coordination. We also provide written diagnostic reports for tenants to share with property managers.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair commercial refrigerators and restaurant equipment in Koreatown?</summary><div class="faq-answer">Yes. We service commercial reach-in coolers and refrigeration units in restaurant settings throughout the Koreatown corridor. Call with your equipment brand and symptoms for same-day availability.</div></details>
-        <details class="faq-item"><summary class="faq-question">Can you provide a written diagnostic report for my landlord in Koreatown?</summary><div class="faq-answer">Yes. We provide written diagnostic documentation as standard — brand, model, failure cause, repair description, and cost breakdown. Ready to forward to your building management or landlord.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Koreatown?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Koreatown?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Koreatown residential repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Mid-Wilshire, Hancock Park, and Silver Lake?</summary><div class="faq-answer">Yes. Our Koreatown service extends to Mid-Wilshire, Hancock Park, Hollywood, Echo Park, Silver Lake, West Hollywood, and all of central Los Angeles.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="kt-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/silver-lake/" class="nearby-link">Silver Lake</a>
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-        <a href="/hollywood/" class="nearby-link">Hollywood</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/culver-city/" class="nearby-link">Culver City</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="kt-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Koreatown?</h2>
-          <p>Apartments · Restaurants · Written tenant reports · LADWP hard water aware · All of 90005 & 90006. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Koreatown, Los Angeles CA 90005 · 90006</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --kt-red: #C8102E; --kt-black: #0a0a0a; --kt-gray: #f5f5f5; --kt-border: #e2e2e2; --kt-text: #1a1a1a; --kt-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .kt-hero { background: var(--kt-black); color: white; padding: 80px 0 60px; }
-  .kt-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .kt-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--kt-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .kt-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .kt-hero__accent { color: var(--kt-red); }
-  .kt-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .kt-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .kt-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .kt-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--kt-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .kt-bottom-cta .btn-secondary { color: var(--kt-text); border-color: var(--kt-border); }
-  .trust-bar { background: var(--kt-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .kt-intro { padding: 72px 0; background: white; }
-  .kt-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .kt-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--kt-black); margin-bottom: 20px; }
-  .kt-intro__text p { font-size: 16px; line-height: 1.7; color: var(--kt-text); margin-bottom: 16px; }
-  .kt-tip { display: flex; gap: 14px; background: #f0f6ff; border: 1px solid #b8d0f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .kt-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .kt-tip__text { font-size: 14px; color: var(--kt-text); line-height: 1.6; }
-  .cta-box { background: var(--kt-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--kt-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .kt-contexts { padding: 72px 0; background: var(--kt-gray); }
-  .context-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .context-card { background: white; border: 1px solid var(--kt-border); border-radius: 14px; padding: 32px; }
-  .context-card--residential { border-color: var(--kt-red); background: #fff5f7; }
-  .context-card--commercial { border-color: #1a6b1a; background: #f5fff5; }
-  .context-icon { font-size: 32px; margin-bottom: 12px; }
-  .context-name { font-size: 18px; font-weight: 600; color: var(--kt-black); margin-bottom: 12px; }
-  .context-desc { font-size: 15px; color: var(--kt-text); line-height: 1.7; margin-bottom: 14px; }
-  .context-note { font-size: 13px; font-weight: 500; color: var(--kt-muted); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--kt-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--kt-muted); text-align: center; margin-bottom: 40px; }
-  .kt-services { padding: 72px 0; background: white; }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--kt-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--kt-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--kt-red); background: #fff5f7; }
-  .service-card--commercial { border-color: #1a6b1a; background: #f5fff5; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--kt-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--kt-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--kt-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--kt-red); font-weight: 500; }
-  .service-card--commercial .service-card__cta { color: #1a6b1a; }
-  .kt-neighborhoods { padding: 72px 0; background: var(--kt-gray); }
-  .kt-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--kt-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--kt-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--kt-text); padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid var(--kt-border); }
-  .nh-item.featured { background: #fff5f7; border-color: var(--kt-red); color: var(--kt-black); font-weight: 500; }
-  .kt-recent { padding: 72px 0; background: white; }
-  .kt-recent h2 { font-size: 30px; font-weight: 700; color: var(--kt-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: var(--kt-gray); border: 1px solid var(--kt-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--kt-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--kt-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--kt-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--kt-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .kt-why { padding: 72px 0; background: var(--kt-gray); }
-  .kt-why h2 { font-size: 30px; font-weight: 700; color: var(--kt-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: white; border-radius: 12px; padding: 28px 24px; border: 1px solid var(--kt-border); }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--kt-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--kt-muted); line-height: 1.6; }
-  .kt-reviews { padding: 72px 0; background: white; }
-  .kt-reviews h2 { font-size: 30px; font-weight: 700; color: var(--kt-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: var(--kt-gray); border: 1px solid var(--kt-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--kt-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--kt-muted); font-weight: 500; }
-  .kt-pricing { padding: 72px 0; background: var(--kt-gray); }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: white; border-radius: 10px; padding: 20px 24px; border: 1px solid var(--kt-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--kt-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--kt-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--kt-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--kt-red); }
-  .pricing-card__note { font-size: 13px; color: var(--kt-muted); }
-  .kt-faq { padding: 72px 0; background: white; }
-  .kt-faq h2 { font-size: 30px; font-weight: 700; color: var(--kt-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--kt-border); border-radius: 8px; background: var(--kt-gray); margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--kt-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--kt-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--kt-text); }
-  .kt-nearby { padding: 48px 0; background: var(--kt-gray); border-top: 1px solid var(--kt-border); }
-  .kt-nearby h2 { font-size: 20px; font-weight: 600; color: var(--kt-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--kt-border); border-radius: 20px; font-size: 14px; color: var(--kt-text); text-decoration: none; background: white; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--kt-red); color: var(--kt-red); }
-  .kt-bottom-cta { padding: 72px 0; background: var(--kt-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .kt-intro__inner { grid-template-columns: 1fr; } .context-grid { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .kt-hero__inner { grid-template-columns: 1fr; } .kt-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .kt-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Koreatown?"
+    body="Apartments · Restaurants · Written tenant reports · LADWP hard water aware · All of 90005 & 90006. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayoutV2>

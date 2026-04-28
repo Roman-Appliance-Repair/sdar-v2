@@ -1,401 +1,308 @@
 ---
-// src/pages/yorba-linda.astro
-// Same Day Appliance Repair — Yorba Linda, CA
-// Branch: Irvine/OC | Phone: (213) 401-9019
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+const citySlug = 'yorba-linda';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = "Yorba Linda";
-const citySlug = "yorba-linda";
-const phone = "(213) 401-9019";
-const phoneRaw = "+12134019019";
-const email = "oc@samedayappliance.repair";
-const branch = "Irvine";
+const cityName = 'Yorba Linda';
+const zips = ['92886', '92887'];
 
-const metaTitle = "Appliance Repair Yorba Linda CA | Same Day Service | (213) 401-9019";
-const metaDesc = "Same-day appliance repair in Yorba Linda, CA. Sub-Zero, Wolf, KitchenAid & all brands. Hot dry climate expertise. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
+const title = `Appliance Repair Yorba Linda CA | Same Day Service | ${branch.phone}`;
+const description = "Same-day appliance repair in Yorba Linda, CA. Sub-Zero, Wolf, KitchenAid & all brands. Hot dry climate expertise. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
+const canonical = 'https://samedayappliance.repair/yorba-linda/';
 
-const neighborhoods = [
-  { name: "East Yorba Linda", zip: "92887" },
-  { name: "West Yorba Linda", zip: "92886" },
-  { name: "Yorba Linda Hills", zip: "92887" },
-  { name: "Travis Ranch area", zip: "92887" },
-  { name: "Fairmont area", zip: "92886" },
-  { name: "Lakeview area", zip: "92886" },
-  { name: "Bryant Ranch", zip: "92887" },
-  { name: "Camino de Bryant", zip: "92887" },
-  { name: "Avenida de las Flores area", zip: "92886" },
-  { name: "Woodgate area", zip: "92886" },
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Yorba Linda', sameAs: 'https://en.wikipedia.org/wiki/Yorba_Linda,_California' },
+    { '@type': 'Place', name: 'Bryant Ranch' },
+    { '@type': 'Place', name: 'Yorba Linda Hills' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Yorba Linda is one of the more spacious cities in North Orange County — large homes, generous lots, and a climate that's genuinely hot in summer. The appliances here work harder than in coastal OC cities, and the maintenance requirements are different as a result.",
+  "Refrigerator compressors cycle more frequently when ambient temperatures are high. In a Yorba Linda home during a 100°F summer week, a refrigerator with fouled condenser coils is running under significant thermal stress. Coil cleaning in Yorba Linda isn't a once-a-year job — we recommend every 6 months, more often in homes with pets. The dust and debris that accumulates in an inland valley home is different from what we see at the coast, but the effect on coil performance is just as real.",
+  "The larger homes also mean longer dryer vent runs. A 22-foot vent with two elbows is common in Yorba Linda estates. During Santa Ana conditions in fall, a lint-clogged dryer vent is a fire hazard. We inspect dryer vents on every dryer call here and give you an honest assessment of what we find.",
+  `Diagnostic fee is $89, credited toward the repair. Call <a href="tel:${phoneRaw}">${branch.phone}</a>.`,
 ];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
 
-const recentRepairs = [
+const heatNarrative = {
+  headline: 'Heat, Dust, and Longer Vent Runs — The Yorba Linda Maintenance Picture',
+  paragraphs: [
+    "Appliance maintenance recommendations are usually written for average conditions. Yorba Linda isn't average. The combination of inland heat, dry air, and the larger home footprints common here creates a specific set of conditions that affect how often appliances need attention.",
+    "<strong>Refrigerators:</strong> The condenser coil on your refrigerator rejects heat into the surrounding air. In a coastal city at 72°F, that's easy work. In a Yorba Linda kitchen at 80°F in August, the refrigerator is working significantly harder — and when the coils are fouled with dust and pet hair, the compressor temperature rises further. Heat is the primary enemy of compressor longevity. We clean coils on every refrigerator call in Yorba Linda and recommend a 6-month inspection cycle for homes with pets or near landscaping that generates airborne debris.",
+    "<strong>Dryers:</strong> Yorba Linda homes run larger than the OC average. Larger homes mean longer dryer vent runs — and longer runs mean more lint accumulation and more restriction. The combination of longer runs and Santa Ana wind conditions in fall creates elevated fire risk. We check vents on every dryer repair here. A thermal fuse that keeps blowing is almost always a vent problem, not a dryer problem.",
+    "<strong>Sub-Zero and water-connected appliances:</strong> North OC water hardness affects ice maker inlet valves and supply line screens. Sub-Zero units are particularly sensitive to flow restriction because of their precision ice mechanics. A filter left in service for 18+ months in Yorba Linda water will cause ice maker problems that look like component failures — but aren't.",
+  ],
+};
+
+const neighborhoods = [
+  { name: 'East Yorba Linda', zip: '92887' },
+  { name: 'West Yorba Linda', zip: '92886' },
+  { name: 'Yorba Linda Hills', zip: '92887' },
+  { name: 'Travis Ranch area', zip: '92887' },
+  { name: 'Fairmont area', zip: '92886' },
+  { name: 'Lakeview area', zip: '92886' },
+  { name: 'Bryant Ranch', zip: '92887' },
+  { name: 'Camino de Bryant', zip: '92887' },
+  { name: 'Avenida de las Flores area', zip: '92886' },
+  { name: 'Woodgate area', zip: '92886' },
+];
+
+const recentJobs = [
   {
-    title: "KitchenAid refrigerator — running constantly, warm inside",
-    neighborhood: "Bryant Ranch",
-    detail: "KitchenAid KRMF706ESS — compressor cycling constantly, interior temperature rising. Condenser coils packed with dust and pet hair — this Bryant Ranch home had two dogs and the refrigerator was in a kitchen with tile floors that generated significant airborne particulate. Yorba Linda's hot summers mean the compressor works harder to begin with; add fouled coils and the unit was severely stressed. Full coil cleaning, fan motor check (healthy), temperature verified. Homeowner hadn't known coil cleaning was a thing. We recommended every 6 months given the pets and the summer heat.",
-    part: "Coil cleaning service",
-    time: "1.5 hours"
+    appliance: 'KitchenAid Refrigerator',
+    location: 'Bryant Ranch',
+    quote: 'KitchenAid refrigerator — running constantly, warm inside',
+    description: "KitchenAid KRMF706ESS — compressor cycling constantly, interior temperature rising. Condenser coils packed with dust and pet hair — this Bryant Ranch home had two dogs and the refrigerator was in a kitchen with tile floors that generated significant airborne particulate. Yorba Linda's hot summers mean the compressor works harder to begin with; add fouled coils and the unit was severely stressed. Full coil cleaning, fan motor check (healthy), temperature verified. Homeowner hadn't known coil cleaning was a thing. We recommended every 6 months given the pets and the summer heat.",
+    outcome: '✓ Same day · Coil cleaning service · 1.5 hours',
   },
   {
-    title: "Whirlpool dryer — taking two cycles, no heat on second run",
-    neighborhood: "Yorba Linda Hills",
-    detail: "Whirlpool WED5000DW — first cycle runs warm, second cycle no heat. Classic thermal fuse failure from restricted airflow. The dryer vent run in this Yorba Linda Hills home was 22 feet with one 90-degree elbow and a downward slope — an inherently restrictive configuration. Lint had accumulated significantly. Cleared the full vent run, replaced the thermal fuse and cycling thermostat, tested airflow at the exterior cap. For long vent runs in larger Yorba Linda homes, we recommend cleaning every 4-6 months. The fire risk during Santa Ana conditions with a clogged vent is real.",
-    part: "Whirlpool OEM thermal fuse + cycling thermostat",
-    time: "2.5 hours"
+    appliance: 'Whirlpool Dryer',
+    location: 'Yorba Linda Hills',
+    quote: 'Whirlpool dryer — taking two cycles, no heat on second run',
+    description: "Whirlpool WED5000DW — first cycle runs warm, second cycle no heat. Classic thermal fuse failure from restricted airflow. The dryer vent run in this Yorba Linda Hills home was 22 feet with one 90-degree elbow and a downward slope — an inherently restrictive configuration. Lint had accumulated significantly. Cleared the full vent run, replaced the thermal fuse and cycling thermostat, tested airflow at the exterior cap. For long vent runs in larger Yorba Linda homes, we recommend cleaning every 4-6 months. The fire risk during Santa Ana conditions with a clogged vent is real.",
+    outcome: '✓ Same day · Whirlpool OEM thermal fuse + cycling thermostat · 2.5 hours',
   },
   {
-    title: "Sub-Zero refrigerator — ice maker stopped, water dispenser slow",
-    neighborhood: "East Yorba Linda",
-    detail: "Sub-Zero 650 — ice maker not producing, water dispenser flow reduced to a trickle. Inline water filter was 26 months past replacement (the 6-month cycle). The inlet valve screen was also partially clogged with mineral scale — North OC water hardness affecting the supply line. Replaced the water filter, cleaned the inlet valve screen, tested ice maker production through two full cycles. Customer was surprised a filter could cause this much trouble; Sub-Zero units are more sensitive to filter restriction than typical refrigerators because of their precision ice maker mechanics.",
-    part: "Sub-Zero OEM water filter + inlet screen cleaning",
-    time: "1.5 hours"
+    appliance: 'Sub-Zero Refrigerator',
+    location: 'East Yorba Linda',
+    quote: 'Sub-Zero refrigerator — ice maker stopped, water dispenser slow',
+    description: "Sub-Zero 650 — ice maker not producing, water dispenser flow reduced to a trickle. Inline water filter was 26 months past replacement (the 6-month cycle). The inlet valve screen was also partially clogged with mineral scale — North OC water hardness affecting the supply line. Replaced the water filter, cleaned the inlet valve screen, tested ice maker production through two full cycles. Customer was surprised a filter could cause this much trouble; Sub-Zero units are more sensitive to filter restriction than typical refrigerators because of their precision ice maker mechanics.",
+    outcome: '✓ Same day · Sub-Zero OEM water filter + inlet screen cleaning · 1.5 hours',
   },
   {
-    title: "Wolf range — two burners igniting slowly, clicking continues after lit",
-    neighborhood: "West Yorba Linda",
-    detail: "Wolf 36-inch gas range — two burners taking 8-10 clicks to light, then continuing to click after the flame was established. Igniter electrodes had accumulated grease residue from cooking — not corrosion as in coastal cities, but carbon buildup from the hot, dry indoor conditions that concentrate cooking residue. Cleaned all six igniter ports and electrode tips, tested every burner. Yorba Linda heat makes kitchen ventilation less effective in summer, which concentrates cooking particulate on nearby burner components.",
-    part: "Cleaning service — no parts required",
-    time: "1 hour"
-  }
+    appliance: 'Wolf Range',
+    location: 'West Yorba Linda',
+    quote: 'Wolf range — two burners igniting slowly, clicking continues after lit',
+    description: "Wolf 36-inch gas range — two burners taking 8-10 clicks to light, then continuing to click after the flame was established. Igniter electrodes had accumulated grease residue from cooking — not corrosion as in coastal cities, but carbon buildup from the hot, dry indoor conditions that concentrate cooking residue. Cleaned all six igniter ports and electrode tips, tested every burner. Yorba Linda heat makes kitchen ventilation less effective in summer, which concentrates cooking particulate on nearby burner components.",
+    outcome: '✓ Same day · Cleaning service — no parts required · 1 hour',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'shield' as const,
+    title: 'We understand inland heat',
+    body: "Coastal OC and inland Yorba Linda have different maintenance needs. We calibrate our inspection and recommendation to what Yorba Linda's climate actually demands — not a generic schedule written for average conditions.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Dryer vent always checked',
+    body: "Longer vent runs in Yorba Linda homes mean more lint, more restriction, and more fire risk in Santa Ana conditions. We inspect and clear vents on every dryer repair call. A thermal fuse that keeps blowing is a vent problem — we find and fix it.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'OEM parts for all tiers',
+    body: "Sub-Zero and Wolf in the hills, KitchenAid and Samsung in the tracts — we carry OEM parts for both. Most Yorba Linda calls finish same visit.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: '90-day warranty, all repairs',
+    body: 'Every repair carries a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"KitchenAid fridge running constantly in summer. Same Day cleaned the coils — completely caked — and explained why it\'s worse in Yorba Linda heat. Never knew this needed to be done. Problem solved immediately."',
+    author: '— Jennifer M., Bryant Ranch',
+  },
+  {
+    stars: 5,
+    text: '"Dryer thermal fuse replaced twice by another company, kept blowing. Same Day cleared the full vent run — 20+ feet of lint — and fixed it properly. Told me the Santa Ana wind risk with a clogged vent. That kind of information matters."',
+    author: '— David K., Yorba Linda Hills',
+  },
+  {
+    stars: 5,
+    text: '"Sub-Zero ice maker stopped. They replaced the water filter — 26 months old — and cleaned the inlet screen. Running again in an hour. No expensive parts, just maintenance I\'d neglected. Honest diagnosis saves money."',
+    author: '— Robert T., East Yorba Linda',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate · Heat/vent assessment included' },
+  { appliance: 'Standard Repair', range: '$150–$380', note: 'Parts + labor · OEM parts only · Most appliances' },
+  { appliance: 'Luxury Brand', range: '$250–$600+', note: 'Sub-Zero · Wolf · Thermador · Miele · Viking · OEM parts' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback if same issue returns', featured: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Yorba Linda?",
-    a: "Yes — Yorba Linda is on our regular Orange County route. We cover both 92886 and 92887 zip codes including all neighborhoods from Bryant Ranch to Yorba Linda Hills. Call before noon for same-day service."
+    question: 'Do you offer same-day appliance repair in Yorba Linda?',
+    answer: "Yes — Yorba Linda is on our regular Orange County route. We cover both 92886 and 92887 zip codes including all neighborhoods from Bryant Ranch to Yorba Linda Hills. Call before noon for same-day service.",
   },
   {
-    q: "What is your diagnostic fee in Yorba Linda?",
-    a: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and written estimate. If you proceed with the repair, the $89 is credited toward your invoice."
+    question: 'What is your diagnostic fee in Yorba Linda?',
+    answer: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and written estimate. If you proceed with the repair, the $89 is credited toward your invoice.",
   },
   {
-    q: "Does Yorba Linda's hot climate affect appliances?",
-    a: "It does. Yorba Linda's summer temperatures regularly exceed 95-100°F, and the Santa Ana wind conditions in fall create additional stress. Refrigerator compressors work harder in hot ambient conditions — and when condenser coils are also fouled with dust, the combined stress accelerates wear significantly. We recommend condenser coil cleaning every 6 months in Yorba Linda, especially in homes with pets or near landscaping that generates airborne debris."
+    question: "Does Yorba Linda's hot climate affect appliances?",
+    answer: "It does. Yorba Linda's summer temperatures regularly exceed 95-100°F, and the Santa Ana wind conditions in fall create additional stress. Refrigerator compressors work harder in hot ambient conditions — and when condenser coils are also fouled with dust, the combined stress accelerates wear significantly. We recommend condenser coil cleaning every 6 months in Yorba Linda, especially in homes with pets or near landscaping that generates airborne debris.",
   },
   {
-    q: "Are dryer vents a particular concern in Yorba Linda?",
-    a: "Yes. Yorba Linda homes tend to have larger square footage and longer vent runs than OC coastal cities. Longer vent runs accumulate lint faster and restrict airflow more severely. During Santa Ana conditions, a clogged dryer vent becomes a genuine fire hazard. We inspect dryer vents on every dryer call in Yorba Linda and clear them when needed."
+    question: 'Are dryer vents a particular concern in Yorba Linda?',
+    answer: "Yes. Yorba Linda homes tend to have larger square footage and longer vent runs than OC coastal cities. Longer vent runs accumulate lint faster and restrict airflow more severely. During Santa Ana conditions, a clogged dryer vent becomes a genuine fire hazard. We inspect dryer vents on every dryer call in Yorba Linda and clear them when needed.",
   },
   {
-    q: "What brands do you repair in Yorba Linda?",
-    a: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, and luxury brands including Sub-Zero, Wolf, Thermador, and Miele. The Bryant Ranch and Yorba Linda Hills neighborhoods have more luxury brand installations; the central neighborhoods have mainstream brands. We carry OEM parts for both."
+    question: 'What brands do you repair in Yorba Linda?',
+    answer: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, and luxury brands including Sub-Zero, Wolf, Thermador, and Miele. The Bryant Ranch and Yorba Linda Hills neighborhoods have more luxury brand installations; the central neighborhoods have mainstream brands. We carry OEM parts for both.",
   },
   {
-    q: "Do you service horse properties and large-lot homes in Yorba Linda?",
-    a: "Yes. Yorba Linda has a number of horse properties and large-lot homes, particularly in the eastern sections. Dryer vent runs in these homes can be especially long. We service all Yorba Linda properties regardless of lot size."
+    question: 'Do you service horse properties and large-lot homes in Yorba Linda?',
+    answer: "Yes. Yorba Linda has a number of horse properties and large-lot homes, particularly in the eastern sections. Dryer vent runs in these homes can be especially long. We service all Yorba Linda properties regardless of lot size.",
   },
   {
-    q: "Do you offer a warranty on repairs in Yorba Linda?",
-    a: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge."
-  }
+    question: 'Do you offer a warranty on repairs in Yorba Linda?',
+    answer: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.",
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Anaheim", slug: "anaheim" },
-  { name: "Irvine", slug: "irvine" },
-  { name: "Fullerton", slug: "fullerton" },
-  { name: "Brea", slug: "brea" },
-  { name: "Placentia", slug: "placentia" },
-  { name: "Villa Park", slug: "villa-park" },
+const nearbyCities = [
+  { name: 'Anaheim', slug: 'anaheim' },
+  { name: 'Irvine', slug: 'irvine' },
+  { name: 'Fullerton', slug: 'fullerton' },
+  { name: 'Tustin', slug: 'tustin' },
+  { name: 'Costa Mesa', slug: 'costa-mesa' },
+  { name: 'Villa Park', slug: 'villa-park' },
 ];
-
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Yorba Linda",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/yorba-linda/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "2600 Michelson Dr Suite 1700",
-        "addressLocality": "Irvine",
-        "addressRegion": "CA",
-        "postalCode": "92612",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Yorba Linda" },
-        { "@type": "Place", "name": "Bryant Ranch" },
-        { "@type": "Place", "name": "Yorba Linda Hills" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "54",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Yorba Linda, CA"
+    subheadline="Same-day service across all of Yorba Linda. Hot dry climate and dryer vent expertise. Sub-Zero, Wolf, KitchenAid & all brands. 90-day warranty."
+    zips={zips}
+    tier={3}
+  />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Yorba Linda, CA · Orange County · 92886 · 92887</div>
-        <h1>Appliance Repair in Yorba Linda, CA</h1>
-        <p class="city-hero-sub">Same-day service across all of Yorba Linda. Hot dry climate and dryer vent expertise. Sub-Zero, Wolf, KitchenAid & all brands. 90-day warranty.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.8 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/yorba-linda/appliance-repair-yorba-linda-ca.webp"
-          alt="Appliance repair technician in Yorba Linda CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Yorba Linda — What the Climate Does to Your Appliances"
+    paragraphs={introParagraphs}
+    bookingTitle="Yorba Linda Service"
+    bookingSub="Available Today"
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Yorba Linda — What the Climate Does to Your Appliances</h2>
-        <p>Yorba Linda is one of the more spacious cities in North Orange County — large homes, generous lots, and a climate that's genuinely hot in summer. The appliances here work harder than in coastal OC cities, and the maintenance requirements are different as a result.</p>
-        <p>Refrigerator compressors cycle more frequently when ambient temperatures are high. In a Yorba Linda home during a 100°F summer week, a refrigerator with fouled condenser coils is running under significant thermal stress. Coil cleaning in Yorba Linda isn't a once-a-year job — we recommend every 6 months, more often in homes with pets. The dust and debris that accumulates in an inland valley home is different from what we see at the coast, but the effect on coil performance is just as real.</p>
-        <p>The larger homes also mean longer dryer vent runs. A 22-foot vent with two elbows is common in Yorba Linda estates. During Santa Ana conditions in fall, a lint-clogged dryer vent is a fire hazard. We inspect dryer vents on every dryer call here and give you an honest assessment of what we find.</p>
-        <p>Diagnostic fee is $89, credited toward the repair. Call <a href={`tel:${phoneRaw}`}>{phone}</a>.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Yorba Linda Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Yorba Linda"
+    services={services}
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Yorba Linda</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Yorba Linda →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={heatNarrative.headline}
+    paragraphs={heatNarrative.paragraphs}
+    background="white"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Heat, Dust, and Longer Vent Runs — The Yorba Linda Maintenance Picture</h2>
-        <p>Appliance maintenance recommendations are usually written for average conditions. Yorba Linda isn't average. The combination of inland heat, dry air, and the larger home footprints common here creates a specific set of conditions that affect how often appliances need attention.</p>
-        <p><strong>Refrigerators:</strong> The condenser coil on your refrigerator rejects heat into the surrounding air. In a coastal city at 72°F, that's easy work. In a Yorba Linda kitchen at 80°F in August, the refrigerator is working significantly harder — and when the coils are fouled with dust and pet hair, the compressor temperature rises further. Heat is the primary enemy of compressor longevity. We clean coils on every refrigerator call in Yorba Linda and recommend a 6-month inspection cycle for homes with pets or near landscaping that generates airborne debris.</p>
-        <p><strong>Dryers:</strong> Yorba Linda homes run larger than the OC average. Larger homes mean longer dryer vent runs — and longer runs mean more lint accumulation and more restriction. The combination of longer runs and Santa Ana wind conditions in fall creates elevated fire risk. We check vents on every dryer repair here. A thermal fuse that keeps blowing is almost always a vent problem, not a dryer problem.</p>
-        <p><strong>Sub-Zero and water-connected appliances:</strong> North OC water hardness affects ice maker inlet valves and supply line screens. Sub-Zero units are particularly sensitive to flow restriction because of their precision ice mechanics. A filter left in service for 18+ months in Yorba Linda water will cause ice maker problems that look like component failures — but aren't.</p>
-      </div>
-    </div>
-  </section>
+  <ServiceArea
+    cityName={cityName}
+    headline="Yorba Linda Neighborhoods We Service"
+    subheadline="From Bryant Ranch to Yorba Linda Hills — every part of 92886 and 92887."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Yorba Linda Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Yorba Linda"
+    jobs={recentJobs}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Yorba Linda</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Yorba Linda Residents Call Us"
+    reasons={whyReasons}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Yorba Linda Residents Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>We understand inland heat</h3>
-          <p>Coastal OC and inland Yorba Linda have different maintenance needs. We calibrate our inspection and recommendation to what Yorba Linda's climate actually demands — not a generic schedule written for average conditions.</p>
-        </div>
-        <div class="why-item">
-          <h3>Dryer vent always checked</h3>
-          <p>Longer vent runs in Yorba Linda homes mean more lint, more restriction, and more fire risk in Santa Ana conditions. We inspect and clear vents on every dryer repair call. A thermal fuse that keeps blowing is a vent problem — we find and fix it.</p>
-        </div>
-        <div class="why-item">
-          <h3>OEM parts for all tiers</h3>
-          <p>Sub-Zero and Wolf in the hills, KitchenAid and Samsung in the tracts — we carry OEM parts for both. Most Yorba Linda calls finish same visit.</p>
-        </div>
-        <div class="why-item">
-          <h3>90-day warranty, all repairs</h3>
-          <p>Every repair carries a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Yorba Linda Clients Say"
+    testimonials={testimonials}
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Yorba Linda Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"KitchenAid fridge running constantly in summer. Same Day cleaned the coils — completely caked — and explained why it's worse in Yorba Linda heat. Never knew this needed to be done. Problem solved immediately."</p>
-          <div class="review-author">— Jennifer M., Bryant Ranch</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Dryer thermal fuse replaced twice by another company, kept blowing. Same Day cleared the full vent run — 20+ feet of lint — and fixed it properly. Told me the Santa Ana wind risk with a clogged vent. That kind of information matters."</p>
-          <div class="review-author">— David K., Yorba Linda Hills</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Sub-Zero ice maker stopped. They replaced the water filter — 26 months old — and cleaned the inlet screen. Running again in an hour. No expensive parts, just maintenance I'd neglected. Honest diagnosis saves money."</p>
-          <div class="review-author">— Robert T., East Yorba Linda</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Yorba Linda"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Yorba Linda</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Credited toward repair · Written estimate · Heat/vent assessment included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$380</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Thermador · OEM parts</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Yorba Linda"
+    faqs={faqs}
+  />
 
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Yorba Linda</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby North OC Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Yorba Linda Repair Today</h2>
-      <p>Same-day service across all of Yorba Linda. Heat and dryer vent expertise.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Yorba Linda, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Yorba Linda", "North Orange County", "Bryant Ranch"]} />
-</Layout>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Yorba Linda Repair Today"
+    body="Same-day service across all of Yorba Linda. Heat and dryer vent expertise. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayoutV2>

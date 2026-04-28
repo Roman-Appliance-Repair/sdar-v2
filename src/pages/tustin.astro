@@ -1,400 +1,308 @@
 ---
-// src/pages/tustin.astro
-// Same Day Appliance Repair — Tustin, CA
-// Branch: Irvine/OC | Phone: (213) 401-9019
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+const citySlug = 'tustin';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = "Tustin";
-const citySlug = "tustin";
-const phone = "(213) 401-9019";
-const phoneRaw = "+12134019019";
-const email = "oc@samedayappliance.repair";
-const branch = "Irvine";
+const cityName = "Tustin";
+const zips = ["92780", "92782", "92705"];
 
-const metaTitle = "Appliance Repair Tustin CA | Same Day Service | (213) 401-9019";
-const metaDesc = "Same-day appliance repair in Tustin, CA. Tustin Legacy, Old Town, North Tustin. Samsung, LG, GE & all brands. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
-const neighborhoods = [
-  { name: "Tustin Legacy", zip: "92782" },
-  { name: "Old Town Tustin", zip: "92780" },
-  { name: "North Tustin", zip: "92705" },
-  { name: "Tustin Ranch", zip: "92782" },
-  { name: "Peppertree area", zip: "92780" },
-  { name: "Columbus Grove", zip: "92782" },
-  { name: "Tustin Field", zip: "92782" },
-  { name: "Laurelwood area", zip: "92780" },
-  { name: "Greenwood area", zip: "92782" },
-  { name: "South Tustin", zip: "92780" },
+const title = `Appliance Repair Tustin CA | Same Day Service | ${phone}`;
+const description = "Same-day appliance repair in Tustin, CA. Tustin Legacy, Old Town, North Tustin. Samsung, LG, GE & all brands. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
+const canonical = "https://samedayappliance.repair/tustin/";
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "HomeAndConstructionBusiness",
+  name: branch.fullName,
+  image: "https://samedayappliance.repair/images/logo.webp",
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { "@type": "City", name: "Tustin", sameAs: "https://en.wikipedia.org/wiki/Tustin,_California" },
+    { "@type": "Place", name: "Tustin Legacy" },
+    { "@type": "Place", name: "Old Town Tustin" },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: "$$",
+  license: "CA CSLB #1138898",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.6",
+    reviewCount: "37",
+    bestRating: "5",
+  },
+};
+
+const introParagraphs = [
+  "Tustin is a city of contrasts. Tustin Legacy — built on the former Marine Corps Air Station — is one of the larger new-urbanist developments in OC, with thousands of homes in the 5-10 year age range and appliances to match. Old Town Tustin has craftsman bungalows, Spanish Colonial homes, and housing stock that goes back to the 1920s. North Tustin trends toward larger, established homes with higher-end kitchen installations.",
+  "Our technicians know all three. In Tustin Legacy we see Samsung flex drawer failures, LG drain pump filter clogs, and GE sensor issues on the first generation of appliances now hitting their 5-8 year service life. In Old Town we see older appliances at repair-or-replace crossroads. In Tustin Ranch and North Tustin we see KitchenAid and Sub-Zero calls that require the right OEM parts.",
+  `We're part of our regular Orange County routes from Irvine. Diagnostic fee is $89, credited toward the repair. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
 ];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
 
-const recentRepairs = [
+const tustinLegacyNarrative = {
+  headline: "Tustin Legacy — What 5-8 Year Appliances Actually Need",
+  paragraphs: [
+    "Tustin Legacy is now at the age where its first generation of appliances are hitting characteristic failure points. Samsung and LG refrigerators installed in 2017-2020 are showing ice maker wire harness failures, linear compressor early wear, and flex drawer control board failures. These are known failure patterns for these models at this age — not defects, just wear curves.",
+    "LG front-load washers at the 4-6 year mark frequently develop drain pump filter clogs — the filter needs quarterly cleaning, but most homeowners don't know it exists until an OE error appears and water sits in the drum. We show every Tustin Legacy LG washer owner where the filter is before we leave.",
+    "GE ranges in the Legacy have started showing oven sensor failures, particularly after self-clean cycles which put the sensor under thermal stress. F2 error after a self-clean is almost always the sensor — a $50-80 OEM part and 90 minutes of labor, not the control board replacement some companies quote.",
+    "Old Town and the historic neighborhoods are a different story — appliances there can be anything from 5 to 20+ years old. We assess each one honestly and give you a repair-or-replace recommendation before starting.",
+  ],
+};
+
+const neighborhoods = [
+  { name: 'Tustin Legacy', zip: '92782', featured: true },
+  { name: 'Old Town Tustin', zip: '92780', featured: true },
+  { name: 'North Tustin', zip: '92705' },
+  { name: 'Tustin Ranch', zip: '92782' },
+  { name: 'Peppertree area', zip: '92780' },
+  { name: 'Columbus Grove', zip: '92782' },
+  { name: 'Tustin Field', zip: '92782' },
+  { name: 'Laurelwood area', zip: '92780' },
+  { name: 'Greenwood area', zip: '92782' },
+  { name: 'South Tustin', zip: '92780' },
+];
+
+const recentJobs = [
   {
-    title: "Samsung French door refrigerator — ice maker stopped, flex drawer unresponsive",
-    neighborhood: "Tustin Legacy",
-    detail: "Samsung RF28 in a Tustin Legacy home — ice maker stopped entirely, flex drawer control panel unresponsive. Two separate issues: the ice maker wire harness had chafed against the door hinge (a known Samsung failure on this model in the first 3-4 years), and the flex drawer control board had failed. Rerouted the harness with protective sleeve, replaced the control board with an OEM Samsung part. Both issues resolved in a single visit. Tustin Legacy homes are newer construction with Samsung and LG dominant — we see these failure patterns regularly.",
-    part: "Samsung OEM flex drawer control board + harness sleeve",
-    time: "2 hours"
+    appliance: 'Samsung French Door Refrigerator',
+    location: 'Tustin Legacy',
+    quote: '"Samsung French door refrigerator — ice maker stopped, flex drawer unresponsive"',
+    description: "Samsung RF28 in a Tustin Legacy home — ice maker stopped entirely, flex drawer control panel unresponsive. Two separate issues: the ice maker wire harness had chafed against the door hinge (a known Samsung failure on this model in the first 3-4 years), and the flex drawer control board had failed. Rerouted the harness with protective sleeve, replaced the control board with an OEM Samsung part. Both issues resolved in a single visit. Tustin Legacy homes are newer construction with Samsung and LG dominant — we see these failure patterns regularly.",
+    outcome: '✓ Same day · Samsung OEM flex drawer control board + harness sleeve · 2 hours',
   },
   {
-    title: "GE oven — oven not heating, F2 error after self-clean cycle",
-    neighborhood: "Old Town Tustin",
-    detail: "GE JB655SKSS — F2 error (oven temperature exceeded limit), oven not heating after running a self-clean cycle. The oven temperature sensor had failed during the high-heat self-clean sequence — this is a known failure mode on GE ranges when the sensor is at the end of its service life. Replaced the sensor with an OEM GE part, cleared the fault code, ran temperature calibration test. Older Old Town home — the range was 12 years old but in good structural condition. Sensor replacement is the right call at this age.",
-    part: "GE OEM oven temperature sensor",
-    time: "1.5 hours"
+    appliance: 'GE Range',
+    location: 'Old Town Tustin',
+    quote: '"GE oven — oven not heating, F2 error after self-clean cycle"',
+    description: "GE JB655SKSS — F2 error (oven temperature exceeded limit), oven not heating after running a self-clean cycle. The oven temperature sensor had failed during the high-heat self-clean sequence — this is a known failure mode on GE ranges when the sensor is at the end of its service life. Replaced the sensor with an OEM GE part, cleared the fault code, ran temperature calibration test. Older Old Town home — the range was 12 years old but in good structural condition. Sensor replacement is the right call at this age.",
+    outcome: '✓ Same day · GE OEM oven temperature sensor · 1.5 hours',
   },
   {
-    title: "LG washer — OE drain error, water not pumping out",
-    neighborhood: "Columbus Grove",
-    detail: "LG WM3900HWA — OE error, water sitting in drum at end of cycle. Drain pump filter completely clogged — this Columbus Grove home had been using the washer without cleaning the filter for the appliance's entire two-year life. Filter packed with lint, coins, and debris. Cleaned the filter and housing, ran diagnostic cycle, confirmed clean drainage. Showed the homeowner the filter location and the quarterly cleaning procedure. Simple maintenance, but nobody had shown them.",
-    part: "Filter cleaning service",
-    time: "45 minutes"
+    appliance: 'LG Washer',
+    location: 'Columbus Grove',
+    quote: '"LG washer — OE drain error, water not pumping out"',
+    description: "LG WM3900HWA — OE error, water sitting in drum at end of cycle. Drain pump filter completely clogged — this Columbus Grove home had been using the washer without cleaning the filter for the appliance's entire two-year life. Filter packed with lint, coins, and debris. Cleaned the filter and housing, ran diagnostic cycle, confirmed clean drainage. Showed the homeowner the filter location and the quarterly cleaning procedure. Simple maintenance, but nobody had shown them.",
+    outcome: '✓ Same day · Filter cleaning service · 45 minutes',
   },
   {
-    title: "KitchenAid dishwasher — not drying dishes, heating element failure",
-    neighborhood: "Tustin Ranch",
-    detail: "KitchenAid KDTM354ESS — dishes coming out wet, drying cycle clearly not working. Heating element had failed — visible crack on inspection. Replaced with OEM KitchenAid element, ran full wash-and-dry cycle to verify. Also found the door seal starting to show wear — noted it for the homeowner as a 6-12 month item to watch. We don't replace things that don't need replacing, but we do tell you what we see.",
-    part: "KitchenAid OEM heating element",
-    time: "1.5 hours"
-  }
+    appliance: 'KitchenAid Dishwasher',
+    location: 'Tustin Ranch',
+    quote: '"KitchenAid dishwasher — not drying dishes, heating element failure"',
+    description: "KitchenAid KDTM354ESS — dishes coming out wet, drying cycle clearly not working. Heating element had failed — visible crack on inspection. Replaced with OEM KitchenAid element, ran full wash-and-dry cycle to verify. Also found the door seal starting to show wear — noted it for the homeowner as a 6-12 month item to watch. We don't replace things that don't need replacing, but we do tell you what we see.",
+    outcome: '✓ Same day · KitchenAid OEM heating element · 1.5 hours',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'We know Legacy failure patterns',
+    body: 'Samsung harness chafe, LG drain pump filter, GE oven sensor after self-clean — we see these weekly in Tustin Legacy. We come prepared and resolve most calls same visit without waiting on parts.',
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'We teach maintenance',
+    body: 'LG washer filter location, Samsung water filter schedule, dishwasher spray arm cleaning — we show you what needs regular attention before we leave. One 2-minute explanation prevents the next service call.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Honest on repair vs. replace',
+    body: 'Old Town appliances at 15+ years get an honest assessment. We tell you before we start whether the repair makes economic sense — not after the work is done.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-day warranty, standard',
+    body: 'Every repair carries a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Samsung in our Tustin Legacy home — ice maker dead, flex drawer unresponsive. Same Day fixed both in one visit, explained the harness issue on this model. They clearly knew exactly what they were looking at before they even opened the fridge."',
+    author: '— Jennifer M., Tustin Legacy',
+  },
+  {
+    stars: 5,
+    text: '"GE oven F2 error after self-clean. Another company wanted to replace the control board. Same Day said it was the temperature sensor — $89 diagnostic and $130 in parts. Done in 90 minutes. That\'s the difference between knowing appliances and guessing."',
+    author: '— Robert K., Old Town Tustin',
+  },
+  {
+    stars: 5,
+    text: '"LG washer OE error — water not draining. Tech cleared the filter in 20 minutes, showed me where it is and how to clean it quarterly. No parts needed, $89 service call credited to the labor. That kind of transparency is rare."',
+    author: '— Amanda S., Columbus Grove',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate · Maintenance guidance included' },
+  { appliance: 'Standard Repair', range: '$150–$380', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Luxury Brand Repair', range: '$250–$600+', note: 'Sub-Zero, KitchenAid built-in, Wolf · OEM parts' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Tustin?",
-    a: "Yes — Tustin is on our regular Orange County route from Irvine. We cover all Tustin neighborhoods including Tustin Legacy, Old Town, Tustin Ranch, North Tustin, and Columbus Grove. Call before noon for same-day service."
+    question: "Do you offer same-day appliance repair in Tustin?",
+    answer: "Yes — Tustin is on our regular Orange County route from Irvine. We cover all Tustin neighborhoods including Tustin Legacy, Old Town, Tustin Ranch, North Tustin, and Columbus Grove. Call before noon for same-day service.",
   },
   {
-    q: "What is your diagnostic fee in Tustin?",
-    a: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice."
+    question: "What is your diagnostic fee in Tustin?",
+    answer: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice.",
   },
   {
-    q: "Do you service appliances in Tustin Legacy specifically?",
-    a: "Yes. Tustin Legacy is a large planned development on the former MCAS Tustin base with predominantly newer construction. The appliances there are mostly Samsung, LG, and GE from the last 5-8 years — which means we see specific failure patterns common to those models in that age range. We're familiar with the Samsung flex drawer issues and LG drain pump maintenance common in those builds."
+    question: "Do you service appliances in Tustin Legacy specifically?",
+    answer: "Yes. Tustin Legacy is a large planned development on the former MCAS Tustin base with predominantly newer construction. The appliances there are mostly Samsung, LG, and GE from the last 5-8 years — which means we see specific failure patterns common to those models in that age range. We're familiar with the Samsung flex drawer issues and LG drain pump maintenance common in those builds.",
   },
   {
-    q: "Do you repair appliances in older Old Town Tustin homes?",
-    a: "Yes. Old Town Tustin has a mix of older Craftsman and ranch-style homes with appliances at various ages. We repair older appliances as long as parts are available and the economics make sense — and we tell you honestly when they don't."
+    question: "Do you repair appliances in older Old Town Tustin homes?",
+    answer: "Yes. Old Town Tustin has a mix of older Craftsman and ranch-style homes with appliances at various ages. We repair older appliances as long as parts are available and the economics make sense — and we tell you honestly when they don't.",
   },
   {
-    q: "What brands do you service in Tustin?",
-    a: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, and luxury brands including Sub-Zero and Wolf in the North Tustin and Tustin Ranch areas. OEM parts on the truck for all of these."
+    question: "What brands do you service in Tustin?",
+    answer: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, and luxury brands including Sub-Zero and Wolf in the North Tustin and Tustin Ranch areas. OEM parts on the truck for all of these.",
   },
   {
-    q: "Do you offer a warranty on repairs in Tustin?",
-    a: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back and fix it at no charge."
+    question: "Do you offer a warranty on repairs in Tustin?",
+    answer: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back and fix it at no charge.",
   },
   {
-    q: "How do I schedule appliance repair in Tustin?",
-    a: "Call (213) 401-9019 — our OC line, answered by someone with our actual schedule. We give you a real 2-hour arrival window. You can also book online at samedayappliance.repair."
-  }
+    question: "How do I schedule appliance repair in Tustin?",
+    answer: `Call ${phone} — our OC line, answered by someone with our actual schedule. We give you a real 2-hour arrival window. You can also book online at samedayappliance.repair.`,
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Irvine", slug: "irvine" },
-  { name: "Orange", slug: "orange" },
-  { name: "Santa Ana", slug: "santa-ana" },
-  { name: "Anaheim", slug: "anaheim" },
-  { name: "Costa Mesa", slug: "costa-mesa" },
-  { name: "Mission Viejo", slug: "mission-viejo" },
+const nearbyCities = [
+  { name: 'Irvine', slug: 'irvine' },
+  { name: 'Santa Ana', slug: 'santa-ana' },
+  { name: 'Anaheim', slug: 'anaheim' },
+  { name: 'Costa Mesa', slug: 'costa-mesa' },
+  { name: 'Mission Viejo', slug: 'mission-viejo' },
+  { name: 'Yorba Linda', slug: 'yorba-linda' },
 ];
-
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Tustin",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/tustin/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "2600 Michelson Dr Suite 1700",
-        "addressLocality": "Irvine",
-        "addressRegion": "CA",
-        "postalCode": "92612",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Tustin" },
-        { "@type": "Place", "name": "Tustin Legacy" },
-        { "@type": "Place", "name": "Old Town Tustin" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "63",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Tustin, CA"
+    subheadline="Same-day service across all of Tustin — Legacy, Old Town, Tustin Ranch, North Tustin. OEM parts, 90-day warranty. $89 diagnostic — waived with repair."
+    zips={zips}
+    tier={3}
+  />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Tustin, CA · Orange County · 92780 · 92782</div>
-        <h1>Appliance Repair in Tustin, CA</h1>
-        <p class="city-hero-sub">Same-day service across all of Tustin — Legacy, Old Town, Tustin Ranch, North Tustin. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.8 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/tustin/appliance-repair-tustin-ca.webp"
-          alt="Appliance repair technician in Tustin CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Tustin — New Development and Old Town, Both Covered"
+    paragraphs={introParagraphs}
+    bookingTitle="Tustin Service"
+    bookingSub="Available Today"
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Tustin — New Development and Old Town, Both Covered</h2>
-        <p>Tustin is a city of contrasts. Tustin Legacy — built on the former Marine Corps Air Station — is one of the larger new-urbanist developments in OC, with thousands of homes in the 5-10 year age range and appliances to match. Old Town Tustin has craftsman bungalows, Spanish Colonial homes, and housing stock that goes back to the 1920s. North Tustin trends toward larger, established homes with higher-end kitchen installations.</p>
-        <p>Our technicians know all three. In Tustin Legacy we see Samsung flex drawer failures, LG drain pump filter clogs, and GE sensor issues on the first generation of appliances now hitting their 5-8 year service life. In Old Town we see older appliances at repair-or-replace crossroads. In Tustin Ranch and North Tustin we see KitchenAid and Sub-Zero calls that require the right OEM parts.</p>
-        <p>We're part of our regular Orange County routes from Irvine. Diagnostic fee is $89, credited toward the repair. Call <a href={`tel:${phoneRaw}`}>{phone}</a>.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Tustin Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Tustin"
+    services={services}
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Tustin</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Tustin →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={tustinLegacyNarrative.headline}
+    paragraphs={tustinLegacyNarrative.paragraphs}
+    background="white"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Tustin Legacy — What 5-8 Year Appliances Actually Need</h2>
-        <p>Tustin Legacy is now at the age where its first generation of appliances are hitting characteristic failure points. Samsung and LG refrigerators installed in 2017-2020 are showing ice maker wire harness failures, linear compressor early wear, and flex drawer control board failures. These are known failure patterns for these models at this age — not defects, just wear curves.</p>
-        <p>LG front-load washers at the 4-6 year mark frequently develop drain pump filter clogs — the filter needs quarterly cleaning, but most homeowners don't know it exists until an OE error appears and water sits in the drum. We show every Tustin Legacy LG washer owner where the filter is before we leave.</p>
-        <p>GE ranges in the Legacy have started showing oven sensor failures, particularly after self-clean cycles which put the sensor under thermal stress. F2 error after a self-clean is almost always the sensor — a $50-80 OEM part and 90 minutes of labor, not the control board replacement some companies quote.</p>
-        <p>Old Town and the historic neighborhoods are a different story — appliances there can be anything from 5 to 20+ years old. We assess each one honestly and give you a repair-or-replace recommendation before starting.</p>
-      </div>
-    </div>
-  </section>
+  <ServiceArea
+    cityName={cityName}
+    headline="Tustin Neighborhoods We Service"
+    subheadline="From Tustin Legacy to Old Town, North Tustin to Columbus Grove."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Tustin Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Tustin"
+    jobs={recentJobs}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Tustin</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Tustin Residents Call Us"
+    reasons={whyReasons}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Tustin Residents Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>We know Legacy failure patterns</h3>
-          <p>Samsung harness chafe, LG drain pump filter, GE oven sensor after self-clean — we see these weekly in Tustin Legacy. We come prepared and resolve most calls same visit without waiting on parts.</p>
-        </div>
-        <div class="why-item">
-          <h3>We teach maintenance</h3>
-          <p>LG washer filter location, Samsung water filter schedule, dishwasher spray arm cleaning — we show you what needs regular attention before we leave. One 2-minute explanation prevents the next service call.</p>
-        </div>
-        <div class="why-item">
-          <h3>Honest on repair vs. replace</h3>
-          <p>Old Town appliances at 15+ years get an honest assessment. We tell you before we start whether the repair makes economic sense — not after the work is done.</p>
-        </div>
-        <div class="why-item">
-          <h3>90-day warranty, standard</h3>
-          <p>Every repair carries a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Tustin Clients Say"
+    testimonials={testimonials}
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Tustin Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Samsung in our Tustin Legacy home — ice maker dead, flex drawer unresponsive. Same Day fixed both in one visit, explained the harness issue on this model. They clearly knew exactly what they were looking at before they even opened the fridge."</p>
-          <div class="review-author">— Jennifer M., Tustin Legacy</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"GE oven F2 error after self-clean. Another company wanted to replace the control board. Same Day said it was the temperature sensor — $89 diagnostic and $130 in parts. Done in 90 minutes. That's the difference between knowing appliances and guessing."</p>
-          <div class="review-author">— Robert K., Old Town Tustin</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"LG washer OE error — water not draining. Tech cleared the filter in 20 minutes, showed me where it is and how to clean it quarterly. No parts needed, $89 service call credited to the labor. That kind of transparency is rare."</p>
-          <div class="review-author">— Amanda S., Columbus Grove</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Tustin"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Tustin</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Credited toward repair · Written estimate · Maintenance guidance included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$380</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, KitchenAid built-in, Wolf · OEM parts</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Tustin"
+    faqs={faqs}
+  />
 
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Tustin</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby OC Cities"
+  />
 
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby OC Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Tustin Repair Today</h2>
-      <p>Same-day service across all of Tustin. Tustin Legacy specialists.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Tustin, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Tustin", "Tustin Legacy", "Orange County"]} />
-</Layout>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Tustin Repair Today"
+    body="Same-day service across all of Tustin. Tustin Legacy specialists. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayoutV2>

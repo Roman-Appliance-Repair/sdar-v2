@@ -1,672 +1,350 @@
 ---
-// src/pages/torrance.astro
-// SDAR — samedayappliance.repair
-// Torrance, CA · 90501 · 90502 · 90503 · 90504 · 90505
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: нет данных — новый город
-// Конкуренты: Alexander's Appliance Repair (90505, local address, free service call),
-//             Torrance Advanced Appliance (listing), Torrance Appliance Repair (flat rate),
-//             GE Factory Service
-// Уникальный угол: Old Torrance historic/Craftsman + Hollywood Riviera coastal +
-//                  South Bay diversity + moderate coastal climate (не aggressive salt air) +
-//                  Walteria hillside + Japanese-American community identity
-// Апрель 2026
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
+const citySlug = 'torrance';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = {
-  name: "Torrance",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90501", "90502", "90503", "90504", "90505"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "torrance",
-};
+const cityName = "Torrance";
+const zips = ["90501", "90502", "90503", "90504", "90505"];
 
-const title = `Appliance Repair Torrance CA — Same Day | Hollywood Riviera · Old Torrance · Walteria | (323) 870-4790`;
-const description = `Same-day appliance repair in Torrance, CA. Hollywood Riviera, Old Torrance, Walteria, North Torrance, South Torrance. All ZIP codes 90501–90505. Samsung, LG, GE, Whirlpool, Sub-Zero. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/torrance/`;
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
-const schemaLocalBusiness = {
+const title = `Appliance Repair Torrance CA — Same Day | Hollywood Riviera · Old Torrance · Walteria | ${phone}`;
+const description = `Same-day appliance repair in Torrance, CA. Hollywood Riviera, Old Torrance, Walteria, North Torrance, South Torrance. All ZIP codes 90501–90505. Samsung, LG, GE, Whirlpool, Sub-Zero. Licensed, OEM parts, 90-day warranty. Call ${phone}.`;
+const canonical = "https://samedayappliance.repair/torrance/";
+
+const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Torrance",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
-  },
-  "areaServed": [
-    { "@type": "City", "name": "Torrance", "sameAs": "https://en.wikipedia.org/wiki/Torrance,_California" },
-    { "@type": "Neighborhood", "name": "Hollywood Riviera" },
-    { "@type": "Neighborhood", "name": "Old Torrance" },
-    { "@type": "Neighborhood", "name": "Walteria" }
+  name: branch.fullName,
+  image: "https://samedayappliance.repair/images/logo.webp",
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { "@type": "City", name: "Torrance", sameAs: "https://en.wikipedia.org/wiki/Torrance,_California" },
+    { "@type": "Neighborhood", name: "Hollywood Riviera" },
+    { "@type": "Neighborhood", name: "Old Torrance" },
+    { "@type": "Neighborhood", name: "Walteria" },
   ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: "$$",
+  license: "CA CSLB #1138898",
+  aggregateRating: {
     "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
+    ratingValue: "4.6",
+    reviewCount: "37",
+    bestRating: "5",
+  },
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const introParagraphs = [
+  "Torrance spans more terrain than most South Bay cities. The Hollywood Riviera in the southwest sits on a coastal bluff with ocean views and correspondingly nice homes — Sub-Zero and Wolf show up here with some regularity. Old Torrance around Sartori Avenue has Craftsman bungalows from the 1910s and 1920s that are well maintained and well loved. Walteria on the eastern hills has larger mid-century homes. North Torrance along Crenshaw and Hawthorne is one of the South Bay's most active corridors with a dense mix of housing types. South Torrance near the boundary with Redondo Beach and Palos Verdes is established residential.",
+  "The Hollywood Riviera does see some coastal influence — not as aggressive as oceanfront Newport Beach or Huntington Harbour, but enough that refrigerators on the bluff side can see accelerated coil wear compared to inland Torrance. We check on relevant calls. Inland Torrance is standard South Bay — no salt air factor, just reliable same-day service with an honest written estimate.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong>. Weekends available.",
+];
+
+const areasNarrative = {
+  eyebrow: "Torrance Coverage",
+  headline: "Torrance — All Neighborhoods",
+  paragraphs: [
+    "Hollywood Riviera to North Torrance — same commitment across all ZIP codes.",
+  ],
+  subSections: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Torrance, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Torrance — Hollywood Riviera, Old Torrance, Walteria, North Torrance, South Torrance, and all ZIP codes 90501 through 90505. Call before noon for same-day afternoon service." }
+      title: "Hollywood Riviera (Coastal Bluff)",
+      paragraphs: [
+        "Ocean-facing bluff homes in the 90277/90278 border area. Sub-Zero and premium brands common. Moderate coastal exposure — we check coils on relevant calls. ZIP 90503 · 90505.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Does coastal proximity affect appliances in Torrance's Hollywood Riviera?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes, moderately. The Hollywood Riviera sits on a coastal bluff with ocean-facing exposure. While not as aggressive as Newport Beach or Huntington Harbour, properties in the Riviera see some accelerated coil wear on refrigerators compared to inland Torrance neighborhoods. We check for this on relevant calls in the coastal ZIP codes." }
+      title: "Old Torrance (Historic Core)",
+      paragraphs: [
+        "Craftsman bungalows and early 20th century homes around Sartori Ave and the historic downtown. Well-maintained older housing with mix of vintage and modern appliances. ZIP 90501.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Torrance?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, Sub-Zero, Wolf, Viking, Thermador, and more. We carry OEM parts on every service vehicle." }
+      title: "Walteria (Hillside)",
+      paragraphs: [
+        "Eastern Torrance hillside with larger mid-century homes and established landscaping. GE, Samsung, LG common. Standard same-day service profile. ZIP 90505.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Are you available on weekends in Torrance?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
+      title: "North Torrance (South Bay Corridor)",
+      paragraphs: [
+        "Dense residential along Crenshaw/Hawthorne corridor. Mix of single-family and multi-family. LG, Samsung, Whirlpool most common. ZIP 90504.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Torrance?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Torrance repairs run $150–$400 depending on the appliance." }
+      title: "South Torrance (Established Residential)",
+      paragraphs: [
+        "Borders Redondo Beach and PV. Well-kept mid-century and newer homes. Standard appliance profile — all brands serviced same day. ZIP 90503 · 90505.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Torrance?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge." }
+      title: "Central Torrance",
+      paragraphs: [
+        "Del Amo area, Madrona Ave, Anza Ave corridor. All brands, all housing types. Same-day available throughout. ZIP 90503 · 90504.",
+      ],
     },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Redondo Beach, Manhattan Beach, and Carson?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Torrance service extends to Redondo Beach, Manhattan Beach, Lawndale, Hawthorne, Carson, Gardena, and all of the South Bay area." }
-    }
-  ]
+  ],
 };
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling · Ice maker · Coastal coil check · Fan motor', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'OE / UE error · Not draining · Not spinning · Stackable', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen' },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · Vent lint buildup · Gas & electric', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not draining · E24 · Error codes · Spray arm', brands: 'Bosch · KitchenAid · Samsung · LG · GE · Miele' },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven', issues: 'Not heating · Gas igniter · Temperature off · Gas & electric', brands: 'GE · Samsung · Bosch · Wolf · Viking · KitchenAid' },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'Not freezing · Ice stopped · Frost buildup · Sub-Zero', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · True' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Compressor · Under-counter · Built-in', brands: 'True · U-Line · Liebherr · Dacor · Sub-Zero' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Gas igniter · Burner · Induction not heating · Hood motor', brands: 'GE · Bosch · Samsung · Wolf · Thermador · Broan' },
+];
+
+const neighborhoods = [
+  { name: 'Hollywood Riviera', zip: '90505', featured: true },
+  { name: 'Old Torrance', zip: '90501', featured: true },
+  { name: 'Walteria', zip: '90505' },
+  { name: 'North Torrance', zip: '90504' },
+  { name: 'South Torrance', zip: '90505' },
+  { name: 'Central Torrance', zip: '90503' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero Refrigerator',
+    location: 'Hollywood Riviera, 90505',
+    quote: '"Running longer than it used to — cycling almost constantly"',
+    description: "Bluff-side home in the Hollywood Riviera — Sub-Zero 36-inch built-in with condenser coils showing moderate salt air particulate accumulation from the coastal bluff exposure. Not as severe as oceanfront Newport Beach, but measurable. Cleaned the coil assembly thoroughly, checked the fan motor (still good), confirmed door seals on both columns. Cycling normalised within the hour. Placed on an annual coil inspection schedule — appropriate for a bluff-adjacent property with this level of exposure.",
+    outcome: '✓ Same day · Coils cleaned · Normal cycling · Annual plan set',
+  },
+  {
+    appliance: 'Samsung Washer',
+    location: 'Old Torrance, 90501',
+    quote: '"dc error, violent vibration — can\'t finish a spin cycle"',
+    description: "Old Torrance Craftsman home — Samsung front-loader dc (unbalanced) error on every cycle. Found two rear shock absorbers failed and two more weakened — causing the drum to cant and trigger the balance sensor regardless of load distribution. Replaced all four with OEM Samsung parts, levelled the machine on the laundry room floor, ran three full spin cycles at maximum speed. Completely smooth. Family had been re-distributing loads and re-spinning for weeks.",
+    outcome: '✓ Same day · OEM Samsung shocks · All four · Full spin confirmed',
+  },
+  {
+    appliance: 'LG Dryer',
+    location: 'Walteria, 90505',
+    quote: '"d80 flow sense — takes forever, two full cycles every load"',
+    description: "LG electric dryer in a Walteria home — d80 flow sense warning indicating 80% vent blockage. Found a significant lint accumulation inside a long vent run that terminated on the hillside wall with a plastic flap cap that had warped partially closed. Cleared the full vent run, replaced the plastic cap with a proper metal backdraft damper, confirmed strong airflow at the termination. d80 cleared immediately. Single-cycle drying confirmed on the first test load.",
+    outcome: '✓ Same day · Vent cleared · Metal cap installed · d80 gone · Single cycle',
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'North Torrance, 90504',
+    quote: '"E24 drain error — standing water, happened out of nowhere"',
+    description: "Bosch 500 series in a North Torrance home — E24 drain error with a full tub of standing water. Combined issue: drain pump housing partially blocked by debris, and the filter trap overdue for cleaning. Cleared both, ran the Bosch diagnostic cycle, confirmed complete drain on three consecutive cycles. Also noticed the knockout plug in the garbage disposal connection had never been removed at installation — partial restriction for the full life of the machine. Removed it. First load out: completely clear tub.",
+    outcome: '✓ Same day · E24 resolved · Disposal knockout removed · Full drain confirmed',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'All of Torrance',
+    body: 'Hollywood Riviera bluff homes to North Torrance corridor apartments to Old Torrance bungalows to Walteria hillside homes. We cover all of it with the same same-day commitment, OEM parts, and 90-day warranty regardless of the neighborhood.',
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Coastal Factor Awareness',
+    body: 'The Hollywood Riviera sits on a coastal bluff — not as aggressive as oceanfront HB or Newport, but enough to see moderately accelerated coil wear on refrigerators. We check on relevant bluff-side calls. Inland Torrance? Standard service, no coastal factor.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Actually Same Day',
+    body: "Torrance is a regular part of our South Bay route — not a special trip. Call before noon and we're typically there that afternoon. We don't use a national dispatch center. We're local and we cover this area consistently.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Sub-Zero in our Hollywood Riviera home was cycling constantly. Tech came out, cleaned the coastal coil buildup, confirmed everything else was fine, put us on an annual maintenance plan for our bluff location. Normal operation immediately. Really appreciated the specific coastal context rather than generic advice."',
+    author: '— Patricia M., Hollywood Riviera, Torrance',
+  },
+  {
+    stars: 5,
+    text: '"LG dryer d80 flow sense in our Walteria home. Tech cleared the whole vent run, replaced the warped plastic cap with a proper metal one. d80 gone, single-cycle drying confirmed before he left. Explained the whole vent situation clearly — the hillside termination point had been restricting airflow for years."',
+    author: '— Marcus K., Walteria, Torrance',
+  },
+  {
+    stars: 5,
+    text: '"Bosch E24 error in our North Torrance home. Tech cleared the pump and filter, then found the garbage disposal knockout was never removed at installation. Fixed two problems, charged for one call. Very thorough — checked things other companies would have missed and never mentioned."',
+    author: '— Sandra R., North Torrance',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator / Ice Maker', range: '$150 – $400', note: 'Coastal coil check (Riviera) · Fan motor · Ice maker · OEM', featured: true },
+  { appliance: 'Washer / Dryer', range: '$150 – $350', note: 'Shock absorbers · Drain pump · Thermal fuse · Vent cleaning' },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'E24 drain · Spray arm · Disposal knockout · Filter' },
+  { appliance: 'Oven / Range', range: '$150 – $400', note: 'Gas igniter · Bake element · Temperature calibration' },
+  { appliance: 'Sub-Zero / Wolf', range: '$300 – $700+', note: 'OEM parts · Hollywood Riviera luxury homes' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: "Do you offer same-day appliance repair in Torrance, CA?",
+    answer: "Yes. Our technicians cover all of Torrance — Hollywood Riviera, Old Torrance, Walteria, North Torrance, South Torrance, and all ZIP codes 90501 through 90505. Call before noon for same-day afternoon service.",
+  },
+  {
+    question: "Does coastal proximity affect appliances in Torrance's Hollywood Riviera?",
+    answer: "Yes, moderately. The Riviera bluff sees some coastal exposure — not as aggressive as oceanfront cities, but enough to see moderately accelerated coil wear. We check on relevant bluff-side calls. Inland Torrance has no coastal factor.",
+  },
+  {
+    question: "Are you available on weekends in Torrance?",
+    answer: "Yes. Saturday 8am–7pm and Sunday 9am–5pm.",
+  },
+  {
+    question: "What appliance brands do you repair in Torrance?",
+    answer: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Viking, and more. OEM parts on every vehicle.",
+  },
+  {
+    question: "What is your diagnostic fee in Torrance?",
+    answer: "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Torrance repairs run $150–$400.",
+  },
+  {
+    question: "What warranty do you offer on appliance repairs in Torrance?",
+    answer: "All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.",
+  },
+  {
+    question: "Do you also serve Redondo Beach, Manhattan Beach, and Carson?",
+    answer: "Yes. Our Torrance service extends to Redondo Beach, Manhattan Beach, Lawndale, Hawthorne, Carson, Gardena, and all of the South Bay area.",
+  },
+];
+
+const nearbyCities = [
+  { name: 'Manhattan Beach', slug: 'manhattan-beach' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Santa Monica', slug: 'santa-monica' },
+  { name: 'Culver City', slug: 'culver-city' },
+  { name: 'Long Beach', slug: 'long-beach' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Brentwood', slug: 'brentwood' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Torrance, CA"
+    subheadline="One of the South Bay's most established cities — coastal bluff homes in the Hollywood Riviera, historic Craftsman bungalows in Old Torrance, well-kept mid-century homes throughout. All appliances, all neighborhoods, same-day. OEM parts, 90-day warranty. Weekends available."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="tr-hero">
-    <div class="tr-hero__inner container">
-      <div class="tr-hero__content">
-        <div class="tr-hero__eyebrow">Torrance, CA · 90501–90505 · Hollywood Riviera · Old Torrance · Walteria · North & South Torrance</div>
-        <h1 class="tr-hero__h1">
-          Appliance Repair<br>
-          <span class="tr-hero__accent">Torrance, CA</span>
-        </h1>
-        <p class="tr-hero__sub">
-          One of the South Bay's most established cities — coastal bluff homes in the
-          Hollywood Riviera, historic Craftsman bungalows in Old Torrance, well-kept
-          mid-century homes throughout. All appliances, all neighborhoods, same-day.
-          OEM parts, 90-day warranty. Weekends available.
-        </p>
-        <div class="tr-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="tr-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="tr-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-torrance-ca.webp"
-          alt="Appliance repair in Torrance CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Torrance — All of It"
+    paragraphs={introParagraphs}
+    bookingTitle="Torrance Service"
+    bookingSub="90501–90505 · All neighborhoods · Same day"
+  />
 
-  <!-- INTRO -->
-  <section class="tr-intro">
-    <div class="container tr-intro__inner">
-      <div class="tr-intro__text">
-        <h2>Appliance Repair in Torrance — All of It</h2>
-        <p>
-          Torrance spans more terrain than most South Bay cities. The Hollywood
-          Riviera in the southwest sits on a coastal bluff with ocean views and
-          correspondingly nice homes — Sub-Zero and Wolf show up here with some
-          regularity. Old Torrance around Sartori Avenue has Craftsman bungalows
-          from the 1910s and 1920s that are well maintained and well loved.
-          Walteria on the eastern hills has larger mid-century homes. North Torrance
-          along Crenshaw and Hawthorne is one of the South Bay's most active
-          corridors with a dense mix of housing types. South Torrance near the
-          boundary with Redondo Beach and Palos Verdes is established residential.
-        </p>
-        <p>
-          The Hollywood Riviera does see some coastal influence — not as aggressive
-          as oceanfront Newport Beach or Huntington Harbour, but enough that
-          refrigerators on the bluff side can see accelerated coil wear compared
-          to inland Torrance. We check on relevant calls. Inland Torrance is
-          standard South Bay — no salt air factor, just reliable same-day service
-          with an honest written estimate.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written
-          estimate before we start. <strong>90-day warranty</strong>.
-          Weekends available.
-        </p>
-      </div>
-      <div class="tr-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Torrance Service</div>
-          <div class="cta-box__sub">90501–90505 · All neighborhoods · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    eyebrow={areasNarrative.eyebrow}
+    headline={areasNarrative.headline}
+    paragraphs={areasNarrative.paragraphs}
+    subSections={areasNarrative.subSections}
+    background="gray"
+  />
 
-  <!-- TORRANCE AREAS -->
-  <section class="tr-areas">
-    <div class="container">
-      <h2 class="section-title">Torrance — All Neighborhoods</h2>
-      <p class="section-sub">Hollywood Riviera to North Torrance — same commitment across all ZIP codes.</p>
-      <div class="area-grid">
-        <div class="area-card area-card--featured">
-          <div class="area-label">Coastal Bluff</div>
-          <div class="area-name">Hollywood Riviera</div>
-          <div class="area-desc">Ocean-facing bluff homes in the 90277/90278 border area. Sub-Zero and premium brands common. Moderate coastal exposure — we check coils on relevant calls.</div>
-          <div class="area-zip">90503 · 90505</div>
-        </div>
-        <div class="area-card">
-          <div class="area-label">Historic Core</div>
-          <div class="area-name">Old Torrance</div>
-          <div class="area-desc">Craftsman bungalows and early 20th century homes around Sartori Ave and the historic downtown. Well-maintained older housing with mix of vintage and modern appliances.</div>
-          <div class="area-zip">90501</div>
-        </div>
-        <div class="area-card">
-          <div class="area-label">Hillside</div>
-          <div class="area-name">Walteria</div>
-          <div class="area-desc">Eastern Torrance hillside with larger mid-century homes and established landscaping. GE, Samsung, LG common. Standard same-day service profile.</div>
-          <div class="area-zip">90505</div>
-        </div>
-        <div class="area-card">
-          <div class="area-label">South Bay Corridor</div>
-          <div class="area-name">North Torrance</div>
-          <div class="area-desc">Dense residential along Crenshaw/Hawthorne corridor. Mix of single-family and multi-family. LG, Samsung, Whirlpool most common.</div>
-          <div class="area-zip">90504</div>
-        </div>
-        <div class="area-card">
-          <div class="area-label">Established Residential</div>
-          <div class="area-name">South Torrance</div>
-          <div class="area-desc">Borders Redondo Beach and PV. Well-kept mid-century and newer homes. Standard appliance profile — all brands serviced same day.</div>
-          <div class="area-zip">90503 · 90505</div>
-        </div>
-        <div class="area-card">
-          <div class="area-label">Central</div>
-          <div class="area-name">Central Torrance</div>
-          <div class="area-desc">Del Amo area, Madrona Ave, Anza Ave corridor. All brands, all housing types. Same-day available throughout.</div>
-          <div class="area-zip">90503 · 90504</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Torrance"
+    subhead="All brands · Coastal & inland · All ZIP codes · South Bay same-day"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="tr-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Torrance</h2>
-      <p class="section-sub">All brands · Coastal & inland · All ZIP codes · South Bay same-day</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="Torrance Neighborhoods We Service"
+    subheadline="Hollywood Riviera to North Torrance — every street in 90501–90505."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <a href="/torrance/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Ice maker · Coastal coil check · Fan motor</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in Torrance"
+    subhead="Real calls from 90501–90505 — all neighborhoods, all brands."
+    jobs={recentJobs}
+  />
 
-        <a href="/torrance/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Stackable</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Torrance Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/torrance/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent lint buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Torrance Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/torrance/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · E24 · Error codes · Spray arm</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Torrance"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/torrance/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Gas & electric</div>
-          <div class="service-card__brands">GE · Samsung · Bosch · Wolf · Viking · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Torrance Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/torrance/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Not freezing · Ice stopped · Frost buildup · Sub-Zero</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
 
-        <a href="/torrance/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/torrance/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · Thermador · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="tr-recent">
-    <div class="container">
-      <h2>Recent Jobs in Torrance</h2>
-      <p class="section-sub">Real calls from 90501–90505 — all neighborhoods, all brands.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Refrigerator</span>
-            <span class="recent-location">Hollywood Riviera, 90505</span>
-          </div>
-          <div class="recent-card__title">"Running longer than it used to — cycling almost constantly"</div>
-          <div class="recent-card__desc">
-            Bluff-side home in the Hollywood Riviera — Sub-Zero 36-inch built-in with
-            condenser coils showing moderate salt air particulate accumulation from the
-            coastal bluff exposure. Not as severe as oceanfront Newport Beach, but
-            measurable. Cleaned the coil assembly thoroughly, checked the fan motor
-            (still good), confirmed door seals on both columns. Cycling normalised
-            within the hour. Placed on an annual coil inspection schedule — appropriate
-            for a bluff-adjacent property with this level of exposure.
-          </div>
-          <div class="recent-card__result">✓ Same day · Coils cleaned · Normal cycling · Annual plan set</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Washer</span>
-            <span class="recent-location">Old Torrance, 90501</span>
-          </div>
-          <div class="recent-card__title">"dc error, violent vibration — can't finish a spin cycle"</div>
-          <div class="recent-card__desc">
-            Old Torrance Craftsman home — Samsung front-loader dc (unbalanced)
-            error on every cycle. Found two rear shock absorbers failed and two
-            more weakened — causing the drum to cant and trigger the balance
-            sensor regardless of load distribution. Replaced all four with OEM
-            Samsung parts, levelled the machine on the laundry room floor,
-            ran three full spin cycles at maximum speed. Completely smooth.
-            Family had been re-distributing loads and re-spinning for weeks.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung shocks · All four · Full spin confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Dryer</span>
-            <span class="recent-location">Walteria, 90505</span>
-          </div>
-          <div class="recent-card__title">"d80 flow sense — takes forever, two full cycles every load"</div>
-          <div class="recent-card__desc">
-            LG electric dryer in a Walteria home — d80 flow sense warning indicating
-            80% vent blockage. Found a significant lint accumulation inside a long
-            vent run that terminated on the hillside wall with a plastic flap cap
-            that had warped partially closed. Cleared the full vent run, replaced
-            the plastic cap with a proper metal backdraft damper, confirmed strong
-            airflow at the termination. d80 cleared immediately. Single-cycle
-            drying confirmed on the first test load.
-          </div>
-          <div class="recent-card__result">✓ Same day · Vent cleared · Metal cap installed · d80 gone · Single cycle</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">North Torrance, 90504</span>
-          </div>
-          <div class="recent-card__title">"E24 drain error — standing water, happened out of nowhere"</div>
-          <div class="recent-card__desc">
-            Bosch 500 series in a North Torrance home — E24 drain error with a full
-            tub of standing water. Combined issue: drain pump housing partially
-            blocked by debris, and the filter trap overdue for cleaning. Cleared
-            both, ran the Bosch diagnostic cycle, confirmed complete drain on three
-            consecutive cycles. Also noticed the knockout plug in the garbage
-            disposal connection had never been removed at installation — partial
-            restriction for the full life of the machine. Removed it. First load
-            out: completely clear tub.
-          </div>
-          <div class="recent-card__result">✓ Same day · E24 resolved · Disposal knockout removed · Full drain confirmed</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="tr-why">
-    <div class="container">
-      <h2>Why Torrance Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">📍</div>
-          <div class="why-title">All of Torrance</div>
-          <div class="why-text">Hollywood Riviera bluff homes to North Torrance corridor apartments to Old Torrance bungalows to Walteria hillside homes. We cover all of it with the same same-day commitment, OEM parts, and 90-day warranty regardless of the neighborhood.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🌊</div>
-          <div class="why-title">Coastal Factor Awareness</div>
-          <div class="why-text">The Hollywood Riviera sits on a coastal bluff — not as aggressive as oceanfront HB or Newport, but enough to see moderately accelerated coil wear on refrigerators. We check on relevant bluff-side calls. Inland Torrance? Standard service, no coastal factor.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">⏱️</div>
-          <div class="why-title">Actually Same Day</div>
-          <div class="why-text">Torrance is a regular part of our South Bay route — not a special trip. Call before noon and we're typically there that afternoon. We don't use a national dispatch center. We're local and we cover this area consistently.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="tr-reviews">
-    <div class="container">
-      <h2>What Torrance Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero in our Hollywood Riviera home was cycling constantly. Tech came out, cleaned the coastal coil buildup, confirmed everything else was fine, put us on an annual maintenance plan for our bluff location. Normal operation immediately. Really appreciated the specific coastal context rather than generic advice."</div>
-          <div class="review-author">— Patricia M., Hollywood Riviera, Torrance</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG dryer d80 flow sense in our Walteria home. Tech cleared the whole vent run, replaced the warped plastic cap with a proper metal one. d80 gone, single-cycle drying confirmed before he left. Explained the whole vent situation clearly — the hillside termination point had been restricting airflow for years."</div>
-          <div class="review-author">— Marcus K., Walteria, Torrance</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Bosch E24 error in our North Torrance home. Tech cleared the pump and filter, then found the garbage disposal knockout was never removed at installation. Fixed two problems, charged for one call. Very thorough — checked things other companies would have missed and never mentioned."</div>
-          <div class="review-author">— Sandra R., North Torrance</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="tr-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Torrance</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Coastal coil check (Riviera) · Fan motor · Ice maker · OEM</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Shock absorbers · Drain pump · Thermal fuse · Vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">E24 drain · Spray arm · Disposal knockout · Filter</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Hollywood Riviera luxury homes</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="tr-faq">
-    <div class="container">
-      <h2>Questions Torrance Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Torrance, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Torrance — Hollywood Riviera, Old Torrance, Walteria, North Torrance, South Torrance, and all ZIP codes 90501 through 90505. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does coastal proximity affect appliances in Torrance's Hollywood Riviera?</summary><div class="faq-answer">Yes, moderately. The Riviera bluff sees some coastal exposure — not as aggressive as oceanfront cities, but enough to see moderately accelerated coil wear. We check on relevant bluff-side calls. Inland Torrance has no coastal factor.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Torrance?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Torrance?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Viking, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Torrance?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Torrance repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">What warranty do you offer on appliance repairs in Torrance?</summary><div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Redondo Beach, Manhattan Beach, and Carson?</summary><div class="faq-answer">Yes. Our Torrance service extends to Redondo Beach, Manhattan Beach, Lawndale, Hawthorne, Carson, Gardena, and all of the South Bay area.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="tr-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/manhattan-beach/" class="nearby-link">Manhattan Beach</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/culver-city/" class="nearby-link">Culver City</a>
-        <a href="/long-beach/" class="nearby-link">Long Beach</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="tr-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Torrance?</h2>
-          <p>Hollywood Riviera · Old Torrance · Walteria · North & South Torrance · All of 90501–90505. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Torrance, CA 90501–90505</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --tr-red: #C8102E; --tr-black: #0a0a0a; --tr-gray: #f5f5f5; --tr-border: #e2e2e2; --tr-text: #1a1a1a; --tr-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .tr-hero { background: var(--tr-black); color: white; padding: 80px 0 60px; }
-  .tr-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .tr-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--tr-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .tr-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .tr-hero__accent { color: var(--tr-red); }
-  .tr-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .tr-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .tr-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .tr-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--tr-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .tr-bottom-cta .btn-secondary { color: var(--tr-text); border-color: var(--tr-border); }
-  .trust-bar { background: var(--tr-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .tr-intro { padding: 72px 0; background: white; }
-  .tr-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .tr-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--tr-black); margin-bottom: 20px; }
-  .tr-intro__text p { font-size: 16px; line-height: 1.7; color: var(--tr-text); margin-bottom: 16px; }
-  .cta-box { background: var(--tr-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--tr-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .tr-areas { padding: 72px 0; background: var(--tr-gray); }
-  .area-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .area-card { background: white; border: 1px solid var(--tr-border); border-radius: 12px; padding: 22px; }
-  .area-card--featured { border-color: var(--tr-red); background: #fff5f7; }
-  .area-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--tr-muted); margin-bottom: 4px; }
-  .area-name { font-size: 15px; font-weight: 600; color: var(--tr-black); margin-bottom: 8px; }
-  .area-desc { font-size: 13px; color: var(--tr-muted); line-height: 1.5; margin-bottom: 10px; }
-  .area-zip { font-size: 12px; font-weight: 500; color: var(--tr-red); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--tr-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--tr-muted); text-align: center; margin-bottom: 40px; }
-  .tr-services { padding: 72px 0; background: white; }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--tr-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--tr-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--tr-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--tr-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--tr-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--tr-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--tr-red); font-weight: 500; }
-  .tr-recent { padding: 72px 0; background: var(--tr-gray); }
-  .tr-recent h2 { font-size: 30px; font-weight: 700; color: var(--tr-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--tr-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--tr-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--tr-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--tr-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--tr-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .tr-why { padding: 72px 0; background: white; }
-  .tr-why h2 { font-size: 30px; font-weight: 700; color: var(--tr-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--tr-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--tr-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--tr-muted); line-height: 1.6; }
-  .tr-reviews { padding: 72px 0; background: var(--tr-gray); }
-  .tr-reviews h2 { font-size: 30px; font-weight: 700; color: var(--tr-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--tr-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--tr-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--tr-muted); font-weight: 500; }
-  .tr-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--tr-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--tr-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--tr-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--tr-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--tr-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--tr-red); }
-  .pricing-card__note { font-size: 13px; color: var(--tr-muted); }
-  .tr-faq { padding: 72px 0; background: var(--tr-gray); }
-  .tr-faq h2 { font-size: 30px; font-weight: 700; color: var(--tr-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--tr-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--tr-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--tr-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--tr-text); }
-  .tr-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--tr-border); }
-  .tr-nearby h2 { font-size: 20px; font-weight: 600; color: var(--tr-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--tr-border); border-radius: 20px; font-size: 14px; color: var(--tr-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--tr-red); color: var(--tr-red); }
-  .tr-bottom-cta { padding: 72px 0; background: var(--tr-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .tr-intro__inner { grid-template-columns: 1fr; } .area-grid { grid-template-columns: repeat(2, 1fr); } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .tr-hero__inner { grid-template-columns: 1fr; } .tr-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .area-grid { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .tr-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Torrance?"
+    body="Hollywood Riviera · Old Torrance · Walteria · North & South Torrance · All of 90501–90505. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayoutV2>

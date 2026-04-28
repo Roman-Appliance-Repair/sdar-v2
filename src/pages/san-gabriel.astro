@@ -1,681 +1,296 @@
 ---
-// src/pages/san-gabriel.astro
-// SDAR — samedayappliance.repair
-// San Gabriel, CA 91775 & 91776
-// Филиал: Pasadena · (626) 376-4458
-// GSC: нет данных — новый город
-// Конкуренты: все brand-specific spam sites (thermadorrepairpro, gemonogramrepaircenter,
-//             lgappliancesservice — все AES clone pages), Sears, sangabrielappliancerepairpros
-// Уникальный угол: исторический город (Mission San Gabriel 1771), Chinese-American SGV community,
-//                  SGVMWD hard water, Mission Drive/Las Tunas corridor, weekends available
-// Апрель 2026
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
+const citySlug = 'san-gabriel';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = {
-  name: "San Gabriel",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91775", "91776"],
-  phone: "(626) 376-4458",
-  phoneRaw: "+16263764458",
-  email: "pasadena@samedayappliance.repair",
-  branch: "Pasadena",
-  slug: "san-gabriel",
-};
+const cityName = 'San Gabriel';
+const zips = ['91775', '91776'];
 
-const title = `Appliance Repair San Gabriel CA — Same Day | 91775 · Mission Dr · Las Tunas | (626) 376-4458`;
-const description = `Same-day appliance repair in San Gabriel, CA 91775 & 91776. Mission Drive corridor, Las Tunas, Valley Blvd. Samsung, LG, GE, Whirlpool, Sub-Zero. Licensed, OEM parts, 90-day warranty. Weekends available. Call (626) 376-4458.`;
-const canonical = `https://samedayappliance.repair/san-gabriel/`;
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — San Gabriel",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "55 S Lake Ave",
-    "addressLocality": "Pasadena",
-    "addressRegion": "CA",
-    "postalCode": "91101",
-    "addressCountry": "US"
+const title = `Appliance Repair San Gabriel CA — Same Day | 91775 · Mission Dr · Las Tunas | ${branch.phone}`;
+const description = `Same-day appliance repair in San Gabriel, CA 91775 & 91776. Mission Drive corridor, Las Tunas, Valley Blvd. Samsung, LG, GE, Whirlpool, Sub-Zero. Licensed, OEM parts, 90-day warranty. Weekends available. Call ${branch.phone}.`;
+const canonical = 'https://samedayappliance.repair/san-gabriel/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'San Gabriel', sameAs: 'https://en.wikipedia.org/wiki/San_Gabriel,_California' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "San Gabriel", "sameAs": "https://en.wikipedia.org/wiki/San_Gabriel,_California" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in San Gabriel, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of San Gabriel — 91775 and 91776 — including the Mission Drive corridor, Las Tunas Drive, Valley Boulevard, Ramona Street, Del Mar Avenue, and every residential street in the city. Call before noon for same-day afternoon service. We're also available Saturdays and Sundays." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does hard water in San Gabriel affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. San Gabriel is served by the San Gabriel Valley Municipal Water District, which delivers mineral-rich groundwater from the SGV basin. Ice maker inlet valves, dishwasher spray arms, and washing machine inlet screens accumulate scale faster than in softer-water cities. We check for this on every San Gabriel call involving ice makers and dishwashers." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in San Gabriel?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, Sub-Zero, Wolf, Viking, Thermador, Miele, and more. We carry OEM parts on every service vehicle and never use aftermarket substitutes." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in San Gabriel?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm. If your appliance breaks on a weekend, you don't have to wait until Monday." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in San Gabriel?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most San Gabriel repairs run $150–$400 depending on the appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in San Gabriel?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Alhambra, Temple City, and Rosemead?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our San Gabriel service area extends to Alhambra, Temple City, Rosemead, Monterey Park, El Monte, San Marino, and South Pasadena. All within our regular SGV route from the Pasadena branch." }
-    }
-  ]
-};
+const introParagraphs = [
+  "San Gabriel is one of the oldest cities in Los Angeles County — home to Mission San Gabriel Arcángel, founded in 1771, and the historic street grid that radiates from it. The residential neighborhoods along Mission Drive, Del Mar Avenue, and the streets around the civic center range from early 20th century bungalows to post-war ranch homes to newer construction, and the appliances inside them are as varied as the housing stock.",
+  "Hard water is a consistent issue throughout San Gabriel. Served by the San Gabriel Valley Municipal Water District — the same mineral-rich SGV groundwater supply as Arcadia, San Marino, and Temple City — ice maker inlet valves and dishwasher spray arms accumulate scale significantly faster than national average. We check for this proactively on every San Gabriel call involving ice makers and dishwashers. It comes up consistently.",
+  "San Gabriel is also a busy family community — the Valley Boulevard and Las Tunas Drive corridors are active, the restaurants and businesses bring foot traffic, and the residential streets behind them are full of families who need appliances working when they need them. Same-day service, weekends included, written estimate before we start.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. <strong>90-day warranty</strong> on all parts and labor. OEM parts only.",
+  "<strong>Hard water tip for San Gabriel:</strong> SGVMWD groundwater is mineral-rich throughout the SGV. If your refrigerator ice maker has been gradually producing less ice over several months — not a sudden stop, but a slow decline — mineral scale on the water inlet valve is almost certainly the cause in 91775 and 91776. Replacing your refrigerator's in-door filter every 6 months (not 12) helps significantly with this water supply.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Hard water ice maker · Not cooling · Fan motor · Temperature off', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Hard water spray arm scale · Not draining · Spots on glasses · Error codes', brands: 'Bosch · KitchenAid · Samsung · LG · GE · Miele' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'Hard water inlet screens · Not draining · Not spinning · Error codes', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen' },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · Vent lint buildup · Gas & electric', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven', issues: 'Not heating · Gas igniter · Temperature off · Gas & electric', brands: 'GE · Samsung · Bosch · Wolf · Viking · KitchenAid' },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'Hard water inlet valve · Not freezing · Ice stopped · Frost', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Compressor · Under-counter · Built-in', brands: 'True · U-Line · Liebherr · Dacor · Sub-Zero' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Igniter · Gas burner · Induction not heating · Hood motor', brands: 'GE · Bosch · Samsung · Wolf · Thermador · Broan' },
+];
+
+const neighborhoods = [
+  { name: 'Mission Drive corridor', zip: '91775', featured: true },
+  { name: 'Las Tunas Drive area', zip: '91775', featured: true },
+  { name: 'Del Mar Ave neighborhood', zip: '91776', featured: true },
+  { name: 'Valley Blvd corridor', zip: '91776' },
+  { name: 'Ramona Street area', zip: '91776' },
+  { name: 'North San Gabriel', zip: '91775' },
+  { name: 'South San Gabriel', zip: '91776' },
+];
+
+const keyStreets = ['Mission Drive', 'Las Tunas Drive', 'Valley Blvd', 'Del Mar Ave', 'Ramona St', 'San Gabriel Blvd'];
+
+const recentJobs = [
+  {
+    appliance: 'LG French Door',
+    location: 'Mission Drive corridor, 91775',
+    quote: 'Ice maker dropped from full to almost nothing over 3 months',
+    description: "LG French door refrigerator — the gradual decline is the consistent SGVMWD hard water pattern throughout the SGV. Inlet valve orifice restricted by calcium scale to about 20% capacity. Replaced with an OEM LG inlet valve, flushed the water line, replaced the in-door filter (14 months old — should have been changed at 6). Full ice production within 24 hours. Owner was surprised to learn the water hardness here is what drives the issue, not the appliance.",
+    outcome: '✓ Same day · OEM LG inlet valve · SGVMWD cause explained · Full production',
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'Del Mar Ave, 91776',
+    quote: 'Spots on everything and the machine smells musty',
+    description: "Bosch 500 series — both spray arm ports nearly blocked with SGVMWD mineral deposits, filter trap caked with scale contributing to the odor. Less than 22 months since installation. Descaled both spray arm assemblies completely, deep-cleaned the filter trap, ran a full citric acid maintenance cycle, confirmed full spray arm rotation and clean drain. Showed the homeowner the extracted scale — striking amount for a machine under two years old. Monthly maintenance tablet routine and 6-month filter habit explained.",
+    outcome: '✓ Same day · Scale cleared · Odor gone · First load clean',
+  },
+  {
+    appliance: 'Samsung Washer',
+    location: 'Las Tunas area, 91775',
+    quote: 'DC error code — vibrating violently on spin cycle',
+    description: "Samsung front-loader DC (unbalanced load detection) error presenting as violent vibration on every spin cycle — not just with large loads, but any load. Found two rear shock absorbers weakened and one almost completely failed. The uneven suspension was triggering the unbalance sensor. Replaced all four shock absorbers with OEM Samsung parts, leveled the machine, ran three test cycles at high spin. Quiet, smooth operation. Family had been doing half-loads and re-spinning everything — problem gone.",
+    outcome: '✓ Same day · OEM Samsung shocks · All four replaced · Full spin confirmed',
+  },
+  {
+    appliance: 'GE Range',
+    location: 'Ramona St, 91776',
+    quote: "Oven igniter glows but won't light — been happening for two weeks",
+    description: "GE freestanding gas range — oven igniter visible orange glow but failing to draw enough amperage to open the gas valve. This is the standard GE igniter failure pattern. Replaced with an OEM GE igniter, tested oven at 325°F, 375°F, and 450°F — all accurate within 5 degrees. Done in under 30 minutes. Homeowner had been convinced the valve itself was the problem and was prepared for a much larger repair — explained the igniter amperage mechanism and why this is the more common failure.",
+    outcome: '✓ Same day · OEM GE igniter · All temps accurate · Explained the failure',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'SGVMWD Hard Water',
+    body: 'San Gabriel Valley Municipal Water District groundwater accelerates mineral scale on ice makers and dishwashers throughout 91775 and 91776. We test inlet valves and check for deposits on every relevant San Gabriel call — it consistently comes up with this water supply.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Actually Same Day',
+    body: "Call before noon and we're typically there that afternoon. San Gabriel is a regular part of our SGV route — not a special trip. We don't route calls through a dispatch center and send whoever is available; we cover this area consistently.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Weekends Available',
+    body: "Saturday 8am–7pm and Sunday 9am–5pm. Families in San Gabriel have busy weekday schedules — we're available when the appliance breaks, not just when it's convenient for us.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"LG refrigerator ice maker barely producing anything. Same Day came out, identified the hard water mineral buildup on the inlet valve right away, replaced it, explained why our SGV water causes this. Full production by next morning. Very knowledgeable about the actual cause, not just the symptom."',
+    author: '— Michael C., Mission Drive, San Gabriel',
+  },
+  {
+    stars: 5,
+    text: `"New Bosch dishwasher with spots and a musty smell in under two years. Tech showed me the mineral scale packed into both spray arms — from our water, not anything we did wrong. Cleared everything, gave us a monthly routine. Completely clean from the first load after. Really appreciated the honest explanation."`,
+    author: '— Linda W., Del Mar Ave, San Gabriel',
+  },
+  {
+    stars: 5,
+    text: `"Samsung washer vibrating violently every spin cycle. Same Day replaced all four shock absorbers with OEM parts, leveled the machine, ran three test cycles. Completely smooth and quiet. We'd been dealing with this for months — done in under 90 minutes. Professional, efficient, and fairly priced."`,
+    author: '— Jenny T., Las Tunas area, San Gabriel',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator / Ice Maker', range: '$150 – $400', note: 'SGVMWD hard water inlet valve · Fan motor · OEM parts', featured: true },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'Hard water descaling · Drain pump · Spray arm', featured: true },
+  { appliance: 'Washer / Dryer', range: '$150 – $350', note: 'Drain pump · Thermal fuse · Shock absorbers · Vent' },
+  { appliance: 'Oven / Range', range: '$150 – $400', note: 'Gas igniter · Bake element · Temperature calibration' },
+  { appliance: 'Sub-Zero / Wolf', range: '$300 – $700+', note: 'OEM parts only · Luxury brand expertise' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in San Gabriel, CA?',
+    answer: "Yes. Our technicians cover all of San Gabriel — 91775 and 91776 — including Mission Drive, Las Tunas, Valley Boulevard, Del Mar Avenue, Ramona Street, and every residential street. Call before noon for same-day afternoon service.",
+  },
+  {
+    question: 'Does hard water in San Gabriel affect appliances?',
+    answer: 'Yes. SGVMWD delivers mineral-rich groundwater throughout San Gabriel. Ice maker inlet valves and dishwasher spray arms scale up faster than national average. We test for mineral deposits proactively on every relevant San Gabriel call.',
+  },
+  {
+    question: 'Are you available on weekends in San Gabriel?',
+    answer: "Yes. Saturday 8am–7pm and Sunday 9am–5pm. If your appliance breaks on a weekend, you don't have to wait until Monday.",
+  },
+  {
+    question: 'What appliance brands do you repair in San Gabriel?',
+    answer: 'All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Viking, Thermador, and more. OEM parts on every vehicle.',
+  },
+  {
+    question: 'What is your diagnostic fee in San Gabriel?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most San Gabriel repairs run $150–$400.',
+  },
+  {
+    question: 'What warranty do you offer on appliance repairs in San Gabriel?',
+    answer: 'All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.',
+  },
+  {
+    question: 'Do you also serve Alhambra, Temple City, and Rosemead?',
+    answer: 'Yes. Our San Gabriel service extends to Alhambra, Temple City, Rosemead, Monterey Park, El Monte, San Marino, and South Pasadena. All within our regular SGV route.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Pasadena', slug: 'pasadena' },
+  { name: 'Alhambra', slug: 'alhambra' },
+  { name: 'Temple City', slug: 'temple-city' },
+  { name: 'San Marino', slug: 'san-marino' },
+  { name: 'Arcadia', slug: 'arcadia' },
+  { name: 'South Pasadena', slug: 'south-pasadena' },
+  { name: 'Monrovia', slug: 'monrovia' },
+  { name: 'Glendale', slug: 'glendale' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="San Gabriel, CA"
+    subheadline="One of the most historic cities in the San Gabriel Valley — and one where appliances need the same reliable service as anywhere else. Samsung, LG, GE, Whirlpool, Sub-Zero, all brands. Same-day service, OEM parts, 90-day warranty. Weekends available."
+    zips={zips}
+    tier={3}
+  />
 
-  <!-- HERO -->
-  <section class="sg-hero">
-    <div class="sg-hero__inner container">
-      <div class="sg-hero__content">
-        <div class="sg-hero__eyebrow">San Gabriel, CA · 91775 & 91776 · Mission Drive · Las Tunas · Valley Blvd · Del Mar Ave</div>
-        <h1 class="sg-hero__h1">
-          Appliance Repair<br>
-          <span class="sg-hero__accent">San Gabriel, CA</span>
-        </h1>
-        <p class="sg-hero__sub">
-          One of the most historic cities in the San Gabriel Valley —
-          and one where appliances need the same reliable service as anywhere else.
-          Samsung, LG, GE, Whirlpool, Sub-Zero, all brands. Same-day service,
-          OEM parts, 90-day warranty. Weekends available.
-        </p>
-        <div class="sg-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="sg-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="sg-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-san-gabriel-ca.webp"
-          alt="Appliance repair in San Gabriel CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in San Gabriel — What We Know Here"
+    paragraphs={introParagraphs}
+    bookingTitle="San Gabriel Service Team"
+    bookingSub="91775 · 91776 · Same day · Weekends ok"
+  />
 
-  <!-- INTRO -->
-  <section class="sg-intro">
-    <div class="container sg-intro__inner">
-      <div class="sg-intro__text">
-        <h2>Appliance Repair in San Gabriel — What We Know Here</h2>
-        <p>
-          San Gabriel is one of the oldest cities in Los Angeles County — home to
-          Mission San Gabriel Arcángel, founded in 1771, and the historic street grid
-          that radiates from it. The residential neighborhoods along Mission Drive,
-          Del Mar Avenue, and the streets around the civic center range from early
-          20th century bungalows to post-war ranch homes to newer construction, and
-          the appliances inside them are as varied as the housing stock.
-        </p>
-        <p>
-          Hard water is a consistent issue throughout San Gabriel. Served by the
-          San Gabriel Valley Municipal Water District — the same mineral-rich SGV
-          groundwater supply as Arcadia, San Marino, and Temple City — ice maker
-          inlet valves and dishwasher spray arms accumulate scale significantly faster
-          than national average. We check for this proactively on every San Gabriel
-          call involving ice makers and dishwashers. It comes up consistently.
-        </p>
-        <p>
-          San Gabriel is also a busy family community — the Valley Boulevard and
-          Las Tunas Drive corridors are active, the restaurants and businesses bring
-          foot traffic, and the residential streets behind them are full of families
-          who need appliances working when they need them. Same-day service, weekends
-          included, written estimate before we start.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair.
-          <strong>90-day warranty</strong> on all parts and labor. OEM parts only.
-        </p>
-        <div class="sg-tip">
-          <div class="sg-tip__icon">💧</div>
-          <div class="sg-tip__text">
-            <strong>Hard water tip for San Gabriel:</strong> SGVMWD groundwater
-            is mineral-rich throughout the SGV. If your refrigerator ice maker has
-            been gradually producing less ice over several months — not a sudden
-            stop, but a slow decline — mineral scale on the water inlet valve is
-            almost certainly the cause in 91775 and 91776. Replacing your
-            refrigerator's in-door filter every 6 months (not 12) helps significantly
-            with this water supply.
-          </div>
-        </div>
-      </div>
-      <div class="sg-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">San Gabriel Service Team</div>
-          <div class="cta-box__sub">91775 · 91776 · Same day · Weekends ok</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in San Gabriel"
+    subhead="All brands · SGVMWD hard water aware · 91775 & 91776"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="sg-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in San Gabriel</h2>
-      <p class="section-sub">All brands · SGVMWD hard water aware · 91775 & 91776</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="All of San Gabriel — 91775 & 91776"
+    subheadline="Mission Drive to Valley Blvd — every neighborhood in the city"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={keyStreets}
+  />
 
-        <a href="/san-gabriel/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Hard water ice maker · Not cooling · Fan motor · Temperature off</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in San Gabriel"
+    subhead="Real calls from 91775 and 91776 — SGV homes, SGVMWD hard water, same-day service."
+    jobs={recentJobs}
+  />
 
-        <a href="/san-gabriel/dishwasher-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Hard water spray arm scale · Not draining · Spots on glasses · Error codes</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why San Gabriel Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/san-gabriel/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Hard water inlet screens · Not draining · Not spinning · Error codes</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What San Gabriel Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/san-gabriel/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent lint buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in San Gabriel"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/san-gabriel/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Gas & electric</div>
-          <div class="service-card__brands">GE · Samsung · Bosch · Wolf · Viking · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions San Gabriel Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/san-gabriel/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Hard water inlet valve · Not freezing · Ice stopped · Frost</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
 
-        <a href="/san-gabriel/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/san-gabriel/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter · Gas burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · Thermador · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="sg-neighborhoods">
-    <div class="container">
-      <h2>All of San Gabriel — 91775 & 91776</h2>
-      <p class="section-sub">Mission Drive to Valley Blvd — every neighborhood in the city</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">San Gabriel Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Mission Drive corridor</div>
-            <div class="nh-item featured">Las Tunas Drive area</div>
-            <div class="nh-item featured">Del Mar Ave neighborhood</div>
-            <div class="nh-item">Valley Blvd corridor</div>
-            <div class="nh-item">Ramona Street area</div>
-            <div class="nh-item">North San Gabriel</div>
-            <div class="nh-item">South San Gabriel</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Mission Drive</div>
-            <div class="nh-item">Las Tunas Drive</div>
-            <div class="nh-item">Valley Blvd</div>
-            <div class="nh-item">Del Mar Ave</div>
-            <div class="nh-item">Ramona St</div>
-            <div class="nh-item">San Gabriel Blvd</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Alhambra (91801–03)</div>
-            <div class="nh-item">Temple City (91780)</div>
-            <div class="nh-item">Rosemead (91770)</div>
-            <div class="nh-item">Monterey Park (91754)</div>
-            <div class="nh-item">El Monte (91731)</div>
-            <div class="nh-item">San Marino (91108)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="sg-recent">
-    <div class="container">
-      <h2>Recent Jobs in San Gabriel</h2>
-      <p class="section-sub">Real calls from 91775 and 91776 — SGV homes, SGVMWD hard water, same-day service.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG French Door</span>
-            <span class="recent-location">Mission Drive corridor, 91775</span>
-          </div>
-          <div class="recent-card__title">"Ice maker dropped from full to almost nothing over 3 months"</div>
-          <div class="recent-card__desc">
-            LG French door refrigerator — the gradual decline is the consistent SGVMWD
-            hard water pattern throughout the SGV. Inlet valve orifice restricted by
-            calcium scale to about 20% capacity. Replaced with an OEM LG inlet valve,
-            flushed the water line, replaced the in-door filter (14 months old —
-            should have been changed at 6). Full ice production within 24 hours.
-            Owner was surprised to learn the water hardness here is what drives the
-            issue, not the appliance.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM LG inlet valve · SGVMWD cause explained · Full production</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Del Mar Ave, 91776</span>
-          </div>
-          <div class="recent-card__title">"Spots on everything and the machine smells musty"</div>
-          <div class="recent-card__desc">
-            Bosch 500 series — both spray arm ports nearly blocked with SGVMWD mineral
-            deposits, filter trap caked with scale contributing to the odor. Less than
-            22 months since installation. Descaled both spray arm assemblies completely,
-            deep-cleaned the filter trap, ran a full citric acid maintenance cycle,
-            confirmed full spray arm rotation and clean drain. Showed the homeowner
-            the extracted scale — striking amount for a machine under two years old.
-            Monthly maintenance tablet routine and 6-month filter habit explained.
-          </div>
-          <div class="recent-card__result">✓ Same day · Scale cleared · Odor gone · First load clean</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Washer</span>
-            <span class="recent-location">Las Tunas area, 91775</span>
-          </div>
-          <div class="recent-card__title">"DC error code — vibrating violently on spin cycle"</div>
-          <div class="recent-card__desc">
-            Samsung front-loader DC (unbalanced load detection) error presenting as
-            violent vibration on every spin cycle — not just with large loads, but
-            any load. Found two rear shock absorbers weakened and one almost completely
-            failed. The uneven suspension was triggering the unbalance sensor.
-            Replaced all four shock absorbers with OEM Samsung parts, leveled the
-            machine, ran three test cycles at high spin. Quiet, smooth operation.
-            Family had been doing half-loads and re-spinning everything — problem gone.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung shocks · All four replaced · Full spin confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">GE Range</span>
-            <span class="recent-location">Ramona St, 91776</span>
-          </div>
-          <div class="recent-card__title">"Oven igniter glows but won't light — been happening for two weeks"</div>
-          <div class="recent-card__desc">
-            GE freestanding gas range — oven igniter visible orange glow but failing
-            to draw enough amperage to open the gas valve. This is the standard GE
-            igniter failure pattern. Replaced with an OEM GE igniter, tested oven at
-            325°F, 375°F, and 450°F — all accurate within 5 degrees. Done in under
-            30 minutes. Homeowner had been convinced the valve itself was the problem
-            and was prepared for a much larger repair — explained the igniter amperage
-            mechanism and why this is the more common failure.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM GE igniter · All temps accurate · Explained the failure</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="sg-why">
-    <div class="container">
-      <h2>Why San Gabriel Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">SGVMWD Hard Water</div>
-          <div class="why-text">San Gabriel Valley Municipal Water District groundwater accelerates mineral scale on ice makers and dishwashers throughout 91775 and 91776. We test inlet valves and check for deposits on every relevant San Gabriel call — it consistently comes up with this water supply.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">⏱️</div>
-          <div class="why-title">Actually Same Day</div>
-          <div class="why-text">Call before noon and we're typically there that afternoon. San Gabriel is a regular part of our SGV route — not a special trip. We don't route calls through a dispatch center and send whoever is available; we cover this area consistently.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📅</div>
-          <div class="why-title">Weekends Available</div>
-          <div class="why-text">Saturday 8am–7pm and Sunday 9am–5pm. Families in San Gabriel have busy weekday schedules — we're available when the appliance breaks, not just when it's convenient for us.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="sg-reviews">
-    <div class="container">
-      <h2>What San Gabriel Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG refrigerator ice maker barely producing anything. Same Day came out, identified the hard water mineral buildup on the inlet valve right away, replaced it, explained why our SGV water causes this. Full production by next morning. Very knowledgeable about the actual cause, not just the symptom."</div>
-          <div class="review-author">— Michael C., Mission Drive, San Gabriel</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"New Bosch dishwasher with spots and a musty smell in under two years. Tech showed me the mineral scale packed into both spray arms — from our water, not anything we did wrong. Cleared everything, gave us a monthly routine. Completely clean from the first load after. Really appreciated the honest explanation."</div>
-          <div class="review-author">— Linda W., Del Mar Ave, San Gabriel</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Samsung washer vibrating violently every spin cycle. Same Day replaced all four shock absorbers with OEM parts, leveled the machine, ran three test cycles. Completely smooth and quiet. We'd been dealing with this for months — done in under 90 minutes. Professional, efficient, and fairly priced."</div>
-          <div class="review-author">— Jenny T., Las Tunas area, San Gabriel</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="sg-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in San Gabriel</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">SGVMWD hard water inlet valve · Fan motor · OEM parts</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Hard water descaling · Drain pump · Spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump · Thermal fuse · Shock absorbers · Vent</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts only · Luxury brand expertise</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="sg-faq">
-    <div class="container">
-      <h2>Questions San Gabriel Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in San Gabriel, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of San Gabriel — 91775 and 91776 — including Mission Drive, Las Tunas, Valley Boulevard, Del Mar Avenue, Ramona Street, and every residential street. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does hard water in San Gabriel affect appliances?</summary><div class="faq-answer">Yes. SGVMWD delivers mineral-rich groundwater throughout San Gabriel. Ice maker inlet valves and dishwasher spray arms scale up faster than national average. We test for mineral deposits proactively on every relevant San Gabriel call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in San Gabriel?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm. If your appliance breaks on a weekend, you don't have to wait until Monday.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in San Gabriel?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Viking, Thermador, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in San Gabriel?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most San Gabriel repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">What warranty do you offer on appliance repairs in San Gabriel?</summary><div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Alhambra, Temple City, and Rosemead?</summary><div class="faq-answer">Yes. Our San Gabriel service extends to Alhambra, Temple City, Rosemead, Monterey Park, El Monte, San Marino, and South Pasadena. All within our regular SGV route.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="sg-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/alhambra/" class="nearby-link">Alhambra</a>
-        <a href="/temple-city/" class="nearby-link">Temple City</a>
-        <a href="/san-marino/" class="nearby-link">San Marino</a>
-        <a href="/arcadia/" class="nearby-link">Arcadia</a>
-        <a href="/south-pasadena/" class="nearby-link">South Pasadena</a>
-        <a href="/monrovia/" class="nearby-link">Monrovia</a>
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="sg-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in San Gabriel?</h2>
-          <p>SGVMWD hard water specialists · All brands · Weekends available. 91775 & 91776. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — San Gabriel, CA 91775 & 91776</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --sg-red: #C8102E; --sg-black: #0a0a0a; --sg-gray: #f5f5f5; --sg-border: #e2e2e2; --sg-text: #1a1a1a; --sg-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .sg-hero { background: var(--sg-black); color: white; padding: 80px 0 60px; }
-  .sg-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .sg-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--sg-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .sg-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .sg-hero__accent { color: var(--sg-red); }
-  .sg-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .sg-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .sg-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .sg-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--sg-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .sg-bottom-cta .btn-secondary { color: var(--sg-text); border-color: var(--sg-border); }
-  .trust-bar { background: var(--sg-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .sg-intro { padding: 72px 0; background: white; }
-  .sg-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .sg-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--sg-black); margin-bottom: 20px; }
-  .sg-intro__text p { font-size: 16px; line-height: 1.7; color: var(--sg-text); margin-bottom: 16px; }
-  .sg-tip { display: flex; gap: 14px; background: #eef6ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .sg-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .sg-tip__text { font-size: 14px; color: var(--sg-text); line-height: 1.6; }
-  .cta-box { background: var(--sg-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--sg-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--sg-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--sg-muted); text-align: center; margin-bottom: 40px; }
-  .sg-services { padding: 72px 0; background: var(--sg-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--sg-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--sg-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--sg-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--sg-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--sg-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--sg-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--sg-red); font-weight: 500; }
-  .sg-neighborhoods { padding: 72px 0; background: white; }
-  .sg-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--sg-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--sg-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--sg-text); padding: 8px 12px; background: var(--sg-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--sg-red); color: var(--sg-black); font-weight: 500; }
-  .sg-recent { padding: 72px 0; background: var(--sg-gray); }
-  .sg-recent h2 { font-size: 30px; font-weight: 700; color: var(--sg-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--sg-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--sg-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--sg-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--sg-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--sg-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .sg-why { padding: 72px 0; background: white; }
-  .sg-why h2 { font-size: 30px; font-weight: 700; color: var(--sg-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--sg-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--sg-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--sg-muted); line-height: 1.6; }
-  .sg-reviews { padding: 72px 0; background: var(--sg-gray); }
-  .sg-reviews h2 { font-size: 30px; font-weight: 700; color: var(--sg-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--sg-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--sg-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--sg-muted); font-weight: 500; }
-  .sg-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--sg-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--sg-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--sg-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--sg-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--sg-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--sg-red); }
-  .pricing-card__note { font-size: 13px; color: var(--sg-muted); }
-  .sg-faq { padding: 72px 0; background: var(--sg-gray); }
-  .sg-faq h2 { font-size: 30px; font-weight: 700; color: var(--sg-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--sg-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--sg-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--sg-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--sg-text); }
-  .sg-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--sg-border); }
-  .sg-nearby h2 { font-size: 20px; font-weight: 600; color: var(--sg-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--sg-border); border-radius: 20px; font-size: 14px; color: var(--sg-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--sg-red); color: var(--sg-red); }
-  .sg-bottom-cta { padding: 72px 0; background: var(--sg-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .sg-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .sg-hero__inner { grid-template-columns: 1fr; } .sg-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .sg-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in San Gabriel?"
+    body="SGVMWD hard water specialists · All brands · Weekends available. 91775 & 91776. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayoutV2>

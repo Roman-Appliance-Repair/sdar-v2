@@ -1,400 +1,319 @@
 ---
-// src/pages/villa-park.astro
-// Same Day Appliance Repair — Villa Park, CA
-// Branch: Irvine/OC | Phone: (213) 401-9019
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+const citySlug = 'villa-park';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = "Villa Park";
-const citySlug = "villa-park";
-const phone = "(213) 401-9019";
-const phoneRaw = "+12134019019";
-const email = "oc@samedayappliance.repair";
-const branch = "Irvine";
+const cityName = "Villa Park";
+const zips = ["92861"];
 
-const metaTitle = "Appliance Repair Villa Park CA | Same Day Service | (213) 401-9019";
-const metaDesc = "Same-day appliance repair in Villa Park, CA. Sub-Zero, Wolf, Thermador, Miele & all luxury brands. Estate home specialists. OEM parts, 90-day warranty. $89 diagnostic.";
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
-const neighborhoods = [
-  { name: "Villa Park proper", zip: "92861" },
-  { name: "Santiago Hills border area", zip: "92861" },
-  { name: "Hewes Street corridor", zip: "92861" },
-  { name: "Serrano Avenue area", zip: "92861" },
-  { name: "Vista Del Rio area", zip: "92861" },
-  { name: "Orange Park Acres border", zip: "92861" },
+const title = `Appliance Repair Villa Park CA | Same Day Service | ${phone}`;
+const description = "Same-day appliance repair in Villa Park, CA. Sub-Zero, Wolf, Thermador, Miele & all luxury brands. Estate home specialists. OEM parts, 90-day warranty. $89 diagnostic.";
+const canonical = "https://samedayappliance.repair/villa-park/";
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "HomeAndConstructionBusiness",
+  name: branch.fullName,
+  image: "https://samedayappliance.repair/images/logo.webp",
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { "@type": "City", name: "Villa Park", sameAs: "https://en.wikipedia.org/wiki/Villa_Park,_California" },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: "$$$",
+  license: "CA CSLB #1138898",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.6",
+    reviewCount: "37",
+    bestRating: "5",
+  },
+};
+
+const introParagraphs = [
+  "Villa Park is the smallest city in Orange County and one of the wealthiest communities in California — six thousand residents, no apartments, no strip malls, exclusively large estate homes. The appliances in these homes are Sub-Zero, Wolf, Thermador, Miele, and Dacor as a matter of course. This isn't a city where we encounter luxury brands occasionally. It's what every kitchen here has.",
+  "That changes how we approach every service call. We don't need to ask what brand you have and then figure out if we carry parts for it. We stock OEM parts for Sub-Zero, Wolf, Thermador, Miele, and the other brands common in Villa Park on every truck. Most calls finish same visit.",
+  "The maintenance requirements are also specific. Sub-Zero water filters need a 6-month replacement cycle. Thermador steam ovens need periodic descaling based on usage and water hardness. Wolf dual-fuel ranges develop element wear over time that presents as slow preheating before any error code appears. We find these things proactively and tell you before they become failures.",
+  `Diagnostic fee is $89, credited toward the repair. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
 ];
 
 const services = [
-  { name: "Sub-Zero Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Wolf Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Thermador Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Miele Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Washer & Dryer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Sub-Zero Repair', slug: 'refrigerator' },
+  { icon: '🔥', name: 'Wolf Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Thermador Repair', slug: 'cooktop' },
+  { icon: '🍽️', name: 'Miele Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🫧', name: 'Washer & Dryer Repair', slug: 'washer' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
 ];
 
-const recentRepairs = [
+const villaParkContextNarrative = {
+  headline: "What Every Villa Park Homeowner Should Know About Their Appliances",
+  paragraphs: [],
+  subSections: [
+    {
+      title: "Sub-Zero: filters and coils on a real schedule",
+      paragraphs: [
+        "Sub-Zero recommends a 6-month water filter replacement on any model with a water dispenser or ice maker. In practice, we find filters in service for 18-24 months in most homes we visit — the reminder gets ignored or forgotten. At that age, flow restriction affects ice maker output quality first (hollow cubes, reduced production), and eventually stresses the inlet valve. We replace the filter on every Sub-Zero call where it's overdue, and we set a reminder with the homeowner before we leave.",
+      ],
+    },
+    {
+      title: "Wolf: slow preheat before the error code",
+      paragraphs: [
+        "Wolf dual-fuel ranges with aging elements show a characteristic gradual performance decline — preheat times stretch from 12-15 minutes to 25-35 minutes before any fault code appears. By the time the code shows, the element has been running inefficiently for months. We check element resistance on every Wolf oven call and flag degraded elements even when they haven't failed yet.",
+      ],
+    },
+    {
+      title: "Thermador steam ovens: descaling is non-optional",
+      paragraphs: [
+        "Thermador steam ovens require periodic descaling based on usage cycles. With North OC water hardness, that's typically every 50-60 uses. Skipping the cycle leads to calcium buildup on the steam generator's internal element, which causes E118-series faults. The fix at that point is a professional descaling service — but preventing it is a quarterly 20-minute built-in program that we walk every Thermador steam oven owner through.",
+      ],
+    },
+  ],
+};
+
+const neighborhoods = [
+  { name: 'Villa Park proper', zip: '92861', featured: true },
+  { name: 'Santiago Hills border area', zip: '92861' },
+  { name: 'Hewes Street corridor', zip: '92861' },
+  { name: 'Serrano Avenue area', zip: '92861' },
+  { name: 'Vista Del Rio area', zip: '92861' },
+  { name: 'Orange Park Acres border', zip: '92861' },
+];
+
+const recentJobs = [
   {
-    title: "Sub-Zero 700 series — ice maker producing hollow cubes, dispenser slow",
-    neighborhood: "Villa Park",
-    detail: "Sub-Zero 700 series built-in — ice maker running but producing hollow, partially-formed cubes; water dispenser flow reduced. Two-part issue: water filter 20 months past the 6-month replacement cycle, and the water inlet valve diaphragm was showing early failure signs from the restricted flow. Replaced the filter, replaced the inlet valve with an OEM Sub-Zero part, ran three ice maker cycles to verify output. The filter replacement alone would have bought time, but the valve was already strained — we addressed both. This is the correct call at that filter age.",
-    part: "Sub-Zero OEM water filter + inlet valve",
-    time: "1.5 hours"
+    appliance: 'Sub-Zero 700 Series',
+    location: 'Villa Park',
+    quote: '"Sub-Zero 700 series — ice maker producing hollow cubes, dispenser slow"',
+    description: "Sub-Zero 700 series built-in — ice maker running but producing hollow, partially-formed cubes; water dispenser flow reduced. Two-part issue: water filter 20 months past the 6-month replacement cycle, and the water inlet valve diaphragm was showing early failure signs from the restricted flow. Replaced the filter, replaced the inlet valve with an OEM Sub-Zero part, ran three ice maker cycles to verify output. The filter replacement alone would have bought time, but the valve was already strained — we addressed both. This is the correct call at that filter age.",
+    outcome: '✓ Same day · Sub-Zero OEM water filter + inlet valve · 1.5 hours',
   },
   {
-    title: "Wolf dual-fuel range — oven taking 35 minutes to preheat to 350°F",
-    neighborhood: "Villa Park",
-    detail: "Wolf DF486G — oven preheating slowly, 35 minutes to reach 350°F instead of the normal 12-15. Both bake and broil elements tested; broil element was showing reduced resistance, contributing to slower heat recovery. Replaced the broil element with an OEM Wolf part and ran calibration at 325°F, 375°F, and 450°F. Preheat time back to 14 minutes. Customer had been assuming the oven was 'just like that' for months — it wasn't.",
-    part: "Wolf OEM broil element",
-    time: "1.5 hours"
+    appliance: 'Wolf Dual-Fuel Range',
+    location: 'Villa Park',
+    quote: '"Wolf dual-fuel range — oven taking 35 minutes to preheat to 350°F"',
+    description: "Wolf DF486G — oven preheating slowly, 35 minutes to reach 350°F instead of the normal 12-15. Both bake and broil elements tested; broil element was showing reduced resistance, contributing to slower heat recovery. Replaced the broil element with an OEM Wolf part and ran calibration at 325°F, 375°F, and 450°F. Preheat time back to 14 minutes. Customer had been assuming the oven was 'just like that' for months — it wasn't.",
+    outcome: '✓ Same day · Wolf OEM broil element · 1.5 hours',
   },
   {
-    title: "Thermador steam oven — E118 error, steam function not working",
-    neighborhood: "Villa Park",
-    detail: "Thermador MES301HP steam oven — E118 steam generator fault. The steam generator descaling cycle had been skipped for over a year; calcium scale from the OC water supply had built up on the heating element inside the generator to the point of failure. Performed a full professional descale cycle, cleared the fault code, tested steam generation at multiple settings. Customer wasn't aware the unit needed periodic descaling — Thermador steam ovens require it every 50-80 cycles depending on water hardness. Left with a maintenance reminder schedule.",
-    part: "Descale service + generator inspection",
-    time: "2 hours"
+    appliance: 'Thermador Steam Oven',
+    location: 'Villa Park',
+    quote: '"Thermador steam oven — E118 error, steam function not working"',
+    description: "Thermador MES301HP steam oven — E118 steam generator fault. The steam generator descaling cycle had been skipped for over a year; calcium scale from the OC water supply had built up on the heating element inside the generator to the point of failure. Performed a full professional descale cycle, cleared the fault code, tested steam generation at multiple settings. Customer wasn't aware the unit needed periodic descaling — Thermador steam ovens require it every 50-80 cycles depending on water hardness. Left with a maintenance reminder schedule.",
+    outcome: '✓ Same day · Descale service + generator inspection · 2 hours',
   },
   {
-    title: "Miele dishwasher — G 7000 series, F70 water intake fault",
-    neighborhood: "Villa Park",
-    detail: "Miele G 7566 SCVi — F70 water intake error, cycle refusing to start. Inlet valve solenoid had failed. Replaced with an OEM Miele part. Also cleaned the intake filter screen which had accumulated mineral scale — North OC water hardness contributing. While we were there, the customer asked about the dishwasher's recommended descaling cycle; Miele recommends it every 4-6 weeks with OC water hardness. We walked them through the built-in descaling program before leaving.",
-    part: "Miele OEM inlet valve solenoid",
-    time: "1.5 hours"
-  }
+    appliance: 'Miele Dishwasher',
+    location: 'Villa Park',
+    quote: '"Miele dishwasher — G 7000 series, F70 water intake fault"',
+    description: "Miele G 7566 SCVi — F70 water intake error, cycle refusing to start. Inlet valve solenoid had failed. Replaced with an OEM Miele part. Also cleaned the intake filter screen which had accumulated mineral scale — North OC water hardness contributing. While we were there, the customer asked about the dishwasher's recommended descaling cycle; Miele recommends it every 4-6 weeks with OC water hardness. We walked them through the built-in descaling program before leaving.",
+    outcome: '✓ Same day · Miele OEM inlet valve solenoid · 1.5 hours',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'Luxury brands are our standard',
+    body: "Sub-Zero, Wolf, Thermador, Miele — we carry OEM parts for all of these on every OC truck. We're not calling a parts warehouse after the diagnosis. Most Villa Park calls finish same visit.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Proactive, not reactive',
+    body: 'We flag what we see before it fails — degraded Wolf elements, overdue Sub-Zero filters, Thermador steam generator scale buildup. We tell you what we find and let you decide.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Correct diagnosis every time',
+    body: 'A Sub-Zero ice maker making hollow cubes is a filter and valve issue, not a sealed system problem. A Wolf with slow preheat has an aging element, not a control board fault. We diagnose correctly.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-day warranty',
+    body: 'Every repair carries a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Sub-Zero ice maker degrading for months. Same Day replaced the filter and valve, explained the 6-month filter cycle I\'d been ignoring. Also caught an issue with the coils while there. Thorough, professional, done right."',
+    author: '— Catherine W., Villa Park',
+  },
+  {
+    stars: 5,
+    text: '"Thermador steam oven E118 fault — they descaled it professionally and walked me through the quarterly maintenance program I should have been doing. Oven back in full service same day."',
+    author: '— David R., Villa Park',
+  },
+  {
+    stars: 5,
+    text: '"Wolf range preheating slowly for months, finally called. Broil element replaced, back to 14-minute preheat. Technician knew immediately what the issue was. This is what it looks like when a company actually knows the appliance."',
+    author: '— Susan T., Villa Park',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate · Proactive maintenance assessment' },
+  { appliance: 'Luxury Brand Repair', range: '$250–$600+', note: 'Sub-Zero, Wolf, Thermador, Miele, Dacor · OEM parts' },
+  { appliance: 'Maintenance Service', range: '$89–$200', note: 'Coil cleaning, filter replacement, descaling · Preventive care' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Villa Park?",
-    a: "Yes — Villa Park is part of our regular Orange County route. We cover all of Villa Park's 92861 zip code. Call before noon for same-day service."
+    question: "Do you offer same-day appliance repair in Villa Park?",
+    answer: "Yes — Villa Park is part of our regular Orange County route. We cover all of Villa Park's 92861 zip code. Call before noon for same-day service.",
   },
   {
-    q: "Do you specialize in Sub-Zero, Wolf, and Thermador repair in Villa Park?",
-    a: "Yes. Villa Park is an exclusively large-lot estate community where Sub-Zero, Wolf, Thermador, Miele, and Dacor are the standard installations rather than the exception. Our OC technicians carry OEM parts for all of these brands and service them regularly. We don't treat luxury appliance repair as a specialty — it's the majority of what we do in Villa Park."
+    question: "Do you specialize in Sub-Zero, Wolf, and Thermador repair in Villa Park?",
+    answer: "Yes. Villa Park is an exclusively large-lot estate community where Sub-Zero, Wolf, Thermador, Miele, and Dacor are the standard installations rather than the exception. Our OC technicians carry OEM parts for all of these brands and service them regularly. We don't treat luxury appliance repair as a specialty — it's the majority of what we do in Villa Park.",
   },
   {
-    q: "What is your diagnostic fee in Villa Park?",
-    a: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice."
+    question: "What is your diagnostic fee in Villa Park?",
+    answer: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice.",
   },
   {
-    q: "How often should Sub-Zero refrigerators be serviced in Villa Park?",
-    a: "Sub-Zero recommends a 6-month water filter replacement cycle and an annual condenser coil inspection. In Villa Park — which has hot dry summers and is inland from the coast — the coil fouling is primarily from household dust rather than salt air. We recommend cleaning when we find meaningful buildup, which is typically every 6-12 months depending on the home."
+    question: "How often should Sub-Zero refrigerators be serviced in Villa Park?",
+    answer: "Sub-Zero recommends a 6-month water filter replacement cycle and an annual condenser coil inspection. In Villa Park — which has hot dry summers and is inland from the coast — the coil fouling is primarily from household dust rather than salt air. We recommend cleaning when we find meaningful buildup, which is typically every 6-12 months depending on the home.",
   },
   {
-    q: "Do you service Thermador steam ovens in Villa Park?",
-    a: "Yes. Thermador steam ovens require periodic descaling based on usage cycles — typically every 50-80 uses depending on water hardness. OC water hardness makes this maintenance more frequent than the general recommendation. We perform professional descaling service and can leave you with a reminder schedule calibrated to your usage."
+    question: "Do you service Thermador steam ovens in Villa Park?",
+    answer: "Yes. Thermador steam ovens require periodic descaling based on usage cycles — typically every 50-80 uses depending on water hardness. OC water hardness makes this maintenance more frequent than the general recommendation. We perform professional descaling service and can leave you with a reminder schedule calibrated to your usage.",
   },
   {
-    q: "What other luxury brands do you repair in Villa Park?",
-    a: "Sub-Zero, Wolf, Thermador, Miele, Dacor, Viking, La Cornue, Gaggenau, Fisher & Paykel, and Bertazzoni. If you have a brand not listed, call us — our OC technicians have experience with the full range of luxury appliance brands installed in estate homes."
+    question: "What other luxury brands do you repair in Villa Park?",
+    answer: "Sub-Zero, Wolf, Thermador, Miele, Dacor, Viking, La Cornue, Gaggenau, Fisher & Paykel, and Bertazzoni. If you have a brand not listed, call us — our OC technicians have experience with the full range of luxury appliance brands installed in estate homes.",
   },
   {
-    q: "Do you offer a warranty on repairs in Villa Park?",
-    a: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge."
-  }
+    question: "Do you offer a warranty on repairs in Villa Park?",
+    answer: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.",
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Orange", slug: "orange" },
-  { name: "Anaheim Hills", slug: "anaheim-hills" },
-  { name: "Yorba Linda", slug: "yorba-linda" },
-  { name: "Tustin", slug: "tustin" },
-  { name: "Irvine", slug: "irvine" },
-  { name: "Fullerton", slug: "fullerton" },
+const nearbyCities = [
+  { name: 'Anaheim', slug: 'anaheim' },
+  { name: 'Yorba Linda', slug: 'yorba-linda' },
+  { name: 'Tustin', slug: 'tustin' },
+  { name: 'Irvine', slug: 'irvine' },
+  { name: 'Fullerton', slug: 'fullerton' },
+  { name: 'Santa Ana', slug: 'santa-ana' },
 ];
-
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Villa Park",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/villa-park/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "2600 Michelson Dr Suite 1700",
-        "addressLocality": "Irvine",
-        "addressRegion": "CA",
-        "postalCode": "92612",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Villa Park" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "31",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Villa Park, CA"
+    subheadline="Sub-Zero, Wolf, Thermador, Miele & all luxury brands. Estate home specialists. OEM parts, 90-day warranty. $89 diagnostic — waived with repair."
+    zips={zips}
+    tier={1}
+  />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Villa Park, CA · Orange County · 92861</div>
-        <h1>Appliance Repair in Villa Park, CA</h1>
-        <p class="city-hero-sub">Sub-Zero, Wolf, Thermador, Miele & all luxury brands. Estate home specialists. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.9 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/villa-park/appliance-repair-villa-park-ca.webp"
-          alt="Appliance repair technician in Villa Park CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Villa Park — Where Sub-Zero Is the Standard"
+    paragraphs={introParagraphs}
+    bookingTitle="Villa Park Service"
+    bookingSub="92861 · Estate Homes · Same Day"
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Villa Park — Where Sub-Zero Is the Standard</h2>
-        <p>Villa Park is the smallest city in Orange County and one of the wealthiest communities in California — six thousand residents, no apartments, no strip malls, exclusively large estate homes. The appliances in these homes are Sub-Zero, Wolf, Thermador, Miele, and Dacor as a matter of course. This isn't a city where we encounter luxury brands occasionally. It's what every kitchen here has.</p>
-        <p>That changes how we approach every service call. We don't need to ask what brand you have and then figure out if we carry parts for it. We stock OEM parts for Sub-Zero, Wolf, Thermador, Miele, and the other brands common in Villa Park on every truck. Most calls finish same visit.</p>
-        <p>The maintenance requirements are also specific. Sub-Zero water filters need a 6-month replacement cycle. Thermador steam ovens need periodic descaling based on usage and water hardness. Wolf dual-fuel ranges develop element wear over time that presents as slow preheating before any error code appears. We find these things proactively and tell you before they become failures.</p>
-        <p>Diagnostic fee is $89, credited toward the repair. Call <a href={`tel:${phoneRaw}`}>{phone}</a>.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Villa Park Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Luxury Appliance Repair Services in Villa Park"
+    services={services}
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Luxury Appliance Repair Services in Villa Park</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Villa Park →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={villaParkContextNarrative.headline}
+    paragraphs={villaParkContextNarrative.paragraphs}
+    subSections={villaParkContextNarrative.subSections}
+    background="white"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>What Every Villa Park Homeowner Should Know About Their Appliances</h2>
+  <ServiceArea
+    cityName={cityName}
+    headline="Villa Park Areas We Service"
+    subheadline="All of 92861 — large-lot estate community."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <h3>Sub-Zero: filters and coils on a real schedule</h3>
-        <p>Sub-Zero recommends a 6-month water filter replacement on any model with a water dispenser or ice maker. In practice, we find filters in service for 18-24 months in most homes we visit — the reminder gets ignored or forgotten. At that age, flow restriction affects ice maker output quality first (hollow cubes, reduced production), and eventually stresses the inlet valve. We replace the filter on every Sub-Zero call where it's overdue, and we set a reminder with the homeowner before we leave.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Villa Park"
+    jobs={recentJobs}
+  />
 
-        <h3>Wolf: slow preheat before the error code</h3>
-        <p>Wolf dual-fuel ranges with aging elements show a characteristic gradual performance decline — preheat times stretch from 12-15 minutes to 25-35 minutes before any fault code appears. By the time the code shows, the element has been running inefficiently for months. We check element resistance on every Wolf oven call and flag degraded elements even when they haven't failed yet.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Villa Park Homeowners Call Us"
+    reasons={whyReasons}
+  />
 
-        <h3>Thermador steam ovens: descaling is non-optional</h3>
-        <p>Thermador steam ovens require periodic descaling based on usage cycles. With North OC water hardness, that's typically every 50-60 uses. Skipping the cycle leads to calcium buildup on the steam generator's internal element, which causes E118-series faults. The fix at that point is a professional descaling service — but preventing it is a quarterly 20-minute built-in program that we walk every Thermador steam oven owner through.</p>
-      </div>
-    </div>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Villa Park Clients Say"
+    testimonials={testimonials}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Villa Park Areas We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Villa Park"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Villa Park</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 Villa Park</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Villa Park"
+    faqs={faqs}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Villa Park Homeowners Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>Luxury brands are our standard</h3>
-          <p>Sub-Zero, Wolf, Thermador, Miele — we carry OEM parts for all of these on every OC truck. We're not calling a parts warehouse after the diagnosis. Most Villa Park calls finish same visit.</p>
-        </div>
-        <div class="why-item">
-          <h3>Proactive, not reactive</h3>
-          <p>We flag what we see before it fails — degraded Wolf elements, overdue Sub-Zero filters, Thermador steam generator scale buildup. We tell you what we find and let you decide.</p>
-        </div>
-        <div class="why-item">
-          <h3>Correct diagnosis every time</h3>
-          <p>A Sub-Zero ice maker making hollow cubes is a filter and valve issue, not a sealed system problem. A Wolf with slow preheat has an aging element, not a control board fault. We diagnose correctly.</p>
-        </div>
-        <div class="why-item">
-          <h3>90-day warranty</h3>
-          <p>Every repair carries a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby OC Cities"
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Villa Park Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Sub-Zero ice maker degrading for months. Same Day replaced the filter and valve, explained the 6-month filter cycle I'd been ignoring. Also caught an issue with the coils while there. Thorough, professional, done right."</p>
-          <div class="review-author">— Catherine W., Villa Park</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Thermador steam oven E118 fault — they descaled it professionally and walked me through the quarterly maintenance program I should have been doing. Oven back in full service same day."</p>
-          <div class="review-author">— David R., Villa Park</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Wolf range preheating slowly for months, finally called. Broil element replaced, back to 14-minute preheat. Technician knew immediately what the issue was. This is what it looks like when a company actually knows the appliance."</p>
-          <div class="review-author">— Susan T., Villa Park</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Villa Park</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Credited toward repair · Written estimate · Proactive maintenance assessment</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Thermador, Miele, Dacor · OEM parts</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Maintenance Service</div>
-          <div class="pricing-price">$89–$200</div>
-          <div class="pricing-note">Coil cleaning, filter replacement, descaling · Preventive care</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Villa Park</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby OC Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Villa Park Repair Today</h2>
-      <p>Sub-Zero, Wolf, Thermador, Miele — same-day service, OEM parts, estate home expertise.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Villa Park, CA 92861</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Villa Park", "Orange County", "Estate Homes"]} />
-</Layout>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Villa Park Repair Today"
+    body="Sub-Zero, Wolf, Thermador, Miele — same-day service, OEM parts, estate home expertise. $89 diagnostic · 90-day warranty · OEM parts · Villa Park, CA 92861."
+  />
+</CityLayoutV2>
