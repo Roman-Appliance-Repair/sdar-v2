@@ -14,6 +14,8 @@ export interface Props {
   citySlug: string;
   cityName: string;
   jobs: RecentJob[];
+  /** Optional override of the default H2 ("Jobs Our Team Did in {cityName} — Real Repairs"). */
+  headline?: string;
   subhead?: string;
 }
 
@@ -21,8 +23,10 @@ const {
   citySlug,
   cityName,
   jobs,
+  headline,
   subhead = 'Not made up. These are actual calls our technicians handled.',
 } = Astro.props;
+const finalHeadline = headline ?? `Jobs Our Team Did in ${cityName} — Real Repairs`;
 
 const photoSrc = `/images/cities/${citySlug}/recent-repair.webp`;
 const photoAlt = `OEM appliance part replacement ${cityName}`;
@@ -30,7 +34,7 @@ const photoAlt = `OEM appliance part replacement ${cityName}`;
 
 <section class="v2-recent">
   <div class="v2-container">
-    <h2 class="v2-section-title">Jobs Our Team Did in {cityName} — Real Repairs</h2>
+    <h2 class="v2-section-title">{finalHeadline}</h2>
     <p class="v2-section-sub">{subhead}</p>
     <div class="v2-recent__grid">
       {jobs.map((j, i) => (

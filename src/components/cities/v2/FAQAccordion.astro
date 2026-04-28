@@ -3,9 +3,15 @@
  *  Single source: schema = HTML 1:1 from same `faqs` prop array. */
 
 export interface FAQ { question: string; answer: string; schemaAnswer?: string; }
-export interface Props { cityName: string; faqs: FAQ[]; }
+export interface Props {
+  cityName: string;
+  faqs: FAQ[];
+  /** Optional override of the default H2. */
+  headline?: string;
+}
 
-const { cityName, faqs } = Astro.props;
+const { cityName, faqs, headline } = Astro.props;
+const finalHeadline = headline ?? `Frequently Asked Questions — Appliance Repair ${cityName}`;
 
 const faqSchema = {
   '@context': 'https://schema.org',
@@ -20,7 +26,7 @@ const faqSchema = {
 
 <section class="v2-faq">
   <div class="v2-container">
-    <h2 class="v2-section-title">Frequently Asked Questions — Appliance Repair {cityName}</h2>
+    <h2 class="v2-section-title">{finalHeadline}</h2>
     <div class="v2-faq__list">
       {faqs.map((f) => (
         <details class="v2-faq__item">

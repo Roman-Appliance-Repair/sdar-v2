@@ -7,20 +7,30 @@ export interface PriceTier { appliance: string; range: string; note: string; fea
 export interface Props {
   cityName: string;
   tiers: PriceTier[];
-  footnote?: string;
+  /** Optional override of the default H2 ("Appliance Repair Costs in {cityName}"). */
+  headline?: string;
+  /** Optional override of the default subheadline. */
+  subhead?: string;
+  /** Optional luxury-brand footnote. Default is the WeHo wording; pass empty string
+   *  or false to omit. */
+  footnote?: string | false;
 }
 
 const {
   cityName,
   tiers,
+  headline,
+  subhead,
   footnote = "Sub-Zero, Thermador, Viking, Miele and other luxury brands may cost more due to OEM part pricing. We'll always tell you upfront. No work starts without your written approval.",
 } = Astro.props;
+const finalHeadline = headline ?? `Appliance Repair Costs in ${cityName}`;
+const finalSub = subhead ?? 'Honest estimates. Written before we start. Diagnostic fee $89 — waived with repair.';
 ---
 
 <section class="v2-pricing">
   <div class="v2-container">
-    <h2 class="v2-section-title">Appliance Repair Costs in {cityName}</h2>
-    <p class="v2-section-sub">Honest estimates. Written before we start. Diagnostic fee $89 — waived with repair.</p>
+    <h2 class="v2-section-title">{finalHeadline}</h2>
+    <p class="v2-section-sub">{finalSub}</p>
     <div class="v2-pricing__grid">
       {tiers.map((t) => (
         <div class={`v2-pricing__card ${t.featured ? 'v2-pricing__card--featured' : ''}`}>

@@ -2,9 +2,15 @@
 /** v2 WhyCallsUsBack — 4 reasons grid. */
 
 export interface Reason { iconKey: 'clock' | 'parts' | 'shield' | 'team'; title: string; body: string; }
-export interface Props { cityName: string; reasons: Reason[]; }
+export interface Props {
+  cityName: string;
+  reasons: Reason[];
+  /** Optional override of the default H2 ("Why {cityName} Calls Us Back"). */
+  headline?: string;
+}
 
-const { cityName, reasons } = Astro.props;
+const { cityName, reasons, headline } = Astro.props;
+const finalHeadline = headline ?? `Why ${cityName} Calls Us Back`;
 
 const ICONS: Record<Reason['iconKey'], string> = {
   clock: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
@@ -16,7 +22,7 @@ const ICONS: Record<Reason['iconKey'], string> = {
 
 <section class="v2-why">
   <div class="v2-container">
-    <h2 class="v2-section-title">Why {cityName} Calls Us Back</h2>
+    <h2 class="v2-section-title">{finalHeadline}</h2>
     <div class="v2-why__grid">
       {reasons.map((r) => (
         <div class="v2-why__card">

@@ -7,21 +7,27 @@ export interface ServiceCard {
   name: string;
   /** slug WITHOUT "-repair" suffix; component appends it */
   slug: string;
-  issues: string;
-  brands: string;
+  /** Optional — omit for 2-tier (icon + name + cta only). */
+  issues?: string;
+  /** Optional — omit for 2-tier. */
+  brands?: string;
 }
 
 export interface Props {
   cityName: string;
+  /** Optional override of the default H2 ("Appliances We Repair in {cityName}"). */
+  headline?: string;
   subhead?: string;
   services: ServiceCard[];
 }
 
 const {
   cityName,
+  headline,
   subhead = 'All major brands · Gas & electric · Residential & commercial',
   services,
 } = Astro.props;
+const finalHeadline = headline ?? `Appliances We Repair in ${cityName}`;
 
 const toHref = (slug: string) => {
   const cleaned = slug.replace(/^\/+|\/+$/g, '').replace(/-repair$/, '');
@@ -31,15 +37,15 @@ const toHref = (slug: string) => {
 
 <section class="v2-services">
   <div class="v2-container">
-    <h2 class="v2-section-title">Appliances We Repair in {cityName}</h2>
+    <h2 class="v2-section-title">{finalHeadline}</h2>
     <p class="v2-section-sub">{subhead}</p>
     <div class="v2-services__grid">
       {services.map((s) => (
         <a href={toHref(s.slug)} class="v2-svc-card">
           <div class="v2-svc-card__icon" aria-hidden="true">{s.icon}</div>
           <div class="v2-svc-card__name">{s.name}</div>
-          <div class="v2-svc-card__issues">{s.issues}</div>
-          <div class="v2-svc-card__brands">{s.brands}</div>
+          {s.issues && <div class="v2-svc-card__issues">{s.issues}</div>}
+          {s.brands && <div class="v2-svc-card__brands">{s.brands}</div>}
           <div class="v2-svc-card__cta">Learn more →</div>
         </a>
       ))}

@@ -1,429 +1,382 @@
 ---
-// src/pages/anaheim.astro
-// Same Day Appliance Repair — Anaheim, CA
-// Branch: Irvine/OC | Phone: (213) 401-9019
+/**
+ * Anaheim, CA — v2 migrated page (T11 pilot).
+ * Branch: Irvine — service_area (no public street address).
+ * Content source of truth: wiki/migration/content-dumps/anaheim.md
+ *
+ * Verbatim contract: every word, paragraph, FAQ, recent job, review,
+ * neighborhood, and street from the T7 dump appears here. The unique
+ * "Anaheim Hills vs. the Rest of the City" narrative is rendered through
+ * <CustomNarrative>; commercial mentions are preserved in narrative.
+ *
+ * Pricing-discipline (narrow):
+ *   - $120 commercial pricing card removed from PricingCards (only the
+ *     $120 number is dropped; surrounding narrative stays intact)
+ *   - FAQ Q3 about commercial: the "$120" sentence is replaced with a
+ *     pricing-neutral line; the rest of Q3 stays verbatim
+ *   - Custom narrative paragraph 4 about commercial: the "$120" sentence
+ *     is replaced; the rest stays verbatim
+ *   - Service card "Commercial Refrigerator" is preserved verbatim — it's
+ *     a service category, not a $120 pricing claim
+ *
+ * Branch isolation:
+ *   - Phone (213) 401-9019 from cities.ts → branches.ts (Irvine)
+ *   - No streetAddress in schema (Irvine is service_area, not physical_pin)
+ *   - All ZIPs are anaheim's (92801–92808 minus 92803)
+ *   - Nearby cities are OC neighbors only
+ *
+ * Legacy preserved as anaheim.astro.legacy (the pre-v2 live design).
+ */
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
 
-const city = "Anaheim";
-const citySlug = "anaheim";
-const phone = "(213) 401-9019";
-const phoneRaw = "+12134019019";
-const email = "oc@samedayappliance.repair";
-const branch = "Irvine";
+const citySlug = 'anaheim';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const metaTitle = "Appliance Repair Anaheim CA | Same Day Service | (213) 401-9019";
-const metaDesc = "Same-day appliance repair in Anaheim, CA. Anaheim Hills, Platinum Triangle, Downtown. Refrigerator, washer, dryer, oven. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
+const cityName = 'Anaheim';
+const zips = ['92801', '92802', '92804', '92805', '92806', '92807', '92808'];
 
-const neighborhoods = [
-  { name: "Anaheim Hills", zip: "92807" },
-  { name: "Platinum Triangle", zip: "92806" },
-  { name: "Downtown Anaheim", zip: "92805" },
-  { name: "West Anaheim", zip: "92804" },
-  { name: "East Anaheim", zip: "92806" },
-  { name: "North Anaheim", zip: "92801" },
-  { name: "Canyon Area", zip: "92808" },
-  { name: "Lincoln Avenue Corridor", zip: "92805" },
-  { name: "Disneyland Resort Area", zip: "92802" },
-  { name: "Ball Road Corridor", zip: "92804" },
-  { name: "Anaheim Stadium Area", zip: "92806" },
-  { name: "Colony Historic District", zip: "92805" },
+const title = `Appliance Repair Anaheim CA | Same Day Service | ${branch.phone}`;
+const description = 'Same-day appliance repair in Anaheim, CA. Anaheim Hills, Platinum Triangle, Downtown. Refrigerator, washer, dryer, oven. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/anaheim/';
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+// LocalBusiness schema — service_area branch, no streetAddress.
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  // streetAddress omitted: Irvine is service_area (NAP rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Anaheim', sameAs: 'https://en.wikipedia.org/wiki/Anaheim,_California' },
+    { '@type': 'Place', name: 'Anaheim Hills' },
+    { '@type': 'Place', name: 'Platinum Triangle' },
+  ],
+  openingHoursSpecification: [
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Monday','Tuesday','Wednesday','Thursday','Friday'], opens: '07:00', closes: '21:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Saturday'], opens: '08:00', closes: '19:00' },
+    { '@type': 'OpeningHoursSpecification', dayOfWeek: ['Sunday'], opens: '09:00', closes: '17:00' },
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+};
+
+// =====================================================================
+// Section 3: INTRO — H2 "Appliance Repair in Anaheim — Two Very Different Cities in One"
+// 3 paragraphs verbatim from dump, plus side booking card.
+// =====================================================================
+const introParagraphs = [
+  "Anaheim is one of the more interesting cities we work in from an appliance standpoint. It's not a uniform market. Anaheim Hills to the east is a different world from West Anaheim or the Disneyland Resort corridor — the homes are larger, the appliances are higher-end, and the calls tend to be Sub-Zero, GE Monogram, and Wolf. The Platinum Triangle near Angel Stadium has a wave of newer construction condos where Samsung and LG are the norm. And then there's the commercial corridor near the resort, which generates its own category of calls entirely: ice machines, walk-in coolers, commercial refrigeration.",
+  "Our technicians run Anaheim daily as part of our Orange County routes out of Irvine. We know the difference between a multi-family West Anaheim call and an Anaheim Hills estate, and we show up prepared for both. OEM parts for the mainstream brands and the luxury brands alike. We don't sub out anything — the technician who calls you back is the one who shows up.",
+  `Diagnostic fee is $89 — goes away the moment you say yes to the repair. What we quote is what you pay. No fuel surcharges, no weekend premium, no separate charge for a second look if we need to diagnose something adjacent. Call <a href="tel:${phoneRaw}">${branch.phone}</a> and someone with our actual schedule picks up.`,
 ];
 
+// =====================================================================
+// Section 4: WHAT_WE_REPAIR — 8 services, 2-tier (icon + name only).
+// 8th card "Commercial Refrigerator" preserved verbatim — service category, not pricing.
+// =====================================================================
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Commercial Refrigerator", slug: "commercial-refrigerator-repair", icon: "🏪" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🏪', name: 'Commercial Refrigerator', slug: 'commercial-refrigerator' },
 ];
 
-const recentRepairs = [
+// =====================================================================
+// Section 5: CUSTOM_NARRATIVE — "Anaheim Hills vs. the Rest of the City — Why It Matters"
+// 4 paragraphs verbatim. Paragraph 4 has the "$120" commercial-pricing
+// sentence replaced (only sentence with the dollar figure); rest verbatim.
+// =====================================================================
+const anaheimHillsNarrative = {
+  headline: 'Anaheim Hills vs. the Rest of the City — Why It Matters',
+  paragraphs: [
+    "Most appliance repair companies treat Anaheim as one market. It isn't. When we get a call from Anaheim Hills, our technicians load differently than when heading to West Anaheim or the Platinum Triangle. The difference isn't attitude — it's parts inventory.",
+    "Anaheim Hills homes in the 92807 and 92808 zip codes tend to have kitchen suites that rival Newport Beach — Sub-Zero built-in refrigerators, GE Monogram column units, Wolf ranges, Thermador steam ovens. These are not off-the-shelf fixes. You need the right diagnostic tools, the right OEM part, and a technician who has actually worked on that model before. We stock parts for Sub-Zero, GE Monogram, Wolf, and Thermador on our OC trucks specifically because Anaheim Hills generates that volume of calls.",
+    "The Platinum Triangle — the area around Angel Stadium and the Anaheim Convention Center — is a newer construction zone with mostly Samsung and LG appliances in the high-rise and mid-rise condos. These calls are different: flex drawer control boards, linear compressor issues on LG refrigerators, Samsung ice maker wire harness failures. We know these failure patterns well.",
+    `And the resort area generates its own separate category: commercial ice machines, walk-in coolers for restaurants, commercial refrigerators. If you're running a food service operation near Disneyland and a unit goes down, call our commercial line at <a href="tel:${phoneRaw}">${branch.phone}</a>. We move quickly on food safety calls.`,
+  ],
+};
+
+// =====================================================================
+// Section 6: NEIGHBORHOODS — H2 "Anaheim Neighborhoods We Service"
+// 12 entries verbatim, plus dump's intro line.
+// =====================================================================
+const neighborhoods = [
+  { name: 'Anaheim Hills', zip: '92807' },
+  { name: 'Platinum Triangle', zip: '92806' },
+  { name: 'Downtown Anaheim', zip: '92805' },
+  { name: 'West Anaheim', zip: '92804' },
+  { name: 'East Anaheim', zip: '92806' },
+  { name: 'North Anaheim', zip: '92801' },
+  { name: 'Canyon Area', zip: '92808' },
+  { name: 'Lincoln Avenue Corridor', zip: '92805' },
+  { name: 'Disneyland Resort Area', zip: '92802' },
+  { name: 'Ball Road Corridor', zip: '92804' },
+  { name: 'Anaheim Stadium Area', zip: '92806' },
+  { name: 'Colony Historic District', zip: '92805' },
+];
+const neighborhoodsSubhead = 'We cover all of Anaheim. Our technicians know the city well and route efficiently between the hills, the flatlands, and the resort district.';
+
+// =====================================================================
+// Section 7: RECENT_JOBS — 4 jobs verbatim.
+// =====================================================================
+const recentJobs = [
   {
-    title: "Samsung fridge — ice maker stopped, flex drawer not responding",
-    neighborhood: "Platinum Triangle",
-    detail: "New construction condo in the Platinum Triangle — Samsung RF28 with the flex drawer. Ice maker had stopped producing entirely, flex drawer control board was unresponsive. These Samsung units have a known issue with the ice maker wire harness routing — it chafes against the door hinge over time. We rerouted the harness with a protective sleeve, replaced the ice maker module, and reset the control board. Everything back online same visit.",
-    part: "Samsung OEM ice maker module + harness sleeve",
-    time: "2 hours"
+    appliance: 'Samsung Refrigerator',
+    location: 'Platinum Triangle',
+    quote: 'Samsung fridge — ice maker stopped, flex drawer not responding',
+    description: 'New construction condo in the Platinum Triangle — Samsung RF28 with the flex drawer. Ice maker had stopped producing entirely, flex drawer control board was unresponsive. These Samsung units have a known issue with the ice maker wire harness routing — it chafes against the door hinge over time. We rerouted the harness with a protective sleeve, replaced the ice maker module, and reset the control board. Everything back online same visit.',
+    outcome: '✓ Same day · Samsung OEM ice maker module + harness sleeve · 2 hours',
   },
   {
-    title: "LG washer — LE error code, drum won't spin",
-    neighborhood: "Anaheim Hills",
-    detail: "Large home in Anaheim Hills with an LG front-loader showing LE error — motor overload fault. On inspection the direct drive motor stator had failed, a known failure point on LG units in this generation. Replaced the stator assembly with an OEM LG part. Ran three full cycles before leaving to confirm no recurrence. Customer had asked a neighbor about repair — that neighbor had been quoted a new washer by another company.",
-    part: "LG OEM direct drive stator assembly",
-    time: "1.5 hours"
+    appliance: 'LG Washer',
+    location: 'Anaheim Hills',
+    quote: "LG washer — LE error code, drum won't spin",
+    description: 'Large home in Anaheim Hills with an LG front-loader showing LE error — motor overload fault. On inspection the direct drive motor stator had failed, a known failure point on LG units in this generation. Replaced the stator assembly with an OEM LG part. Ran three full cycles before leaving to confirm no recurrence. Customer had asked a neighbor about repair — that neighbor had been quoted a new washer by another company.',
+    outcome: '✓ Same day · LG OEM direct drive stator assembly · 1.5 hours',
   },
   {
-    title: "GE Monogram refrigerator — not cooling, compressor running constantly",
-    neighborhood: "Anaheim Hills",
-    detail: "Built-in GE Monogram in a custom Anaheim Hills kitchen — running constantly but not reaching temperature. Thermistor had failed, causing the control board to misread the cabinet temperature and run the compressor indefinitely. Replaced the thermistor, cleared the error log, verified temperature stabilization over 45 minutes before leaving. Classic misdiagnosis opportunity — the compressor sounds fine, so many techs replace it unnecessarily. We don't.",
-    part: "GE Monogram OEM thermistor",
-    time: "1.5 hours"
+    appliance: 'GE Monogram Refrigerator',
+    location: 'Anaheim Hills',
+    quote: 'GE Monogram refrigerator — not cooling, compressor running constantly',
+    description: "Built-in GE Monogram in a custom Anaheim Hills kitchen — running constantly but not reaching temperature. Thermistor had failed, causing the control board to misread the cabinet temperature and run the compressor indefinitely. Replaced the thermistor, cleared the error log, verified temperature stabilization over 45 minutes before leaving. Classic misdiagnosis opportunity — the compressor sounds fine, so many techs replace it unnecessarily. We don't.",
+    outcome: '✓ Same day · GE Monogram OEM thermistor · 1.5 hours',
   },
   {
-    title: "Commercial ice machine — mold contamination, Disneyland area restaurant",
-    neighborhood: "Resort District",
-    detail: "Restaurant near the resort area — Scotsman ice machine producing discolored ice with off smell. Full mold remediation: drained and sanitized the reservoir, replaced the water filter and distribution tube, cleaned all internal surfaces per manufacturer spec. Retested ice quality. This is exactly the kind of call where cutting corners has health consequences — we don't rush commercial food equipment jobs.",
-    part: "Scotsman OEM water filter + distribution tube",
-    time: "3 hours"
-  }
+    appliance: 'Scotsman Ice Machine',
+    location: 'Resort District',
+    quote: 'Commercial ice machine — mold contamination, Disneyland area restaurant',
+    description: "Restaurant near the resort area — Scotsman ice machine producing discolored ice with off smell. Full mold remediation: drained and sanitized the reservoir, replaced the water filter and distribution tube, cleaned all internal surfaces per manufacturer spec. Retested ice quality. This is exactly the kind of call where cutting corners has health consequences — we don't rush commercial food equipment jobs.",
+    outcome: '✓ Same day · Scotsman OEM water filter + distribution tube · 3 hours',
+  },
 ];
 
+// =====================================================================
+// Section 8: METHOD/WHY_US — H2 "Why Anaheim Residents Call Us" — 4 reasons verbatim.
+// =====================================================================
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: "We don't guess",
+    body: 'A compressor running constantly doesn\'t mean the compressor is bad — in a GE Monogram, it often means the thermistor failed and the board is misreading temperature. We diagnose correctly the first time, which is how we can offer a 90-day warranty without losing money on callbacks.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'OEM parts, not aftermarket',
+    body: "We use manufacturer-original parts on every repair. On a Samsung flex drawer or an LG linear compressor, aftermarket parts are a shortcut that creates the next service call. We don't do that.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Commercial calls treated seriously',
+    body: "A restaurant ice machine near the resort that's producing contaminated ice isn't an inconvenience — it's a health code issue. We treat commercial food equipment calls with the urgency they deserve and follow manufacturer sanitation protocols completely.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Real phone answer',
+    body: 'When you call our Anaheim line, someone who knows our OC schedule answers. You get a real arrival window — not a 6-hour block. We pick up the phone.',
+  },
+];
+
+// =====================================================================
+// Section 9: REVIEWS — H2 "What Anaheim Clients Say" — 3 testimonials verbatim.
+// =====================================================================
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Samsung refrigerator in our Platinum Triangle condo — ice maker completely dead. They came same day, had the part on the truck, done in two hours. I had called two other companies first and neither had the part."',
+    author: '— Marcus T., Platinum Triangle',
+  },
+  {
+    stars: 5,
+    text: "\"Our GE Monogram fridge in Anaheim Hills wasn't cooling. Another company told us the compressor needed replacing — $1,200 quote. Same Day came out, said it was the thermistor, fixed it for $280 including parts. That's the difference between someone who actually knows the appliance and someone guessing.\"",
+    author: '— Christine R., Anaheim Hills',
+  },
+  {
+    stars: 5,
+    text: "\"We run a restaurant near the resort. Ice machine was putting out bad-smelling ice. They came out the same morning I called, did a full sanitization and replaced the filter and distribution tube. Followed up two days later to check. That's the level of service a food business needs.\"",
+    author: '— David L., Resort District',
+  },
+];
+
+// =====================================================================
+// Section 10: PRICING — H2 "Repair Pricing in Anaheim"
+// Original dump had 4 cards including "Commercial Diagnostic $120". Per
+// pricing-discipline (narrow), the $120 number/card is dropped. Remaining
+// 3 residential cards verbatim.
+// =====================================================================
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Home appliances · Credited toward repair · Written estimate' },
+  { appliance: 'Standard Repair', range: '$150–$350', note: 'Parts + labor · OEM parts only · 90-day warranty' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback if same issue returns', featured: true },
+];
+
+// =====================================================================
+// Section 11: FAQ — H2 "Frequently Asked Questions — Anaheim" — 7 items verbatim,
+// except Q3 commercial answer where "$120" sentence is replaced (only that
+// sentence — surrounding text verbatim).
+// =====================================================================
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Anaheim?",
-    a: "Yes — we cover all of Anaheim including Anaheim Hills, the Platinum Triangle, West Anaheim, and the resort district. Call before noon and we can typically be at your door that afternoon. Our OC technicians run routes throughout the city daily."
+    question: 'Do you offer same-day appliance repair in Anaheim?',
+    answer: 'Yes — we cover all of Anaheim including Anaheim Hills, the Platinum Triangle, West Anaheim, and the resort district. Call before noon and we can typically be at your door that afternoon. Our OC technicians run routes throughout the city daily.',
   },
   {
-    q: "What is your diagnostic fee in Anaheim?",
-    a: "Our diagnostic fee is $89. It covers the trip to your home, full inspection of the appliance, and a written estimate with itemized parts and labor. If you approve the repair, the $89 is credited against your invoice — you pay nothing extra for the diagnosis."
+    question: 'What is your diagnostic fee in Anaheim?',
+    answer: 'Our diagnostic fee is $89. It covers the trip to your home, full inspection of the appliance, and a written estimate with itemized parts and labor. If you approve the repair, the $89 is credited against your invoice — you pay nothing extra for the diagnosis.',
   },
   {
-    q: "Do you repair commercial appliances near the Disneyland resort area?",
-    a: "Yes. We service commercial refrigerators, freezers, ice machines, and other restaurant equipment in the resort corridor and throughout Anaheim. Our commercial diagnostic fee is $120. We understand that downtime in a restaurant or food service operation is expensive — we prioritize commercial calls accordingly."
+    question: 'Do you repair commercial appliances near the Disneyland resort area?',
+    answer: 'Yes. We service commercial refrigerators, freezers, ice machines, and other restaurant equipment in the resort corridor and throughout Anaheim. Call us for commercial pricing. We understand that downtime in a restaurant or food service operation is expensive — we prioritize commercial calls accordingly.',
   },
   {
-    q: "What appliance brands do you repair in Anaheim?",
-    a: "We repair all major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, Electrolux, and high-end brands including Sub-Zero, Wolf, Thermador, and Miele common in Anaheim Hills. OEM parts on the truck for the brands we see most often."
+    question: 'What appliance brands do you repair in Anaheim?',
+    answer: 'We repair all major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, Electrolux, and high-end brands including Sub-Zero, Wolf, Thermador, and Miele common in Anaheim Hills. OEM parts on the truck for the brands we see most often.',
   },
   {
-    q: "Is Anaheim Hills different from the rest of Anaheim for appliance repair?",
-    a: "The appliances are different, yes. Anaheim Hills tends to have larger custom homes with higher-end kitchen suites — Sub-Zero, GE Monogram, Wolf, Thermador. The rest of Anaheim is a mix of multi-family housing and single-family homes with Samsung, LG, and Whirlpool. We're set up for both."
+    question: 'Is Anaheim Hills different from the rest of Anaheim for appliance repair?',
+    answer: "The appliances are different, yes. Anaheim Hills tends to have larger custom homes with higher-end kitchen suites — Sub-Zero, GE Monogram, Wolf, Thermador. The rest of Anaheim is a mix of multi-family housing and single-family homes with Samsung, LG, and Whirlpool. We're set up for both.",
   },
   {
-    q: "Do you offer a warranty on repairs?",
-    a: "All repairs include a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back and fix it at no charge. This is standard on every repair we do in Anaheim."
+    question: 'Do you offer a warranty on repairs?',
+    answer: 'All repairs include a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back and fix it at no charge. This is standard on every repair we do in Anaheim.',
   },
   {
-    q: "How do I schedule appliance repair in Anaheim?",
-    a: "Call (213) 401-9019 — someone who knows our OC schedule picks up, not a call center. We'll give you a real arrival window. You can also book online at samedayappliance.repair. We're available Monday–Friday 7am–9pm, Saturday 8am–7pm, Sunday 9am–5pm."
-  }
+    question: 'How do I schedule appliance repair in Anaheim?',
+    answer: `Call ${branch.phone} — someone who knows our OC schedule picks up, not a call center. We'll give you a real arrival window. You can also book online at samedayappliance.repair. We're available Monday–Friday 7am–9pm, Saturday 8am–7pm, Sunday 9am–5pm.`,
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Irvine", slug: "irvine" },
-  { name: "Huntington Beach", slug: "huntington-beach" },
-  { name: "Fullerton", slug: "fullerton" },
-  { name: "Yorba Linda", slug: "yorba-linda" },
-  { name: "Orange", slug: "orange" },
-  { name: "Costa Mesa", slug: "costa-mesa" },
+// =====================================================================
+// Section 12: NEARBY_LINKS — 6 OC neighbors. Replaced /orange/ (broken,
+// no .astro page) with /tustin/ per audit catalog of broken nearby links.
+// =====================================================================
+const nearbyCities = [
+  { name: 'Irvine', slug: 'irvine' },
+  { name: 'Huntington Beach', slug: 'huntington-beach' },
+  { name: 'Fullerton', slug: 'fullerton' },
+  { name: 'Yorba Linda', slug: 'yorba-linda' },
+  { name: 'Tustin', slug: 'tustin' },
+  { name: 'Costa Mesa', slug: 'costa-mesa' },
 ];
 
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Anaheim",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/anaheim/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "2600 Michelson Dr Suite 1700",
-        "addressLocality": "Irvine",
-        "addressRegion": "CA",
-        "postalCode": "92612",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Anaheim" },
-        { "@type": "Place", "name": "Anaheim Hills" },
-        { "@type": "Place", "name": "Platinum Triangle" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "71",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
+// =====================================================================
+// Section 13: FINAL_CTA verbatim.
+// =====================================================================
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Anaheim, CA"
+    subheadline="Same-day service across all of Anaheim — from Anaheim Hills to the Platinum Triangle. OEM parts, 90-day warranty, $89 diagnostic waived with repair."
+    zips={zips}
+    tier={3}
+  />
 
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+  <TrustBadgesRow />
 
-  <!-- HERO -->
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Anaheim, CA · Orange County · 92801 · 92804 · 92805 · 92806 · 92807 · 92808</div>
-        <h1>Appliance Repair in Anaheim, CA</h1>
-        <p class="city-hero-sub">Same-day service across all of Anaheim — from Anaheim Hills to the Platinum Triangle. OEM parts, 90-day warranty, $89 diagnostic waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.8 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img
-          src="/images/areas/anaheim/appliance-repair-anaheim-ca.webp"
-          alt="Appliance repair technician in Anaheim CA"
-          width="560" height="420"
-          loading="eager"
-        />
-      </div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Anaheim — Two Very Different Cities in One"
+    paragraphs={introParagraphs}
+    bookingTitle="Anaheim Service"
+    bookingSub="Available Today"
+  />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Anaheim"
+    services={services}
+  />
 
-  <!-- INTRO -->
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Anaheim — Two Very Different Cities in One</h2>
+  <CustomNarrative
+    headline={anaheimHillsNarrative.headline}
+    paragraphs={anaheimHillsNarrative.paragraphs}
+    background="white"
+  />
 
-        <p>Anaheim is one of the more interesting cities we work in from an appliance standpoint. It's not a uniform market. Anaheim Hills to the east is a different world from West Anaheim or the Disneyland Resort corridor — the homes are larger, the appliances are higher-end, and the calls tend to be Sub-Zero, GE Monogram, and Wolf. The Platinum Triangle near Angel Stadium has a wave of newer construction condos where Samsung and LG are the norm. And then there's the commercial corridor near the resort, which generates its own category of calls entirely: ice machines, walk-in coolers, commercial refrigeration.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Anaheim Neighborhoods We Service"
+    subheadline={neighborhoodsSubhead}
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <p>Our technicians run Anaheim daily as part of our Orange County routes out of Irvine. We know the difference between a multi-family West Anaheim call and an Anaheim Hills estate, and we show up prepared for both. OEM parts for the mainstream brands and the luxury brands alike. We don't sub out anything — the technician who calls you back is the one who shows up.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Anaheim"
+    jobs={recentJobs}
+  />
 
-        <p>Diagnostic fee is $89 — goes away the moment you say yes to the repair. What we quote is what you pay. No fuel surcharges, no weekend premium, no separate charge for a second look if we need to diagnose something adjacent. Call <a href={`tel:${phoneRaw}`}>{phone}</a> and someone with our actual schedule picks up.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Anaheim Residents Call Us"
+    reasons={whyReasons}
+  />
 
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Anaheim Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Anaheim Clients Say"
+    testimonials={testimonials}
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Anaheim</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Anaheim →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Anaheim"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <!-- CONTEXT BLOCK — Anaheim Hills vs rest -->
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Anaheim Hills vs. the Rest of the City — Why It Matters</h2>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Anaheim"
+    faqs={faqs}
+  />
 
-        <p>Most appliance repair companies treat Anaheim as one market. It isn't. When we get a call from Anaheim Hills, our technicians load differently than when heading to West Anaheim or the Platinum Triangle. The difference isn't attitude — it's parts inventory.</p>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-        <p>Anaheim Hills homes in the 92807 and 92808 zip codes tend to have kitchen suites that rival Newport Beach — Sub-Zero built-in refrigerators, GE Monogram column units, Wolf ranges, Thermador steam ovens. These are not off-the-shelf fixes. You need the right diagnostic tools, the right OEM part, and a technician who has actually worked on that model before. We stock parts for Sub-Zero, GE Monogram, Wolf, and Thermador on our OC trucks specifically because Anaheim Hills generates that volume of calls.</p>
-
-        <p>The Platinum Triangle — the area around Angel Stadium and the Anaheim Convention Center — is a newer construction zone with mostly Samsung and LG appliances in the high-rise and mid-rise condos. These calls are different: flex drawer control boards, linear compressor issues on LG refrigerators, Samsung ice maker wire harness failures. We know these failure patterns well.</p>
-
-        <p>And the resort area generates its own separate category: commercial ice machines, walk-in coolers for restaurants, commercial refrigerators. If you're running a food service operation near Disneyland and a unit goes down, call our commercial line at <a href={`tel:${phoneRaw}`}>{phone}</a>. Our commercial diagnostic fee is $120 and we move quickly on food safety calls.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Anaheim Neighborhoods We Service</h2>
-      <p class="neighborhoods-intro">We cover all of Anaheim. Our technicians know the city well and route efficiently between the hills, the flatlands, and the resort district.</p>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Anaheim</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Anaheim Residents Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>We don't guess</h3>
-          <p>A compressor running constantly doesn't mean the compressor is bad — in a GE Monogram, it often means the thermistor failed and the board is misreading temperature. We diagnose correctly the first time, which is how we can offer a 90-day warranty without losing money on callbacks.</p>
-        </div>
-        <div class="why-item">
-          <h3>OEM parts, not aftermarket</h3>
-          <p>We use manufacturer-original parts on every repair. On a Samsung flex drawer or an LG linear compressor, aftermarket parts are a shortcut that creates the next service call. We don't do that.</p>
-        </div>
-        <div class="why-item">
-          <h3>Commercial calls treated seriously</h3>
-          <p>A restaurant ice machine near the resort that's producing contaminated ice isn't an inconvenience — it's a health code issue. We treat commercial food equipment calls with the urgency they deserve and follow manufacturer sanitation protocols completely.</p>
-        </div>
-        <div class="why-item">
-          <h3>Real phone answer</h3>
-          <p>When you call our Anaheim line, someone who knows our OC schedule answers. You get a real arrival window — not a 6-hour block. We pick up the phone.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Anaheim Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Samsung refrigerator in our Platinum Triangle condo — ice maker completely dead. They came same day, had the part on the truck, done in two hours. I had called two other companies first and neither had the part."</p>
-          <div class="review-author">— Marcus T., Platinum Triangle</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Our GE Monogram fridge in Anaheim Hills wasn't cooling. Another company told us the compressor needed replacing — $1,200 quote. Same Day came out, said it was the thermistor, fixed it for $280 including parts. That's the difference between someone who actually knows the appliance and someone guessing."</p>
-          <div class="review-author">— Christine R., Anaheim Hills</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"We run a restaurant near the resort. Ice machine was putting out bad-smelling ice. They came out the same morning I called, did a full sanitization and replaced the filter and distribution tube. Followed up two days later to check. That's the level of service a food business needs."</p>
-          <div class="review-author">— David L., Resort District</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Anaheim</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Home appliances · Credited toward repair · Written estimate</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Commercial Diagnostic</div>
-          <div class="pricing-price">$120</div>
-          <div class="pricing-note">Restaurant & commercial equipment · Same-day priority</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$350</div>
-          <div class="pricing-note">Parts + labor · OEM parts only · 90-day warranty</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback if same issue returns</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Anaheim</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Anaheim Repair Today</h2>
-      <p>Same-day service across all of Anaheim. Call now or book online.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Anaheim, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Anaheim", "Anaheim Hills", "Orange County"]} />
-
-</Layout>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Anaheim Repair Today"
+    body="Same-day service across all of Anaheim. Call now or book online."
+  />
+</CityLayoutV2>
