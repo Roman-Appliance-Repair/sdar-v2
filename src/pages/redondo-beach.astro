@@ -1,687 +1,331 @@
 ---
-// src/pages/redondo-beach.astro
-// SDAR — samedayappliance.repair
-// Redondo Beach, CA · 90277 · 90278
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: нет данных — новый город
-// Конкуренты: Alexander's Appliance Repair (90277, local, free service call),
-//             Paradise Appliance (real job logs: Jenn-Air, KitchenAid),
-//             Beachside Appliance Repair (90278, since 2010, HVAC+appliances),
-//             redondobeachappliancerepair.com (generic "salt air / marine-grade" angle)
-// Уникальный угол: The Strand / South Redondo aggressive salt air +
-//                  North Redondo (90278) inland no-salt contrast +
-//                  Riviera Village + Hollywood Riviera bluff +
-//                  honest two-zone coastal gradient (не один generic coastal brush)
-// Апрель 2026
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
+const citySlug = 'redondo-beach';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = {
-  name: "Redondo Beach",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90277", "90278"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "redondo-beach",
-};
+const cityName = 'Redondo Beach';
+const zips = ['90277', '90278'];
 
-const title = `Appliance Repair Redondo Beach CA — Same Day | The Strand · Riviera Village · North Redondo | (323) 870-4790`;
-const description = `Same-day appliance repair in Redondo Beach, CA 90277 & 90278. The Strand, South Redondo, Riviera Village, North Redondo, Hollywood Riviera. Salt air specialists for coastal homes. Samsung, LG, GE, Sub-Zero. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/redondo-beach/`;
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Redondo Beach",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const title = `Appliance Repair Redondo Beach CA — Same Day | The Strand · Riviera Village · North Redondo | ${phone}`;
+const description = `Same-day appliance repair in Redondo Beach, CA 90277 & 90278. The Strand, South Redondo, Riviera Village, North Redondo, Hollywood Riviera. Salt air specialists for coastal homes. Samsung, LG, GE, Sub-Zero. Licensed, OEM parts, 90-day warranty. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/redondo-beach/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Redondo Beach', sameAs: 'https://en.wikipedia.org/wiki/Redondo_Beach,_California' },
+    { '@type': 'Neighborhood', name: 'South Redondo Beach' },
+    { '@type': 'Neighborhood', name: 'North Redondo Beach' },
+    { '@type': 'Neighborhood', name: 'Riviera Village' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Redondo Beach", "sameAs": "https://en.wikipedia.org/wiki/Redondo_Beach,_California" },
-    { "@type": "Neighborhood", "name": "South Redondo Beach" },
-    { "@type": "Neighborhood", "name": "North Redondo Beach" },
-    { "@type": "Neighborhood", "name": "Riviera Village" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const introParagraphs = [
+  "Redondo Beach is two different cities depending on which side of Artesia Boulevard you're on. South Redondo — The Strand, Riviera Village, the oceanfront blocks — is genuinely coastal living. The salt air is real and it affects appliances in measurable ways. Refrigerator condenser coils accumulate salt particulate. Gas range igniter electrodes corrode from the moisture and salt exposure. Outdoor appliances wear faster. We've learned to check for all of this on every relevant call in the coastal ZIPs.",
+  "North Redondo (90278) is a different story — inland townhomes and single-family homes where the primary need is reliable same-day service with an honest written estimate. No salt air factor, no extra complexity. LG, Samsung, GE, Whirlpool — we carry OEM parts for all of them and get there same day.",
+  "Riviera Village is the sweet spot — walkable, well-kept, close enough to the water to see some coastal influence but not Strand-level exposure. The Hollywood Riviera bluff homes sit on the edge between Redondo Beach and Torrance with ocean-facing exposure and premium appliances.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong>. Weekends available.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Salt air coil inspection · Not cooling · Ice maker · Fan motor', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · KitchenAid' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'OE / UE error · Not draining · Not spinning · Stackable', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen' },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · Vent buildup · Gas & electric', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not draining · E24 · Error codes · Spray arm', brands: 'Bosch · KitchenAid · Samsung · LG · GE · Jenn-Air' },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven', issues: 'Salt air igniter corrosion · Not heating · Temperature off', brands: 'GE · Samsung · KitchenAid · Wolf · Viking · Jenn-Air' },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'Not freezing · Ice stopped · Frost buildup · Salt air', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · True' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Compressor · Coastal humidity · Built-in', brands: 'True · U-Line · Liebherr · Dacor · Sub-Zero' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Salt air igniter · Gas burner · Induction · Hood motor', brands: 'GE · Bosch · Samsung · Wolf · KitchenAid · Broan' },
+];
+
+const zonesNarrative = {
+  headline: 'Two Redondo Beaches — One Service',
+  paragraphs: [
+    "The coastal/inland split matters for appliances. Here's what it means for each zone.",
+  ],
+  subSections: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Redondo Beach, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Redondo Beach — The Strand, South Redondo, Riviera Village, Hollywood Riviera, and all of North Redondo. Both ZIP codes 90277 and 90278. Call before noon for same-day afternoon service." }
+      title: 'Coastal · Salt Air — South Redondo · The Strand · Riviera Village · Hollywood Riviera (90277)',
+      paragraphs: [
+        "Homes on or near The Strand and the ocean-facing blocks of South Redondo see real salt air — not just \"beach proximity\" but actual salt particulate that loads condenser coils and corrodes igniter electrodes faster than anywhere else in the South Bay except Malibu. Strand-adjacent homes may need coil cleaning every <strong>3–5 months</strong>. We inspect for salt corrosion on every coastal Redondo Beach refrigerator and range call.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "How does salt air affect appliances in South Redondo Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Significantly for homes on or near The Strand and oceanfront South Redondo. Salt air accelerates corrosion on refrigerator condenser coils, range igniter electrodes, and outdoor appliances. Strand-adjacent homes may need condenser coil cleaning every 3–5 months rather than the standard 12. We inspect for salt air corrosion on every South Redondo refrigerator call." }
+      title: 'Inland · Standard — North Redondo · Aviation Corridor · Artesia area (90278)',
+      paragraphs: [
+        "North Redondo (90278) inland of Artesia Blvd has essentially no meaningful salt air factor. The appliance profile here is standard South Bay — LG, Samsung, GE, Whirlpool in well-maintained townhomes and single-family homes. Reliable same-day service, honest estimate, 90-day warranty. No coastal maintenance surcharges or upsells.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Is North Redondo Beach the same as South Redondo for appliance repair?",
-      "acceptedAnswer": { "@type": "Answer", "text": "For the most part, yes — same same-day service, same $89 diagnostic, same 90-day warranty. The difference is that North Redondo (90278, inland of Artesia Blvd) has no meaningful salt air factor, while South Redondo coastal homes require salt air awareness on refrigerator and range calls." }
+      title: 'Redondo Beach Salt Air Guide',
+      paragraphs: [
+        "The closer to The Strand, the more aggressive the exposure. A home on the water in South Redondo needs condenser coil cleaning every 3–5 months. A home three blocks inland in Riviera Village — every 6 months. A home in North Redondo near Artesia — standard 12-month cycle. We calibrate our maintenance recommendations to your actual distance from the water, not a blanket coastal policy.",
+      ],
     },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Redondo Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Jenn-Air, Sub-Zero, Wolf, and more. We carry OEM parts on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Redondo Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Redondo Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Redondo Beach repairs run $150–$400." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Torrance, Manhattan Beach, and Hermosa Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Redondo Beach service extends to Torrance, Manhattan Beach, Hermosa Beach, El Segundo, Hawthorne, Lawndale, and all of the South Bay." }
-    }
-  ]
+  ],
 };
+
+const neighborhoods = [
+  { name: 'The Strand', zip: '90277', featured: true },
+  { name: 'South Redondo', zip: '90277', featured: true },
+  { name: 'Riviera Village', zip: '90277', featured: true },
+  { name: 'Hollywood Riviera', zip: '90277' },
+  { name: 'North Redondo', zip: '90278' },
+  { name: 'Aviation Corridor', zip: '90278' },
+  { name: 'Artesia area', zip: '90278' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero Refrigerator',
+    location: 'The Strand, South Redondo 90277',
+    quote: 'Not keeping temperature — cycling way too often',
+    description: "Strand-front home in South Redondo — Sub-Zero 42-inch built-in with condenser coils so heavily loaded with salt air particulate the compressor was working at near-continuous duty. This is the most aggressive salt air environment in Redondo Beach: direct ocean exposure at street level. Full coil cleaning, replaced a weakened condenser fan motor showing heat stress. Temperature stable and cycling normalized within 45 minutes. Placed on a 4-month coil inspection schedule appropriate for a Strand-front location.",
+    outcome: '✓ Same day · Coils cleaned · Fan motor replaced · 4-month Strand schedule',
+  },
+  {
+    appliance: 'GE Gas Range',
+    location: 'Riviera Village, 90277',
+    quote: "Two burners clicking constantly — won't ignite clean",
+    description: "Riviera Village home three blocks from the water — GE freestanding gas range with two igniter electrodes corroded from the combination of salt air moisture and cooking steam. One electrode had a visible salt deposit at the tip. Replaced both corroded electrodes with OEM GE parts, cleaned the electrode wells, tested all four burners — all igniting cleanly on first spark. Explained the salt air igniter corrosion pattern: Riviera Village homes see this every 2–3 years, Strand homes every 12–18 months.",
+    outcome: '✓ Same day · OEM GE igniters · All burners clean · Interval explained',
+  },
+  {
+    appliance: 'LG Washer',
+    location: 'North Redondo, 90278',
+    quote: "LE motor error — won't spin, machine just stops",
+    description: "North Redondo townhome — LG front-loader LE hall sensor error. Ran SmartDiagnosis through the app first: confirmed hall sensor on the rotor assembly. Replaced with OEM LG hall sensor, cleared the error code, ran three full cycles at maximum spin. Machine quiet and stable. Standard North Redondo call — no salt air factor, no coastal complexity. Done in under an hour.",
+    outcome: '✓ Same day · OEM LG hall sensor · Smart diagnosis first · Done in 55 min',
+  },
+  {
+    appliance: 'Samsung French Door',
+    location: 'Hollywood Riviera, 90277',
+    quote: 'Ice maker declining for months — almost no output now',
+    description: "Hollywood Riviera bluff home — Samsung French door with gradual ice maker decline. Combined causes: salt air particulate on the condenser coils reducing cooling efficiency, and a slowly scaling water inlet valve from the coastal moisture. Cleaned the coils, replaced the OEM Samsung inlet valve, installed a fresh filter. Full ice production confirmed next morning. Riviera bluff properties sit right in the moderately aggressive salt air zone — between Strand intensity and inland calm. 6-month coil plan appropriate here.",
+    outcome: '✓ Same day · Coils + inlet valve · OEM Samsung · 6-month plan set',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Genuine Salt Air Knowledge',
+    body: "We know the difference between a Strand-front home (4-month coil cycle), a Riviera Village home three blocks in (6 months), and North Redondo near Artesia (standard 12 months). We don't apply a blanket \"coastal\" label to all of Redondo Beach and call it specialized service.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Both ZIPs, All Neighborhoods',
+    body: "South Redondo coastal homes and North Redondo inland townhomes get the same same-day commitment, OEM parts, and 90-day warranty. We're on the same South Bay route as Torrance, Manhattan Beach, and Hermosa Beach — Redondo Beach is never a special trip.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Weekends Available',
+    body: "Saturday 8am–7pm and Sunday 9am–5pm. Redondo Beach weekends are busy and appliances know it. We're available both days.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: "\"Sub-Zero on The Strand was cycling non-stop. Same Day cleaned the salt-loaded coils, replaced the fan motor, put us on a 4-month Strand-specific plan. Done in under an hour. The tech knew exactly what a Strand-front property looks like — this wasn't generic coastal advice.\"",
+    author: '— James W., The Strand, South Redondo',
+  },
+  {
+    stars: 5,
+    text: '"Gas range igniters corroded again in our Riviera Village home. Tech replaced both electrodes with OEM GE parts, explained the 2–3 year interval for our distance from the water. Everything clean on first spark. Really appreciated that he gave us a specific interval, not just \'you live near the beach.\'"',
+    author: '— Maria C., Riviera Village, Redondo Beach',
+  },
+  {
+    stars: 5,
+    text: '"LG washer LE error in our North Redondo townhome. Tech ran the SmartDiagnosis app, confirmed the hall sensor, replaced it with OEM part, tested three cycles. Done in under an hour, no fuss. Appreciated that he didn\'t try to make it complicated — it was a straightforward repair, treated as such."',
+    author: '— Kevin S., North Redondo, 90278',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator + Salt Air Coil Check', range: '$150 – $400', note: 'Coastal inspection · Strand / Riviera / Hollywood Riviera', featured: true },
+  { appliance: 'Washer / Dryer', range: '$150 – $350', note: 'Hall sensor · Drain pump · Thermal fuse · Vent cleaning' },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'E24 drain · Spray arm · Filter · Error codes' },
+  { appliance: 'Oven / Range', range: '$150 – $400', note: 'Salt air igniter · Gas valve · Calibration · OEM' },
+  { appliance: 'Sub-Zero / Wolf', range: '$300 – $700+', note: 'OEM parts · Hollywood Riviera · Strand homes' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Redondo Beach, CA?',
+    answer: 'Yes. Our technicians cover all of Redondo Beach — The Strand, South Redondo, Riviera Village, Hollywood Riviera, and all of North Redondo. Both ZIP codes 90277 and 90278. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'How does salt air affect appliances in South Redondo Beach?',
+    answer: 'Significantly for homes on or near The Strand and oceanfront South Redondo. Salt air accelerates corrosion on refrigerator condenser coils, range igniter electrodes, and outdoor appliances. Strand-adjacent homes may need condenser coil cleaning every 3–5 months rather than the standard 12. We inspect for salt air corrosion on every South Redondo refrigerator call.',
+  },
+  {
+    question: 'Is North Redondo Beach the same as South Redondo for appliance repair?',
+    answer: 'For the most part, yes — same same-day service, same $89 diagnostic, same 90-day warranty. The difference is that North Redondo (90278, inland of Artesia Blvd) has no meaningful salt air factor, while South Redondo coastal homes require salt air awareness on refrigerator and range calls.',
+  },
+  {
+    question: 'What appliance brands do you repair in Redondo Beach?',
+    answer: 'All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Jenn-Air, Sub-Zero, Wolf, and more. We carry OEM parts on every service vehicle.',
+  },
+  {
+    question: 'Are you available on weekends in Redondo Beach?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm.',
+  },
+  {
+    question: 'What is your diagnostic fee in Redondo Beach?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Redondo Beach repairs run $150–$400.',
+  },
+  {
+    question: 'Do you also serve Torrance, Manhattan Beach, and Hermosa Beach?',
+    answer: 'Yes. Our Redondo Beach service extends to Torrance, Manhattan Beach, Hermosa Beach, El Segundo, Hawthorne, Lawndale, and all of the South Bay.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Manhattan Beach', slug: 'manhattan-beach' },
+  { name: 'Torrance', slug: 'torrance' },
+  { name: 'Santa Monica', slug: 'santa-monica' },
+  { name: 'Marina Del Rey', slug: 'marina-del-rey' },
+  { name: 'Culver City', slug: 'culver-city' },
+  { name: 'Long Beach', slug: 'long-beach' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Redondo Beach, CA"
+    subheadline="The Strand and South Redondo coastal homes live differently from North Redondo inland — salt air is real here, and we know the difference. Same-day service across all of 90277 and 90278. OEM parts, 90-day warranty. Weekends available."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="rb-hero">
-    <div class="rb-hero__inner container">
-      <div class="rb-hero__content">
-        <div class="rb-hero__eyebrow">Redondo Beach, CA · 90277 & 90278 · The Strand · Riviera Village · North Redondo · Hollywood Riviera</div>
-        <h1 class="rb-hero__h1">
-          Appliance Repair<br>
-          <span class="rb-hero__accent">Redondo Beach, CA</span>
-        </h1>
-        <p class="rb-hero__sub">
-          The Strand and South Redondo coastal homes live differently from North
-          Redondo inland — salt air is real here, and we know the difference.
-          Same-day service across all of 90277 and 90278. OEM parts, 90-day
-          warranty. Weekends available.
-        </p>
-        <div class="rb-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="rb-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="rb-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-redondo-beach-ca.webp"
-          alt="Appliance repair in Redondo Beach CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Salt Air Specialists</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={zonesNarrative.headline}
+    paragraphs={zonesNarrative.paragraphs}
+    subSections={zonesNarrative.subSections}
+    background="black"
+  />
 
-  <!-- TWO-ZONE SECTION -->
-  <section class="rb-zones">
-    <div class="container">
-      <h2 class="section-title">Two Redondo Beaches — One Service</h2>
-      <p class="section-sub">The coastal/inland split matters for appliances. Here's what it means for each zone.</p>
-      <div class="zone-grid">
-        <div class="zone-card zone-card--coastal">
-          <div class="zone-label">Coastal · Salt Air</div>
-          <div class="zone-name">South Redondo · The Strand · Riviera Village · Hollywood Riviera</div>
-          <div class="zone-desc">
-            Homes on or near The Strand and the ocean-facing blocks of South Redondo
-            see real salt air — not just "beach proximity" but actual salt particulate
-            that loads condenser coils and corrodes igniter electrodes faster than
-            anywhere else in the South Bay except Malibu. Strand-adjacent homes
-            may need coil cleaning every <strong>3–5 months</strong>. We inspect
-            for salt corrosion on every coastal Redondo Beach refrigerator and
-            range call.
-          </div>
-          <div class="zone-zip">90277</div>
-        </div>
-        <div class="zone-card zone-card--inland">
-          <div class="zone-label">Inland · Standard</div>
-          <div class="zone-name">North Redondo · Aviation Corridor · Artesia area</div>
-          <div class="zone-desc">
-            North Redondo (90278) inland of Artesia Blvd has essentially no meaningful
-            salt air factor. The appliance profile here is standard South Bay — LG,
-            Samsung, GE, Whirlpool in well-maintained townhomes and single-family
-            homes. Reliable same-day service, honest estimate, 90-day warranty.
-            No coastal maintenance surcharges or upsells.
-          </div>
-          <div class="zone-zip">90278</div>
-        </div>
-      </div>
-      <div class="zone-tip">
-        <div class="zone-tip__icon">🌊</div>
-        <div class="zone-tip__text">
-          <strong>Redondo Beach salt air guide:</strong> The closer to The Strand,
-          the more aggressive the exposure. A home on the water in South Redondo
-          needs condenser coil cleaning every 3–5 months. A home three blocks
-          inland in Riviera Village — every 6 months. A home in North Redondo
-          near Artesia — standard 12-month cycle. We calibrate our maintenance
-          recommendations to your actual distance from the water, not a blanket
-          coastal policy.
-        </div>
-      </div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Redondo Beach — What We Know"
+    paragraphs={introParagraphs}
+    bookingTitle="Redondo Beach Service"
+    bookingSub="90277 · 90278 · Coastal aware · Same day"
+  />
 
-  <!-- INTRO -->
-  <section class="rb-intro">
-    <div class="container rb-intro__inner">
-      <div class="rb-intro__text">
-        <h2>Appliance Repair in Redondo Beach — What We Know</h2>
-        <p>
-          Redondo Beach is two different cities depending on which side of
-          Artesia Boulevard you're on. South Redondo — The Strand, Riviera Village,
-          the oceanfront blocks — is genuinely coastal living. The salt air is
-          real and it affects appliances in measurable ways. Refrigerator
-          condenser coils accumulate salt particulate. Gas range igniter
-          electrodes corrode from the moisture and salt exposure. Outdoor
-          appliances wear faster. We've learned to check for all of this on
-          every relevant call in the coastal ZIPs.
-        </p>
-        <p>
-          North Redondo (90278) is a different story — inland townhomes and
-          single-family homes where the primary need is reliable same-day
-          service with an honest written estimate. No salt air factor, no
-          extra complexity. LG, Samsung, GE, Whirlpool — we carry OEM
-          parts for all of them and get there same day.
-        </p>
-        <p>
-          Riviera Village is the sweet spot — walkable, well-kept, close enough
-          to the water to see some coastal influence but not Strand-level exposure.
-          The Hollywood Riviera bluff homes sit on the edge between Redondo Beach
-          and Torrance with ocean-facing exposure and premium appliances.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written
-          estimate before we start. <strong>90-day warranty</strong>.
-          Weekends available.
-        </p>
-      </div>
-      <div class="rb-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Redondo Beach Service</div>
-          <div class="cta-box__sub">90277 · 90278 · Coastal aware · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Redondo Beach"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="rb-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Redondo Beach</h2>
-      <p class="section-sub">All brands · Salt air aware for coastal homes · 90277 & 90278</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="Redondo Beach Areas We Service"
+    subheadline="The Strand, Riviera Village, Hollywood Riviera, North Redondo. ZIP codes 90277 and 90278."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <a href="/redondo-beach/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Salt air coil inspection · Not cooling · Ice maker · Fan motor</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in Redondo Beach"
+    subhead="Real calls from 90277 and 90278 — The Strand, Riviera Village, North Redondo."
+    jobs={recentJobs}
+  />
 
-        <a href="/redondo-beach/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Stackable</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Redondo Beach Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/redondo-beach/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Redondo Beach Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/redondo-beach/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · E24 · Error codes · Spray arm</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Jenn-Air</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Redondo Beach"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/redondo-beach/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Salt air igniter corrosion · Not heating · Temperature off</div>
-          <div class="service-card__brands">GE · Samsung · KitchenAid · Wolf · Viking · Jenn-Air</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Redondo Beach Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/redondo-beach/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Not freezing · Ice stopped · Frost buildup · Salt air</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
 
-        <a href="/redondo-beach/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Coastal humidity · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/redondo-beach/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Salt air igniter · Gas burner · Induction · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · KitchenAid · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="rb-recent">
-    <div class="container">
-      <h2>Recent Jobs in Redondo Beach</h2>
-      <p class="section-sub">Real calls from 90277 and 90278 — The Strand, Riviera Village, North Redondo.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Refrigerator</span>
-            <span class="recent-location">The Strand, South Redondo 90277</span>
-          </div>
-          <div class="recent-card__title">"Not keeping temperature — cycling way too often"</div>
-          <div class="recent-card__desc">
-            Strand-front home in South Redondo — Sub-Zero 42-inch built-in with
-            condenser coils so heavily loaded with salt air particulate the
-            compressor was working at near-continuous duty. This is the most
-            aggressive salt air environment in Redondo Beach: direct ocean
-            exposure at street level. Full coil cleaning, replaced a weakened
-            condenser fan motor showing heat stress. Temperature stable and
-            cycling normalized within 45 minutes. Placed on a 4-month
-            coil inspection schedule appropriate for a Strand-front location.
-          </div>
-          <div class="recent-card__result">✓ Same day · Coils cleaned · Fan motor replaced · 4-month Strand schedule</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">GE Gas Range</span>
-            <span class="recent-location">Riviera Village, 90277</span>
-          </div>
-          <div class="recent-card__title">"Two burners clicking constantly — won't ignite clean"</div>
-          <div class="recent-card__desc">
-            Riviera Village home three blocks from the water — GE freestanding
-            gas range with two igniter electrodes corroded from the combination
-            of salt air moisture and cooking steam. One electrode had a visible
-            salt deposit at the tip. Replaced both corroded electrodes with OEM
-            GE parts, cleaned the electrode wells, tested all four burners —
-            all igniting cleanly on first spark. Explained the salt air igniter
-            corrosion pattern: Riviera Village homes see this every 2–3 years,
-            Strand homes every 12–18 months.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM GE igniters · All burners clean · Interval explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Washer</span>
-            <span class="recent-location">North Redondo, 90278</span>
-          </div>
-          <div class="recent-card__title">"LE motor error — won't spin, machine just stops"</div>
-          <div class="recent-card__desc">
-            North Redondo townhome — LG front-loader LE hall sensor error. Ran
-            SmartDiagnosis through the app first: confirmed hall sensor on the
-            rotor assembly. Replaced with OEM LG hall sensor, cleared the error
-            code, ran three full cycles at maximum spin. Machine quiet and
-            stable. Standard North Redondo call — no salt air factor, no coastal
-            complexity. Done in under an hour.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM LG hall sensor · Smart diagnosis first · Done in 55 min</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung French Door</span>
-            <span class="recent-location">Hollywood Riviera, 90277</span>
-          </div>
-          <div class="recent-card__title">"Ice maker declining for months — almost no output now"</div>
-          <div class="recent-card__desc">
-            Hollywood Riviera bluff home — Samsung French door with gradual ice
-            maker decline. Combined causes: salt air particulate on the condenser
-            coils reducing cooling efficiency, and a slowly scaling water inlet
-            valve from the coastal moisture. Cleaned the coils, replaced the
-            OEM Samsung inlet valve, installed a fresh filter. Full ice
-            production confirmed next morning. Riviera bluff properties sit
-            right in the moderately aggressive salt air zone — between Strand
-            intensity and inland calm. 6-month coil plan appropriate here.
-          </div>
-          <div class="recent-card__result">✓ Same day · Coils + inlet valve · OEM Samsung · 6-month plan set</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="rb-why">
-    <div class="container">
-      <h2>Why Redondo Beach Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🌊</div>
-          <div class="why-title">Genuine Salt Air Knowledge</div>
-          <div class="why-text">We know the difference between a Strand-front home (4-month coil cycle), a Riviera Village home three blocks in (6 months), and North Redondo near Artesia (standard 12 months). We don't apply a blanket "coastal" label to all of Redondo Beach and call it specialized service.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📍</div>
-          <div class="why-title">Both ZIPs, All Neighborhoods</div>
-          <div class="why-text">South Redondo coastal homes and North Redondo inland townhomes get the same same-day commitment, OEM parts, and 90-day warranty. We're on the same South Bay route as Torrance, Manhattan Beach, and Hermosa Beach — Redondo Beach is never a special trip.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📅</div>
-          <div class="why-title">Weekends Available</div>
-          <div class="why-text">Saturday 8am–7pm and Sunday 9am–5pm. Redondo Beach weekends are busy and appliances know it. We're available both days.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="rb-reviews">
-    <div class="container">
-      <h2>What Redondo Beach Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero on The Strand was cycling non-stop. Same Day cleaned the salt-loaded coils, replaced the fan motor, put us on a 4-month Strand-specific plan. Done in under an hour. The tech knew exactly what a Strand-front property looks like — this wasn't generic coastal advice."</div>
-          <div class="review-author">— James W., The Strand, South Redondo</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Gas range igniters corroded again in our Riviera Village home. Tech replaced both electrodes with OEM GE parts, explained the 2–3 year interval for our distance from the water. Everything clean on first spark. Really appreciated that he gave us a specific interval, not just 'you live near the beach.'"</div>
-          <div class="review-author">— Maria C., Riviera Village, Redondo Beach</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG washer LE error in our North Redondo townhome. Tech ran the SmartDiagnosis app, confirmed the hall sensor, replaced it with OEM part, tested three cycles. Done in under an hour, no fuss. Appreciated that he didn't try to make it complicated — it was a straightforward repair, treated as such."</div>
-          <div class="review-author">— Kevin S., North Redondo, 90278</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="rb-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Redondo Beach</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator + Salt Air Coil Check</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Coastal inspection · Strand / Riviera / Hollywood Riviera</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Hall sensor · Drain pump · Thermal fuse · Vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">E24 drain · Spray arm · Filter · Error codes</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Salt air igniter · Gas valve · Calibration · OEM</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Hollywood Riviera · Strand homes</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="rb-faq">
-    <div class="container">
-      <h2>Questions Redondo Beach Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Redondo Beach, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Redondo Beach — The Strand, South Redondo, Riviera Village, Hollywood Riviera, and North Redondo. Both 90277 and 90278. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">How does salt air affect appliances in South Redondo Beach?</summary><div class="faq-answer">Significantly for homes on or near The Strand. Salt air loads condenser coils and corrodes igniter electrodes. Strand-adjacent homes may need coil cleaning every 3–5 months. We inspect on every coastal Redondo Beach refrigerator and range call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Is North Redondo the same as South Redondo for appliance repair?</summary><div class="faq-answer">Almost — same service, same pricing, same warranty. The difference: North Redondo (90278) has no salt air factor. South Redondo coastal homes require salt air awareness on refrigerator and range calls.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Redondo Beach?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Redondo Beach?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Jenn-Air, Sub-Zero, Wolf, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Redondo Beach?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Redondo Beach repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Torrance, Manhattan Beach, and Hermosa Beach?</summary><div class="faq-answer">Yes. Our Redondo Beach service extends to Torrance, Manhattan Beach, Hermosa Beach, El Segundo, Hawthorne, Lawndale, and all of the South Bay.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="rb-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/manhattan-beach/" class="nearby-link">Manhattan Beach</a>
-        <a href="/torrance/" class="nearby-link">Torrance</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/marina-del-rey/" class="nearby-link">Marina del Rey</a>
-        <a href="/culver-city/" class="nearby-link">Culver City</a>
-        <a href="/long-beach/" class="nearby-link">Long Beach</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="rb-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Redondo Beach?</h2>
-          <p>The Strand · Riviera Village · North Redondo · Salt air specialists · All of 90277 & 90278. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Redondo Beach, CA 90277 · 90278</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --rb-red: #C8102E; --rb-black: #0a0a0a; --rb-gray: #f5f5f5; --rb-border: #e2e2e2; --rb-text: #1a1a1a; --rb-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .rb-hero { background: var(--rb-black); color: white; padding: 80px 0 60px; }
-  .rb-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .rb-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--rb-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .rb-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .rb-hero__accent { color: var(--rb-red); }
-  .rb-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .rb-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .rb-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .rb-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--rb-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .rb-bottom-cta .btn-secondary { color: var(--rb-text); border-color: var(--rb-border); }
-  .trust-bar { background: var(--rb-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .rb-zones { padding: 72px 0; background: var(--rb-black); color: white; }
-  .zone-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
-  .zone-card { border-radius: 14px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); }
-  .zone-card--coastal { background: rgba(200,16,46,0.15); border-color: rgba(200,16,46,0.4); }
-  .zone-card--inland { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
-  .zone-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-  .zone-name { font-size: 16px; font-weight: 600; color: white; margin-bottom: 14px; }
-  .zone-desc { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.7; margin-bottom: 16px; }
-  .zone-zip { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.4); }
-  .zone-tip { display: flex; gap: 16px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 20px 24px; }
-  .zone-tip__icon { font-size: 22px; flex-shrink: 0; }
-  .zone-tip__text { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.6; }
-  .rb-zones .section-title { color: white; }
-  .rb-zones .section-sub { color: rgba(255,255,255,0.6); }
-  .rb-intro { padding: 72px 0; background: white; }
-  .rb-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .rb-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--rb-black); margin-bottom: 20px; }
-  .rb-intro__text p { font-size: 16px; line-height: 1.7; color: var(--rb-text); margin-bottom: 16px; }
-  .cta-box { background: var(--rb-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--rb-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--rb-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--rb-muted); text-align: center; margin-bottom: 40px; }
-  .rb-services { padding: 72px 0; background: var(--rb-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--rb-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--rb-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--rb-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--rb-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--rb-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--rb-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--rb-red); font-weight: 500; }
-  .rb-recent { padding: 72px 0; background: white; }
-  .rb-recent h2 { font-size: 30px; font-weight: 700; color: var(--rb-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: var(--rb-gray); border: 1px solid var(--rb-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--rb-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--rb-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--rb-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--rb-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .rb-why { padding: 72px 0; background: var(--rb-gray); }
-  .rb-why h2 { font-size: 30px; font-weight: 700; color: var(--rb-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: white; border-radius: 12px; padding: 28px 24px; border: 1px solid var(--rb-border); }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--rb-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--rb-muted); line-height: 1.6; }
-  .rb-reviews { padding: 72px 0; background: white; }
-  .rb-reviews h2 { font-size: 30px; font-weight: 700; color: var(--rb-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: var(--rb-gray); border: 1px solid var(--rb-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--rb-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--rb-muted); font-weight: 500; }
-  .rb-pricing { padding: 72px 0; background: var(--rb-gray); }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: white; border-radius: 10px; padding: 20px 24px; border: 1px solid var(--rb-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--rb-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--rb-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--rb-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--rb-red); }
-  .pricing-card__note { font-size: 13px; color: var(--rb-muted); }
-  .rb-faq { padding: 72px 0; background: white; }
-  .rb-faq h2 { font-size: 30px; font-weight: 700; color: var(--rb-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--rb-border); border-radius: 8px; background: var(--rb-gray); margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--rb-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--rb-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--rb-text); }
-  .rb-nearby { padding: 48px 0; background: var(--rb-gray); border-top: 1px solid var(--rb-border); }
-  .rb-nearby h2 { font-size: 20px; font-weight: 600; color: var(--rb-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--rb-border); border-radius: 20px; font-size: 14px; color: var(--rb-text); text-decoration: none; background: white; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--rb-red); color: var(--rb-red); }
-  .rb-bottom-cta { padding: 72px 0; background: var(--rb-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .rb-intro__inner { grid-template-columns: 1fr; } .zone-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .rb-hero__inner { grid-template-columns: 1fr; } .rb-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .rb-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Redondo Beach?"
+    body="The Strand · Riviera Village · North Redondo · Salt air specialists · All of 90277 & 90278. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayoutV2>

@@ -1,452 +1,335 @@
 ---
-// src/pages/riverside.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = "Riverside";
-const citySlug = "riverside";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["92501","92503","92504","92505","92506","92507","92508"];
-const county = "Riverside";
+const citySlug = 'riverside';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Riverside';
+const zips = ['92501', '92503', '92504', '92505', '92506', '92507', '92508'];
+
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
 const title = `Appliance Repair Riverside CA — Same Day | All Brands | ${phone}`;
 const description = `Same-day appliance repair in Riverside CA. Refrigerator, washer, dryer, oven, dishwasher & more. Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington. Licensed. OEM parts. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/riverside/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Riverside', sameAs: 'https://en.wikipedia.org/wiki/Riverside,_California' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Riverside is the county seat of Riverside County and one of the most historically rich cities in Southern California. The Mission Inn, the Victoria Avenue palm-lined boulevard, the Wood Streets Craftsman neighborhood, the UC Riverside campus — Riverside has layers that most Inland Empire cities don't. And that layered character shows up directly in the appliance service we do here: no other city in our Riverside County territory has the range of housing generations, from 1910s Craftsman homes near Downtown to 2010s master-planned Orangecrest to the Hawarden Hills estates above Victoria Avenue.",
+  "UC Riverside anchors a substantial student and faculty rental market in Canyon Crest and the surrounding streets. Rental appliances in an active student household see 2–3x the normal use — and need service earlier and more frequently than owner-occupied homes. We work with UCR-area landlords directly and coordinate scheduling with tenants so occupied properties get same-day resolution.",
+  "The climate here is Inland Valley: 100–107°F summers, dry and dusty, hard water throughout Riverside County. The hillside neighborhoods — Canyon Crest, Hawarden Hills — get Santa Ana wind particulate that adds to coil loading. We build all of this into our diagnosis and maintenance recommendations for every Riverside call.",
+  `Same-day coverage across all Riverside ZIP codes. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
+];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🫧', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🍳', name: 'Stove & Cooktop Repair', slug: 'stove' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
+
+const housingNarrative = {
+  headline: "Riverside's Housing Generations — Four Distinct Appliance Profiles",
+  subSections: [
+    {
+      title: 'Wood Streets, Arlington Heights & Victoria Ave — Pre-War Stock',
+      paragraphs: [
+        "The Wood Streets are one of the most distinctive historic neighborhoods in the IE — tree-lined streets of Craftsman bungalows, Tudor cottages, and Colonial Revival homes built between 1910 and 1940. Arlington Heights and the areas flanking Victoria Avenue carry similar character. Appliances in these homes are often replacement units from the 1990s and 2000s — older Whirlpool, GE, and Hotpoint that are mechanically simple and frequently worth repairing. A drive coupling failure in a 17-year-old Whirlpool top-loader costs $90 to fix. We see these machines regularly in this part of Riverside and always assess honestly before recommending replacement.",
+      ],
+    },
+    {
+      title: 'Magnolia Center, Hunter Park & Mid-Century Riverside — 1950s–1980s',
+      paragraphs: [
+        "The mid-century neighborhoods east of Downtown and around Magnolia Avenue represent Riverside's post-war expansion — ranch homes and tract housing with appliances typically 10–20 years into their lifespan. Samsung, LG, and Whirlpool from the 2000s are the most common, now entering secondary failure windows. Hard water is a consistent issue throughout these lower-elevation neighborhoods — dishwasher scale and ice maker mineral deposits are the most common maintenance-related calls we make here.",
+      ],
+    },
+    {
+      title: 'Canyon Crest & UCR Area — University Corridor',
+      paragraphs: [
+        "Canyon Crest sits on a hillside east of campus and is home to a mix of owner-occupied houses and rental properties serving the UCR community. The university generates rental demand from students, faculty, and graduate staff. Appliances in active student rentals run at 2–3x normal use rates — front-load washers, refrigerators opened constantly by multiple occupants, dishwashers running two cycles a day. We see bearing failures, door gasket deterioration, and ice maker failures showing up 2–3 years earlier in active student rentals than comparable owner-occupied homes.",
+        "Canyon Crest's hillside location also means Santa Ana wind events funnel fine chaparral particulate across the ridge. Condenser coils in Canyon Crest homes accumulate faster than the valley floor — we recommend 6-month cleaning intervals here.",
+      ],
+    },
+    {
+      title: 'Orangecrest, Hawarden Hills & Newer Riverside — 1990s–2010s',
+      paragraphs: [
+        "Orangecrest is Riverside's master-planned 1990s–2000s expansion in the southeast — uniform tract homes with consistent builder-grade appliances now 12–20 years old. Samsung, LG, and KitchenAid dominate. LG start relay failures, Samsung ice maker issues, and Whirlpool dryer thermal fuse failures are the common calls. Hawarden Hills, above Victoria Avenue, has larger estate homes with a higher concentration of Sub-Zero, Wolf, and KitchenAid. We carry OEM parts for the full spectrum.",
+      ],
+    },
+  ],
+};
 
 const neighborhoods = [
-  { name: "Canyon Crest", zip: "92507" },
-  { name: "Orangecrest", zip: "92508" },
-  { name: "La Sierra", zip: "92505" },
-  { name: "Wood Streets", zip: "92501" },
-  { name: "Arlington Heights", zip: "92503" },
-  { name: "Hawarden Hills", zip: "92506" },
-  { name: "Victoria Ave Area", zip: "92506" },
-  { name: "Hunter Park", zip: "92507" },
-  { name: "Magnolia Center", zip: "92506" },
-  { name: "Downtown Riverside", zip: "92501" },
-  { name: "UCR / University Area", zip: "92507" },
-  { name: "East Riverside", zip: "92504" },
+  { name: 'Canyon Crest', zip: '92507' },
+  { name: 'Orangecrest', zip: '92508' },
+  { name: 'La Sierra', zip: '92505' },
+  { name: 'Wood Streets', zip: '92501' },
+  { name: 'Arlington Heights', zip: '92503' },
+  { name: 'Hawarden Hills', zip: '92506' },
+  { name: 'Victoria Ave Area', zip: '92506' },
+  { name: 'Hunter Park', zip: '92507' },
+  { name: 'Magnolia Center', zip: '92506' },
+  { name: 'Downtown Riverside', zip: '92501' },
+  { name: 'UCR / University Area', zip: '92507' },
+  { name: 'East Riverside', zip: '92504' },
 ];
 
-const faqItems = [
+const recentJobs = [
   {
-    q: "Do you offer same-day appliance repair in Riverside?",
-    a: `Yes — same-day service is available throughout Riverside including Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington Heights, and the university area. Call ${phone} before noon for same-day scheduling. We cover all Riverside ZIP codes without a trip surcharge.`
-  },
-  {
-    q: "Do you service rental properties near UC Riverside?",
-    a: "Yes. UC Riverside generates a large student rental market in the surrounding neighborhoods — particularly around Canyon Crest Drive and the streets near campus. We work with landlords and property managers throughout the UCR corridor. Tenant calls get priority scheduling — a broken washer or warm refrigerator in an occupied rental is a habitability issue we take seriously. We coordinate directly with both the landlord and tenant."
-  },
-  {
-    q: "Can you repair older appliances in Riverside's historic neighborhoods?",
-    a: "Yes. Riverside has some of the oldest housing stock in the IE — Wood Streets, Arlington Heights, and the Victoria Avenue area have Craftsman and Victorian homes from the 1910s–1940s. Appliances in these homes range from well-maintained older machines to mid-range replacements. If the core mechanical components are sound, older Whirlpool, GE, and Hotpoint machines are almost always worth repairing. We give you honest numbers after diagnosis."
-  },
-  {
-    q: "What brands do you repair in Riverside?",
-    a: "All major brands. Wood Streets and Arlington Heights have older GE, Whirlpool, and Hotpoint. Canyon Crest and UCR area run mid-range Samsung and LG. Orangecrest and newer East Riverside have KitchenAid, Samsung, and LG from the 2000s–2010s. Hawarden Hills estates sometimes have Sub-Zero and Wolf. We carry OEM parts for all generations."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `$89, applied directly to the repair cost when you proceed. No hidden trip charge to Riverside. We quote on-site after diagnosis — not over the phone based on symptoms. What we quote is what appears on the invoice.`
-  },
-  {
-    q: "Does the summer heat affect appliances in Riverside differently than coastal cities?",
-    a: "Significantly. Riverside sits in the Inland Valley and regularly hits 100–107°F in summer — much hotter than coastal cities 40 miles away. Refrigerators working against that ambient temperature need clean condenser coils to function. In Riverside's dry, dusty conditions — especially in the hills of Canyon Crest and Hawarden Hills — coils load up faster than average. We start every summer refrigerator call with condenser inspection and cleaning."
-  },
-  {
-    q: "Do you service commercial appliances in Riverside?",
-    a: "Yes. As the county seat of Riverside County, the city has commercial density around the downtown corridor, Mission Inn, and the UC Riverside area. We service commercial refrigerators, walk-in coolers, and commercial ice machines. Commercial diagnostic is $120, applied to the repair."
-  },
-];
-
-const recentRepairs = [
-  {
-    title: "Sub-Zero 648PRO — running warm, clogged coils, Hawarden Hills estate",
-    neighborhood: "Hawarden Hills, 92506",
+    appliance: 'Sub-Zero 648PRO',
+    location: 'Hawarden Hills, 92506',
+    quote: 'running warm, clogged coils, Hawarden Hills estate',
     description: "Hillside estate above Victoria Avenue, Sub-Zero column refrigerator running continuously and failing to hold temperature. Hawarden Hills homes sit above the valley floor and channel Santa Ana wind events across the hillside — the condenser coil pack had 14 months of fine particulate accumulation. In 105°F ambient heat, the coil was overwhelmed. Cleaned the condenser thoroughly — it took two passes to clear the rear screen and coil fins completely. Confirmed normal compressor function and 38°F recovery. Also found a hairline crack in the right door gasket from Riverside's dry heat cycling. Replaced with OEM Sub-Zero gasket. Unit running normally.",
-    note: "Hillside Riverside homes above Victoria Ave get more particulate than the valley floor. Sub-Zero coils every 5 months."
+    outcome: 'Hillside Riverside homes above Victoria Ave get more particulate than the valley floor. Sub-Zero coils every 5 months.',
   },
   {
-    title: "Samsung RF23M8090SG — 22E error, iced evaporator, Canyon Crest rental",
-    neighborhood: "Canyon Crest, 92507",
+    appliance: 'Samsung RF23M8090SG',
+    location: 'Canyon Crest, 92507',
+    quote: '22E error, iced evaporator, Canyon Crest rental',
     description: "UCR-area rental property, landlord called — tenant reporting warm refrigerator with 22E error. The 22E is an ice room sensor code but the underlying cause was a completely iced-over evaporator from a failed defrost heater. The defrost heater assembly had failed, allowing frost to accumulate over several weeks until the coil was fully blocked. Replaced the defrost heater assembly with OEM Samsung parts, manually defrosted the coil, confirmed 38°F recovery. Landlord needed this resolved before the tenant's next day home — we were done same afternoon.",
-    note: "Samsung 22E: diagnose the defrost heater first. Replacing the sensor without finding the root cause is a callback."
+    outcome: 'Samsung 22E: diagnose the defrost heater first. Replacing the sensor without finding the root cause is a callback.',
   },
   {
-    title: "Whirlpool WTW4855HW — won't spin or agitate, drive coupling failure, Wood Streets",
-    neighborhood: "Wood Streets, 92501",
+    appliance: 'Whirlpool WTW4855HW',
+    location: 'Wood Streets, 92501',
+    quote: "won't spin or agitate, drive coupling failure, Wood Streets",
     description: "1910s Craftsman home in the Wood Streets, 17-year-old Whirlpool top-loader. Neither spin nor agitation working — classic drive coupling failure. The coupling sits between the motor and transmission and wears out well before either the motor or transmission fails. Checked both — solid. Replaced the drive coupling, tested through a full cycle. Owner had been told to replace the machine by a big-box store. Repair: $89 diagnostic + $90 coupling and labor. Machine has years of life left in it.",
-    note: "Wood Streets older Whirlpools: drive coupling failure is the most common call. $90 vs $800 replacement."
+    outcome: 'Wood Streets older Whirlpools: drive coupling failure is the most common call. $90 vs $800 replacement.',
   },
   {
-    title: "LG LFXS26973S — ice maker dead, water dispenser fine, 2016 model",
-    neighborhood: "Orangecrest, 92508",
+    appliance: 'LG LFXS26973S',
+    location: 'Orangecrest, 92508',
+    quote: 'ice maker dead, water dispenser fine, 2016 model',
     description: "8-year-old LG French-door in an Orangecrest home, ice maker silent, water dispenser working normally. Isolated to the ice maker inlet valve secondary solenoid — the most common failure mode on this LG generation. Also found the ice maker mold had significant mineral scale from Riverside County hard water — 8 years without any descaling. Replaced the inlet valve with an OEM LG part, descaled the mold thoroughly, replaced the water filter (15 months old), adjusted freezer from -2°F to +2°F to prevent fill tube icing. Ice production restored same visit.",
-    note: "Riverside County hard water: ice maker descaling every 18 months without fail."
+    outcome: 'Riverside County hard water: ice maker descaling every 18 months without fail.',
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Riverside",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Riverside",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'We work on all eras of Riverside housing',
+    body: "From a 1920s Craftsman in the Wood Streets to a 2015 Orangecrest tract home — we bring the right approach to each. Older machines get an honest repair-versus-replace assessment. Newer machines get OEM parts and root-cause diagnosis. No one-size-fits-all advice.",
   },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    iconKey: 'shield' as const,
+    title: 'UCR rental priority',
+    body: "Canyon Crest and UCR-area landlords can't wait on occupied rental calls. We coordinate directly with tenants, hit same-day whenever possible, and keep the landlord informed throughout. A habitability issue deserves same-day attention.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Hillside vs. valley — we know the difference',
+    body: 'Canyon Crest and Hawarden Hills get more particulate than Magnolia Center or Orangecrest. We account for this in every refrigerator call in the hillside neighborhoods and give the right maintenance schedule for the specific location.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Diagnosis before the quote',
+    body: "Samsung 22E is a defrost heater until proven otherwise. A Whirlpool top-loader that won't agitate is usually a drive coupling, not a transmission. LG clicking is an $18 start relay before it's a $450 compressor. We find the cheap fix first.",
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
-};
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Sub-Zero on our Hawarden Hills property running warm in July. Tech diagnosed clogged coils from the Santa Ana dust — two passes to fully clear. Replaced a cracked gasket too. Unit back to normal, explained the 5-month maintenance schedule for our hillside location. Excellent."',
+    author: '— Richard & Anne B., Hawarden Hills',
+  },
+  {
+    stars: 5,
+    text: '"Old Whirlpool in our Wood Streets home stopped working. Big-box store said replace it — $800. Same Day found a drive coupling failure, fixed it for $90. 17-year-old machine running perfectly. Very honest about what it actually needed."',
+    author: '— Margaret H., Wood Streets',
+  },
+  {
+    stars: 5,
+    text: '"UCR-area landlord. Tenant called about a Samsung showing an error code — warm fridge. Same Day came same afternoon, found defrost heater failure, fixed it before tenant got home. Perfect coordination, no drama."',
+    author: '— Jason P., Canyon Crest landlord',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator Repair', range: '$150–$450', note: 'Compressor relay · Coil cleaning · Defrost heater · Fan motor' },
+  { appliance: 'Washer Repair', range: '$120–$380', note: 'Drive coupling · Drain pump · Bearing · Hall sensor' },
+  { appliance: 'Dryer Repair', range: '$120–$300', note: 'Thermal fuse · Heating element · Vent path' },
+  { appliance: 'Dishwasher Repair', range: '$89–$360', note: 'Drain pump · Filter · Spray arm · Hard water descaling' },
+  { appliance: 'Oven / Range Repair', range: '$130–$400', note: 'Igniter · Bake element · Gas valve · Calibration' },
+  { appliance: 'Sub-Zero Repair', range: '$250–$650', note: 'OEM Sub-Zero parts · Coil cleaning · Door gasket' },
+  { appliance: 'Ice Maker Repair', range: '$120–$260', note: 'Inlet valve · Descaling · Fill tube · Mold' },
+  { appliance: 'Condenser Coil Cleaning', range: '$89–$150', note: 'Hillside: every 5 months. Valley: every 6.' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Riverside?',
+    answer: `Yes — same-day service is available throughout Riverside including Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington Heights, and the university area. Call ${phone} before noon for same-day scheduling. We cover all Riverside ZIP codes without a trip surcharge.`,
+  },
+  {
+    question: 'Do you service rental properties near UC Riverside?',
+    answer: 'Yes. UC Riverside generates a large student rental market in the surrounding neighborhoods — particularly around Canyon Crest Drive and the streets near campus. We work with landlords and property managers throughout the UCR corridor. Tenant calls get priority scheduling — a broken washer or warm refrigerator in an occupied rental is a habitability issue we take seriously. We coordinate directly with both the landlord and tenant.',
+  },
+  {
+    question: "Can you repair older appliances in Riverside's historic neighborhoods?",
+    answer: "Yes. Riverside has some of the oldest housing stock in the IE — Wood Streets, Arlington Heights, and the Victoria Avenue area have Craftsman and Victorian homes from the 1910s–1940s. Appliances in these homes range from well-maintained older machines to mid-range replacements. If the core mechanical components are sound, older Whirlpool, GE, and Hotpoint machines are almost always worth repairing. We give you honest numbers after diagnosis.",
+  },
+  {
+    question: 'What brands do you repair in Riverside?',
+    answer: 'All major brands. Wood Streets and Arlington Heights have older GE, Whirlpool, and Hotpoint. Canyon Crest and UCR area run mid-range Samsung and LG. Orangecrest and newer East Riverside have KitchenAid, Samsung, and LG from the 2000s–2010s. Hawarden Hills estates sometimes have Sub-Zero and Wolf. We carry OEM parts for all generations.',
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: '$89, applied directly to the repair cost when you proceed. No hidden trip charge to Riverside. We quote on-site after diagnosis — not over the phone based on symptoms. What we quote is what appears on the invoice.',
+  },
+  {
+    question: 'Does the summer heat affect appliances in Riverside differently than coastal cities?',
+    answer: "Significantly. Riverside sits in the Inland Valley and regularly hits 100–107°F in summer — much hotter than coastal cities 40 miles away. Refrigerators working against that ambient temperature need clean condenser coils to function. In Riverside's dry, dusty conditions — especially in the hills of Canyon Crest and Hawarden Hills — coils load up faster than average. We start every summer refrigerator call with condenser inspection and cleaning.",
+  },
+  {
+    question: 'Do you service commercial appliances in Riverside?',
+    answer: 'Yes. As the county seat of Riverside County, the city has commercial density around the downtown corridor, Mission Inn, and the UC Riverside area. We service commercial refrigerators, walk-in coolers, and commercial ice machines. Call us for commercial pricing.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Moreno Valley', slug: 'moreno-valley' },
+  { name: 'Corona', slug: 'corona' },
+  { name: 'Lake Elsinore', slug: 'lake-elsinore' },
+  { name: 'Fontana', slug: 'fontana' },
+  { name: 'San Bernardino', slug: 'san-bernardino' },
+  { name: 'Redlands', slug: 'redlands' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Riverside"
+    subheadline="Same-day service in Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington Heights, and throughout Riverside. All eras of housing, all brands, OEM parts."
+    zips={zips}
+    tier={2}
+  />
 
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">Riverside County Seat · ZIP 92501–92508</p>
-        <h1>Appliance Repair<br><span class="accent">Riverside</span></h1>
-        <p class="hero-sub">Same-day service in Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington Heights, and throughout Riverside. All eras of housing, all brands, OEM parts.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🏛️</span><span>Historic &amp; Modern Homes</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Riverside — County Seat, Most Diverse Housing in the IE"
+    paragraphs={introParagraphs}
+    bookingTitle="Riverside"
+    bookingSub="Same-Day Service"
+  />
 
-  <section class="intro-section container">
-    <div class="intro-content">
-      <h2>Appliance Repair in Riverside — County Seat, Most Diverse Housing in the IE</h2>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Riverside"
+    services={services}
+  />
 
-      <p>Riverside is the county seat of Riverside County and one of the most historically rich cities in Southern California. The Mission Inn, the Victoria Avenue palm-lined boulevard, the Wood Streets Craftsman neighborhood, the UC Riverside campus — Riverside has layers that most Inland Empire cities don't. And that layered character shows up directly in the appliance service we do here: no other city in our Riverside County territory has the range of housing generations, from 1910s Craftsman homes near Downtown to 2010s master-planned Orangecrest to the Hawarden Hills estates above Victoria Avenue.</p>
+  <CustomNarrative
+    headline={housingNarrative.headline}
+    subSections={housingNarrative.subSections}
+    background="white"
+  />
 
-      <p>UC Riverside anchors a substantial student and faculty rental market in Canyon Crest and the surrounding streets. Rental appliances in an active student household see 2–3x the normal use — and need service earlier and more frequently than owner-occupied homes. We work with UCR-area landlords directly and coordinate scheduling with tenants so occupied properties get same-day resolution.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Neighborhoods We Service in Riverside"
+    subheadline="We cover all of Riverside — Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington Heights, Hawarden Hills, and every neighborhood in between. No travel surcharge to any Riverside ZIP code."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>The climate here is Inland Valley: 100–107°F summers, dry and dusty, hard water throughout Riverside County. The hillside neighborhoods — Canyon Crest, Hawarden Hills — get Santa Ana wind particulate that adds to coil loading. We build all of this into our diagnosis and maintenance recommendations for every Riverside call.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Riverside"
+    jobs={recentJobs}
+  />
 
-      <p>Same-day coverage across all Riverside ZIP codes. Call {phone}.</p>
-    </div>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Riverside Residents Call Us"
+    reasons={whyReasons}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Riverside</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ All Housing Eras Welcome</li>
-        <li>✓ UCR Rental Property Priority</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ 90-Day Warranty</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Riverside Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Riverside</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Typical Repair Pricing in Riverside"
+    subhead="Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>Riverside's Housing Generations — Four Distinct Appliance Profiles</h2>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Riverside Appliance Repair — FAQ"
+    faqs={faqs}
+  />
 
-        <h3>Wood Streets, Arlington Heights &amp; Victoria Ave — Pre-War Stock</h3>
-        <p>The Wood Streets are one of the most distinctive historic neighborhoods in the IE — tree-lined streets of Craftsman bungalows, Tudor cottages, and Colonial Revival homes built between 1910 and 1940. Arlington Heights and the areas flanking Victoria Avenue carry similar character. Appliances in these homes are often replacement units from the 1990s and 2000s — older Whirlpool, GE, and Hotpoint that are mechanically simple and frequently worth repairing. A drive coupling failure in a 17-year-old Whirlpool top-loader costs $90 to fix. We see these machines regularly in this part of Riverside and always assess honestly before recommending replacement.</p>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-        <h3>Magnolia Center, Hunter Park &amp; Mid-Century Riverside — 1950s–1980s</h3>
-        <p>The mid-century neighborhoods east of Downtown and around Magnolia Avenue represent Riverside's post-war expansion — ranch homes and tract housing with appliances typically 10–20 years into their lifespan. Samsung, LG, and Whirlpool from the 2000s are the most common, now entering secondary failure windows. Hard water is a consistent issue throughout these lower-elevation neighborhoods — dishwasher scale and ice maker mineral deposits are the most common maintenance-related calls we make here.</p>
-
-        <h3>Canyon Crest &amp; UCR Area — University Corridor</h3>
-        <p>Canyon Crest sits on a hillside east of campus and is home to a mix of owner-occupied houses and rental properties serving the UCR community. The university generates rental demand from students, faculty, and graduate staff. Appliances in active student rentals run at 2–3x normal use rates — front-load washers, refrigerators opened constantly by multiple occupants, dishwashers running two cycles a day. We see bearing failures, door gasket deterioration, and ice maker failures showing up 2–3 years earlier in active student rentals than comparable owner-occupied homes.</p>
-        <p>Canyon Crest's hillside location also means Santa Ana wind events funnel fine chaparral particulate across the ridge. Condenser coils in Canyon Crest homes accumulate faster than the valley floor — we recommend 6-month cleaning intervals here.</p>
-
-        <h3>Orangecrest, Hawarden Hills &amp; Newer Riverside — 1990s–2010s</h3>
-        <p>Orangecrest is Riverside's master-planned 1990s–2000s expansion in the southeast — uniform tract homes with consistent builder-grade appliances now 12–20 years old. Samsung, LG, and KitchenAid dominate. LG start relay failures, Samsung ice maker issues, and Whirlpool dryer thermal fuse failures are the common calls. Hawarden Hills, above Victoria Avenue, has larger estate homes with a higher concentration of Sub-Zero, Wolf, and KitchenAid. We carry OEM parts for the full spectrum.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Riverside</h2>
-      <p>We cover all of Riverside — Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington Heights, Hawarden Hills, and every neighborhood in between. No travel surcharge to any Riverside ZIP code.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Jurupa Valley, Norco, and Moreno Valley — same dispatch, no surcharge. Call {phone}.</p>
-  </section>
-
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">03</div>
-      <h2>Recent Repairs in Riverside</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <section class="why-section container">
-    <div class="context-number">04</div>
-    <h2>Why Riverside Residents Call Us</h2>
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>We work on all eras of Riverside housing</h3>
-        <p>From a 1920s Craftsman in the Wood Streets to a 2015 Orangecrest tract home — we bring the right approach to each. Older machines get an honest repair-versus-replace assessment. Newer machines get OEM parts and root-cause diagnosis. No one-size-fits-all advice.</p>
-      </div>
-      <div class="why-item">
-        <h3>UCR rental priority</h3>
-        <p>Canyon Crest and UCR-area landlords can't wait on occupied rental calls. We coordinate directly with tenants, hit same-day whenever possible, and keep the landlord informed throughout. A habitability issue deserves same-day attention.</p>
-      </div>
-      <div class="why-item">
-        <h3>Hillside vs. valley — we know the difference</h3>
-        <p>Canyon Crest and Hawarden Hills get more particulate than Magnolia Center or Orangecrest. We account for this in every refrigerator call in the hillside neighborhoods and give the right maintenance schedule for the specific location.</p>
-      </div>
-      <div class="why-item">
-        <h3>Diagnosis before the quote</h3>
-        <p>Samsung 22E is a defrost heater until proven otherwise. A Whirlpool top-loader that won't agitate is usually a drive coupling, not a transmission. LG clicking is an $18 start relay before it's a $450 compressor. We find the cheap fix first.</p>
-      </div>
-    </div>
-
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Sub-Zero on our Hawarden Hills property running warm in July. Tech diagnosed clogged coils from the Santa Ana dust — two passes to fully clear. Replaced a cracked gasket too. Unit back to normal, explained the 5-month maintenance schedule for our hillside location. Excellent."</p>
-        <p class="reviewer">— Richard &amp; Anne B., Hawarden Hills</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Old Whirlpool in our Wood Streets home stopped working. Big-box store said replace it — $800. Same Day found a drive coupling failure, fixed it for $90. 17-year-old machine running perfectly. Very honest about what it actually needed."</p>
-        <p class="reviewer">— Margaret H., Wood Streets</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"UCR-area landlord. Tenant called about a Samsung showing an error code — warm fridge. Same Day came same afternoon, found defrost heater failure, fixed it before tenant got home. Perfect coordination, no drama."</p>
-        <p class="reviewer">— Jason P., Canyon Crest landlord</p>
-      </div>
-    </div>
-
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Riverside</h3>
-      <p>Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item"><span class="pi-service">Refrigerator Repair</span><span class="pi-range">$150–$450</span></div>
-        <div class="price-item"><span class="pi-service">Washer Repair</span><span class="pi-range">$120–$380</span></div>
-        <div class="price-item"><span class="pi-service">Dryer Repair</span><span class="pi-range">$120–$300</span></div>
-        <div class="price-item"><span class="pi-service">Dishwasher Repair</span><span class="pi-range">$89–$360</span></div>
-        <div class="price-item"><span class="pi-service">Oven / Range Repair</span><span class="pi-range">$130–$400</span></div>
-        <div class="price-item"><span class="pi-service">Sub-Zero Repair</span><span class="pi-range">$250–$650</span></div>
-        <div class="price-item"><span class="pi-service">Ice Maker Repair</span><span class="pi-range">$120–$260</span></div>
-        <div class="price-item"><span class="pi-service">Condenser Coil Cleaning</span><span class="pi-range">$89–$150</span></div>
-      </div>
-      <p class="pricing-note">$89 diagnostic applied to repair cost. No trip charge to any Riverside ZIP code.</p>
-    </div>
-  </section>
-
-  <section class="faq-section container">
-    <h2>Riverside Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/moreno-valley/">Moreno Valley</a>
-      <a href="/corona/">Corona</a>
-      <a href="/lake-elsinore/">Lake Elsinore</a>
-      <a href="/fontana/">Fontana</a>
-      <a href="/san-bernardino/">San Bernardino</a>
-      <a href="/redlands/">Redlands</a>
-    </div>
-  </section>
-
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Riverside Today?</h2>
-      <p>Same-day service in Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington Heights, Hawarden Hills, and all Riverside neighborhoods.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero{background:var(--color-bg);padding:5rem 0 4rem}
-.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:.75rem}
-h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
-h1 .accent{color:var(--color-accent)}
-.hero-sub{font-size:1.05rem;color:var(--color-text-muted);margin-bottom:2rem;max-width:48ch}
-.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
-.hero-trust{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.85rem;color:var(--color-text-muted)}
-.trust-bar{background:var(--color-accent);padding:1rem 0}
-.trust-bar-inner{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap}
-.trust-item{display:flex;align-items:center;gap:.5rem;color:#fff;font-size:.875rem;font-weight:600}
-.intro-section{display:grid;grid-template-columns:1fr 300px;gap:4rem;padding-top:4rem;padding-bottom:4rem}
-.intro-content h2{font-size:1.6rem;margin-bottom:1.25rem}
-.intro-content p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
-.sticky-cta-box{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem;position:sticky;top:5rem;height:fit-content}
-.scb-city{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--color-accent);margin-bottom:.25rem}
-.scb-phone{font-size:1.4rem;font-weight:800;margin-bottom:1.25rem}
-.btn-block{display:block;width:100%;text-align:center;margin-bottom:.75rem}
-.scb-list{list-style:none;padding:0;margin:1.25rem 0;font-size:.875rem}
-.scb-list li{padding:.3rem 0;border-bottom:1px solid var(--color-border);color:var(--color-text-body)}
-.scb-hours{font-size:.8rem;color:var(--color-text-muted);text-align:center}
-.services-section{background:var(--color-surface);padding:4rem 0}
-.services-section h2{text-align:center;font-size:1.75rem;margin-bottom:2rem}
-.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.service-card{background:var(--color-bg);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem 1rem;text-align:center;text-decoration:none;color:var(--color-text);transition:border-color .2s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:.75rem}
-.service-card:hover{border-color:var(--color-accent);transform:translateY(-2px)}
-.svc-icon{font-size:2rem}
-.svc-name{font-size:.9rem;font-weight:600}
-.context-block{padding:4rem 0}
-.context-inner{display:grid;grid-template-columns:80px 1fr;gap:2rem}
-.context-number{font-size:4rem;font-weight:900;color:var(--color-accent);opacity:.2;line-height:1}
-.context-body h2{font-size:1.6rem;margin-bottom:1.25rem}
-.context-body h3{font-size:1.1rem;font-weight:700;margin:1.75rem 0 .75rem}
-.context-body p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
-.neighborhoods-section{padding:4rem 0}
-.section-intro{margin-bottom:2rem}
-.section-intro h2{font-size:1.6rem;margin-bottom:.75rem}
-.neighborhoods-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.nbhd-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1rem 1.25rem}
-.nbhd-name{display:block;font-weight:600;margin-bottom:.25rem}
-.nbhd-zip{font-size:.8rem;color:var(--color-text-muted)}
-.nbhd-note{margin-top:1.5rem;font-size:.875rem;color:var(--color-text-muted)}
-.repairs-section{padding:4rem 0}
-.section-header{display:flex;align-items:baseline;gap:1rem;margin-bottom:2rem}
-.section-header h2{font-size:1.6rem}
-.repairs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.repair-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem}
-.repair-title{font-size:1rem;font-weight:700;margin-bottom:.5rem}
-.repair-location{font-size:.8rem;color:var(--color-accent);margin-bottom:1rem}
-.repair-desc{font-size:.9rem;line-height:1.7;color:var(--color-text-body);margin-bottom:1rem}
-.repair-note{font-size:.85rem;color:var(--color-text-muted);border-top:1px solid var(--color-border);padding-top:.75rem}
-.why-section{padding:4rem 0}
-.why-section h2{font-size:1.6rem;margin-bottom:2rem}
-.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:3rem}
-.why-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem}
-.why-item h3{font-size:1rem;margin-bottom:.5rem}
-.why-item p{font-size:.9rem;color:var(--color-text-body);line-height:1.7}
-.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:3rem}
-.review-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem}
-.stars{color:#f59e0b;font-size:1rem;margin-bottom:.75rem}
-.review-card p{font-size:.875rem;line-height:1.65;color:var(--color-text-body);margin-bottom:.75rem}
-.reviewer{font-size:.8rem;color:var(--color-text-muted)}
-.pricing-block{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:2rem}
-.pricing-block h3{margin-bottom:.5rem}
-.pricing-block>p{font-size:.9rem;color:var(--color-text-muted);margin-bottom:1.5rem}
-.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.price-item{display:flex;flex-direction:column;gap:.25rem}
-.pi-service{font-size:.85rem;color:var(--color-text-muted)}
-.pi-range{font-size:1rem;font-weight:700}
-.pricing-note{font-size:.8rem;color:var(--color-text-muted);margin-top:1.25rem}
-.faq-section{padding:4rem 0}
-.faq-section h2{font-size:1.6rem;margin-bottom:2rem}
-.faq-list{display:flex;flex-direction:column;gap:.75rem}
-.faq-item{border:1px solid var(--color-border);border-radius:.5rem;background:var(--color-surface)}
-.faq-q{padding:1.25rem 1.5rem;font-weight:600;cursor:pointer;list-style:none}
-.faq-a{padding:0 1.5rem 1.25rem;font-size:.9rem;line-height:1.7;color:var(--color-text-body)}
-.nearby-section{padding:3rem 0}
-.nearby-section h2{font-size:1.25rem;margin-bottom:1.25rem}
-.nearby-grid{display:flex;gap:1rem;flex-wrap:wrap}
-.nearby-grid a{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.375rem;padding:.5rem 1rem;text-decoration:none;color:var(--color-text);font-size:.875rem}
-.nearby-grid a:hover{border-color:var(--color-accent);color:var(--color-accent)}
-.bottom-cta{background:var(--color-surface);border-top:1px solid var(--color-border);padding:4rem 0;text-align:center}
-.bottom-cta h2{font-size:1.75rem;margin-bottom:.75rem}
-.bottom-cta p{color:var(--color-text-muted);margin-bottom:2rem}
-.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-@media(max-width:1024px){.intro-section{grid-template-columns:1fr}.sticky-cta-box{position:static}.services-grid,.neighborhoods-grid{grid-template-columns:repeat(2,1fr)}.pricing-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.hero-inner{grid-template-columns:1fr}.context-inner{grid-template-columns:1fr}.repairs-grid,.why-grid,.reviews-grid{grid-template-columns:1fr}}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Riverside Today?"
+    body="Same-day service in Canyon Crest, Orangecrest, La Sierra, Wood Streets, Arlington Heights, Hawarden Hills, and all Riverside neighborhoods."
+  />
+</CityLayoutV2>

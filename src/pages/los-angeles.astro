@@ -1,431 +1,317 @@
 ---
-import Layout from "@layouts/Layout.astro";
-import CTA from "@components/CTA.astro";
+/**
+ * Los Angeles, CA — v2 migrated page (T12 Wave 2 Batch A).
+ * Branch: Los Angeles — service_area (no public street address).
+ * Content source of truth: wiki/migration/content-dumps/los-angeles.md
+ *
+ * Two CustomNarrative blocks render the page's unique sections:
+ *   1. "Wine Cellar Cooling Unit Repair — Los Angeles" (specialty service)
+ *   2. "Property Management & Multi-Unit Buildings"
+ *
+ * Pricing-discipline (narrow):
+ *   - FAQ Q2 dump answer mentioned "$120 for commercial or premium brands like
+ *     Sub-Zero" — replaced ONLY that sentence with "Call us for commercial
+ *     pricing." Surrounding sentence verbatim. Q1, Q3-Q7 untouched.
+ *   - No $120 pricing card in dump (different pricing structure — 6-card
+ *     Standard/Luxury split). Mapped down to 6 residential tiers.
+ *
+ * Branch isolation:
+ *   - Phone (424) 325-0520 from cities.ts → branches.ts (Los Angeles)
+ *   - No streetAddress in schema (LA is service_area; legacy used WeHo
+ *     branch address — explicitly removed per branch-isolation contract)
+ *   - All ZIPs are LA: 90004, 90005, 90006, 90012, 90014, 90016, 90017,
+ *     90018, 90019, 90020, 90027, 90029, 90034, 90035, 90036
+ *
+ * No standard ReviewsBlock — dump has no testimonials section. Followed
+ * verbatim contract: don't generate fake reviews.
+ *
+ * Legacy preserved as los-angeles.astro.legacy.
+ */
 
-const title = "Appliance Repair Los Angeles, CA | Same Day Appliance Repair";
-const description = "Same-day appliance repair in Los Angeles CA. Westside, Koreatown, Mid-City, Hancock Park. Wine cellar, Sub-Zero, Viking. Licensed. Call (424) 325-0520.";
-const canonical = "https://samedayappliance.repair/los-angeles/";
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const schemaLD = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Los Angeles",
-  "telephone": "+14243250520",
-  "email": "info@samedayappliance.repair",
-  "url": "https://samedayappliance.repair/los-angeles/",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const citySlug = 'los-angeles';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Los Angeles';
+const zips = ['90004', '90005', '90006', '90012', '90014', '90016', '90017', '90018', '90019', '90020', '90027', '90029', '90034', '90035', '90036'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = 'Appliance Repair Los Angeles, CA | Same Day Appliance Repair';
+const description = 'Same-day appliance repair in Los Angeles CA. Westside, Koreatown, Mid-City, Hancock Park. Wine cellar, Sub-Zero, Viking. Licensed. Call (424) 325-0520.';
+const canonical = 'https://samedayappliance.repair/los-angeles/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Los Angeles', sameAs: 'https://en.wikipedia.org/wiki/Los_Angeles' },
+    { '@type': 'Place', name: 'Koreatown' },
+    { '@type': 'Place', name: 'Hancock Park' },
+    { '@type': 'Place', name: 'Mid-City' },
+    { '@type': 'Place', name: 'West Adams' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Los Angeles" },
-    { "@type": "Neighborhood", "name": "Koreatown" },
-    { "@type": "Neighborhood", "name": "Hancock Park" },
-    { "@type": "Neighborhood", "name": "Mid-City" },
-    { "@type": "Neighborhood", "name": "West Adams" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Los Angeles?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. Call (424) 325-0520 before noon and we can typically schedule same-day service across most of Los Angeles — Westside, Koreatown, Mid-City, Hancock Park, Downtown, West Adams, and surrounding neighborhoods."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Los Angeles?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Our diagnostic fee is $89 for residential appliances and $120 for commercial or premium brands like Sub-Zero. Both fees are waived when you approve the repair."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair wine cellar cooling units — WhisperKool, CellarPro, Wine Guardian, US Cellar Systems?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. We specialize in wine cellar cooling unit repair in Los Angeles — including WhisperKool, CellarPro, Wine Guardian, and US Cellar Systems. These units are common in West LA, Brentwood, Hancock Park, and hillside homes throughout the city."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you work in multi-unit buildings and apartment complexes in LA?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. We work in apartment buildings, condos, and multi-unit properties throughout Los Angeles. We can coordinate directly with tenants and building managers, and we provide written estimates and receipts for property management documentation."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you provide on repairs in Los Angeles?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "90 days on parts and labor, every job. We use OEM parts where available and document everything in writing before we start."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Viking refrigerators in Los Angeles?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. Viking refrigerator repair is one of our most common calls in LA. We carry OEM Viking parts and our technicians are trained on the full Viking refrigeration line including built-in and French door models."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How much does refrigerator repair cost in Los Angeles?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Standard refrigerator repairs in Los Angeles typically run $200–$450. Sub-Zero, Viking, and other luxury brands range $300–$700+. We provide upfront pricing before starting any work."
-      }
-    }
-  ]
+const introParagraphs = [
+  "Los Angeles is the largest appliance repair market in the country — and one of the most varied. A Koreatown apartment building with 40 LG units. A Hancock Park craftsman with a Sub-Zero refrigerator and a wine cellar cooling unit that's been making noise for a month. A Mid-City fourplex where three dryers in the laundry room haven't worked right since last winter. A West Adams restaurant with a walk-in cooler failing on a Friday morning.",
+  `We handle all of it. Our Los Angeles base covers the Westside corridor — from Koreatown west to the 405, and from Hollywood south to Culver City. When you call same day appliance repair Los Angeles and reach <a href="tel:${phoneRaw}">${branch.phone}</a>, you're talking to someone who schedules the LA runs. Not a national dispatch center.`,
+  "LA's heat is harder on appliances than people realize. Refrigerator compressors work harder during summer. Condenser coils clog faster in the dry, dusty inland neighborhoods. We check for those things on every diagnostic call — because fixing the symptom without finding the cause means the same call in three months.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling, ice maker failures, compressor, fan motor.', brands: 'Viking · Sub-Zero · Samsung · LG · GE' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer', issues: 'Not draining, not spinning, error codes. Multi-unit buildings and single homes.', brands: 'LG · Samsung · Whirlpool · Bosch · Miele' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer', issues: 'Not heating, weak heat, long drying times. Dryer vent cleaning included with service.', brands: 'LG · Samsung · GE · Maytag · Whirlpool' },
+  { icon: '🔥', name: 'Oven, Stove & Range Repair', slug: 'oven', issues: 'Burner ignition, control board, oven not heating.', brands: 'Wolf · Viking · Thermador · GE · Bosch' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not cleaning, not draining, door latch, control panel.', brands: 'Bosch · Miele · KitchenAid · Samsung · LG' },
+  { icon: '🍷', name: 'Wine Cellar Cooling Units', slug: 'wine-cooler', issues: 'WhisperKool, CellarPro, Wine Guardian, US Cellar Systems. Same-day in West LA.', brands: 'WhisperKool · CellarPro · Wine Guardian · US Cellar Systems' },
+  { icon: '🏢', name: 'Commercial Appliances', slug: 'commercial-refrigerator', issues: 'Walk-in coolers, commercial refrigeration, ovens. Restaurant and property management.', brands: 'True · Traulsen · Hoshizaki · Manitowoc' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Not freezing, icing over, temperature fluctuations.', brands: 'Sub-Zero · True · GE · Samsung · Whirlpool' },
+  { icon: '🌬️', name: 'Range Hood Repair', slug: 'range-hood', issues: 'Fan motor, duct cleaning, control panel. All styles and brands.', brands: 'Wolf · Thermador · Broan · GE · Samsung' },
+  { icon: '🌡️', name: 'Wall Heater Repair', slug: 'wall-heater', issues: 'Gas wall heaters throughout older LA homes. Common in Koreatown, Mid-City, West Adams.', brands: 'Vanguard · Williams · Cozy · Empire' },
+];
+
+const wineCellarNarrative = {
+  eyebrow: 'SPECIALTY SERVICE',
+  headline: 'Wine Cellar Cooling Unit Repair — Los Angeles',
+  paragraphs: [
+    "Wine cellar cooling units are a specialty most appliance repair companies don't touch. We do. Homes throughout West LA, Brentwood, Hancock Park, and the hillside neighborhoods have WhisperKool, CellarPro, Wine Guardian, and US Cellar Systems units that require someone who actually knows the difference between a condenser fan failure and a refrigerant issue.",
+    "If your wine cellar isn't maintaining temperature, is icing over, running louder than usual, or cycling on and off too frequently — those are all diagnosable problems. We service through-wall, ductless split, and self-contained cooling units.",
+    "<strong>Brands we service in LA:</strong> WhisperKool · CellarPro · Wine Guardian · US Cellar Systems · WhisperKool SC · CellarPro 8000VSx",
+    "<strong>Common Wine Cellar Cooling Issues We Fix:</strong> Unit running but cellar temperature rising · Excessive ice buildup on evaporator coils · Unit cycling on/off every few minutes · Loud compressor or fan noise · Error codes on digital display · Unit not turning on at all · Temperature swings of 5°F or more · Condensation forming inside the cellar",
+  ],
 };
+
+const propertyManagementNarrative = {
+  headline: 'Property Management & Multi-Unit Buildings',
+  paragraphs: [
+    "Los Angeles has more apartment units per square mile than almost any other city in the country. A large portion of our LA calls come from property managers, building owners, and HOAs who need someone reliable — not a different technician every time.",
+    "We can coordinate directly with tenants, schedule around building access hours, provide written estimates and invoices for your records, and work within your preferred scheduling system. Our technicians know how to handle shared laundry rooms, stacked units in tight closets, and the logistics of multi-unit calls.",
+    "<strong>What we offer property managers:</strong> Direct tenant scheduling available · Written estimates before every repair · Invoice documentation for property records · Experience with Appfolio, RealPage workflows · Multi-unit volume pricing on request",
+  ],
+};
+
+const neighborhoods = [
+  { name: 'Koreatown', zip: '90005' },
+  { name: 'Koreatown', zip: '90006' },
+  { name: 'Koreatown', zip: '90020' },
+  { name: 'Hancock Park', zip: '90004' },
+  { name: 'Hancock Park', zip: '90019' },
+  { name: 'Mid-City', zip: '90019' },
+  { name: 'Mid-City', zip: '90035' },
+  { name: 'West Adams', zip: '90016' },
+  { name: 'West Adams', zip: '90018' },
+  { name: 'Downtown Los Angeles', zip: '90012' },
+  { name: 'Downtown Los Angeles', zip: '90014' },
+  { name: 'Downtown Los Angeles', zip: '90017' },
+  { name: 'Pico-Robertson', zip: '90035' },
+  { name: 'Pico-Robertson', zip: '90034' },
+  { name: 'Miracle Mile', zip: '90036' },
+  { name: 'Los Feliz Border', zip: '90027' },
+  { name: 'Los Feliz Border', zip: '90029' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'WhisperKool Wine Cellar',
+    location: 'Hancock Park, 90019',
+    quote: 'Wine cellar at 68°F — supposed to be 55°F',
+    description: "WhisperKool SC6000 — condenser fan motor had seized. Unit was running but couldn't move heat out of the cellar. Replaced motor with OEM part. Cellar was at 56°F within two hours.",
+    outcome: '✓ Same day · OEM WhisperKool fan motor · 56°F within 2 hours',
+  },
+  {
+    appliance: 'Multi-Unit Dryers',
+    location: 'Koreatown, 90005',
+    quote: 'Dryer in laundry room not heating — three units affected',
+    description: "Property manager call — shared laundry room in a 24-unit building. The main vent run was completely blocked after years without cleaning. Cleared the vent, replaced heating element on one unit, other two just needed the vent cleared.",
+    outcome: '✓ Same day · Vent cleared · 1 element + 2 vent-only fixes',
+  },
+  {
+    appliance: 'Viking Refrigerator',
+    location: 'West Adams, 90016',
+    quote: 'Viking refrigerator not cooling, compressor runs constantly',
+    description: "Condenser coils were completely caked with dust — home near the 10 freeway. Cleaned coils, confirmed temperatures. Owner said the previous tech told them the compressor needed replacement. It didn't.",
+    outcome: '✓ Same day · Coils cleaned · No compressor replacement needed',
+  },
+  {
+    appliance: 'Vanguard Wall Heater',
+    location: 'Mid-City, 90019',
+    quote: 'Wall heater ignition failing every morning',
+    description: "Older Vanguard wall heater — thermocouple had weakened and wasn't sensing the pilot flame reliably. Replaced thermocouple and cleaned the pilot assembly. Fired up on the first try every time after that.",
+    outcome: '✓ Same day · OEM thermocouple · First-try ignition restored',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator (Standard)', range: '$200–$450', note: 'Whirlpool, GE, Samsung, LG · OEM parts · 90-day warranty' },
+  { appliance: 'Refrigerator (Luxury)', range: '$300–$700+', note: 'Sub-Zero, Viking, Wolf · OEM parts · 90-day warranty', featured: true },
+  { appliance: 'Washer / Dryer', range: '$150–$380', note: 'Drain pump, heating element, vent cleaning' },
+  { appliance: 'Oven / Range', range: '$175–$500+', note: 'Wolf, Viking standard. OEM. Temperature calibration included.' },
+  { appliance: 'Wine Cellar Cooling Unit', range: '$200–$450+', note: 'WhisperKool, CellarPro, Wine Guardian · OEM' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair · Written estimate' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Los Angeles?',
+    answer: `Yes. Call ${branch.phone} before noon and we can typically schedule same-day service across most of Los Angeles — Westside, Koreatown, Mid-City, Hancock Park, Downtown, West Adams, and surrounding neighborhoods.`,
+  },
+  {
+    question: 'What is your diagnostic fee in Los Angeles?',
+    answer: 'Our diagnostic fee is $89 for residential appliances. Call us for commercial pricing. Both fees are waived when you approve the repair.',
+  },
+  {
+    question: 'Do you repair wine cellar cooling units — WhisperKool, CellarPro, Wine Guardian, US Cellar Systems?',
+    answer: 'Yes. We specialize in wine cellar cooling unit repair in Los Angeles — including WhisperKool, CellarPro, Wine Guardian, and US Cellar Systems. These units are common in West LA, Brentwood, Hancock Park, and hillside homes throughout the city.',
+  },
+  {
+    question: 'Do you work in multi-unit buildings and apartment complexes in LA?',
+    answer: 'Yes. We work in apartment buildings, condos, and multi-unit properties throughout Los Angeles. We can coordinate directly with tenants and building managers, and we provide written estimates and receipts for property management documentation.',
+  },
+  {
+    question: 'What warranty do you provide on repairs in Los Angeles?',
+    answer: '90 days on parts and labor, every job. We use OEM parts where available and document everything in writing before we start.',
+  },
+  {
+    question: 'Do you repair Viking refrigerators in Los Angeles?',
+    answer: 'Yes. Viking refrigerator repair is one of our most common calls in LA. We carry OEM Viking parts and our technicians are trained on the full Viking refrigeration line including built-in and French door models.',
+  },
+  {
+    question: 'How much does refrigerator repair cost in Los Angeles?',
+    answer: 'Standard refrigerator repairs in Los Angeles typically run $200–$450. Sub-Zero, Viking, and other luxury brands range $300–$700+. We provide upfront pricing before starting any work.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+  { name: 'Santa Monica', slug: 'santa-monica' },
+  { name: 'Culver City', slug: 'culver-city' },
+  { name: 'Hollywood', slug: 'hollywood' },
+  { name: 'Brentwood', slug: 'brentwood' },
+  { name: 'Koreatown', slug: 'koreatown' },
+  { name: 'Pasadena', slug: 'pasadena' },
+  { name: 'Glendale', slug: 'glendale' },
+  { name: 'Marina del Rey', slug: 'marina-del-rey' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLD)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
-
-  <!-- HERO -->
-  <section style="background:#0a0a0a; color:#fff; padding: 80px 0 60px;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center;">
-      <div>
-        <p style="color:#C8102E; font-size:13px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:16px;">
-          LOS ANGELES, CA · WESTSIDE · MID-CITY · KOREATOWN · DOWNTOWN
-        </p>
-        <h1 style="font-size:clamp(2rem,4vw,3rem); font-weight:800; line-height:1.15; margin-bottom:20px;">
-          Appliance Repair<br/>
-          <span style="color:#C8102E;">Los Angeles, CA</span>
-        </h1>
-        <p style="font-size:1.1rem; color:#ccc; line-height:1.6; margin-bottom:32px;">
-          Same-day service on every major appliance across Los Angeles. Sub-Zero, Viking, Wolf, Samsung, LG, GE — residential and commercial. Wine cellar cooling units. Licensed, OEM parts, 90-day warranty.
-        </p>
-        <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px;">
-          <a href="tel:+14243250520" style="background:#C8102E; color:#fff; padding:14px 28px; border-radius:4px; font-weight:700; font-size:1rem; text-decoration:none; display:flex; align-items:center; gap:8px;">
-            📞 Call (424) 325-0520
-          </a>
-          <a href="/book/" style="background:transparent; color:#fff; border:2px solid #fff; padding:14px 28px; border-radius:4px; font-weight:700; font-size:1rem; text-decoration:none;">
-            Book Online
-          </a>
-        </div>
-        <p style="color:#aaa; font-size:0.9rem;">⭐⭐⭐⭐⭐ 4.6 · 37 Google reviews · BBB A+</p>
-      </div>
-      <div>
-        <img
-          src="/images/appliance-repair-los-angeles-ca.webp"
-          alt="Appliance repair technician in Los Angeles CA"
-          style="width:100%; border-radius:8px; max-height:400px; object-fit:cover;"
-          loading="eager"
-        />
-      </div>
-    </div>
-  </section>
-
-  <!-- TRUST BAR -->
-  <section style="background:#C8102E; color:#fff; padding:16px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">⏱ Same-Day Service</span>
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">🛡 90-Day Warranty</span>
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">🔧 OEM Parts</span>
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">✅ Licensed & Insured</span>
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">🏆 85% First-Visit Fix Rate</span>
-    </div>
-  </section>
-
-  <!-- INTRO -->
-  <section style="background:#fff; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:2fr 1fr; gap:48px; align-items:start;">
-      <div>
-        <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:20px;">
-          Los Angeles Has Every Kind of Appliance Problem
-        </h2>
-        <p style="font-size:1.05rem; color:#333; line-height:1.8; margin-bottom:16px;">
-          Los Angeles is the largest appliance repair market in the country — and one of the most varied. A Koreatown apartment building with 40 LG units. A Hancock Park craftsman with a Sub-Zero refrigerator and a wine cellar cooling unit that's been making noise for a month. A Mid-City fourplex where three dryers in the laundry room haven't worked right since last winter. A West Adams restaurant with a walk-in cooler failing on a Friday morning.
-        </p>
-        <p style="font-size:1.05rem; color:#333; line-height:1.8; margin-bottom:16px;">
-          We handle all of it. Our Los Angeles base covers the Westside corridor — from Koreatown west to the 405, and from Hollywood south to Culver City. When you call same day appliance repair Los Angeles and reach (424) 325-0520, you're talking to someone who schedules the LA runs. Not a national dispatch center.
-        </p>
-        <p style="font-size:1.05rem; color:#333; line-height:1.8; margin-bottom:24px;">
-          LA's heat is harder on appliances than people realize. Refrigerator compressors work harder during summer. Condenser coils clog faster in the dry, dusty inland neighborhoods. We check for those things on every diagnostic call — because fixing the symptom without finding the cause means the same call in three months.
-        </p>
-
-        <!-- Wine cellar tip -->
-        <div style="background:#f0f7ff; border:1px solid #b8d4f0; border-radius:6px; padding:20px; margin:24px 0;">
-          <p style="font-weight:700; margin-bottom:8px;">🍷 Wine Cellar Cooling Unit Repair in Los Angeles</p>
-          <p style="font-size:0.95rem; color:#555; line-height:1.6; margin:0;">
-            We service all major wine cellar cooling unit brands in Los Angeles — WhisperKool, CellarPro, Wine Guardian, and US Cellar Systems. These units are common in West LA, Brentwood, Hancock Park, and hillside homes, and most repair companies don't work on them. If your wine cellar isn't holding temperature or is making unusual noises, call (424) 325-0520.
-          </p>
-        </div>
-      </div>
-
-      <!-- Sticky CTA -->
-      <div style="position:sticky; top:24px; background:#0a0a0a; color:#fff; border-radius:8px; padding:32px; text-align:center;">
-        <p style="font-size:0.85rem; color:#aaa; margin-bottom:4px;">Book Same-Day Service</p>
-        <p style="font-weight:700; font-size:1rem; margin-bottom:16px;">Los Angeles · Available Today</p>
-        <a href="tel:+14243250520" style="display:block; color:#C8102E; font-size:1.5rem; font-weight:800; text-decoration:none; margin-bottom:16px;">
-          (424) 325-0520
-        </a>
-        <a href="/book/" style="display:block; background:#C8102E; color:#fff; padding:12px; border-radius:4px; font-weight:700; text-decoration:none; margin-bottom:16px;">
-          Schedule Online →
-        </a>
-        <p style="font-size:0.8rem; color:#aaa;">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SERVICES GRID -->
-  <section style="background:#f5f5f5; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:8px;">Appliance Repair Services in Los Angeles</h2>
-      <p style="color:#666; margin-bottom:36px;">Residential and commercial. All major brands. Same-day availability across LA.</p>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px;">
-        {[
-          { name: "Refrigerator Repair", icon: "🧊", desc: "Not cooling, ice maker failures, compressor, fan motor. Viking, Sub-Zero, Samsung, LG, GE.", href: "/los-angeles/refrigerator-repair/" },
-          { name: "Washer Repair", icon: "🌀", desc: "Not draining, not spinning, error codes. Multi-unit buildings and single homes.", href: "/los-angeles/washer-repair/" },
-          { name: "Dryer Repair", icon: "💨", desc: "Not heating, weak heat, long drying times. Dryer vent cleaning included with service.", href: "/los-angeles/dryer-repair/" },
-          { name: "Oven, Stove & Range Repair", icon: "🔥", desc: "Burner ignition, control board, oven not heating. Wolf, Viking, Thermador, GE.", href: "/los-angeles/oven-repair/" },
-          { name: "Dishwasher Repair", icon: "🍽", desc: "Not cleaning, not draining, door latch, control panel. Bosch, Miele, KitchenAid.", href: "/los-angeles/dishwasher-repair/" },
-          { name: "Wine Cellar Cooling Units", icon: "🍷", desc: "WhisperKool, CellarPro, Wine Guardian, US Cellar Systems. Same-day in West LA.", href: "/services/wine-cellar-repair-los-angeles/" },
-          { name: "Commercial Appliances", icon: "🏢", desc: "Walk-in coolers, commercial refrigeration, ovens. Restaurant and property management.", href: "/services/commercial-refrigerator-repair-los-angeles/" },
-          { name: "Freezer Repair", icon: "❄️", desc: "Not freezing, icing over, temperature fluctuations.", href: "/services/freezer-repair-los-angeles/" },
-          { name: "Range Hood Repair", icon: "💨", desc: "Fan motor, duct cleaning, control panel. All styles and brands.", href: "/services/range-hood-repair-los-angeles/" },
-          { name: "Wall Heater Repair", icon: "🌡", desc: "Gas wall heaters throughout older LA homes. Common in Koreatown, Mid-City, West Adams.", href: "/services/wall-heater-repair-los-angeles/" },
-        ].map(s => (
-          <a href={s.href} style="background:#fff; border:1px solid #e2e2e2; border-radius:8px; padding:24px; text-decoration:none; color:#1a1a1a;" onmouseover="this.style.borderColor='#C8102E'" onmouseout="this.style.borderColor='#e2e2e2'">
-            <div style="font-size:2rem; margin-bottom:12px;">{s.icon}</div>
-            <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:8px;">{s.name}</h3>
-            <p style="font-size:0.9rem; color:#666; line-height:1.5; margin:0;">{s.desc}</p>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- WINE CELLAR SPOTLIGHT -->
-  <section style="background:#0a0a0a; color:#fff; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center;">
-      <div>
-        <p style="color:#C8102E; font-size:12px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:12px;">SPECIALTY SERVICE</p>
-        <h2 style="font-size:1.75rem; font-weight:800; margin-bottom:20px;">
-          Wine Cellar Cooling Unit Repair — Los Angeles
-        </h2>
-        <p style="color:#ccc; line-height:1.8; margin-bottom:16px;">
-          Wine cellar cooling units are a specialty most appliance repair companies don't touch. We do. Homes throughout West LA, Brentwood, Hancock Park, and the hillside neighborhoods have WhisperKool, CellarPro, Wine Guardian, and US Cellar Systems units that require someone who actually knows the difference between a condenser fan failure and a refrigerant issue.
-        </p>
-        <p style="color:#ccc; line-height:1.8; margin-bottom:24px;">
-          If your wine cellar isn't maintaining temperature, is icing over, running louder than usual, or cycling on and off too frequently — those are all diagnosable problems. We service through-wall, ductless split, and self-contained cooling units.
-        </p>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          {["WhisperKool", "CellarPro", "Wine Guardian", "US Cellar Systems", "WhisperKool SC", "CellarPro 8000VSx"].map(b => (
-            <span style="color:#ccc; font-size:0.9rem; padding:8px 12px; background:#1a1a1a; border-radius:4px;">{b}</span>
-          ))}
-        </div>
-      </div>
-      <div style="background:#1a1a1a; border-radius:8px; padding:32px;">
-        <h3 style="color:#C8102E; font-size:1.1rem; font-weight:700; margin-bottom:16px;">Common Wine Cellar Cooling Issues We Fix</h3>
-        <div style="display:grid; gap:12px;">
-          {[
-            "Unit running but cellar temperature rising",
-            "Excessive ice buildup on evaporator coils",
-            "Unit cycling on/off every few minutes",
-            "Loud compressor or fan noise",
-            "Error codes on digital display",
-            "Unit not turning on at all",
-            "Temperature swings of 5°F or more",
-            "Condensation forming inside the cellar",
-          ].map(i => (
-            <div style="display:flex; gap:10px; align-items:start;">
-              <span style="color:#C8102E; flex-shrink:0;">→</span>
-              <span style="font-size:0.9rem; color:#ccc;">{i}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section style="background:#fff; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:8px;">Los Angeles Neighborhoods We Serve</h2>
-      <p style="color:#666; margin-bottom:36px;">Our Los Angeles technicians cover the city from the Westside east to Downtown.</p>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px;">
-        {[
-          { name: "Koreatown", zip: "90005 · 90006 · 90020", desc: "High-density apartments and condos. LG and Samsung are common here. Multi-unit building experience." },
-          { name: "Hancock Park", zip: "90004 · 90019", desc: "Large craftsman and colonial homes. Sub-Zero, Viking, wine cellars are standard." },
-          { name: "Mid-City", zip: "90019 · 90035", desc: "Mix of single-family and multi-unit. Wide range of appliance brands and ages." },
-          { name: "West Adams", zip: "90016 · 90018", desc: "Historic homes with older appliances and gas wall heaters. Growing renovation activity." },
-          { name: "Downtown Los Angeles", zip: "90012 · 90014 · 90017", desc: "High-rise condos and lofts. Common: integrated appliances, limited access, loading dock scheduling." },
-          { name: "Pico-Robertson", zip: "90035 · 90034", desc: "Dense residential. Bosch and Miele dishwashers are very common in this area." },
-          { name: "Miracle Mile", zip: "90036", desc: "Mid-century buildings and newer construction. Mixed appliance stock." },
-          { name: "Los Feliz Border", zip: "90027 · 90029", desc: "Where Mid-City meets the hills. Older homes with updated kitchens and newer appliances." },
-        ].map(n => (
-          <div style="background:#f5f5f5; border-radius:8px; padding:20px;">
-            <h3 style="font-size:1rem; font-weight:700; margin-bottom:4px;">{n.name}</h3>
-            <span style="font-size:0.8rem; color:#C8102E; font-weight:600;">ZIP {n.zip}</span>
-            <p style="font-size:0.85rem; color:#666; line-height:1.5; margin-top:8px; margin-bottom:0;">{n.desc}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- PROPERTY MANAGEMENT BLOCK -->
-  <section style="background:#f5f5f5; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center;">
-      <div>
-        <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:20px;">
-          Property Management & Multi-Unit Buildings
-        </h2>
-        <p style="font-size:1.05rem; color:#333; line-height:1.8; margin-bottom:16px;">
-          Los Angeles has more apartment units per square mile than almost any other city in the country. A large portion of our LA calls come from property managers, building owners, and HOAs who need someone reliable — not a different technician every time.
-        </p>
-        <p style="font-size:1.05rem; color:#333; line-height:1.8; margin-bottom:16px;">
-          We can coordinate directly with tenants, schedule around building access hours, provide written estimates and invoices for your records, and work within your preferred scheduling system. Our technicians know how to handle shared laundry rooms, stacked units in tight closets, and the logistics of multi-unit calls.
-        </p>
-        <div style="display:grid; gap:12px; margin-top:24px;">
-          {[
-            "Direct tenant scheduling available",
-            "Written estimates before every repair",
-            "Invoice documentation for property records",
-            "Experience with Appfolio, RealPage workflows",
-            "Multi-unit volume pricing on request",
-          ].map(f => (
-            <div style="display:flex; gap:12px; align-items:center;">
-              <span style="color:#C8102E;">✓</span>
-              <span style="font-size:0.95rem; color:#333;">{f}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-      <div>
-        <!-- RECENT REPAIRS -->
-        <h3 style="font-size:1.2rem; font-weight:700; color:#0a0a0a; margin-bottom:20px;">Recent LA Repairs</h3>
-        <div style="display:grid; gap:16px;">
-          {[
-            {
-              title: "Wine cellar at 68°F — supposed to be 55°F",
-              area: "Hancock Park, 90019",
-              desc: "WhisperKool SC6000 — condenser fan motor had seized. Unit was running but couldn't move heat out of the cellar. Replaced motor with OEM part. Cellar was at 56°F within two hours."
-            },
-            {
-              title: "Dryer in laundry room not heating — three units affected",
-              area: "Koreatown, 90005",
-              desc: "Property manager call — shared laundry room in a 24-unit building. The main vent run was completely blocked after years without cleaning. Cleared the vent, replaced heating element on one unit, other two just needed the vent cleared."
-            },
-            {
-              title: "Viking refrigerator not cooling, compressor runs constantly",
-              area: "West Adams, 90016",
-              desc: "Condenser coils were completely caked with dust — home near the 10 freeway. Cleaned coils, confirmed temperatures. Owner said the previous tech told them the compressor needed replacement. It didn't."
-            },
-            {
-              title: "Wall heater ignition failing every morning",
-              area: "Mid-City, 90019",
-              desc: "Older Vanguard wall heater — thermocouple had weakened and wasn't sensing the pilot flame reliably. Replaced thermocouple and cleaned the pilot assembly. Fired up on the first try every time after that."
-            },
-          ].map(r => (
-            <div style="background:#fff; border-radius:8px; padding:20px; border-left:4px solid #C8102E;">
-              <h3 style="font-size:0.95rem; font-weight:700; margin-bottom:4px;">"{r.title}"</h3>
-              <p style="font-size:0.8rem; color:#C8102E; font-weight:600; margin-bottom:10px;">{r.area}</p>
-              <p style="font-size:0.88rem; color:#555; line-height:1.6; margin:0;">{r.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section style="background:#fff; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:8px;">Appliance Repair Pricing — Los Angeles</h2>
-      <p style="color:#666; margin-bottom:36px;">Upfront pricing before we start. $89 diagnostic fee waived with repair approval.</p>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; margin-bottom:32px;">
-        {[
-          { appliance: "Refrigerator", standard: "$200 – $450", luxury: "$300 – $700+ (Sub-Zero, Viking)" },
-          { appliance: "Washer", standard: "$150 – $350", luxury: "$200 – $450 (Miele, Bosch)" },
-          { appliance: "Dryer", standard: "$150 – $320", luxury: "$200 – $400" },
-          { appliance: "Oven / Range", standard: "$175 – $420", luxury: "$250 – $500+ (Wolf, Viking)" },
-          { appliance: "Dishwasher", standard: "$150 – $320", luxury: "$200 – $450 (Miele)" },
-          { appliance: "Wine Cellar Unit", standard: "$200 – $450", luxury: "WhisperKool, CellarPro, Wine Guardian" },
-        ].map(p => (
-          <div style="background:#f5f5f5; border-radius:8px; padding:20px; border:1px solid #e2e2e2;">
-            <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px;">{p.appliance}</h3>
-            <p style="font-size:0.85rem; color:#555; margin-bottom:4px;">Standard: <strong>{p.standard}</strong></p>
-            <p style="font-size:0.85rem; color:#555; margin:0;">Luxury: <strong style="font-size:0.8rem;">{p.luxury}</strong></p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section style="background:#f5f5f5; padding:64px 0;">
-    <div style="max-width:800px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:36px;">Frequently Asked Questions — Los Angeles</h2>
-      <div style="display:grid; gap:24px;">
-        {faqSchema.mainEntity.map(q => (
-          <div style="background:#fff; border-radius:8px; padding:24px;">
-            <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:8px;">{q.name}</h3>
-            <p style="color:#555; line-height:1.6; margin:0;">{q.acceptedAnswer.text}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section style="background:#fff; padding:48px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.3rem; font-weight:700; color:#0a0a0a; margin-bottom:20px;">Nearby Areas We Serve</h2>
-      <div style="display:flex; flex-wrap:wrap; gap:12px;">
-        {[
-          { name: "West Hollywood", href: "/west-hollywood/" },
-          { name: "Beverly Hills", href: "/beverly-hills/" },
-          { name: "Santa Monica", href: "/santa-monica/" },
-          { name: "Culver City", href: "/culver-city/" },
-          { name: "Hollywood", href: "/hollywood/" },
-          { name: "Brentwood", href: "/brentwood/" },
-          { name: "Koreatown", href: "/koreatown/" },
-          { name: "Pasadena", href: "/pasadena/" },
-          { name: "Glendale", href: "/glendale/" },
-          { name: "Marina del Rey", href: "/marina-del-rey/" },
-        ].map(c => (
-          <a href={c.href} style="background:#f5f5f5; border:1px solid #e2e2e2; border-radius:4px; padding:8px 16px; font-size:0.9rem; color:#1a1a1a; text-decoration:none; font-weight:500;">
-            {c.name}
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <CTA
-    phone="(424) 325-0520"
-    branch="Los Angeles"
-    zones={["Los Angeles", "Koreatown", "Hancock Park", "Mid-City", "West Adams", "Downtown LA"]}
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Los Angeles, CA"
+    subheadline="Same-day service on every major appliance across Los Angeles. Sub-Zero, Viking, Wolf, Samsung, LG, GE — residential and commercial. Wine cellar cooling units. Licensed, OEM parts, 90-day warranty."
+    zips={zips}
+    tier={3}
   />
-</Layout>
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Los Angeles Has Every Kind of Appliance Problem"
+    paragraphs={introParagraphs}
+    bookingTitle="Los Angeles"
+    bookingSub="Available Today"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Los Angeles"
+    subhead="Residential and commercial. All major brands. Same-day availability across LA."
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={wineCellarNarrative.eyebrow}
+    headline={wineCellarNarrative.headline}
+    paragraphs={wineCellarNarrative.paragraphs}
+    background="white"
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Los Angeles Neighborhoods We Serve"
+    subheadline="Our Los Angeles technicians cover the city from the Westside east to Downtown."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <CustomNarrative
+    headline={propertyManagementNarrative.headline}
+    paragraphs={propertyManagementNarrative.paragraphs}
+    background="gray"
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent LA Repairs"
+    jobs={recentJobs}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Pricing — Los Angeles"
+    subhead="Upfront pricing before we start. $89 diagnostic fee waived with repair approval."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Los Angeles"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Nearby Areas We Serve"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Los Angeles Repair Today"
+    body="Same-day service across all of Los Angeles. Westside, Koreatown, Hancock Park, Mid-City, West Adams, Downtown LA. Wine cellar specialists. Call now or book online."
+  />
+</CityLayoutV2>

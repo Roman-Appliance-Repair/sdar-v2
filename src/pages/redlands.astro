@@ -1,510 +1,341 @@
 ---
-// src/pages/redlands.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = "Redlands";
-const citySlug = "redlands";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["92373", "92374"];
-const county = "San Bernardino";
+const citySlug = 'redlands';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Redlands';
+const zips = ['92373', '92374'];
+
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
 const title = `Appliance Repair Redlands CA — Same Day | All Brands | ${phone}`;
 const description = `Same-day appliance repair in Redlands CA. Refrigerator, washer, dryer, oven, dishwasher & more. Smiley Heights, Downtown, University area. Licensed. OEM parts. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/redlands/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Redlands', sameAs: 'https://en.wikipedia.org/wiki/Redlands,_California' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Redlands is one of the most distinctive cities we service in Southern California. Known as the \"Jewel of the Inland Empire,\" it has a character unlike any other SB County city — Victorian and Craftsman homes in Smiley Heights and near Downtown that date to the 1890s and early 1900s, tree-lined streets, historic citrus groves, and the University of Redlands anchoring a college-town feel in the central neighborhoods. Then there's East Redlands and the newer developments pushing toward Loma Linda, with completely different appliance profiles. This is not a one-generation city.",
+  "The historic neighborhoods create specific appliance service needs that most companies in this area aren't equipped for. Older GE and Whirlpool machines in 1920s Craftsman homes are often genuinely worth repairing — mechanically simpler than modern units, strong motors, parts still available. We approach these calls the same way we approach calls in Pasadena's historic neighborhoods: with patience, honest assessment, and a bias toward repair when the machine's core components are sound.",
+  "The mountain proximity matters. Redlands sits at the base of the San Bernardino Mountains, and canyon winds carry fine particulate from the mountain faces into homes throughout the hillside neighborhoods. After major wildfire events in the San Bernardino National Forest, ash and smoke particles add to coil loading throughout the city. We account for this on every refrigerator call in hillside and upper Redlands neighborhoods.",
+  `Same-day service across ZIP codes 92373 and 92374. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
+];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🫧', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🍳', name: 'Stove & Cooktop Repair', slug: 'stove' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
 ];
 
-const neighborhoods = [
-  { name: "Smiley Heights", zip: "92373" },
-  { name: "Downtown Redlands", zip: "92373" },
-  { name: "North Redlands", zip: "92374" },
-  { name: "South Redlands", zip: "92373" },
-  { name: "University Area", zip: "92374" },
-  { name: "Highland Ave Corridor", zip: "92346" },
-  { name: "Redlands Blvd Area", zip: "92373" },
-  { name: "East Redlands", zip: "92374" },
-  { name: "Citrus Valley", zip: "92373" },
-  { name: "Ford Park Area", zip: "92373" },
-  { name: "Orange Street", zip: "92373" },
-  { name: "Mentone Border", zip: "92374" },
-];
-
-const faqItems = [
-  {
-    q: "Do you offer same-day appliance repair in Redlands?",
-    a: `Yes — same-day service is available throughout Redlands including Smiley Heights, Downtown, the University area, North and South Redlands, and East Redlands. Call ${phone} before noon for same-day scheduling. We cover ZIP codes 92373 and 92374 without a trip surcharge.`
-  },
-  {
-    q: "Can you repair older appliances in Redlands historic homes?",
-    a: "Yes, and it's one of the things that sets us apart from most IE appliance companies. Redlands has some of the oldest housing stock in San Bernardino County — Victorian and Craftsman homes in Smiley Heights and near Downtown that date to the 1890s through 1930s. The appliances in these homes range from 15-year-old replacements to original vintage units. If the machine is mechanically sound and parts are available, we quote the repair honestly. A 25-year-old Whirlpool or GE that a family has maintained well is often worth keeping — simpler mechanics, no control boards to fail."
-  },
-  {
-    q: "Do you service rental properties and student housing near University of Redlands?",
-    a: "Yes. The University of Redlands generates significant rental demand in the surrounding neighborhoods, and we work with landlords and property managers throughout the university area. A broken washer or refrigerator in an occupied rental needs same-day attention — we coordinate with both landlords and tenants and aim to close every rental call the day we open it."
-  },
-  {
-    q: "What brands do you repair in Redlands?",
-    a: "All major brands. Historic Redlands homes tend to have older GE, Whirlpool, and Maytag. Mid-century and 1980s–1990s homes run updated mid-range appliances. Smiley Heights estates and larger historic properties sometimes have Sub-Zero, Wolf, or Thermador. East Redlands and newer developments run Samsung, LG, and KitchenAid. We carry OEM parts across all generations."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `$89, applied directly to the repair cost when you proceed. No hidden trip charge to Redlands. We quote on-site after diagnosis — what we quote is what appears on the invoice.`
-  },
-  {
-    q: "Does living near the San Bernardino Mountains affect my appliances?",
-    a: "Yes, in two ways. First, Redlands sits at the base of the San Bernardino Mountains, and canyon winds carry fine particulate from the mountain faces — similar to Upland near the San Gabriels. Condenser coils on refrigerators in hillside neighborhoods like Smiley Heights clog faster than average. Second, during wildfire season, ash and smoke particles circulate through the region and can accelerate coil loading. After major fire events in the San Bernardino Mountains, we recommend condenser cleaning for refrigerators in Redlands even if they were recently serviced."
-  },
-  {
-    q: "Is it worth repairing a 15-year-old appliance in a historic Redlands home?",
-    a: "Usually yes for mechanically sound machines. A $140 repair on a 15-year-old Whirlpool washer with a failed drive belt — if the motor and transmission are solid — is almost always better economics than a $700–$900 replacement. The calculus changes when the compressor on a refrigerator is failing at 15+ years in a hot climate, where repair cost versus expected remaining lifespan stops making sense. We give you honest numbers after diagnosis."
-  },
-];
-
-const recentRepairs = [
-  {
-    title: "Sub-Zero 648PRO — not cooling, compressor noise, Smiley Heights estate",
-    neighborhood: "Smiley Heights, 92373",
-    description: "Historic 1920s estate in Smiley Heights, Sub-Zero 48-inch column refrigerator running constantly with audible compressor strain. Classic mountain proximity coil loading — the home sits on a ridge that channels canyon air from the San Bernardino Mountains, and the condenser coil pack had two years of fine grey particulate on it. Combined with late-summer ambient temperatures of 105°F, the coils were overwhelmed. Cleaned the condenser coils thoroughly, tested compressor load under ambient conditions — within normal range post-cleaning. Also found a hairline crack in the right door gasket from Redlands' dry heat. Replaced the gasket with an OEM Sub-Zero part. Unit restored to normal operation.",
-    note: "Smiley Heights hillside homes get mountain particulate year-round. Sub-Zero coils here need cleaning every 5 months."
-  },
-  {
-    title: "GE GTW680BSJWS washer — won't drain, F2 code, 2009 model",
-    neighborhood: "Downtown Redlands, 92373",
-    description: "15-year-old GE top-loader in a 1940s Craftsman home near Downtown. F2 is a drain error. Pump motor was drawing current but barely turning — the impeller had a piece of a sock lodged in it (classic). Cleared the obstruction, tested pump flow — adequate. While there, the customer asked about the machine's age and whether to keep it. Motor was strong, transmission solid. Only the pump impeller needed attention. $89 diagnostic + $65 labor. Machine running clean. We told the customer it had at least 5 more years in it.",
-    note: "Old GE top-loaders are among the most repairable machines we work on. Simple mechanics, strong motors."
-  },
-  {
-    title: "Samsung RF28R7351SR — ice maker dead, water dispenser works, 2020 build",
-    neighborhood: "East Redlands, 92374",
-    description: "2020 Samsung French-door from an East Redlands newer development, 4 years old. Ice maker silent, water dispenser functioning normally. Isolated the issue to the ice maker inlet valve secondary solenoid — failed independently of the water solenoid. In Redlands' hard water, we also found mineral scale in the ice maker mold that had been accumulating since installation with no descaling. Replaced the inlet valve assembly (OEM Samsung), descaled the ice maker mold, adjusted the freezer set point from -1°F to +2°F to prevent fill tube freezing. Ice production restored within 8 hours.",
-    note: "Redlands hard water requires ice maker descaling every 12–18 months. Most owners never do it until something fails."
-  },
-  {
-    title: "Whirlpool WED5000DW dryer — no heat, thermal fuse blown, University area rental",
-    neighborhood: "University area, 92374",
-    description: "Property manager called — tenant near University of Redlands reporting no heat in the dryer. Confirmed blown thermal fuse. As always, we investigated the root cause: a 19-foot vent run through the interior of the house with a 90-degree bend at the exit, partially blocked with lint. Cleared the full vent, replaced both the thermal fuse and the thermal limiter as a set (replacing fuse alone without the limiter on Whirlpool units often results in a repeat failure within weeks). Confirmed airflow at the exterior vent. Done in under two hours. Property manager had it fixed before the tenant came home.",
-    note: "Always replace thermal fuse and thermal limiter together on Whirlpool dryers. And always find the blockage first."
-  },
-];
-
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Redlands",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Redlands",
-    "addressRegion": "CA",
-    "addressCountry": "US"
-  },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
+const housingNarrative = {
+  headline: 'Redlands Housing Stock — From Victorian Estates to East Redlands New Builds',
+  subSections: [
+    {
+      title: 'Smiley Heights & Historic Downtown — 1890s–1930s',
+      paragraphs: [
+        "Smiley Heights is the most distinctive neighborhood in Redlands — hilltop estates and Victorian homes built by prosperous citrus families in the late 1800s and early 1900s. The housing here is carefully maintained, and the appliances reflect the owners' investment in their properties. We service Sub-Zero and Wolf in the larger Smiley Heights estates, and older but well-maintained Whirlpool, GE, and KitchenAid in the historic homes closer to Downtown. The hillside location creates the mountain particulate issue we see throughout Redlands hillside areas — condenser coils in Smiley Heights homes need more frequent cleaning than flat neighborhoods.",
+        "Downtown Redlands and the Orange Street corridor have a mix of historic commercial buildings, apartments, and craftsman homes from the 1900s–1930s. Rental properties here support both the University of Redlands student population and long-term residents. We work with landlords and property managers in this corridor regularly and understand the urgency of occupied rental repairs.",
+      ],
+    },
+    {
+      title: 'University of Redlands Area — Rental Market',
+      paragraphs: [
+        "The University of Redlands generates substantial rental demand in the surrounding neighborhoods — primarily the streets within walking distance of campus. These properties run mid-range appliances in the 5–15 year range, and they see higher-than-average use. Washers and dryers in student rental properties run daily loads throughout the academic year. Refrigerators are opened constantly by multiple occupants. We see appliances in active rental properties need service significantly earlier than comparable owner-occupied homes. We work directly with landlords on priority scheduling and aim for same-day service on all occupied rental calls.",
+      ],
+    },
+    {
+      title: 'Mid-Century Redlands — 1950s–1980s Neighborhoods',
+      paragraphs: [
+        "The streets south and north of Redlands Boulevard represent the city's post-war expansion — mid-century ranch homes and tract houses built from the 1950s through the 1980s. Appliances here span from 15-year-old replacements installed in the 2000s to older original machines still running strong. Whirlpool, GE, and Maytag dominate. Hard water from SB County supply is an issue throughout these neighborhoods — dishwasher filter cleaning every three months is our standard recommendation, and we include descaling on every applicable service call.",
+      ],
+    },
+    {
+      title: 'East Redlands — 1990s–2010s Development',
+      paragraphs: [
+        "East Redlands toward the Loma Linda border represents the city's newer growth — planned subdivisions and tract homes from the 1990s through 2010s. Samsung, LG, and KitchenAid dominate here, now entering the 8–15 year failure window. Ice maker issues, evaporator fan failures, and front-load washer bearing wear are the common calls. The proximity to Loma Linda University Medical Center means this area has a higher-than-average concentration of healthcare workers — people with demanding schedules who need appliance problems resolved quickly.",
+      ],
+    },
+    {
+      title: 'Mountain Proximity — Wildfire Ash and Canyon Particulate',
+      paragraphs: [
+        "Redlands sits directly below the San Bernardino Mountains, and the impact on appliances is real. Canyon winds carry decomposed granite particulate from the mountain faces into hillside neighborhoods year-round. During and after wildfire events in the San Bernardino National Forest — which have increased in frequency and severity — ash and smoke particles circulate throughout the region and accelerate condenser coil loading across all of Redlands. After the 2020 El Dorado Fire and subsequent events, we made more condenser cleaning calls in Redlands than in any comparable month. We recommend checking condenser coils after any significant fire event in the mountains, even if they were recently cleaned.",
+      ],
+    },
   ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
-};
+// Audit fix #4: dropped "Highland Ave Corridor" entry (92346 not in city.zips).
+const neighborhoods = [
+  { name: 'Smiley Heights', zip: '92373' },
+  { name: 'Downtown Redlands', zip: '92373' },
+  { name: 'North Redlands', zip: '92374' },
+  { name: 'South Redlands', zip: '92373' },
+  { name: 'University Area', zip: '92374' },
+  { name: 'Redlands Blvd Area', zip: '92373' },
+  { name: 'East Redlands', zip: '92374' },
+  { name: 'Citrus Valley', zip: '92373' },
+  { name: 'Ford Park Area', zip: '92373' },
+  { name: 'Orange Street', zip: '92373' },
+  { name: 'Mentone Border', zip: '92374' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero 648PRO',
+    location: 'Smiley Heights, 92373',
+    quote: 'not cooling, compressor noise, Smiley Heights estate',
+    description: "Historic 1920s estate in Smiley Heights, Sub-Zero 48-inch column refrigerator running constantly with audible compressor strain. Classic mountain proximity coil loading — the home sits on a ridge that channels canyon air from the San Bernardino Mountains, and the condenser coil pack had two years of fine grey particulate on it. Combined with late-summer ambient temperatures of 105°F, the coils were overwhelmed. Cleaned the condenser coils thoroughly, tested compressor load under ambient conditions — within normal range post-cleaning. Also found a hairline crack in the right door gasket from Redlands' dry heat. Replaced the gasket with an OEM Sub-Zero part. Unit restored to normal operation.",
+    outcome: 'Smiley Heights hillside homes get mountain particulate year-round. Sub-Zero coils here need cleaning every 5 months.',
+  },
+  {
+    appliance: 'GE GTW680BSJWS washer',
+    location: 'Downtown Redlands, 92373',
+    quote: "won't drain, F2 code, 2009 model",
+    description: "15-year-old GE top-loader in a 1940s Craftsman home near Downtown. F2 is a drain error. Pump motor was drawing current but barely turning — the impeller had a piece of a sock lodged in it (classic). Cleared the obstruction, tested pump flow — adequate. While there, the customer asked about the machine's age and whether to keep it. Motor was strong, transmission solid. Only the pump impeller needed attention. $89 diagnostic + $65 labor. Machine running clean. We told the customer it had at least 5 more years in it.",
+    outcome: 'Old GE top-loaders are among the most repairable machines we work on. Simple mechanics, strong motors.',
+  },
+  {
+    appliance: 'Samsung RF28R7351SR',
+    location: 'East Redlands, 92374',
+    quote: 'ice maker dead, water dispenser works, 2020 build',
+    description: "2020 Samsung French-door from an East Redlands newer development, 4 years old. Ice maker silent, water dispenser functioning normally. Isolated the issue to the ice maker inlet valve secondary solenoid — failed independently of the water solenoid. In Redlands' hard water, we also found mineral scale in the ice maker mold that had been accumulating since installation with no descaling. Replaced the inlet valve assembly (OEM Samsung), descaled the ice maker mold, adjusted the freezer set point from -1°F to +2°F to prevent fill tube freezing. Ice production restored within 8 hours.",
+    outcome: 'Redlands hard water requires ice maker descaling every 12–18 months. Most owners never do it until something fails.',
+  },
+  {
+    appliance: 'Whirlpool WED5000DW dryer',
+    location: 'University area, 92374',
+    quote: 'no heat, thermal fuse blown, University area rental',
+    description: "Property manager called — tenant near University of Redlands reporting no heat in the dryer. Confirmed blown thermal fuse. As always, we investigated the root cause: a 19-foot vent run through the interior of the house with a 90-degree bend at the exit, partially blocked with lint. Cleared the full vent, replaced both the thermal fuse and the thermal limiter as a set (replacing fuse alone without the limiter on Whirlpool units often results in a repeat failure within weeks). Confirmed airflow at the exterior vent. Done in under two hours. Property manager had it fixed before the tenant came home.",
+    outcome: 'Always replace thermal fuse and thermal limiter together on Whirlpool dryers. And always find the blockage first.',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'We work on older appliances',
+    body: "Historic Redlands homes deserve respect — and so do the appliances in them. If a 20-year-old GE or Whirlpool is mechanically sound, we'll fix it honestly and tell you how many more years it has in it. We don't push replacement on machines worth repairing.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Mountain proximity expertise',
+    body: "Canyon particulate and wildfire ash are real factors in Redlands, particularly in Smiley Heights and hillside neighborhoods. We account for this in every refrigerator diagnosis and recommend the right post-fire cleaning schedule when it's relevant.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Rental & university area priority',
+    body: "We work with University of Redlands area landlords and coordinate directly with tenants. Same-day service on occupied rentals isn't just a goal — it's a commitment. A tenant without a working appliance is a habitability problem we take seriously.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Diagnosis before the quote',
+    body: "The $89 fee covers a real on-site diagnosis. A blown thermal fuse has a root cause — we find it before replacing parts. A Sub-Zero running warm usually has clean coils as the answer, not a compressor. We don't quote the expensive fix until the cheap one is ruled out.",
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Sub-Zero in our Smiley Heights home was struggling in summer. Tech found the condenser coils completely packed — mountain dust, he said. Cleaned them thoroughly and replaced a door gasket. Unit running perfectly. Explained the 5-month cleaning schedule for our location. Very knowledgeable."',
+    author: '— William & Carol M., Smiley Heights',
+  },
+  {
+    stars: 5,
+    text: '"Old GE washer in our 1940s Craftsman home — other companies said just buy a new one. Same Day found a piece of fabric stuck in the pump, cleared it in 30 minutes. $89 diagnostic and $65 service. Machine is 15 years old and they told me it has years left in it."',
+    author: '— Patricia L., Downtown Redlands',
+  },
+  {
+    stars: 5,
+    text: '"Property manager for three rentals near the university. Called Same Day for a broken Whirlpool dryer — they were there the same afternoon, found a blocked vent AND a blown thermal fuse, fixed both. They always handle my tenants professionally. My go-to for all three properties."',
+    author: '— David K., University area landlord',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator Repair', range: '$150–$450', note: 'Compressor relay · Coil cleaning · Inlet valve · Fan motor' },
+  { appliance: 'Washer Repair', range: '$120–$380', note: 'Drain pump · Drive coupling · Bearing · Actuator' },
+  { appliance: 'Dryer Repair', range: '$120–$320', note: 'Thermal fuse + limiter · Heating element · Vent path' },
+  { appliance: 'Dishwasher Repair', range: '$89–$360', note: 'Drain pump · Filter · Spray arm · Hard water descaling' },
+  { appliance: 'Oven / Range Repair', range: '$140–$400', note: 'Igniter · Bake element · Gas valve · Calibration' },
+  { appliance: 'Sub-Zero Repair', range: '$250–$650', note: 'OEM Sub-Zero parts · Coil cleaning · Door gasket' },
+  { appliance: 'Wine Cooler Repair', range: '$150–$450', note: 'Compressor · Thermistor · Door seal · Temperature swings' },
+  { appliance: 'Condenser Coil Cleaning', range: '$89–$150', note: 'Hillside homes: every 5 months recommended' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Redlands?',
+    answer: `Yes — same-day service is available throughout Redlands including Smiley Heights, Downtown, the University area, North and South Redlands, and East Redlands. Call ${phone} before noon for same-day scheduling. We cover ZIP codes 92373 and 92374 without a trip surcharge.`,
+  },
+  {
+    question: 'Can you repair older appliances in Redlands historic homes?',
+    answer: "Yes, and it's one of the things that sets us apart from most IE appliance companies. Redlands has some of the oldest housing stock in San Bernardino County — Victorian and Craftsman homes in Smiley Heights and near Downtown that date to the 1890s through 1930s. The appliances in these homes range from 15-year-old replacements to original vintage units. If the machine is mechanically sound and parts are available, we quote the repair honestly. A 25-year-old Whirlpool or GE that a family has maintained well is often worth keeping — simpler mechanics, no control boards to fail.",
+  },
+  {
+    question: 'Do you service rental properties and student housing near University of Redlands?',
+    answer: 'Yes. The University of Redlands generates significant rental demand in the surrounding neighborhoods, and we work with landlords and property managers throughout the university area. A broken washer or refrigerator in an occupied rental needs same-day attention — we coordinate with both landlords and tenants and aim to close every rental call the day we open it.',
+  },
+  {
+    question: 'What brands do you repair in Redlands?',
+    answer: 'All major brands. Historic Redlands homes tend to have older GE, Whirlpool, and Maytag. Mid-century and 1980s–1990s homes run updated mid-range appliances. Smiley Heights estates and larger historic properties sometimes have Sub-Zero, Wolf, or Thermador. East Redlands and newer developments run Samsung, LG, and KitchenAid. We carry OEM parts across all generations.',
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: '$89, applied directly to the repair cost when you proceed. No hidden trip charge to Redlands. We quote on-site after diagnosis — what we quote is what appears on the invoice.',
+  },
+  {
+    question: 'Does living near the San Bernardino Mountains affect my appliances?',
+    answer: 'Yes, in two ways. First, Redlands sits at the base of the San Bernardino Mountains, and canyon winds carry fine particulate from the mountain faces — similar to Upland near the San Gabriels. Condenser coils on refrigerators in hillside neighborhoods like Smiley Heights clog faster than average. Second, during wildfire season, ash and smoke particles circulate through the region and can accelerate coil loading. After major fire events in the San Bernardino Mountains, we recommend condenser cleaning for refrigerators in Redlands even if they were recently serviced.',
+  },
+  {
+    question: 'Is it worth repairing a 15-year-old appliance in a historic Redlands home?',
+    answer: 'Usually yes for mechanically sound machines. A $140 repair on a 15-year-old Whirlpool washer with a failed drive belt — if the motor and transmission are solid — is almost always better economics than a $700–$900 replacement. The calculus changes when the compressor on a refrigerator is failing at 15+ years in a hot climate, where repair cost versus expected remaining lifespan stops making sense. We give you honest numbers after diagnosis.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Loma Linda', slug: 'loma-linda' },
+  { name: 'San Bernardino', slug: 'san-bernardino' },
+  { name: 'Fontana', slug: 'fontana' },
+  { name: 'Rancho Cucamonga', slug: 'rancho-cucamonga' },
+  { name: 'Riverside', slug: 'riverside' },
+  { name: 'Corona', slug: 'corona' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Redlands"
+    subheadline="Same-day service in Smiley Heights, Downtown, University area, North and South Redlands, and East Redlands. Historic homes to new builds. All brands, OEM parts."
+    zips={zips}
+    tier={3}
+  />
 
-  <!-- HERO -->
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">San Bernardino County · ZIP 92373, 92374</p>
-        <h1>Appliance Repair<br><span class="accent">Redlands</span></h1>
-        <p class="hero-sub">Same-day service in Smiley Heights, Downtown, University area, North and South Redlands, and East Redlands. Historic homes to new builds. All brands, OEM parts.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-      <div class="hero-img">
-        <img src="/images/cities/redlands-appliance-repair.jpg" alt="Appliance repair in Redlands CA" width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🏛️</span><span>Historic &amp; Modern Homes</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Redlands — The Jewel of the Inland Empire Has Unique Needs"
+    paragraphs={introParagraphs}
+    bookingTitle="Redlands"
+    bookingSub="Same-Day Service"
+  />
 
-  <!-- INTRO + SIDEBAR -->
-  <section class="intro-section container">
-    <div class="intro-content">
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Redlands"
+    services={services}
+  />
 
-      <h2>Appliance Repair in Redlands — The Jewel of the Inland Empire Has Unique Needs</h2>
+  <CustomNarrative
+    headline={housingNarrative.headline}
+    subSections={housingNarrative.subSections}
+    background="white"
+  />
 
-      <p>Redlands is one of the most distinctive cities we service in Southern California. Known as the "Jewel of the Inland Empire," it has a character unlike any other SB County city — Victorian and Craftsman homes in Smiley Heights and near Downtown that date to the 1890s and early 1900s, tree-lined streets, historic citrus groves, and the University of Redlands anchoring a college-town feel in the central neighborhoods. Then there's East Redlands and the newer developments pushing toward Loma Linda, with completely different appliance profiles. This is not a one-generation city.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Neighborhoods We Service in Redlands"
+    subheadline="We cover all of Redlands — Smiley Heights, Downtown, the University area, East Redlands, and everything between. No travel surcharge to any address in 92373 or 92374."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>The historic neighborhoods create specific appliance service needs that most companies in this area aren't equipped for. Older GE and Whirlpool machines in 1920s Craftsman homes are often genuinely worth repairing — mechanically simpler than modern units, strong motors, parts still available. We approach these calls the same way we approach calls in Pasadena's historic neighborhoods: with patience, honest assessment, and a bias toward repair when the machine's core components are sound.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Redlands"
+    jobs={recentJobs}
+  />
 
-      <p>The mountain proximity matters. Redlands sits at the base of the San Bernardino Mountains, and canyon winds carry fine particulate from the mountain faces into homes throughout the hillside neighborhoods. After major wildfire events in the San Bernardino National Forest, ash and smoke particles add to coil loading throughout the city. We account for this on every refrigerator call in hillside and upper Redlands neighborhoods.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Redlands Residents Call Us"
+    reasons={whyReasons}
+  />
 
-      <p>Same-day service across ZIP codes 92373 and 92374. Call {phone}.</p>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Redlands Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-    </div>
+  <PricingCards
+    cityName={cityName}
+    headline="Typical Repair Pricing in Redlands"
+    subhead="Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Redlands</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ Historic &amp; Vintage Appliances Welcome</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ 90-Day Warranty</li>
-        <li>✓ Licensed &amp; Insured</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Redlands Appliance Repair — FAQ"
+    faqs={faqs}
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Redlands</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-  <!-- HOUSING STOCK BLOCK -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>Redlands Housing Stock — From Victorian Estates to East Redlands New Builds</h2>
-
-        <h3>Smiley Heights &amp; Historic Downtown — 1890s–1930s</h3>
-        <p>Smiley Heights is the most distinctive neighborhood in Redlands — hilltop estates and Victorian homes built by prosperous citrus families in the late 1800s and early 1900s. The housing here is carefully maintained, and the appliances reflect the owners' investment in their properties. We service Sub-Zero and Wolf in the larger Smiley Heights estates, and older but well-maintained Whirlpool, GE, and KitchenAid in the historic homes closer to Downtown. The hillside location creates the mountain particulate issue we see throughout Redlands hillside areas — condenser coils in Smiley Heights homes need more frequent cleaning than flat neighborhoods.</p>
-
-        <p>Downtown Redlands and the Orange Street corridor have a mix of historic commercial buildings, apartments, and craftsman homes from the 1900s–1930s. Rental properties here support both the University of Redlands student population and long-term residents. We work with landlords and property managers in this corridor regularly and understand the urgency of occupied rental repairs.</p>
-
-        <h3>University of Redlands Area — Rental Market</h3>
-        <p>The University of Redlands generates substantial rental demand in the surrounding neighborhoods — primarily the streets within walking distance of campus. These properties run mid-range appliances in the 5–15 year range, and they see higher-than-average use. Washers and dryers in student rental properties run daily loads throughout the academic year. Refrigerators are opened constantly by multiple occupants. We see appliances in active rental properties need service significantly earlier than comparable owner-occupied homes. We work directly with landlords on priority scheduling and aim for same-day service on all occupied rental calls.</p>
-
-        <h3>Mid-Century Redlands — 1950s–1980s Neighborhoods</h3>
-        <p>The streets south and north of Redlands Boulevard represent the city's post-war expansion — mid-century ranch homes and tract houses built from the 1950s through the 1980s. Appliances here span from 15-year-old replacements installed in the 2000s to older original machines still running strong. Whirlpool, GE, and Maytag dominate. Hard water from SB County supply is an issue throughout these neighborhoods — dishwasher filter cleaning every three months is our standard recommendation, and we include descaling on every applicable service call.</p>
-
-        <h3>East Redlands — 1990s–2010s Development</h3>
-        <p>East Redlands toward the Loma Linda border represents the city's newer growth — planned subdivisions and tract homes from the 1990s through 2010s. Samsung, LG, and KitchenAid dominate here, now entering the 8–15 year failure window. Ice maker issues, evaporator fan failures, and front-load washer bearing wear are the common calls. The proximity to Loma Linda University Medical Center means this area has a higher-than-average concentration of healthcare workers — people with demanding schedules who need appliance problems resolved quickly.</p>
-
-        <h3>Mountain Proximity — Wildfire Ash and Canyon Particulate</h3>
-        <p>Redlands sits directly below the San Bernardino Mountains, and the impact on appliances is real. Canyon winds carry decomposed granite particulate from the mountain faces into hillside neighborhoods year-round. During and after wildfire events in the San Bernardino National Forest — which have increased in frequency and severity — ash and smoke particles circulate throughout the region and accelerate condenser coil loading across all of Redlands. After the 2020 El Dorado Fire and subsequent events, we made more condenser cleaning calls in Redlands than in any comparable month. We recommend checking condenser coils after any significant fire event in the mountains, even if they were recently cleaned.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Redlands</h2>
-      <p>We cover all of Redlands — Smiley Heights, Downtown, the University area, Highland Ave corridor, East Redlands, and everything between. No travel surcharge to any address in 92373 or 92374.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Loma Linda, Mentone, and Highland — same dispatch, no surcharge. Call {phone}.</p>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">03</div>
-      <h2>Recent Repairs in Redlands</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- WHY US + REVIEWS + PRICING -->
-  <section class="why-section container">
-    <div class="context-number">04</div>
-    <h2>Why Redlands Residents Call Us</h2>
-
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>We work on older appliances</h3>
-        <p>Historic Redlands homes deserve respect — and so do the appliances in them. If a 20-year-old GE or Whirlpool is mechanically sound, we'll fix it honestly and tell you how many more years it has in it. We don't push replacement on machines worth repairing.</p>
-      </div>
-      <div class="why-item">
-        <h3>Mountain proximity expertise</h3>
-        <p>Canyon particulate and wildfire ash are real factors in Redlands, particularly in Smiley Heights and hillside neighborhoods. We account for this in every refrigerator diagnosis and recommend the right post-fire cleaning schedule when it's relevant.</p>
-      </div>
-      <div class="why-item">
-        <h3>Rental &amp; university area priority</h3>
-        <p>We work with University of Redlands area landlords and coordinate directly with tenants. Same-day service on occupied rentals isn't just a goal — it's a commitment. A tenant without a working appliance is a habitability problem we take seriously.</p>
-      </div>
-      <div class="why-item">
-        <h3>Diagnosis before the quote</h3>
-        <p>The $89 fee covers a real on-site diagnosis. A blown thermal fuse has a root cause — we find it before replacing parts. A Sub-Zero running warm usually has clean coils as the answer, not a compressor. We don't quote the expensive fix until the cheap one is ruled out.</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Sub-Zero in our Smiley Heights home was struggling in summer. Tech found the condenser coils completely packed — mountain dust, he said. Cleaned them thoroughly and replaced a door gasket. Unit running perfectly. Explained the 5-month cleaning schedule for our location. Very knowledgeable."</p>
-        <p class="reviewer">— William &amp; Carol M., Smiley Heights</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Old GE washer in our 1940s Craftsman home — other companies said just buy a new one. Same Day found a piece of fabric stuck in the pump, cleared it in 30 minutes. $89 diagnostic and $65 service. Machine is 15 years old and they told me it has years left in it."</p>
-        <p class="reviewer">— Patricia L., Downtown Redlands</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Property manager for three rentals near the university. Called Same Day for a broken Whirlpool dryer — they were there the same afternoon, found a blocked vent AND a blown thermal fuse, fixed both. They always handle my tenants professionally. My go-to for all three properties."</p>
-        <p class="reviewer">— David K., University area landlord</p>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Redlands</h3>
-      <p>Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item">
-          <span class="pi-service">Refrigerator Repair</span>
-          <span class="pi-range">$150–$450</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Washer Repair</span>
-          <span class="pi-range">$120–$380</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Repair</span>
-          <span class="pi-range">$120–$320</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Repair</span>
-          <span class="pi-range">$89–$360</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Oven / Range Repair</span>
-          <span class="pi-range">$140–$400</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Sub-Zero Repair</span>
-          <span class="pi-range">$250–$650</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Wine Cooler Repair</span>
-          <span class="pi-range">$150–$450</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Condenser Coil Cleaning</span>
-          <span class="pi-range">$89–$150</span>
-        </div>
-      </div>
-      <p class="pricing-note">$89 diagnostic applied to repair. No trip charge to Redlands ZIP codes.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq-section container">
-    <h2>Redlands Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/loma-linda/">Loma Linda</a>
-      <a href="/san-bernardino/">San Bernardino</a>
-      <a href="/fontana/">Fontana</a>
-      <a href="/rancho-cucamonga/">Rancho Cucamonga</a>
-      <a href="/riverside/">Riverside</a>
-      <a href="/corona/">Corona</a>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Redlands Today?</h2>
-      <p>Same-day service in Smiley Heights, Downtown, the University area, East Redlands, and all Redlands ZIP codes. Historic homes welcome.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
-.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
-h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
-h1 .accent { color: var(--color-accent); }
-.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
-.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
-.trust-bar { background: var(--color-accent); padding: 1rem 0; }
-.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
-.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
-.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
-.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
-.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
-.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
-.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
-.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
-.services-section { background: var(--color-surface); padding: 4rem 0; }
-.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
-.svc-icon { font-size: 2rem; }
-.svc-name { font-size: .9rem; font-weight: 600; }
-.context-block { padding: 4rem 0; }
-.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
-.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; }
-.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
-.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.neighborhoods-section { padding: 4rem 0; }
-.section-intro { margin-bottom: 2rem; }
-.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
-.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
-.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
-.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
-.nbhd-note { margin-top: 1.5rem; font-size: .875rem; color: var(--color-text-muted); }
-.repairs-section { padding: 4rem 0; }
-.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
-.section-header h2 { font-size: 1.6rem; }
-.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
-.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
-.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
-.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
-.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
-.why-section { padding: 4rem 0; }
-.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
-.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
-.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
-.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
-.reviewer { font-size: .8rem; color: var(--color-text-muted); }
-.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
-.pricing-block h3 { margin-bottom: .5rem; }
-.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.price-item { display: flex; flex-direction: column; gap: .25rem; }
-.pi-service { font-size: .85rem; color: var(--color-text-muted); }
-.pi-range { font-size: 1rem; font-weight: 700; }
-.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
-.faq-section { padding: 4rem 0; }
-.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.faq-list { display: flex; flex-direction: column; gap: .75rem; }
-.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
-.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
-.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
-.nearby-section { padding: 3rem 0; }
-.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
-.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
-.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
-.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
-.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
-.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
-.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
-.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-@media (max-width: 1024px) {
-  .intro-section { grid-template-columns: 1fr; }
-  .sticky-cta-box { position: static; }
-  .services-grid, .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-img { display: none; }
-  .context-inner { grid-template-columns: 1fr; }
-  .repairs-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Redlands Today?"
+    body="Same-day service in Smiley Heights, Downtown, the University area, East Redlands, and all Redlands ZIP codes. Historic homes welcome."
+  />
+</CityLayoutV2>

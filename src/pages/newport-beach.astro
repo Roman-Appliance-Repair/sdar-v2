@@ -1,695 +1,316 @@
 ---
-// src/pages/newport-beach.astro
-// SDAR — samedayappliance.repair
-// Newport Beach, CA 92660 · 92661 · 92662 · 92663 · 92657 · 92625
-// Филиал: Irvine · (213) 401-9019
-// GSC: нет данных — новый город
-// Конкуренты: iFix Appliances OC (strong — salt air, Pelican Hill, white glove),
-//             Ambulance Appliance (Irvine-based, generic), Sub-Zero clones,
-//             DryerFix (NB-specific, washer/dryer only)
-// Уникальный угол: salt air corrosion 4-6 month cycle, Balboa Island/CdM/Newport Coast geography,
-//                  vacation rental + primary residence mix, outdoor kitchen, gated Pelican Hill
-// Апрель 2026
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
+const citySlug = 'newport-beach';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = {
-  name: "Newport Beach",
-  state: "CA",
-  county: "Orange",
-  zips: ["92660", "92661", "92662", "92663", "92657", "92625"],
-  phone: "(213) 401-9019",
-  phoneRaw: "+12134019019",
-  email: "irvine@samedayappliance.repair",
-  branch: "Irvine",
-  slug: "newport-beach",
-};
+const cityName = 'Newport Beach';
+const zips = ['92660', '92661', '92662', '92663', '92657', '92625'];
 
-const title = `Appliance Repair Newport Beach CA — Same Day | Balboa Island · Corona del Mar · Newport Coast | (213) 401-9019`;
-const description = `Same-day appliance repair in Newport Beach, CA. Balboa Island, Corona del Mar, Newport Coast, Lido Isle, The Peninsula. Salt air specialists. Sub-Zero, Wolf, Miele. Licensed, OEM parts, 90-day warranty. Call (213) 401-9019.`;
-const canonical = `https://samedayappliance.repair/newport-beach/`;
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Newport Beach",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Irvine",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const title = `Appliance Repair Newport Beach CA — Same Day | Balboa Island · Corona del Mar · Newport Coast | ${phone}`;
+const description = `Same-day appliance repair in Newport Beach, CA. Balboa Island, Corona del Mar, Newport Coast, Lido Isle, The Peninsula. Salt air specialists. Sub-Zero, Wolf, Miele. Licensed, OEM parts, 90-day warranty. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/newport-beach/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Newport Beach', sameAs: 'https://en.wikipedia.org/wiki/Newport_Beach,_California' },
+    { '@type': 'Neighborhood', name: 'Balboa Island' },
+    { '@type': 'Neighborhood', name: 'Corona del Mar' },
+    { '@type': 'Neighborhood', name: 'Newport Coast' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Newport Beach", "sameAs": "https://en.wikipedia.org/wiki/Newport_Beach,_California" },
-    { "@type": "Neighborhood", "name": "Balboa Island" },
-    { "@type": "Neighborhood", "name": "Corona del Mar" },
-    { "@type": "Neighborhood", "name": "Newport Coast" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Newport Beach, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Newport Beach — Balboa Island, Corona del Mar, Newport Coast, Lido Isle, The Peninsula, Dover Shores, Back Bay, and all ZIP codes 92660, 92661, 92662, 92663, 92657, and 92625. Call before noon for same-day afternoon service." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does salt air in Newport Beach affect appliances faster than inland?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes, significantly. Salt air accelerates corrosion on refrigerator condenser coils, dishwasher control boards, and outdoor appliance components. In Newport Beach — particularly on Balboa Island, The Peninsula, and oceanfront homes in Corona del Mar — condenser coils that would last 12–18 months inland may need attention every 4–6 months. We check coil condition and inspect for salt-related corrosion on every Newport Beach refrigerator call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, Miele, and Thermador appliances in Newport Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Sub-Zero, Wolf, Thermador, Miele, Gaggenau, and Viking are standard in Newport Beach kitchens. Our technicians carry OEM parts for these brands on every service vehicle and are experienced with the built-in and panel-ready configurations common in Newport Beach estates and high-rise condos." }
-    },
-    {
-      "@type": "Question",
-      "name": "Can you service appliances in Newport Beach gated communities?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians are familiar with the access protocols for Newport Coast, Pelican Hill, Crystal Cove, and other gated communities in the Newport Beach area. We coordinate guard gate access before arrival and work with property managers and household staff when needed." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair outdoor kitchen appliances in Newport Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Newport Beach properties frequently have outdoor entertaining areas with outdoor-rated refrigerators, ice makers, and BBQ igniter systems. Outdoor appliances in a coastal environment see accelerated wear from salt air — we repair and service these and advise on protective maintenance." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Newport Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We provide a complete written estimate before starting any work. Luxury brand repairs may run higher due to OEM part pricing — always disclosed upfront." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Irvine, Laguna Beach, and Costa Mesa?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Newport Beach service area extends to Irvine, Laguna Beach, Costa Mesa, Huntington Beach, and all of coastal Orange County." }
-    }
-  ]
+const introParagraphs = [
+  "Newport Beach is one of the most desirable addresses in California — and the Pacific Ocean is about 200 feet from most of it. That proximity is wonderful for residents. It's harder on appliances.",
+  "Salt air is the defining environmental factor for appliance maintenance in Newport Beach. Refrigerator condenser coils that would last 12–18 months in an inland city accumulate salt-laden particulate much faster here — particularly in oceanfront properties on Balboa Island, The Peninsula, and the waterfront homes in Corona del Mar. A coil that's overloaded makes the compressor work harder, shortens its life, and drives up energy costs. We inspect and clean condenser coils on every Newport Beach refrigerator call — it's consistently relevant here in a way it isn't inland.",
+  "Outdoor kitchen appliances — outdoor-rated refrigerators, ice makers, BBQ igniter systems — see this effect even more acutely. Salt air exposure on an outdoor unit is dramatically more aggressive than on indoor equipment. Igniter electrode corrosion, coil degradation, and control board moisture ingress are all accelerated in an oceanfront outdoor kitchen. We service and repair outdoor appliances throughout Newport Beach.",
+  "Inside, the kitchens are serious: Sub-Zero, Wolf, Thermador, Miele, Gaggenau — standard in Newport Beach estates and high-rise units alike. Our technicians carry OEM parts for all of these on every service vehicle. We're also familiar with the access logistics for Newport Coast, Pelican Hill, Crystal Cove, and other gated communities.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on all parts and labor. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Salt air coil inspection · Not cooling · Ice maker · Sub-Zero built-in', brands: 'Sub-Zero · Wolf · True · Samsung · LG · Thermador' },
+  { icon: '🔥', name: 'Oven, Range & Steam Oven', slug: 'oven', issues: 'Dual-fuel · Steam combi · Temperature off · Salt air igniter corrosion', brands: 'Wolf · Thermador · Gaggenau · Miele · Viking · La Cornue' },
+  { icon: '🌿', name: 'Outdoor Kitchen Appliances', slug: 'outdoor-appliance', issues: 'BBQ igniter corrosion · Outdoor fridge · Outdoor ice maker · Coastal wear', brands: 'Viking · Wolf · True · Lynx · Bull · Blaze · Hoshizaki' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: "Panel-ready · Error codes · Control board · Not draining · Miele", brands: 'Miele · Gaggenau · Thermador · Bosch · Cove · KitchenAid' },
+  { icon: '🫧', name: 'Washer & Dryer Repair', slug: 'washer', issues: 'Miele heat pump · Not draining · European models · Stackable', brands: 'Miele · LG · Samsung · Bosch · Whirlpool · Speed Queen' },
+  { icon: '🍷', name: 'Wine Cellar & Cooler Repair', slug: 'wine-cellar', issues: 'Temperature off · Coastal humidity · WhisperKOOL · Sub-Zero wine', brands: 'Sub-Zero · EuroCave · True · WhisperKOOL · Liebherr · U-Line' },
+  { icon: '🧊', name: 'Ice Machine & Ice Maker', slug: 'ice-machine', issues: 'Low production · Salt air corrosion · Built-in · Outdoor ice maker', brands: 'Sub-Zero · True · Scotsman · Hoshizaki · U-Line · GE' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Wolf star burner · Thermador induction · Hood systems · Igniter', brands: 'Wolf · Thermador · Gaggenau · Miele · Viking · Dacor' },
+];
+
+const saltAirTipNarrative = {
+  headline: 'Salt Air Tip for Newport Beach',
+  paragraphs: [
+    "<strong>Salt air tip for Newport Beach:</strong> If your refrigerator has been running louder than usual, or cycling on and off more frequently — especially in an oceanfront property — the most likely cause is condenser coils loaded with salt-air particulate. Clean coils every 4–6 months in a coastal property, not the 12-month recommendation written for inland environments. We include this inspection on every Newport Beach fridge call.",
+  ],
 };
+
+const neighborhoods = [
+  { name: 'Balboa Island', zip: '92662', featured: true },
+  { name: 'Corona del Mar', zip: '92625', featured: true },
+  { name: 'Newport Coast', zip: '92657', featured: true },
+  { name: 'Lido Isle', zip: '92663' },
+  { name: 'The Peninsula', zip: '92661' },
+  { name: 'Dover Shores', zip: '92660' },
+  { name: 'Back Bay', zip: '92660' },
+  { name: "Mariner's Mile", zip: '92660' },
+  { name: 'Newport Coast / Pelican Hill', zip: '92657', featured: true },
+  { name: 'Crystal Cove', zip: '92657', featured: true },
+  { name: 'Harbor Ridge', zip: '92660' },
+  { name: 'Big Canyon', zip: '92660' },
+  { name: 'Bonita Canyon', zip: '92660' },
+  { name: 'Belcourt', zip: '92660' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero Built-In',
+    location: 'Balboa Island, 92662',
+    quote: 'Running constantly, cycling every few minutes — much louder than usual',
+    description: 'Balboa Island waterfront home — the Sub-Zero 48-inch column had condenser coils packed with salt-air particulate. In an oceanfront property this close to the bay, coil accumulation can happen in 4–5 months rather than the 12–18 months typical inland. Removed and thoroughly cleaned the coil assembly, replaced the condenser fan motor that had begun to seize from the added thermal load, confirmed door seals. Compressor cycling normalized immediately. Homeowner now on a 5-month coil inspection schedule for this property.',
+    outcome: '✓ Same day · Salt air coils cleaned · Fan motor replaced · 5-month plan',
+  },
+  {
+    appliance: 'Wolf Dual-Fuel Range',
+    location: 'Corona del Mar, 92625',
+    quote: "Three burners sparking constantly, oven won't come to temperature",
+    description: 'CdM oceanfront estate — Wolf 48-inch dual-fuel in a custom kitchen with ocean-facing windows left open regularly. Three surface igniter electrodes corroded from salt air moisture ingress; oven igniter drawing weak current. Replaced all three surface electrodes and the oven igniter with OEM Wolf parts, sealed the electrode wells against moisture, calibrated the oven (running 20°F low). Recommended keeping the kitchen ventilated with the hood rather than the windows when cooking — reduces direct salt air exposure to the igniter surfaces.',
+    outcome: '✓ Same day · OEM Wolf · Salt air cause explained · Calibrated',
+  },
+  {
+    appliance: 'True Outdoor Refrigerator',
+    location: 'Newport Coast, 92657',
+    quote: 'Outdoor fridge by the pool not cooling — two years old',
+    description: 'Newport Coast estate — True outdoor-rated undercounter refrigerator on a covered terrace. Even with the roofline coverage, coastal air had accelerated coil corrosion significantly for a two-year-old unit. Cleaned and treated the condenser coil assembly, replaced the fan, inspected and reseated the door gasket showing early UV degradation. Back to 38°F. Recommended annual coil maintenance for outdoor units in coastal locations — the difference between 2-year and 6-year service life.',
+    outcome: '✓ Same day · Outdoor True · Coastal wear explained · Annual plan set',
+  },
+  {
+    appliance: 'Miele Dishwasher',
+    location: 'Lido Isle, 92663',
+    quote: 'F70 error, water in the base — machine completely locked out',
+    description: 'Miele G 7000 panel-front on Lido Isle — F70 flood protection error from water in the base pan. Found the water inlet connection had developed a slow seep from vibration over time. Cleared the base pan, tightened and re-sealed the inlet connection, ran the Miele anti-flood reset procedure, tested three full cycles. Panel cabinetry came out and went back without a mark. Homeowner uses the home as a seasonal residence — explained how to run a maintenance cycle at the start of each season to prevent standing water issues.',
+    outcome: '✓ Same day · Miele F70 resolved · Panel intact · Seasonal maintenance explained',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Salt Air Specialists',
+    body: 'Coastal corrosion affects condenser coils, igniter electrodes, and outdoor appliance components faster than any other factor in Newport Beach. We check for salt-air damage proactively on every relevant NB call — and we know the maintenance schedule that actually works in a coastal environment.',
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Outdoor Kitchen Experts',
+    body: 'Outdoor refrigerators, outdoor ice makers, BBQ igniter systems — coastal exposure accelerates wear dramatically. We repair and service outdoor kitchen appliances throughout Newport Beach, and advise on the maintenance that extends their life near the ocean.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Gated Community Ready',
+    body: 'Newport Coast, Pelican Hill, Crystal Cove, Harbor Ridge — we coordinate gate access before arrival, work with property managers and household staff, and handle the logistics professionally. Estate managers welcome.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket on luxury systems. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Sub-Zero was running constantly and getting loud. Same Day came to our Balboa Island home, cleaned the salt-air coils, replaced the fan motor, and explained the 5-month maintenance schedule for a waterfront property. Immediately quieter. We had no idea the ocean proximity was the issue — very knowledgeable."',
+    author: '— Sarah K., Balboa Island, Newport Beach',
+  },
+  {
+    stars: 5,
+    text: '"Wolf range in our CdM home — three burners sparking constantly and oven temperature way off. Tech came same day, identified the salt air corrosion on the igniters, replaced everything with OEM Wolf parts, calibrated the oven. Also explained how the ocean windows were contributing. Professional, thorough, and genuinely expert on the coastal factor."',
+    author: '— Michael T., Corona del Mar, Newport Beach',
+  },
+  {
+    stars: 5,
+    text: "\"Miele dishwasher with F70 error at our Lido Isle home. Tech came out, cleared the issue, handled the panel cabinetry perfectly, and gave us a seasonal maintenance plan since we're not here year-round. Everything you want from a luxury appliance service — knowledgeable, clean, efficient, no surprises.\"",
+    author: '— Jennifer L., Lido Isle, Newport Beach',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Sub-Zero / Wolf / Gaggenau', range: '$300 – $800+', note: 'OEM parts · Salt air coil inspection · Coastal maintenance', featured: true },
+  { appliance: 'Outdoor Kitchen Appliances', range: '$200 – $600', note: 'Coastal corrosion · Outdoor fridge · BBQ igniter · Ice maker', featured: true },
+  { appliance: 'Thermador / Miele / Viking', range: '$250 – $600+', note: 'OEM parts · Panel-ready · Steam oven · Built-in' },
+  { appliance: 'Refrigerator (standard)', range: '$200 – $450', note: 'Salt air coil clean · Fan motor · Ice maker · Thermostat' },
+  { appliance: 'Dishwasher / Washer / Dryer', range: '$150 – $450', note: 'Panel-ready · Miele heat pump · European models' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Newport Beach, CA?',
+    answer: 'Yes. Our technicians cover all of Newport Beach — Balboa Island, Corona del Mar, Newport Coast, Lido Isle, The Peninsula, Dover Shores, Back Bay, and all ZIP codes 92660, 92661, 92662, 92663, 92657, and 92625. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'Does salt air in Newport Beach affect appliances faster than inland?',
+    answer: 'Yes, significantly. Salt air accelerates corrosion on refrigerator condenser coils, dishwasher control boards, and outdoor appliance components. In Newport Beach — particularly on Balboa Island, The Peninsula, and oceanfront homes in Corona del Mar — condenser coils that would last 12–18 months inland may need attention every 4–6 months. We check coil condition and inspect for salt-related corrosion on every Newport Beach refrigerator call.',
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, Miele, and Thermador appliances in Newport Beach?',
+    answer: 'Yes. Sub-Zero, Wolf, Thermador, Miele, Gaggenau, and Viking are standard in Newport Beach kitchens. Our technicians carry OEM parts for these brands on every service vehicle and are experienced with the built-in and panel-ready configurations common in Newport Beach estates and high-rise condos.',
+  },
+  {
+    question: 'Can you service appliances in Newport Beach gated communities?',
+    answer: 'Yes. Our technicians are familiar with the access protocols for Newport Coast, Pelican Hill, Crystal Cove, and other gated communities in the Newport Beach area. We coordinate guard gate access before arrival and work with property managers and household staff when needed.',
+  },
+  {
+    question: 'Do you repair outdoor kitchen appliances in Newport Beach?',
+    answer: 'Yes. Newport Beach properties frequently have outdoor entertaining areas with outdoor-rated refrigerators, ice makers, and BBQ igniter systems. Outdoor appliances in a coastal environment see accelerated wear from salt air — we repair and service these and advise on protective maintenance.',
+  },
+  {
+    question: 'What is your diagnostic fee in Newport Beach?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. We provide a complete written estimate before starting any work. Luxury brand repairs may run higher due to OEM part pricing — always disclosed upfront.',
+  },
+  {
+    question: 'Do you also serve Irvine, Laguna Beach, and Costa Mesa?',
+    answer: 'Yes. Our Newport Beach service area extends to Irvine, Laguna Beach, Costa Mesa, Huntington Beach, and all of coastal Orange County.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Irvine', slug: 'irvine' },
+  { name: 'Laguna Beach', slug: 'laguna-beach' },
+  { name: 'Costa Mesa', slug: 'costa-mesa' },
+  { name: 'Huntington Beach', slug: 'huntington-beach' },
+  { name: 'Laguna Niguel', slug: 'laguna-niguel' },
+  { name: 'Dana Point', slug: 'dana-point' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Newport Beach, CA"
+    subheadline="Coastal living puts unique demands on appliances — salt air accelerates coil corrosion, outdoor kitchen equipment weathers hard, and luxury kitchens deserve expert service. Sub-Zero, Wolf, Miele, Thermador. Same-day service, OEM parts, 90-day warranty. Gated communities welcome."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="nb-hero">
-    <div class="nb-hero__inner container">
-      <div class="nb-hero__content">
-        <div class="nb-hero__eyebrow">Newport Beach, CA · Balboa Island · Corona del Mar · Newport Coast · Lido Isle</div>
-        <h1 class="nb-hero__h1">
-          Appliance Repair<br>
-          <span class="nb-hero__accent">Newport Beach, CA</span>
-        </h1>
-        <p class="nb-hero__sub">
-          Coastal living puts unique demands on appliances — salt air accelerates coil
-          corrosion, outdoor kitchen equipment weathers hard, and luxury kitchens
-          deserve expert service. Sub-Zero, Wolf, Miele, Thermador. Same-day service,
-          OEM parts, 90-day warranty. Gated communities welcome.
-        </p>
-        <div class="nb-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="nb-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="nb-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-newport-beach-ca.webp"
-          alt="Appliance repair in Newport Beach CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Gated Community Ready</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Newport Beach — What the Coast Changes"
+    paragraphs={introParagraphs}
+    bookingTitle="Newport Beach Service"
+    bookingSub="All ZIP codes · Gated ready · Same day"
+  />
 
-  <!-- INTRO: SALT AIR SECTION -->
-  <section class="nb-intro">
-    <div class="container nb-intro__inner">
-      <div class="nb-intro__text">
-        <h2>Appliance Repair in Newport Beach — What the Coast Changes</h2>
-        <p>
-          Newport Beach is one of the most desirable addresses in California — and
-          the Pacific Ocean is about 200 feet from most of it. That proximity is
-          wonderful for residents. It's harder on appliances.
-        </p>
-        <p>
-          Salt air is the defining environmental factor for appliance maintenance
-          in Newport Beach. Refrigerator condenser coils that would last 12–18 months
-          in an inland city accumulate salt-laden particulate much faster here —
-          particularly in oceanfront properties on Balboa Island, The Peninsula,
-          and the waterfront homes in Corona del Mar. A coil that's overloaded
-          makes the compressor work harder, shortens its life, and drives up energy
-          costs. We inspect and clean condenser coils on every Newport Beach
-          refrigerator call — it's consistently relevant here in a way it isn't inland.
-        </p>
-        <p>
-          Outdoor kitchen appliances — outdoor-rated refrigerators, ice makers,
-          BBQ igniter systems — see this effect even more acutely. Salt air exposure
-          on an outdoor unit is dramatically more aggressive than on indoor equipment.
-          Igniter electrode corrosion, coil degradation, and control board moisture
-          ingress are all accelerated in an oceanfront outdoor kitchen. We service
-          and repair outdoor appliances throughout Newport Beach.
-        </p>
-        <p>
-          Inside, the kitchens are serious: Sub-Zero, Wolf, Thermador, Miele, Gaggenau —
-          standard in Newport Beach estates and high-rise units alike. Our technicians
-          carry OEM parts for all of these on every service vehicle. We're also familiar
-          with the access logistics for Newport Coast, Pelican Hill, Crystal Cove,
-          and other gated communities.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong> on all parts and labor.
-        </p>
-        <div class="nb-tip">
-          <div class="nb-tip__icon">🌊</div>
-          <div class="nb-tip__text">
-            <strong>Salt air tip for Newport Beach:</strong> If your refrigerator has
-            been running louder than usual, or cycling on and off more frequently —
-            especially in an oceanfront property — the most likely cause is condenser
-            coils loaded with salt-air particulate. Clean coils every 4–6 months in
-            a coastal property, not the 12-month recommendation written for inland
-            environments. We include this inspection on every Newport Beach fridge call.
-          </div>
-        </div>
-      </div>
-      <div class="nb-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Newport Beach Service</div>
-          <div class="cta-box__sub">All ZIP codes · Gated ready · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Newport Beach"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="nb-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Newport Beach</h2>
-      <p class="section-sub">Luxury & coastal-aware · Indoor & outdoor · All ZIP codes</p>
-      <div class="services-grid">
+  <CustomNarrative
+    headline={saltAirTipNarrative.headline}
+    paragraphs={saltAirTipNarrative.paragraphs}
+    background="white"
+  />
 
-        <a href="/newport-beach/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Salt air coil inspection · Not cooling · Ice maker · Sub-Zero built-in</div>
-          <div class="service-card__brands">Sub-Zero · Wolf · True · Samsung · LG · Thermador</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ServiceArea
+    cityName={cityName}
+    headline="All of Newport Beach"
+    subheadline="From Balboa Island to Newport Coast — every neighborhood and ZIP code"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <a href="/newport-beach/oven-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Steam Oven</div>
-          <div class="service-card__issues">Dual-fuel · Steam combi · Temperature off · Salt air igniter corrosion</div>
-          <div class="service-card__brands">Wolf · Thermador · Gaggenau · Miele · Viking · La Cornue</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in Newport Beach"
+    subhead="Real calls from the Newport Beach area — coastal homes, gated estates, outdoor kitchens."
+    jobs={recentJobs}
+  />
 
-        <a href="/newport-beach/outdoor-appliance-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🌿</div>
-          <div class="service-card__name">Outdoor Kitchen Appliances</div>
-          <div class="service-card__issues">BBQ igniter corrosion · Outdoor fridge · Outdoor ice maker · Coastal wear</div>
-          <div class="service-card__brands">Viking · Wolf · True · Lynx · Bull · Blaze · Hoshizaki</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Newport Beach Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/newport-beach/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Panel-ready · Error codes · Control board · Not draining · Miele</div>
-          <div class="service-card__brands">Miele · Gaggenau · Thermador · Bosch · Cove · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Newport Beach Clients Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/newport-beach/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer & Dryer Repair</div>
-          <div class="service-card__issues">Miele heat pump · Not draining · European models · Stackable</div>
-          <div class="service-card__brands">Miele · LG · Samsung · Bosch · Whirlpool · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Newport Beach"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    tiers={pricingTiers}
+    footnote="OEM parts for luxury brands are manufacturer-priced. Part cost and labor are disclosed separately in every written estimate — no surprises."
+  />
 
-        <a href="/newport-beach/wine-cellar-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cellar & Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Coastal humidity · WhisperKOOL · Sub-Zero wine</div>
-          <div class="service-card__brands">Sub-Zero · EuroCave · True · WhisperKOOL · Liebherr · U-Line</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Newport Beach Clients Ask"
+    faqs={faqs}
+  />
 
-        <a href="/newport-beach/ice-machine-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Ice Machine & Ice Maker</div>
-          <div class="service-card__issues">Low production · Salt air corrosion · Built-in · Outdoor ice maker</div>
-          <div class="service-card__brands">Sub-Zero · True · Scotsman · Hoshizaki · U-Line · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
 
-        <a href="/newport-beach/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Wolf star burner · Thermador induction · Hood systems · Igniter</div>
-          <div class="service-card__brands">Wolf · Thermador · Gaggenau · Miele · Viking · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="nb-neighborhoods">
-    <div class="container">
-      <h2>All of Newport Beach</h2>
-      <p class="section-sub">From Balboa Island to Newport Coast — every neighborhood and ZIP code</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Newport Beach Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Balboa Island (92662)</div>
-            <div class="nh-item featured">Corona del Mar (92625)</div>
-            <div class="nh-item featured">Newport Coast (92657)</div>
-            <div class="nh-item">Lido Isle (92663)</div>
-            <div class="nh-item">The Peninsula (92661)</div>
-            <div class="nh-item">Dover Shores (92660)</div>
-            <div class="nh-item">Back Bay (92660)</div>
-            <div class="nh-item">Mariner's Mile</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Gated Communities</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Newport Coast / Pelican Hill</div>
-            <div class="nh-item featured">Crystal Cove</div>
-            <div class="nh-item">Harbor Ridge</div>
-            <div class="nh-item">Big Canyon</div>
-            <div class="nh-item">Bonita Canyon</div>
-            <div class="nh-item">Belcourt</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Irvine (92612–02)</div>
-            <div class="nh-item">Laguna Beach (92651)</div>
-            <div class="nh-item">Costa Mesa (92626–28)</div>
-            <div class="nh-item">Huntington Beach (92648)</div>
-            <div class="nh-item">Laguna Niguel (92677)</div>
-            <div class="nh-item">Dana Point (92629)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="nb-recent">
-    <div class="container">
-      <h2>Recent Jobs in Newport Beach</h2>
-      <p class="section-sub">Real calls from the Newport Beach area — coastal homes, gated estates, outdoor kitchens.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Built-In</span>
-            <span class="recent-location">Balboa Island, 92662</span>
-          </div>
-          <div class="recent-card__title">"Running constantly, cycling every few minutes — much louder than usual"</div>
-          <div class="recent-card__desc">
-            Balboa Island waterfront home — the Sub-Zero 48-inch column had condenser
-            coils packed with salt-air particulate. In an oceanfront property this close
-            to the bay, coil accumulation can happen in 4–5 months rather than the
-            12–18 months typical inland. Removed and thoroughly cleaned the coil
-            assembly, replaced the condenser fan motor that had begun to seize from
-            the added thermal load, confirmed door seals. Compressor cycling
-            normalized immediately. Homeowner now on a 5-month coil inspection
-            schedule for this property.
-          </div>
-          <div class="recent-card__result">✓ Same day · Salt air coils cleaned · Fan motor replaced · 5-month plan</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Dual-Fuel Range</span>
-            <span class="recent-location">Corona del Mar, 92625</span>
-          </div>
-          <div class="recent-card__title">"Three burners sparking constantly, oven won't come to temperature"</div>
-          <div class="recent-card__desc">
-            CdM oceanfront estate — Wolf 48-inch dual-fuel in a custom kitchen with
-            ocean-facing windows left open regularly. Three surface igniter electrodes
-            corroded from salt air moisture ingress; oven igniter drawing weak current.
-            Replaced all three surface electrodes and the oven igniter with OEM Wolf
-            parts, sealed the electrode wells against moisture, calibrated the oven
-            (running 20°F low). Recommended keeping the kitchen ventilated with the
-            hood rather than the windows when cooking — reduces direct salt air
-            exposure to the igniter surfaces.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Wolf · Salt air cause explained · Calibrated</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">True Outdoor Refrigerator</span>
-            <span class="recent-location">Newport Coast, 92657</span>
-          </div>
-          <div class="recent-card__title">"Outdoor fridge by the pool not cooling — two years old"</div>
-          <div class="recent-card__desc">
-            Newport Coast estate — True outdoor-rated undercounter refrigerator on
-            a covered terrace. Even with the roofline coverage, coastal air had
-            accelerated coil corrosion significantly for a two-year-old unit. Cleaned
-            and treated the condenser coil assembly, replaced the fan, inspected and
-            reseated the door gasket showing early UV degradation. Back to 38°F.
-            Recommended annual coil maintenance for outdoor units in coastal
-            locations — the difference between 2-year and 6-year service life.
-          </div>
-          <div class="recent-card__result">✓ Same day · Outdoor True · Coastal wear explained · Annual plan set</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Miele Dishwasher</span>
-            <span class="recent-location">Lido Isle, 92663</span>
-          </div>
-          <div class="recent-card__title">"F70 error, water in the base — machine completely locked out"</div>
-          <div class="recent-card__desc">
-            Miele G 7000 panel-front on Lido Isle — F70 flood protection error from
-            water in the base pan. Found the water inlet connection had developed a
-            slow seep from vibration over time. Cleared the base pan, tightened and
-            re-sealed the inlet connection, ran the Miele anti-flood reset procedure,
-            tested three full cycles. Panel cabinetry came out and went back without
-            a mark. Homeowner uses the home as a seasonal residence — explained how
-            to run a maintenance cycle at the start of each season to prevent
-            standing water issues.
-          </div>
-          <div class="recent-card__result">✓ Same day · Miele F70 resolved · Panel intact · Seasonal maintenance explained</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="nb-why">
-    <div class="container">
-      <h2>Why Newport Beach Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🌊</div>
-          <div class="why-title">Salt Air Specialists</div>
-          <div class="why-text">Coastal corrosion affects condenser coils, igniter electrodes, and outdoor appliance components faster than any other factor in Newport Beach. We check for salt-air damage proactively on every relevant NB call — and we know the maintenance schedule that actually works in a coastal environment.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏡</div>
-          <div class="why-title">Outdoor Kitchen Experts</div>
-          <div class="why-text">Outdoor refrigerators, outdoor ice makers, BBQ igniter systems — coastal exposure accelerates wear dramatically. We repair and service outdoor kitchen appliances throughout Newport Beach, and advise on the maintenance that extends their life near the ocean.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🔐</div>
-          <div class="why-title">Gated Community Ready</div>
-          <div class="why-text">Newport Coast, Pelican Hill, Crystal Cove, Harbor Ridge — we coordinate gate access before arrival, work with property managers and household staff, and handle the logistics professionally. Estate managers welcome.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket on luxury systems. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="nb-reviews">
-    <div class="container">
-      <h2>What Newport Beach Clients Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero was running constantly and getting loud. Same Day came to our Balboa Island home, cleaned the salt-air coils, replaced the fan motor, and explained the 5-month maintenance schedule for a waterfront property. Immediately quieter. We had no idea the ocean proximity was the issue — very knowledgeable."</div>
-          <div class="review-author">— Sarah K., Balboa Island, Newport Beach</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Wolf range in our CdM home — three burners sparking constantly and oven temperature way off. Tech came same day, identified the salt air corrosion on the igniters, replaced everything with OEM Wolf parts, calibrated the oven. Also explained how the ocean windows were contributing. Professional, thorough, and genuinely expert on the coastal factor."</div>
-          <div class="review-author">— Michael T., Corona del Mar, Newport Beach</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Miele dishwasher with F70 error at our Lido Isle home. Tech came out, cleared the issue, handled the panel cabinetry perfectly, and gave us a seasonal maintenance plan since we're not here year-round. Everything you want from a luxury appliance service — knowledgeable, clean, efficient, no surprises."</div>
-          <div class="review-author">— Jennifer L., Lido Isle, Newport Beach</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="nb-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Newport Beach</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf / Gaggenau</div>
-          <div class="pricing-card__range">$300 – $800+</div>
-          <div class="pricing-card__note">OEM parts · Salt air coil inspection · Coastal maintenance</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Outdoor Kitchen Appliances</div>
-          <div class="pricing-card__range">$200 – $600</div>
-          <div class="pricing-card__note">Coastal corrosion · Outdoor fridge · BBQ igniter · Ice maker</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Thermador / Miele / Viking</div>
-          <div class="pricing-card__range">$250 – $600+</div>
-          <div class="pricing-card__note">OEM parts · Panel-ready · Steam oven · Built-in</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator (standard)</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Salt air coil clean · Fan motor · Ice maker · Thermostat</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher / Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $450</div>
-          <div class="pricing-card__note">Panel-ready · Miele heat pump · European models</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-      <p class="pricing-note">OEM parts for luxury brands are manufacturer-priced. Part cost and labor are disclosed separately in every written estimate — no surprises.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="nb-faq">
-    <div class="container">
-      <h2>Questions Newport Beach Clients Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Newport Beach, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Newport Beach — Balboa Island, Corona del Mar, Newport Coast, Lido Isle, The Peninsula, Dover Shores, and all ZIP codes 92660, 92661, 92662, 92663, 92657, and 92625. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does salt air in Newport Beach affect appliances faster than inland?</summary><div class="faq-answer">Yes, significantly. Refrigerator condenser coils, igniter electrodes, and outdoor appliance components corrode much faster in a coastal environment. Oceanfront properties may need coil attention every 4–6 months versus 12–18 inland. We inspect for salt-air damage on every relevant Newport Beach call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero, Wolf, Miele, and Thermador appliances in Newport Beach?</summary><div class="faq-answer">Yes. Sub-Zero, Wolf, Thermador, Miele, Gaggenau, and Viking are standard in Newport Beach kitchens. We carry OEM parts for these brands on every vehicle and are experienced with built-in and panel-ready configurations.</div></details>
-        <details class="faq-item"><summary class="faq-question">Can you service appliances in Newport Beach gated communities?</summary><div class="faq-answer">Yes. Our technicians know the access protocols for Newport Coast, Pelican Hill, Crystal Cove, and other gated communities. We coordinate gate access before arrival and work with property managers as needed.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair outdoor kitchen appliances in Newport Beach?</summary><div class="faq-answer">Yes. Outdoor refrigerators, ice makers, and BBQ igniter systems see accelerated wear in the coastal environment. We repair and service outdoor kitchen appliances and advise on protective maintenance.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Newport Beach?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Luxury brand repairs run higher due to OEM part pricing — always disclosed upfront.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Irvine, Laguna Beach, and Costa Mesa?</summary><div class="faq-answer">Yes. Our Newport Beach service extends to Irvine, Laguna Beach, Costa Mesa, Huntington Beach, and all of coastal Orange County.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="nb-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/manhattan-beach/" class="nearby-link">Manhattan Beach</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/pacific-palisades/" class="nearby-link">Pacific Palisades</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/marina-del-rey/" class="nearby-link">Marina del Rey</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="nb-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance issue in Newport Beach?</h2>
-          <p>Balboa Island · Corona del Mar · Newport Coast · Salt air specialists · Sub-Zero · Wolf · Outdoor kitchens. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Newport Beach, CA</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --nb-red: #C8102E; --nb-black: #0a0a0a; --nb-gray: #f5f5f5; --nb-border: #e2e2e2; --nb-text: #1a1a1a; --nb-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .nb-hero { background: var(--nb-black); color: white; padding: 80px 0 60px; }
-  .nb-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .nb-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--nb-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .nb-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .nb-hero__accent { color: var(--nb-red); }
-  .nb-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .nb-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .nb-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .nb-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--nb-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .nb-bottom-cta .btn-secondary { color: var(--nb-text); border-color: var(--nb-border); }
-  .trust-bar { background: var(--nb-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .nb-intro { padding: 72px 0; background: white; }
-  .nb-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .nb-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--nb-black); margin-bottom: 20px; }
-  .nb-intro__text p { font-size: 16px; line-height: 1.7; color: var(--nb-text); margin-bottom: 16px; }
-  .nb-tip { display: flex; gap: 14px; background: #eaf4fb; border: 1px solid #87c1e0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .nb-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .nb-tip__text { font-size: 14px; color: var(--nb-text); line-height: 1.6; }
-  .cta-box { background: var(--nb-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--nb-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--nb-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--nb-muted); text-align: center; margin-bottom: 40px; }
-  .nb-services { padding: 72px 0; background: var(--nb-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--nb-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--nb-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--nb-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--nb-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--nb-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--nb-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--nb-red); font-weight: 500; }
-  .nb-neighborhoods { padding: 72px 0; background: white; }
-  .nb-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--nb-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--nb-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--nb-text); padding: 8px 12px; background: var(--nb-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--nb-red); color: var(--nb-black); font-weight: 500; }
-  .nb-recent { padding: 72px 0; background: var(--nb-gray); }
-  .nb-recent h2 { font-size: 30px; font-weight: 700; color: var(--nb-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--nb-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--nb-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--nb-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--nb-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--nb-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .nb-why { padding: 72px 0; background: white; }
-  .nb-why h2 { font-size: 30px; font-weight: 700; color: var(--nb-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--nb-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--nb-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--nb-muted); line-height: 1.6; }
-  .nb-reviews { padding: 72px 0; background: var(--nb-gray); }
-  .nb-reviews h2 { font-size: 30px; font-weight: 700; color: var(--nb-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--nb-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--nb-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--nb-muted); font-weight: 500; }
-  .nb-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--nb-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--nb-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--nb-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--nb-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--nb-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--nb-red); }
-  .pricing-card__note { font-size: 13px; color: var(--nb-muted); }
-  .pricing-note { font-size: 14px; color: var(--nb-muted); text-align: center; max-width: 640px; margin: 0 auto; }
-  .nb-faq { padding: 72px 0; background: var(--nb-gray); }
-  .nb-faq h2 { font-size: 30px; font-weight: 700; color: var(--nb-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--nb-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--nb-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--nb-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--nb-text); }
-  .nb-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--nb-border); }
-  .nb-nearby h2 { font-size: 20px; font-weight: 600; color: var(--nb-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--nb-border); border-radius: 20px; font-size: 14px; color: var(--nb-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--nb-red); color: var(--nb-red); }
-  .nb-bottom-cta { padding: 72px 0; background: var(--nb-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .nb-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .nb-hero__inner { grid-template-columns: 1fr; } .nb-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .nb-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance issue in Newport Beach?"
+    body="Balboa Island · Corona del Mar · Newport Coast · Salt air specialists · Sub-Zero · Wolf · Outdoor kitchens. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayoutV2>

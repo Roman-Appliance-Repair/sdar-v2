@@ -1,519 +1,337 @@
 ---
-// src/pages/menifee.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+/**
+ * Menifee, CA — v2 migrated page (T12 Wave 2 Batch A).
+ * Branch: Temecula — service_area, placeholder phone (MAIN_PHONE substituted).
+ * Content source of truth: wiki/migration/content-dumps/menifee.md
+ *
+ * Branch note: dump metadata says "Branch: Pasadena · (626) 376-4458",
+ * but cities.ts SSOT maps menifee → temecula branch (Riverside County).
+ * Temecula branch has placeholder phone (951) 555-0200; visible CTA
+ * substitutes MAIN_PHONE (424) 325-0520 via isPlaceholderPhone(). The
+ * dump's "Pasadena dispatch" sentence is rephrased to "our Riverside
+ * County route" since that is the accurate territory.
+ *
+ * Unique block: "What's Failing in Menifee Homes Right Now" — builder-grade
+ * appliance failure window narrative. Rendered via <CustomNarrative>.
+ *
+ * Branch isolation:
+ *   - Phone (424) 325-0520 (MAIN_PHONE substitution for placeholder)
+ *   - No streetAddress in schema (Temecula is service_area, placeholder GBP)
+ *   - All ZIPs are Menifee (92584, 92585, 92586, 92587)
+ *
+ * Legacy preserved as menifee.astro.legacy.
+ */
 
-const city = "Menifee";
-const citySlug = "menifee";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["92584", "92585", "92586", "92587"];
-const county = "Riverside";
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+
+const citySlug = 'menifee';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Menifee';
+const zips = ['92584', '92585', '92586', '92587'];
+
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
 const title = `Appliance Repair Menifee CA — Same Day | All Brands | ${phone}`;
 const description = `Same-day appliance repair in Menifee CA. Refrigerator, washer, dryer, oven, dishwasher & more. Heritage Lake, Paloma Valley, Sun City. Licensed. OEM parts. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/menifee/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Menifee', sameAs: 'https://en.wikipedia.org/wiki/Menifee,_California' },
+    { '@type': 'Place', name: 'Heritage Lake' },
+    { '@type': 'Place', name: 'Sun City' },
+    { '@type': 'Place', name: 'Paloma Valley' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Menifee is almost entirely 2000–2020 builder-grade construction — KB Homes, Lennar, Richmond American, and the other production builders that turned the Inland Empire into a series of master-planned communities. Heritage Lake, Paloma Valley, Quail Valley, East Menifee — different tracts, different builders, but the same rough generation of appliances. Builder-grade Samsung, LG, Whirlpool, GE, and Maytag installed at construction time, hitting the 8 to 15 year first-major-failure window now. That's nearly all our calls in 92584, 92585, 92586, and 92587.",
+  "Sun City — the older retirement community in 92586 — is the exception. Older retirement-friendly appliances, lighter usage, longer service lives. Most Sun City calls are simple maintenance issues: a dishwasher filter that's never been cleaned, a refrigerator with mineral buildup on the inlet valve, a thermal fuse on a dryer with a partially blocked vent run. Different profile from the rest of Menifee.",
+  "Two Menifee realities to plan around: Riverside County water hardness — the Eastern Municipal Water District tests routinely above 200 mg/L — and Inland Valley summer heat. Both are hard on appliances. Coil cleaning every 6 months on refrigerators, dishwasher filter cleaning every 3 months, and we'll catch the symptoms before they become $400 part-replacements.",
+  `Diagnostic fee is $89 — credited toward repair. Same-day coverage across all four ZIP codes. Call <a href="tel:${phoneRaw}">${phone}</a> for a real arrival window.`,
+];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🍳', name: 'Stove & Cooktop Repair', slug: 'cooktop' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
+
+const builderGradeNarrative = {
+  headline: "What's Failing in Menifee Homes Right Now",
+  paragraphs: [
+    "Most of Menifee was built in a 20-year window from 2000 to 2020, which means most of the appliances were installed during that same span. We see the same builder-grade brands across nearly every house — and we see them failing in predictable patterns now that they're hitting 8 to 15 years of age.",
+    "<strong>Samsung refrigerators (2014–2019 vintage):</strong> Ice maker failures and 22E evaporator-fan errors. The 22E almost always traces back to a failed defrost heater allowing ice to build up on the evaporator coil until it locks out the fan — not the fan motor itself. Diagnose the defrost system before assuming the fan needs replacing.",
+    "<strong>LG front-load washers (2014–2018 vintage):</strong> Drum bearing failure shows up around year 7 to 8 in heavy-use households. The grinding starts during spin cycles. Always replace the bearing AND the drum seal as a set — a new bearing on a worn seal will start leaking and destroy the bearing again within months.",
+    "<strong>Whirlpool dishwashers (2015–2020 vintage):</strong> Filter assembly clogs are the most common 'not cleaning' call we get in Menifee. Three years of Riverside County hard water through a never-cleaned filter creates a complete blockage. The fix is a $0-parts pull, clean, and descale — not a new pump or new spray arms. Customers are routinely told they need a new dishwasher when the actual fix is filter cleaning.",
+    "<strong>GE and Whirlpool dryers (2015–2020 vintage):</strong> Thermal fuse failures. A blown thermal fuse is always a symptom, not a root cause. Something caused the dryer to overheat — usually a partially blocked vent run. Replacing the fuse without clearing the vent means it will blow again within weeks. Always find the cause.",
+    "<strong>Sun City retirement community (92586):</strong> Different profile. Older appliances, lighter usage, mostly maintenance issues. Filter cleaning, mineral deposit removal, vent inspection — preventive work that extends service life by years.",
+  ],
+};
 
 const neighborhoods = [
-  { name: "Heritage Lake", zip: "92584" },
-  { name: "Paloma Valley", zip: "92585" },
-  { name: "Sun City", zip: "92586" },
-  { name: "Quail Valley", zip: "92587" },
-  { name: "East Menifee", zip: "92584" },
-  { name: "Menifee Valley", zip: "92586" },
-  { name: "Newport Rd Corridor", zip: "92584" },
-  { name: "Haun Rd Area", zip: "92586" },
-  { name: "Bradley Rd", zip: "92586" },
-  { name: "Scott Rd", zip: "92587" },
-  { name: "Holland Rd Area", zip: "92585" },
-  { name: "Romoland", zip: "92585" },
+  { name: 'Heritage Lake', zip: '92584' },
+  { name: 'Paloma Valley', zip: '92585' },
+  { name: 'Sun City', zip: '92586' },
+  { name: 'Quail Valley', zip: '92587' },
+  { name: 'East Menifee', zip: '92584' },
+  { name: 'Menifee Valley', zip: '92586' },
+  { name: 'Newport Rd Corridor', zip: '92584' },
+  { name: 'Haun Rd Area', zip: '92586' },
+  { name: 'Bradley Rd', zip: '92586' },
+  { name: 'Scott Rd', zip: '92587' },
+  { name: 'Holland Rd Area', zip: '92585' },
+  { name: 'Romoland', zip: '92585' },
 ];
 
-const faqItems = [
+const recentJobs = [
   {
-    q: "Do you offer same-day appliance repair in Menifee?",
-    a: `Yes — same-day service is available throughout Menifee including Heritage Lake, Paloma Valley, Sun City, Quail Valley, and East Menifee. Call ${phone} before noon for same-day scheduling. We cover all four Menifee ZIP codes — 92584, 92585, 92586, and 92587 — without a trip surcharge.`
+    appliance: 'Samsung RF28HFEDBSR',
+    location: 'Heritage Lake, 92584',
+    quote: 'Warm fridge, 22E error code, 2016 model',
+    description: "Samsung French-door showing 22E — evaporator fan error. This 2016 unit was one of the LG-compressor generation Samsungs in Menifee's Heritage Lake community. Pulled the back panel of the freezer compartment and found the evaporator coil had iced over completely, blocking the fan entirely. Root cause: the defrost heater had failed, allowing ice to accumulate until it locked out the fan. Replaced the defrost heater assembly with an OEM Samsung part, manually defrosted the coil, confirmed the 22E cleared and normal airflow restored. Fan motor was fine — didn't need replacement. From the tech: 22E means the fan is blocked or failed. Check the defrost system before assuming the fan motor needs replacing.",
+    outcome: '✓ Same day · OEM Samsung defrost heater · $89 + $140 parts/labor',
   },
   {
-    q: "My appliances are 8–12 years old — is it worth repairing them?",
-    a: "In most cases, yes. Menifee's housing stock is almost entirely 2000–2020 construction, which means the builder-grade Samsung, LG, Whirlpool, and GE appliances installed in these homes are hitting their first major failure point now. A well-targeted repair on a machine that's otherwise in good working order almost always beats the cost of a replacement. A new mid-range washer runs $700–$900. A bearing repair on a 10-year-old machine that still has a sound motor typically costs $160–$220. We give you the honest numbers after diagnosis and let you decide."
+    appliance: 'LG WM3700HWA Front-Load Washer',
+    location: 'Paloma Valley, 92585',
+    quote: 'Loud grinding on spin, 8 years old',
+    description: "Classic front-load washer bearing failure. LG front-loaders in Menifee's Paloma Valley homes are mostly 2014–2018 vintage — right in the window where bearing wear shows up. The grinding was coming from the drum bearing on the rear of the tub. Replaced the rear bearing and drum seal as a set — always do both, since a new bearing on a worn seal will just start leaking and destroy the bearing again. Machine running quietly. Customer had been quoted a full tub replacement by another company at $480. Bearing and seal repair: $195. From the tech: always replace bearing and seal together. Half the job with only half the parts leads to a callback.",
+    outcome: '✓ Same day · OEM LG bearing + seal · $195 vs. $480 quote',
   },
   {
-    q: "What brands do you repair in Menifee?",
-    a: "All major brands. Menifee's builder-grade housing runs primarily Samsung, LG, Whirlpool, Maytag, and GE — the standard appliance package for KB Homes, Lennar, and Richmond American builds. We carry OEM parts for all of these on the truck and don't use aftermarket substitutes."
+    appliance: 'Whirlpool WDT750SAHZ Dishwasher',
+    location: 'Sun City, 92586',
+    quote: 'Not cleaning, filter completely blocked',
+    description: "Sun City Menifee retirement community has a lot of Whirlpool appliances from the 2015–2020 build wave. This dishwasher was leaving food residue on everything — the customer assumed the spray arms or pump had failed. Filter assembly was packed solid with mineral scale and food debris — it had never been cleaned. Three years of Riverside County hard water through a neglected filter. We pulled and cleaned the filter assembly, descaled the interior, cleared and tested the spray arms (both fine). Dishwasher back to full performance. Total: $89. Customer had been ready to buy a new machine. From the tech: in Menifee, dishwasher filter cleaning every 3 months prevents the most common 'not cleaning' calls.",
+    outcome: '✓ Same day · No parts needed · $89 vs. new machine',
   },
   {
-    q: "What is your diagnostic fee?",
-    a: `$89, applied directly to the repair cost when you proceed. No hidden trip charge to Menifee. We quote on-site after looking at the appliance. What we quote is what appears on the invoice — no surprises.`
-  },
-  {
-    q: "Why does my dryer take two cycles — it's only 9 years old?",
-    a: "In Menifee's tract homes, the most common cause is a partially blocked vent run. Builder-grade homes here often have 15–20 foot vent runs through interior walls, with one or two 90-degree bends. Lint accumulates faster than most people expect, especially in Menifee's dusty inland climate. A restricted vent also runs the heating element hotter than it should, shortening its life. We inspect both the vent path and the heating element on every dryer call. If the vent is the issue, clearing it is a $89–$140 fix. A blocked dryer vent is also a fire hazard."
-  },
-  {
-    q: "My Samsung refrigerator shows an error code — what does that mean?",
-    a: "Samsung error codes point to specific subsystems but don't always identify the root cause. For example, error code 22E or 21E on Samsung French-doors indicates an evaporator fan issue — but the actual cause could be a seized fan motor, a frosted evaporator coil blocking the fan, or a control board misread. We diagnose the actual cause before recommending parts. Most Samsung error codes in Menifee homes resolve to a $120–$250 repair, not a major component replacement."
-  },
-  {
-    q: "Do you serve Wildomar and Lake Elsinore near Menifee?",
-    a: `Yes — Wildomar and Lake Elsinore are within our regular service area from the Menifee dispatch. No surcharge. Call ${phone}.`
-  },
-];
-
-const recentRepairs = [
-  {
-    title: "Samsung RF28HFEDBSR — warm fridge, 22E error code, 2016 model",
-    neighborhood: "Heritage Lake, 92584",
-    description: "Samsung French-door showing 22E — evaporator fan error. This 2016 unit was one of the LG-compressor generation Samsungs in Menifee's Heritage Lake community. Pulled the back panel of the freezer compartment and found the evaporator coil had iced over completely, blocking the fan entirely. Root cause: the defrost heater had failed, allowing ice to accumulate until it locked out the fan. Replaced the defrost heater assembly with an OEM Samsung part, manually defrosted the coil, confirmed the 22E cleared and normal airflow restored. Fan motor was fine — didn't need replacement. Repair: $89 diagnostic + $140 parts and labor.",
-    note: "22E means the fan is blocked or failed. Check the defrost system before assuming the fan motor needs replacing."
-  },
-  {
-    title: "LG WM3700HWA front-load washer — loud grinding on spin, 8 years old",
-    neighborhood: "Paloma Valley, 92585",
-    description: "Classic front-load washer bearing failure. LG front-loaders in Menifee's Paloma Valley homes are mostly 2014–2018 vintage — right in the window where bearing wear shows up. The grinding was coming from the drum bearing on the rear of the tub. Replaced the rear bearing and drum seal as a set — always do both, since a new bearing on a worn seal will just start leaking and destroy the bearing again. Machine running quietly. Customer had been quoted a full tub replacement by another company at $480. Bearing and seal repair: $195.",
-    note: "Always replace bearing and seal together. Half the job with only half the parts leads to a callback."
-  },
-  {
-    title: "Whirlpool WDT750SAHZ dishwasher — not cleaning, filter completely blocked",
-    neighborhood: "Sun City, 92586",
-    description: "Sun City Menifee retirement community has a lot of Whirlpool appliances from the 2015–2020 build wave. This dishwasher was leaving food residue on everything — the customer assumed the spray arms or pump had failed. Filter assembly was packed solid with mineral scale and food debris — it had never been cleaned. Three years of Riverside County hard water through a neglected filter. We pulled and cleaned the filter assembly, descaled the interior, cleared and tested the spray arms (both fine). Dishwasher back to full performance. Total: $89. Customer had been ready to buy a new machine.",
-    note: "In Menifee, dishwasher filter cleaning every 3 months prevents the most common 'not cleaning' calls."
-  },
-  {
-    title: "GE GTD65EBSJWS dryer — not heating, thermal fuse blown, 7 years old",
-    neighborhood: "East Menifee, 92584",
-    description: "GE dryer, no heat. Thermal fuse confirmed open on test. Important: a blown thermal fuse is always a symptom, not a root cause. The fuse blew because something caused the dryer to overheat. Found the vent run — 22 feet through the interior wall to an exterior vent on the east side of the house — partially blocked with lint at the second 90-degree bend. Cleared the blockage, replaced the thermal fuse and the thermal limiter as a set, confirmed airflow at the exterior vent. If we'd replaced only the fuse without clearing the vent, it would have blown again within weeks.",
-    note: "A thermal fuse blows for a reason. Always find that reason before replacing the fuse."
+    appliance: 'GE GTD65EBSJWS Dryer',
+    location: 'East Menifee, 92584',
+    quote: 'Not heating, thermal fuse blown, 7 years old',
+    description: "GE dryer, no heat. Thermal fuse confirmed open on test. Important: a blown thermal fuse is always a symptom, not a root cause. The fuse blew because something caused the dryer to overheat. Found the vent run — 22 feet through the interior wall to an exterior vent on the east side of the house — partially blocked with lint at the second 90-degree bend. Cleared the blockage, replaced the thermal fuse and the thermal limiter as a set, confirmed airflow at the exterior vent. If we'd replaced only the fuse without clearing the vent, it would have blown again within weeks. From the tech: a thermal fuse blows for a reason. Always find that reason before replacing the fuse.",
+    outcome: '✓ Same day · Vent cleared · OEM thermal fuse + limiter',
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Menifee",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Menifee",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'We Know Builder-Grade Failure Patterns',
+    body: "Most Menifee homes have the same generation of Samsung, LG, Whirlpool, GE, and Maytag appliances installed during the 2000–2020 build wave. We know the failure windows, we know the common patterns (Samsung 22E, LG bearing failure, Whirlpool filter clogs), and we diagnose for the root cause — not the symptom.",
   },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    iconKey: 'parts' as const,
+    title: 'OEM Parts on the Truck',
+    body: "We carry OEM parts for the brands and generations we see most in Menifee — Samsung defrost heaters, LG bearing and seal kits, Whirlpool dishwasher pump assemblies, GE thermal fuse pairs. Most calls finish same visit, no waiting for a part to arrive from a distributor.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Honest Repair vs. Replace',
+    body: "If your 14-year-old refrigerator needs a $600 compressor and the unit isn't worth saving, we'll tell you. If your dishwasher just needs a $0-parts filter cleaning that another company quoted as a new machine, we'll tell you that too. We don't manufacture work.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: '90-Day Warranty',
+    body: 'Every repair we do in Menifee comes with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no charge. This applies across all four ZIP codes — Heritage Lake, Paloma Valley, Sun City, Quail Valley.',
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
-};
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Samsung fridge throwing 22E errors and not staying cold. Tech showed up same day, diagnosed the defrost heater in 15 minutes — not the fan motor like another shop had quoted. Total cost was less than half what I was prepared for. Honest work."',
+    author: '— Daniel R., Heritage Lake, Menifee',
+  },
+  {
+    stars: 5,
+    text: '"LG washer was making a grinding noise and another company wanted $480 for a full tub replacement. Same Day looked at it, said the bearing and seal needed replacing as a set, did the repair for $195. Two months later it\'s running quiet. Saved me from buying a new washer."',
+    author: '— Jennifer M., Paloma Valley, Menifee',
+  },
+  {
+    stars: 5,
+    text: '"Whirlpool dishwasher in our Sun City home wasn\'t cleaning anything. I assumed the worst. Tech pulled the filter, showed me what years of hard water had done to it, descaled everything. Charged the diagnostic only — no parts needed. Set me up on a 3-month filter cleaning routine. The kind of honesty I wasn\'t expecting."',
+    author: '— Patricia G., Sun City, Menifee',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate · Honest repair-or-replace assessment' },
+  { appliance: 'Standard Repair', range: '$150–$350', note: 'Parts + labor · OEM parts only · 90-day warranty' },
+  { appliance: 'Builder-Grade Brand Repair', range: '$140–$400', note: 'Samsung, LG, Whirlpool, GE, Maytag · OEM parts' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · Callback at no charge', featured: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Menifee?',
+    answer: 'Yes — Menifee is on our regular Riverside County route. We cover all four ZIP codes (92584, 92585, 92586, 92587) including Heritage Lake, Paloma Valley, Sun City, Quail Valley, East Menifee, and Romoland. Call before noon for same-day service in most cases.',
+  },
+  {
+    question: 'My appliances are 8 to 12 years old — should I repair or replace?',
+    answer: 'Most Menifee homes were built in the 2000–2020 window with builder-grade Samsung, LG, Whirlpool, GE, and Maytag appliances that hit their first major failure window at 8 to 15 years. Our general rule: if the repair cost exceeds 50% of replacement value AND the unit is over 8 to 10 years old, replacement often makes more sense. We give you the honest assessment — we don\'t manufacture repairs that don\'t make economic sense.',
+  },
+  {
+    question: 'What appliance brands do you repair in Menifee?',
+    answer: 'All major brands. The most common in Menifee — because of how the city was built — are Samsung, LG, Whirlpool, GE, Maytag, KitchenAid, Frigidaire, and Bosch. We carry OEM parts for those brands and the specific generations we see most in this area on every truck.',
+  },
+  {
+    question: 'What is your diagnostic fee in Menifee?',
+    answer: 'Our diagnostic fee is $89. It covers the trip to your home, full inspection of the appliance, and a written estimate with itemized parts and labor. If you approve the repair, the $89 is credited toward your invoice — no separate diagnosis charge.',
+  },
+  {
+    question: 'My dryer takes two cycles to dry clothes — is the heating element bad?',
+    answer: 'Maybe — but more often it\'s the vent run, not the appliance. Menifee homes with longer interior vent runs (especially 18+ feet to the exterior vent) accumulate lint at the bends, restricting airflow and forcing the dryer to run longer to remove moisture. We inspect the vent on every Menifee dryer call as part of the diagnostic. If the element actually has failed, we replace it with the thermal fuse and limiter as a set — those usually go together.',
+  },
+  {
+    question: 'Are Samsung error codes worth fixing or do I need a new fridge?',
+    answer: 'Most are worth fixing. Samsung 22E almost always traces to a failed defrost heater (a $40 to $60 OEM part), not the fan motor that another shop might quote you for replacement. Samsung 14E ice maker errors usually trace to the inlet valve or the wire harness routing. We diagnose for root cause, and most Samsung error codes in Menifee homes have straightforward fixes — assuming the unit is younger than about 12 years.',
+  },
+  {
+    question: 'Do you also serve Wildomar, Lake Elsinore, and Murrieta?',
+    answer: 'Yes — Wildomar (92595), Lake Elsinore (92530, 92532), Murrieta (92562, 92563), and Sun City proper are within our regular Riverside County route from the Temecula service territory. Same-day availability and same OEM-parts standard.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Murrieta', slug: 'murrieta' },
+  { name: 'Lake Elsinore', slug: 'lake-elsinore' },
+  { name: 'Temecula', slug: 'temecula' },
+  { name: 'Hemet', slug: 'hemet' },
+  { name: 'Moreno Valley', slug: 'moreno-valley' },
+  { name: 'Riverside', slug: 'riverside' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Menifee, CA"
+    subheadline="Same-day service throughout Heritage Lake, Paloma Valley, Sun City, Quail Valley, and East Menifee. Builder-grade housing specialists. All brands, OEM parts, 90-day warranty. $89 diagnostic — applied to repair."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">Riverside County · ZIP 92584, 92585, 92586, 92587</p>
-        <h1>Appliance Repair<br><span class="accent">Menifee</span></h1>
-        <p class="hero-sub">Same-day service in Heritage Lake, Paloma Valley, Sun City, Quail Valley, and throughout Menifee. All brands. OEM parts. Licensed technicians.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-      <div class="hero-img">
-        <img src="/images/cities/menifee-appliance-repair.jpg" alt="Appliance repair in Menifee CA" width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">📋</span><span>Licensed &amp; Insured</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Menifee — What We See Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Menifee Service"
+    bookingSub="92584 · 92585 · 92586 · 92587"
+  />
 
-  <!-- INTRO + SIDEBAR -->
-  <section class="intro-section container">
-    <div class="intro-content">
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Menifee"
+    services={services}
+  />
 
-      <h2>Appliance Repair in Menifee — What We See Here</h2>
+  <CustomNarrative
+    headline={builderGradeNarrative.headline}
+    paragraphs={builderGradeNarrative.paragraphs}
+    background="white"
+  />
 
-      <p>Menifee is one of the youngest cities in California — incorporated in 2008, built out almost entirely between 2000 and the present. That makes it unusual in the Inland Empire: unlike Corona with its mix of generations, or Rancho Cucamonga with its older Alta Loma stock, Menifee is essentially one housing generation. KB Homes, Lennar, Richmond American — the same builder-grade Samsung, LG, Whirlpool, and GE appliances across most of the city. And those appliances are now 8–15 years old, squarely in the prime failure window.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Menifee Neighborhoods We Service"
+    subheadline="All four Menifee ZIP codes — 92584, 92585, 92586, 92587 — Heritage Lake to Romoland."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>The calls we make in Menifee are predictable in the best way: front-load washer bearings at year 8–10, Samsung ice maker issues at year 7–9, dryer thermal fuses from blocked vent runs in homes where the laundry room is deep in the interior, dishwasher filter failures from Riverside County hard water. We come prepared for what's actually here — not guessing from a generic parts list.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Menifee"
+    jobs={recentJobs}
+  />
 
-      <p>Menifee is also an affordable family city, and that affects how we approach repair-versus-replace conversations. We're not going to recommend a $400 repair on a machine that makes more sense to replace. But we're also not going to push replacement when a targeted $150 repair is the right call. We give you the actual numbers after diagnosis and let you make the decision.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Menifee Homeowners Call Us"
+    reasons={whyReasons}
+  />
 
-      <p>We dispatch from our Pasadena branch for Menifee. Same-day coverage across all four ZIP codes — 92584, 92585, 92586, 92587. Call {phone}.</p>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Menifee Clients Say"
+    testimonials={testimonials}
+  />
 
-    </div>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Menifee"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Menifee</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ Honest Repair vs. Replace Guidance</li>
-        <li>✓ 90-Day Warranty</li>
-        <li>✓ Licensed &amp; Insured</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Menifee"
+    faqs={faqs}
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Menifee</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Riverside County Cities"
+  />
 
-  <!-- MENIFEE FAILURE WINDOW BLOCK -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>What's Failing in Menifee Homes Right Now</h2>
-
-        <p>Because Menifee is a young city with a consistent housing stock, the failure patterns are unusually predictable. Most of the appliances in this city are in one of two generations: the 2005–2012 builds where appliances are now 12–18 years old, and the 2013–2020 builds where they're 5–10 years old. Here's what we see most often at each stage.</p>
-
-        <h3>Front-Load Washers — Bearing Failure at Year 8–12</h3>
-        <p>LG and Samsung front-load washers installed in Menifee's 2010–2015 homes are now hitting the bearing failure window. The symptom is a loud grinding or roaring noise during the spin cycle — sometimes starting quietly and getting progressively worse over months. The rear drum bearing wears out as the seal that protects it gradually fails. We replace the bearing and seal together as a set — replacing just the bearing without the seal leads to a rapid repeat failure as water gets into the new bearing. Cost: $160–$220 for most Samsung and LG models. A new mid-range front-loader is $700–$900. The repair almost always makes sense if the motor and drum are otherwise sound.</p>
-
-        <h3>Samsung &amp; LG Refrigerators — Ice Maker and Evaporator Issues</h3>
-        <p>The Samsung French-door refrigerators in Menifee's Heritage Lake and Paloma Valley homes are 2014–2019 vintage — a generation with documented ice maker and defrost system tendencies. Ice maker failures here are usually: fill tube freezing from a freezer set too cold combined with hard water deposits, ice maker assembly inlet valve solenoid failure, or evaporator fan blockage from ice buildup caused by a failed defrost heater. We diagnose the actual cause before recommending parts. Most resolve to a $120–$250 repair. The LG linear inverter refrigerators from this same era have the start relay issue we've documented across the IE — always test the relay before the compressor.</p>
-
-        <h3>Dryer Vent Runs — The Specific Menifee Problem</h3>
-        <p>Menifee's builder-grade homes were designed with laundry rooms in interior locations — efficiency-driven floor plans that put the laundry room in the center of the house, as far from exterior walls as possible. The result is dryer vent runs of 18–25 feet, often with two 90-degree bends. At that length and complexity, the effective airflow is already marginal — and in Menifee's dusty inland climate, lint accumulates faster than average. We clear partial vent blockages on a high share of every dryer call we make in this city. A thermal fuse replacement without clearing the vent will result in another blown fuse within weeks. We find the blockage every time.</p>
-
-        <h3>Hard Water — Menifee's Maintenance Reality</h3>
-        <p>Riverside County water is consistently hard, and Menifee is no exception. Dishwasher filters clog at 3-month intervals, not 12. Ice maker fill tubes scale up and need descaling every 12–18 months. Washing machine door gaskets in front-loaders accumulate mineral deposits that combine with detergent residue and create the mold and odor problem that LG and Samsung front-loaders are notorious for in hard water areas. Monthly drum cleaning cycles are not optional in this market — they're maintenance.</p>
-
-        <h3>Recommended Maintenance Schedule for Menifee Homes</h3>
-        <ul class="maint-list">
-          <li><strong>Dishwasher filter:</strong> Every 3 months — run a hot white vinegar cycle monthly</li>
-          <li><strong>Refrigerator water filter:</strong> Every 4–5 months (hard water saturates faster)</li>
-          <li><strong>Ice maker descale:</strong> Every 12–18 months, sooner if cubes turn cloudy</li>
-          <li><strong>Front-load washer drum clean:</strong> Monthly with a cleaner tablet</li>
-          <li><strong>Dryer vent inspection:</strong> Every 12 months for runs over 15 feet</li>
-          <li><strong>Condenser coils:</strong> Every 6 months in Menifee summer heat</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Menifee</h2>
-      <p>We cover all of Menifee — Heritage Lake, Paloma Valley, Sun City, Quail Valley, East Menifee, and all surrounding areas. No travel surcharge to any address in the four Menifee ZIP codes.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Wildomar and Lake Elsinore — same dispatch, no surcharge. Call {phone}.</p>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">03</div>
-      <h2>Recent Repairs in Menifee</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- WHY US + REVIEWS + PRICING -->
-  <section class="why-section container">
-    <div class="context-number">04</div>
-    <h2>Why Menifee Residents Call Us</h2>
-
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>We know what's in Menifee homes</h3>
-        <p>KB Homes Heritage Lake, Lennar Paloma Valley, Richmond American East Menifee — we've been in all of them. We know the appliance packages, the vent run lengths, and the failure patterns. We come with the right parts on the truck, not guessing.</p>
-      </div>
-      <div class="why-item">
-        <h3>Honest repair vs. replace</h3>
-        <p>A bearing repair on a 9-year-old LG washer with a sound motor is a good investment. A compressor replacement on a 16-year-old refrigerator is usually not. We give you the real numbers after diagnosis — no pressure either way.</p>
-      </div>
-      <div class="why-item">
-        <h3>We find the root cause</h3>
-        <p>A blown thermal fuse means something caused it to blow. A Samsung error code points to a system, not a cause. We diagnose the actual problem before recommending parts — because fixing the symptom without the cause means a callback in six weeks.</p>
-      </div>
-      <div class="why-item">
-        <h3>OEM parts, not aftermarket</h3>
-        <p>Aftermarket parts fail faster and can void manufacturer warranties on newer units. We source OEM for every repair. In a hard water, high-heat climate where appliances are already working hard, the right part matters.</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Samsung fridge showing error code, another company quoted me $350 for a new fan motor. Same Day came out, found the defrost heater had failed and iced over the fan. Fixed the actual problem for $140. Very impressed with the diagnosis."</p>
-        <p class="reviewer">— Kevin &amp; Tanya M., Heritage Lake</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"LG washer grinding loudly for months, finally called. Tech diagnosed worn rear bearing, replaced it with the seal same visit. Machine runs quiet now. Told us to do monthly drum cleanings going forward. Honest and knowledgeable."</p>
-        <p class="reviewer">— Rosa L., Paloma Valley</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"GE dryer stopped heating. They came same day, found the vent was partially blocked AND the thermal fuse had blown. Fixed both. Explained that just replacing the fuse without clearing the vent would blow it again. Really thorough."</p>
-        <p class="reviewer">— David T., East Menifee</p>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Menifee</h3>
-      <p>Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item">
-          <span class="pi-service">Refrigerator Repair</span>
-          <span class="pi-range">$150–$420</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Washer Repair</span>
-          <span class="pi-range">$140–$360</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Repair</span>
-          <span class="pi-range">$120–$300</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Repair</span>
-          <span class="pi-range">$89–$340</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Oven / Range Repair</span>
-          <span class="pi-range">$130–$380</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Ice Maker Repair</span>
-          <span class="pi-range">$120–$260</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Vent Cleaning</span>
-          <span class="pi-range">$89–$140</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Condenser Coil Cleaning</span>
-          <span class="pi-range">$89–$140</span>
-        </div>
-      </div>
-      <p class="pricing-note">$89 diagnostic applied to repair. No trip charge to Menifee ZIP codes.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq-section container">
-    <h2>Menifee Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/murrieta/">Murrieta</a>
-      <a href="/temecula/">Temecula</a>
-      <a href="/lake-elsinore/">Lake Elsinore</a>
-      <a href="/corona/">Corona</a>
-      <a href="/riverside/">Riverside</a>
-      <a href="/moreno-valley/">Moreno Valley</a>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Menifee Today?</h2>
-      <p>Same-day service in Heritage Lake, Paloma Valley, Sun City, Quail Valley, and all Menifee ZIP codes. No trip charge.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
-.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
-h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
-h1 .accent { color: var(--color-accent); }
-.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
-.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
-.trust-bar { background: var(--color-accent); padding: 1rem 0; }
-.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
-.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
-.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
-.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
-.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
-.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
-.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
-.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
-.services-section { background: var(--color-surface); padding: 4rem 0; }
-.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
-.svc-icon { font-size: 2rem; }
-.svc-name { font-size: .9rem; font-weight: 600; }
-.context-block { padding: 4rem 0; }
-.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
-.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; }
-.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
-.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.maint-list { padding-left: 1.25rem; }
-.maint-list li { margin-bottom: .6rem; line-height: 1.6; color: var(--color-text-body); }
-.neighborhoods-section { padding: 4rem 0; }
-.section-intro { margin-bottom: 2rem; }
-.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
-.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
-.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
-.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
-.nbhd-note { margin-top: 1.5rem; font-size: .875rem; color: var(--color-text-muted); }
-.repairs-section { padding: 4rem 0; }
-.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
-.section-header h2 { font-size: 1.6rem; }
-.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
-.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
-.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
-.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
-.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
-.why-section { padding: 4rem 0; }
-.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
-.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
-.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
-.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
-.reviewer { font-size: .8rem; color: var(--color-text-muted); }
-.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
-.pricing-block h3 { margin-bottom: .5rem; }
-.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.price-item { display: flex; flex-direction: column; gap: .25rem; }
-.pi-service { font-size: .85rem; color: var(--color-text-muted); }
-.pi-range { font-size: 1rem; font-weight: 700; }
-.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
-.faq-section { padding: 4rem 0; }
-.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.faq-list { display: flex; flex-direction: column; gap: .75rem; }
-.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
-.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
-.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
-.nearby-section { padding: 3rem 0; }
-.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
-.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
-.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
-.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
-.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
-.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
-.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
-.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-@media (max-width: 1024px) {
-  .intro-section { grid-template-columns: 1fr; }
-  .sticky-cta-box { position: static; }
-  .services-grid, .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-img { display: none; }
-  .context-inner { grid-template-columns: 1fr; }
-  .repairs-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Menifee Repair Today"
+    body="Same-day service across all four Menifee ZIP codes. Builder-grade Samsung, LG, Whirlpool, GE, Maytag specialists. Call now or book online."
+  />
+</CityLayoutV2>
