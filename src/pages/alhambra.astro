@@ -1,685 +1,302 @@
 ---
-// src/pages/alhambra.astro
-// SDAR — samedayappliance.repair
-// Alhambra, CA 91801 & 91803
-// Филиал: Pasadena · (626) 376-4458
-// GSC: нет данных — новый город
-// Конкуренты: Alhambra Reliable (local, minimal), AlhambraAce/Pros (AI-spam),
-//             Sears (corporate), appliancerepair-alhambraca.com (minimal)
-// Уникальный угол: diverse SGV urban community + Mission District Victorian homes +
-//                  multi-family/condo density + SGVMWD hard water + Main St commercial adjacent
-// Апрель 2026
+/**
+ * Alhambra, CA — Variant A migration (T9 Batch 6, Group 3 Pasadena).
+ * Branch: Pasadena · ZIPs: 91801, 91803 · Source: wiki/migration/content-dumps/alhambra.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Pasadena is service_area)
+ *   - Phone via branches.ts (`branchSlug='pasadena'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Alhambra",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91801", "91803"],
-  phone: "(626) 376-4458",
-  phoneRaw: "+16263764458",
-  email: "pasadena@samedayappliance.repair",
-  branch: "Pasadena",
-  slug: "alhambra",
-};
+const branchSlug = 'pasadena';
+const cityName = 'Alhambra';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Alhambra CA — Same Day | 91801 · Mission District · Main St | (626) 376-4458`;
-const description = `Same-day appliance repair in Alhambra, CA 91801 & 91803. Mission District, Main Street corridor, condos and single-family homes. Samsung, LG, GE, Whirlpool, Sub-Zero. Licensed, OEM parts, 90-day warranty. Weekends available. Call (626) 376-4458.`;
-const canonical = `https://samedayappliance.repair/alhambra/`;
+const title = 'Appliance Repair Alhambra CA | Same Day Service | All Brands';
+const description = 'Same-day appliance repair in Alhambra, CA 91801 & 91803. Mission District, Main Street corridor, condos and single-family homes. SGVMWD hard water specialists. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/alhambra/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Alhambra",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "55 S Lake Ave",
-    "addressLocality": "Pasadena",
-    "addressRegion": "CA",
-    "postalCode": "91101",
-    "addressCountry": "US"
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🥶', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+];
+
+const neighborhoods = [
+  { name: 'Mission District', zip: '91801' },
+  { name: 'Main Street corridor', zip: '91801' },
+  { name: 'Fremont Avenue', zip: '91801' },
+  { name: 'Almansor Street area', zip: '91801' },
+  { name: 'Garfield Avenue corridor', zip: '91801' },
+  { name: 'Atlantic Boulevard', zip: '91803' },
+  { name: 'Valley Boulevard area', zip: '91803' },
+  { name: 'Northeast Alhambra', zip: '91801' },
+  { name: 'Downtown Alhambra', zip: '91801' },
+  { name: 'South Alhambra', zip: '91803' },
+];
+
+const narrativeIntro = [
+  "Alhambra is one of the most diverse urban communities in the San Gabriel Valley — a dense, walkable city where 1920s Mission District Victorians sit a few blocks from mid-rise condos, multi-family buildings cluster around Main Street and Fremont, and the appliance mix runs from inherited GE workhorses to new LG and Samsung installs in recently remodeled kitchens. We service all of it.",
+  "The single biggest factor that shapes our work in Alhambra is water. The city is supplied by the San Gabriel Valley Municipal Water District, which delivers mineral-rich groundwater pulled from the SGV basin. That water is hard — visibly hard — and it shows up first in ice makers, dishwashers, and washing machines. Inlet valves scale, spray arm ports clog, and inlet screens accumulate calcium faster than they would in a softer-water city like Burbank or Glendale. We check for it on every relevant call.",
+  "The other factor is density. Alhambra has a real stock of condos and multi-family buildings, particularly near Main Street, Fremont, and the Mission District. We work with tenants, owners, landlords, and property managers — often on the same call. We can produce written diagnostic reports for property management when needed, and we know how to handle access logistics in stacked and shared-laundry buildings.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'SGVMWD hard water — what to watch for',
+    paragraphs: [
+      "If your dishwasher started leaving spots on glasses that weren't there before, your ice maker has been quietly producing less ice for several months, or your washer's fill cycle has slowed — mineral scale is the most common cause in Alhambra. The fix is rarely a big repair; it's usually descaling and an inlet-valve service before the valve fails outright. Catching it early matters: a scaled inlet valve eventually fails completely, and at that point you're looking at a part replacement rather than a maintenance flush.",
+      "We recommend running a dishwasher descaling tablet monthly in Alhambra, replacing refrigerator water filters every 6 months instead of the manufacturer-default 12, and having the ice maker inlet valve inspected annually if the unit is more than 4 years old. None of this is expensive on its own — it just gets expensive when it's neglected.",
+    ],
   },
-  "areaServed": [
-    { "@type": "City", "name": "Alhambra", "sameAs": "https://en.wikipedia.org/wiki/Alhambra,_California" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    title: 'Mission District homes and Main Street condos',
+    paragraphs: [
+      "The 1920s Mission District homes have their own pattern: original kitchens have been remodeled once or twice, and the appliance install conditions vary widely. Tight clearances behind built-in refrigerators, gas lines that were sized for a smaller range, drain plumbing that wasn't planned for a modern dishwasher pump. We've seen all of it and we work in those spaces carefully.",
+      "The Main Street and Fremont condo stock is a different challenge — stacked laundry installations, shared utility rooms, and HOA rules around appliance service and water shutoffs. We coordinate access, work clean, and document the repair so HOAs and property managers have what they need.",
+    ],
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'Samsung Refrigerator',
+    neighborhood: 'Mission District',
+    title: 'Samsung French door — ice maker dropped to almost nothing',
+    body: "Samsung French door, gradual ice production decline over about four months — classic SGVMWD hard water mineral buildup on the inlet valve. Owner thought the ice maker was dying. We replaced the inlet valve with an OEM Samsung part, flushed the water line, and replaced the in-door filter (original, never changed in 3 years). Full ice production within 24 hours. Owner now on a 6-month filter cycle and understands why this happens in Alhambra.",
+    part: 'OEM Samsung inlet valve + in-door filter',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM Samsung · Hard water plan set',
+  },
+  {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Main Street corridor',
+    title: 'Bosch dishwasher — glasses cloudy, water barely circulating',
+    body: "Bosch in a recently remodeled Main Street condo — spray arm ports almost completely blocked with SGVMWD mineral scale. Both upper and lower spray arms affected. Descaled both assemblies completely, cleaned the filter trap (significant buildup), ran a citric acid maintenance cycle, confirmed full rotation on both arms. Showed the homeowner the scale we'd cleared from the ports — they were genuinely shocked at the volume. Set them up on a monthly descaling tablet routine. Glasses came out clear from the first load after.",
+    part: 'Spray arm descale + filter clean',
+    time: '1.5 hours',
+    result: '✓ Same day · Scale cleared · Routine explained',
+  },
+  {
+    badge: 'LG Washer',
+    neighborhood: 'Fremont Avenue',
+    title: 'LG front-loader — slow fill, error code on long cycles',
+    body: "LG front-loader in a multi-family building on Fremont — slow fill, cycle errors on longer programs. Both inlet screens were caked with calcium and fine sediment from the SGV water. Pulled both inlets, cleaned the screens (the cold side was nearly closed off), checked the inlet valve operation, ran a full diagnostic cycle. Fill rate back to spec. Property manager wanted documentation for the file — we left a written diagnostic report on the way out.",
+    part: 'Inlet screen clean + valve test',
+    time: '1 hour',
+    result: '✓ Same day · Fill rate restored · Report on file',
+  },
+  {
+    badge: 'GE Refrigerator',
+    neighborhood: 'Almansor Street',
+    title: 'GE side-by-side — not cooling, working hard',
+    body: "Older GE side-by-side in a 1920s Mission District home, tight clearance behind the unit. Compressor running but cabinet temps in the high 50s. Condenser coils were heavily dust-loaded — typical for this kind of older install where the kickplate doesn't get pulled often. Full coil cleaning, fan motor inspection (healthy), gasket check, temperature verified before leaving. We left the homeowner with an annual maintenance schedule appropriate for the install location.",
+    part: 'Coil cleaning + fan inspection',
+    time: '1.5 hours',
+    result: '✓ Same day · Coils cleaned · Temps verified',
+  },
+];
+
+const reviews = [
+  {
+    text: "Our Samsung ice maker had been getting worse for months — turns out it was the water in Alhambra causing buildup on the valve. They replaced the part, explained the SGV water situation clearly, and put us on a 6-month filter routine. Ice production is fully back. Honest and informative.",
+    author: '— A. Nguyen, Mission District',
+  },
+  {
+    text: "Bosch dishwasher leaving spots on every glass. Tech showed me the mineral buildup on the spray arms — I had no idea how much had accumulated. He cleared everything, gave me a maintenance plan, and the next load came out perfect. Same day on a Saturday, no upsell, no fluff.",
+    author: '— J. Hernandez, Main Street area',
+  },
+  {
+    text: "I manage a multi-family building on Fremont and called for a tenant's washer issue. They were professional with the tenant, fixed the inlet screens, and left me with a written report for the file. That's the kind of service I'll keep using for the property.",
+    author: '— M. Lee, property manager, Fremont Avenue',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · SGV hard water assessment included' },
+  { label: 'Standard Repair', price: '$150–$400', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Luxury Brand Repair', price: '$250–$600+', note: 'Sub-Zero, Wolf, Thermador, Miele · OEM parts' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Alhambra?',
+    answer: 'Yes. Our technicians cover all of Alhambra — 91801 and 91803 — including the Mission District, the Main Street corridor, Fremont Avenue, Almansor Street, and all residential streets and condo buildings throughout the city. Call before noon for same-day afternoon service in most cases.',
+  },
+  {
+    question: 'Does hard water in Alhambra affect appliances?',
+    answer: 'Yes — significantly. Alhambra is served by the San Gabriel Valley Municipal Water District, which delivers mineral-rich groundwater from the SGV basin. Ice maker inlet valves, dishwasher spray arms, and washing machine inlet screens accumulate scale faster than in softer-water cities. We check for this proactively on every Alhambra call involving ice makers, dishwashers, and washers.',
+  },
+  {
+    question: 'Do you repair appliances in Alhambra condos and multi-family buildings?',
+    answer: 'Yes. Alhambra has a significant stock of condos, apartment buildings, and multi-family units, particularly near Main Street and Fremont. We work with tenants, homeowners, landlords, and property managers, and we can prepare written diagnostic reports for property management when needed.',
+  },
+  {
+    question: 'What is your diagnostic fee in Alhambra?',
+    answer: 'Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice. Most Alhambra repairs run $150–$400 depending on the appliance and the failure.',
+  },
+  {
+    question: 'What appliance brands do you repair in Alhambra?',
+    answer: 'All major brands — Samsung, LG, GE, Whirlpool, Maytag, Frigidaire, KitchenAid, Bosch — and luxury brands including Sub-Zero, Wolf, Thermador, and Miele in the higher-end Mission District and recently remodeled homes. OEM parts for all of them on our trucks.',
+  },
+  {
+    question: 'Are you available on weekends in Alhambra?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm. Weekend appointments are common in Alhambra and we keep them on the regular Pasadena route.',
+  },
+  {
+    question: 'Do you also serve nearby San Gabriel, Monterey Park, and Temple City?',
+    answer: 'Yes — those cities are all part of our regular SGV service area out of the Pasadena branch. Same-day service, same pricing, same warranty.',
+  },
+];
+
+const nearby = [
+  { slug: 'pasadena', name: 'Pasadena' },
+  { slug: 'south-pasadena', name: 'South Pasadena' },
+  { slug: 'san-gabriel', name: 'San Gabriel' },
+  { slug: 'monterey-park', name: 'Monterey Park' },
+  { slug: 'temple-city', name: 'Temple City' },
+  { slug: 'arcadia', name: 'Arcadia' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Alhambra', sameAs: 'https://en.wikipedia.org/wiki/Alhambra,_California' },
+    { '@type': 'PostalCode', name: '91801' },
+    { '@type': 'PostalCode', name: '91803' },
+    { '@type': 'Place', name: 'Mission District' },
+    { '@type': 'Place', name: 'Main Street corridor' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Alhambra, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Alhambra — 91801 and 91803 — including the Mission District, the Main Street corridor, Fremont Avenue, Almansor Street, and all residential streets throughout the city, including condos and multi-family buildings. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Does hard water in Alhambra affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Alhambra is served by the San Gabriel Valley Municipal Water District, which delivers mineral-rich groundwater from the SGV basin. Ice maker inlet valves, dishwasher spray arms, and washing machine inlet screens accumulate scale faster than in softer-water cities. We check for this proactively on every Alhambra call involving ice makers and dishwashers." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair appliances in Alhambra condos and multi-family buildings?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Alhambra has a significant stock of condos, apartment buildings, and multi-family units, particularly in the denser parts of the city near Main Street and Fremont. We work with tenants, homeowners, landlords, and property managers. We can prepare written diagnostic reports for property management if needed." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Alhambra?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, Sub-Zero, Wolf, Viking, Thermador, Miele, and more. We carry OEM parts on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Alhambra?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Alhambra?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Alhambra repairs run $150–$400 depending on the appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve San Gabriel, Temple City, and Monterey Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Alhambra service area extends to San Gabriel, Temple City, Monterey Park, Rosemead, San Marino, South Pasadena, and Pasadena. All within our regular SGV route." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="alh-hero">
-    <div class="alh-hero__inner container">
-      <div class="alh-hero__content">
-        <div class="alh-hero__eyebrow">Alhambra, CA · 91801 & 91803 · Mission District · Main Street · Fremont Ave</div>
-        <h1 class="alh-hero__h1">
-          Appliance Repair<br>
-          <span class="alh-hero__accent">Alhambra, CA</span>
-        </h1>
-        <p class="alh-hero__sub">
-          Houses, condos, and apartments throughout all of Alhambra 91801 and 91803.
-          Samsung, LG, GE, Whirlpool, Sub-Zero — all brands. Same-day service,
-          OEM parts, 90-day warranty. Tenants and landlords both welcome.
-          Weekends available.
-        </p>
-        <div class="alh-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="alh-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="alh-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-alhambra-ca.webp"
-          alt="Appliance repair in Alhambra CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Alhambra, CA · Los Angeles County · 91801 & 91803"
+    headlineMain="Appliance repair in"
+    headlineAccent="Alhambra, CA"
+    subheadline="Same-day service across all of Alhambra. Mission District, Main Street, Fremont. SGVMWD hard water specialists. OEM parts, 90-day warranty. $89 diagnostic — waived with repair."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="The City & The Water"
+    headline="Diverse SGV neighborhoods,"
+    headlineAccent="mineral-rich water"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="alh-intro">
-    <div class="container alh-intro__inner">
-      <div class="alh-intro__text">
-        <h2>Appliance Repair in Alhambra — What to Know</h2>
-        <p>
-          Alhambra is one of the denser residential cities in the San Gabriel Valley —
-          a mix of single-family homes, condos, and multi-family buildings spread across
-          91801 and 91803. The Mission District and surrounding historic streets have
-          well-maintained Victorian and Craftsman homes from the early 1900s. The denser
-          corridors near Main Street and Fremont have condos and apartment buildings.
-          North Alhambra toward San Marino borders runs larger, more recently updated
-          single-family homes.
-        </p>
-        <p>
-          We work in all of these. Tenants calling about a broken washer in a condo on
-          Chapel Avenue, a homeowner on Almansor with a Samsung refrigerator that stopped
-          cooling, a property manager on Fremont who needs a dryer fixed in a rental
-          unit — same day, same quality, we handle the different logistics of each.
-          If you're a tenant and need documentation for your landlord, we can prepare
-          a written diagnostic report.
-        </p>
-        <p>
-          Hard water is a consistent factor in Alhambra. The San Gabriel Valley Municipal
-          Water District delivers mineral-rich groundwater throughout this area — ice maker
-          inlet valves and dishwasher spray arms scale up faster here than in softer-water
-          cities. We check proactively on every Alhambra call involving ice makers and
-          dishwashers. Older supply lines in the pre-war Mission District homes can add
-          to the mineral content further.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong>. Available
-          <strong>Saturdays and Sundays</strong>.
-        </p>
-        <div class="alh-tip">
-          <div class="alh-tip__icon">💧</div>
-          <div class="alh-tip__text">
-            <strong>Hard water tip for Alhambra:</strong> SGVMWD groundwater plus
-            older supply lines in pre-war homes is a combination that accelerates
-            scale buildup on ice maker inlet valves and dishwasher spray arms faster
-            than most SGV cities. If your ice maker output has dropped gradually over
-            several months, or your dishwasher leaves film despite clean filters —
-            mineral scale on the inlet valve is the most common cause in 91801.
-          </div>
-        </div>
-      </div>
-      <div class="alh-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Alhambra Service Team</div>
-          <div class="cta-box__sub">91801 · 91803 · Houses & condos</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliances we repair in"
+    headlineAccent="Alhambra"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="alh-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Alhambra</h2>
-      <p class="section-sub">All brands · SGVMWD hard water aware · Houses, condos & apartments · 91801 & 91803</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Alhambra neighborhoods"
+    headlineAccent="we service"
+    subheadline="Mission District to South Alhambra — single-family, condo, and multi-family across 91801 and 91803."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/alhambra/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Hard water ice maker · Not cooling · Fan motor · Temperature off</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Alhambra"
+    jobs={jobs}
+  />
 
-        <a href="/alhambra/dishwasher-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Hard water spray arm · Not draining · Error codes · Spots on glasses</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/alhambra/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Not draining · Not spinning · Error codes · Condo stackable</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Alhambra"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/alhambra/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Alhambra"
+    cards={pricingCards}
+    bottomNote="Residential pricing only. Parts and labor included in the repair quote — no surprise add-ons."
+  />
 
-        <a href="/alhambra/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Gas & electric</div>
-          <div class="service-card__brands">GE · Samsung · Bosch · Wolf · Viking · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Alhambra"
+    faqs={faqs}
+  />
 
-        <a href="/alhambra/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Hard water inlet valve · Not freezing · Ice stopped · Frost</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/alhambra/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/alhambra/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter · Gas burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · Thermador · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="alh-neighborhoods">
-    <div class="container">
-      <h2>All of Alhambra — 91801 & 91803</h2>
-      <p class="section-sub">Mission District to North Alhambra — every neighborhood</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Alhambra Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Mission District</div>
-            <div class="nh-item featured">Main Street corridor</div>
-            <div class="nh-item featured">Fremont Ave area</div>
-            <div class="nh-item">Almansor Park neighborhood</div>
-            <div class="nh-item">North Alhambra</div>
-            <div class="nh-item">South Alhambra</div>
-            <div class="nh-item">Chapel Ave corridor</div>
-            <div class="nh-item">Midwick Tract</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Main Street</div>
-            <div class="nh-item">Fremont Ave</div>
-            <div class="nh-item">Garfield Ave</div>
-            <div class="nh-item">Valley Blvd</div>
-            <div class="nh-item">Almansor St</div>
-            <div class="nh-item">Chapel Ave</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">San Marino (91108)</div>
-            <div class="nh-item">South Pasadena (91030)</div>
-            <div class="nh-item">San Gabriel (91775)</div>
-            <div class="nh-item">Temple City (91780)</div>
-            <div class="nh-item">Monterey Park (91754)</div>
-            <div class="nh-item">Rosemead (91770)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="alh-recent">
-    <div class="container">
-      <h2>Recent Jobs in Alhambra</h2>
-      <p class="section-sub">Real calls from 91801 and 91803 — houses, condos, SGVMWD hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Mission District, 91801</span>
-          </div>
-          <div class="recent-card__title">"Ice maker slowed to almost nothing over 4 months"</div>
-          <div class="recent-card__desc">
-            1920s Mission District bungalow — the original galvanized pipes were still
-            in place, adding iron to the SGVMWD mineral content. Samsung French door:
-            inlet valve almost completely blocked with iron-calcium scale. Replaced
-            with an OEM Samsung inlet valve, flushed the water line thoroughly, replaced
-            the in-door filter (over 14 months old). Full production within 24 hours.
-            Explained the combined effect of the older pipes and SGV water hardness —
-            owner switched to 6-month filter replacement and set an annual inlet valve
-            inspection.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung inlet valve · Older pipe factor explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Washer</span>
-            <span class="recent-location">Chapel Ave condo, 91803</span>
-          </div>
-          <div class="recent-card__title">"OE error, standing water — tenant called, landlord MIA"</div>
-          <div class="recent-card__desc">
-            Condo unit on Chapel — tenant had been dealing with standing water in the
-            washer for over a week, landlord not responding. LG front-loader OE drain
-            error from a blocked pump filter — lint and debris from an older building
-            connection. Cleared the pump filter, tested three full cycles, confirmed
-            complete drain. Prepared a written diagnostic report and itemized estimate
-            for the tenant to forward to the property owner. Tenant had documentation
-            in hand within the hour.
-          </div>
-          <div class="recent-card__result">✓ Same day · OE resolved · Written report for landlord provided</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Almansor Park, 91801</span>
-          </div>
-          <div class="recent-card__title">"Film on everything — even freshly cleaned glasses look dirty"</div>
-          <div class="recent-card__desc">
-            Classic SGVMWD hard water presentation — Bosch 500 series with both spray
-            arm ports nearly closed with mineral deposits. Less than two years since
-            installation. Descaled both spray arms completely, deep-cleaned the filter
-            assembly, ran a citric acid cycle to clear residual buildup from the
-            interior walls. Showed the homeowner the extracted scale — visibly
-            significant for such a new machine. Monthly maintenance tablet routine
-            explained. First load out: clean glasses.
-          </div>
-          <div class="recent-card__result">✓ Same day · Scale cleared · Monthly routine advised · Clean first load</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">GE Dryer</span>
-            <span class="recent-location">North Alhambra, 91803</span>
-          </div>
-          <div class="recent-card__title">"Takes forever to dry — two full cycles every time"</div>
-          <div class="recent-card__desc">
-            GE electric dryer in a North Alhambra home — thermal fuse blown from a
-            partially blocked vent run. The vent terminated at the side of the garage
-            with a plastic flap cap that had bent inward, restricting airflow to
-            roughly 30%. Replaced the thermal fuse, replaced the damaged vent cap with
-            a proper metal backdraft damper, confirmed strong airflow at the termination.
-            Single-cycle drying from the first test load. Homeowner had been double-cycling
-            for at least six months.
-          </div>
-          <div class="recent-card__result">✓ Same day · Thermal fuse · Vent cap replaced · Single cycle confirmed</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="alh-why">
-    <div class="container">
-      <h2>Why Alhambra Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">Houses, Condos & Apartments</div>
-          <div class="why-text">Alhambra has a wide range of housing types — single-family homes in the Mission District, condos near Main Street, apartments throughout 91801 and 91803. We work in all of them. Tenants, homeowners, landlords, property managers all welcome. We can prepare written diagnostic reports if needed.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">SGVMWD Hard Water</div>
-          <div class="why-text">San Gabriel Valley Municipal Water District groundwater accelerates mineral scale on ice makers and dishwashers throughout this area. Older Mission District homes with galvanized pipes compound the effect further. We test for this proactively on every relevant Alhambra call.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📅</div>
-          <div class="why-title">Weekends Available</div>
-          <div class="why-text">Saturday 8am–7pm and Sunday 9am–5pm. If your appliance breaks on a weekend, you don't have to wait until Monday. We cover Alhambra as a regular part of our SGV Saturday route.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="alh-reviews">
-    <div class="container">
-      <h2>What Alhambra Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Samsung ice maker had been slowing down for months. Tech came to our Mission District house, identified the mineral buildup from our old pipes plus the SGV water, replaced the inlet valve, and explained exactly what to do going forward. Full ice production by the next morning. Very knowledgeable and thorough."</div>
-          <div class="review-author">— Henry C., Mission District, Alhambra</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"I'm a renter and my landlord wouldn't respond about the broken washer. Same Day came out, fixed the drain error, AND gave me a written diagnostic report I could forward to the property manager. Situation resolved within 24 hours. This is exactly how a repair company should handle tenant situations."</div>
-          <div class="review-author">— Jenny W., Chapel Ave, Alhambra</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Almost-new Bosch dishwasher leaving film on everything. Tech showed me the mineral scale on both spray arms — never would have guessed how much builds up in under two years with our water. Cleared everything, gave me a maintenance routine. Clean dishes from the very first load after. Very satisfied."</div>
-          <div class="review-author">— Michelle T., Almansor Park, Alhambra</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="alh-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Alhambra</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">SGVMWD hard water inlet valve · Fan motor · OEM parts</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Hard water descaling · Drain pump · Spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump · Thermal fuse · Vent cleaning · Stackable</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Built-in kitchen configurations</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="alh-faq">
-    <div class="container">
-      <h2>Questions Alhambra Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Alhambra, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Alhambra — 91801 and 91803 — including the Mission District, Main Street corridor, Fremont Avenue, Almansor Street, and all residential streets, condos, and multi-family buildings. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does hard water in Alhambra affect appliances?</summary><div class="faq-answer">Yes. SGVMWD delivers mineral-rich groundwater throughout Alhambra. Older Mission District homes with galvanized pipes compound the effect. Ice maker inlet valves and dishwasher spray arms scale faster here than in softer-water cities. We test for this proactively on every relevant Alhambra call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair appliances in Alhambra condos and apartments?</summary><div class="faq-answer">Yes. We work with tenants, homeowners, landlords, and property managers. If you're a tenant and need documentation for your landlord, we can prepare a written diagnostic report — it comes up regularly in Alhambra.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Alhambra?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Alhambra?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Viking, Thermador, Miele, and more. We carry OEM parts on every service vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Alhambra?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Alhambra repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve San Gabriel, Temple City, and Monterey Park?</summary><div class="faq-answer">Yes. Our Alhambra service extends to San Gabriel, Temple City, Monterey Park, Rosemead, San Marino, and South Pasadena. All within our regular SGV route.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="alh-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/south-pasadena/" class="nearby-link">South Pasadena</a>
-        <a href="/san-marino/" class="nearby-link">San Marino</a>
-        <a href="/arcadia/" class="nearby-link">Arcadia</a>
-        <a href="/monrovia/" class="nearby-link">Monrovia</a>
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="alh-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Alhambra?</h2>
-          <p>Houses · Condos · Apartments · SGVMWD hard water specialists. 91801 & 91803. Tenants welcome. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Alhambra, CA 91801 & 91803</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --alh-red: #C8102E; --alh-black: #0a0a0a; --alh-gray: #f5f5f5; --alh-border: #e2e2e2; --alh-text: #1a1a1a; --alh-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .alh-hero { background: var(--alh-black); color: white; padding: 80px 0 60px; }
-  .alh-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .alh-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--alh-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .alh-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .alh-hero__accent { color: var(--alh-red); }
-  .alh-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .alh-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .alh-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .alh-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--alh-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .alh-bottom-cta .btn-secondary { color: var(--alh-text); border-color: var(--alh-border); }
-  .trust-bar { background: var(--alh-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .alh-intro { padding: 72px 0; background: white; }
-  .alh-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .alh-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--alh-black); margin-bottom: 20px; }
-  .alh-intro__text p { font-size: 16px; line-height: 1.7; color: var(--alh-text); margin-bottom: 16px; }
-  .alh-tip { display: flex; gap: 14px; background: #eef6ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .alh-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .alh-tip__text { font-size: 14px; color: var(--alh-text); line-height: 1.6; }
-  .cta-box { background: var(--alh-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--alh-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--alh-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--alh-muted); text-align: center; margin-bottom: 40px; }
-  .alh-services { padding: 72px 0; background: var(--alh-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--alh-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--alh-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--alh-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--alh-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--alh-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--alh-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--alh-red); font-weight: 500; }
-  .alh-neighborhoods { padding: 72px 0; background: white; }
-  .alh-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--alh-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--alh-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--alh-text); padding: 8px 12px; background: var(--alh-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--alh-red); color: var(--alh-black); font-weight: 500; }
-  .alh-recent { padding: 72px 0; background: var(--alh-gray); }
-  .alh-recent h2 { font-size: 30px; font-weight: 700; color: var(--alh-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--alh-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--alh-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--alh-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--alh-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--alh-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .alh-why { padding: 72px 0; background: white; }
-  .alh-why h2 { font-size: 30px; font-weight: 700; color: var(--alh-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--alh-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--alh-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--alh-muted); line-height: 1.6; }
-  .alh-reviews { padding: 72px 0; background: var(--alh-gray); }
-  .alh-reviews h2 { font-size: 30px; font-weight: 700; color: var(--alh-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--alh-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--alh-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--alh-muted); font-weight: 500; }
-  .alh-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--alh-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--alh-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--alh-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--alh-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--alh-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--alh-red); }
-  .pricing-card__note { font-size: 13px; color: var(--alh-muted); }
-  .alh-faq { padding: 72px 0; background: var(--alh-gray); }
-  .alh-faq h2 { font-size: 30px; font-weight: 700; color: var(--alh-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--alh-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--alh-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--alh-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--alh-text); }
-  .alh-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--alh-border); }
-  .alh-nearby h2 { font-size: 20px; font-weight: 600; color: var(--alh-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--alh-border); border-radius: 20px; font-size: 14px; color: var(--alh-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--alh-red); color: var(--alh-red); }
-  .alh-bottom-cta { padding: 72px 0; background: var(--alh-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .alh-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .alh-hero__inner { grid-template-columns: 1fr; } .alh-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .alh-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Alhambra repair today"
+    body="Same-day service from our Pasadena branch. All of Alhambra — Mission District, Main Street, Fremont, and every condo and single-family street in 91801 and 91803. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>

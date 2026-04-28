@@ -1,677 +1,303 @@
 ---
-// src/pages/arcadia.astro
-// SDAR — samedayappliance.repair
-// Arcadia, CA 91006 & 91007
-// Филиал: Pasadena · (626) 376-4458
-// GSC: нет данных — новый город с нуля
-// Конкуренты: SoCal Appliance Pro, TruePro, Appliance Repair Men — все generic
-// Уникальный угол: Chinese-American community ("Beverly Hills of SGV") + 
-//                  Highlands/Baldwin Stocker luxury + SGVMWD hard water
-// Апрель 2026
+/**
+ * Arcadia, CA — Variant A migration (T9 Batch 6, Group 3 Pasadena).
+ * Branch: Pasadena · ZIPs: 91006, 91007 · Source: wiki/migration/content-dumps/arcadia.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Pasadena is service_area)
+ *   - Phone via branches.ts (`branchSlug='pasadena'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Arcadia",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91006", "91007"],
-  phone: "(626) 376-4458",
-  phoneRaw: "+16263764458",
-  email: "pasadena@samedayappliance.repair",
-  branch: "Pasadena",
-  slug: "arcadia",
-};
+const branchSlug = 'pasadena';
+const cityName = 'Arcadia';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Arcadia CA — Same Day | Highlands · Baldwin Stocker · 91006 | (626) 376-4458`;
-const description = `Same-day appliance repair in Arcadia, CA 91006 & 91007. Arcadia Highlands, Baldwin Stocker, Live Oak, Santa Anita. Sub-Zero, Wolf, Samsung, LG. Licensed, OEM parts, 90-day warranty. Call (626) 376-4458.`;
-const canonical = `https://samedayappliance.repair/arcadia/`;
+const title = 'Appliance Repair Arcadia CA | Same Day Service | All Brands';
+const description = 'Same-day appliance repair in Arcadia, CA 91006 & 91007. Highlands, Baldwin Stocker, Live Oak, Santa Anita. Sub-Zero, Wolf, Bosch, Samsung, LG. SGVMWD hard water specialists. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/arcadia/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Arcadia",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "55 S Lake Ave",
-    "addressLocality": "Pasadena",
-    "addressRegion": "CA",
-    "postalCode": "91101",
-    "addressCountry": "US"
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🥶', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+];
+
+const neighborhoods = [
+  { name: 'Arcadia Highlands', zip: '91006' },
+  { name: 'Baldwin Stocker', zip: '91007' },
+  { name: 'Live Oak', zip: '91006' },
+  { name: 'Santa Anita area', zip: '91007' },
+  { name: 'Highland Oaks', zip: '91006' },
+  { name: 'Downtown Arcadia', zip: '91007' },
+  { name: 'North Arcadia', zip: '91006' },
+  { name: 'South Arcadia', zip: '91007' },
+  { name: 'Foothill Boulevard corridor', zip: '91006' },
+  { name: 'Huntington Drive corridor', zip: '91007' },
+];
+
+const narrativeIntro = [
+  "Arcadia is a tale of two appliance environments inside a single city. The Highlands and Baldwin Stocker estates run heavily on built-in luxury — Sub-Zero refrigeration, Wolf and Thermador ranges, Miele dishwashers, occasional Gaggenau steam ovens — installed in custom kitchens where the cabinetry, ventilation, and clearances were designed around the appliance. Repair work in those homes is precise: the right OEM part, careful handling of panel-front cabinetry, and an understanding that a 48-inch built-in column is not a 36-inch freestanding fridge.",
+  "On the other side of the city, the Santa Anita and Live Oak neighborhoods are a mix of mid-century ranch homes and newer construction with mainstream brands — Samsung, LG, GE, Whirlpool, Bosch. The repair work is more standard, but the appliances see heavier use in larger family kitchens.",
+  "What unites both ends of Arcadia is the water. The city is supplied by the San Gabriel Valley Municipal Water District, which delivers mineral-rich groundwater. In a Sub-Zero in the Highlands and an LG in Live Oak, the same thing happens: ice maker inlet valves scale, dishwasher spray arm ports clog, washer inlet screens accumulate calcium. We test the inlet valve and check for mineral deposits on every relevant call.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'SGVMWD hard water — the Arcadia pattern',
+    paragraphs: [
+      "If your dishwasher started leaving spots on glasses that weren't there before, or your ice maker is producing noticeably less ice, mineral scale on the inlet valve is the most likely cause in the SGV. Running a dishwasher descaling tablet monthly and replacing your refrigerator water filter every 6 months — not 12, regardless of what the manufacturer says — both help significantly. We explain this on every relevant Arcadia call.",
+      "The pattern we see in Highlands and Baldwin Stocker Sub-Zeros is a slow ice-production decline followed by complete stoppage. By the time the homeowner calls, the inlet valve orifice is almost entirely blocked. The fix is an OEM Sub-Zero inlet valve and a thorough water-line flush. Catching it earlier — at the slow-decline stage — is faster and cheaper.",
+    ],
   },
-  "areaServed": [
-    { "@type": "City", "name": "Arcadia", "sameAs": "https://en.wikipedia.org/wiki/Arcadia,_California" },
-    { "@type": "Neighborhood", "name": "Arcadia Highlands" },
-    { "@type": "Neighborhood", "name": "Baldwin Stocker" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    title: 'Highlands and Baldwin Stocker — luxury depth',
+    paragraphs: [
+      "We carry OEM parts for Sub-Zero, Wolf, Thermador, Miele, and Bosch on the truck. We've worked in custom stone-hood Wolf installs, panel-ready Bosch dishwashers in Baldwin Stocker, and Sub-Zero columns with tight kitchen-island clearances on Live Oak. The skill set is depth on these specific brands plus the patience to handle the cabinetry around them.",
+      "Calibration matters on this equipment. Wolf ovens that arrive 20°F low after a few years of cooking aren't unusual, and a calibration after an igniter replacement is part of the job. The household chef's sign-off is the real acceptance test — and it should be.",
+    ],
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'Sub-Zero Refrigerator',
+    neighborhood: 'Arcadia Highlands',
+    title: 'Sub-Zero — ice maker stopped completely, no ice at all',
+    body: "Highlands estate, Sub-Zero 48-inch built-in column. Gradual decline in ice production over months followed by complete stoppage — textbook SGVMWD hard water mineral scale on the inlet valve. The valve orifice was almost entirely blocked with calcium deposits. Replaced with an OEM Sub-Zero inlet valve, flushed the water line thoroughly, replaced the in-door filter (overdue). Full ice production within 24 hours. Owner now on a 6-month filter cycle and annual inlet valve inspection — essential in this water district.",
+    part: 'OEM Sub-Zero inlet valve + filter',
+    time: '2 hours',
+    result: '✓ Same day · OEM Sub-Zero · Hard water plan set',
+  },
+  {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Baldwin Stocker',
+    title: 'Bosch dishwasher — glasses cloudy, water barely circulating',
+    body: "Bosch 800 series in a Baldwin Stocker home — spray arm ports almost completely blocked with SGVMWD mineral scale. Both upper and lower spray arms affected. Descaled both assemblies completely, cleaned the filter trap (significant buildup), ran a citric acid maintenance cycle, confirmed full rotation on both arms. Showed the homeowner the mineral deposits — they were shocked at how much had accumulated in 18 months. Set them up on a monthly tablet routine. Glasses came out clear from the first load after.",
+    part: 'Spray arm descale + filter clean',
+    time: '1.5 hours',
+    result: '✓ Same day · Scale cleared · Routine explained',
+  },
+  {
+    badge: 'Samsung French Door',
+    neighborhood: 'Live Oak',
+    title: 'Samsung — fridge warm, freezer running fine',
+    body: "Classic Samsung dual-evaporator presentation — upper evaporator fan motor seized, fresh food section without airflow while the freezer ran on its own system. Samsung French door in a Live Oak family home, kitchen island layout with tight clearance behind the fridge. Replaced the fan motor with an OEM Samsung part, cleared the blocked defrost drain, ran a full defrost and temperature cycle. Back to 37°F within two hours of the visit.",
+    part: 'OEM Samsung evaporator fan motor',
+    time: '2 hours',
+    result: '✓ Same day · OEM Samsung · Back to temperature',
+  },
+  {
+    badge: 'Wolf Range',
+    neighborhood: 'Arcadia Highlands',
+    title: "Wolf range — oven won't reach temperature, star burner sparking",
+    body: "Wolf 36-inch dual-fuel in a Highlands kitchen — oven igniter drawing weak current (the igniter glows but can't draw enough amperage to reliably open the gas valve, a classic Wolf failure mode). Surface igniter electrode corroded from kitchen moisture exposure. Replaced oven igniter and surface electrode with OEM Wolf parts, calibrated oven — it was running 20°F low. Chef of the household tested three dishes after the repair. Approved.",
+    part: 'OEM Wolf igniter + surface electrode',
+    time: '2.5 hours',
+    result: '✓ Same day · OEM Wolf · Calibrated +20°F · Chef approved',
+  },
+];
+
+const reviews = [
+  {
+    text: "Our Sub-Zero stopped making ice completely. Same Day came out to our Highlands home, identified the hard water valve blockage right away, replaced the part, and explained the water quality issue in Arcadia. Ice maker fully working and we now understand why it kept failing. Very professional and knowledgeable.",
+    author: '— Linda C., Arcadia Highlands',
+  },
+  {
+    text: "Bosch dishwasher leaving spots on everything. Tech came to our Baldwin Stocker home, showed me the mineral scale on both spray arms — I had no idea how much had built up in 18 months. Cleared everything, gave us a maintenance routine. Running perfectly now. Would not have guessed the water was the issue.",
+    author: '— David W., Baldwin Stocker',
+  },
+  {
+    text: "Wolf range in our kitchen — oven not heating right and one burner sparking. Called Saturday, they came out same day, had all the Wolf OEM parts, recalibrated the oven after the repair. Our family chef tested it and was very satisfied. Weekend availability and actual same-day service made all the difference.",
+    author: '— Michelle T., Arcadia Highlands',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · SGV hard water assessment included' },
+  { label: 'Standard Repair', price: '$150–$450', note: 'Refrigerator, washer, dryer, oven, range · Parts + labor · 90-day warranty' },
+  { label: 'Sub-Zero / Wolf / Thermador', price: '$300–$700+', note: 'Built-in luxury brands · OEM parts · Calibration included' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Arcadia?',
+    answer: 'Yes. Our technicians cover all of Arcadia — 91006 and 91007 — including Arcadia Highlands, Baldwin Stocker, Live Oak, Santa Anita, and Highland Oaks. Call before noon for same-day afternoon service in most cases. Saturday and Sunday appointments are part of our regular Pasadena route.',
+  },
+  {
+    question: 'Does hard water in Arcadia affect appliances?',
+    answer: 'Yes — significantly. Arcadia is supplied by the San Gabriel Valley Municipal Water District, which delivers mineral-rich groundwater. Ice maker inlet valves, dishwasher spray arms, and washing machine inlet screens accumulate scale faster than in softer-water cities. We check for this proactively on every Arcadia call. Refrigerator water filters should be replaced every 6 months in Arcadia, not the manufacturer-default 12.',
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, and Thermador in the Highlands and Baldwin Stocker?',
+    answer: 'Yes. We carry OEM parts for Sub-Zero, Wolf, Thermador, Miele, and Bosch on our trucks. Most luxury brand repairs in Arcadia are completed in a single visit. Built-in column refrigerators, dual-fuel ranges, panel-ready dishwashers — we work in those installations daily.',
+  },
+  {
+    question: 'Are you available on weekends in Arcadia?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm. Weekend service is part of the regular schedule, not a premium add-on.',
+  },
+  {
+    question: 'What is your diagnostic fee in Arcadia?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. We provide a written estimate before any work begins. Most Arcadia repairs run $150–$450 for standard appliances and $300–$700+ for Sub-Zero, Wolf, and Thermador.',
+  },
+  {
+    question: 'Do you offer a warranty on repairs in Arcadia?',
+    answer: 'All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.',
+  },
+  {
+    question: 'Do you also serve Pasadena, Monrovia, Temple City, and San Marino?',
+    answer: 'Yes — those are all part of our regular SGV service area out of the Pasadena branch. Same-day service, same pricing, same warranty.',
+  },
+];
+
+const nearby = [
+  { slug: 'pasadena', name: 'Pasadena' },
+  { slug: 'monrovia', name: 'Monrovia' },
+  { slug: 'san-marino', name: 'San Marino' },
+  { slug: 'temple-city', name: 'Temple City' },
+  { slug: 'south-pasadena', name: 'South Pasadena' },
+  { slug: 'alhambra', name: 'Alhambra' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Arcadia', sameAs: 'https://en.wikipedia.org/wiki/Arcadia,_California' },
+    { '@type': 'PostalCode', name: '91006' },
+    { '@type': 'PostalCode', name: '91007' },
+    { '@type': 'Place', name: 'Arcadia Highlands' },
+    { '@type': 'Place', name: 'Baldwin Stocker' },
+    { '@type': 'Place', name: 'Live Oak' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Arcadia, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Arcadia — the Highlands, Baldwin Stocker, Live Oak neighborhood, Santa Anita area, and every street in ZIP codes 91006 and 91007. Call before noon for same-day afternoon service. We're also available Saturdays and Sundays." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Does hard water in Arcadia affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Arcadia is served by the San Gabriel Valley Municipal Water District, which delivers water with high mineral content from the San Gabriel Valley groundwater basin. This means ice maker inlet valves, dishwasher spray arms, and washing machine inlet screens accumulate mineral scale faster than in softer-water cities. We check for this proactively on every Arcadia call involving ice makers and dishwashers." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, and luxury appliances in Arcadia Highlands?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Arcadia Highlands and Baldwin Stocker neighborhoods have some of the finest homes in the San Gabriel Valley, frequently equipped with Sub-Zero refrigerators, Wolf ranges, Thermador appliances, and Miele dishwashers. Our technicians carry OEM parts for these brands and are experienced with built-in and custom kitchen configurations." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Arcadia?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Arcadia repairs run $150–$400 depending on the appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Arcadia?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. We're available Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Arcadia?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Pasadena, Monrovia, Temple City, and San Marino?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Arcadia service area extends to Pasadena, Monrovia, Duarte, Temple City, San Marino, El Monte, and South Pasadena. We're the closest team for all 91006 and 91007 calls." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="arc-hero">
-    <div class="arc-hero__inner container">
-      <div class="arc-hero__content">
-        <div class="arc-hero__eyebrow">Arcadia, CA · 91006 & 91007 · Highlands · Baldwin Stocker · Live Oak · Santa Anita</div>
-        <h1 class="arc-hero__h1">
-          Appliance Repair<br>
-          <span class="arc-hero__accent">Arcadia, CA</span>
-        </h1>
-        <p class="arc-hero__sub">
-          From the estate kitchens of the Highlands to the family homes throughout
-          the Santa Anita corridor — all of Arcadia 91006 and 91007.
-          Sub-Zero, Wolf, Samsung, LG, all brands. Same-day service,
-          OEM parts, 90-day warranty. Weekends available.
-        </p>
-        <div class="arc-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="arc-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="arc-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-arcadia-ca.webp"
-          alt="Appliance repair in Arcadia CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Arcadia, CA · Los Angeles County · 91006 & 91007"
+    headlineMain="Appliance repair in"
+    headlineAccent="Arcadia, CA"
+    subheadline="Same-day service across all of Arcadia. Highlands, Baldwin Stocker, Live Oak, Santa Anita. Sub-Zero, Wolf, Bosch, Samsung, LG. SGVMWD hard water specialists. OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Estates & Mainstream"
+    headline="Built-in luxury, mid-century ranch,"
+    headlineAccent="and SGVMWD hard water"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="arc-intro">
-    <div class="container arc-intro__inner">
-      <div class="arc-intro__text">
-        <h2>Appliance Repair in Arcadia — What We Know About This City</h2>
-        <p>
-          Arcadia is one of the most prosperous cities in the San Gabriel Valley.
-          The Highlands neighborhood north of Foothill Boulevard and the Baldwin
-          Stocker area have some of the finest homes in the SGV — large estates
-          with kitchens equipped with Sub-Zero refrigerators, Wolf ranges,
-          Thermador and Miele appliances. The rest of the city runs a full range
-          from updated mid-century ranch homes to newer construction throughout
-          the Santa Anita and Live Oak neighborhoods.
-        </p>
-        <p>
-          Hard water is a real and consistent issue in Arcadia. The city is served
-          by the San Gabriel Valley Municipal Water District, which draws from the
-          San Gabriel Valley groundwater basin — a naturally mineral-rich source.
-          Ice maker inlet valves, dishwasher spray arms, and washing machine inlet
-          screens accumulate scale significantly faster here than in softer-water
-          cities. On every Arcadia call involving an ice maker or dishwasher, our
-          technicians test the inlet valve and check for mineral deposits before
-          recommending any other parts replacement. It's consistently relevant here.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong> on parts and labor.
-          Weekends available: Saturday 8am–7pm, Sunday 9am–5pm.
-        </p>
-        <div class="arc-tip">
-          <div class="arc-tip__icon">💧</div>
-          <div class="arc-tip__text">
-            <strong>Hard water tip for Arcadia:</strong> If your dishwasher has been
-            leaving spots on glasses that weren't there before, or your ice maker is
-            producing noticeably less ice — mineral scale on the inlet valve is the
-            most likely cause in the SGV. Running a dishwasher descaling tablet monthly
-            and replacing your refrigerator water filter every 6 months (not 12) both
-            help significantly. We explain this on every relevant Arcadia call.
-          </div>
-        </div>
-      </div>
-      <div class="arc-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Arcadia Service Team</div>
-          <div class="cta-box__sub">91006 · 91007 · Highlands to Live Oak</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliances we repair in"
+    headlineAccent="Arcadia"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="arc-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Arcadia</h2>
-      <p class="section-sub">All brands · Hard water aware · Highlands estates & SGV homes · 91006 & 91007</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Arcadia neighborhoods"
+    headlineAccent="we service"
+    subheadline="Highlands and Baldwin Stocker estates to Live Oak family homes — across 91006 and 91007."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/arcadia/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Hard water ice maker · Not cooling · Fan motor · Built-in Sub-Zero</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · Wolf</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Arcadia"
+    jobs={jobs}
+  />
 
-        <a href="/arcadia/dishwasher-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Hard water spray arm scale · Not draining · Error codes · Spots</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · Miele · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/arcadia/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Hard water inlet screens · Not draining · Not spinning · Error codes</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Arcadia"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/arcadia/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent cleaning · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Arcadia"
+    cards={pricingCards}
+    bottomNote="Residential pricing only. Parts and labor included in the repair quote — no surprise add-ons."
+  />
 
-        <a href="/arcadia/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove Repair</div>
-          <div class="service-card__issues">Not heating · Igniter · Temperature off · Gas & electric</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · GE · Samsung · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Arcadia"
+    faqs={faqs}
+  />
 
-        <a href="/arcadia/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Hard water inlet valve · Not freezing · Ice stopped · Frost</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/arcadia/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler & Cellar Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Built-in · Under-counter</div>
-          <div class="service-card__brands">Sub-Zero · True · U-Line · Liebherr · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/arcadia/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter · Gas burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">Wolf · Thermador · GE · Bosch · Samsung · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="arc-neighborhoods">
-    <div class="container">
-      <h2>All of Arcadia — 91006 & 91007</h2>
-      <p class="section-sub">Highlands estates to Live Oak family homes — every neighborhood</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Arcadia Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Arcadia Highlands</div>
-            <div class="nh-item featured">Baldwin Stocker</div>
-            <div class="nh-item featured">Live Oak</div>
-            <div class="nh-item">Santa Anita area</div>
-            <div class="nh-item">Highland Oaks</div>
-            <div class="nh-item">Downtown Arcadia</div>
-            <div class="nh-item">North Arcadia</div>
-            <div class="nh-item">South Arcadia</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Foothill Blvd</div>
-            <div class="nh-item">Huntington Drive</div>
-            <div class="nh-item">Baldwin Ave</div>
-            <div class="nh-item">Duarte Road</div>
-            <div class="nh-item">Live Oak Ave</div>
-            <div class="nh-item">Colorado Blvd</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Pasadena (91101–09)</div>
-            <div class="nh-item">Monrovia (91016)</div>
-            <div class="nh-item">Duarte (91010)</div>
-            <div class="nh-item">Temple City (91780)</div>
-            <div class="nh-item">San Marino (91108)</div>
-            <div class="nh-item">El Monte (91731)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="arc-recent">
-    <div class="container">
-      <h2>Recent Jobs in Arcadia</h2>
-      <p class="section-sub">Real calls from 91006 and 91007 — estates, SGV homes, hard water issues.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Refrigerator</span>
-            <span class="recent-location">Arcadia Highlands, 91006</span>
-          </div>
-          <div class="recent-card__title">"Ice maker stopped completely — no ice at all"</div>
-          <div class="recent-card__desc">
-            Highlands estate, Sub-Zero 48-inch built-in column. Gradual decline in ice
-            production followed by complete stoppage — textbook SGVMWD hard water mineral
-            scale on the inlet valve. The valve orifice was almost entirely blocked with
-            calcium deposits. Replaced with an OEM Sub-Zero inlet valve, flushed the
-            water line thoroughly, replaced the in-door filter which was overdue.
-            Full ice production within 24 hours. Owner now on 6-month filter cycle
-            and annual inlet valve inspection — essential in this water district.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Sub-Zero inlet valve · Hard water plan set</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Baldwin Stocker, 91007</span>
-          </div>
-          <div class="recent-card__title">"Glasses completely cloudy, machine barely circulating water"</div>
-          <div class="recent-card__desc">
-            Bosch 800 series — spray arm ports almost completely blocked with SGVMWD
-            mineral scale. Both upper and lower spray arms affected. Descaled both
-            assemblies completely, cleaned the filter trap (significant buildup),
-            ran a citric acid maintenance cycle, confirmed full rotation on both arms.
-            Showed the homeowner the mineral deposits on the arms — they were shocked
-            at how much had accumulated in 18 months. Monthly dishwasher tablet routine
-            explained. Glasses coming out clear from the first load.
-          </div>
-          <div class="recent-card__result">✓ Same day · Scale cleared · Maintenance routine explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung French Door</span>
-            <span class="recent-location">Live Oak, 91006</span>
-          </div>
-          <div class="recent-card__title">"Fridge warm, freezer still running fine"</div>
-          <div class="recent-card__desc">
-            Classic Samsung dual-evaporator presentation — upper evaporator fan motor
-            seized, fresh food section without airflow while the freezer ran on its own
-            system. Samsung French door in a Live Oak family home, kitchen island layout
-            with tight clearance behind the fridge. Replaced the fan motor with an OEM
-            Samsung part, cleared the blocked defrost drain, ran a full defrost and
-            temperature cycle. Back to 37°F within two hours of the visit.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung fan motor · Back to temperature</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Range</span>
-            <span class="recent-location">Arcadia Highlands, 91006</span>
-          </div>
-          <div class="recent-card__title">"Oven won't reach temperature, star burner sparking"</div>
-          <div class="recent-card__desc">
-            Wolf 36-inch dual-fuel in an Highlands kitchen — oven igniter drawing weak
-            current (the igniter glows but can't draw enough amperage to reliably
-            open the gas valve, a classic Wolf failure mode). Surface igniter electrode
-            corroded from kitchen moisture exposure. Replaced oven igniter and surface
-            electrode with OEM Wolf parts, calibrated oven — it was running 20°F low.
-            Chef of the household tested three dishes after the repair. Approved.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Wolf · Calibrated +20°F · Chef approved</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="arc-why">
-    <div class="container">
-      <h2>Why Arcadia Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">SGVMWD Hard Water Specialists</div>
-          <div class="why-text">The San Gabriel Valley Municipal Water District delivers mineral-rich groundwater to Arcadia. Ice makers and dishwashers scale up faster here than in many LA cities. We test inlet valves and check for mineral deposits on every relevant Arcadia call — it consistently matters.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏡</div>
-          <div class="why-title">Highlands & Estate Experience</div>
-          <div class="why-text">Sub-Zero, Wolf, Thermador, Miele — the Arcadia Highlands and Baldwin Stocker estates have some of the finest kitchens in the SGV. We carry OEM parts for these brands on every Arcadia vehicle and are trained on their specific systems.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📅</div>
-          <div class="why-title">Weekends Available</div>
-          <div class="why-text">Saturday 8am–7pm and Sunday 9am–5pm. Families in Arcadia have busy weekday schedules — we're available when you need us, not just Mon–Fri.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="arc-reviews">
-    <div class="container">
-      <h2>What Arcadia Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our Sub-Zero stopped making ice completely. Same Day came out to our Highlands home, identified the hard water valve blockage right away, replaced the part, and explained the water quality issue in Arcadia. Ice maker fully working and we now understand why it kept failing. Very professional and knowledgeable."</div>
-          <div class="review-author">— Linda C., Arcadia Highlands</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Bosch dishwasher leaving spots on everything. Tech came to our Baldwin Stocker home, showed me the mineral scale on both spray arms — I had no idea how much had built up in 18 months. Cleared everything, gave us a maintenance routine. Running perfectly now. Would not have guessed the water was the issue."</div>
-          <div class="review-author">— David W., Baldwin Stocker, Arcadia</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Wolf range in our kitchen — oven not heating right and one burner sparking. Called Saturday, they came out same day, had all the Wolf OEM parts, recalibrated the oven after the repair. Our family chef tested it and was very satisfied. Weekend availability and actual same-day service made all the difference."</div>
-          <div class="review-author">— Michelle T., Arcadia Highlands</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="arc-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Arcadia</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $450</div>
-          <div class="pricing-card__note">Hard water inlet valve · Fan motor · Coil · Sub-Zero built-in</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Hard water descaling + drain pump + spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Built-in · Highlands estate service</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Inlet screens, drain pump, heating element</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $420</div>
-          <div class="pricing-card__note">Igniter, bake element, Wolf/Viking calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="arc-faq">
-    <div class="container">
-      <h2>Questions Arcadia Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Arcadia, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Arcadia — the Highlands, Baldwin Stocker, Live Oak, Santa Anita area, and all of 91006 and 91007. Call before noon for same-day afternoon service. Weekends available too.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does hard water in Arcadia affect appliances?</summary><div class="faq-answer">Yes. Arcadia is served by the San Gabriel Valley Municipal Water District, which delivers high-mineral groundwater. Ice maker inlet valves, dishwasher spray arms, and washing machine inlet screens accumulate scale faster than in softer-water cities. We check for this proactively on every relevant Arcadia call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero, Wolf, and luxury appliances in Arcadia Highlands?</summary><div class="faq-answer">Yes. The Arcadia Highlands and Baldwin Stocker neighborhoods have Sub-Zero refrigerators, Wolf ranges, and Thermador appliances. We carry OEM parts for these brands and are experienced with built-in and custom kitchen configurations.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Arcadia?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Arcadia?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Arcadia repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">What warranty do you offer on appliance repairs in Arcadia?</summary><div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Pasadena, Monrovia, Temple City, and San Marino?</summary><div class="faq-answer">Yes. Our Arcadia service area extends to Pasadena, Monrovia, Duarte, Temple City, San Marino, and El Monte. We're the closest team for all 91006 and 91007 calls.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="arc-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/south-pasadena/" class="nearby-link">South Pasadena</a>
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/silver-lake/" class="nearby-link">Silver Lake</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="arc-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Arcadia?</h2>
-          <p>Highlands · Baldwin Stocker · Live Oak · Hard water specialists. 91006 & 91007. $89 diagnostic waived with repair. 90-day warranty. Weekends available.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Arcadia, CA 91006 & 91007</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --arc-red: #C8102E; --arc-black: #0a0a0a; --arc-gray: #f5f5f5; --arc-border: #e2e2e2; --arc-text: #1a1a1a; --arc-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .arc-hero { background: var(--arc-black); color: white; padding: 80px 0 60px; }
-  .arc-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .arc-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--arc-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .arc-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .arc-hero__accent { color: var(--arc-red); }
-  .arc-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .arc-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .arc-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .arc-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--arc-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .arc-bottom-cta .btn-secondary { color: var(--arc-text); border-color: var(--arc-border); }
-  .trust-bar { background: var(--arc-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .arc-intro { padding: 72px 0; background: white; }
-  .arc-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .arc-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--arc-black); margin-bottom: 20px; }
-  .arc-intro__text p { font-size: 16px; line-height: 1.7; color: var(--arc-text); margin-bottom: 16px; }
-  .arc-tip { display: flex; gap: 14px; background: #eef6ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .arc-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .arc-tip__text { font-size: 14px; color: var(--arc-text); line-height: 1.6; }
-  .cta-box { background: var(--arc-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--arc-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--arc-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--arc-muted); text-align: center; margin-bottom: 40px; }
-  .arc-services { padding: 72px 0; background: var(--arc-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--arc-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--arc-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--arc-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--arc-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--arc-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--arc-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--arc-red); font-weight: 500; }
-  .arc-neighborhoods { padding: 72px 0; background: white; }
-  .arc-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--arc-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--arc-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--arc-text); padding: 8px 12px; background: var(--arc-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--arc-red); color: var(--arc-black); font-weight: 500; }
-  .arc-recent { padding: 72px 0; background: var(--arc-gray); }
-  .arc-recent h2 { font-size: 30px; font-weight: 700; color: var(--arc-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--arc-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--arc-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--arc-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--arc-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--arc-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .arc-why { padding: 72px 0; background: white; }
-  .arc-why h2 { font-size: 30px; font-weight: 700; color: var(--arc-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--arc-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--arc-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--arc-muted); line-height: 1.6; }
-  .arc-reviews { padding: 72px 0; background: var(--arc-gray); }
-  .arc-reviews h2 { font-size: 30px; font-weight: 700; color: var(--arc-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--arc-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--arc-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--arc-muted); font-weight: 500; }
-  .arc-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--arc-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--arc-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--arc-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--arc-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--arc-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--arc-red); }
-  .pricing-card__note { font-size: 13px; color: var(--arc-muted); }
-  .arc-faq { padding: 72px 0; background: var(--arc-gray); }
-  .arc-faq h2 { font-size: 30px; font-weight: 700; color: var(--arc-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--arc-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--arc-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--arc-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--arc-text); }
-  .arc-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--arc-border); }
-  .arc-nearby h2 { font-size: 20px; font-weight: 600; color: var(--arc-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--arc-border); border-radius: 20px; font-size: 14px; color: var(--arc-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--arc-red); color: var(--arc-red); }
-  .arc-bottom-cta { padding: 72px 0; background: var(--arc-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .arc-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .arc-hero__inner { grid-template-columns: 1fr; } .arc-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .arc-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Arcadia repair today"
+    body="Same-day service from our Pasadena branch. Highlands, Baldwin Stocker, Live Oak, Santa Anita — all of 91006 and 91007. $89 diagnostic · 90-day warranty · OEM parts on the truck."
+  />
+</CityLayout>
