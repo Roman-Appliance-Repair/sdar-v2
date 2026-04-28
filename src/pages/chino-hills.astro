@@ -1,582 +1,322 @@
 ---
-// src/pages/chino-hills.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+/**
+ * Chino Hills, CA — Variant A migration (T9 Batch 3, Group 1: RC/Temecula).
+ * Branch: Rancho Cucamonga (placeholder phone — pending real DID per branches.ts)
+ * Source: wiki/migration/content-dumps/chino-hills.md
+ *
+ * Migration notes:
+ *   - Dump attributed Pasadena branch (outdated). Per cities.ts SSOT 2026-04-26,
+ *     chino-hills primaryBranch = 'rancho-cucamonga' (placeholder phone).
+ *   - Hard water is the page's core selling point — preserved across hero,
+ *     narrative, jobs, FAQ.
+ *   - Pricing consolidated 8 dump cards → 4 (Diagnostic, Standard, Hard-Water,
+ *     Warranty) per Variant A Pricing component supporting 3–4 cards.
+ *   - Dropped /diamond-bar/ broken nearby link (no /diamond-bar/ page exists).
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema (placeholder branch, no GBP yet)
+ *   - streetAddress omitted (rancho-cucamonga is service_area)
+ *   - Phone via branches.ts; renders placeholder until real DID purchased
+ */
 
-const city = "Chino Hills";
-const citySlug = "chino-hills";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["91709"];
-const county = "San Bernardino";
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const title = `Appliance Repair Chino Hills CA — Same Day | All Brands | ${phone}`;
-const description = `Same-day appliance repair in Chino Hills. Refrigerator, washer, dryer, oven, dishwasher & more. Hard water specialists. Samsung, LG, Bosch, Sub-Zero. Licensed. Call ${phone}.`;
+const branchSlug = 'rancho-cucamonga';
+const cityName = 'Chino Hills';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
+
+const title = `Appliance Repair Chino Hills CA | Same Day Service | ${branch.phone}`;
+const description = 'Same-day appliance repair in Chino Hills, CA. Butterfield Ranch, Rolling Ridge, Eucalyptus Hills, Carbon Canyon. Hard water specialists. OEM parts, 90-day warranty. $89 diagnostic.';
+const canonical = 'https://samedayappliance.repair/chino-hills/';
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Outdoor Refrigerator Repair", slug: "freezer-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
 ];
 
 const neighborhoods = [
-  { name: "Butterfield Ranch", zip: "91709" },
-  { name: "Los Serranos", zip: "91709" },
-  { name: "Rolling Ridge", zip: "91709" },
-  { name: "Payne Ranch", zip: "91709" },
-  { name: "Eucalyptus Hills", zip: "91709" },
-  { name: "Carbon Canyon", zip: "91709" },
-  { name: "Chino Hills Pkwy Corridor", zip: "91709" },
-  { name: "Peyton Dr Area", zip: "91709" },
-  { name: "The Shoppes Area", zip: "91709" },
-  { name: "Soquel Canyon Estates", zip: "91709" },
-  { name: "Country Hills", zip: "91709" },
-  { name: "Summit Ranch", zip: "91709" },
+  { name: 'Butterfield Ranch', zip: '91709' },
+  { name: 'Los Serranos', zip: '91709' },
+  { name: 'Rolling Ridge', zip: '91709' },
+  { name: 'Payne Ranch', zip: '91709' },
+  { name: 'Eucalyptus Hills', zip: '91709' },
+  { name: 'Carbon Canyon', zip: '91709' },
+  { name: 'Chino Hills Pkwy Corridor', zip: '91709' },
+  { name: 'Peyton Dr Area', zip: '91709' },
+  { name: 'The Shoppes Area', zip: '91709' },
+  { name: 'Soquel Canyon Estates', zip: '91709' },
+  { name: 'Country Hills', zip: '91709' },
+  { name: 'Summit Ranch', zip: '91709' },
 ];
 
-const faqItems = [
+const narrativeIntro = [
+  "Chino Hills is one of the cleaner, quieter calls we make in San Bernardino County. The city is mostly planned residential — newer homes, well-maintained HOA communities, a mix of mid-range Samsung and LG alongside genuinely high-end Sub-Zero and Wolf kitchens in the hillside estates. The homes are newer than most of what we service in the Inland Empire, which means appliances are in that 8–15 year window where things start to go wrong.",
+  "The one thing that surprises first-time customers here: hard water. Chino Hills gets its supply through a combination of MWD imported water and local groundwater, and the hardness levels are consistently high. Dishwashers scale up faster than anywhere on the Westside. Ice makers clog with mineral deposits. Washing machines develop scale buildup in the drum and door gasket. We see more hard water-related calls in Chino Hills and the broader San Bernardino County corridor than anywhere else we service — including coastal cities.",
+  "The hillside geography matters too. Homes in Eucalyptus Hills, Carbon Canyon, and the elevated streets off Chino Hills Parkway sit higher than the valley floor. Santa Ana wind events move through the canyons here with real force, carrying fine particulate. Condenser coils on refrigerators and wine coolers in homes near the canyon ridges clog noticeably faster.",
+];
+
+const narrativeSubSections = [
   {
-    q: "Do you offer same-day appliance repair in Chino Hills?",
-    a: `Yes — same-day service is available throughout Chino Hills (ZIP 91709), including Butterfield Ranch, Rolling Ridge, Payne Ranch, Eucalyptus Hills, and Carbon Canyon. Call ${phone} before noon for same-day availability. We dispatch from our Pasadena branch and cover all of Chino Hills without a trip surcharge.`
+    title: 'Dishwashers — quarterly filter cleaning, not annual',
+    paragraphs: [
+      'Hard water deposits accumulate in the spray arm ports, filter assembly, and door gasket on a predictable timeline. In a coastal city, you can go 12–18 months between filter cleanings. In Chino Hills, the filter should be cleaned every 3 months. The spray arm ports should be cleared every 6 months.',
+      "The Bosch E24 drain error is endemic here. It means the dishwasher can't drain — and the first diagnosis in every Chino Hills home is the filter, not the pump. A pump replacement costs $250–$350. A filter cleaning costs $89. We find the cheaper fix first.",
+    ],
   },
   {
-    q: "Why does my dishwasher leave white spots and film on glasses?",
-    a: "This is one of the most common calls we get in Chino Hills — and it's a hard water problem, not a dishwasher malfunction. Chino Hills sits in an area with some of the hardest municipal water in Southern California. The calcium and magnesium deposits etch glass over time and leave film on dishes. The fix involves descaling the interior, cleaning the filter assembly, and in some cases replacing a worn spray arm. We also recommend a monthly rinse-aid boost and quarterly filter cleaning for homes in this area."
+    title: 'Ice makers — descale every 12–18 months',
+    paragraphs: [
+      "Scale buildup inside the ice maker mold is a slow process most people never notice — until cubes start tasting off, come out cloudy, or production drops dramatically. We descale ice makers as part of every ice maker repair call in San Bernardino County. If you have a refrigerator with a built-in ice maker and you've never had it serviced, and you've lived in Chino Hills for more than three years, it's worth a look.",
+    ],
   },
   {
-    q: "My Bosch dishwasher shows E24 — what does that mean?",
-    a: "E24 on a Bosch is a drain error. In Chino Hills homes, the most common cause isn't a pump failure — it's a clogged filter from hard water mineral accumulation combined with food debris. Second most common: a kinked drain hose under the counter. We diagnose before quoting, so you're not paying for a pump replacement when a $89 filter cleaning call would solve it."
+    title: 'Refrigerator water filters — every 4 months',
+    paragraphs: [
+      "Manufacturer recommendation is every 6 months. In Chino Hills hard water, every 4 months is more appropriate. A saturated filter doesn't just reduce water quality — it restricts flow to the ice maker and can contribute to ice maker failures. We replace filters on almost every refrigerator call here and recommend customers put a recurring reminder in their phone.",
+    ],
   },
   {
-    q: "What brands do you repair in Chino Hills?",
-    a: "All of them. The newer planned communities in Chino Hills run a lot of Samsung, LG, and Bosch. The estates near Butterfield Ranch and Eucalyptus Hills tend toward Sub-Zero, Wolf, Thermador, and KitchenAid Professional. Outdoor kitchens in this area often have beverage centers and outdoor-rated refrigerators — we service those too. We carry OEM parts for all major brands."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `Our diagnostic fee is $89, applied directly to the repair the moment you proceed. No hidden trip charge. We quote on-site after diagnosis — not over the phone based on symptoms. What we quote is what appears on the invoice.`
-  },
-  {
-    q: "Does the hilly terrain affect appliance performance?",
-    a: "Not directly — but the hillside environment in Chino Hills does create more dust and particulate circulation than flat neighborhoods. Condenser coils on refrigerators and wine coolers clog faster. Homes near Carbon Canyon Road also see more canyon-driven particulate during Santa Ana wind events. We recommend condenser cleaning every 6–9 months for homes in elevated or canyon-adjacent areas."
-  },
-  {
-    q: "My LG refrigerator compressor hums loudly but the fridge is warm — is it the compressor?",
-    a: "Not always. A loud compressor hum combined with warm temps often points to a refrigerant leak or a failed start relay — not the compressor itself. The LG linear inverter compressor models (common in Chino Hills homes built 2012–2018) had a documented class-action-related failure pattern. We diagnose the root cause first. A start relay replacement costs $120–$180. A compressor replacement is $400–$650. We won't recommend the expensive fix if the cheap one solves it."
+    title: 'Canyon-adjacent condenser coils — every 6–9 months',
+    paragraphs: [
+      "Carbon Canyon Road properties and the elevated streets off Chino Hills Parkway see the most particulate exposure from Santa Ana wind events. Condenser coils on every appliance clog faster here. Outdoor kitchens are particularly vulnerable — a beverage center sitting on a patio exposed to canyon winds needs coil cleaning every 4–5 months.",
+    ],
   },
 ];
 
-const recentRepairs = [
+const jobs = [
   {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Butterfield Ranch',
     title: "Bosch 800 series dishwasher — E24 error, won't drain",
-    neighborhood: "Butterfield Ranch, 91709",
-    description: "Classic Chino Hills call. The E24 on this Bosch 800 had another company recommending a drain pump replacement at $340. We opened it up and found a filter assembly packed with calcium scale and a drain hose with a partial kink behind the toe kick. Cleaned the filter, cleared the hose, ran a full descale cycle. Total: $89 diagnostic, $45 parts and materials. Running perfectly. The homeowner had been putting rinse aid in the wrong compartment for three years, which accelerated the scale buildup.",
-    note: "Hard water is the number one dishwasher issue in Chino Hills. Most E24 errors here are not pump failures."
+    body: 'Classic Chino Hills call. The E24 on this Bosch 800 had another company recommending a drain pump replacement at $340. We opened it up and found a filter assembly packed with calcium scale and a drain hose with a partial kink behind the toe kick. Cleaned the filter, cleared the hose, ran a full descale cycle. Total: $89 diagnostic, $45 parts and materials. Running perfectly.',
+    part: 'Filter cleaning + descale (no pump replacement)',
+    time: '1.5 hours',
+    result: '✓ Same day · ~$300 saved vs misdiagnosis · Hard water descale included',
   },
   {
-    title: "LG LRMVS3006S — warm fridge, compressor noise, 2016 model",
-    neighborhood: "Rolling Ridge, 91709",
-    description: "This is the LG linear inverter compressor generation that had documented failure issues. Customer had been told by the manufacturer's service line to replace the compressor — quoted $620. We diagnosed and found it was a start relay failure — the compressor itself was still functional. Replaced the relay, confirmed refrigerant pressure was within spec, and the unit held 38°F overnight. Repair cost: $155. We walked the customer through the LG extended warranty program for the compressor in case it fails later.",
-    note: "Always diagnose before replacing. The relay is $18. The compressor is $400+. They present with the same symptoms."
+    badge: 'LG Refrigerator',
+    neighborhood: 'Rolling Ridge',
+    title: 'LG LRMVS3006S — warm fridge, compressor noise, 2016 model',
+    body: 'This is the LG linear inverter compressor generation that had documented failure issues. Customer had been told by the manufacturer service line to replace the compressor — quoted $620. We diagnosed and found it was a start relay failure. The compressor itself was still functional. Replaced the relay, confirmed refrigerant pressure within spec, unit held 38°F overnight. Always diagnose before replacing — the relay is $18, the compressor is $400+.',
+    part: 'LG OEM start relay',
+    time: '1.5 hours',
+    result: '✓ Same day · ~$465 saved vs compressor swap · OEM LG part',
   },
   {
-    title: "KitchenAid KRFC300ESS — ice maker stopped producing, water in the door dispenser works fine",
-    neighborhood: "Eucalyptus Hills, 91709",
-    description: "Ice maker failure with working water dispenser almost always points to the ice maker inlet valve secondary solenoid — the water and ice lines share a valve body with two solenoids, and the ice solenoid fails independently. On this KitchenAid, the solenoid had failed AND the ice maker mold had a mineral crust from Chino Hills hard water that was blocking fill. We replaced the valve assembly and cleaned the ice maker mold. Running within two hours.",
-    note: "In hard water areas, ice maker descaling should happen every 12–18 months. Most people never do it."
+    badge: 'KitchenAid Refrigerator',
+    neighborhood: 'Eucalyptus Hills',
+    title: 'KitchenAid KRFC300ESS — ice maker stopped, water dispenser fine',
+    body: 'Ice maker failure with working water dispenser almost always points to the ice maker inlet valve secondary solenoid — the water and ice lines share a valve body with two solenoids, and the ice solenoid fails independently. On this KitchenAid, the solenoid had failed AND the ice maker mold had a mineral crust from Chino Hills hard water blocking fill. Replaced the valve assembly and cleaned the mold.',
+    part: 'KitchenAid OEM inlet valve + descale',
+    time: '2 hours',
+    result: '✓ Same day · OEM valve · Mold descaled',
   },
   {
-    title: "Samsung DW80R9950US — not cleaning top rack, bottom rack fine",
-    neighborhood: "Payne Ranch, 91709",
-    description: "Poor top rack cleaning on a Samsung dishwasher is almost always the upper spray arm. In this Chino Hills home, the upper spray arm ports were 80% blocked with mineral deposits — 3 years of hard water without filter cleaning. The pump and motor were fine. We removed and descaled the spray arm assembly, cleaned the filter, and advised on a quarterly filter maintenance schedule. The customer had been about to buy a new dishwasher. Cost: $89 diagnostic + $65 service. Dishwasher restored to like-new cleaning performance.",
-    note: "Quarterly filter cleaning in Chino Hills is not optional. It's every 3 months, not annually."
+    badge: 'Samsung Dishwasher',
+    neighborhood: 'Payne Ranch',
+    title: 'Samsung DW80R9950US — not cleaning top rack, bottom rack fine',
+    body: 'Poor top rack cleaning is almost always the upper spray arm. Upper spray arm ports were 80% blocked with mineral deposits — 3 years of hard water without filter cleaning. Pump and motor were fine. Removed and descaled the spray arm assembly, cleaned the filter, advised on quarterly filter maintenance. Customer had been about to buy a new dishwasher.',
+    part: 'Spray arm descale + filter clean',
+    time: '1.5 hours',
+    result: '✓ Same day · No parts needed · New dishwasher avoided',
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Chino Hills",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Chino Hills",
-    "addressRegion": "CA",
-    "postalCode": "91709",
-    "addressCountry": "US"
+const reviews = [
+  {
+    text: "Bosch dishwasher was showing E24 and another company told me I needed a new drain pump. Same Day came out, cleaned the filter and found a kinked hose. $89 and it's been running perfect for six months. Really wish I'd called them first.",
+    author: '— Christine L., Butterfield Ranch',
   },
-  "areaServed": [{ "@type": "City", "name": "Chino Hills" }],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    text: 'LG fridge in our Rolling Ridge home was making a loud hum and getting warm. The tech diagnosed a bad start relay — not the compressor like we feared. Cost us $155 instead of $600. Gave us a full explanation of the LG warranty situation too.',
+    author: '— Brian & Monica T., Rolling Ridge',
+  },
+  {
+    text: 'KitchenAid ice maker stopped working. They came same day, replaced the inlet valve, descaled the mold, and told me about the hard water filter schedule. Everything I needed to know. Very thorough.',
+    author: '— Sandra K., Eucalyptus Hills',
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · Hard-water assessment included' },
+  { label: 'Standard Repair', price: '$150–$380', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Hard-Water Service', price: '$89–$150', note: 'Dishwasher descale · Filter & spray arm cleaning · Often resolves error codes alone' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback if same issue returns', highlight: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Chino Hills?',
+    answer: 'Yes — same-day service is available throughout Chino Hills (ZIP 91709), including Butterfield Ranch, Rolling Ridge, Payne Ranch, Eucalyptus Hills, and Carbon Canyon. Our techs cover all of Chino Hills without a trip surcharge.',
+  },
+  {
+    question: 'Why does my dishwasher leave white spots and film on glasses?',
+    answer: "This is one of the most common calls we get in Chino Hills — and it's a hard water problem, not a dishwasher malfunction. Chino Hills sits in an area with some of the hardest municipal water in Southern California. The fix involves descaling the interior, cleaning the filter assembly, and in some cases replacing a worn spray arm. We also recommend a monthly rinse-aid boost and quarterly filter cleaning.",
+  },
+  {
+    question: 'My Bosch dishwasher shows E24 — what does that mean?',
+    answer: "E24 on a Bosch is a drain error. In Chino Hills homes, the most common cause isn't a pump failure — it's a clogged filter from hard water mineral accumulation combined with food debris. Second most common: a kinked drain hose under the counter. We diagnose before quoting, so you're not paying for a pump replacement when an $89 filter cleaning would solve it.",
+  },
+  {
+    question: 'What brands do you repair in Chino Hills?',
+    answer: 'All of them. The newer planned communities run a lot of Samsung, LG, and Bosch. The estates near Butterfield Ranch and Eucalyptus Hills tend toward Sub-Zero, Wolf, Thermador, and KitchenAid Professional. Outdoor kitchens often have beverage centers and outdoor-rated refrigerators — we service those too. OEM parts for all major brands.',
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: 'Our diagnostic fee is $89, applied directly to the repair the moment you proceed. No hidden trip charge. We quote on-site after diagnosis — not over the phone based on symptoms.',
+  },
+  {
+    question: 'Does the hilly terrain affect appliance performance?',
+    answer: 'The hillside environment in Chino Hills creates more dust and particulate circulation than flat neighborhoods. Condenser coils on refrigerators and wine coolers clog faster. Homes near Carbon Canyon Road also see more canyon-driven particulate during Santa Ana wind events. We recommend condenser cleaning every 6–9 months for elevated or canyon-adjacent areas.',
+  },
+  {
+    question: 'My LG refrigerator hums loudly but the fridge is warm — is it the compressor?',
+    answer: "Not always. A loud hum combined with warm temps often points to a refrigerant leak or a failed start relay — not the compressor itself. The LG linear inverter compressor models (common in Chino Hills homes built 2012–2018) had a documented failure pattern. A start relay replacement costs $120–$180. A compressor replacement is $400–$650. We won't recommend the expensive fix if the cheap one solves it.",
+  },
+];
+
+const nearby = [
+  { slug: 'rancho-cucamonga', name: 'Rancho Cucamonga' },
+  { slug: 'ontario', name: 'Ontario' },
+  { slug: 'upland', name: 'Upland' },
+  { slug: 'fontana', name: 'Fontana' },
+  { slug: 'yorba-linda', name: 'Yorba Linda' },
+  { slug: 'corona', name: 'Corona' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Chino Hills', sameAs: 'https://en.wikipedia.org/wiki/Chino_Hills,_California' },
+    { '@type': 'PostalCode', postalCode: '91709' },
+  ],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
+    },
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- ═══════════════════════════════════════════
-       HERO
-  ═══════════════════════════════════════════ -->
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">San Bernardino County · ZIP 91709</p>
-        <h1>Appliance Repair<br><span class="accent">Chino Hills</span></h1>
-        <p class="hero-sub">Same-day service throughout Butterfield Ranch, Rolling Ridge, Eucalyptus Hills, Carbon Canyon, and all Chino Hills neighborhoods. Hard water specialists. All brands, OEM parts.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-      <div class="hero-img">
-        <img src="/images/cities/chino-hills-appliance-repair.jpg" alt="Appliance repair in Chino Hills CA" width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Chino Hills, CA · San Bernardino County · 91709"
+    headlineMain="Appliance repair in"
+    headlineAccent="Chino Hills, CA"
+    subheadline="Same-day service throughout Butterfield Ranch, Rolling Ridge, Eucalyptus Hills, Carbon Canyon, and all Chino Hills neighborhoods. Hard water specialists. OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- ═══════════════════════════════════════════
-       TRUST BAR
-  ═══════════════════════════════════════════ -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">💧</span><span>Hard Water Specialists</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <CustomNarrative
+    number="01"
+    eyebrow="Hard Water"
+    headline="Hard water in Chino Hills —"
+    headlineAccent="what it does to your appliances"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- ═══════════════════════════════════════════
-       INTRO + STICKY SIDEBAR
-  ═══════════════════════════════════════════ -->
-  <section class="intro-section container">
-    <div class="intro-content">
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliances we repair in"
+    headlineAccent="Chino Hills"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-      <h2>Appliance Repair in Chino Hills — What's Different Here</h2>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Chino Hills neighborhoods"
+    headlineAccent="we service"
+    subheadline="From Butterfield Ranch estates to Los Serranos, the canyon roads off Carbon Canyon, and the developments along Chino Hills Parkway. No travel surcharge anywhere in 91709."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-      <p>Chino Hills is one of the cleaner, quieter calls we make in San Bernardino County. The city is mostly planned residential — newer homes, well-maintained HOA communities, a mix of mid-range Samsung and LG alongside some genuinely high-end Sub-Zero and Wolf kitchens in the hillside estates. The homes are newer than most of what we service in the Inland Empire, which means the appliances are in that 8–15 year window where things start to go wrong.</p>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Chino Hills"
+    jobs={jobs}
+  />
 
-      <p>The one thing that surprises first-time customers here: hard water. Chino Hills gets its water supply through a combination of MWD imported water and local groundwater, and the hardness levels are consistently high. This affects appliances in specific ways. Dishwashers scale up faster than anywhere on the Westside. Ice makers clog with mineral deposits. Washing machines develop scale buildup in the drum and door gasket. We see more hard water-related calls in Chino Hills and the broader San Bernardino County corridor than anywhere else we service — including coastal cities.</p>
+  <Method number="05" />
 
-      <p>The hillside geography matters too. Homes in Eucalyptus Hills, Carbon Canyon, and the elevated streets off Chino Hills Parkway sit higher than the valley floor. Santa Ana wind events move through the canyons here with real force, carrying fine particulate. Condenser coils on refrigerators and wine coolers in homes near the canyon ridges clog noticeably faster. And outdoor kitchens — which are common in the nicer properties here — need more frequent service than indoor appliances exposed to SoCal's mild-but-dusty climate.</p>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Chino Hills"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-      <p>We dispatch from our Pasadena branch for Chino Hills. Same-day availability throughout ZIP 91709. Call us at {phone}.</p>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Chino Hills"
+    cards={pricingCards}
+    bottomNote="$89 diagnostic fee applied to repair cost. No hidden trip charge to Chino Hills."
+  />
 
-    </div>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Chino Hills"
+    faqs={faqs}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Chino Hills</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ Hard Water &amp; Scale Specialists</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ 90-Day Warranty</li>
-        <li>✓ Licensed &amp; Insured</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <!-- ═══════════════════════════════════════════
-       SERVICES GRID
-  ═══════════════════════════════════════════ -->
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Chino Hills</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       HARD WATER BLOCK (City-Specific)
-  ═══════════════════════════════════════════ -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>Hard Water in Chino Hills — What It Does to Your Appliances</h2>
-
-        <p>This is the conversation we have on almost every service call in Chino Hills. Hard water — water with high concentrations of dissolved calcium and magnesium — is the single biggest factor driving appliance wear in this city. Most homeowners have no idea it's happening until something stops working.</p>
-
-        <h3>Dishwashers</h3>
-        <p>Hard water deposits accumulate in the spray arm ports, filter assembly, and door gasket on a predictable timeline. In a coastal city with softer water, you can go 12–18 months between filter cleanings. In Chino Hills, the filter should be cleaned every 3 months. The spray arm ports should be cleared every 6 months. If your glasses have a white film or etch marks, that's calcium. If your dishwasher is leaving dishes dirty, clean the filter before assuming anything is broken — nine times out of ten in this area, that's the issue.</p>
-
-        <p>The Bosch E24 drain error is endemic here. It means the dishwasher can't drain — and the first diagnosis in every Chino Hills home is the filter, not the pump. A pump replacement costs $250–$350. A filter cleaning costs $89. We find the cheaper fix first.</p>
-
-        <h3>Ice Makers</h3>
-        <p>Scale buildup inside the ice maker mold is a slow process that most people never notice — until the ice cubes start tasting off, come out cloudy, or production drops dramatically. We descale ice makers as part of every ice maker repair call in San Bernardino County. If you have a refrigerator with a built-in ice maker and you've never had it serviced, and you've lived in Chino Hills for more than three years, it's worth a look.</p>
-
-        <h3>Washing Machines</h3>
-        <p>Hard water leaves mineral deposits in the drum, door gasket, and detergent dispenser of front-loading washers. Over time, this contributes to the mold and odor problems that Samsung and LG front-loaders are known for in hard water areas. Monthly drum cleaning with a washing machine cleaner is not optional in Chino Hills — it's maintenance. We also see detergent dispenser blockages and door gasket hardening accelerated by scale accumulation.</p>
-
-        <h3>Refrigerator Water Filters</h3>
-        <p>Manufacturer recommendation is every 6 months. In Chino Hills hard water, every 4 months is more appropriate. A saturated filter doesn't just reduce water quality — it restricts flow to the ice maker and can contribute to ice maker failures. We replace filters on almost every refrigerator call here and recommend customers put a recurring reminder in their phone.</p>
-
-        <h3>Maintenance Schedule for Chino Hills Homes</h3>
-        <ul class="maint-list">
-          <li><strong>Dishwasher filter:</strong> Every 3 months — run hot water + white vinegar cycle monthly</li>
-          <li><strong>Refrigerator water filter:</strong> Every 4 months (not 6)</li>
-          <li><strong>Ice maker descale:</strong> Every 12–18 months, or when cubes turn cloudy</li>
-          <li><strong>Washing machine drum clean:</strong> Monthly with cleaner tablet</li>
-          <li><strong>Condenser coils (canyon/hillside homes):</strong> Every 6–9 months</li>
-          <li><strong>Outdoor refrigerator coils:</strong> Every 4–6 months</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       NEIGHBORHOODS GRID
-  ═══════════════════════════════════════════ -->
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Chino Hills</h2>
-      <p>We cover all of Chino Hills — from the Butterfield Ranch estates to Los Serranos, the canyon roads off Carbon Canyon, and the newer developments along Chino Hills Parkway. No travel surcharge anywhere in 91709.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       HOUSING STOCK BLOCK
-  ═══════════════════════════════════════════ -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">03</div>
-      <div class="context-body">
-        <h2>What's in Chino Hills Homes — Appliance Profile by Neighborhood</h2>
-
-        <p>Chino Hills is primarily a 2000–2015 build city, which puts most of the housing stock in the appliance failure window. Appliances installed when the homes were built are now 10–20 years old. Appliances upgraded in the 2010s are 8–12 years old. Both generations are showing up on our schedule regularly.</p>
-
-        <h3>Butterfield Ranch &amp; Eucalyptus Hills — Upper Tier</h3>
-        <p>These are the larger homes — 3,000–5,000 square feet on hillside lots with views. The kitchens tend to have Sub-Zero or Thermador refrigerators, Wolf ranges, and KitchenAid or Bosch dishwashers. Wine coolers and beverage centers are common. Outdoor kitchens with refrigerators and ice makers are standard in the newer builds. We treat these calls the same as our Beverly Hills and Bel Air work — OEM parts, careful handling, no aftermarket substitutes. Sub-Zero condenser cleaning in canyon-adjacent homes here should be every 6 months.</p>
-
-        <h3>Rolling Ridge &amp; Payne Ranch — Mid-Tier Planned Communities</h3>
-        <p>Solid planned community housing — 2,000–3,500 sq ft, built primarily 2000–2012. Samsung, LG, and Whirlpool dominate. These are the homes where we see the most hard water-related dishwasher and ice maker calls. The LG linear inverter compressor failures from the 2012–2018 generation show up regularly here. We keep Samsung French-door OEM parts and LG start relay assemblies stocked specifically for this part of the Inland Empire.</p>
-
-        <h3>Los Serranos — Older Stock</h3>
-        <p>Los Serranos is the oldest part of Chino Hills — original housing stock from the 1950s and '60s, still largely intact. Appliances here are a mix of older Whirlpool and GE that have been in service for 20+ years and mid-range replacements from the 2000s and '10s. We often get calls here to assess whether it's worth repairing a 15-year-old fridge or washer. Our honest answer: if the compressor or motor is sound, older appliances without control boards often outlast the replacement.</p>
-
-        <h3>Carbon Canyon &amp; Hillside Roads — Canyon Homes</h3>
-        <p>Carbon Canyon Road properties and the elevated streets off Chino Hills Parkway see the most particulate exposure from Santa Ana wind events. Condenser coils on every appliance clog faster here. Outdoor kitchens are particularly vulnerable — a beverage center sitting on a patio exposed to canyon winds needs coil cleaning every 4–5 months. We also see more vent-related dryer issues here, as homes often have longer external vent runs to manage hillside architecture.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       RECENT REPAIRS
-  ═══════════════════════════════════════════ -->
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">04</div>
-      <h2>Recent Repairs in Chino Hills</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       WHY US + REVIEWS + PRICING
-  ═══════════════════════════════════════════ -->
-  <section class="why-section container">
-    <div class="context-number">05</div>
-    <h2>Why Chino Hills Residents Call Us</h2>
-
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>We diagnose before we quote</h3>
-        <p>The $89 diagnostic fee means we look at the actual appliance before we tell you what it costs. We don't quote LG compressor replacements over the phone when 60% of the time it's a $155 start relay. Diagnosis first, always.</p>
-      </div>
-      <div class="why-item">
-        <h3>We understand hard water</h3>
-        <p>Most appliance companies in this area treat hard water issues as broken appliances. We treat them as maintenance problems first. An E24 Bosch error in Chino Hills is a $89 call until proven otherwise. We find the cheap fix before recommending the expensive one.</p>
-      </div>
-      <div class="why-item">
-        <h3>OEM parts — not aftermarket</h3>
-        <p>Third-party parts fail faster, fit poorly, and can void manufacturer warranties. We source OEM for every repair. In a hard water environment where appliances already work harder than they should, using the right parts matters more, not less.</p>
-      </div>
-      <div class="why-item">
-        <h3>We know what's in these houses</h3>
-        <p>Chino Hills has a specific mix — Butterfield Ranch Sub-Zeros, Rolling Ridge Samsung and LG from 2012–2018, Los Serranos older stock. We come prepared for what's actually here, with the right parts on the truck for the most common calls in this market.</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Bosch dishwasher was showing E24 and another company told me I needed a new drain pump. Same Day came out, cleaned the filter and found a kinked hose. $89 and it's been running perfect for six months. Really wish I'd called them first."</p>
-        <p class="reviewer">— Christine L., Butterfield Ranch</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"LG fridge in our Rolling Ridge home was making a loud hum and getting warm. The tech diagnosed a bad start relay — not the compressor like we feared. Cost us $155 instead of $600. Gave us a full explanation of the LG warranty situation too. Super professional."</p>
-        <p class="reviewer">— Brian &amp; Monica T., Rolling Ridge</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"KitchenAid ice maker stopped working. They came same day, replaced the inlet valve, descaled the mold, and told me about the hard water filter schedule. Everything I needed to know. Very thorough."</p>
-        <p class="reviewer">— Sandra K., Eucalyptus Hills</p>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Chino Hills</h3>
-      <p>Every repair is different. The $89 diagnostic fee is applied when you proceed. These are typical ranges for common calls in this market.</p>
-      <div class="pricing-grid">
-        <div class="price-item">
-          <span class="pi-service">Refrigerator Repair</span>
-          <span class="pi-range">$150–$450</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Repair</span>
-          <span class="pi-range">$89–$360</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Washer Repair</span>
-          <span class="pi-range">$140–$380</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Repair</span>
-          <span class="pi-range">$120–$320</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Ice Maker Repair</span>
-          <span class="pi-range">$120–$280</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Sub-Zero Repair</span>
-          <span class="pi-range">$250–$650</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Descale</span>
-          <span class="pi-range">$89–$130</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Condenser Coil Cleaning</span>
-          <span class="pi-range">$89–$150</span>
-        </div>
-      </div>
-      <p class="pricing-note">$89 diagnostic fee applied to repair cost. No hidden trip charge to Chino Hills.</p>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       FAQ
-  ═══════════════════════════════════════════ -->
-  <section class="faq-section container">
-    <h2>Chino Hills Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       NEARBY CITIES
-  ═══════════════════════════════════════════ -->
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/rancho-cucamonga/">Rancho Cucamonga</a>
-      <a href="/ontario/">Ontario</a>
-      <a href="/upland/">Upland</a>
-      <a href="/diamond-bar/">Diamond Bar</a>
-      <a href="/yorba-linda/">Yorba Linda</a>
-      <a href="/fontana/">Fontana</a>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       BOTTOM CTA
-  ═══════════════════════════════════════════ -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Chino Hills Today?</h2>
-      <p>Same-day service throughout Butterfield Ranch, Rolling Ridge, Eucalyptus Hills, Los Serranos, and all of ZIP 91709.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
-.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
-h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
-h1 .accent { color: var(--color-accent); }
-.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
-.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
-
-.trust-bar { background: var(--color-accent); padding: 1rem 0; }
-.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
-
-.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
-.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-
-.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
-.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
-.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
-.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
-.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
-.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
-
-.services-section { background: var(--color-surface); padding: 4rem 0; }
-.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
-.svc-icon { font-size: 2rem; }
-.svc-name { font-size: .9rem; font-weight: 600; }
-
-.context-block { padding: 4rem 0; }
-.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
-.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; }
-.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
-.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.maint-list { padding-left: 1.25rem; }
-.maint-list li { margin-bottom: .6rem; line-height: 1.6; color: var(--color-text-body); }
-
-.neighborhoods-section { padding: 4rem 0; }
-.section-intro { margin-bottom: 2rem; }
-.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
-.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
-.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
-.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
-
-.repairs-section { padding: 4rem 0; }
-.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
-.section-header h2 { font-size: 1.6rem; }
-.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
-.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
-.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
-.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
-.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
-
-.why-section { padding: 4rem 0; }
-.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
-.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
-
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
-.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
-.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
-.reviewer { font-size: .8rem; color: var(--color-text-muted); }
-
-.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
-.pricing-block h3 { margin-bottom: .5rem; }
-.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.price-item { display: flex; flex-direction: column; gap: .25rem; }
-.pi-service { font-size: .85rem; color: var(--color-text-muted); }
-.pi-range { font-size: 1rem; font-weight: 700; }
-.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
-
-.faq-section { padding: 4rem 0; }
-.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.faq-list { display: flex; flex-direction: column; gap: .75rem; }
-.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
-.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
-.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
-
-.nearby-section { padding: 3rem 0; }
-.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
-.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
-.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
-.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
-
-.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
-.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
-.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
-.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-
-@media (max-width: 1024px) {
-  .intro-section { grid-template-columns: 1fr; }
-  .sticky-cta-box { position: static; }
-  .services-grid, .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-img { display: none; }
-  .context-inner { grid-template-columns: 1fr; }
-  .repairs-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Chino Hills repair today"
+    body="Same-day service throughout Butterfield Ranch, Rolling Ridge, Eucalyptus Hills, and all of 91709. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>
