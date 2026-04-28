@@ -1,854 +1,332 @@
 ---
-// src/pages/glendale.astro
-// SDAR — samedayappliance.repair
-// Glendale, CA — Волна 2
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: appliance repair glendale — 511 показов · позиция 48.7
-// cooktop repair glendale — 116 показов · позиция 21 (ближайший к топу)
-// Апрель 2026
+/**
+ * Glendale, CA — v2 migrated page (T12 batch).
+ * Branch: Pasadena — service_area (no public street address).
+ * Content source of truth: legacy src/pages/glendale.astro.legacy + content-dumps/glendale.md
+ *
+ * Unique block: "Hillside Estates, Mid-Century Homes, Brand Blvd Condos — We've
+ * Worked in All of Them" — rendered via CustomNarrative.
+ *
+ * Branch isolation:
+ *   - Phone (626) 376-4458 from cities.ts → branches.ts (Pasadena)
+ *   - No streetAddress in schema (Pasadena is service_area)
+ *   - All ZIPs are Glendale's (91201–91208)
+ *
+ * Legacy preserved as glendale.astro.legacy.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = {
-  name: "Glendale",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91201", "91202", "91203", "91204", "91205", "91206", "91207", "91208"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "glendale",
-};
+const citySlug = 'glendale';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const title = `Appliance Repair Glendale CA — Same Day Service | (323) 870-4790`;
-const description = `Same-day appliance repair in Glendale, CA. Our technicians serve Verdugo Woodlands, Adams Hill, Rossmoyne, Montrose. Refrigerator, washer, dryer, oven. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/glendale/`;
+const cityName = 'Glendale';
+const zips = ['91201', '91202', '91203', '91204', '91205', '91206', '91207', '91208'];
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Glendale",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Glendale CA — Same Day Service | ${phone}`;
+const description = 'Same-day appliance repair in Glendale, CA. Our technicians serve Verdugo Woodlands, Adams Hill, Rossmoyne, Montrose. Refrigerator, washer, dryer, oven. Licensed, OEM parts, 90-day warranty.';
+const canonical = 'https://samedayappliance.repair/glendale/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Glendale', sameAs: 'https://en.wikipedia.org/wiki/Glendale,_California' },
+    { '@type': 'City', name: 'La Crescenta' },
+    { '@type': 'City', name: 'Montrose' },
+    { '@type': 'City', name: 'Eagle Rock' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Glendale", "sameAs": "https://en.wikipedia.org/wiki/Glendale,_California" },
-    { "@type": "City", "name": "La Crescenta" },
-    { "@type": "City", "name": "Montrose" },
-    { "@type": "City", "name": "Eagle Rock" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Glendale, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Glendale — Verdugo Woodlands, Adams Hill, Rossmoyne, Sparr Heights, Montrose, Chevy Chase Canyon, Brand Blvd corridor. Call before noon and we're usually there the same afternoon. We serve ZIP codes 91201 through 91208." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliances do you repair in Glendale?",
-      "acceptedAnswer": { "@type": "Answer", "text": "We repair all major home appliances: refrigerators, washers, dryers, ovens, stoves, ranges, dishwashers, cooktops, freezers, wine coolers, microwaves, range hoods, and ice makers. We service every major brand — Samsung, LG, Whirlpool, GE, Bosch, KitchenAid, Sub-Zero, Viking, Thermador, Miele, Dacor, and more." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Viking and Thermador appliances in Glendale?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Glendale's hillside homes — especially in Verdugo Woodlands, Rossmoyne, and Chevy Chase Canyon — have a lot of high-end appliances. Our technicians are trained on Viking ranges, Thermador cooktops, Sub-Zero refrigerators, and Miele dishwashers. We carry OEM parts for these brands on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Glendale?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before any work begins. No hidden fees — the price we quote is the price on the invoice." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Glendale?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back and fix it at no charge. We use genuine OEM parts — not aftermarket." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also service La Crescenta, Montrose, and Eagle Rock?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Glendale service coverage extends to La Crescenta, Montrose, Eagle Rock, Atwater Village, Glassell Park, La Cañada Flintridge, and Tujunga. If you're in the Verdugo Hills area and need a technician, we're likely the closest call." }
-    },
-    {
-      "@type": "Question",
-      "name": "How much does appliance repair cost in Glendale?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Most home appliance repairs in Glendale run $150–$400 depending on the appliance and the specific failure. The $89 diagnostic fee is waived with repair. Luxury brand repairs (Sub-Zero, Viking, Thermador) may cost more due to OEM part pricing. We always give you a written estimate before starting." }
-    }
-  ]
+const introParagraphs = [
+  "Glendale is one of those cities where you see the full range of everything — luxury Thermador ranges in the Mediterranean estates up in Rossmoyne, 15-year-old Whirlpool washers in the Tropico apartments that still have plenty of life left, brand-new Samsung French doors in the condos on Brand Boulevard. Our technicians work across all of it. We don't specialize in just one type — we show up prepared for whatever Glendale throws at us.",
+  "When you call Same Day Appliance Repair in Glendale, you're reaching our team directly — not a dispatcher who'll route you to whoever's available. We pick up, we ask what's happening, and we tell you honestly whether we can be there today. Most of the time, we can. Call before noon and a same day appliance repair Glendale visit is usually on the schedule.",
+  "Diagnostic fee: <strong>$89</strong>, waived when you proceed with the repair. Every repair comes with a written estimate before we start, and a <strong>90-day warranty</strong> on parts and labor when we finish.",
+  "<strong>From our techs:</strong> Glendale's hillside neighborhoods — Verdugo Woodlands, Chevy Chase Canyon, Glenoaks Canyon — have some of the dustiest conditions we work in. Condenser coils on refrigerators clog faster here than in flatland LA. If your fridge is running constantly and the motor sounds like it's working hard, pull it out and check the coils. A quick vacuum every 6 months can add years to the compressor's life.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling · Leaking · Ice maker broken · Fan motor · Constant cycling', brands: 'Samsung · LG · Sub-Zero · GE · Whirlpool · Viking' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'Not spinning · Not draining · Leaking · Shaking · Front-load & top-load', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen' },
+  { icon: '♨️', name: 'Dryer Repair', slug: 'dryer', issues: 'Not heating · Takes too long · Drum not spinning · Dryer vent cleaning', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🔥', name: 'Oven, Stove & Range Repair', slug: 'oven', issues: 'Not heating · Uneven temp · Igniter clicking · Door seal broken', brands: 'Viking · Thermador · GE · Bosch · Wolf · Whirlpool' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: "Not draining · Leaving spots · Leaking · Won't start · Error codes", brands: 'Bosch · Miele · KitchenAid · Samsung · LG · GE' },
+  { icon: '🔆', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burner won't light · Clicking constantly · Induction not heating", brands: 'Thermador · Viking · GE · Bosch · Samsung · Miele' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Not freezing · Frosting up · Temperature off · Ice buildup', brands: 'Whirlpool · GE · Samsung · LG · Sub-Zero · Frigidaire' },
+  { icon: '💨', name: 'Range Hood Repair', slug: 'range-hood', issues: 'Fan not working · Lights out · Motor failure · Noisy · Filter cleaning', brands: 'Broan · Zephyr · KitchenAid · Viking · Thermador · GE' },
+];
+
+const glendaleContextNarrative = {
+  eyebrow: 'What Makes Glendale Different',
+  headline: "Hillside Estates, Mid-Century Homes, Brand Blvd Condos — We've Worked in All of Them",
+  paragraphs: [
+    "Glendale sits between the Verdugo Mountains and Griffith Park, and that geography shapes everything — including the appliances. Up in Verdugo Woodlands and Rossmoyne you find the Mediterranean estates and hillside homes with luxury Viking ranges and Sub-Zero refrigerators. Down toward Brand Boulevard and Tropico it's newer condos and high-rises with Samsung and LG units. Adams Hill has the craftsman homes with older appliances that need someone who actually knows how to work on them.",
+    "Our technicians come prepared for all of it. We carry OEM parts for luxury brands and mainstream brands on the same vehicle. We know Glendale's neighborhoods well enough to know what we're likely walking into — and we have the right parts to handle it in one visit. Glendale also has one of the largest Armenian communities in the US, and we serve those households with the same care and same-day availability as everyone else in the city.",
+  ],
 };
+
+const neighborhoods = [
+  { name: 'Verdugo Woodlands', zip: '91206', featured: true },
+  { name: 'Rossmoyne', zip: '91207', featured: true },
+  { name: 'Adams Hill', zip: '91204', featured: true },
+  { name: 'Sparr Heights', zip: '91208' },
+  { name: 'Chevy Chase Canyon', zip: '91206' },
+  { name: 'Glenoaks Canyon', zip: '91206' },
+  { name: 'Downtown Glendale', zip: '91203' },
+  { name: 'Tropico', zip: '91204' },
+  { name: 'Rancho San Rafael', zip: '91201' },
+];
+
+const keyStreets = ['Brand Blvd', 'Colorado Blvd', 'Central Ave', 'Glendale Ave', 'Verdugo Rd', 'Glenoaks Blvd', 'San Fernando Rd', 'Foothill Blvd'];
+
+const recentJobs = [
+  {
+    appliance: 'Viking Range',
+    location: 'Verdugo Woodlands, 91206',
+    quote: "Two burners clicking constantly, won't light",
+    description: 'Viking dual-fuel range — igniter switches were worn and staying in a stuck-on position. Classic failure after a few years on these ranges, especially with the amount of cooking these hillside kitchens do. Our tech replaced both igniter modules with OEM Viking parts, cleaned the burner ports, and checked the gas valve operation. Tested all six burners plus both ovens before leaving. Homeowner mentioned they\'d been putting it off for weeks — the fix took less than 90 minutes.',
+    outcome: '✓ Same day · OEM Viking parts · Full burner check',
+  },
+  {
+    appliance: 'Samsung Refrigerator',
+    location: 'Adams Hill, 91204',
+    quote: 'Fridge is warm, freezer still working fine',
+    description: "This is one of the most common calls we get in Glendale — and it's almost always the same culprit on Samsung French door models: a failed evaporator fan in the fresh food section. The freezer keeps running because it has its own system, but the fridge warms up. Our tech replaced the fan motor with an OEM Samsung part, cleared the blocked defrost drain, and ran a defrost cycle. Back to 37°F within a few hours of the visit.",
+    outcome: '✓ Same day · OEM Samsung fan motor',
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'Rossmoyne, 91207',
+    quote: 'E24 error, dishes sitting in water at the end',
+    description: "E24 on Bosch means drainage failure. Found a blocked drain hose at the garbage disposal connection — a very common issue when disposals are replaced and the knockout plug isn't removed. Cleared the blockage, checked the drain pump (still good), tested three cycles. While there, the homeowner asked about a grinding noise on another Bosch unit — turned out to be a food trap issue we cleared on the spot. Same visit, no extra charge.",
+    outcome: '✓ Same day · Drain cleared + bonus fix',
+  },
+  {
+    appliance: 'LG Dryer',
+    location: 'Sparr Heights, 91208',
+    quote: 'Takes two full cycles to dry one load',
+    description: "Two full cycles almost always means airflow restriction, not a heating element failure. In Glendale's hillside homes, vent ducts run long distances through walls and attics — and lint accumulates faster in the dusty air up here. Found significant lint buildup about 8 feet into the duct. Cleared the blockage completely, replaced the thermal fuse that had tripped from the heat, and tested airflow with a gauge before leaving. Homeowner got a dryer vent cleaning tutorial to do annually.",
+    outcome: '✓ Same day · Vent cleared · Thermal fuse replaced',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'We Pick Up the Phone',
+    body: "You're calling Same Day Appliance Repair, not a call center. When you dial our Glendale number, someone who actually knows the schedule picks up and tells you honestly when we can be there.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'We Find the Real Problem',
+    body: "A thermal fuse blows for a reason. An igniter fails after years of buildup. We don't just swap the obvious part — we find what caused it, fix that too, and tell you how to prevent it from happening again.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Parts on the Truck for Both Ends of Glendale',
+    body: 'OEM parts for Sub-Zero, Viking, Thermador, and Miele for the hillside homes. Parts for Samsung, LG, Whirlpool, GE, and Bosch for everyone else. We come stocked for what Glendale actually has.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, No Exceptions',
+    body: 'Every repair we do in Glendale is backed by 90 days on parts and labor. Same issue comes back within 90 days — we return and fix it, no charge, no questions. California licensed, BBB A+ rated.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Our Viking range had two burners that wouldn\'t stop clicking. Technician came out to our Verdugo Woodlands home the same afternoon, replaced the igniters, cleaned everything, and tested all six burners. Total time was maybe 90 minutes. Very impressed with the knowledge on premium appliances."',
+    author: '— Elena M., Verdugo Woodlands, Glendale',
+  },
+  {
+    stars: 5,
+    text: '"Called at 10am about my Samsung fridge not cooling. By 2pm the technician was in my kitchen in Adams Hill, diagnosed the problem in 20 minutes, had the part on his truck, and fixed it on the spot. Honestly didn\'t expect same-day service to actually mean same day."',
+    author: '— Armen K., Adams Hill, Glendale',
+  },
+  {
+    stars: 5,
+    text: "\"My Bosch dishwasher had an E24 error and I'd already looked up repair companies without much luck. Same Day Appliance Repair came out to Rossmoyne, cleared the drain blockage, and also noticed a second issue with my other dishwasher and fixed that too in the same visit. Great honest service.\"",
+    author: '— Sophia R., Rossmoyne, Glendale',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator', range: '$200 – $450', note: 'Fan motor, thermostat, ice maker, compressor relay, coil cleaning' },
+  { appliance: 'Washer', range: '$150 – $350', note: 'Drain pump, door latch, shock absorbers, control board' },
+  { appliance: 'Dryer', range: '$150 – $320', note: 'Heating element, thermal fuse, drum roller, dryer vent cleaning' },
+  { appliance: 'Oven / Range', range: '$175 – $420', note: 'Igniter, bake element, gas valve, door seal, control board' },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'Drain pump, door latch, wash motor, spray arm' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair', featured: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Glendale, CA?',
+    answer: "Yes. Our technicians cover all of Glendale — Verdugo Woodlands, Adams Hill, Rossmoyne, Sparr Heights, Montrose, Chevy Chase Canyon, Brand Blvd corridor. Call before noon and we're usually there the same afternoon. We serve ZIP codes 91201 through 91208.",
+  },
+  {
+    question: 'What appliances do you repair in Glendale?',
+    answer: 'We repair all major home appliances: refrigerators, washers, dryers, ovens, stoves, ranges, dishwashers, cooktops, freezers, wine coolers, microwaves, range hoods, and ice makers. We service every major brand — Samsung, LG, Whirlpool, GE, Bosch, KitchenAid, Sub-Zero, Viking, Thermador, Miele, Dacor, and more.',
+  },
+  {
+    question: 'Do you repair Viking and Thermador appliances in Glendale?',
+    answer: "Yes. Glendale's hillside homes — especially in Verdugo Woodlands, Rossmoyne, and Chevy Chase Canyon — have a lot of high-end appliances. Our technicians are trained on Viking ranges, Thermador cooktops, Sub-Zero refrigerators, and Miele dishwashers. We carry OEM parts for these brands on every service vehicle.",
+  },
+  {
+    question: 'What is your diagnostic fee in Glendale?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before any work begins. No hidden fees — the price we quote is the price on the invoice.',
+  },
+  {
+    question: 'What warranty do you offer on appliance repairs in Glendale?',
+    answer: 'All repairs come with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back and fix it at no charge. We use genuine OEM parts — not aftermarket.',
+  },
+  {
+    question: 'Do you also service La Crescenta, Montrose, and Eagle Rock?',
+    answer: "Yes. Our Glendale service coverage extends to La Crescenta, Montrose, Eagle Rock, Atwater Village, Glassell Park, La Cañada Flintridge, and Tujunga. If you're in the Verdugo Hills area and need a technician, we're likely the closest call.",
+  },
+  {
+    question: 'How much does appliance repair cost in Glendale?',
+    answer: 'Most home appliance repairs in Glendale run $150–$400 depending on the appliance and the specific failure. The $89 diagnostic fee is waived with repair. Luxury brand repairs (Sub-Zero, Viking, Thermador) may cost more due to OEM part pricing. We always give you a written estimate before starting.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Burbank', slug: 'burbank' },
+  { name: 'Pasadena', slug: 'pasadena' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'La Cañada Flintridge', slug: 'la-canada-flintridge' },
+  { name: 'North Hollywood', slug: 'north-hollywood' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Eagle Rock', slug: 'eagle-rock' },
+  { name: 'Silver Lake', slug: 'silver-lake' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Glendale, CA"
+    subheadline="Our technicians are in Glendale regularly — from the hillside homes in Verdugo Woodlands to the mid-century apartments in Adams Hill and the condos along Brand Boulevard. Same-day service, OEM parts, 90-day warranty on every repair."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="gl-hero">
-    <div class="gl-hero__inner container">
-      <div class="gl-hero__content">
-        <div class="gl-hero__eyebrow">Glendale, CA · 91201–91208 · Verdugo Woodlands · Adams Hill · Rossmoyne</div>
-        <h1 class="gl-hero__h1">
-          Appliance Repair<br>
-          <span class="gl-hero__accent">Glendale, CA</span>
-        </h1>
-        <p class="gl-hero__sub">
-          Our technicians are in Glendale regularly — from the hillside homes in Verdugo Woodlands
-          to the mid-century apartments in Adams Hill and the condos along Brand Boulevard.
-          Same-day service, OEM parts, 90-day warranty on every repair.
-        </p>
-        <div class="gl-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="gl-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed</span>
-        </div>
-      </div>
-      <div class="gl-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-glendale-ca.webp"
-          alt="Appliance repair technician in Glendale CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Same-Day Service</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>90-Day Warranty</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>OEM Parts</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Licensed & Insured</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>85% First-Visit Fix Rate</span>
-      </div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Same Day Appliance Repair in Glendale — From Our Technicians"
+    paragraphs={introParagraphs}
+    bookingTitle="Talk to Our Glendale Team"
+    bookingSub="Same-day available · Call now"
+  />
 
-  <!-- INTRO -->
-  <section class="gl-intro">
-    <div class="container gl-intro__inner">
-      <div class="gl-intro__text">
-        <h2>Same Day Appliance Repair in Glendale — From Our Technicians</h2>
-        <p>
-          Glendale is one of those cities where you see the full range of everything — luxury Thermador
-          ranges in the Mediterranean estates up in Rossmoyne, 15-year-old Whirlpool washers in the
-          Tropico apartments that still have plenty of life left, brand-new Samsung French doors in the
-          condos on Brand Boulevard. Our technicians work across all of it. We don't specialize in
-          just one type — we show up prepared for whatever Glendale throws at us.
-        </p>
-        <p>
-          When you call Same Day Appliance Repair in Glendale, you're reaching our team directly —
-          not a dispatcher who'll route you to whoever's available. We pick up, we ask what's happening,
-          and we tell you honestly whether we can be there today. Most of the time, we can. Call before
-          noon and a same day appliance repair Glendale visit is usually on the schedule.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong>, waived when you proceed with the repair. Every repair
-          comes with a written estimate before we start, and a <strong>90-day warranty</strong> on
-          parts and labor when we finish.
-        </p>
-        <div class="gl-tip">
-          <div class="gl-tip__icon">💡</div>
-          <div class="gl-tip__text">
-            <strong>From our techs:</strong> Glendale's hillside neighborhoods — Verdugo Woodlands,
-            Chevy Chase Canyon, Glenoaks Canyon — have some of the dustiest conditions we work in.
-            Condenser coils on refrigerators clog faster here than in flatland LA. If your fridge is
-            running constantly and the motor sounds like it's working hard, pull it out and check the
-            coils. A quick vacuum every 6 months can add years to the compressor's life.
-          </div>
-        </div>
-      </div>
-      <div class="gl-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Talk to Our Glendale Team</div>
-          <div class="cta-box__sub">Same-day available · Call now</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Fix in Glendale"
+    services={services}
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="gl-services">
-    <div class="container">
-      <h2 class="section-title">What We Fix in Glendale</h2>
-      <p class="section-sub">All major brands · Gas & electric · Residential & commercial</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="We Cover All of Glendale — Every Neighborhood"
+    subheadline="From the hillside estates to Brand Blvd condos — ZIP codes 91201 through 91208"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={keyStreets}
+  />
 
-        <a href="/glendale/refrigerator-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Leaking · Ice maker broken · Fan motor · Constant cycling</div>
-          <div class="service-card__brands">Samsung · LG · Sub-Zero · GE · Whirlpool · Viking</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <CustomNarrative
+    eyebrow={glendaleContextNarrative.eyebrow}
+    headline={glendaleContextNarrative.headline}
+    paragraphs={glendaleContextNarrative.paragraphs}
+    background="black"
+  />
 
-        <a href="/glendale/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Not spinning · Not draining · Leaking · Shaking · Front-load & top-load</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs Our Technicians Did in Glendale"
+    subhead="Real calls from Glendale residents. Most completed the same day we were called."
+    jobs={recentJobs}
+  />
 
-        <a href="/glendale/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Takes too long · Drum not spinning · Dryer vent cleaning</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Glendale Homeowners Call Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/glendale/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Stove & Range Repair</div>
-          <div class="service-card__issues">Not heating · Uneven temp · Igniter clicking · Door seal broken</div>
-          <div class="service-card__brands">Viking · Thermador · GE · Bosch · Wolf · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Glendale Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/glendale/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Leaving spots · Leaking · Won't start · Error codes</div>
-          <div class="service-card__brands">Bosch · Miele · KitchenAid · Samsung · LG · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Glendale"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair."
+    tiers={pricingTiers}
+    footnote="Sub-Zero, Viking, Thermador, Miele and other luxury brands may cost more due to OEM part pricing. We quote you exactly before starting — no work begins without your written approval."
+  />
 
-        <a href="/glendale/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop Repair</div>
-          <div class="service-card__issues">Burner won't light · Clicking constantly · Induction not heating</div>
-          <div class="service-card__brands">Thermador · Viking · GE · Bosch · Samsung · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Glendale Customers Ask Us"
+    faqs={faqs}
+  />
 
-        <a href="/glendale/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer Repair</div>
-          <div class="service-card__issues">Not freezing · Frosting up · Temperature off · Ice buildup</div>
-          <div class="service-card__brands">Whirlpool · GE · Samsung · LG · Sub-Zero · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+  />
 
-        <a href="/glendale/range-hood-repair/" class="service-card">
-          <div class="service-card__icon">💨</div>
-          <div class="service-card__name">Range Hood Repair</div>
-          <div class="service-card__issues">Fan not working · Lights out · Motor failure · Noisy · Filter cleaning</div>
-          <div class="service-card__brands">Broan · Zephyr · KitchenAid · Viking · Thermador · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="gl-neighborhoods">
-    <div class="container">
-      <h2>We Cover All of Glendale — Every Neighborhood</h2>
-      <p class="section-sub">From the hillside estates to Brand Blvd condos — ZIP codes 91201 through 91208</p>
-
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Glendale Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Verdugo Woodlands</div>
-            <div class="nh-item featured">Rossmoyne</div>
-            <div class="nh-item featured">Adams Hill</div>
-            <div class="nh-item">Sparr Heights</div>
-            <div class="nh-item">Chevy Chase Canyon</div>
-            <div class="nh-item">Glenoaks Canyon</div>
-            <div class="nh-item">Downtown Glendale</div>
-            <div class="nh-item">Tropico</div>
-            <div class="nh-item">Rancho San Rafael</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Also Serving Nearby</div>
-          <div class="nh-list">
-            <div class="nh-item">Montrose</div>
-            <div class="nh-item">La Crescenta</div>
-            <div class="nh-item">Eagle Rock</div>
-            <div class="nh-item">La Cañada Flintridge</div>
-            <div class="nh-item">Atwater Village</div>
-            <div class="nh-item">Glassell Park</div>
-            <div class="nh-item">Tujunga</div>
-            <div class="nh-item">Sunland</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list streets">
-            <div class="nh-item">Brand Blvd</div>
-            <div class="nh-item">Colorado Blvd</div>
-            <div class="nh-item">Central Ave</div>
-            <div class="nh-item">Glendale Ave</div>
-            <div class="nh-item">Verdugo Rd</div>
-            <div class="nh-item">Glenoaks Blvd</div>
-            <div class="nh-item">San Fernando Rd</div>
-            <div class="nh-item">Foothill Blvd</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- GLENDALE CONTEXT — Hillside + Luxury + Diversity -->
-  <section class="gl-context">
-    <div class="container">
-      <div class="context-inner">
-        <div class="context-text">
-          <div class="context-eyebrow">What Makes Glendale Different</div>
-          <h2>Hillside Estates, Mid-Century Homes, Brand Blvd Condos — We've Worked in All of Them</h2>
-          <p>
-            Glendale sits between the Verdugo Mountains and Griffith Park, and that geography shapes
-            everything — including the appliances. Up in Verdugo Woodlands and Rossmoyne you find
-            the Mediterranean estates and hillside homes with luxury Viking ranges and Sub-Zero
-            refrigerators. Down toward Brand Boulevard and Tropico it's newer condos and high-rises
-            with Samsung and LG units. Adams Hill has the craftsman homes with older appliances
-            that need someone who actually knows how to work on them.
-          </p>
-          <p>
-            Our technicians come prepared for all of it. We carry OEM parts for luxury brands and
-            mainstream brands on the same vehicle. We know Glendale's neighborhoods well enough to
-            know what we're likely walking into — and we have the right parts to handle it in one visit.
-            Glendale also has one of the largest Armenian communities in the US, and we serve those
-            households with the same care and same-day availability as everyone else in the city.
-          </p>
-          <div class="context-stats">
-            <div class="cstat">
-              <div class="cstat-num">85%</div>
-              <div class="cstat-label">First-visit fix rate</div>
-            </div>
-            <div class="cstat">
-              <div class="cstat-num">90</div>
-              <div class="cstat-label">Day warranty</div>
-            </div>
-            <div class="cstat">
-              <div class="cstat-num">$89</div>
-              <div class="cstat-label">Diagnostic fee</div>
-            </div>
-            <div class="cstat">
-              <div class="cstat-num">7</div>
-              <div class="cstat-label">Days a week</div>
-            </div>
-          </div>
-        </div>
-        <div class="context-brands">
-          <div class="brands-label">All brands our technicians repair in Glendale</div>
-          <div class="brands-grid">
-            <span>Samsung</span><span>LG</span><span>Whirlpool</span>
-            <span>GE</span><span>Maytag</span><span>Bosch</span>
-            <span>KitchenAid</span><span>Frigidaire</span><span>Electrolux</span>
-            <span>Sub-Zero</span><span>Viking</span><span>Thermador</span>
-            <span>Wolf</span><span>Miele</span><span>Dacor</span>
-            <span>Jenn-Air</span><span>Speed Queen</span><span>Fisher & Paykel</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="gl-recent">
-    <div class="container">
-      <h2>Recent Jobs Our Technicians Did in Glendale</h2>
-      <p class="section-sub">Real calls from Glendale residents. Most completed the same day we were called.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Viking Range</span>
-            <span class="recent-location">Verdugo Woodlands, 91206</span>
-          </div>
-          <div class="recent-card__title">"Two burners clicking constantly, won't light"</div>
-          <div class="recent-card__desc">
-            Viking dual-fuel range — igniter switches were worn and staying in a stuck-on position.
-            Classic failure after a few years on these ranges, especially with the amount of cooking
-            these hillside kitchens do. Our tech replaced both igniter modules with OEM Viking parts,
-            cleaned the burner ports, and checked the gas valve operation. Tested all six burners
-            plus both ovens before leaving. Homeowner mentioned they'd been putting it off for weeks —
-            the fix took less than 90 minutes.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Viking parts · Full burner check</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Adams Hill, 91204</span>
-          </div>
-          <div class="recent-card__title">"Fridge is warm, freezer still working fine"</div>
-          <div class="recent-card__desc">
-            This is one of the most common calls we get in Glendale — and it's almost always the
-            same culprit on Samsung French door models: a failed evaporator fan in the fresh food
-            section. The freezer keeps running because it has its own system, but the fridge warms
-            up. Our tech replaced the fan motor with an OEM Samsung part, cleared the blocked
-            defrost drain, and ran a defrost cycle. Back to 37°F within a few hours of the visit.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung fan motor</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Rossmoyne, 91207</span>
-          </div>
-          <div class="recent-card__title">"E24 error, dishes sitting in water at the end"</div>
-          <div class="recent-card__desc">
-            E24 on Bosch means drainage failure. Found a blocked drain hose at the garbage disposal
-            connection — a very common issue when disposals are replaced and the knockout plug isn't
-            removed. Cleared the blockage, checked the drain pump (still good), tested three cycles.
-            While there, the homeowner asked about a grinding noise on another Bosch unit — turned
-            out to be a food trap issue we cleared on the spot. Same visit, no extra charge.
-          </div>
-          <div class="recent-card__result">✓ Same day · Drain cleared + bonus fix</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Dryer</span>
-            <span class="recent-location">Sparr Heights, 91208</span>
-          </div>
-          <div class="recent-card__title">"Takes two full cycles to dry one load"</div>
-          <div class="recent-card__desc">
-            Two full cycles almost always means airflow restriction, not a heating element failure.
-            In Glendale's hillside homes, vent ducts run long distances through walls and attics —
-            and lint accumulates faster in the dusty air up here. Found significant lint buildup
-            about 8 feet into the duct. Cleared the blockage completely, replaced the thermal fuse
-            that had tripped from the heat, and tested airflow with a gauge before leaving.
-            Homeowner got a dryer vent cleaning tutorial to do annually.
-          </div>
-          <div class="recent-card__result">✓ Same day · Vent cleared · Thermal fuse replaced</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="gl-why">
-    <div class="container">
-      <h2>Why Glendale Homeowners Call Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">📞</div>
-          <div class="why-title">We Pick Up the Phone</div>
-          <div class="why-text">You're calling Same Day Appliance Repair, not a call center. When you dial our Glendale number, someone who actually knows the schedule picks up and tells you honestly when we can be there.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🔧</div>
-          <div class="why-title">We Find the Real Problem</div>
-          <div class="why-text">A thermal fuse blows for a reason. An igniter fails after years of buildup. We don't just swap the obvious part — we find what caused it, fix that too, and tell you how to prevent it from happening again.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📦</div>
-          <div class="why-title">Parts on the Truck for Both Ends of Glendale</div>
-          <div class="why-text">OEM parts for Sub-Zero, Viking, Thermador, and Miele for the hillside homes. Parts for Samsung, LG, Whirlpool, GE, and Bosch for everyone else. We come stocked for what Glendale actually has.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, No Exceptions</div>
-          <div class="why-text">Every repair we do in Glendale is backed by 90 days on parts and labor. Same issue comes back within 90 days — we return and fix it, no charge, no questions. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="gl-reviews">
-    <div class="container">
-      <h2>What Glendale Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our Viking range had two burners that wouldn't stop clicking. Technician came out to our Verdugo Woodlands home the same afternoon, replaced the igniters, cleaned everything, and tested all six burners. Total time was maybe 90 minutes. Very impressed with the knowledge on premium appliances."</div>
-          <div class="review-author">— Elena M., Verdugo Woodlands, Glendale</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Called at 10am about my Samsung fridge not cooling. By 2pm the technician was in my kitchen in Adams Hill, diagnosed the problem in 20 minutes, had the part on his truck, and fixed it on the spot. Honestly didn't expect same-day service to actually mean same day."</div>
-          <div class="review-author">— Armen K., Adams Hill, Glendale</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"My Bosch dishwasher had an E24 error and I'd already looked up repair companies without much luck. Same Day Appliance Repair came out to Rossmoyne, cleared the drain blockage, and also noticed a second issue with my other dishwasher and fixed that too in the same visit. Great honest service."</div>
-          <div class="review-author">— Sophia R., Rossmoyne, Glendale</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="gl-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Glendale</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Fan motor, thermostat, ice maker, compressor relay, coil cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump, door latch, shock absorbers, control board</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dryer</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Heating element, thermal fuse, drum roller, dryer vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$175 – $420</div>
-          <div class="pricing-card__note">Igniter, bake element, gas valve, door seal, control board</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Drain pump, door latch, wash motor, spray arm</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-      <p class="pricing-note">Sub-Zero, Viking, Thermador, Miele and other luxury brands may cost more due to OEM part pricing. We quote you exactly before starting — no work begins without your written approval.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="gl-faq">
-    <div class="container">
-      <h2>Questions Glendale Customers Ask Us</h2>
-      <div class="faq-list">
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you offer same-day appliance repair in Glendale, CA?</summary>
-          <div class="faq-answer">Yes. Our technicians cover all of Glendale — Verdugo Woodlands, Adams Hill, Rossmoyne, Sparr Heights, Montrose, Chevy Chase Canyon, Brand Blvd corridor. Call before noon and we're usually there the same afternoon. We serve ZIP codes 91201 through 91208.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What appliances do you repair in Glendale?</summary>
-          <div class="faq-answer">We repair all major home appliances: refrigerators, washers, dryers, ovens, stoves, ranges, dishwashers, cooktops, freezers, wine coolers, microwaves, range hoods, and ice makers. We service every major brand — Samsung, LG, Whirlpool, GE, Bosch, KitchenAid, Sub-Zero, Viking, Thermador, Miele, Dacor, and more.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair Viking and Thermador appliances in Glendale?</summary>
-          <div class="faq-answer">Yes. Glendale's hillside homes — especially in Verdugo Woodlands, Rossmoyne, and Chevy Chase Canyon — have a lot of high-end appliances. Our technicians are trained on Viking ranges, Thermador cooktops, Sub-Zero refrigerators, and Miele dishwashers. We carry OEM parts for these brands on every service vehicle.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What is your diagnostic fee in Glendale?</summary>
-          <div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before any work begins. No hidden fees — the price we quote is the price on the invoice.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What warranty do you offer on appliance repairs in Glendale?</summary>
-          <div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back and fix it at no charge. We use genuine OEM parts — not aftermarket.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you also service La Crescenta, Montrose, and Eagle Rock?</summary>
-          <div class="faq-answer">Yes. Our Glendale service coverage extends to La Crescenta, Montrose, Eagle Rock, Atwater Village, Glassell Park, La Cañada Flintridge, and Tujunga. If you're in the Verdugo Hills area and need a technician, we're likely the closest call.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">How much does appliance repair cost in Glendale?</summary>
-          <div class="faq-answer">Most home appliance repairs in Glendale run $150–$400 depending on the appliance and the specific failure. The $89 diagnostic fee is waived with repair. Luxury brand repairs (Sub-Zero, Viking, Thermador) may cost more due to OEM part pricing. We always give you a written estimate before starting.</div>
-        </details>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="gl-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/la-canada-flintridge/" class="nearby-link">La Cañada Flintridge</a>
-        <a href="/north-hollywood/" class="nearby-link">North Hollywood</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/eagle-rock/" class="nearby-link">Eagle Rock</a>
-        <a href="/silver-lake/" class="nearby-link">Silver Lake</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="gl-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Glendale? Call us now.</h2>
-          <p>Our team covers all of Glendale and the Verdugo Hills area. Diagnostic $89 waived with repair. 90-day warranty. We pick up the phone.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Glendale, CA</span>
-          <span>·</span>
-          <span>Serving 91201 · 91202 · 91203 · 91204 · 91205 · 91206 · 91207 · 91208</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</Layout>
-
-<style>
-  :root {
-    --gl-red: #C8102E;
-    --gl-black: #0a0a0a;
-    --gl-gray: #f5f5f5;
-    --gl-border: #e2e2e2;
-    --gl-text: #1a1a1a;
-    --gl-muted: #6b6b6b;
-  }
-
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  /* HERO */
-  .gl-hero { background: var(--gl-black); color: white; padding: 80px 0 60px; }
-  .gl-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .gl-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--gl-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .gl-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .gl-hero__accent { color: var(--gl-red); }
-  .gl-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .gl-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .gl-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .gl-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-
-  /* BUTTONS */
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--gl-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); transition: border-color 0.2s; }
-  .btn-secondary:hover { border-color: white; }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .gl-bottom-cta .btn-secondary { color: var(--gl-text); border-color: var(--gl-border); }
-  .gl-bottom-cta .btn-secondary:hover { background: var(--gl-gray); }
-
-  /* TRUST BAR */
-  .trust-bar { background: var(--gl-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-
-  /* INTRO */
-  .gl-intro { padding: 72px 0; background: white; }
-  .gl-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .gl-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--gl-black); margin-bottom: 20px; }
-  .gl-intro__text p { font-size: 16px; line-height: 1.7; color: var(--gl-text); margin-bottom: 16px; }
-  .gl-tip { display: flex; gap: 14px; background: #fff8e7; border: 1px solid #f0d070; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .gl-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .gl-tip__text { font-size: 14px; color: var(--gl-text); line-height: 1.6; }
-  .cta-box { background: var(--gl-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--gl-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__book:hover { background: rgba(255,255,255,0.08); }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-
-  /* SECTION */
-  .section-title { font-size: 30px; font-weight: 700; color: var(--gl-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--gl-muted); text-align: center; margin-bottom: 40px; }
-
-  /* SERVICES */
-  .gl-services { padding: 72px 0; background: var(--gl-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--gl-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--gl-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--gl-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--gl-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--gl-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--gl-red); font-weight: 500; }
-
-  /* NEIGHBORHOODS */
-  .gl-neighborhoods { padding: 72px 0; background: white; }
-  .gl-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--gl-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--gl-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--gl-text); padding: 8px 12px; background: var(--gl-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--gl-red); color: var(--gl-black); font-weight: 500; }
-
-  /* CONTEXT */
-  .gl-context { padding: 72px 0; background: var(--gl-black); color: white; }
-  .context-inner { display: grid; grid-template-columns: 1fr 300px; gap: 60px; align-items: start; }
-  .context-eyebrow { font-size: 13px; font-weight: 500; color: var(--gl-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .context-text h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px; }
-  .context-text p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.75); margin-bottom: 16px; }
-  .context-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 28px; }
-  .cstat { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 20px; text-align: center; }
-  .cstat-num { font-size: 30px; font-weight: 700; color: var(--gl-red); margin-bottom: 4px; }
-  .cstat-label { font-size: 12px; color: rgba(255,255,255,0.6); }
-  .context-brands { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 28px; }
-  .brands-label { font-size: 13px; font-weight: 500; color: rgba(255,255,255,0.5); margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.06em; }
-  .brands-grid { display: flex; flex-wrap: wrap; gap: 8px; }
-  .brands-grid span { padding: 5px 12px; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; font-size: 13px; color: rgba(255,255,255,0.75); }
-
-  /* RECENT */
-  .gl-recent { padding: 72px 0; background: var(--gl-gray); }
-  .gl-recent h2 { font-size: 30px; font-weight: 700; color: var(--gl-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--gl-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--gl-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--gl-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--gl-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--gl-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-
-  /* WHY */
-  .gl-why { padding: 72px 0; background: white; }
-  .gl-why h2 { font-size: 30px; font-weight: 700; color: var(--gl-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--gl-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--gl-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--gl-muted); line-height: 1.6; }
-
-  /* REVIEWS */
-  .gl-reviews { padding: 72px 0; background: var(--gl-gray); }
-  .gl-reviews h2 { font-size: 30px; font-weight: 700; color: var(--gl-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--gl-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--gl-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--gl-muted); font-weight: 500; }
-
-  /* PRICING */
-  .gl-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--gl-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--gl-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--gl-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--gl-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 24px; font-weight: 700; color: var(--gl-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--gl-red); }
-  .pricing-card__note { font-size: 13px; color: var(--gl-muted); }
-  .pricing-note { font-size: 14px; color: var(--gl-muted); text-align: center; max-width: 640px; margin: 0 auto; }
-
-  /* FAQ */
-  .gl-faq { padding: 72px 0; background: var(--gl-gray); }
-  .gl-faq h2 { font-size: 30px; font-weight: 700; color: var(--gl-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--gl-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--gl-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--gl-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--gl-text); }
-
-  /* NEARBY */
-  .gl-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--gl-border); }
-  .gl-nearby h2 { font-size: 20px; font-weight: 600; color: var(--gl-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--gl-border); border-radius: 20px; font-size: 14px; color: var(--gl-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--gl-red); color: var(--gl-red); }
-
-  /* BOTTOM CTA */
-  .gl-bottom-cta { padding: 72px 0; background: var(--gl-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-
-  /* RESPONSIVE */
-  @media (max-width: 1024px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-grid { grid-template-columns: repeat(2, 1fr); }
-    .reviews-grid { grid-template-columns: 1fr 1fr; }
-    .context-inner { grid-template-columns: 1fr; }
-    .context-stats { grid-template-columns: repeat(4, 1fr); }
-    .nh-columns { grid-template-columns: 1fr 1fr; }
-    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .gl-hero__inner { grid-template-columns: 1fr; }
-    .gl-hero__img-wrap { display: none; }
-    .gl-intro__inner { grid-template-columns: 1fr; }
-    .recent-grid { grid-template-columns: 1fr; }
-    .reviews-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr 1fr; }
-    .nh-columns { grid-template-columns: 1fr; }
-    .context-stats { grid-template-columns: repeat(2, 1fr); }
-    .trust-bar__inner { justify-content: center; }
-  }
-  @media (max-width: 480px) {
-    .services-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; }
-    .gl-hero { padding: 48px 0 40px; }
-    .bottom-cta__text h2 { font-size: 26px; }
-  }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Glendale? Call us now."
+    body="Our team covers all of Glendale and the Verdugo Hills area. Diagnostic $89 waived with repair. 90-day warranty. We pick up the phone."
+  />
+</CityLayoutV2>

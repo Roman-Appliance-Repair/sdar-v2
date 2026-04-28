@@ -1,406 +1,344 @@
 ---
-// src/pages/fullerton.astro
-// Same Day Appliance Repair — Fullerton, CA
-// Branch: Irvine/OC | Phone: (213) 401-9019
+/**
+ * Fullerton, CA — v2 migrated page (T12 batch).
+ * Branch: Irvine — service_area (no public street address).
+ * Content source of truth: legacy src/pages/fullerton.astro.legacy + content-dumps/fullerton.md
+ *
+ * Unique block: "Three Fullertons — And Why Each Is Different for Repairs" — rendered
+ * via CustomNarrative with subSections (rental corridor / historic downtown /
+ * Sunny Hills North Fullerton).
+ *
+ * Branch isolation:
+ *   - Phone (213) 401-9019 from cities.ts → branches.ts (Irvine)
+ *   - No streetAddress in schema (Irvine is service_area, not physical_pin)
+ *   - All ZIPs are Fullerton's (92831, 92832, 92833, 92835)
+ *
+ * Nearby city fixes per audit catalog: /brea/, /placentia/, /la-habra/, /buena-park/
+ * don't have .astro pages. Replaced with /anaheim/, /tustin/, /yorba-linda/, /costa-mesa/.
+ *
+ * Legacy preserved as fullerton.astro.legacy.
+ */
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = "Fullerton";
-const citySlug = "fullerton";
-const phone = "(213) 401-9019";
-const phoneRaw = "+12134019019";
-const email = "oc@samedayappliance.repair";
-const branch = "Irvine";
+const citySlug = 'fullerton';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const metaTitle = "Appliance Repair Fullerton CA | Same Day Service | (213) 401-9019";
-const metaDesc = "Same-day appliance repair in Fullerton, CA. Historic downtown, CSUF area, rental properties. Samsung, LG, GE & all brands. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
+const cityName = 'Fullerton';
+const zips = ['92831', '92832', '92833', '92835'];
 
-const neighborhoods = [
-  { name: "Downtown Fullerton", zip: "92832" },
-  { name: "North Fullerton", zip: "92835" },
-  { name: "East Fullerton", zip: "92831" },
-  { name: "West Fullerton", zip: "92833" },
-  { name: "Sunny Hills area", zip: "92835" },
-  { name: "CSUF / State College area", zip: "92831" },
-  { name: "Fullerton Hills", zip: "92835" },
-  { name: "Raymond Hills", zip: "92835" },
-  { name: "Amerige Heights", zip: "92833" },
-  { name: "Brea border area", zip: "92835" },
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Fullerton CA | Same Day Service | ${phone}`;
+const description = 'Same-day appliance repair in Fullerton, CA. Historic downtown, CSUF area, rental properties. Samsung, LG, GE & all brands. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/fullerton/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Fullerton', sameAs: 'https://en.wikipedia.org/wiki/Fullerton,_California' },
+    { '@type': 'Place', name: 'Sunny Hills' },
+    { '@type': 'Place', name: 'North Fullerton' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Fullerton is one of the more varied cities in North OC — 140,000 residents, two universities, a historic downtown with bungalows and Craftsman homes from the 1920s and 30s, newer tracts in the hills, and a significant rental market that keeps a lot of appliances working hard. Our technicians cover Fullerton daily on our OC routes and know the city well.",
+  "The rental market around CSUF and Fullerton College generates a consistent volume of calls — property managers who need documented same-day service, landlords who need honest guidance on whether a repair makes sense. We provide written service reports on every call and show up in the window we give you. That consistency matters when you're managing multiple units.",
+  "The historic neighborhoods around downtown have appliances that are sometimes decades old and sometimes recently replaced. We repair what's worth repairing and tell you clearly when it isn't. The Sunny Hills and Fullerton Hills areas have more recent housing with higher-end appliance installations — KitchenAid built-ins, Sub-Zero, Bosch — and we carry OEM parts for those too.",
+  `Diagnostic fee is $89, credited toward the repair. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
 ];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
 
-const recentRepairs = [
+const fullertonContextNarrative = {
+  headline: 'Three Fullertons — And Why Each Is Different for Repairs',
+  subSections: [
+    {
+      title: 'The rental corridor (CSUF / Fullerton College area)',
+      paragraphs: [
+        "The neighborhoods around California State University Fullerton and Fullerton College generate a large volume of rental units — single-family homes, duplexes, and apartments with heavy appliance use. Washers and dryers in rental units run more cycles per week than owner-occupied homes. Refrigerators see more door openings. When something breaks, there's a tenant involved and a property manager who needs it fixed fast, documented, and done right. We work with Fullerton landlords and property managers regularly — written service reports, accurate arrival windows, no surprises on the invoice.",
+      ],
+    },
+    {
+      title: 'Historic downtown neighborhoods',
+      paragraphs: [
+        "The streets around downtown Fullerton — Amerige Heights, the historic district, the bungalow belt near Commonwealth — have housing stock from the 1920s through the 1950s. Appliances in these homes range from recently replaced to genuinely old. We repair older units as long as parts are available and the cost makes sense, and we give you an honest assessment before starting. A 1940s Craftsman with a 10-year-old GE range is a good repair candidate. A 1940s Craftsman with a 20-year-old compressor-failed refrigerator usually isn't.",
+      ],
+    },
+    {
+      title: 'Sunny Hills and North Fullerton',
+      paragraphs: [
+        "The hillside neighborhoods in North Fullerton and Sunny Hills have newer, larger homes with higher-end kitchen installations — Sub-Zero, KitchenAid built-in, Bosch, occasionally Wolf or Thermador. These are the calls where having OEM parts on the truck matters. We carry them.",
+      ],
+    },
+  ],
+};
+
+const neighborhoods = [
+  { name: 'Downtown Fullerton', zip: '92832' },
+  { name: 'North Fullerton', zip: '92835' },
+  { name: 'East Fullerton', zip: '92831' },
+  { name: 'West Fullerton', zip: '92833' },
+  { name: 'Sunny Hills area', zip: '92835' },
+  { name: 'CSUF / State College area', zip: '92831' },
+  { name: 'Fullerton Hills', zip: '92835' },
+  { name: 'Raymond Hills', zip: '92835' },
+  { name: 'Amerige Heights', zip: '92833' },
+  { name: 'Brea border area', zip: '92835' },
+];
+
+const recentJobs = [
   {
-    title: "Samsung refrigerator — ice maker not working, water dispenser slow",
-    neighborhood: "North Fullerton",
-    detail: "Samsung RF28R7351SR — ice maker completely stopped, water dispenser reduced to a trickle. Classic combination: water filter 22 months old plus hard water mineral scale on the inlet valve screen. North OC water running through a clogged filter and a partially blocked valve restricts flow to the point where the ice maker stops cycling. Replaced the filter, cleaned the inlet screen, tested two full ice maker cycles before leaving. Homeowner was surprised a filter change could cause all this — it can, especially on Samsung's precision ice mechanics.",
-    part: "Samsung OEM water filter + inlet screen cleaning",
-    time: "1 hour"
+    appliance: 'Samsung refrigerator',
+    location: 'North Fullerton',
+    quote: 'ice maker not working, water dispenser slow',
+    description: "Samsung RF28R7351SR — ice maker completely stopped, water dispenser reduced to a trickle. Classic combination: water filter 22 months old plus hard water mineral scale on the inlet valve screen. North OC water running through a clogged filter and a partially blocked valve restricts flow to the point where the ice maker stops cycling. Replaced the filter, cleaned the inlet screen, tested two full ice maker cycles before leaving. Homeowner was surprised a filter change could cause all this — it can, especially on Samsung's precision ice mechanics.",
+    outcome: '✓ Same day · Samsung OEM water filter + inlet screen cleaning · 1 hour',
   },
   {
-    title: "LG dryer — no heat, HE error code",
-    neighborhood: "CSUF area",
-    detail: "LG DLEX3900W — HE error (high heat sensor tripped), drum turning but no heat output. Heating element had failed, taking the thermal limiter with it. Standard combined failure on this LG model. Rental unit in the CSUF corridor — the property manager called us. Replaced the heating element and thermal limiter with OEM LG parts, inspected the vent run (clear at 8 feet, good). Tested three cycles before leaving. Property manager said they use us for all their Fullerton units now.",
-    part: "LG OEM heating element + thermal limiter",
-    time: "1.5 hours"
+    appliance: 'LG dryer',
+    location: 'CSUF area',
+    quote: 'no heat, HE error code',
+    description: 'LG DLEX3900W — HE error (high heat sensor tripped), drum turning but no heat output. Heating element had failed, taking the thermal limiter with it. Standard combined failure on this LG model. Rental unit in the CSUF corridor — the property manager called us. Replaced the heating element and thermal limiter with OEM LG parts, inspected the vent run (clear at 8 feet, good). Tested three cycles before leaving. Property manager said they use us for all their Fullerton units now.',
+    outcome: '✓ Same day · LG OEM heating element + thermal limiter · 1.5 hours',
   },
   {
-    title: "Craftsman home oven — GE range not heating evenly, burning one side",
-    neighborhood: "Downtown Fullerton",
-    detail: "Older GE 30-inch freestanding range in a 1940s Craftsman bungalow near downtown — uneven baking, left side significantly hotter. The bake element had developed a hot spot and was failing non-uniformly. Replaced the bake element with an OEM GE part, verified temperature distribution across four test cycles. The historic homes around downtown Fullerton often have appliances in good cosmetic shape that are approaching end-of-life on components — this one was 11 years old and worth repairing.",
-    part: "GE OEM bake element",
-    time: "1.5 hours"
+    appliance: 'Craftsman home oven',
+    location: 'Downtown Fullerton',
+    quote: 'GE range not heating evenly, burning one side',
+    description: 'Older GE 30-inch freestanding range in a 1940s Craftsman bungalow near downtown — uneven baking, left side significantly hotter. The bake element had developed a hot spot and was failing non-uniformly. Replaced the bake element with an OEM GE part, verified temperature distribution across four test cycles. The historic homes around downtown Fullerton often have appliances in good cosmetic shape that are approaching end-of-life on components — this one was 11 years old and worth repairing.',
+    outcome: '✓ Same day · GE OEM bake element · 1.5 hours',
   },
   {
-    title: "Bosch dishwasher — E24 error, standing water after cycle",
-    neighborhood: "Sunny Hills",
-    detail: "Bosch SHPM88Z75N — E24 drain error, standing water in the tub after every cycle. Drain pump was partially obstructed — a piece of broken glass had worked through the filter and lodged in the impeller. Cleared the obstruction, inspected the impeller for damage (minor scoring but functional), ran four full cycles to confirm clean drainage. Also found the filter assembly hadn't been cleaned in over a year — mineral scale buildup adding to the drainage restriction. Left the homeowner with a monthly filter cleaning reminder.",
-    part: "Obstruction removal + filter service",
-    time: "1.5 hours"
-  }
+    appliance: 'Bosch dishwasher',
+    location: 'Sunny Hills',
+    quote: 'E24 error, standing water after cycle',
+    description: "Bosch SHPM88Z75N — E24 drain error, standing water in the tub after every cycle. Drain pump was partially obstructed — a piece of broken glass had worked through the filter and lodged in the impeller. Cleared the obstruction, inspected the impeller for damage (minor scoring but functional), ran four full cycles to confirm clean drainage. Also found the filter assembly hadn't been cleaned in over a year — mineral scale buildup adding to the drainage restriction. Left the homeowner with a monthly filter cleaning reminder.",
+    outcome: '✓ Same day · Obstruction removal + filter service · 1.5 hours',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Rental-ready documentation',
+    body: 'Written service report on every call. Arrival windows we actually hit. Property managers and landlords in Fullerton can count on us to show up, fix it, and document it properly.',
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Honest on older appliances',
+    body: "We tell you when an older appliance isn't worth repairing before we start — not after. Historic Fullerton homes have appliances at various stages of life and we give you a straight answer on each one.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: '85% first-visit resolution',
+    body: 'We carry OEM parts for the brands common in Fullerton — Samsung, LG, GE, Bosch, KitchenAid — on our trucks. Most calls get resolved same visit without waiting on parts.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-day warranty',
+    body: 'Every repair includes a 90-day warranty on parts and labor. Same issue returns — we come back at no charge. This applies to rental properties too.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Samsung fridge stopped making ice. They replaced the filter, explained the hard water issue, and had it cycling again in an hour. The property manager used to call three different companies before finding Same Day — now they call only us."',
+    author: '— North Fullerton homeowner',
+  },
+  {
+    stars: 5,
+    text: '"I manage 6 units near CSUF. Same Day shows up when they say they will, gives me written reports, and bills me the same amount they quoted. Three years of reliable service. That\'s all I need."',
+    author: '— Property Manager, Fullerton',
+  },
+  {
+    stars: 5,
+    text: '"Old GE oven in our 1940s Craftsman — uneven baking. New bake element, verified temperature across multiple settings, same day. Technician knew what he was looking at immediately. Old house, solid repair."',
+    author: '— Downtown Fullerton homeowner',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate · Rental documentation available' },
+  { appliance: 'Standard Repair', range: '$150–$380', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Luxury Brand Repair', range: '$250–$600+', note: 'Sub-Zero, KitchenAid built-in, Bosch · OEM parts' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Fullerton?",
-    a: "Yes — Fullerton is part of our regular Orange County route from Irvine. We cover all Fullerton zip codes (92831, 92832, 92833, 92835) including downtown, Sunny Hills, North Fullerton, and the CSUF area. Call before noon for same-day service in most cases."
+    question: 'Do you offer same-day appliance repair in Fullerton?',
+    answer: 'Yes — Fullerton is part of our regular Orange County route from Irvine. We cover all Fullerton zip codes (92831, 92832, 92833, 92835) including downtown, Sunny Hills, North Fullerton, and the CSUF area. Call before noon for same-day service in most cases.',
   },
   {
-    q: "What is your diagnostic fee in Fullerton?",
-    a: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice."
+    question: 'What is your diagnostic fee in Fullerton?',
+    answer: 'Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice.',
   },
   {
-    q: "Do you work with property managers and landlords in Fullerton?",
-    a: "Yes. Fullerton's university rental market generates a consistent need for appliance repair in multi-unit buildings and single-family rentals. We work with property managers who need reliable, documented same-day service. We provide written service reports on every call and show up when we say we will."
+    question: 'Do you work with property managers and landlords in Fullerton?',
+    answer: "Yes. Fullerton's university rental market generates a consistent need for appliance repair in multi-unit buildings and single-family rentals. We work with property managers who need reliable, documented same-day service. We provide written service reports on every call and show up when we say we will.",
   },
   {
-    q: "Do you repair appliances in older Fullerton homes?",
-    a: "Yes. The historic neighborhoods around downtown Fullerton have older housing stock with appliances that range from vintage to recently replaced. We repair appliances as long as the economics make sense and parts are available — and we're honest when they don't. Most appliances up to 15 years old have good parts availability."
+    question: 'Do you repair appliances in older Fullerton homes?',
+    answer: "Yes. The historic neighborhoods around downtown Fullerton have older housing stock with appliances that range from vintage to recently replaced. We repair appliances as long as the economics make sense and parts are available — and we're honest when they don't. Most appliances up to 15 years old have good parts availability.",
   },
   {
-    q: "Does Fullerton's water hardness affect appliances?",
-    a: "Yes. North OC water has meaningful hardness that affects dishwasher spray arms, refrigerator water inlet valves, and ice maker components over time. We inspect for mineral scale on every service call on water-connected appliances. The fix is usually simple — filter replacement, inlet screen cleaning, spray arm descaling — but it needs to happen before it causes component failure."
+    question: "Does Fullerton's water hardness affect appliances?",
+    answer: 'Yes. North OC water has meaningful hardness that affects dishwasher spray arms, refrigerator water inlet valves, and ice maker components over time. We inspect for mineral scale on every service call on water-connected appliances. The fix is usually simple — filter replacement, inlet screen cleaning, spray arm descaling — but it needs to happen before it causes component failure.',
   },
   {
-    q: "What brands do you repair in Fullerton?",
-    a: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, and luxury brands including Sub-Zero, Wolf, and Thermador in the Fullerton Hills and Sunny Hills areas. OEM parts on the truck for all of these."
+    question: 'What brands do you repair in Fullerton?',
+    answer: 'All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, and luxury brands including Sub-Zero, Wolf, and Thermador in the Fullerton Hills and Sunny Hills areas. OEM parts on the truck for all of these.',
   },
   {
-    q: "Do you offer a warranty on repairs in Fullerton?",
-    a: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge."
-  }
+    question: 'Do you offer a warranty on repairs in Fullerton?',
+    answer: 'All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.',
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Anaheim", slug: "anaheim" },
-  { name: "Yorba Linda", slug: "yorba-linda" },
-  { name: "Brea", slug: "brea" },
-  { name: "Placentia", slug: "placentia" },
-  { name: "La Habra", slug: "la-habra" },
-  { name: "Buena Park", slug: "buena-park" },
+// Nearby cities — per audit, /brea/, /placentia/, /la-habra/, /buena-park/ don't exist.
+// Substituted with verified-existing OC neighbors.
+const nearbyCities = [
+  { name: 'Anaheim', slug: 'anaheim' },
+  { name: 'Yorba Linda', slug: 'yorba-linda' },
+  { name: 'Tustin', slug: 'tustin' },
+  { name: 'Costa Mesa', slug: 'costa-mesa' },
+  { name: 'Santa Ana', slug: 'santa-ana' },
+  { name: 'Irvine', slug: 'irvine' },
 ];
-
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Fullerton",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/fullerton/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "2600 Michelson Dr Suite 1700",
-        "addressLocality": "Irvine",
-        "addressRegion": "CA",
-        "postalCode": "92612",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Fullerton" },
-        { "@type": "Place", "name": "Sunny Hills" },
-        { "@type": "Place", "name": "North Fullerton" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "76",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Fullerton, CA"
+    subheadline="Same-day service across all of Fullerton. Historic homes, university rentals, Sunny Hills estates. OEM parts, 90-day warranty. $89 diagnostic — waived with repair."
+    zips={zips}
+    tier={3}
+  />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Fullerton, CA · Orange County · 92831 · 92832 · 92833 · 92835</div>
-        <h1>Appliance Repair in Fullerton, CA</h1>
-        <p class="city-hero-sub">Same-day service across all of Fullerton. Historic homes, university rentals, Sunny Hills estates. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.8 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/fullerton/appliance-repair-fullerton-ca.webp"
-          alt="Appliance repair technician in Fullerton CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Fullerton — A City with Range"
+    paragraphs={introParagraphs}
+    bookingTitle="Fullerton Service"
+    bookingSub="Available Today"
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Fullerton — A City with Range</h2>
-        <p>Fullerton is one of the more varied cities in North OC — 140,000 residents, two universities, a historic downtown with bungalows and Craftsman homes from the 1920s and 30s, newer tracts in the hills, and a significant rental market that keeps a lot of appliances working hard. Our technicians cover Fullerton daily on our OC routes and know the city well.</p>
-        <p>The rental market around CSUF and Fullerton College generates a consistent volume of calls — property managers who need documented same-day service, landlords who need honest guidance on whether a repair makes sense. We provide written service reports on every call and show up in the window we give you. That consistency matters when you're managing multiple units.</p>
-        <p>The historic neighborhoods around downtown have appliances that are sometimes decades old and sometimes recently replaced. We repair what's worth repairing and tell you clearly when it isn't. The Sunny Hills and Fullerton Hills areas have more recent housing with higher-end appliance installations — KitchenAid built-ins, Sub-Zero, Bosch — and we carry OEM parts for those too.</p>
-        <p>Diagnostic fee is $89, credited toward the repair. Call <a href={`tel:${phoneRaw}`}>{phone}</a>.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Fullerton Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Fullerton"
+    services={services}
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Fullerton</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Fullerton →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={fullertonContextNarrative.headline}
+    subSections={fullertonContextNarrative.subSections}
+    background="white"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Three Fullertons — And Why Each Is Different for Repairs</h2>
+  <ServiceArea
+    cityName={cityName}
+    headline="Fullerton Neighborhoods We Service"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <h3>The rental corridor (CSUF / Fullerton College area)</h3>
-        <p>The neighborhoods around California State University Fullerton and Fullerton College generate a large volume of rental units — single-family homes, duplexes, and apartments with heavy appliance use. Washers and dryers in rental units run more cycles per week than owner-occupied homes. Refrigerators see more door openings. When something breaks, there's a tenant involved and a property manager who needs it fixed fast, documented, and done right. We work with Fullerton landlords and property managers regularly — written service reports, accurate arrival windows, no surprises on the invoice.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Fullerton"
+    jobs={recentJobs}
+  />
 
-        <h3>Historic downtown neighborhoods</h3>
-        <p>The streets around downtown Fullerton — Amerige Heights, the historic district, the bungalow belt near Commonwealth — have housing stock from the 1920s through the 1950s. Appliances in these homes range from recently replaced to genuinely old. We repair older units as long as parts are available and the cost makes sense, and we give you an honest assessment before starting. A 1940s Craftsman with a 10-year-old GE range is a good repair candidate. A 1940s Craftsman with a 20-year-old compressor-failed refrigerator usually isn't.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Fullerton Residents and Landlords Call Us"
+    reasons={whyReasons}
+  />
 
-        <h3>Sunny Hills and North Fullerton</h3>
-        <p>The hillside neighborhoods in North Fullerton and Sunny Hills have newer, larger homes with higher-end kitchen installations — Sub-Zero, KitchenAid built-in, Bosch, occasionally Wolf or Thermador. These are the calls where having OEM parts on the truck matters. We carry them.</p>
-      </div>
-    </div>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Fullerton Clients Say"
+    testimonials={testimonials}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Fullerton Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Fullerton"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Fullerton</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Fullerton"
+    faqs={faqs}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Fullerton Residents and Landlords Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>Rental-ready documentation</h3>
-          <p>Written service report on every call. Arrival windows we actually hit. Property managers and landlords in Fullerton can count on us to show up, fix it, and document it properly.</p>
-        </div>
-        <div class="why-item">
-          <h3>Honest on older appliances</h3>
-          <p>We tell you when an older appliance isn't worth repairing before we start — not after. Historic Fullerton homes have appliances at various stages of life and we give you a straight answer on each one.</p>
-        </div>
-        <div class="why-item">
-          <h3>85% first-visit resolution</h3>
-          <p>We carry OEM parts for the brands common in Fullerton — Samsung, LG, GE, Bosch, KitchenAid — on our trucks. Most calls get resolved same visit without waiting on parts.</p>
-        </div>
-        <div class="why-item">
-          <h3>90-day warranty</h3>
-          <p>Every repair includes a 90-day warranty on parts and labor. Same issue returns — we come back at no charge. This applies to rental properties too.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby North OC Cities"
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Fullerton Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Samsung fridge stopped making ice. They replaced the filter, explained the hard water issue, and had it cycling again in an hour. The property manager used to call three different companies before finding Same Day — now they call only us."</p>
-          <div class="review-author">— North Fullerton homeowner</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"I manage 6 units near CSUF. Same Day shows up when they say they will, gives me written reports, and bills me the same amount they quoted. Three years of reliable service. That's all I need."</p>
-          <div class="review-author">— Property Manager, Fullerton</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Old GE oven in our 1940s Craftsman — uneven baking. New bake element, verified temperature across multiple settings, same day. Technician knew what he was looking at immediately. Old house, solid repair."</p>
-          <div class="review-author">— Downtown Fullerton homeowner</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Fullerton</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Credited toward repair · Written estimate · Rental documentation available</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$380</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, KitchenAid built-in, Bosch · OEM parts</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Fullerton</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby North OC Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Fullerton Repair Today</h2>
-      <p>Same-day service across all of Fullerton. Property managers welcome.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Fullerton, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Fullerton", "North Orange County", "Sunny Hills"]} />
-</Layout>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Fullerton Repair Today"
+    body="Same-day service across all of Fullerton. Property managers welcome. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayoutV2>

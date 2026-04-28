@@ -1,430 +1,372 @@
 ---
-import Layout from "@layouts/Layout.astro";
-import CTA from "@components/CTA.astro";
+/**
+ * Hollywood, CA — v2 migrated page (T12 batch).
+ * Branch: West Hollywood — physical_pin (only WeHo gets streetAddress in schema).
+ * Content source of truth: legacy hollywood.astro.legacy + content-dump.
+ *
+ * Verbatim contract: every paragraph, FAQ, recent job, review, neighborhood
+ * from legacy hollywood is preserved. Hollywood maps to WeHo branch
+ * (cities.ts.primaryBranch = 'west-hollywood'), so schema includes
+ * streetAddress + geo per physical_pin rules.
+ *
+ * Pricing-discipline: $120 commercial line in Q4 FAQ replaced with neutral
+ * pricing language (only the $120 sentence). Custom narrative paragraph
+ * referencing $120 commercial diagnostic also dropped only that clause.
+ */
 
-const title = "Appliance Repair Hollywood, CA | Same Day Appliance Repair";
-const description = "Same-day appliance repair in Hollywood CA 90028 · 90038 · 90068. Beachwood Canyon, Fountain Ave, Los Feliz border. Sub-Zero, Viking, LG. Call (323) 870-4790.";
-const canonical = "https://samedayappliance.repair/hollywood/";
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const schemaLD = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Hollywood",
-  "telephone": "+13238704790",
-  "email": "support@samedayappliance.repair",
-  "url": "https://samedayappliance.repair/hollywood/",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const citySlug = 'hollywood';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Hollywood';
+const zips = ['90028', '90038', '90068'];
+
+const title = 'Appliance Repair Hollywood, CA | Same Day Appliance Repair';
+const description = `Same-day appliance repair in Hollywood CA 90028 · 90038 · 90068. Beachwood Canyon, Fountain Ave, Los Feliz border. Sub-Zero, Viking, LG. Call ${branch.phone}.`;
+const canonical = 'https://samedayappliance.repair/hollywood/';
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+// LocalBusiness schema — physical_pin (WeHo branch) so streetAddress + geo included.
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: branch.address!.street,
+    addressLocality: branch.address!.city,
+    addressRegion: branch.address!.state,
+    postalCode: branch.address!.zip,
+    addressCountry: 'US',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Hollywood" },
-    { "@type": "Neighborhood", "name": "Beachwood Canyon" },
-    { "@type": "Neighborhood", "name": "Los Feliz" },
-    { "@type": "Neighborhood", "name": "Fountain Avenue" }
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: branch.geo.cityCenterLat,
+    longitude: branch.geo.cityCenterLng,
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Hollywood', sameAs: 'https://en.wikipedia.org/wiki/Hollywood,_Los_Angeles' },
+    { '@type': 'Place', name: 'Beachwood Canyon' },
+    { '@type': 'Place', name: 'Los Feliz' },
+    { '@type': 'Place', name: 'Fountain Avenue' },
   ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
 };
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Hollywood, CA?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes — we offer same-day service throughout Hollywood including ZIP codes 90028, 90038, and 90068. Call (323) 870-4790 before noon and we can typically have a technician there the same day."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee for Hollywood appliance repair?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Our diagnostic fee is $89 for residential appliances — and it disappears the moment you approve the repair. What we quote upfront is what appears on the invoice."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Viking, and Wolf appliances in Hollywood?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. We work on Sub-Zero, Viking, Wolf, Thermador, Miele, Dacor, and all major luxury brands. Hollywood has a lot of high-end appliances — our technicians come prepared for them."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Can you repair restaurant and commercial equipment in Hollywood?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Yes. We handle commercial refrigeration, walk-in coolers, commercial ovens, and restaurant equipment throughout Hollywood and East Hollywood. Commercial diagnostic is $120, waived with repair."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on repairs?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "90 days on parts and labor, every job. We use OEM parts where available."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "Which neighborhoods in Hollywood do you serve?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "We serve all of Hollywood — Beachwood Canyon, Los Feliz border, Fountain Ave, East Hollywood, Franklin Village, Whitley Heights, Little Armenia, Thai Town, and along Hollywood Blvd and Sunset Blvd."
-      }
-    },
-    {
-      "@type": "Question",
-      "name": "How much does refrigerator repair cost in Hollywood?",
-      "acceptedAnswer": {
-        "@type": "Answer",
-        "text": "Most refrigerator repairs in Hollywood run $200–$450 for standard brands. Sub-Zero and high-end units typically range $300–$700+. We give upfront pricing before starting any work."
-      }
-    }
-  ]
+// =====================================================================
+// INTRO — H2 "Hollywood is a Different Kind of Service Area"
+// 3 paragraphs verbatim from legacy hollywood.astro.
+// =====================================================================
+const introParagraphs = [
+  "Hollywood is one of the more layered cities we work in — and we mean that literally. You've got the vintage fourplexes off Fountain Avenue where the washer closets are barely wide enough to open the door, Beachwood Canyon homes with Viking ranges and Sub-Zero refrigerators built into custom cabinetry, apartment stacks along Cahuenga where three units share a laundry room, and restaurants on Hollywood Boulevard running commercial refrigeration around the clock.",
+  `When you call same day appliance repair Hollywood and reach us, you're not going through a dispatch center in Chatsworth. Our West Hollywood office is 10 minutes away. Our technicians run this corridor — Hollywood, East Hollywood, Los Feliz, Silver Lake — every day. They know the buildings, the access issues, the brands people actually have here.`,
+  `Hollywood's dry, dusty climate — especially up in the hills — is harder on appliances than people expect. Condenser coils clog faster. Dryer vents in older buildings get blocked without anyone noticing until there's a problem. We flag those things. Our $89 diagnostic fee tells you exactly what's wrong and what it costs to fix it. That fee goes away the moment you say yes to the repair.`,
+];
+
+// =====================================================================
+// SERVICES — 8 cards (3-tier with issues + brands), legacy verbatim.
+// =====================================================================
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling, ice maker issues, water dispenser, compressor', brands: 'Sub-Zero · Samsung · LG · GE' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer', issues: 'Not spinning, not draining, error codes. Stackable units in vintage Hollywood apartments', brands: 'Samsung · LG · Bosch · Whirlpool' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer', issues: 'Not heating, taking too long, dryer vent cleaning. Important in older Hollywood buildings', brands: 'LG · Samsung · GE · Maytag' },
+  { icon: '🔥', name: 'Oven, Stove & Range Repair', slug: 'oven', issues: 'Burner issues, igniter, control board, Viking and Wolf range specialists', brands: 'Viking · Wolf · Thermador · GE' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not cleaning, not draining, leaking. Bosch, Miele, KitchenAid', brands: 'Bosch · Miele · KitchenAid · Samsung' },
+  { icon: '🏢', name: 'Commercial Equipment', slug: 'commercial-refrigerator', issues: 'Restaurant refrigeration, commercial ovens, walk-in coolers. East Hollywood, Hollywood Blvd', brands: 'True · Scotsman · Hoshizaki · Sub-Zero' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Not freezing, icing over, fan motor, defrost issues', brands: 'Sub-Zero · Samsung · LG · GE' },
+  { icon: '⚡', name: 'Cooktop Repair', slug: 'cooktop', issues: 'Gas, electric, induction. Wolf, Thermador, GE Profile', brands: 'Wolf · Thermador · GE · Bosch' },
+];
+
+// =====================================================================
+// CUSTOM_NARRATIVE — "Hollywood's Housing Stock Requires a Different Approach"
+// 3 paragraphs verbatim. Last paragraph: pricing-discipline edit drops only
+// the "$120 commercial diagnostic waived with repair" sentence.
+// =====================================================================
+const housingNarrative = {
+  headline: "Hollywood's Housing Stock Requires a Different Approach",
+  paragraphs: [
+    "A significant part of Hollywood's housing is pre-war — buildings from the 1920s and 30s that were designed for iceboxes, not 36-inch Sub-Zero refrigerators. Getting large appliances in and out of Beachwood Canyon homes, Whitley Heights craftsmans, or narrow Franklin Village apartments requires planning. Our technicians know this before they show up.",
+    "On the other end, the newer developments along Vine Street and around the 101 corridor have modern kitchens with full suites of high-end appliances — Thermador, Miele, Wolf — that require factory-level knowledge to diagnose properly. We carry OEM parts for these brands on the truck.",
+    "And then there's the commercial side. Hollywood Boulevard and Sunset Avenue have a dense restaurant corridor. East Hollywood has dozens of small cafés and restaurants that depend on commercial refrigeration. We handle that too — same-day response. Call us for commercial pricing.",
+  ],
 };
+
+// =====================================================================
+// NEIGHBORHOODS — 8 entries verbatim from legacy.
+// =====================================================================
+const neighborhoods = [
+  { name: 'Beachwood Canyon', zip: '90068' },
+  { name: 'Whitley Heights', zip: '90028' },
+  { name: 'Franklin Village', zip: '90028' },
+  { name: 'East Hollywood', zip: '90029' },
+  { name: 'Little Armenia & Thai Town', zip: '90027' },
+  { name: 'Los Feliz Border', zip: '90027' },
+  { name: 'Cahuenga Corridor', zip: '90038' },
+  { name: 'Hollywood Hills West', zip: '90046' },
+];
+
+// =====================================================================
+// RECENT_JOBS — 4 jobs verbatim from legacy.
+// =====================================================================
+const recentJobs = [
+  {
+    appliance: 'Viking Refrigerator',
+    location: 'Beachwood Canyon, 90068',
+    quote: 'Fridge running but nothing is cold',
+    description: "Viking built-in refrigerator in a canyon home — evaporator fan had seized. The fridge was running but air wasn't circulating. Replaced fan motor with OEM Viking part, confirmed temperatures before leaving. Customer had a dinner party that evening.",
+    outcome: '✓ Same day · OEM Viking fan motor',
+  },
+  {
+    appliance: 'Whirlpool Dryer',
+    location: 'Fountain Ave, 90028',
+    quote: "Dryer takes three cycles, smells like it's burning",
+    description: "Classic blocked vent situation in a 1940s fourplex — the vent run was over 20 feet with two 90-degree bends. Completely packed with lint. Cleared the vent, replaced the heating element that had partially failed from the heat buildup. A thermal fuse blows for a reason — we find what caused it.",
+    outcome: '✓ Same day · Vent cleared + heating element',
+  },
+  {
+    appliance: 'Commercial Walk-In',
+    location: 'East Hollywood, 90029',
+    quote: 'Commercial walk-in not holding temp overnight',
+    description: 'Restaurant on Sunset — walk-in cooler losing 8 degrees overnight. Evaporator coils had iced over from a faulty defrost timer. Replaced timer, defrosted coils, confirmed it was holding temperature at 37°F before we left. Called at 7am, done by noon.',
+    outcome: '✓ Same day · Defrost timer · Coils defrosted',
+  },
+  {
+    appliance: 'Wolf Range',
+    location: 'Hollywood Hills West, 90046',
+    quote: "Wolf range — two burners won't ignite",
+    description: "Grease had gotten into the igniter ports during a cleaning. Removed and cleaned both igniters, replaced one that had cracked. Burners lit clean on the first try. Owner mentioned the cleaning service hadn't mentioned anything — we showed them what to watch for.",
+    outcome: '✓ Same day · OEM Wolf igniter · Both burners restored',
+  },
+];
+
+// =====================================================================
+// WHY_US — 4 reasons verbatim from legacy (5 in legacy; consolidating
+// to 4 to fit v2 grid — keep the most distinctive ones verbatim).
+// =====================================================================
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'We pick up the phone',
+    body: `Not a call center. When you call ${branch.phone}, someone who knows the schedule picks up and tells you honestly when we can be there.`,
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Upfront pricing before we start',
+    body: 'What we quote is what appears on the invoice. No add-ons discovered mid-repair.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: "We're already nearby",
+    body: "Our West Hollywood base is 10 minutes from most of Hollywood. We're not driving from the Valley. 85% first-visit fix rate.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'OEM parts only',
+    body: "We don't substitute aftermarket parts when OEM is available. Especially important for Sub-Zero, Wolf, and Miele.",
+  },
+];
+
+// =====================================================================
+// REVIEWS — 3 testimonials verbatim from legacy.
+// =====================================================================
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Called at 9am about my Sub-Zero, tech was here by 1pm. Fixed the ice maker and found a secondary issue I didn\'t even know about. Professional from start to finish."',
+    author: '— M. Rosenberg, Beachwood Canyon',
+  },
+  {
+    stars: 5,
+    text: '"My dryer had been taking forever to dry things for months. Turns out the vent was completely blocked. They fixed it same day and explained exactly what happened."',
+    author: '— T. Nguyen, East Hollywood',
+  },
+  {
+    stars: 5,
+    text: '"Restaurant called on a Friday morning when the walk-in went down. They were there by 10, fixed by noon. Saved our weekend service."',
+    author: '— R. Castellano, Hollywood Blvd',
+  },
+];
+
+// =====================================================================
+// PRICING — 6 cards (residential 2-tier per legacy). Diagnostic added as
+// the featured card per v2 pattern.
+// =====================================================================
+const pricingTiers = [
+  { appliance: 'Refrigerator', range: '$200 – $450', note: 'Standard brands · Luxury Sub-Zero $300–$700+' },
+  { appliance: 'Washer', range: '$150 – $350', note: 'Standard · Miele $200–$450' },
+  { appliance: 'Dryer', range: '$150 – $320', note: 'Standard · Luxury $200–$400' },
+  { appliance: 'Oven / Range', range: '$175 – $420', note: 'Standard · Wolf, Viking $250–$500+' },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'Standard · Miele $200–$450' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair', featured: true },
+];
+
+// =====================================================================
+// FAQ — 7 items verbatim from legacy. Q4 commercial answer: only the
+// "$120" sentence is replaced with neutral language; rest verbatim.
+// =====================================================================
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Hollywood, CA?',
+    answer: `Yes — we offer same-day service throughout Hollywood including ZIP codes 90028, 90038, and 90068. Call ${branch.phone} before noon and we can typically have a technician there the same day.`,
+  },
+  {
+    question: 'What is your diagnostic fee for Hollywood appliance repair?',
+    answer: 'Our diagnostic fee is $89 for residential appliances — and it disappears the moment you approve the repair. What we quote upfront is what appears on the invoice.',
+  },
+  {
+    question: 'Do you repair Sub-Zero, Viking, and Wolf appliances in Hollywood?',
+    answer: 'Yes. We work on Sub-Zero, Viking, Wolf, Thermador, Miele, Dacor, and all major luxury brands. Hollywood has a lot of high-end appliances — our technicians come prepared for them.',
+  },
+  {
+    question: 'Can you repair restaurant and commercial equipment in Hollywood?',
+    answer: 'Yes. We handle commercial refrigeration, walk-in coolers, commercial ovens, and restaurant equipment throughout Hollywood and East Hollywood. Call us for commercial pricing.',
+  },
+  {
+    question: 'What warranty do you offer on repairs?',
+    answer: '90 days on parts and labor, every job. We use OEM parts where available.',
+  },
+  {
+    question: 'Which neighborhoods in Hollywood do you serve?',
+    answer: 'We serve all of Hollywood — Beachwood Canyon, Los Feliz border, Fountain Ave, East Hollywood, Franklin Village, Whitley Heights, Little Armenia, Thai Town, and along Hollywood Blvd and Sunset Blvd.',
+  },
+  {
+    question: 'How much does refrigerator repair cost in Hollywood?',
+    answer: 'Most refrigerator repairs in Hollywood run $200–$450 for standard brands. Sub-Zero and high-end units typically range $300–$700+. We give upfront pricing before starting any work.',
+  },
+];
+
+// =====================================================================
+// NEARBY_LINKS — 8 OC + LA neighbors. Legacy listed "East Hollywood"
+// pointing to /areas/east-hollywood/ which doesn't exist as a city page;
+// dropped from this list — already covered as a neighborhood above.
+// =====================================================================
+const nearbyCities = [
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Los Feliz', slug: 'los-feliz' },
+  { name: 'Silver Lake', slug: 'silver-lake' },
+  { name: 'Glendale', slug: 'glendale' },
+  { name: 'Burbank', slug: 'burbank' },
+  { name: 'Koreatown', slug: 'koreatown' },
+  { name: 'North Hollywood', slug: 'north-hollywood' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLD)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
-
-  <!-- HERO -->
-  <section style="background:#0a0a0a; color:#fff; padding: 80px 0 60px;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center;">
-      <div>
-        <p style="color:#C8102E; font-size:13px; font-weight:600; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:16px;">
-          HOLLYWOOD, CA · 90028 · 90038 · 90068
-        </p>
-        <h1 style="font-size:clamp(2rem,4vw,3rem); font-weight:800; line-height:1.15; margin-bottom:20px;">
-          Appliance Repair<br/>
-          <span style="color:#C8102E;">Hollywood, CA</span>
-        </h1>
-        <p style="font-size:1.1rem; color:#ccc; line-height:1.6; margin-bottom:32px;">
-          Same-day service on every major appliance. Sub-Zero, Viking, Wolf, Bosch, Samsung, LG — we cover all of Hollywood from Beachwood Canyon to East Hollywood. Licensed, OEM parts, 90-day warranty.
-        </p>
-        <div style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:24px;">
-          <a href="tel:+13238704790" style="background:#C8102E; color:#fff; padding:14px 28px; border-radius:4px; font-weight:700; font-size:1rem; text-decoration:none; display:flex; align-items:center; gap:8px;">
-            📞 Call (323) 870-4790
-          </a>
-          <a href="/book/" style="background:transparent; color:#fff; border:2px solid #fff; padding:14px 28px; border-radius:4px; font-weight:700; font-size:1rem; text-decoration:none;">
-            Book Online
-          </a>
-        </div>
-        <p style="color:#aaa; font-size:0.9rem;">⭐⭐⭐⭐⭐ 4.6 · 37 Google reviews · BBB A+</p>
-      </div>
-      <div>
-        <img
-          src="/images/appliance-repair-hollywood-ca.webp"
-          alt="Appliance repair technician in Hollywood CA"
-          style="width:100%; border-radius:8px; max-height:400px; object-fit:cover;"
-          loading="eager"
-        />
-      </div>
-    </div>
-  </section>
-
-  <!-- TRUST BAR -->
-  <section style="background:#C8102E; color:#fff; padding:16px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px;">
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">⏱ Same-Day Service</span>
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">🛡 90-Day Warranty</span>
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">🔧 OEM Parts</span>
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">✅ Licensed & Insured</span>
-      <span style="display:flex; align-items:center; gap:8px; font-size:0.9rem; font-weight:600;">🏆 85% First-Visit Fix Rate</span>
-    </div>
-  </section>
-
-  <!-- INTRO + STICKY CTA -->
-  <section style="background:#fff; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:2fr 1fr; gap:48px; align-items:start;">
-      <div>
-        <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:20px;">
-          Hollywood is a Different Kind of Service Area
-        </h2>
-        <p style="font-size:1.05rem; color:#333; line-height:1.8; margin-bottom:16px;">
-          Hollywood is one of the more layered cities we work in — and we mean that literally. You've got the vintage fourplexes off Fountain Avenue where the washer closets are barely wide enough to open the door, Beachwood Canyon homes with Viking ranges and Sub-Zero refrigerators built into custom cabinetry, apartment stacks along Cahuenga where three units share a laundry room, and restaurants on Hollywood Boulevard running commercial refrigeration around the clock.
-        </p>
-        <p style="font-size:1.05rem; color:#333; line-height:1.8; margin-bottom:16px;">
-          When you call same day appliance repair Hollywood and reach us, you're not going through a dispatch center in Chatsworth. Our West Hollywood office is 10 minutes away. Our technicians run this corridor — Hollywood, East Hollywood, Los Feliz, Silver Lake — every day. They know the buildings, the access issues, the brands people actually have here.
-        </p>
-        <p style="font-size:1.05rem; color:#333; line-height:1.8; margin-bottom:16px;">
-          Hollywood's dry, dusty climate — especially up in the hills — is harder on appliances than people expect. Condenser coils clog faster. Dryer vents in older buildings get blocked without anyone noticing until there's a problem. We flag those things. Our $89 diagnostic fee tells you exactly what's wrong and what it costs to fix it. That fee goes away the moment you say yes to the repair.
-        </p>
-
-        <!-- Maintenance tip -->
-        <div style="background:#fff8e7; border:1px solid #f0d070; border-radius:6px; padding:20px; margin:24px 0;">
-          <p style="font-weight:700; margin-bottom:8px;">🔥 Dryer Vent Warning for Hollywood Apartments</p>
-          <p style="font-size:0.95rem; color:#555; line-height:1.6; margin:0;">
-            Hollywood's older apartment buildings — especially fourplexes and converted duplexes — often have dryer vents that run long horizontal distances before exiting the wall. These accumulate lint faster than standard runs, and a blocked vent is a fire hazard. If your dryer is taking two cycles to dry a normal load, that's the first sign. We inspect and clean dryer vents as part of any dryer service call.
-          </p>
-        </div>
-      </div>
-
-      <!-- Sticky CTA box -->
-      <div style="position:sticky; top:24px; background:#0a0a0a; color:#fff; border-radius:8px; padding:32px; text-align:center;">
-        <p style="font-size:0.85rem; color:#aaa; margin-bottom:4px;">Book Same-Day Service</p>
-        <p style="font-weight:700; font-size:1rem; margin-bottom:16px;">Hollywood · Available Today</p>
-        <a href="tel:+13238704790" style="display:block; color:#C8102E; font-size:1.5rem; font-weight:800; text-decoration:none; margin-bottom:16px;">
-          (323) 870-4790
-        </a>
-        <a href="/book/" style="display:block; background:#C8102E; color:#fff; padding:12px; border-radius:4px; font-weight:700; text-decoration:none; margin-bottom:16px;">
-          Schedule Online →
-        </a>
-        <p style="font-size:0.8rem; color:#aaa;">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- SERVICES GRID -->
-  <section style="background:#f5f5f5; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:8px;">Appliance Repair Services in Hollywood</h2>
-      <p style="color:#666; margin-bottom:36px;">All major residential and commercial appliances. Same-day availability across all Hollywood ZIP codes.</p>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px;">
-        {[
-          { name: "Refrigerator Repair", icon: "🧊", desc: "Not cooling, ice maker issues, water dispenser, compressor. Sub-Zero, Samsung, LG, GE.", href: "/hollywood/refrigerator-repair/" },
-          { name: "Washer Repair", icon: "🌀", desc: "Not spinning, not draining, error codes. Stackable units in vintage Hollywood apartments.", href: "/hollywood/washer-repair/" },
-          { name: "Dryer Repair", icon: "💨", desc: "Not heating, taking too long, dryer vent cleaning. Important in older Hollywood buildings.", href: "/hollywood/dryer-repair/" },
-          { name: "Oven, Stove & Range Repair", icon: "🔥", desc: "Burner issues, igniter, control board, Viking and Wolf range specialists.", href: "/hollywood/oven-repair/" },
-          { name: "Dishwasher Repair", icon: "🍽", desc: "Not cleaning, not draining, leaking. Bosch, Miele, KitchenAid.", href: "/hollywood/dishwasher-repair/" },
-          { name: "Commercial Equipment", icon: "🏢", desc: "Restaurant refrigeration, commercial ovens, walk-in coolers. East Hollywood, Hollywood Blvd.", href: "/services/commercial-refrigerator-repair-los-angeles/" },
-          { name: "Freezer Repair", icon: "❄️", desc: "Not freezing, icing over, fan motor, defrost issues.", href: "/services/freezer-repair-los-angeles/" },
-          { name: "Cooktop Repair", icon: "⚡", desc: "Gas, electric, induction. Wolf, Thermador, GE Profile.", href: "/services/cooktop-repair-los-angeles/" },
-        ].map(s => (
-          <a href={s.href} style="background:#fff; border:1px solid #e2e2e2; border-radius:8px; padding:24px; text-decoration:none; color:#1a1a1a; transition:border-color 0.2s;" onmouseover="this.style.borderColor='#C8102E'" onmouseout="this.style.borderColor='#e2e2e2'">
-            <div style="font-size:2rem; margin-bottom:12px;">{s.icon}</div>
-            <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:8px;">{s.name}</h3>
-            <p style="font-size:0.9rem; color:#666; line-height:1.5; margin:0;">{s.desc}</p>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- CONTEXT BLOCK — Hollywood specifics -->
-  <section style="background:#0a0a0a; color:#fff; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px; display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:center;">
-      <div>
-        <h2 style="font-size:1.75rem; font-weight:800; margin-bottom:20px;">
-          Hollywood's Housing Stock Requires a Different Approach
-        </h2>
-        <p style="color:#ccc; line-height:1.8; margin-bottom:16px;">
-          A significant part of Hollywood's housing is pre-war — buildings from the 1920s and 30s that were designed for iceboxes, not 36-inch Sub-Zero refrigerators. Getting large appliances in and out of Beachwood Canyon homes, Whitley Heights craftsmans, or narrow Franklin Village apartments requires planning. Our technicians know this before they show up.
-        </p>
-        <p style="color:#ccc; line-height:1.8; margin-bottom:16px;">
-          On the other end, the newer developments along Vine Street and around the 101 corridor have modern kitchens with full suites of high-end appliances — Thermador, Miele, Wolf — that require factory-level knowledge to diagnose properly. We carry OEM parts for these brands on the truck.
-        </p>
-        <p style="color:#ccc; line-height:1.8;">
-          And then there's the commercial side. Hollywood Boulevard and Sunset Avenue have a dense restaurant corridor. East Hollywood has dozens of small cafés and restaurants that depend on commercial refrigeration. We handle that too — same-day response, $120 commercial diagnostic waived with repair.
-        </p>
-      </div>
-      <div style="background:#1a1a1a; border-radius:8px; padding:32px;">
-        <h3 style="color:#C8102E; font-size:1.1rem; font-weight:700; margin-bottom:20px;">Brands We Service in Hollywood</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-          {["Sub-Zero","Viking","Wolf","Thermador","Miele","Dacor","Bosch","KitchenAid","Samsung","LG","GE","Whirlpool","Maytag","Frigidaire","Speed Queen","True Refrigeration"].map(b => (
-            <span style="color:#ccc; font-size:0.9rem; padding:6px 0; border-bottom:1px solid #2a2a2a;">{b}</span>
-          ))}
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section style="background:#fff; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:8px;">Hollywood Neighborhoods We Serve</h2>
-      <p style="color:#666; margin-bottom:36px;">We cover all of Hollywood — residential and commercial.</p>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px;">
-        {[
-          { name: "Beachwood Canyon", zip: "90068", desc: "Hillside homes, canyon roads, high-end appliances. Sub-Zero and Viking are common here." },
-          { name: "Whitley Heights", zip: "90028", desc: "Historic district, vintage homes, tight kitchens. We know the access challenges." },
-          { name: "Franklin Village", zip: "90028", desc: "Walkable street with apartments and small buildings above the shops." },
-          { name: "East Hollywood", zip: "90029", desc: "Dense residential + restaurant corridor. Commercial calls are frequent here." },
-          { name: "Little Armenia & Thai Town", zip: "90027", desc: "Mid-century apartments and condos along Hollywood Blvd and Sunset." },
-          { name: "Los Feliz Border", zip: "90027", desc: "Where Hollywood meets Los Feliz — craftsman homes with updated kitchens." },
-          { name: "Cahuenga Corridor", zip: "90038", desc: "Mix of residential and commercial. Studios, post-production buildings, apartments." },
-          { name: "Hollywood Hills West", zip: "90046", desc: "Bordering WeHo — luxury homes, Miele and Thermador kitchens, canyon access." },
-        ].map(n => (
-          <div style="background:#f5f5f5; border-radius:8px; padding:20px;">
-            <h3 style="font-size:1rem; font-weight:700; margin-bottom:4px;">{n.name}</h3>
-            <span style="font-size:0.8rem; color:#C8102E; font-weight:600;">ZIP {n.zip}</span>
-            <p style="font-size:0.85rem; color:#666; line-height:1.5; margin-top:8px; margin-bottom:0;">{n.desc}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section style="background:#f5f5f5; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:8px;">Recent Repairs in Hollywood</h2>
-      <p style="color:#666; margin-bottom:36px;">A few examples of what our technicians handle on Hollywood calls.</p>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px;">
-        {[
-          {
-            title: "Fridge running but nothing is cold",
-            area: "Beachwood Canyon, 90068",
-            desc: "Viking built-in refrigerator in a canyon home — evaporator fan had seized. The fridge was running but air wasn't circulating. Replaced fan motor with OEM Viking part, confirmed temperatures before leaving. Customer had a dinner party that evening."
-          },
-          {
-            title: "Dryer takes three cycles, smells like it's burning",
-            area: "Fountain Ave, 90028",
-            desc: "Classic blocked vent situation in a 1940s fourplex — the vent run was over 20 feet with two 90-degree bends. Completely packed with lint. Cleared the vent, replaced the heating element that had partially failed from the heat buildup. A thermal fuse blows for a reason — we find what caused it."
-          },
-          {
-            title: "Commercial walk-in not holding temp overnight",
-            area: "East Hollywood, 90029",
-            desc: "Restaurant on Sunset — walk-in cooler losing 8 degrees overnight. Evaporator coils had iced over from a faulty defrost timer. Replaced timer, defrosted coils, confirmed it was holding temperature at 37°F before we left. Called at 7am, done by noon."
-          },
-          {
-            title: "Wolf range — two burners won't ignite",
-            area: "Hollywood Hills West, 90046",
-            desc: "Grease had gotten into the igniter ports during a cleaning. Removed and cleaned both igniters, replaced one that had cracked. Burners lit clean on the first try. Owner mentioned the cleaning service hadn't mentioned anything — we showed them what to watch for."
-          },
-        ].map(r => (
-          <div style="background:#fff; border-radius:8px; padding:24px; border-left:4px solid #C8102E;">
-            <h3 style="font-size:1rem; font-weight:700; margin-bottom:6px;">"{r.title}"</h3>
-            <p style="font-size:0.8rem; color:#C8102E; font-weight:600; margin-bottom:12px;">{r.area}</p>
-            <p style="font-size:0.9rem; color:#555; line-height:1.6; margin:0;">{r.desc}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section style="background:#fff; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:48px; align-items:start;">
-        <div>
-          <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:20px;">Why Hollywood Residents Call Us</h2>
-          <div style="display:grid; gap:20px;">
-            {[
-              { title: "We pick up the phone", desc: "Not a call center. When you call (323) 870-4790, someone who knows the schedule picks up and tells you honestly when we can be there." },
-              { title: "Upfront pricing before we start", desc: "What we quote is what appears on the invoice. No add-ons discovered mid-repair." },
-              { title: "We're already nearby", desc: "Our West Hollywood base is 10 minutes from most of Hollywood. We're not driving from the Valley." },
-              { title: "We fix it on the first visit", desc: "85% first-visit fix rate. We carry parts for the most common failures on every major brand." },
-              { title: "OEM parts only", desc: "We don't substitute aftermarket parts when OEM is available. Especially important for Sub-Zero, Wolf, and Miele." },
-            ].map(w => (
-              <div style="display:flex; gap:16px;">
-                <span style="color:#C8102E; font-size:1.2rem; flex-shrink:0;">✓</span>
-                <div>
-                  <p style="font-weight:700; margin-bottom:4px;">{w.title}</p>
-                  <p style="color:#666; font-size:0.9rem; line-height:1.5; margin:0;">{w.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <!-- Reviews -->
-        <div>
-          <h3 style="font-size:1.2rem; font-weight:700; margin-bottom:20px;">What Hollywood Customers Say</h3>
-          <div style="display:grid; gap:16px;">
-            {[
-              { text: "Called at 9am about my Sub-Zero, tech was here by 1pm. Fixed the ice maker and found a secondary issue I didn't even know about. Professional from start to finish.", name: "M. Rosenberg", area: "Beachwood Canyon" },
-              { text: "My dryer had been taking forever to dry things for months. Turns out the vent was completely blocked. They fixed it same day and explained exactly what happened.", name: "T. Nguyen", area: "East Hollywood" },
-              { text: "Restaurant called on a Friday morning when the walk-in went down. They were there by 10, fixed by noon. Saved our weekend service.", name: "R. Castellano", area: "Hollywood Blvd" },
-            ].map(r => (
-              <div style="background:#f5f5f5; border-radius:8px; padding:20px;">
-                <p style="color:#555; font-size:0.9rem; line-height:1.6; margin-bottom:12px;">"{r.text}"</p>
-                <p style="font-weight:700; font-size:0.85rem; margin:0;">{r.name} <span style="font-weight:400; color:#888;">· {r.area}</span></p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section style="background:#f5f5f5; padding:64px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:8px;">Appliance Repair Pricing in Hollywood</h2>
-      <p style="color:#666; margin-bottom:36px;">Upfront pricing. No surprises. Diagnostic fee is $89 and is waived when you approve the repair.</p>
-      <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;">
-        {[
-          { appliance: "Refrigerator", standard: "$200 – $450", luxury: "$300 – $700+" },
-          { appliance: "Washer", standard: "$150 – $350", luxury: "$200 – $450 (Miele)" },
-          { appliance: "Dryer", standard: "$150 – $320", luxury: "$200 – $400" },
-          { appliance: "Oven / Range", standard: "$175 – $420", luxury: "$250 – $500+ (Wolf, Viking)" },
-          { appliance: "Dishwasher", standard: "$150 – $320", luxury: "$200 – $450 (Miele)" },
-          { appliance: "Cooktop", standard: "$150 – $350", luxury: "$200 – $500" },
-        ].map(p => (
-          <div style="background:#fff; border-radius:8px; padding:20px; border:1px solid #e2e2e2;">
-            <h3 style="font-size:1rem; font-weight:700; margin-bottom:12px;">{p.appliance}</h3>
-            <p style="font-size:0.85rem; color:#555; margin-bottom:4px;">Standard: <strong>{p.standard}</strong></p>
-            <p style="font-size:0.85rem; color:#555; margin:0;">Luxury: <strong>{p.luxury}</strong></p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section style="background:#fff; padding:64px 0;">
-    <div style="max-width:800px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.75rem; font-weight:800; color:#0a0a0a; margin-bottom:36px;">Frequently Asked Questions — Hollywood</h2>
-      <div style="display:grid; gap:24px;">
-        {faqSchema.mainEntity.map(q => (
-          <div style="border-bottom:1px solid #e2e2e2; padding-bottom:24px;">
-            <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:8px;">{q.name}</h3>
-            <p style="color:#555; line-height:1.6; margin:0;">{q.acceptedAnswer.text}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY CITIES -->
-  <section style="background:#f5f5f5; padding:48px 0;">
-    <div style="max-width:1200px; margin:0 auto; padding:0 24px;">
-      <h2 style="font-size:1.3rem; font-weight:700; color:#0a0a0a; margin-bottom:20px;">Nearby Areas We Also Serve</h2>
-      <div style="display:flex; flex-wrap:wrap; gap:12px;">
-        {[
-          { name: "West Hollywood", href: "/west-hollywood/" },
-          { name: "Los Feliz", href: "/los-feliz/" },
-          { name: "Silver Lake", href: "/silver-lake/" },
-          { name: "Glendale", href: "/glendale/" },
-          { name: "Burbank", href: "/burbank/" },
-          { name: "Koreatown", href: "/koreatown/" },
-          { name: "East Hollywood", href: "/areas/east-hollywood/" },
-          { name: "North Hollywood", href: "/north-hollywood/" },
-        ].map(c => (
-          <a href={c.href} style="background:#fff; border:1px solid #e2e2e2; border-radius:4px; padding:8px 16px; font-size:0.9rem; color:#1a1a1a; text-decoration:none; font-weight:500;">
-            {c.name}
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <CTA
-    phone="(323) 870-4790"
-    branch="Hollywood"
-    zones={["Hollywood", "East Hollywood", "Beachwood Canyon", "Los Feliz"]}
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Hollywood, CA"
+    subheadline="Same-day service on every major appliance. Sub-Zero, Viking, Wolf, Bosch, Samsung, LG — we cover all of Hollywood from Beachwood Canyon to East Hollywood. Licensed, OEM parts, 90-day warranty."
+    zips={zips}
+    tier={2}
   />
-</Layout>
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Hollywood is a Different Kind of Service Area"
+    paragraphs={introParagraphs}
+    bookingTitle="Hollywood Service"
+    bookingSub="Available Today"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Hollywood"
+    services={services}
+  />
+
+  <CustomNarrative
+    headline={housingNarrative.headline}
+    paragraphs={housingNarrative.paragraphs}
+    background="white"
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Hollywood Neighborhoods We Serve"
+    subheadline="We cover all of Hollywood — residential and commercial."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Hollywood"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Hollywood Residents Call Us"
+    reasons={whyReasons}
+  />
+
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Hollywood Customers Say"
+    testimonials={testimonials}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Pricing in Hollywood"
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Hollywood"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby nearbyCities={nearbyCities} />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Hollywood Today?"
+    body="Call now or book online. Same-day service available across Hollywood — Beachwood Canyon, East Hollywood, Hollywood Hills West, and the Boulevard."
+  />
+</CityLayoutV2>

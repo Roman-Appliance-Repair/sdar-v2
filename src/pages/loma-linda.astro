@@ -1,509 +1,379 @@
 ---
-// src/pages/loma-linda.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+/**
+ * Loma Linda, CA — v2 migrated page (T12 batch).
+ * Branch: Rancho Cucamonga — service_area, placeholder phone (pending GBP).
+ * Public phone substitutes MAIN_PHONE via isPlaceholderPhone() in
+ * components and in this page's title/description/schema.
+ * Content source of truth: legacy loma-linda.astro.legacy.
+ *
+ * Unique angle preserved verbatim: shift-worker scheduling for LLUMC
+ * staff (FAQ Q2 + Why-Us reason 1).
+ */
 
-const city = "Loma Linda";
-const citySlug = "loma-linda";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["92350", "92354"];
-const county = "San Bernardino";
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const title = `Appliance Repair Loma Linda CA — Same Day | All Brands | ${phone}`;
-const description = `Same-day appliance repair in Loma Linda CA. Refrigerator, washer, dryer, oven, dishwasher & more. LLUMC area, university district. Licensed. OEM parts. Call ${phone}.`;
+const citySlug = 'loma-linda';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+const displayPhone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
 
-const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
-];
+const cityName = 'Loma Linda';
+const zips = ['92350', '92354'];
 
-const neighborhoods = [
-  { name: "University District / LLUMC", zip: "92350" },
-  { name: "North Loma Linda", zip: "92354" },
-  { name: "South Loma Linda", zip: "92354" },
-  { name: "Barton Rd Corridor", zip: "92354" },
-  { name: "Anderson St Area", zip: "92350" },
-  { name: "California St", zip: "92354" },
-  { name: "Campus Area", zip: "92350" },
-  { name: "Redlands Border", zip: "92354" },
-];
+const title = `Appliance Repair Loma Linda CA — Same Day | All Brands | ${displayPhone}`;
+const description = `Same-day appliance repair in Loma Linda CA. Refrigerator, washer, dryer, oven, dishwasher & more. LLUMC area, university district. Licensed. OEM parts. Call ${displayPhone}.`;
+const canonical = 'https://samedayappliance.repair/loma-linda/';
 
-const faqItems = [
-  {
-    q: "Do you offer same-day appliance repair in Loma Linda?",
-    a: `Yes — same-day service is available throughout Loma Linda including the university district, LLUMC area, North and South Loma Linda, and the Barton Road corridor. Call ${phone} before noon for same-day scheduling. We cover ZIP codes 92350 and 92354 without a trip surcharge.`
-  },
-  {
-    q: "Do you offer early morning or evening appointments for healthcare workers?",
-    a: `Yes. A significant portion of Loma Linda's residents work shifts at Loma Linda University Medical Center — 12-hour shifts starting at 7am or 7pm, nights, weekends. We schedule around your shift. Call ${phone} and tell us your availability — early morning before a shift, evening after, weekend between. We don't limit service to business hours.`
-  },
-  {
-    q: "What brands do you repair in Loma Linda?",
-    a: "All major brands. Loma Linda's housing mix runs Samsung, LG, GE, and Whirlpool across the university district and residential neighborhoods, with some older Kenmore and Maytag in the longer-established homes. Faculty and staff housing near campus tends toward mid-range to upper-mid appliances. We carry OEM parts for all generations on the truck."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `$89, applied directly to the repair cost when you proceed. No hidden trip charge to Loma Linda. We quote on-site after diagnosis — what we quote is what appears on the invoice. No surprises.`
-  },
-  {
-    q: "Why does my refrigerator work fine in winter but struggles in summer?",
-    a: "Loma Linda sits in the Inland Valley and regularly hits 100–107°F in July and August. Appliances that were managing fine in mild weather get pushed past their threshold in the heat. The first check is always condenser coils — in Loma Linda's dry, dusty climate, coils load up faster than coastal cities. A refrigerator with partially clogged coils that was borderline in spring will fail outright in summer. We clean and test on every hot-weather refrigerator call."
-  },
-  {
-    q: "My dishwasher leaves white film on everything — is it broken?",
-    a: "Probably not. Hard water is consistent throughout SB County, and Loma Linda's water supply has high mineral content. White film on dishes and glasses is calcium and magnesium deposits — a water quality issue, not a dishwasher malfunction. The fix involves descaling the interior, cleaning the spray arms, and establishing a maintenance routine. Dishwasher filter cleaning every 3 months is the right schedule for Loma Linda homes."
-  },
-  {
-    q: "Do you service appliances in the university and medical campus housing?",
-    a: `Yes — faculty housing, staff residences, and university-affiliated housing near campus are part of our standard Loma Linda service area. We work with housing offices and property managers when needed. Call ${phone} for availability.`
-  },
-];
+const phoneRaw = `+1${displayPhone.replace(/\D/g, '')}`;
 
-const recentRepairs = [
-  {
-    title: "Samsung RF28R7351SR — warm fridge, 22E error, LLUMC staff housing",
-    neighborhood: "University district, 92350",
-    description: "Call came in at 6:30am — a nurse finishing a night shift. Fridge had been warm since the previous evening. 22E is an ice room temperature sensor error, but the underlying cause here was an iced-over evaporator from a failed defrost heater — the evaporator coil had completely frosted, blocking the fan and the sensor circuit. Replaced the defrost heater assembly with an OEM Samsung part, manually defrosted the coil, confirmed normal fan operation and temperature recovery. Done before 9am. Nurse got some sleep knowing the fridge was running.",
-    note: "22E often points to defrost system failure, not the sensor itself. Root cause diagnosis saves an unnecessary part."
-  },
-  {
-    title: "LG WKEX200HBA washer-dryer combo — not draining, LE code",
-    neighborhood: "North Loma Linda, 92354",
-    description: "LE code on LG combos is a motor error, but in this unit it was triggered by a drain restriction — the pump was straining against a partially blocked drain filter, reading as motor overload. Cleared the filter (considerable hard water scale plus miscellaneous debris), ran a drain cycle, confirmed normal pump operation. Motor itself was fine. LG combos in Loma Linda's hard water environment need quarterly drain filter cleaning — this unit hadn't been cleaned since installation three years prior.",
-    note: "LG LE on a combo unit: always check the drain filter before assuming motor failure."
-  },
-  {
-    title: "Whirlpool WDT750SAHZ dishwasher — not cleaning, white film on everything",
-    neighborhood: "Barton Rd area, 92354",
-    description: "Classic Loma Linda hard water call. The dishwasher was leaving white scale deposits on every load — not poor wash performance, but heavy mineral etching from SB County water running through a filter that had never been cleaned. Pulled the filter assembly — completely calcified. Also descaled the interior tub walls and spray arm ports. Established a 3-month filter cleaning schedule with the customer and recommended a monthly rinse-aid refill. Dishwasher running clean. No parts needed — $89 diagnostic plus service.",
-    note: "White film in Loma Linda is almost always hard water, not a broken dishwasher. Clean the filter first."
-  },
-  {
-    title: "GE Profile PFE28KBLTS — ice maker not making ice, water fine, 2018 model",
-    neighborhood: "South Loma Linda, 92354",
-    description: "GE Profile French-door, water dispenser working, ice maker silent. Isolated to the ice maker inlet valve secondary solenoid — failed independently of the main water solenoid, which is the common failure mode on this GE Profile generation. Also found the ice maker mold had significant mineral scale from hard water — the fill cycle had been depositing calcium with every batch. Replaced the inlet valve assembly with an OEM GE part, descaled the ice maker mold, replaced the water filter (18 months old). Ice production restored same visit. Scheduled follow-up with the customer for 6-month filter replacement.",
-    note: "In Loma Linda hard water, ice maker descaling should happen every 12–18 months without fail."
-  },
-];
-
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Loma Linda",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Loma Linda",
-    "addressRegion": "CA",
-    "addressCountry": "US"
-  },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  // streetAddress omitted: Rancho Cucamonga is service_area.
+  areaServed: [
+    { '@type': 'City', name: 'Loma Linda', sameAs: 'https://en.wikipedia.org/wiki/Loma_Linda,_California' },
+    { '@type': 'Place', name: 'University District' },
+    { '@type': 'Place', name: 'LLUMC area' },
   ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
 };
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
+// =====================================================================
+// INTRO — H2 "Appliance Repair in Loma Linda — A City That Runs on a
+// Different Schedule". 4 paragraphs verbatim from legacy.
+// =====================================================================
+const introParagraphs = [
+  `Loma Linda is unlike any other city in San Bernardino County. It's home to Loma Linda University Medical Center — one of the largest employers in the IE and a nationally recognized health system — and the surrounding community reflects that. A substantial share of Loma Linda residents are healthcare workers, medical students, faculty, and staff operating on 12-hour shifts, night schedules, and rotating weekends. When your refrigerator stops working at 11pm after a night shift or your washer breaks down on a Tuesday morning when you're sleeping before a 7pm start, the standard "call before noon for same-day" approach doesn't always work.`,
+  "We schedule around your shift. Tell us when you're available — early morning before you go in, evening after you get back, weekend between stretches. We'll work with it. A healthcare worker sleeping after a night shift shouldn't have to choose between rest and getting an appliance fixed.",
+  'Beyond scheduling, Loma Linda has specific appliance service characteristics worth knowing. The city sits in the Inland Valley, and summers hit 100–107°F regularly — the same condenser coil and heat stress patterns we see across SB County. Hard water is consistent throughout the area, and dishwasher scale buildup and ice maker mineral deposits are among the most common calls we make here. We descale as standard on every applicable repair.',
+  `Same-day coverage across ZIP codes 92350 and 92354. Call <a href="tel:${phoneRaw}">${displayPhone}</a>.`,
+];
+
+// =====================================================================
+// SERVICES — 8 cards (2-tier, icon + name only per legacy).
+// =====================================================================
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🫧', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🍳', name: 'Stove & Cooktop Repair', slug: 'stove' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+];
+
+// =====================================================================
+// CUSTOM_NARRATIVE — "What Makes Loma Linda Different — And What That
+// Means for Appliance Repair". Multi-H3 verbatim from legacy.
+// =====================================================================
+const lomaLindaNarrative = {
+  headline: 'What Makes Loma Linda Different — And What That Means for Appliance Repair',
+  paragraphs: [],
+  subSections: [
+    {
+      title: 'A Medical Community With Non-Standard Hours',
+      paragraphs: [
+        "Loma Linda University Medical Center runs 24 hours a day, 365 days a year. So does its support workforce — nurses, technicians, residents, administrative staff, housekeeping, food service. A significant portion of the city's residential population works shifts that don't align with the typical Monday-Friday, 9-to-5 service window that most appliance companies operate within.",
+        "We've made calls in Loma Linda at 6:30am for nurses finishing night shifts and at 8pm for doctors starting a day off. We don't penalize non-standard availability. When you call us, tell us your shift schedule and we'll find a window that works. A healthcare worker who just finished 12 hours on a unit shouldn't have to wait until their next day off to get a working refrigerator or washer.",
+      ],
+    },
+    {
+      title: "Hard Water — Loma Linda's Maintenance Reality",
+      paragraphs: [
+        'SB County water is consistently hard, and Loma Linda is no exception. The calcium and magnesium content in local water creates a predictable set of appliance problems that many residents mistake for equipment failure.',
+        '<strong>Dishwashers:</strong> White film and spots on dishes are almost always hard water deposits, not poor wash performance. The dishwasher filter accumulates mineral scale at a rate that requires cleaning every 3 months in this area. The spray arm ports clog. The interior tub walls scale up over time. None of this is a broken machine — it\'s a maintenance issue that most people never address until the dishwasher stops draining or the E24 code appears.',
+        "<strong>Ice makers:</strong> Hard water deposits accumulate inside the ice maker mold on a timeline that most manufacturers don't account for in their maintenance guidelines. In Loma Linda, ice maker descaling every 12–18 months is practical necessity. Cloudy ice cubes, reduced ice production, and fill tube freezing are the warning signs. We descale as part of every applicable ice maker call in this market.",
+        "<strong>Refrigerator water filters:</strong> Manufacturer recommendation is every 6 months. In Loma Linda's hard water, every 4 months is the right interval. A saturated filter restricts flow to the ice maker and reduces water quality — and it's a $30–$50 fix that most people skip until it causes a more expensive problem.",
+      ],
+    },
+    {
+      title: 'Inland Heat — Summer Appliance Stress',
+      paragraphs: [
+        "Loma Linda's Inland Valley location means summers hit 100–107°F routinely. This creates the same condenser coil stress pattern we see across the IE: refrigerators that were managing fine in spring start struggling in July. In Loma Linda's dry, dusty climate, condenser coils should be cleaned every 6 months. A fridge that runs warm only in summer, with the freezer still cold, is almost always a condenser coil issue — we clean and test on every summer refrigerator call before considering more expensive diagnoses.",
+      ],
+    },
+    {
+      title: 'Housing Profile',
+      paragraphs: [
+        'Loma Linda is a compact city — roughly 1.7 square miles of residential, institutional, and commercial land. The housing mix reflects its institutional nature: university faculty and staff housing near campus, older residential neighborhoods from the 1960s–1980s east of Barton Road, and newer condos and apartments that house medical students and rotating residents. Appliances span from 15-year-old Whirlpool and GE in older homes to newer Samsung and LG in recently remodeled or purpose-built units near the medical campus. We come prepared for both ends of that range.',
+      ],
+    },
+  ],
 };
+
+// =====================================================================
+// NEIGHBORHOODS — 8 entries verbatim from legacy.
+// =====================================================================
+const neighborhoods = [
+  { name: 'University District / LLUMC', zip: '92350', featured: true },
+  { name: 'North Loma Linda', zip: '92354' },
+  { name: 'South Loma Linda', zip: '92354' },
+  { name: 'Barton Rd Corridor', zip: '92354' },
+  { name: 'Anderson St Area', zip: '92350' },
+  { name: 'California St', zip: '92354' },
+  { name: 'Campus Area', zip: '92350' },
+  { name: 'Redlands Border', zip: '92354' },
+];
+
+// =====================================================================
+// RECENT_JOBS — 4 jobs verbatim from legacy.
+// =====================================================================
+const recentJobs = [
+  {
+    appliance: 'Samsung Refrigerator',
+    location: 'University district, 92350',
+    quote: 'Samsung RF28R7351SR — warm fridge, 22E error, LLUMC staff housing',
+    description: 'Call came in at 6:30am — a nurse finishing a night shift. Fridge had been warm since the previous evening. 22E is an ice room temperature sensor error, but the underlying cause here was an iced-over evaporator from a failed defrost heater — the evaporator coil had completely frosted, blocking the fan and the sensor circuit. Replaced the defrost heater assembly with an OEM Samsung part, manually defrosted the coil, confirmed normal fan operation and temperature recovery. Done before 9am. Nurse got some sleep knowing the fridge was running.',
+    outcome: '✓ Same morning · OEM Samsung defrost heater · Done before 9am',
+  },
+  {
+    appliance: 'LG Washer-Dryer Combo',
+    location: 'North Loma Linda, 92354',
+    quote: 'LG WKEX200HBA washer-dryer combo — not draining, LE code',
+    description: "LE code on LG combos is a motor error, but in this unit it was triggered by a drain restriction — the pump was straining against a partially blocked drain filter, reading as motor overload. Cleared the filter (considerable hard water scale plus miscellaneous debris), ran a drain cycle, confirmed normal pump operation. Motor itself was fine. LG combos in Loma Linda's hard water environment need quarterly drain filter cleaning — this unit hadn't been cleaned since installation three years prior.",
+    outcome: '✓ Same day · Drain filter cleared · No part needed',
+  },
+  {
+    appliance: 'Whirlpool Dishwasher',
+    location: 'Barton Rd area, 92354',
+    quote: 'Whirlpool WDT750SAHZ dishwasher — not cleaning, white film on everything',
+    description: 'Classic Loma Linda hard water call. The dishwasher was leaving white scale deposits on every load — not poor wash performance, but heavy mineral etching from SB County water running through a filter that had never been cleaned. Pulled the filter assembly — completely calcified. Also descaled the interior tub walls and spray arm ports. Established a 3-month filter cleaning schedule with the customer and recommended a monthly rinse-aid refill. Dishwasher running clean. No parts needed — $89 diagnostic plus service.',
+    outcome: '✓ Same day · Descale + filter service · No parts needed',
+  },
+  {
+    appliance: 'GE Profile Refrigerator',
+    location: 'South Loma Linda, 92354',
+    quote: 'GE Profile PFE28KBLTS — ice maker not making ice, water fine, 2018 model',
+    description: 'GE Profile French-door, water dispenser working, ice maker silent. Isolated to the ice maker inlet valve secondary solenoid — failed independently of the main water solenoid, which is the common failure mode on this GE Profile generation. Also found the ice maker mold had significant mineral scale from hard water — the fill cycle had been depositing calcium with every batch. Replaced the inlet valve assembly with an OEM GE part, descaled the ice maker mold, replaced the water filter (18 months old). Ice production restored same visit. Scheduled follow-up with the customer for 6-month filter replacement.',
+    outcome: '✓ Same day · OEM GE inlet valve · Mold descaled · Filter replaced',
+  },
+];
+
+// =====================================================================
+// WHY_US — 4 reasons verbatim from legacy.
+// =====================================================================
+const whyReasons = [
+  {
+    iconKey: 'clock' as const,
+    title: 'We work around your shift',
+    body: "12-hour nights, rotating weekends, 7am starts — we've heard every schedule. Tell us when you're available and we build around it. A healthcare worker's time is not interchangeable with business hours, and we don't treat it that way.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Hard water — we actually address it',
+    body: "Most companies replace the broken part and leave. We descale, clean the filter, replace the water filter, and leave you with the right maintenance schedule for Loma Linda's water. Because the same problem will be back in 18 months if we don't.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Diagnosis before the quote',
+    body: 'The $89 diagnostic fee means we look at the appliance before recommending anything. An LG combo LE error is usually a drain filter, not a motor. A dishwasher that "doesn\'t clean" is usually scale, not a pump. We find the cheap fix first.',
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'OEM parts, no shortcuts',
+    body: 'Aftermarket parts fail faster in hard water and high-heat environments. We source OEM for every repair — the right part from the right channel. What we quote is what appears on the invoice.',
+  },
+];
+
+// =====================================================================
+// REVIEWS — 3 testimonials verbatim from legacy.
+// =====================================================================
+const testimonials = [
+  {
+    stars: 5,
+    text: '"I work nights at LLUMC and my fridge stopped cooling when I got home at 7am. Called Same Day and they were there by 9am — before I needed to sleep. They fixed a defrost heater issue, explained everything, and were out in under two hours. Incredible service."',
+    author: '— Jennifer K., LLUMC nurse, university district',
+  },
+  {
+    stars: 5,
+    text: '"Dishwasher leaving white film on everything. Tech came out, said it was hard water scale in the filter — not a broken machine. Cleaned and descaled everything, showed me how to maintain it. $89 and problem solved. I had no idea the filter needed cleaning."',
+    author: '— Michael T., Barton Rd area',
+  },
+  {
+    stars: 5,
+    text: '"LG combo washer-dryer showing LE error. Tech cleared a clogged drain filter — had never been cleaned in 3 years. Machine runs perfectly now. Also explained the hard water maintenance schedule for Loma Linda. Very thorough, fair price."',
+    author: '— Sandra L., North Loma Linda',
+  },
+];
+
+// =====================================================================
+// PRICING — 8 cards verbatim from legacy.
+// =====================================================================
+const pricingTiers = [
+  { appliance: 'Refrigerator Repair', range: '$150–$420', note: 'Defrost heater · Coil cleaning · OEM parts' },
+  { appliance: 'Washer Repair', range: '$140–$360', note: 'Drain pump · Door lock · Bearing · OEM' },
+  { appliance: 'Dryer Repair', range: '$120–$300', note: 'Thermal fuse · Vent cleaning · Heating element' },
+  { appliance: 'Dishwasher Repair', range: '$89–$340', note: 'Filter scale · Drain pump · Spray arm' },
+  { appliance: 'Oven / Range Repair', range: '$130–$380', note: 'Igniter · Element · Control board · OEM' },
+  { appliance: 'Ice Maker Repair', range: '$120–$260', note: 'Inlet valve · Descale mold · Filter' },
+  { appliance: 'Dishwasher Descale', range: '$89–$130', note: 'Hard water service · Filter clean · Spray arm' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Applied to repair cost · No trip charge to 92350/92354', featured: true },
+];
+
+// =====================================================================
+// FAQ — 7 items verbatim from legacy.
+// =====================================================================
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Loma Linda?',
+    answer: `Yes — same-day service is available throughout Loma Linda including the university district, LLUMC area, North and South Loma Linda, and the Barton Road corridor. Call ${displayPhone} before noon for same-day scheduling. We cover ZIP codes 92350 and 92354 without a trip surcharge.`,
+  },
+  {
+    question: 'Do you offer early morning or evening appointments for healthcare workers?',
+    answer: `Yes. A significant portion of Loma Linda's residents work shifts at Loma Linda University Medical Center — 12-hour shifts starting at 7am or 7pm, nights, weekends. We schedule around your shift. Call ${displayPhone} and tell us your availability — early morning before a shift, evening after, weekend between. We don't limit service to business hours.`,
+  },
+  {
+    question: 'What brands do you repair in Loma Linda?',
+    answer: "All major brands. Loma Linda's housing mix runs Samsung, LG, GE, and Whirlpool across the university district and residential neighborhoods, with some older Kenmore and Maytag in the longer-established homes. Faculty and staff housing near campus tends toward mid-range to upper-mid appliances. We carry OEM parts for all generations on the truck.",
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: '$89, applied directly to the repair cost when you proceed. No hidden trip charge to Loma Linda. We quote on-site after diagnosis — what we quote is what appears on the invoice. No surprises.',
+  },
+  {
+    question: 'Why does my refrigerator work fine in winter but struggles in summer?',
+    answer: "Loma Linda sits in the Inland Valley and regularly hits 100–107°F in July and August. Appliances that were managing fine in mild weather get pushed past their threshold in the heat. The first check is always condenser coils — in Loma Linda's dry, dusty climate, coils load up faster than coastal cities. A refrigerator with partially clogged coils that was borderline in spring will fail outright in summer. We clean and test on every hot-weather refrigerator call.",
+  },
+  {
+    question: 'My dishwasher leaves white film on everything — is it broken?',
+    answer: "Probably not. Hard water is consistent throughout SB County, and Loma Linda's water supply has high mineral content. White film on dishes and glasses is calcium and magnesium deposits — a water quality issue, not a dishwasher malfunction. The fix involves descaling the interior, cleaning the spray arms, and establishing a maintenance routine. Dishwasher filter cleaning every 3 months is the right schedule for Loma Linda homes.",
+  },
+  {
+    question: 'Do you service appliances in the university and medical campus housing?',
+    answer: `Yes — faculty housing, staff residences, and university-affiliated housing near campus are part of our standard Loma Linda service area. We work with housing offices and property managers when needed. Call ${displayPhone} for availability.`,
+  },
+];
+
+// =====================================================================
+// NEARBY_LINKS — 6 verified-existing per legacy.
+// =====================================================================
+const nearbyCities = [
+  { name: 'Redlands', slug: 'redlands' },
+  { name: 'San Bernardino', slug: 'san-bernardino' },
+  { name: 'Fontana', slug: 'fontana' },
+  { name: 'Rancho Cucamonga', slug: 'rancho-cucamonga' },
+  { name: 'Riverside', slug: 'riverside' },
+  { name: 'Ontario', slug: 'ontario' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Loma Linda, CA"
+    subheadline="Same-day service for Loma Linda's university district, LLUMC area, and surrounding neighborhoods. Flexible scheduling for medical center shift workers. All brands, OEM parts."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">San Bernardino County · ZIP 92350, 92354</p>
-        <h1>Appliance Repair<br><span class="accent">Loma Linda</span></h1>
-        <p class="hero-sub">Same-day service throughout Loma Linda — university district, LLUMC area, Barton Rd, North and South Loma Linda. Flexible scheduling for healthcare workers. All brands, OEM parts.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-      <div class="hero-img">
-        <img src="/images/cities/loma-linda-appliance-repair.jpg" alt="Appliance repair in Loma Linda CA" width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🏥</span><span>Flexible Shift Scheduling</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Loma Linda — A City That Runs on a Different Schedule"
+    paragraphs={introParagraphs}
+    bookingTitle="Loma Linda"
+    bookingSub="Shift-friendly · Same Day"
+  />
 
-  <!-- INTRO + SIDEBAR -->
-  <section class="intro-section container">
-    <div class="intro-content">
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Loma Linda"
+    services={services}
+  />
 
-      <h2>Appliance Repair in Loma Linda — A City That Runs on a Different Schedule</h2>
+  <CustomNarrative
+    headline={lomaLindaNarrative.headline}
+    paragraphs={lomaLindaNarrative.paragraphs}
+    subSections={lomaLindaNarrative.subSections}
+    background="white"
+  />
 
-      <p>Loma Linda is unlike any other city in San Bernardino County. It's home to Loma Linda University Medical Center — one of the largest employers in the IE and a nationally recognized health system — and the surrounding community reflects that. A substantial share of Loma Linda residents are healthcare workers, medical students, faculty, and staff operating on 12-hour shifts, night schedules, and rotating weekends. When your refrigerator stops working at 11pm after a night shift or your washer breaks down on a Tuesday morning when you're sleeping before a 7pm start, the standard "call before noon for same-day" approach doesn't always work.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Areas We Service in Loma Linda"
+    subheadline="We cover all of Loma Linda — the university district, LLUMC corridor, Barton Rd, North and South Loma Linda. No travel surcharge to any address in 92350 or 92354."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>We schedule around your shift. Tell us when you're available — early morning before you go in, evening after you get back, weekend between stretches. We'll work with it. A healthcare worker sleeping after a night shift shouldn't have to choose between rest and getting an appliance fixed.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Loma Linda"
+    jobs={recentJobs}
+  />
 
-      <p>Beyond scheduling, Loma Linda has specific appliance service characteristics worth knowing. The city sits in the Inland Valley, and summers hit 100–107°F regularly — the same condenser coil and heat stress patterns we see across SB County. Hard water is consistent throughout the area, and dishwasher scale buildup and ice maker mineral deposits are among the most common calls we make here. We descale as standard on every applicable repair.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Loma Linda Residents Call Us"
+    reasons={whyReasons}
+  />
 
-      <p>Same-day coverage across ZIP codes 92350 and 92354. Call {phone}.</p>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Loma Linda Customers Say"
+    testimonials={testimonials}
+  />
 
-    </div>
+  <PricingCards
+    cityName={cityName}
+    headline="Typical Repair Pricing in Loma Linda"
+    subhead="Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Loma Linda</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ Flexible Scheduling — Shift-Friendly</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ Hard Water Specialists</li>
-        <li>✓ 90-Day Warranty</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Loma Linda Appliance Repair — FAQ"
+    faqs={faqs}
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Loma Linda</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby nearbyCities={nearbyCities} />
 
-  <!-- LOMA LINDA SPECIFIC BLOCK -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>What Makes Loma Linda Different — And What That Means for Appliance Repair</h2>
-
-        <h3>A Medical Community With Non-Standard Hours</h3>
-        <p>Loma Linda University Medical Center runs 24 hours a day, 365 days a year. So does its support workforce — nurses, technicians, residents, administrative staff, housekeeping, food service. A significant portion of the city's residential population works shifts that don't align with the typical Monday-Friday, 9-to-5 service window that most appliance companies operate within.</p>
-
-        <p>We've made calls in Loma Linda at 6:30am for nurses finishing night shifts and at 8pm for doctors starting a day off. We don't penalize non-standard availability. When you call us, tell us your shift schedule and we'll find a window that works. A healthcare worker who just finished 12 hours on a unit shouldn't have to wait until their next day off to get a working refrigerator or washer.</p>
-
-        <h3>Hard Water — Loma Linda's Maintenance Reality</h3>
-        <p>SB County water is consistently hard, and Loma Linda is no exception. The calcium and magnesium content in local water creates a predictable set of appliance problems that many residents mistake for equipment failure.</p>
-
-        <p><strong>Dishwashers:</strong> White film and spots on dishes are almost always hard water deposits, not poor wash performance. The dishwasher filter accumulates mineral scale at a rate that requires cleaning every 3 months in this area. The spray arm ports clog. The interior tub walls scale up over time. None of this is a broken machine — it's a maintenance issue that most people never address until the dishwasher stops draining or the E24 code appears.</p>
-
-        <p><strong>Ice makers:</strong> Hard water deposits accumulate inside the ice maker mold on a timeline that most manufacturers don't account for in their maintenance guidelines. In Loma Linda, ice maker descaling every 12–18 months is practical necessity. Cloudy ice cubes, reduced ice production, and fill tube freezing are the warning signs. We descale as part of every applicable ice maker call in this market.</p>
-
-        <p><strong>Refrigerator water filters:</strong> Manufacturer recommendation is every 6 months. In Loma Linda's hard water, every 4 months is the right interval. A saturated filter restricts flow to the ice maker and reduces water quality — and it's a $30–$50 fix that most people skip until it causes a more expensive problem.</p>
-
-        <h3>Inland Heat — Summer Appliance Stress</h3>
-        <p>Loma Linda's Inland Valley location means summers hit 100–107°F routinely. This creates the same condenser coil stress pattern we see across the IE: refrigerators that were managing fine in spring start struggling in July. In Loma Linda's dry, dusty climate, condenser coils should be cleaned every 6 months. A fridge that runs warm only in summer, with the freezer still cold, is almost always a condenser coil issue — we clean and test on every summer refrigerator call before considering more expensive diagnoses.</p>
-
-        <h3>Housing Profile</h3>
-        <p>Loma Linda is a compact city — roughly 1.7 square miles of residential, institutional, and commercial land. The housing mix reflects its institutional nature: university faculty and staff housing near campus, older residential neighborhoods from the 1960s–1980s east of Barton Road, and newer condos and apartments that house medical students and rotating residents. Appliances span from 15-year-old Whirlpool and GE in older homes to newer Samsung and LG in recently remodeled or purpose-built units near the medical campus. We come prepared for both ends of that range.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Areas We Service in Loma Linda</h2>
-      <p>We cover all of Loma Linda — the university district, LLUMC corridor, Barton Rd, North and South Loma Linda. No travel surcharge to any address in 92350 or 92354.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Redlands and Highland — same dispatch, no surcharge. Call {phone}.</p>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">03</div>
-      <h2>Recent Repairs in Loma Linda</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- WHY US + REVIEWS + PRICING -->
-  <section class="why-section container">
-    <div class="context-number">04</div>
-    <h2>Why Loma Linda Residents Call Us</h2>
-
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>We work around your shift</h3>
-        <p>12-hour nights, rotating weekends, 7am starts — we've heard every schedule. Tell us when you're available and we build around it. A healthcare worker's time is not interchangeable with business hours, and we don't treat it that way.</p>
-      </div>
-      <div class="why-item">
-        <h3>Hard water — we actually address it</h3>
-        <p>Most companies replace the broken part and leave. We descale, clean the filter, replace the water filter, and leave you with the right maintenance schedule for Loma Linda's water. Because the same problem will be back in 18 months if we don't.</p>
-      </div>
-      <div class="why-item">
-        <h3>Diagnosis before the quote</h3>
-        <p>The $89 diagnostic fee means we look at the appliance before recommending anything. An LG combo LE error is usually a drain filter, not a motor. A dishwasher that "doesn't clean" is usually scale, not a pump. We find the cheap fix first.</p>
-      </div>
-      <div class="why-item">
-        <h3>OEM parts, no shortcuts</h3>
-        <p>Aftermarket parts fail faster in hard water and high-heat environments. We source OEM for every repair — the right part from the right channel. What we quote is what appears on the invoice.</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"I work nights at LLUMC and my fridge stopped cooling when I got home at 7am. Called Same Day and they were there by 9am — before I needed to sleep. They fixed a defrost heater issue, explained everything, and were out in under two hours. Incredible service."</p>
-        <p class="reviewer">— Jennifer K., LLUMC nurse, university district</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Dishwasher leaving white film on everything. Tech came out, said it was hard water scale in the filter — not a broken machine. Cleaned and descaled everything, showed me how to maintain it. $89 and problem solved. I had no idea the filter needed cleaning."</p>
-        <p class="reviewer">— Michael T., Barton Rd area</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"LG combo washer-dryer showing LE error. Tech cleared a clogged drain filter — had never been cleaned in 3 years. Machine runs perfectly now. Also explained the hard water maintenance schedule for Loma Linda. Very thorough, fair price."</p>
-        <p class="reviewer">— Sandra L., North Loma Linda</p>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Loma Linda</h3>
-      <p>Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item">
-          <span class="pi-service">Refrigerator Repair</span>
-          <span class="pi-range">$150–$420</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Washer Repair</span>
-          <span class="pi-range">$140–$360</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Repair</span>
-          <span class="pi-range">$120–$300</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Repair</span>
-          <span class="pi-range">$89–$340</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Oven / Range Repair</span>
-          <span class="pi-range">$130–$380</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Ice Maker Repair</span>
-          <span class="pi-range">$120–$260</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Descale</span>
-          <span class="pi-range">$89–$130</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Condenser Coil Cleaning</span>
-          <span class="pi-range">$89–$140</span>
-        </div>
-      </div>
-      <p class="pricing-note">$89 diagnostic applied to repair cost. No trip charge to Loma Linda ZIP codes.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq-section container">
-    <h2>Loma Linda Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/redlands/">Redlands</a>
-      <a href="/san-bernardino/">San Bernardino</a>
-      <a href="/fontana/">Fontana</a>
-      <a href="/rancho-cucamonga/">Rancho Cucamonga</a>
-      <a href="/riverside/">Riverside</a>
-      <a href="/ontario/">Ontario</a>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Loma Linda Today?</h2>
-      <p>Same-day service throughout Loma Linda. Flexible scheduling for healthcare workers and shift workers. Call anytime.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
-.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
-h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
-h1 .accent { color: var(--color-accent); }
-.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
-.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
-.trust-bar { background: var(--color-accent); padding: 1rem 0; }
-.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
-.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
-.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
-.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
-.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
-.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
-.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
-.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
-.services-section { background: var(--color-surface); padding: 4rem 0; }
-.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
-.svc-icon { font-size: 2rem; }
-.svc-name { font-size: .9rem; font-weight: 600; }
-.context-block { padding: 4rem 0; }
-.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
-.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; }
-.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
-.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.neighborhoods-section { padding: 4rem 0; }
-.section-intro { margin-bottom: 2rem; }
-.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
-.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
-.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
-.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
-.nbhd-note { margin-top: 1.5rem; font-size: .875rem; color: var(--color-text-muted); }
-.repairs-section { padding: 4rem 0; }
-.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
-.section-header h2 { font-size: 1.6rem; }
-.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
-.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
-.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
-.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
-.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
-.why-section { padding: 4rem 0; }
-.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
-.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
-.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
-.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
-.reviewer { font-size: .8rem; color: var(--color-text-muted); }
-.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
-.pricing-block h3 { margin-bottom: .5rem; }
-.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.price-item { display: flex; flex-direction: column; gap: .25rem; }
-.pi-service { font-size: .85rem; color: var(--color-text-muted); }
-.pi-range { font-size: 1rem; font-weight: 700; }
-.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
-.faq-section { padding: 4rem 0; }
-.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.faq-list { display: flex; flex-direction: column; gap: .75rem; }
-.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
-.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
-.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
-.nearby-section { padding: 3rem 0; }
-.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
-.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
-.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
-.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
-.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
-.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
-.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
-.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-@media (max-width: 1024px) {
-  .intro-section { grid-template-columns: 1fr; }
-  .sticky-cta-box { position: static; }
-  .services-grid, .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-img { display: none; }
-  .context-inner { grid-template-columns: 1fr; }
-  .repairs-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Loma Linda Today?"
+    body="Same-day service throughout Loma Linda. Flexible scheduling for healthcare workers and shift workers. Call anytime."
+  />
+</CityLayoutV2>

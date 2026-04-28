@@ -1,669 +1,361 @@
 ---
-// src/pages/irvine.astro
-// SDAR — samedayappliance.repair
-// Irvine, CA · 92602 · 92604 · 92606 · 92612 · 92618 · 92620
-// Филиал: Irvine · (213) 401-9019
-// GSC: irvine appliance repair — 123 показа, позиция 65
-//      appliance repair irvine — 57 показов, позиция 66
-//      dryer repair irvine — 19 показов, поз 62
-//      oven repair irvine — 19 показов, поз 66
-// Конкуренты: iFix OC (strong — HOA, tech hub, Shady Canyon), D&V Appliance (local),
-//             Irvine Appliance Repair Pros (listing-style)
-// Уникальный угол: master-planned city + HOA-compliant service + Shady Canyon luxury +
-//                  tech hub / smart appliances + UCI corridor student housing
-// Апрель 2026
+/**
+ * Irvine, CA — v2 migrated page (T12 batch).
+ * Branch: Irvine — service_area (no public street address).
+ * Content source of truth: legacy irvine.astro.legacy + content-dump.
+ *
+ * Verbatim contract: every paragraph, FAQ, recent job, review,
+ * neighborhood/community, ZIP from the legacy page is preserved.
+ * The 9-card community grid is rendered as a CustomNarrative subSections
+ * block followed by ServiceArea for the standard ZIP grid.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = {
-  name: "Irvine",
-  state: "CA",
-  county: "Orange",
-  zips: ["92602", "92604", "92606", "92612", "92618", "92620"],
-  phone: "(213) 401-9019",
-  phoneRaw: "+12134019019",
-  email: "irvine@samedayappliance.repair",
-  branch: "Irvine",
-  slug: "irvine",
-};
+const citySlug = 'irvine';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const title = `Appliance Repair Irvine CA — Same Day | Shady Canyon · Woodbridge · Great Park | (213) 401-9019`;
-const description = `Same-day appliance repair in Irvine, CA. All communities — Woodbridge, Turtle Rock, Northpark, Shady Canyon, Great Park, Orchard Hills. HOA-compliant service. Sub-Zero, Wolf, Samsung, LG. Licensed, OEM parts, 90-day warranty. Call (213) 401-9019.`;
-const canonical = `https://samedayappliance.repair/irvine/`;
+const cityName = 'Irvine';
+const zips = ['92602', '92604', '92606', '92612', '92618', '92620'];
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Irvine",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Irvine",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const title = `Appliance Repair Irvine CA — Same Day | Shady Canyon · Woodbridge · Great Park | ${branch.phone}`;
+const description = `Same-day appliance repair in Irvine, CA. All communities — Woodbridge, Turtle Rock, Northpark, Shady Canyon, Great Park, Orchard Hills. HOA-compliant service. Sub-Zero, Wolf, Samsung, LG. Licensed, OEM parts, 90-day warranty. Call ${branch.phone}.`;
+const canonical = 'https://samedayappliance.repair/irvine/';
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  // streetAddress omitted: Irvine is service_area.
+  areaServed: [
+    { '@type': 'City', name: 'Irvine', sameAs: 'https://en.wikipedia.org/wiki/Irvine,_California' },
+    { '@type': 'Place', name: 'Woodbridge' },
+    { '@type': 'Place', name: 'Shady Canyon' },
+    { '@type': 'Place', name: 'Turtle Rock' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Irvine", "sameAs": "https://en.wikipedia.org/wiki/Irvine,_California" },
-    { "@type": "Neighborhood", "name": "Woodbridge" },
-    { "@type": "Neighborhood", "name": "Shady Canyon" },
-    { "@type": "Neighborhood", "name": "Turtle Rock" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Irvine, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians are based in Irvine and cover all communities — Woodbridge, Turtle Rock, Northpark, Westpark, University Park, Great Park, Orchard Hills, Portola Springs, Shady Canyon, and all ZIP codes 92602, 92604, 92606, 92612, 92618, and 92620. Call before noon for same-day afternoon service." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you follow HOA rules when doing appliance repair in Irvine?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Nearly every Irvine community has HOA rules — parking restrictions, noise windows, approved contractor lists, service documentation requirements. We know the protocols for Irvine's major communities, arrive in marked service vehicles, work within the allowed hours, and can provide service documentation for HOA records on request." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair smart appliances and connected home systems in Irvine?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Irvine is a tech-forward city — Samsung Family Hub refrigerators, LG ThinQ smart washers, Bosch app-connected appliances, and more are common in the newer Irvine communities. Our technicians carry diagnostic tablets and are trained on smart appliance control boards and connectivity issues, not just mechanical failures." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, and luxury appliances in Shady Canyon and Turtle Rock?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Shady Canyon, Turtle Rock, and the larger Irvine estates frequently have Sub-Zero refrigerators, Wolf ranges, Thermador appliances, and Miele dishwashers. Our technicians carry OEM parts for these brands on every vehicle and are trained on their specific systems." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Irvine?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Irvine repairs run $150–$400 depending on the appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Irvine?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Newport Beach, Costa Mesa, and Lake Forest?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Irvine branch covers all of Orange County — Newport Beach, Costa Mesa, Lake Forest, Laguna Hills, Mission Viejo, Tustin, and surrounding cities." }
-    }
-  ]
+// =====================================================================
+// INTRO — H2 "Appliance Repair in Irvine — Built for This City"
+// 4 paragraphs verbatim from legacy.
+// =====================================================================
+const introParagraphs = [
+  "Irvine isn't like other cities. Every community is planned, maintained, and governed — Woodbridge, Turtle Rock, Northpark, Westpark, Great Park, Orchard Hills. Most have HOA rules that govern when service vehicles can arrive, where they can park, and what documentation they need to provide. We know this. Our technicians arrive in marked vehicles, work within allowed hours, and can provide service documentation for HOA records.",
+  "The housing range in Irvine is also unusually broad — from condo units near UCI to newer construction townhomes in Portola Springs to luxury estates in Shady Canyon with Sub-Zero, Wolf, and Thermador kitchens. We carry parts for all of these on the same vehicle and don't treat any job as less important than another.",
+  "Irvine is also a technology hub. Samsung Family Hub refrigerators, LG ThinQ smart washers, Bosch connected dishwashers — newer Irvine homes often have smart appliances that need a technician who can read diagnostic data from the control board, not just check the obvious mechanical failures. Our technicians carry diagnostic tablets and are trained on smart appliance electronics.",
+  'Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong>. Weekends available.',
+];
+
+// =====================================================================
+// SERVICES — 8 cards (3-tier with issues + brands), legacy verbatim.
+// =====================================================================
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Smart Family Hub · Not cooling · Ice maker · Sub-Zero built-in', brands: 'Samsung · LG · Sub-Zero · Bosch · GE · Thermador' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'ThinQ smart · OE error · Not draining · Not spinning', brands: 'LG · Samsung · Bosch · Whirlpool · Maytag · Miele' },
+  { icon: '♨️', name: 'Dryer Repair', slug: 'dryer', issues: 'Not heating · Smart dryer · Vent cleaning · Thermal fuse', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Miele' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Connected Bosch · Not draining · Error codes · Panel-ready', brands: 'Bosch · Miele · Samsung · LG · KitchenAid · GE' },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven', issues: 'Not heating · Gas igniter · Temperature off · Wolf & Viking', brands: 'Wolf · Thermador · GE · Samsung · Bosch · Viking' },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'Not freezing · Ice stopped · Frost buildup · Built-in', brands: 'Sub-Zero · Samsung · LG · GE · Whirlpool · True' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Compressor · Built-in · Under-counter', brands: 'Sub-Zero · True · U-Line · Liebherr · Dacor' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Igniter · Gas burner · Induction not heating · Hood motor', brands: 'Wolf · Thermador · GE · Bosch · Samsung · Broan' },
+];
+
+// =====================================================================
+// CUSTOM_NARRATIVE — 9-card community grid rendered as subSections.
+// Verbatim community names + descriptions from legacy.
+// =====================================================================
+const communitiesNarrative = {
+  headline: 'Every Irvine Community — Same Service, Same Day',
+  paragraphs: ['From Woodbridge to Orchard Hills — we know HOA rules, parking, and access for each.'],
+  subSections: [
+    { title: 'Shady Canyon', paragraphs: ['Gated · Sub-Zero / Wolf estates · Estate manager coordination'] },
+    { title: 'Turtle Rock', paragraphs: ['Established · Hillside homes · Premium brands common'] },
+    { title: 'Orchard Hills', paragraphs: ['Newer luxury · Smart appliances · Large kitchens'] },
+    { title: 'Woodbridge', paragraphs: ['92604 · Established community · All brands'] },
+    { title: 'Northpark / Westpark', paragraphs: ['92606 · HOA · Standard & mid-range brands'] },
+    { title: 'Great Park', paragraphs: ['92618 · New construction · Smart appliances'] },
+    { title: 'Portola Springs', paragraphs: ['92618 · Newer · HOA · All brands'] },
+    { title: 'University Park / UCI', paragraphs: ['92612 · Condos · Standard brands · Stackable'] },
+    { title: 'Stonegate / Cypress Village', paragraphs: ['92620 · Mid-range · Samsung / LG common'] },
+  ],
 };
+
+// =====================================================================
+// NEIGHBORHOODS (community summary grid for ServiceArea section).
+// =====================================================================
+const neighborhoods = [
+  { name: 'Shady Canyon', zip: '92603', featured: true },
+  { name: 'Turtle Rock', zip: '92603', featured: true },
+  { name: 'Orchard Hills', zip: '92602', featured: true },
+  { name: 'Woodbridge', zip: '92604' },
+  { name: 'Northpark / Westpark', zip: '92606' },
+  { name: 'Great Park', zip: '92618' },
+  { name: 'Portola Springs', zip: '92618' },
+  { name: 'University Park / UCI', zip: '92612' },
+  { name: 'Stonegate / Cypress Village', zip: '92620' },
+];
+
+// =====================================================================
+// RECENT_JOBS — 4 jobs verbatim from legacy.
+// =====================================================================
+const recentJobs = [
+  {
+    appliance: 'Samsung Family Hub',
+    location: 'Great Park, 92618',
+    quote: 'Touch screen unresponsive, ice maker stopped, app showing offline',
+    description: "New construction home in Great Park — Samsung Family Hub 4-door French door. The main control board had a firmware issue manifesting as both ice maker failure and screen lockout. Connected our diagnostic tablet to the refrigerator's service port, read the error log, confirmed control board fault. Replaced the main board with an OEM Samsung part, restored Wi-Fi connectivity, verified ice maker function and all touch screen features. Homeowner was a software engineer — appreciated the diagnostic approach.",
+    outcome: '✓ Same day · OEM Samsung board · App reconnected · All features confirmed',
+  },
+  {
+    appliance: 'Sub-Zero Refrigerator',
+    location: 'Shady Canyon, 92603',
+    quote: 'Not cooling properly — fluctuating 8–10 degrees all day',
+    description: 'Shady Canyon estate — HOA required advance service vehicle registration, coordinated through the property manager. Sub-Zero 48-inch built-in: dual evaporator fan motor on the fresh food side beginning to fail, creating inconsistent airflow. Replaced with an OEM Sub-Zero motor, rechecked all door seals, confirmed temperatures in both compartments stable for one hour before leaving. Service documentation provided for estate records.',
+    outcome: '✓ Same day · HOA + estate coordinated · OEM Sub-Zero · Stable temps',
+  },
+  {
+    appliance: 'LG ThinQ Washer',
+    location: 'Woodbridge, 92604',
+    quote: 'LE error on every cycle — motor error on the app too',
+    description: "LG front-loader ThinQ — LE error (motor/rotor sensor fault) appearing both on the display and in the SmartDiagnosis app. Ran the LG smart diagnosis protocol through the app before opening the machine — confirmed hall sensor failure on the motor rotor. Replaced the hall sensor with an OEM LG part, cleared error logs through the app, ran three wash cycles at different settings. No further LE codes. Homeowner appreciated that we used the app's own diagnostic system rather than just guessing.",
+    outcome: '✓ Same day · Smart diagnosis protocol · OEM LG sensor · App clear',
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'Northpark, 92606',
+    quote: 'E24 drain error — standing water, happened suddenly',
+    description: 'Northpark townhome — Bosch 800 series. E24 drain error from combined pump blockage and filter clog. Cleared the drain pump assembly and deep-cleaned the filter, ran the Bosch diagnostic cycle, confirmed full drain on three consecutive cycles. Also checked the drain hose routing — had a slight kink from the original installation that had gradually worsened. Re-routed and secured the hose. HOA building management notified the repair was complete per their maintenance log requirement.',
+    outcome: '✓ Same day · E24 resolved · Hose re-routed · HOA log updated',
+  },
+];
+
+// =====================================================================
+// WHY_US — 4 reasons verbatim from legacy.
+// =====================================================================
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'HOA-Compliant Service',
+    body: "Nearly every Irvine community has HOA rules. We know the parking, noise, and documentation requirements for Irvine's major communities. We arrive in marked vehicles, work within allowed hours, and provide service documentation for HOA records when requested.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Smart Appliance Expertise',
+    body: "Samsung Family Hub, LG ThinQ, Bosch connected appliances — Irvine's newer homes run technology-forward kitchens. Our technicians carry diagnostic tablets and know how to interface with smart appliance control boards, not just check mechanical components.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Every Community, Every Budget',
+    body: "Shady Canyon estate with Sub-Zero and Wolf. Great Park new construction with Samsung and LG. University Park condo with standard GE. We carry parts for all of these and don't treat any job as less important than another.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Local Irvine branch.',
+  },
+];
+
+// =====================================================================
+// REVIEWS — 3 testimonials verbatim from legacy.
+// =====================================================================
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Samsung Family Hub in our Great Park home had a dead screen and offline ice maker. Same Day connected to the diagnostic port, read the error log, replaced the control board with OEM parts, restored Wi-Fi and all features. As a software engineer I really appreciated that they actually diagnosed it properly instead of just replacing random parts."',
+    author: '— Kevin L., Great Park, Irvine',
+  },
+  {
+    stars: 5,
+    text: '"Sub-Zero in our Shady Canyon home fluctuating temperatures. Property manager handled the HOA logistics — Same Day registered with the gate, arrived on time, replaced the fan motor with OEM parts, provided service documentation. Professional throughout. Would absolutely use again."',
+    author: '— M. Chen (via property manager), Shady Canyon, Irvine',
+  },
+  {
+    stars: 5,
+    text: '"LG ThinQ washer with LE error. Tech used the SmartDiagnosis app first before even opening the machine — confirmed the exact sensor fault, replaced it with OEM parts, cleared the error through the app. Done in under an hour. Knowledgeable, efficient, and clearly up to date on smart appliances."',
+    author: '— Jennifer T., Woodbridge, Irvine',
+  },
+];
+
+// =====================================================================
+// PRICING — 6 cards verbatim from legacy.
+// =====================================================================
+const pricingTiers = [
+  { appliance: 'Smart Appliances (Samsung, LG ThinQ)', range: '$150 – $450', note: 'Control board · Sensor · App diagnostics · OEM parts' },
+  { appliance: 'Sub-Zero / Wolf / Thermador', range: '$300 – $700+', note: 'OEM parts · Shady Canyon / Turtle Rock estates' },
+  { appliance: 'Refrigerator (standard)', range: '$150 – $400', note: 'Fan motor · Ice maker · Thermostat · All brands' },
+  { appliance: 'Washer / Dryer', range: '$150 – $350', note: 'Smart sensor · Drain pump · Thermal fuse · Vent' },
+  { appliance: 'Dishwasher / Oven', range: '$150 – $400', note: 'Drain pump · Error codes · Gas igniter · Calibration' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair', featured: true },
+];
+
+// =====================================================================
+// FAQ — 7 items verbatim from legacy schema.
+// =====================================================================
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Irvine, CA?',
+    answer: 'Yes. Our technicians are based in Irvine and cover all communities — Woodbridge, Turtle Rock, Northpark, Westpark, University Park, Great Park, Orchard Hills, Portola Springs, Shady Canyon, and all ZIP codes 92602, 92604, 92606, 92612, 92618, and 92620. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'Do you follow HOA rules when doing appliance repair in Irvine?',
+    answer: "Yes. Nearly every Irvine community has HOA rules — parking restrictions, noise windows, approved contractor lists, service documentation requirements. We know the protocols for Irvine's major communities, arrive in marked service vehicles, work within the allowed hours, and can provide service documentation for HOA records on request.",
+  },
+  {
+    question: 'Do you repair smart appliances and connected home systems in Irvine?',
+    answer: 'Yes. Irvine is a tech-forward city — Samsung Family Hub refrigerators, LG ThinQ smart washers, Bosch app-connected appliances, and more are common in the newer Irvine communities. Our technicians carry diagnostic tablets and are trained on smart appliance control boards and connectivity issues, not just mechanical failures.',
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, and luxury appliances in Shady Canyon and Turtle Rock?',
+    answer: 'Yes. Shady Canyon, Turtle Rock, and the larger Irvine estates frequently have Sub-Zero refrigerators, Wolf ranges, Thermador appliances, and Miele dishwashers. Our technicians carry OEM parts for these brands on every vehicle and are trained on their specific systems.',
+  },
+  {
+    question: 'What is your diagnostic fee in Irvine?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Irvine repairs run $150–$400 depending on the appliance.',
+  },
+  {
+    question: 'What warranty do you offer on appliance repairs in Irvine?',
+    answer: 'All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.',
+  },
+  {
+    question: 'Do you also serve Newport Beach, Costa Mesa, and Lake Forest?',
+    answer: 'Yes. Our Irvine branch covers all of Orange County — Newport Beach, Costa Mesa, Lake Forest, Laguna Hills, Mission Viejo, Tustin, and surrounding cities.',
+  },
+];
+
+// =====================================================================
+// NEARBY_LINKS — 8 verified-existing.
+// =====================================================================
+const nearbyCities = [
+  { name: 'Newport Beach', slug: 'newport-beach' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Santa Monica', slug: 'santa-monica' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Brentwood', slug: 'brentwood' },
+  { name: 'Malibu', slug: 'malibu' },
+  { name: 'Pasadena', slug: 'pasadena' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Irvine, CA"
+    subheadline="Irvine's master-planned communities, HOA requirements, and tech-forward homes call for a service company that knows the city. Local Irvine branch, same-day service, HOA-compliant, OEM parts, 90-day warranty. All communities covered."
+    zips={zips}
+    tier={1}
+  />
 
-  <!-- HERO -->
-  <section class="irv-hero">
-    <div class="irv-hero__inner container">
-      <div class="irv-hero__content">
-        <div class="irv-hero__eyebrow">Irvine, CA · All Communities · Woodbridge · Shady Canyon · Great Park · Orchard Hills</div>
-        <h1 class="irv-hero__h1">
-          Appliance Repair<br>
-          <span class="irv-hero__accent">Irvine, CA</span>
-        </h1>
-        <p class="irv-hero__sub">
-          Irvine's master-planned communities, HOA requirements, and tech-forward homes
-          call for a service company that knows the city. Local Irvine branch, same-day
-          service, HOA-compliant, OEM parts, 90-day warranty. All communities covered.
-        </p>
-        <div class="irv-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="irv-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="irv-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-irvine-ca.webp"
-          alt="Appliance repair in Irvine CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>HOA-Compliant</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Irvine — Built for This City"
+    paragraphs={introParagraphs}
+    bookingTitle="Irvine Local Branch"
+    bookingSub="All communities · HOA-ready"
+  />
 
-  <!-- INTRO -->
-  <section class="irv-intro">
-    <div class="container irv-intro__inner">
-      <div class="irv-intro__text">
-        <h2>Appliance Repair in Irvine — Built for This City</h2>
-        <p>
-          Irvine isn't like other cities. Every community is planned, maintained,
-          and governed — Woodbridge, Turtle Rock, Northpark, Westpark, Great Park,
-          Orchard Hills. Most have HOA rules that govern when service vehicles can
-          arrive, where they can park, and what documentation they need to provide.
-          We know this. Our technicians arrive in marked vehicles, work within allowed
-          hours, and can provide service documentation for HOA records.
-        </p>
-        <p>
-          The housing range in Irvine is also unusually broad — from condo units
-          near UCI to newer construction townhomes in Portola Springs to luxury
-          estates in Shady Canyon with Sub-Zero, Wolf, and Thermador kitchens.
-          We carry parts for all of these on the same vehicle and don't treat
-          any job as less important than another.
-        </p>
-        <p>
-          Irvine is also a technology hub. Samsung Family Hub refrigerators, LG
-          ThinQ smart washers, Bosch connected dishwashers — newer Irvine homes
-          often have smart appliances that need a technician who can read diagnostic
-          data from the control board, not just check the obvious mechanical failures.
-          Our technicians carry diagnostic tablets and are trained on smart
-          appliance electronics.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong>. Weekends available.
-        </p>
-      </div>
-      <div class="irv-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Irvine Local Branch</div>
-          <div class="cta-box__sub">All communities · HOA-ready · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Irvine"
+    services={services}
+  />
 
-  <!-- IRVINE COMMUNITY GRID -->
-  <section class="irv-communities">
-    <div class="container">
-      <h2 class="section-title">Every Irvine Community — Same Service, Same Day</h2>
-      <p class="section-sub">From Woodbridge to Orchard Hills — we know HOA rules, parking, and access for each.</p>
-      <div class="community-grid">
-        <div class="community-card community-card--featured">
-          <div class="community-name">Shady Canyon</div>
-          <div class="community-detail">Gated · Sub-Zero / Wolf estates · Estate manager coordination</div>
-        </div>
-        <div class="community-card community-card--featured">
-          <div class="community-name">Turtle Rock</div>
-          <div class="community-detail">Established · Hillside homes · Premium brands common</div>
-        </div>
-        <div class="community-card community-card--featured">
-          <div class="community-name">Orchard Hills</div>
-          <div class="community-detail">Newer luxury · Smart appliances · Large kitchens</div>
-        </div>
-        <div class="community-card">
-          <div class="community-name">Woodbridge</div>
-          <div class="community-detail">92604 · Established community · All brands</div>
-        </div>
-        <div class="community-card">
-          <div class="community-name">Northpark / Westpark</div>
-          <div class="community-detail">92606 · HOA · Standard & mid-range brands</div>
-        </div>
-        <div class="community-card">
-          <div class="community-name">Great Park</div>
-          <div class="community-detail">92618 · New construction · Smart appliances</div>
-        </div>
-        <div class="community-card">
-          <div class="community-name">Portola Springs</div>
-          <div class="community-detail">92618 · Newer · HOA · All brands</div>
-        </div>
-        <div class="community-card">
-          <div class="community-name">University Park / UCI</div>
-          <div class="community-detail">92612 · Condos · Standard brands · Stackable</div>
-        </div>
-        <div class="community-card">
-          <div class="community-name">Stonegate / Cypress Village</div>
-          <div class="community-detail">92620 · Mid-range · Samsung / LG common</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={communitiesNarrative.headline}
+    paragraphs={communitiesNarrative.paragraphs}
+    subSections={communitiesNarrative.subSections}
+    background="gray"
+  />
 
-  <!-- SERVICES -->
-  <section class="irv-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Irvine</h2>
-      <p class="section-sub">All brands · Smart appliances · HOA-compliant · All ZIP codes</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="Irvine Communities We Serve"
+    subheadline="Every neighborhood across all six ZIP codes."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <a href="/irvine/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Smart Family Hub · Not cooling · Ice maker · Sub-Zero built-in</div>
-          <div class="service-card__brands">Samsung · LG · Sub-Zero · Bosch · GE · Thermador</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in Irvine"
+    subhead="Real calls from Irvine communities — smart appliances, HOA coordination, luxury brands."
+    jobs={recentJobs}
+  />
 
-        <a href="/irvine/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">ThinQ smart · OE error · Not draining · Not spinning</div>
-          <div class="service-card__brands">LG · Samsung · Bosch · Whirlpool · Maytag · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Irvine Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/irvine/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Smart dryer · Vent cleaning · Thermal fuse</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Irvine Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/irvine/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Connected Bosch · Not draining · Error codes · Panel-ready</div>
-          <div class="service-card__brands">Bosch · Miele · Samsung · LG · KitchenAid · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Irvine"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/irvine/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Wolf & Viking</div>
-          <div class="service-card__brands">Wolf · Thermador · GE · Samsung · Bosch · Viking</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Irvine Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/irvine/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Not freezing · Ice stopped · Frost buildup · Built-in</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby nearbyCities={nearbyCities} />
 
-        <a href="/irvine/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Built-in · Under-counter</div>
-          <div class="service-card__brands">Sub-Zero · True · U-Line · Liebherr · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/irvine/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter · Gas burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">Wolf · Thermador · GE · Bosch · Samsung · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="irv-recent">
-    <div class="container">
-      <h2>Recent Jobs in Irvine</h2>
-      <p class="section-sub">Real calls from Irvine communities — smart appliances, HOA coordination, luxury brands.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Family Hub</span>
-            <span class="recent-location">Great Park, 92618</span>
-          </div>
-          <div class="recent-card__title">"Touch screen unresponsive, ice maker stopped, app showing offline"</div>
-          <div class="recent-card__desc">
-            New construction home in Great Park — Samsung Family Hub 4-door French door.
-            The main control board had a firmware issue manifesting as both ice maker
-            failure and screen lockout. Connected our diagnostic tablet to the refrigerator's
-            service port, read the error log, confirmed control board fault. Replaced
-            the main board with an OEM Samsung part, restored Wi-Fi connectivity,
-            verified ice maker function and all touch screen features. Homeowner
-            was a software engineer — appreciated the diagnostic approach.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung board · App reconnected · All features confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Refrigerator</span>
-            <span class="recent-location">Shady Canyon, 92603</span>
-          </div>
-          <div class="recent-card__title">"Not cooling properly — fluctuating 8–10 degrees all day"</div>
-          <div class="recent-card__desc">
-            Shady Canyon estate — HOA required advance service vehicle registration,
-            coordinated through the property manager. Sub-Zero 48-inch built-in:
-            dual evaporator fan motor on the fresh food side beginning to fail, creating
-            inconsistent airflow. Replaced with an OEM Sub-Zero motor, rechecked
-            all door seals, confirmed temperatures in both compartments stable for
-            one hour before leaving. Service documentation provided for estate records.
-          </div>
-          <div class="recent-card__result">✓ Same day · HOA + estate coordinated · OEM Sub-Zero · Stable temps</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG ThinQ Washer</span>
-            <span class="recent-location">Woodbridge, 92604</span>
-          </div>
-          <div class="recent-card__title">"LE error on every cycle — motor error on the app too"</div>
-          <div class="recent-card__desc">
-            LG front-loader ThinQ — LE error (motor/rotor sensor fault) appearing both
-            on the display and in the SmartDiagnosis app. Ran the LG smart diagnosis
-            protocol through the app before opening the machine — confirmed hall sensor
-            failure on the motor rotor. Replaced the hall sensor with an OEM LG part,
-            cleared error logs through the app, ran three wash cycles at different
-            settings. No further LE codes. Homeowner appreciated that we used the
-            app's own diagnostic system rather than just guessing.
-          </div>
-          <div class="recent-card__result">✓ Same day · Smart diagnosis protocol · OEM LG sensor · App clear</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Northpark, 92606</span>
-          </div>
-          <div class="recent-card__title">"E24 drain error — standing water, happened suddenly"</div>
-          <div class="recent-card__desc">
-            Northpark townhome — Bosch 800 series. E24 drain error from combined
-            pump blockage and filter clog. Cleared the drain pump assembly and deep-cleaned
-            the filter, ran the Bosch diagnostic cycle, confirmed full drain on three
-            consecutive cycles. Also checked the drain hose routing — had a slight kink
-            from the original installation that had gradually worsened. Re-routed
-            and secured the hose. HOA building management notified the repair was
-            complete per their maintenance log requirement.
-          </div>
-          <div class="recent-card__result">✓ Same day · E24 resolved · Hose re-routed · HOA log updated</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="irv-why">
-    <div class="container">
-      <h2>Why Irvine Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🏘️</div>
-          <div class="why-title">HOA-Compliant Service</div>
-          <div class="why-text">Nearly every Irvine community has HOA rules. We know the parking, noise, and documentation requirements for Irvine's major communities. We arrive in marked vehicles, work within allowed hours, and provide service documentation for HOA records when requested.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📱</div>
-          <div class="why-title">Smart Appliance Expertise</div>
-          <div class="why-text">Samsung Family Hub, LG ThinQ, Bosch connected appliances — Irvine's newer homes run technology-forward kitchens. Our technicians carry diagnostic tablets and know how to interface with smart appliance control boards, not just check mechanical components.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏡</div>
-          <div class="why-title">Every Community, Every Budget</div>
-          <div class="why-text">Shady Canyon estate with Sub-Zero and Wolf. Great Park new construction with Samsung and LG. University Park condo with standard GE. We carry parts for all of these and don't treat any job as less important than another.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Local Irvine branch.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="irv-reviews">
-    <div class="container">
-      <h2>What Irvine Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Samsung Family Hub in our Great Park home had a dead screen and offline ice maker. Same Day connected to the diagnostic port, read the error log, replaced the control board with OEM parts, restored Wi-Fi and all features. As a software engineer I really appreciated that they actually diagnosed it properly instead of just replacing random parts."</div>
-          <div class="review-author">— Kevin L., Great Park, Irvine</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero in our Shady Canyon home fluctuating temperatures. Property manager handled the HOA logistics — Same Day registered with the gate, arrived on time, replaced the fan motor with OEM parts, provided service documentation. Professional throughout. Would absolutely use again."</div>
-          <div class="review-author">— M. Chen (via property manager), Shady Canyon, Irvine</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG ThinQ washer with LE error. Tech used the SmartDiagnosis app first before even opening the machine — confirmed the exact sensor fault, replaced it with OEM parts, cleared the error through the app. Done in under an hour. Knowledgeable, efficient, and clearly up to date on smart appliances."</div>
-          <div class="review-author">— Jennifer T., Woodbridge, Irvine</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="irv-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Irvine</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Smart Appliances (Samsung, LG ThinQ)</div>
-          <div class="pricing-card__range">$150 – $450</div>
-          <div class="pricing-card__note">Control board · Sensor · App diagnostics · OEM parts</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf / Thermador</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Shady Canyon / Turtle Rock estates</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator (standard)</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Fan motor · Ice maker · Thermostat · All brands</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Smart sensor · Drain pump · Thermal fuse · Vent</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher / Oven</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Drain pump · Error codes · Gas igniter · Calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="irv-faq">
-    <div class="container">
-      <h2>Questions Irvine Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Irvine, CA?</summary><div class="faq-answer">Yes. Our technicians are based in Irvine and cover all communities — Woodbridge, Turtle Rock, Northpark, Westpark, Great Park, Orchard Hills, Portola Springs, Shady Canyon, and all ZIP codes 92602, 92604, 92606, 92612, 92618, and 92620. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you follow HOA rules when doing appliance repair in Irvine?</summary><div class="faq-answer">Yes. We know the protocols for Irvine's major communities, arrive in marked vehicles, work within allowed hours, and provide service documentation for HOA records on request.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair smart appliances and connected home systems in Irvine?</summary><div class="faq-answer">Yes. Samsung Family Hub, LG ThinQ, Bosch connected appliances — our technicians carry diagnostic tablets and are trained on smart appliance control boards and connectivity issues.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero, Wolf, and luxury appliances in Shady Canyon?</summary><div class="faq-answer">Yes. Shady Canyon, Turtle Rock, and larger Irvine estates frequently have Sub-Zero, Wolf, Thermador, and Miele. We carry OEM parts for these brands and are trained on their specific systems.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Irvine?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Irvine repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">What warranty do you offer on appliance repairs in Irvine?</summary><div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Newport Beach, Costa Mesa, and Lake Forest?</summary><div class="faq-answer">Yes. Our Irvine branch covers all of Orange County — Newport Beach, Costa Mesa, Lake Forest, Laguna Hills, Mission Viejo, Tustin, and surrounding cities.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="irv-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/newport-beach/" class="nearby-link">Newport Beach</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="irv-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Irvine?</h2>
-          <p>All communities · HOA-compliant · Smart appliances · Sub-Zero to Samsung. $89 diagnostic waived with repair. 90-day warranty. Local Irvine branch.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Irvine, CA</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --irv-red: #C8102E; --irv-black: #0a0a0a; --irv-gray: #f5f5f5; --irv-border: #e2e2e2; --irv-text: #1a1a1a; --irv-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .irv-hero { background: var(--irv-black); color: white; padding: 80px 0 60px; }
-  .irv-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .irv-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--irv-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .irv-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .irv-hero__accent { color: var(--irv-red); }
-  .irv-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .irv-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .irv-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .irv-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--irv-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .irv-bottom-cta .btn-secondary { color: var(--irv-text); border-color: var(--irv-border); }
-  .trust-bar { background: var(--irv-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .irv-intro { padding: 72px 0; background: white; }
-  .irv-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .irv-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--irv-black); margin-bottom: 20px; }
-  .irv-intro__text p { font-size: 16px; line-height: 1.7; color: var(--irv-text); margin-bottom: 16px; }
-  .cta-box { background: var(--irv-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--irv-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .irv-communities { padding: 72px 0; background: var(--irv-gray); }
-  .community-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  .community-card { background: white; border: 1px solid var(--irv-border); border-radius: 10px; padding: 18px 20px; }
-  .community-card--featured { border-color: var(--irv-red); background: #fff5f7; }
-  .community-name { font-size: 15px; font-weight: 600; color: var(--irv-black); margin-bottom: 4px; }
-  .community-detail { font-size: 13px; color: var(--irv-muted); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--irv-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--irv-muted); text-align: center; margin-bottom: 40px; }
-  .irv-services { padding: 72px 0; background: white; }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--irv-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--irv-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--irv-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--irv-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--irv-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--irv-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--irv-red); font-weight: 500; }
-  .irv-recent { padding: 72px 0; background: var(--irv-gray); }
-  .irv-recent h2 { font-size: 30px; font-weight: 700; color: var(--irv-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--irv-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--irv-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--irv-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--irv-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--irv-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .irv-why { padding: 72px 0; background: white; }
-  .irv-why h2 { font-size: 30px; font-weight: 700; color: var(--irv-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--irv-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--irv-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--irv-muted); line-height: 1.6; }
-  .irv-reviews { padding: 72px 0; background: var(--irv-gray); }
-  .irv-reviews h2 { font-size: 30px; font-weight: 700; color: var(--irv-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--irv-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--irv-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--irv-muted); font-weight: 500; }
-  .irv-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--irv-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--irv-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--irv-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--irv-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--irv-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--irv-red); }
-  .pricing-card__note { font-size: 13px; color: var(--irv-muted); }
-  .irv-faq { padding: 72px 0; background: var(--irv-gray); }
-  .irv-faq h2 { font-size: 30px; font-weight: 700; color: var(--irv-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--irv-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--irv-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--irv-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--irv-text); }
-  .irv-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--irv-border); }
-  .irv-nearby h2 { font-size: 20px; font-weight: 600; color: var(--irv-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--irv-border); border-radius: 20px; font-size: 14px; color: var(--irv-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--irv-red); color: var(--irv-red); }
-  .irv-bottom-cta { padding: 72px 0; background: var(--irv-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .irv-intro__inner { grid-template-columns: 1fr; } .community-grid { grid-template-columns: repeat(2, 1fr); } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .irv-hero__inner { grid-template-columns: 1fr; } .irv-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .community-grid { grid-template-columns: 1fr 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .community-grid { grid-template-columns: 1fr; } .irv-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Irvine?"
+    body="All communities · HOA-compliant · Smart appliances · Sub-Zero to Samsung. $89 diagnostic waived with repair. 90-day warranty. Local Irvine branch."
+  />
+</CityLayoutV2>

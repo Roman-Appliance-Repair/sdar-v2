@@ -1,690 +1,309 @@
 ---
-// src/pages/glassell-park.astro
-// SDAR — samedayappliance.repair
-// Glassell Park, Los Angeles CA 90065
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: glassell park appliance repair — 3 показа, поз 7.0 (!!!)
-//      Текущая /glassell-park/ страница уже в топ-10 без content
-// Конкуренты: Top Notch LA (323-827-7237, knows "working-class older homes"),
-//             Pros Fix Appliances (866-696-7767, generic),
-//             G&R Appliance Repair (Glendale-based)
-// Уникальный угол: hills above LA River + San Fernando Rd corridor +
-//                  older homes (1940s–60s) + LADWP hard water + compact multi-family +
-//                  between Highland Park & Atwater Village
-// Апрель 2026
+/**
+ * Glassell Park, CA — v2 migrated page (T12 batch).
+ * Branch: Los Angeles — service_area (no public street address).
+ * Content source of truth: legacy src/pages/glassell-park.astro.legacy + content-dumps/glassell-park.md
+ *
+ * Branch isolation:
+ *   - Phone (424) 325-0520 from cities.ts → branches.ts (Los Angeles)
+ *   - No streetAddress in schema (LA is service_area, not physical_pin)
+ *   - All ZIPs are Glassell Park's (90065)
+ *
+ * Legacy preserved as glassell-park.astro.legacy.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = {
-  name: "Glassell Park",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90065"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "glassell-park",
-};
+const citySlug = 'glassell-park';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const title = `Appliance Repair Glassell Park CA 90065 — Same Day | San Fernando Rd · NELA Hills | (323) 870-4790`;
-const description = `Same-day appliance repair in Glassell Park, CA 90065. San Fernando Rd corridor, Verdugo Rd, Toland Way, all streets. Samsung, LG, GE, Whirlpool — all brands. Licensed, OEM parts, 90-day warranty. Weekends available. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/glassell-park/`;
+const cityName = 'Glassell Park';
+const zips = ['90065'];
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Glassell Park",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Glassell Park CA 90065 — Same Day | San Fernando Rd · NELA Hills | ${phone}`;
+const description = 'Same-day appliance repair in Glassell Park, CA 90065. San Fernando Rd corridor, Verdugo Rd, Toland Way, all streets. Samsung, LG, GE, Whirlpool — all brands. Licensed, OEM parts, 90-day warranty. Weekends available.';
+const canonical = 'https://samedayappliance.repair/glassell-park/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'Neighborhood', name: 'Glassell Park', sameAs: 'https://en.wikipedia.org/wiki/Glassell_Park,_Los_Angeles' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Glassell Park", "sameAs": "https://en.wikipedia.org/wiki/Glassell_Park,_Los_Angeles" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Glassell Park, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Glassell Park 90065 — San Fernando Road, Verdugo Road, Toland Way, Andover Drive, Glenalbyn Drive, and every residential street including the hillside homes above the LA River. Call before noon for same-day afternoon service." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does hard water in Glassell Park affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Glassell Park is LADWP territory at 230–310 mg/L. Many of the older homes in 90065 still have galvanized supply lines that add iron to the baseline mineral content. Ice maker inlet valves and dishwasher spray arms accumulate scale faster here than in soft-water cities. We check for this on every relevant Glassell Park call." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Glassell Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, and more. We carry OEM parts on every service vehicle and never use aftermarket substitutes." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Glassell Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Glassell Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Glassell Park repairs run $150–$400." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Glassell Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Atwater Village, Highland Park, and Mount Washington?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Glassell Park service extends to Atwater Village, Highland Park, Mount Washington, Cypress Park, Eagle Rock, Silver Lake, Los Feliz, and all of northeast LA." }
-    }
-  ]
-};
+const introParagraphs = [
+  "Glassell Park doesn't need much introduction to people who live there — it's a neighbourhood that works, that has character, and that doesn't make a big deal about itself. The hillside streets above the LA River have homes from the 1940s and 1950s sitting alongside newer construction. The flats off San Fernando Road have a mix of single-family homes and multi-family buildings that have been here for generations.",
+  "What we bring to Glassell Park is the same thing we bring to every northeast LA neighbourhood: same-day service, OEM parts, and technicians who give you a written estimate before touching anything. No dispatch center routing, no upsell pressure. The diagnostic fee is $89, waived when you proceed. If the repair doesn't make economic sense, we'll tell you.",
+  "LADWP hard water is a factor throughout 90065. At 230–310 mg/L, with many of the older homes still on galvanized supply lines, ice maker inlet valves and dishwasher spray arms scale up faster here than national average. We check for this proactively on every relevant call.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong>. Weekends available.",
+  "<strong>Hard water tip for Glassell Park:</strong> If your refrigerator ice maker has been gradually producing less over the past few months — not a sudden stop but a slow decline — mineral scale on the water inlet valve is the most likely cause in 90065. Older homes with original galvanized supply lines compound the LADWP mineral content. Replacing your in-door filter every 6 months (not 12) helps meaningfully with this water supply.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'LADWP hard water ice maker · Not cooling · Fan motor · Temperature', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'OE / UE error · Not draining · Not spinning · Stackable', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen' },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · Vent buildup · Gas & electric', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven', issues: 'Not heating · Gas igniter · Temperature off · Gas & electric', brands: 'GE · Samsung · Bosch · Wolf · Viking · KitchenAid' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Hard water spray arm · Not draining · E24 · Error codes', brands: 'Bosch · KitchenAid · Samsung · LG · GE · Miele' },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'LADWP inlet valve scale · Not freezing · Ice stopped · Frost', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Compressor · Under-counter · Built-in', brands: 'True · U-Line · Liebherr · Dacor · Sub-Zero' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Gas igniter · Burner · Induction not heating · Hood motor', brands: 'GE · Bosch · Samsung · Wolf · Thermador · Broan' },
+];
+
+const neighborhoods = [
+  { name: 'San Fernando Rd corridor', zip: '90065', featured: true },
+  { name: 'Verdugo Rd area', zip: '90065', featured: true },
+  { name: 'Hillside streets above LA River', zip: '90065', featured: true },
+  { name: 'Toland Way', zip: '90065' },
+  { name: 'Andover Drive', zip: '90065' },
+  { name: 'Glenalbyn Drive', zip: '90065' },
+  { name: 'Eagle Rock Blvd border', zip: '90065' },
+];
+
+const keyStreets = ['San Fernando Rd', 'Verdugo Rd', 'Toland Way', 'Andover Dr', 'Glenalbyn Dr', 'Division St'];
+
+const recentJobs = [
+  {
+    appliance: 'Samsung Refrigerator',
+    location: 'Verdugo Rd hillside, 90065',
+    quote: 'Ice maker stopped almost completely — was fine, then nothing',
+    description: "1950s hillside home on a Verdugo Rd side street — Samsung French door, three years old, original galvanized supply lines still behind the walls. LADWP hard water plus iron from the old pipes had scaled the inlet valve to nearly zero flow. Replaced the inlet valve with an OEM Samsung part, flushed the water line, installed a fresh filter (11 months old — past the 6-month window for this water supply). Full production next day. Explained the galvanized pipe compound effect — owner hadn't known the pipes were still original.",
+    outcome: '✓ Same day · OEM Samsung · Old pipes explained · Full production',
+  },
+  {
+    appliance: 'LG Front-Load Washer',
+    location: 'San Fernando flats, 90065',
+    quote: "OE drain error — standing water, won't complete a cycle",
+    description: 'Older multi-family building off San Fernando — LG front-loader in a ground-floor unit. OE drain error from a pump filter blocked by a combination of lint and LADWP mineral scale. Cleared the pump filter and housing, confirmed drain on three full cycles. Also noticed the drain hose had a reverse-loop configuration from the original installation that was creating a partial siphon effect — re-routed with proper standpipe clearance. Explained to the tenant that the quarterly filter cleaning matters more in LADWP territory because of the mineral buildup rate.',
+    outcome: '✓ Same day · OE resolved · Hose re-routed · Quarterly routine set',
+  },
+  {
+    appliance: 'GE Gas Range',
+    location: 'Andover Dr, 90065',
+    quote: "Oven igniter glows but won't light — been two weeks",
+    description: "GE freestanding gas range in a Glassell Park single-family — the standard igniter failure: visually glowing orange but drawing insufficient current to open the gas valve. OEM GE igniter swap, 25 minutes on-site. Tested at 325°F, 375°F, and 450°F — accurate at all three. Homeowner had thought the gas valve itself was the problem, had been quoted significantly more by a competitor for a valve replacement. Explained the igniter amperage mechanism so they'd recognise the pattern if it recurred.",
+    outcome: '✓ Same day · OEM GE igniter · All temps confirmed · Cause explained',
+  },
+  {
+    appliance: 'Whirlpool Dryer',
+    location: 'Glenalbyn Dr, 90065',
+    quote: 'No heat — taking three cycles to dry a normal load',
+    description: 'Whirlpool electric dryer in a hillside home — thermal fuse blown from a vent run that had accumulated lint over several years inside a flexible duct section that had partially collapsed. Airflow was down to roughly 20% of normal. Replaced the thermal fuse, replaced the collapsed flexible duct section with rigid metal, cleared the full vent run to the exterior, confirmed strong airflow at the termination cap. Single-cycle drying on the first test load. The three-cycle pattern had been building for months before the fuse finally blew.',
+    outcome: '✓ Same day · Thermal fuse · Rigid duct installed · Single cycle confirmed',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'LADWP Hard Water Aware',
+    body: 'Glassell Park runs on LADWP at 230–310 mg/L. Older homes with original galvanized pipes add iron on top. Ice makers and dishwashers scale faster than national average here. We test for mineral deposits proactively on every relevant call.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Actually Same Day',
+    body: "Glassell Park is a regular part of our northeast LA route — not a special trip. Call before noon and we're typically there that afternoon. We're already in the neighbourhood working Eagle Rock, Atwater Village, and Highland Park calls on the same day.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Weekends Available',
+    body: "Saturday 8am–7pm and Sunday 9am–5pm. Appliances don't break on weekdays only. Weekend calls in Glassell Park are covered the same way as any other day.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Samsung fridge ice maker stopped completely. Tech came to our Verdugo hillside home, found the hard water issue compounded by our old galvanized pipes, replaced the inlet valve, explained what to do going forward. Full ice next morning. Really appreciated being told the actual cause and not just given a part replacement."',
+    author: '— Teresa M., Verdugo Rd, Glassell Park',
+  },
+  {
+    stars: 5,
+    text: '"GE oven igniter not lighting. Another company quoted us for a whole gas valve replacement. Same Day came out, diagnosed the actual issue in five minutes, replaced the igniter with OEM parts in 25 minutes, tested at three temperatures and left. Half the price, done in an hour. Should have called first."',
+    author: '— Daniel R., Andover Dr, Glassell Park',
+  },
+  {
+    stars: 5,
+    text: '"Whirlpool dryer taking forever to dry anything. Tech found the collapsed duct section, replaced it with rigid metal, confirmed the airflow. Single-cycle drying from the first test load. He explained the whole duct situation so clearly I felt like I understood what had been happening for months. Efficient and honest."',
+    author: '— Rita C., Glenalbyn Dr, Glassell Park',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator / Ice Maker', range: '$150 – $400', note: 'LADWP inlet valve · Galvanized pipe factor · Fan motor', featured: true },
+  { appliance: 'Washer / Dryer', range: '$150 – $350', note: 'Drain pump · Thermal fuse · Vent cleaning · Stackable', featured: true },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'Hard water scale · E24 · Drain pump · Spray arm' },
+  { appliance: 'Oven / Range', range: '$150 – $400', note: 'Gas igniter · Bake element · Temperature calibration' },
+  { appliance: 'Sub-Zero / Wolf', range: '$300 – $700+', note: 'OEM parts only · Luxury brand expertise' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Glassell Park, CA?',
+    answer: 'Yes. Our technicians cover all of Glassell Park 90065 — San Fernando Road, Verdugo Road, Toland Way, Andover Drive, Glenalbyn Drive, and every residential street. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'Does hard water in Glassell Park affect appliances?',
+    answer: 'Yes. LADWP runs 230–310 mg/L in 90065. Older homes with galvanized pipes add iron. Ice maker inlet valves and dishwasher spray arms scale faster than average. We check proactively on every relevant call.',
+  },
+  {
+    question: 'Are you available on weekends in Glassell Park?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm.',
+  },
+  {
+    question: 'What appliance brands do you repair in Glassell Park?',
+    answer: 'All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, and more. OEM parts on every vehicle.',
+  },
+  {
+    question: 'What is your diagnostic fee in Glassell Park?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Glassell Park repairs run $150–$400.',
+  },
+  {
+    question: 'What warranty do you offer on appliance repairs in Glassell Park?',
+    answer: 'All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.',
+  },
+  {
+    question: 'Do you also serve Atwater Village, Highland Park, and Mount Washington?',
+    answer: 'Yes. Our Glassell Park service extends to Atwater Village, Highland Park, Mount Washington, Cypress Park, Eagle Rock, Silver Lake, and all of northeast LA.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Atwater Village', slug: 'atwater-village' },
+  { name: 'Highland Park', slug: 'highland-park' },
+  { name: 'Eagle Rock', slug: 'eagle-rock' },
+  { name: 'Silver Lake', slug: 'silver-lake' },
+  { name: 'Los Feliz', slug: 'los-feliz' },
+  { name: 'Glendale', slug: 'glendale' },
+  { name: 'Burbank', slug: 'burbank' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Glassell Park, CA"
+    subheadline="Hillside homes, older construction, a neighbourhood that's been here long before the surrounding areas got trendy. Same reliable service whether you're on the flats off San Fernando or up on the hill above the river. Same-day, OEM parts, 90-day warranty. Weekends available."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="gp-hero">
-    <div class="gp-hero__inner container">
-      <div class="gp-hero__content">
-        <div class="gp-hero__eyebrow">Glassell Park · 90065 · San Fernando Rd · Verdugo Rd · LA River Hills</div>
-        <h1 class="gp-hero__h1">
-          Appliance Repair<br>
-          <span class="gp-hero__accent">Glassell Park, CA</span>
-        </h1>
-        <p class="gp-hero__sub">
-          Hillside homes, older construction, a neighbourhood that's been here long
-          before the surrounding areas got trendy. Same reliable service whether
-          you're on the flats off San Fernando or up on the hill above the river.
-          Same-day, OEM parts, 90-day warranty. Weekends available.
-        </p>
-        <div class="gp-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="gp-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="gp-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-glassell-park-ca.webp"
-          alt="Appliance repair in Glassell Park CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Glassell Park — Straightforward"
+    paragraphs={introParagraphs}
+    bookingTitle="Glassell Park Service"
+    bookingSub="90065 · Same day · Weekends ok"
+  />
 
-  <!-- INTRO -->
-  <section class="gp-intro">
-    <div class="container gp-intro__inner">
-      <div class="gp-intro__text">
-        <h2>Appliance Repair in Glassell Park — Straightforward</h2>
-        <p>
-          Glassell Park doesn't need much introduction to people who live there —
-          it's a neighbourhood that works, that has character, and that doesn't
-          make a big deal about itself. The hillside streets above the LA River
-          have homes from the 1940s and 1950s sitting alongside newer construction.
-          The flats off San Fernando Road have a mix of single-family homes and
-          multi-family buildings that have been here for generations.
-        </p>
-        <p>
-          What we bring to Glassell Park is the same thing we bring to every
-          northeast LA neighbourhood: same-day service, OEM parts, and technicians
-          who give you a written estimate before touching anything. No dispatch
-          center routing, no upsell pressure. The diagnostic fee is $89, waived
-          when you proceed. If the repair doesn't make economic sense, we'll tell you.
-        </p>
-        <p>
-          LADWP hard water is a factor throughout 90065. At 230–310 mg/L, with
-          many of the older homes still on galvanized supply lines, ice maker inlet
-          valves and dishwasher spray arms scale up faster here than national
-          average. We check for this proactively on every relevant call.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written
-          estimate before we start. <strong>90-day warranty</strong>.
-          Weekends available.
-        </p>
-        <div class="gp-tip">
-          <div class="gp-tip__icon">💧</div>
-          <div class="gp-tip__text">
-            <strong>Hard water tip for Glassell Park:</strong> If your refrigerator
-            ice maker has been gradually producing less over the past few months —
-            not a sudden stop but a slow decline — mineral scale on the water inlet
-            valve is the most likely cause in 90065. Older homes with original
-            galvanized supply lines compound the LADWP mineral content. Replacing
-            your in-door filter every 6 months (not 12) helps meaningfully with
-            this water supply.
-          </div>
-        </div>
-      </div>
-      <div class="gp-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Glassell Park Service</div>
-          <div class="cta-box__sub">90065 · Same day · Weekends ok</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Glassell Park"
+    subhead="All brands · LADWP hard water aware · Houses & multi-family · 90065"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="gp-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Glassell Park</h2>
-      <p class="section-sub">All brands · LADWP hard water aware · Houses & multi-family · 90065</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="All of Glassell Park — 90065"
+    subheadline="From the hillside streets to the San Fernando flats"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={keyStreets}
+  />
 
-        <a href="/glassell-park/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">LADWP hard water ice maker · Not cooling · Fan motor · Temperature</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in Glassell Park"
+    subhead="Real calls from 90065 — hillside homes, older construction, LADWP hard water."
+    jobs={recentJobs}
+  />
 
-        <a href="/glassell-park/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Stackable</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Glassell Park Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/glassell-park/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Glassell Park Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/glassell-park/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Gas & electric</div>
-          <div class="service-card__brands">GE · Samsung · Bosch · Wolf · Viking · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Glassell Park"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/glassell-park/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Hard water spray arm · Not draining · E24 · Error codes</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Glassell Park Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/glassell-park/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">LADWP inlet valve scale · Not freezing · Ice stopped · Frost</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+  />
 
-        <a href="/glassell-park/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/glassell-park/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · Thermador · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="gp-neighborhoods">
-    <div class="container">
-      <h2>All of Glassell Park — 90065</h2>
-      <p class="section-sub">From the hillside streets to the San Fernando flats</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">GP Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">San Fernando Rd corridor</div>
-            <div class="nh-item featured">Verdugo Rd area</div>
-            <div class="nh-item featured">Hillside streets above LA River</div>
-            <div class="nh-item">Toland Way</div>
-            <div class="nh-item">Andover Drive</div>
-            <div class="nh-item">Glenalbyn Drive</div>
-            <div class="nh-item">Eagle Rock Blvd border</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">San Fernando Rd</div>
-            <div class="nh-item">Verdugo Rd</div>
-            <div class="nh-item">Toland Way</div>
-            <div class="nh-item">Andover Dr</div>
-            <div class="nh-item">Glenalbyn Dr</div>
-            <div class="nh-item">Division St</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Atwater Village (90039)</div>
-            <div class="nh-item">Highland Park (90042)</div>
-            <div class="nh-item">Mount Washington (90065)</div>
-            <div class="nh-item">Cypress Park (90065)</div>
-            <div class="nh-item">Eagle Rock (90041)</div>
-            <div class="nh-item">Silver Lake (90026)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="gp-recent">
-    <div class="container">
-      <h2>Recent Jobs in Glassell Park</h2>
-      <p class="section-sub">Real calls from 90065 — hillside homes, older construction, LADWP hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Verdugo Rd hillside, 90065</span>
-          </div>
-          <div class="recent-card__title">"Ice maker stopped almost completely — was fine, then nothing"</div>
-          <div class="recent-card__desc">
-            1950s hillside home on a Verdugo Rd side street — Samsung French door,
-            three years old, original galvanized supply lines still behind the walls.
-            LADWP hard water plus iron from the old pipes had scaled the inlet valve
-            to nearly zero flow. Replaced the inlet valve with an OEM Samsung part,
-            flushed the water line, installed a fresh filter (11 months old — past
-            the 6-month window for this water supply). Full production next day.
-            Explained the galvanized pipe compound effect — owner hadn't known
-            the pipes were still original.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung · Old pipes explained · Full production</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Front-Load Washer</span>
-            <span class="recent-location">San Fernando flats, 90065</span>
-          </div>
-          <div class="recent-card__title">"OE drain error — standing water, won't complete a cycle"</div>
-          <div class="recent-card__desc">
-            Older multi-family building off San Fernando — LG front-loader in
-            a ground-floor unit. OE drain error from a pump filter blocked by
-            a combination of lint and LADWP mineral scale. Cleared the pump filter
-            and housing, confirmed drain on three full cycles. Also noticed the
-            drain hose had a reverse-loop configuration from the original
-            installation that was creating a partial siphon effect — re-routed
-            with proper standpipe clearance. Explained to the tenant that the
-            quarterly filter cleaning matters more in LADWP territory because
-            of the mineral buildup rate.
-          </div>
-          <div class="recent-card__result">✓ Same day · OE resolved · Hose re-routed · Quarterly routine set</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">GE Gas Range</span>
-            <span class="recent-location">Andover Dr, 90065</span>
-          </div>
-          <div class="recent-card__title">"Oven igniter glows but won't light — been two weeks"</div>
-          <div class="recent-card__desc">
-            GE freestanding gas range in a Glassell Park single-family — the
-            standard igniter failure: visually glowing orange but drawing
-            insufficient current to open the gas valve. OEM GE igniter swap,
-            25 minutes on-site. Tested at 325°F, 375°F, and 450°F — accurate
-            at all three. Homeowner had thought the gas valve itself was the
-            problem, had been quoted significantly more by a competitor for
-            a valve replacement. Explained the igniter amperage mechanism
-            so they'd recognise the pattern if it recurred.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM GE igniter · All temps confirmed · Cause explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Whirlpool Dryer</span>
-            <span class="recent-location">Glenalbyn Dr, 90065</span>
-          </div>
-          <div class="recent-card__title">"No heat — taking three cycles to dry a normal load"</div>
-          <div class="recent-card__desc">
-            Whirlpool electric dryer in a hillside home — thermal fuse blown
-            from a vent run that had accumulated lint over several years inside
-            a flexible duct section that had partially collapsed. Airflow was
-            down to roughly 20% of normal. Replaced the thermal fuse, replaced
-            the collapsed flexible duct section with rigid metal, cleared the
-            full vent run to the exterior, confirmed strong airflow at the
-            termination cap. Single-cycle drying on the first test load. The
-            three-cycle pattern had been building for months before the fuse
-            finally blew.
-          </div>
-          <div class="recent-card__result">✓ Same day · Thermal fuse · Rigid duct installed · Single cycle confirmed</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="gp-why">
-    <div class="container">
-      <h2>Why Glassell Park Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">LADWP Hard Water Aware</div>
-          <div class="why-text">Glassell Park runs on LADWP at 230–310 mg/L. Older homes with original galvanized pipes add iron on top. Ice makers and dishwashers scale faster than national average here. We test for mineral deposits proactively on every relevant call.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">⏱️</div>
-          <div class="why-title">Actually Same Day</div>
-          <div class="why-text">Glassell Park is a regular part of our northeast LA route — not a special trip. Call before noon and we're typically there that afternoon. We're already in the neighbourhood working Eagle Rock, Atwater Village, and Highland Park calls on the same day.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📅</div>
-          <div class="why-title">Weekends Available</div>
-          <div class="why-text">Saturday 8am–7pm and Sunday 9am–5pm. Appliances don't break on weekdays only. Weekend calls in Glassell Park are covered the same way as any other day.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="gp-reviews">
-    <div class="container">
-      <h2>What Glassell Park Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Samsung fridge ice maker stopped completely. Tech came to our Verdugo hillside home, found the hard water issue compounded by our old galvanized pipes, replaced the inlet valve, explained what to do going forward. Full ice next morning. Really appreciated being told the actual cause and not just given a part replacement."</div>
-          <div class="review-author">— Teresa M., Verdugo Rd, Glassell Park</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"GE oven igniter not lighting. Another company quoted us for a whole gas valve replacement. Same Day came out, diagnosed the actual issue in five minutes, replaced the igniter with OEM parts in 25 minutes, tested at three temperatures and left. Half the price, done in an hour. Should have called first."</div>
-          <div class="review-author">— Daniel R., Andover Dr, Glassell Park</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Whirlpool dryer taking forever to dry anything. Tech found the collapsed duct section, replaced it with rigid metal, confirmed the airflow. Single-cycle drying from the first test load. He explained the whole duct situation so clearly I felt like I understood what had been happening for months. Efficient and honest."</div>
-          <div class="review-author">— Rita C., Glenalbyn Dr, Glassell Park</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="gp-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Glassell Park</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">LADWP inlet valve · Galvanized pipe factor · Fan motor</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump · Thermal fuse · Vent cleaning · Stackable</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Hard water scale · E24 · Drain pump · Spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts only · Luxury brand expertise</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="gp-faq">
-    <div class="container">
-      <h2>Questions Glassell Park Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Glassell Park, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Glassell Park 90065 — San Fernando Road, Verdugo Road, Toland Way, Andover Drive, Glenalbyn Drive, and every residential street. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does hard water in Glassell Park affect appliances?</summary><div class="faq-answer">Yes. LADWP runs 230–310 mg/L in 90065. Older homes with galvanized pipes add iron. Ice maker inlet valves and dishwasher spray arms scale faster than average. We check proactively on every relevant call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Glassell Park?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Glassell Park?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Glassell Park?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Glassell Park repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">What warranty do you offer on appliance repairs in Glassell Park?</summary><div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Atwater Village, Highland Park, and Mount Washington?</summary><div class="faq-answer">Yes. Our Glassell Park service extends to Atwater Village, Highland Park, Mount Washington, Cypress Park, Eagle Rock, Silver Lake, and all of northeast LA.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="gp-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/atwater-village/" class="nearby-link">Atwater Village</a>
-        <a href="/highland-park/" class="nearby-link">Highland Park</a>
-        <a href="/eagle-rock/" class="nearby-link">Eagle Rock</a>
-        <a href="/silver-lake/" class="nearby-link">Silver Lake</a>
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="gp-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Glassell Park?</h2>
-          <p>LADWP hard water aware · All of 90065 · Weekends available. $89 diagnostic waived with repair. 90-day warranty. OEM parts.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Glassell Park, CA 90065</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --gp-red: #C8102E; --gp-black: #0a0a0a; --gp-gray: #f5f5f5; --gp-border: #e2e2e2; --gp-text: #1a1a1a; --gp-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .gp-hero { background: var(--gp-black); color: white; padding: 80px 0 60px; }
-  .gp-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .gp-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--gp-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .gp-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .gp-hero__accent { color: var(--gp-red); }
-  .gp-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .gp-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .gp-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .gp-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--gp-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .gp-bottom-cta .btn-secondary { color: var(--gp-text); border-color: var(--gp-border); }
-  .trust-bar { background: var(--gp-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .gp-intro { padding: 72px 0; background: white; }
-  .gp-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .gp-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--gp-black); margin-bottom: 20px; }
-  .gp-intro__text p { font-size: 16px; line-height: 1.7; color: var(--gp-text); margin-bottom: 16px; }
-  .gp-tip { display: flex; gap: 14px; background: #eef6ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .gp-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .gp-tip__text { font-size: 14px; color: var(--gp-text); line-height: 1.6; }
-  .cta-box { background: var(--gp-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--gp-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--gp-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--gp-muted); text-align: center; margin-bottom: 40px; }
-  .gp-services { padding: 72px 0; background: var(--gp-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--gp-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--gp-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--gp-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--gp-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--gp-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--gp-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--gp-red); font-weight: 500; }
-  .gp-neighborhoods { padding: 72px 0; background: white; }
-  .gp-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--gp-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--gp-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--gp-text); padding: 8px 12px; background: var(--gp-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--gp-red); color: var(--gp-black); font-weight: 500; }
-  .gp-recent { padding: 72px 0; background: var(--gp-gray); }
-  .gp-recent h2 { font-size: 30px; font-weight: 700; color: var(--gp-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--gp-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--gp-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--gp-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--gp-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--gp-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .gp-why { padding: 72px 0; background: white; }
-  .gp-why h2 { font-size: 30px; font-weight: 700; color: var(--gp-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--gp-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--gp-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--gp-muted); line-height: 1.6; }
-  .gp-reviews { padding: 72px 0; background: var(--gp-gray); }
-  .gp-reviews h2 { font-size: 30px; font-weight: 700; color: var(--gp-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--gp-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--gp-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--gp-muted); font-weight: 500; }
-  .gp-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--gp-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--gp-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--gp-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--gp-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--gp-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--gp-red); }
-  .pricing-card__note { font-size: 13px; color: var(--gp-muted); }
-  .gp-faq { padding: 72px 0; background: var(--gp-gray); }
-  .gp-faq h2 { font-size: 30px; font-weight: 700; color: var(--gp-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--gp-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--gp-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--gp-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .gp-question::after { content: '−'; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--gp-text); }
-  .gp-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--gp-border); }
-  .gp-nearby h2 { font-size: 20px; font-weight: 600; color: var(--gp-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--gp-border); border-radius: 20px; font-size: 14px; color: var(--gp-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--gp-red); color: var(--gp-red); }
-  .gp-bottom-cta { padding: 72px 0; background: var(--gp-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .gp-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .gp-hero__inner { grid-template-columns: 1fr; } .gp-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .gp-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Glassell Park?"
+    body="LADWP hard water aware · All of 90065 · Weekends available. $89 diagnostic waived with repair. 90-day warranty. OEM parts."
+  />
+</CityLayoutV2>
