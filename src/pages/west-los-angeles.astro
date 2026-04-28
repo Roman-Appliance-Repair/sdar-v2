@@ -1,327 +1,231 @@
 ---
-// src/pages/west-los-angeles.astro
-// Same Day Appliance Repair — West Los Angeles, CA
-// Branch: West Hollywood | Phone: (424) 325-0520
-// Tier: T3 — neighborhood-district page covering Westwood, Sawtelle, Palms, Mar Vista, Rancho Park, Century City
+/**
+ * West Los Angeles, CA — Variant A migration (T9 batch 1, stub-pattern).
+ * Branch: Los Angeles · ZIPs: 90024, 90025, 90034, 90064, 90066, 90067
+ * Source: wiki/migration/content-dumps/west-los-angeles.md
+ *
+ * Stub-pattern preserved verbatim:
+ *   - 12 services 2-tier (over-listed)
+ *   - 3 jobs · 5 FAQs · NO Reviews · NO Method
+ *   - Trust-bar item-4 "Luxury Brand Specialists" override per dump
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (LA branch is service_area)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ *
+ * Source-bug note: legacy hero photo basename uses `west-la` (not slug). N/A
+ * for this migration since text-only hero is rendered (no heroPhoto prop).
+ */
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = "West Los Angeles";
-const citySlug = "west-los-angeles";
-const phone = "(424) 325-0520";
-const phoneRaw = "+14243250520";
-const email = "support@samedayappliance.repair";
-const branch = "West Hollywood";
+const branchSlug = 'los-angeles';
+const cityName = 'West Los Angeles';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const metaTitle = "Appliance Repair West Los Angeles CA | Same Day Service | (424) 325-0520";
-const metaDesc = "Same-day appliance repair in West LA. Westwood, Sawtelle, Palms, Mar Vista, Rancho Park, Century City. Sub-Zero, Wolf, Miele specialists. $89 diagnostic — waived with repair.";
-
-const neighborhoods = [
-  { name: "Westwood", zip: "90024" },
-  { name: "Sawtelle / West LA", zip: "90025" },
-  { name: "Palms", zip: "90034" },
-  { name: "Rancho Park / Cheviot Hills", zip: "90064" },
-  { name: "Mar Vista", zip: "90066" },
-  { name: "Century City", zip: "90067" },
-];
+const title = `Appliance Repair West Los Angeles CA | Same Day Service | ${branch.phone}`;
+const description = 'Same-day appliance repair in West LA. Westwood, Sawtelle, Palms, Mar Vista, Rancho Park, Century City. Sub-Zero, Wolf, Miele specialists. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/west-los-angeles/';
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Stove Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Microwave Repair", slug: "microwave-repair", icon: "📻" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Garbage Disposal Repair", slug: "garbage-disposal-repair", icon: "🗑️" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍳', name: 'Stove Repair', slug: 'stove' },
+  { icon: '📻', name: 'Microwave Repair', slug: 'microwave' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🥶', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🗑️', name: 'Garbage Disposal Repair', slug: 'garbage-disposal' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
 ];
 
-const recentRepairs = [
+const neighborhoods = [
+  { name: 'Westwood', zip: '90024' },
+  { name: 'Sawtelle / West LA', zip: '90025' },
+  { name: 'Palms', zip: '90034' },
+  { name: 'Rancho Park / Cheviot Hills', zip: '90064' },
+  { name: 'Mar Vista', zip: '90066' },
+  { name: 'Century City', zip: '90067' },
+];
+
+const jobs = [
   {
-    title: "Sub-Zero 685 — Westwood condo, evaporator fan seized after move-in",
-    neighborhood: "Westwood",
-    detail: "Sub-Zero 685/F built-in in a Wilshire-corridor Westwood condo near Westwood Plaza — homeowners had moved in three weeks prior, refrigerator side running 48°F instead of 38°F. Evaporator fan motor had seized — the unit had sat unused during the seller's six-month vacancy, and the fan motor bearings froze from disuse rather than wear. Replaced the fan motor (Sub-Zero OEM), defrosted the iced-over evaporator, ran a 24-hour cool-down test the next day. Westwood condo Sub-Zero installs in the Wilshire towers tend to be 2010-2018 generation; we see post-vacancy fan motor failures repeatedly when properties sit empty between owners.",
-    part: "Sub-Zero OEM evaporator fan motor",
-    time: "2 hours"
+    badge: 'Sub-Zero 685',
+    neighborhood: 'Westwood',
+    title: 'Sub-Zero 685 — Westwood condo, evaporator fan seized after move-in',
+    body: "Sub-Zero 685/F built-in in a Wilshire-corridor Westwood condo near Westwood Plaza — homeowners had moved in three weeks prior, refrigerator side running 48°F instead of 38°F. Evaporator fan motor had seized — the unit had sat unused during the seller's six-month vacancy, and the fan motor bearings froze from disuse rather than wear. Replaced the fan motor (Sub-Zero OEM), defrosted the iced-over evaporator, ran a 24-hour cool-down test the next day. Westwood condo Sub-Zero installs in the Wilshire towers tend to be 2010-2018 generation; we see post-vacancy fan motor failures repeatedly when properties sit empty between owners.",
+    part: 'Sub-Zero OEM evaporator fan motor',
+    time: '2 hours',
+    result: '✓ Same day · OEM Sub-Zero · 24h cool-down test',
   },
   {
-    title: "Bosch dishwasher — Sawtelle apartment, E15 error mid-cycle",
-    neighborhood: "Sawtelle / West LA",
-    detail: "Bosch SHX 800 series in a Sawtelle 1980s apartment building near Sawtelle + Olympic — E15 error code (water leak detected). Anti-flood pan had collected water from a slow drip at the sump-to-pump connection. Replaced the cracked sump gasket, dried the anti-flood pan, reset the float switch, ran two test cycles. Sawtelle's older multi-unit apartment buildings have water shutoffs at the building level which means we coordinate with the property manager before opening any plumbing — standard for West LA apartment service. Job spec written so the property manager could file it with the building's records.",
-    part: "Bosch OEM sump gasket",
-    time: "1.5 hours"
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Sawtelle / West LA',
+    title: 'Bosch dishwasher — Sawtelle apartment, E15 error mid-cycle',
+    body: "Bosch SHX 800 series in a Sawtelle 1980s apartment building near Sawtelle + Olympic — E15 error code (water leak detected). Anti-flood pan had collected water from a slow drip at the sump-to-pump connection. Replaced the cracked sump gasket, dried the anti-flood pan, reset the float switch, ran two test cycles. Sawtelle's older multi-unit apartment buildings have water shutoffs at the building level which means we coordinate with the property manager before opening any plumbing — standard for West LA apartment service. Job spec written so the property manager could file it with the building's records.",
+    part: 'Bosch OEM sump gasket',
+    time: '1.5 hours',
+    result: '✓ Same day · E15 cleared · Property mgr notified',
   },
   {
-    title: "Miele washer — Mar Vista 1950s home, F-19 vibration error on spin",
-    neighborhood: "Mar Vista",
-    detail: "Miele W1 washer in a Mar Vista mid-century home off Centinela — F-19 imbalance error consistently at the high-spin extraction phase. Unit was level and balanced; the issue was the suspension bushings on the inner drum had worn enough to allow excess axial play during 1400 RPM extraction. Replaced both suspension bushings (Miele specifies pairs), recalibrated the drum-balance sensor, ran four test cycles with mixed loads. Mar Vista's older flat-pad concrete laundry rooms transmit washer vibration into the rest of the house more than newer construction does — Miele customers there notice imbalance issues earlier than they would in newer homes.",
-    part: "Miele OEM suspension bushing pair",
-    time: "2.5 hours"
-  }
+    badge: 'Miele W1 Washer',
+    neighborhood: 'Mar Vista',
+    title: 'Miele washer — Mar Vista 1950s home, F-19 vibration error on spin',
+    body: "Miele W1 washer in a Mar Vista mid-century home off Centinela — F-19 imbalance error consistently at the high-spin extraction phase. Unit was level and balanced; the issue was the suspension bushings on the inner drum had worn enough to allow excess axial play during 1400 RPM extraction. Replaced both suspension bushings (Miele specifies pairs), recalibrated the drum-balance sensor, ran four test cycles with mixed loads. Mar Vista's older flat-pad concrete laundry rooms transmit washer vibration into the rest of the house more than newer construction does — Miele customers there notice imbalance issues earlier than they would in newer homes.",
+    part: 'Miele OEM suspension bushing pair',
+    time: '2.5 hours',
+    result: '✓ Same day · OEM Miele · 4 test cycles',
+  },
+];
+
+const pricingCards = [
+  { label: 'Residential Diagnostic', price: '$89', note: 'No distance surcharge · Credited toward repair · Written estimate' },
+  { label: 'Standard Repair', price: '$150–$350', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Luxury Brand Repair', price: '$250–$600+', note: 'Sub-Zero, Wolf, Viking, Thermador, Miele · OEM parts', highlight: true },
+  { label: '90-Day Warranty', price: 'All Repairs', note: 'Parts + labor · Same-issue return at no charge' },
 ];
 
 const faqs = [
   {
-    q: "Do you service Westwood, Century City, and the rest of West LA?",
-    a: "Yes — West LA is a regular service district from our West Hollywood branch. The (424) 325-0520 number reaches dispatch with our actual schedule. Coverage spans all six neighborhoods: Westwood (90024), Sawtelle / West LA (90025), Palms (90034), Rancho Park / Cheviot Hills (90064), Mar Vista (90066), and Century City (90067). Same-day service available when you call before noon."
+    question: 'Do you service Westwood, Century City, and the rest of West LA?',
+    answer: `Yes — West LA is a regular service district. The ${branch.phone} number reaches dispatch with our actual schedule. Coverage spans all six neighborhoods: Westwood (90024), Sawtelle / West LA (90025), Palms (90034), Rancho Park / Cheviot Hills (90064), Mar Vista (90066), and Century City (90067). Same-day service available when you call before noon.`,
   },
   {
-    q: "Do you handle Westwood and Century City high-rise condos?",
-    a: "Yes. Wilshire-corridor Westwood and Century City have a high concentration of high-rise condo Sub-Zero, Wolf, Thermador, and Miele installs from the 2010-2018 build wave. We coordinate with building concierge or property management for service-elevator access when needed. Our West Hollywood truck stocks OEM parts for these brands, so we don't roll up to a Century City call empty-handed."
+    question: 'Do you handle Westwood and Century City high-rise condos?',
+    answer: "Yes. Wilshire-corridor Westwood and Century City have a high concentration of high-rise condo Sub-Zero, Wolf, Thermador, and Miele installs from the 2010-2018 build wave. We coordinate with building concierge or property management for service-elevator access when needed. Our truck stocks OEM parts for these brands, so we don't roll up to a Century City call empty-handed.",
   },
   {
-    q: "What appliance brands are most common in West LA homes?",
-    a: "Mixed across neighborhoods. Westwood + Century City + Rancho Park / Cheviot Hills luxury homes and condos run Sub-Zero, Wolf, Thermador, Miele, Bosch. Sawtelle + Palms + Mar Vista mid-market homes (1950s-80s housing stock, many renovated) have a mix of premium-mainstream brands — KitchenAid, GE Profile, Samsung, LG, Whirlpool, Bosch dishwashers common. We carry parts for both luxury and mass-market on the West Hollywood truck."
+    question: 'What appliance brands are most common in West LA homes?',
+    answer: 'Mixed across neighborhoods. Westwood + Century City + Rancho Park / Cheviot Hills luxury homes and condos run Sub-Zero, Wolf, Thermador, Miele, Bosch. Sawtelle + Palms + Mar Vista mid-market homes (1950s-80s housing stock, many renovated) have a mix of premium-mainstream brands — KitchenAid, GE Profile, Samsung, LG, Whirlpool, Bosch dishwashers common. We carry parts for both luxury and mass-market.',
   },
   {
-    q: "Do you charge a distance surcharge for West LA?",
-    a: "No. West LA is on our regular West Hollywood branch route. The $89 residential diagnostic is the same in West LA as it is in Beverly Hills, West Hollywood, or Brentwood. What we quote is what you pay."
+    question: 'Do you charge a distance surcharge for West LA?',
+    answer: 'No. West LA is on our regular Westside route. The $89 residential diagnostic is the same in West LA as it is in Beverly Hills, West Hollywood, or Brentwood. What we quote is what you pay.',
   },
   {
-    q: "What is your warranty on West LA repairs?",
-    a: "All repairs carry a 90-day warranty on parts and labor. If the same issue returns within that window, we come back at no additional charge. CSLB License #1138898 + BBB accredited."
-  }
+    question: 'What is your warranty on West LA repairs?',
+    answer: 'All repairs carry a 90-day warranty on parts and labor. If the same issue returns within that window, we come back at no additional charge. CSLB License #1138898 + BBB accredited.',
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Beverly Hills", slug: "beverly-hills" },
-  { name: "West Hollywood", slug: "west-hollywood" },
-  { name: "Brentwood", slug: "brentwood" },
-  { name: "Santa Monica", slug: "santa-monica" },
-  { name: "Culver City", slug: "culver-city" },
-  { name: "Bel Air", slug: "bel-air" },
+const nearby = [
+  { slug: 'beverly-hills', name: 'Beverly Hills' },
+  { slug: 'west-hollywood', name: 'West Hollywood' },
+  { slug: 'brentwood', name: 'Brentwood' },
+  { slug: 'santa-monica', name: 'Santa Monica' },
+  { slug: 'culver-city', name: 'Culver City' },
+  { slug: 'bel-air', name: 'Bel Air' },
 ];
 
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: LA is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'Place', name: 'West Los Angeles' },
+    { '@type': 'Place', name: 'Westwood' },
+    { '@type': 'Place', name: 'Sawtelle' },
+    { '@type': 'Place', name: 'Mar Vista' },
+    { '@type': 'Place', name: 'Century City' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — West Los Angeles",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/west-los-angeles/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "6230 Wilshire Blvd Ste A PMB 2267",
-        "addressLocality": "Los Angeles",
-        "addressRegion": "CA",
-        "postalCode": "90048",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "Place", "name": "West Los Angeles" },
-        { "@type": "Place", "name": "Westwood" },
-        { "@type": "Place", "name": "Sawtelle" },
-        { "@type": "Place", "name": "Mar Vista" },
-        { "@type": "Place", "name": "Century City" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.6",
-        "reviewCount": "37",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
+  ],
+  priceRange: '$$$',
+  license: 'CA CSLB #1138898',
+};
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">West Los Angeles · LA County · 90024 · 90025 · 90034 · 90064 · 90066 · 90067</div>
-        <h1>Appliance Repair in West Los Angeles, CA</h1>
-        <p class="city-hero-sub">Same-day service across Westwood, Sawtelle, Palms, Mar Vista, Rancho Park, and Century City. Sub-Zero, Wolf, Miele, and all major brands. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.6 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/west-los-angeles/appliance-repair-west-la-ca.webp"
-          alt="Appliance repair technician in West Los Angeles"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="West Los Angeles · LA County · 90024 · 90025 · 90034 · 90064 · 90066 · 90067"
+    headlineMain="Appliance repair in"
+    headlineAccent="West Los Angeles, CA"
+    subheadline="Same-day service across Westwood, Sawtelle, Palms, Mar Vista, Rancho Park, and Century City. Sub-Zero, Wolf, Miele, and all major brands. $89 diagnostic — waived with repair."
+    branchSlug={branchSlug}
+  />
+  <TrustBar item4Text="Luxury Brand Specialists" item4Fine="Sub-Zero · Wolf · Miele" />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">🏢</span><span>Luxury Brand Specialists</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <RepairGrid
+    number="01"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="West LA"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>West LA's six districts — Westwood high-rises to Mar Vista mid-century</h2>
-        <p>"West LA" covers a span of LA neighborhoods that share a postal-region but cook in completely different kitchens. Westwood and Century City are the high-rise condo end — Wilshire towers, the Century Park area near the mall, and the tower clusters along Westwood Boulevard south of UCLA. Sawtelle and Palms are mid-density apartment + small-lot single-family with the Sawtelle Japantown commercial strip running through. Rancho Park and Cheviot Hills are denser-lot single-family with mid-century housing stock and the Cheviot Hills Recreation Center anchoring the area. Mar Vista is the southwestern edge — 1940s-50s tract housing renovated heavily over the past decade, with the Mar Vista Farmers Market on Sunday and the cluster around Centinela + Venice Boulevard.</p>
-        <p>Service work shifts based on which of these you're in. Westwood + Century City condo calls run luxury-brand-heavy: Sub-Zero, Wolf, Thermador, Miele installs in 2010-2018-era Wilshire towers, with concierge or property-management coordination for service-elevator access. Sawtelle + Palms apartment calls require building-side water-shutoff coordination because most pre-1990 multi-unit buildings have shared shutoffs. Rancho Park and Cheviot Hills mid-century renovations frequently have legacy electrical circuits feeding modern luxury appliances — we verify the service before energizing. Mar Vista renovations are the most diverse: 1948 footprint, 2020 Sub-Zero, 1965 service panel, 2018 PEX water lines (or 1948 galvanized still in place — both happen).</p>
-        <p>Our West Hollywood branch runs all of West LA on the regular schedule. The (424) 325-0520 number is the same one that reaches our dispatch for Beverly Hills, West Hollywood, Bel Air, Brentwood, Santa Monica — same technicians, same parts inventory, same OEM relationships. No distance surcharge between any of these neighborhoods. Call <a href={`tel:${phoneRaw}`}>{phone}</a> — someone with our actual Westside schedule picks up.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">West LA Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Residential Diagnostic</strong>
-            <span>— waived with repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="02"
+    eyebrow="Service Area"
+    headline="West LA's six districts —"
+    headlineAccent="all covered"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in West LA</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/services/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">West LA →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <RecentJobs
+    number="03"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="West LA"
+    jobs={jobs}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">01</div>
-      <h2>West LA Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <Pricing
+    number="04"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="West LA"
+    cards={pricingCards}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">02</div>
-      <h2>Recent Repairs in West LA</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FAQ
+    number="05"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="West LA"
+    faqs={faqs}
+  />
 
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in West LA</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Residential Diagnostic</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">No distance surcharge · Credited toward repair · Written estimate</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair Range</div>
-          <div class="pricing-price">$150–$350</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Thermador, Viking, Miele · OEM parts</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">90-Day Warranty</div>
-          <div class="pricing-price">All Repairs</div>
-          <div class="pricing-note">Parts + labor · Same-issue return at no charge</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">03</div>
-      <h2>Frequently Asked Questions — West LA</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby Westside Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your West LA Repair Today</h2>
-      <p>Same-day service across Westwood, Sawtelle, Palms, Mar Vista, Rancho Park, Century City. No distance surcharge.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 residential diagnostic · 90-day warranty · OEM parts · West Los Angeles, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["West Los Angeles", "Westwood", "Sawtelle", "Century City", "Mar Vista"]} />
-</Layout>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="West LA repair today"
+    body="Same-day service across Westwood, Sawtelle, Palms, Mar Vista, Rancho Park, Century City. No distance surcharge. $89 residential diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>
