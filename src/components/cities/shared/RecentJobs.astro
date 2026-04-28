@@ -1,0 +1,152 @@
+---
+/**
+ * Variant A — Recent jobs editorial cards.
+ * Each card: badge · neighborhood · title quote · body · part/time line · result.
+ * Diamond markers, gold dividers between cards.
+ */
+
+import SectionHeader from './SectionHeader.astro';
+
+export interface Job {
+  badge: string;
+  neighborhood: string;
+  title: string;
+  body: string;
+  part?: string;
+  time?: string;
+  result?: string;
+}
+
+export interface Props {
+  number: string;
+  eyebrow?: string;
+  headline: string;
+  headlineAccent?: string;
+  subheadline?: string;
+  jobs: Job[];
+}
+
+const {
+  number,
+  eyebrow = 'Recent Repairs',
+  headline,
+  headlineAccent,
+  subheadline,
+  jobs,
+} = Astro.props;
+---
+
+<section class="va-section va-section--white va-jobs">
+  <div class="va-container">
+    <SectionHeader
+      number={number}
+      eyebrow={eyebrow}
+      headline={headline}
+      headlineAccent={headlineAccent}
+      subheadline={subheadline}
+    />
+    <div class="va-jobs__list">
+      {jobs.map((job, i) => (
+        <>
+          <article class="va-jobs__card">
+            <div class="va-jobs__meta">
+              <span class="va-jobs__badge">{job.badge}</span>
+              <span class="va-jobs__loc">{job.neighborhood}</span>
+            </div>
+            <h3 class="va-h3 va-jobs__title">&ldquo;{job.title}&rdquo;</h3>
+            <p class="va-body va-jobs__body">{job.body}</p>
+            {(job.part || job.time) && (
+              <div class="va-jobs__line">
+                {job.part && (
+                  <>
+                    <span class="va-diamond" aria-hidden="true">◆</span>
+                    <span><strong>Part:</strong> {job.part}</span>
+                  </>
+                )}
+                {job.time && (
+                  <>
+                    <span class="va-diamond" aria-hidden="true">◆</span>
+                    <span><strong>On site:</strong> {job.time}</span>
+                  </>
+                )}
+              </div>
+            )}
+            {job.result && <div class="va-jobs__result">{job.result}</div>}
+          </article>
+          {i < jobs.length - 1 && <hr class="va-divider-gold va-jobs__sep" aria-hidden="true" />}
+        </>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .va-jobs__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .va-jobs__card {
+    padding: 32px 0;
+    max-width: 880px;
+  }
+  .va-jobs__sep {
+    width: 100%;
+    margin: 0;
+    background: linear-gradient(90deg, transparent 0%, var(--va-gold) 30%, var(--va-gold) 70%, transparent 100%);
+    opacity: 0.4;
+  }
+  .va-jobs__meta {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .va-jobs__badge {
+    background: var(--va-black);
+    color: var(--va-gold);
+    font-family: var(--va-font-body);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    border-radius: 2px;
+  }
+  .va-jobs__loc {
+    font-family: var(--va-font-body);
+    font-size: 13px;
+    color: var(--va-muted);
+    letter-spacing: 0.04em;
+  }
+  .va-jobs__title {
+    margin: 0 0 14px;
+    font-style: italic;
+    color: var(--va-text);
+  }
+  .va-jobs__body {
+    margin: 0 0 16px;
+    color: var(--va-text);
+    font-size: 16px;
+  }
+  .va-jobs__line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 14px;
+    color: var(--va-muted);
+    margin-bottom: 8px;
+  }
+  .va-jobs__line strong {
+    color: var(--va-text);
+    font-weight: 600;
+  }
+  .va-jobs__result {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--va-gold);
+    letter-spacing: 0.04em;
+  }
+</style>

@@ -1,0 +1,93 @@
+---
+/**
+ * Variant A — Editorial city page layout.
+ * Used for all 87 city pages. Inherits Footer from base site, but renders
+ * its own TopBar + hero + page sections via slots.
+ */
+
+import '../styles/variant-a-tokens.css';
+import Footer from '../components/Footer.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import TopBar from '../components/cities/shared/TopBar.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  branchSlug: string;
+  ogImage?: string;
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description,
+  canonical,
+  branchSlug,
+  ogImage = '/og-default.jpg',
+  noindex = false,
+} = Astro.props;
+
+const siteUrl = 'https://samedayappliance.repair';
+const ogImageAbs = new URL(ogImage, siteUrl).toString();
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageAbs} />
+    <meta property="og:site_name" content="Same Day Appliance Repair" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageAbs} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <slot name="head-scripts" />
+  </head>
+
+  <body>
+    <TopBar branchSlug={branchSlug} />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+    <style is:global>
+      body {
+        margin: 0;
+        background: var(--va-white);
+        color: var(--va-text);
+        font-family: var(--va-font-body);
+        font-size: 16px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      * { box-sizing: border-box; }
+      a { color: var(--va-red); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    </style>
+  </body>
+</html>

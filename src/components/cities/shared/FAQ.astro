@@ -1,0 +1,119 @@
+---
+/**
+ * Variant A — FAQ block.
+ * Renders details/summary accordion. Generates FAQPage JSON-LD schema from the
+ * SAME props (single source of truth) — eliminates HTML↔schema drift.
+ *
+ * If the original Cat A page had a known schemaDivergence (e.g. west-hollywood Q4
+ * with extra COI sentence in HTML only), pass schemaOverrides to keep schema
+ * answers different from HTML. Default: schema = HTML 1:1.
+ */
+
+import SectionHeader from './SectionHeader.astro';
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+  /** Optional separate schema-only answer if it must differ from HTML. */
+  schemaAnswer?: string;
+}
+
+export interface Props {
+  number: string;
+  eyebrow?: string;
+  headline: string;
+  headlineAccent?: string;
+  subheadline?: string;
+  faqs: FaqItem[];
+}
+
+const {
+  number,
+  eyebrow = 'Questions',
+  headline,
+  headlineAccent,
+  subheadline,
+  faqs,
+} = Astro.props;
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.schemaAnswer ?? f.answer,
+    },
+  })),
+};
+---
+
+<section class="va-section va-section--cream va-faq">
+  <div class="va-container">
+    <SectionHeader
+      number={number}
+      eyebrow={eyebrow}
+      headline={headline}
+      headlineAccent={headlineAccent}
+      subheadline={subheadline}
+    />
+    <div class="va-faq__list">
+      {faqs.map((f) => (
+        <details class="va-faq__item">
+          <summary class="va-faq__q">
+            <span class="va-fraunces">{f.question}</span>
+            <span class="va-faq__chev" aria-hidden="true">+</span>
+          </summary>
+          <div class="va-faq__a" set:html={f.answer}></div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+<style>
+  .va-faq__list {
+    max-width: 880px;
+  }
+  .va-faq__item {
+    border-bottom: 1px solid var(--va-border);
+    padding: 20px 0;
+  }
+  .va-faq__item[open] { padding-bottom: 28px; }
+  .va-faq__q {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    font-size: 19px;
+    font-weight: 500;
+    color: var(--va-text);
+    letter-spacing: -0.005em;
+  }
+  .va-faq__q::-webkit-details-marker { display: none; }
+  .va-faq__chev {
+    color: var(--va-gold);
+    font-size: 22px;
+    line-height: 1;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .va-faq__item[open] .va-faq__chev {
+    transform: rotate(45deg);
+  }
+  .va-faq__a {
+    margin-top: 14px;
+    font-family: var(--va-font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--va-text);
+    max-width: 720px;
+  }
+  .va-faq__a a { color: var(--va-red); text-decoration: underline; }
+</style>

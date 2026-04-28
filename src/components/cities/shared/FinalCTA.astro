@@ -1,0 +1,93 @@
+---
+/**
+ * Variant A — Full-width red final CTA.
+ * Phone CTA pulled from branches.ts via branchSlug.
+ */
+
+import { BRANCHES } from '../../../data/branches.ts';
+
+export interface Props {
+  branchSlug: string;
+  cityName: string;
+  headlineMain?: string;
+  headlineAccent?: string;
+  body?: string;
+}
+
+const {
+  branchSlug,
+  cityName,
+  headlineMain,
+  headlineAccent = cityName,
+  body,
+} = Astro.props;
+
+const branch = BRANCHES.find((b) => b.slug === branchSlug);
+const phone = branch?.phone ?? '';
+const phoneTel = `+1${phone.replace(/\D/g, '')}`;
+
+const finalHeadline = headlineMain ?? 'Schedule your repair in';
+const finalBody =
+  body ??
+  `Same-day service available. $89 diagnostic — credited toward repair. 90-day warranty on parts and labor. OEM parts. ${cityName}, CA.`;
+---
+
+<section class="va-final">
+  <div class="va-container va-final__inner">
+    <div class="va-final__text">
+      <h2 class="va-h2 va-h2--white va-final__h2">
+        {finalHeadline}
+        {' '}
+        <span class="va-h1-accent">{headlineAccent}</span>
+      </h2>
+      <p class="va-body va-body--white va-final__body">{finalBody}</p>
+    </div>
+    <div class="va-final__ctas">
+      <a href={`tel:${phoneTel}`} class="va-btn-primary va-btn-primary--gold">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        Call {phone}
+      </a>
+      <a href="/book/" class="va-btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .va-final {
+    background: var(--va-black);
+    padding: 80px 0;
+    border-top: 1px solid rgba(201, 169, 97, 0.2);
+  }
+  .va-final__inner {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 48px;
+    align-items: center;
+  }
+  .va-final__h2 {
+    font-size: clamp(28px, 3.5vw, 40px);
+    margin: 0 0 16px;
+  }
+  .va-final__body {
+    margin: 0;
+    font-size: 17px;
+    max-width: 640px;
+  }
+  .va-final__ctas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .va-btn-primary--gold {
+    background: var(--va-gold);
+    color: var(--va-black);
+  }
+  .va-btn-primary--gold:hover { background: #b89752; }
+  @media (max-width: 768px) {
+    .va-final__inner { grid-template-columns: 1fr; }
+    .va-final__ctas { justify-content: flex-start; }
+  }
+</style>

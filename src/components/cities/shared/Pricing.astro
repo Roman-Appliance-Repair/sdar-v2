@@ -1,0 +1,117 @@
+---
+/**
+ * Variant A — Pricing cards.
+ * Residential city pages only. NEVER include $120 commercial tier here.
+ * Caller passes 3-4 cards; one may have highlight=true.
+ */
+
+import SectionHeader from './SectionHeader.astro';
+
+export interface PricingCard {
+  label: string;
+  price: string;
+  note: string;
+  highlight?: boolean;
+}
+
+export interface Props {
+  number: string;
+  eyebrow?: string;
+  headline: string;
+  headlineAccent?: string;
+  subheadline?: string;
+  cards: PricingCard[];
+  bottomNote?: string;
+}
+
+const {
+  number,
+  eyebrow = 'Pricing',
+  headline,
+  headlineAccent,
+  subheadline,
+  cards,
+  bottomNote,
+} = Astro.props;
+---
+
+<section class="va-section va-section--white va-pricing">
+  <div class="va-container">
+    <SectionHeader
+      number={number}
+      eyebrow={eyebrow}
+      headline={headline}
+      headlineAccent={headlineAccent}
+      subheadline={subheadline}
+    />
+    <div class={`va-pricing__grid va-pricing__grid--${cards.length}`}>
+      {cards.map((c) => (
+        <div class={`va-pricing__card ${c.highlight ? 'va-pricing__card--highlight' : ''}`}>
+          <div class="va-pricing__label">{c.label}</div>
+          <div class="va-pricing__price va-fraunces">{c.price}</div>
+          <div class="va-pricing__note">{c.note}</div>
+        </div>
+      ))}
+    </div>
+    {bottomNote && <p class="va-body va-body--muted va-pricing__bottom">{bottomNote}</p>}
+  </div>
+</section>
+
+<style>
+  .va-pricing__grid {
+    display: grid;
+    gap: 16px;
+  }
+  .va-pricing__grid--4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .va-pricing__grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .va-pricing__card {
+    background: var(--va-cream);
+    border: 1px solid var(--va-border);
+    border-radius: 4px;
+    padding: 24px 22px;
+    text-align: left;
+  }
+  .va-pricing__card--highlight {
+    background: var(--va-black);
+    border-color: var(--va-gold);
+    color: var(--va-white);
+  }
+  .va-pricing__card--highlight .va-pricing__label,
+  .va-pricing__card--highlight .va-pricing__note { color: rgba(255, 255, 255, 0.7); }
+  .va-pricing__card--highlight .va-pricing__price { color: var(--va-gold); }
+  .va-pricing__label {
+    font-size: 13px;
+    color: var(--va-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 12px;
+  }
+  .va-pricing__price {
+    font-size: 32px;
+    font-weight: 500;
+    color: var(--va-text);
+    line-height: 1;
+    margin-bottom: 12px;
+    letter-spacing: -0.02em;
+  }
+  .va-pricing__note {
+    font-size: 13px;
+    color: var(--va-muted);
+    line-height: 1.5;
+  }
+  .va-pricing__bottom {
+    margin: 24px auto 0;
+    max-width: 720px;
+    font-size: 14px;
+    text-align: center;
+  }
+  @media (max-width: 900px) {
+    .va-pricing__grid--4,
+    .va-pricing__grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .va-pricing__grid--4,
+    .va-pricing__grid--3 { grid-template-columns: 1fr; }
+  }
+</style>

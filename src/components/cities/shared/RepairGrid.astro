@@ -1,0 +1,168 @@
+---
+/**
+ * Variant A — What-we-repair grid.
+ * 3-tier card: icon · name · issues · brands · CTA link
+ * 2-tier card: icon · name · CTA link
+ *
+ * IMPORTANT: All service links resolve to canonical /services/{slug}-repair/.
+ * If a content-dump's slug already includes "-repair" (e.g. "refrigerator-repair"),
+ * we don't double-suffix. Pass slugs without "-repair" suffix in `services`.
+ */
+
+import SectionHeader from './SectionHeader.astro';
+
+export interface ServiceItem {
+  icon: string;
+  name: string;
+  slug: string;
+  issues?: string[] | null;
+  brands?: string[] | null;
+}
+
+export interface Props {
+  number: string;
+  eyebrow?: string;
+  headline: string;
+  headlineAccent?: string;
+  subheadline?: string;
+  services: ServiceItem[];
+  cardStructure: '2-tier' | '3-tier';
+}
+
+const {
+  number,
+  eyebrow = 'Capabilities',
+  headline,
+  headlineAccent,
+  subheadline,
+  services,
+  cardStructure,
+} = Astro.props;
+
+const toServiceUrl = (slug: string): string => {
+  const cleaned = slug.replace(/^\/+|\/+$/g, '');
+  const final = cleaned.endsWith('-repair') ? cleaned : `${cleaned}-repair`;
+  return `/services/${final}/`;
+};
+
+const gridCols = services.length === 12 ? 4 : services.length >= 8 ? 4 : 3;
+---
+
+<section class="va-section va-section--white va-repair">
+  <div class="va-container">
+    <SectionHeader
+      number={number}
+      eyebrow={eyebrow}
+      headline={headline}
+      headlineAccent={headlineAccent}
+      subheadline={subheadline}
+      align="left"
+    />
+    <div class={`va-repair__grid va-repair__grid--cols-${gridCols}`}>
+      {services.map((s) => (
+        <a href={toServiceUrl(s.slug)} class={`va-repair__card va-repair__card--${cardStructure}`}>
+          <div class="va-repair__icon" aria-hidden="true">{s.icon}</div>
+          <div class="va-repair__name">{s.name}</div>
+          {cardStructure === '3-tier' && s.issues && s.issues.length > 0 && (
+            <ul class="va-repair__issues">
+              {s.issues.map((issue) => (<li>{issue}</li>))}
+            </ul>
+          )}
+          {cardStructure === '3-tier' && s.brands && s.brands.length > 0 && (
+            <div class="va-repair__brands">{s.brands.join(' · ')}</div>
+          )}
+          <div class="va-repair__cta">
+            Learn more
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6"/>
+            </svg>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .va-repair__grid {
+    display: grid;
+    gap: 16px;
+  }
+  .va-repair__grid--cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .va-repair__grid--cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .va-repair__card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: var(--va-cream);
+    border: 1px solid var(--va-border);
+    border-radius: 4px;
+    padding: 24px 22px;
+    text-decoration: none;
+    color: var(--va-text);
+    transition: border-color 0.18s, transform 0.18s, background 0.18s;
+  }
+  .va-repair__card:hover {
+    border-color: var(--va-gold);
+    background: var(--va-white);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  .va-repair__icon {
+    font-size: 28px;
+    line-height: 1;
+  }
+  .va-repair__name {
+    font-family: var(--va-font-display);
+    font-weight: 500;
+    font-size: 19px;
+    color: var(--va-text);
+    letter-spacing: -0.01em;
+  }
+  .va-repair__issues {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 13px;
+    color: var(--va-muted);
+    line-height: 1.55;
+  }
+  .va-repair__issues li {
+    position: relative;
+    padding-left: 16px;
+  }
+  .va-repair__issues li::before {
+    content: '◆';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--va-gold);
+    font-size: 9px;
+    line-height: 1.7;
+  }
+  .va-repair__brands {
+    font-size: 12px;
+    color: var(--va-muted);
+    letter-spacing: 0.01em;
+  }
+  .va-repair__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: auto;
+    color: var(--va-red);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .va-repair__card:hover .va-repair__cta { gap: 10px; }
+
+  @media (max-width: 1024px) {
+    .va-repair__grid--cols-4,
+    .va-repair__grid--cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  @media (max-width: 560px) {
+    .va-repair__grid { grid-template-columns: 1fr !important; }
+  }
+</style>

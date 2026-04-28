@@ -1,0 +1,72 @@
+---
+/**
+ * Variant A — Numbered section header.
+ * Renders eyebrow ("01 — Capabilities"), Fraunces H2 with optional red italic accent,
+ * optional subheadline, and a centered gold thin divider above.
+ */
+
+export interface Props {
+  number: string;
+  eyebrow: string;
+  headline: string;
+  headlineAccent?: string;
+  subheadline?: string;
+  align?: 'left' | 'center';
+  white?: boolean;
+}
+
+const {
+  number,
+  eyebrow,
+  headline,
+  headlineAccent,
+  subheadline,
+  align = 'left',
+  white = false,
+} = Astro.props;
+---
+
+<header class={`va-secthead va-secthead--${align}`}>
+  <hr class="va-divider-gold" aria-hidden="true" />
+  <div class={`va-eyebrow-numbered ${white ? 'va-eyebrow-numbered--white' : ''}`}>
+    <span class="va-eyebrow-num">{number}</span>
+    <span>—</span>
+    <span>{eyebrow}</span>
+  </div>
+  <h2 class={`va-h2 ${white ? 'va-h2--white' : ''}`}>
+    {headline}
+    {headlineAccent && (
+      <>
+        {' '}
+        <span class="va-h1-accent">{headlineAccent}</span>
+      </>
+    )}
+  </h2>
+  {subheadline && (
+    <p class={`va-body va-secthead__sub ${white ? 'va-body--white' : 'va-body--muted'}`}>
+      {subheadline}
+    </p>
+  )}
+</header>
+
+<style>
+  .va-secthead {
+    margin: 0 0 48px;
+    max-width: 920px;
+  }
+  .va-secthead--center { margin-left: auto; margin-right: auto; text-align: center; }
+  .va-secthead .va-divider-gold {
+    width: 64px;
+    margin: 0 0 20px;
+    background: var(--va-gold);
+    opacity: 0.7;
+  }
+  .va-secthead--center .va-divider-gold { margin-left: auto; margin-right: auto; }
+  .va-secthead .va-eyebrow-numbered { margin-bottom: 14px; }
+  .va-secthead__sub {
+    margin: 16px 0 0;
+    font-size: 17px;
+  }
+  .va-eyebrow-numbered--white .va-eyebrow-num,
+  .va-eyebrow-numbered--white { color: var(--va-gold); }
+</style>

@@ -1,0 +1,84 @@
+---
+/**
+ * Variant A — Custom narrative editorial block.
+ * Renders a long-form prose section with optional H3 sub-sections.
+ * Used for any city-specific narrative not covered by other shared blocks
+ * (e.g. anaheim's "Anaheim Hills vs Platinum Triangle vs Resort", san-clemente's
+ *  "Coastal vs Inland", encino's "Two Encinos").
+ *
+ * Structure:
+ *   - SectionHeader (numbered + Fraunces H2)
+ *   - paragraphs[] — body paragraphs (string[]) rendered as <p>
+ *   - subSections[] — optional H3 + paragraphs[] groups
+ */
+
+import SectionHeader from './SectionHeader.astro';
+
+export interface NarrativeSubSection {
+  title: string;
+  paragraphs: string[];
+}
+
+export interface Props {
+  number: string;
+  eyebrow: string;
+  headline: string;
+  headlineAccent?: string;
+  paragraphs?: string[];
+  subSections?: NarrativeSubSection[];
+}
+
+const {
+  number,
+  eyebrow,
+  headline,
+  headlineAccent,
+  paragraphs = [],
+  subSections = [],
+} = Astro.props;
+---
+
+<section class="va-section va-section--white va-narr">
+  <div class="va-container">
+    <SectionHeader
+      number={number}
+      eyebrow={eyebrow}
+      headline={headline}
+      headlineAccent={headlineAccent}
+    />
+    <div class="va-narr__body">
+      {paragraphs.map((p) => (
+        <p class="va-body va-narr__p" set:html={p}></p>
+      ))}
+      {subSections.map((sub) => (
+        <div class="va-narr__sub">
+          <h3 class="va-h3 va-narr__sub-title">{sub.title}</h3>
+          {sub.paragraphs.map((p) => (
+            <p class="va-body va-narr__p" set:html={p}></p>
+          ))}
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .va-narr__body {
+    max-width: 760px;
+  }
+  .va-narr__p {
+    margin: 0 0 22px;
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--va-text);
+  }
+  .va-narr__sub {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--va-border);
+  }
+  .va-narr__sub-title {
+    margin: 0 0 14px;
+    color: var(--va-text);
+  }
+</style>

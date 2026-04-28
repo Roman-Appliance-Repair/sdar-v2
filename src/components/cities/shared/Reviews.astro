@@ -1,0 +1,106 @@
+---
+/**
+ * Variant A — Reviews block (3 verbatim review cards).
+ * Pull-quote style with gold accent quote marks.
+ */
+
+import SectionHeader from './SectionHeader.astro';
+
+export interface Review {
+  text: string;
+  author: string;
+  stars?: number;
+}
+
+export interface Props {
+  number: string;
+  eyebrow?: string;
+  headline: string;
+  headlineAccent?: string;
+  subheadline?: string;
+  reviews: Review[];
+}
+
+const {
+  number,
+  eyebrow = 'Word of Mouth',
+  headline,
+  headlineAccent,
+  subheadline,
+  reviews,
+} = Astro.props;
+---
+
+<section class="va-section va-section--white va-reviews">
+  <div class="va-container">
+    <SectionHeader
+      number={number}
+      eyebrow={eyebrow}
+      headline={headline}
+      headlineAccent={headlineAccent}
+      subheadline={subheadline}
+    />
+    <div class={`va-reviews__grid va-reviews__grid--${reviews.length}`}>
+      {reviews.map((r) => (
+        <article class="va-reviews__card">
+          <span class="va-reviews__quote-mark va-fraunces" aria-hidden="true">&ldquo;</span>
+          <div class="va-reviews__stars" aria-label={`${r.stars ?? 5} out of 5 stars`}>
+            {'★'.repeat(r.stars ?? 5)}
+          </div>
+          <p class="va-body va-reviews__text">{r.text}</p>
+          <div class="va-reviews__author">{r.author}</div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .va-reviews__grid {
+    display: grid;
+    gap: 24px;
+  }
+  .va-reviews__grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .va-reviews__grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .va-reviews__grid--1 { grid-template-columns: minmax(0, 720px); margin: 0 auto; }
+  .va-reviews__card {
+    background: var(--va-cream);
+    border: 1px solid var(--va-border);
+    border-radius: 4px;
+    padding: 36px 28px 28px;
+    position: relative;
+  }
+  .va-reviews__quote-mark {
+    position: absolute;
+    top: -8px;
+    left: 22px;
+    font-size: 64px;
+    line-height: 1;
+    color: var(--va-gold);
+    opacity: 0.55;
+  }
+  .va-reviews__stars {
+    color: var(--va-gold);
+    letter-spacing: 4px;
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  .va-reviews__text {
+    margin: 0 0 18px;
+    font-size: 16px;
+    line-height: 1.65;
+    font-style: italic;
+    color: var(--va-text);
+  }
+  .va-reviews__author {
+    font-family: var(--va-font-body);
+    font-size: 13px;
+    color: var(--va-muted);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  @media (max-width: 900px) {
+    .va-reviews__grid--3 { grid-template-columns: 1fr; }
+    .va-reviews__grid--2 { grid-template-columns: 1fr; }
+  }
+</style>

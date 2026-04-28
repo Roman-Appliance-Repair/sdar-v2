@@ -1,0 +1,126 @@
+---
+/**
+ * Variant A — Editorial split hero.
+ * Layout: text left (60%) / 4:5 photo right (40%).
+ * If heroPhoto is missing/falsy, falls back to text-only full-width mode.
+ *
+ * headline supports a mixed-color H1: pass headlineMain (white) and
+ * headlineAccent (red italic, single word/phrase). Renders on two lines.
+ */
+
+import { BRANCHES } from '../../../data/branches.ts';
+
+export interface Props {
+  eyebrow: string;
+  headlineMain: string;
+  headlineAccent: string;
+  subheadline: string;
+  heroPhoto?: string;
+  heroPhotoAlt?: string;
+  branchSlug: string;
+}
+
+const {
+  eyebrow,
+  headlineMain,
+  headlineAccent,
+  subheadline,
+  heroPhoto,
+  heroPhotoAlt = '',
+  branchSlug,
+} = Astro.props;
+
+const branch = BRANCHES.find((b) => b.slug === branchSlug);
+const phone = branch?.phone ?? '';
+const phoneTel = `+1${phone.replace(/\D/g, '')}`;
+
+const hasPhoto = Boolean(heroPhoto);
+---
+
+<section class={`va-hero ${hasPhoto ? 'va-hero--split' : 'va-hero--text-only'}`}>
+  <div class="va-container va-hero__inner">
+    <div class="va-hero__content">
+      <div class="va-eyebrow-gold va-hero__eyebrow">{eyebrow}</div>
+      <h1 class="va-h1">
+        <span class="va-hero__headline-main">{headlineMain}</span>
+        <br />
+        <span class="va-h1-accent">{headlineAccent}</span>
+      </h1>
+      <p class="va-body va-hero__sub">{subheadline}</p>
+      <div class="va-hero__ctas">
+        <a href={`tel:${phoneTel}`} class="va-btn-primary">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+          </svg>
+          Call {phone}
+        </a>
+        <a href="/book/" class="va-btn-secondary va-btn-secondary--dark">Book Online</a>
+      </div>
+    </div>
+    {hasPhoto && (
+      <div class="va-hero__media">
+        <img
+          src={heroPhoto}
+          alt={heroPhotoAlt}
+          width="560"
+          height="700"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .va-hero {
+    background: var(--va-cream);
+    padding: 88px 0 80px;
+    position: relative;
+  }
+  .va-hero__inner {
+    display: grid;
+    gap: 64px;
+    align-items: center;
+  }
+  .va-hero--split .va-hero__inner {
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+  }
+  .va-hero--text-only .va-hero__inner {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 880px;
+  }
+  .va-hero__eyebrow {
+    margin-bottom: 22px;
+  }
+  .va-hero__headline-main { color: var(--va-text); }
+  .va-hero__sub {
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--va-muted);
+    margin: 0 0 32px;
+    max-width: 540px;
+  }
+  .va-hero__ctas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .va-hero__media {
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    border-radius: 6px;
+    background: var(--va-border);
+  }
+  .va-hero__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  @media (max-width: 900px) {
+    .va-hero { padding: 56px 0 48px; }
+    .va-hero--split .va-hero__inner { grid-template-columns: minmax(0, 1fr); gap: 40px; }
+    .va-hero__media { max-width: 460px; }
+  }
+</style>

@@ -1,0 +1,165 @@
+---
+/**
+ * Variant A — Neighborhood grid.
+ * Modes:
+ *   "flat"     — plain pill grid of all neighborhoods
+ *   "featured" — first 2 rendered as detailed Two-Neighborhoods cards (caller passes
+ *                neighborhoods with description), rest fall to flat below
+ *   "zoned"    — neighborhoods grouped by `zone` field (Hillside / Valley / Coastal etc)
+ *
+ * Each neighborhood: { name, zip?, zone?, description? }
+ */
+
+import SectionHeader from './SectionHeader.astro';
+import TwoNeighborhoods from './TwoNeighborhoods.astro';
+
+export interface Neighborhood {
+  name: string;
+  zip?: string;
+  zone?: string;
+  description?: string;
+  photo?: string;
+}
+
+export interface Props {
+  number: string;
+  eyebrow?: string;
+  headline: string;
+  headlineAccent?: string;
+  subheadline?: string;
+  neighborhoods: Neighborhood[];
+  mode: 'flat' | 'featured' | 'zoned';
+}
+
+const {
+  number,
+  eyebrow = 'Service Area',
+  headline,
+  headlineAccent,
+  subheadline,
+  neighborhoods,
+  mode,
+} = Astro.props;
+
+const featured = mode === 'featured' ? neighborhoods.slice(0, 2) : [];
+const flatList = mode === 'featured' ? neighborhoods.slice(2) : neighborhoods;
+
+const zones: { [zone: string]: Neighborhood[] } = {};
+if (mode === 'zoned') {
+  for (const n of neighborhoods) {
+    const zone = n.zone ?? 'Other';
+    if (!zones[zone]) zones[zone] = [];
+    zones[zone].push(n);
+  }
+}
+---
+
+<section class="va-section va-section--cream va-nbhds">
+  <div class="va-container">
+    <SectionHeader
+      number={number}
+      eyebrow={eyebrow}
+      headline={headline}
+      headlineAccent={headlineAccent}
+      subheadline={subheadline}
+    />
+
+    {mode === 'featured' && featured.length > 0 && (
+      <TwoNeighborhoods neighborhoods={featured} />
+    )}
+
+    {mode === 'zoned' ? (
+      <div class="va-nbhds__zones">
+        {Object.entries(zones).map(([zone, items]) => (
+          <div class="va-nbhds__zone">
+            <h3 class="va-nbhds__zone-title va-fraunces">{zone}</h3>
+            <ul class="va-nbhds__list">
+              {items.map((n) => (
+                <li class="va-nbhds__item">
+                  <span class="va-nbhds__name">{n.name}</span>
+                  {n.zip && <span class="va-nbhds__zip">{n.zip}</span>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    ) : (
+      flatList.length > 0 && (
+        <ul class="va-nbhds__list va-nbhds__list--grid">
+          {flatList.map((n) => (
+            <li class="va-nbhds__item">
+              <span class="va-nbhds__name">{n.name}</span>
+              {n.zip && <span class="va-nbhds__zip">{n.zip}</span>}
+            </li>
+          ))}
+        </ul>
+      )
+    )}
+  </div>
+</section>
+
+<style>
+  .va-nbhds__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .va-nbhds__list--grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .va-nbhds__item {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--va-white);
+    border: 1px solid var(--va-border);
+    border-radius: 4px;
+  }
+  .va-nbhds__name {
+    font-family: var(--va-font-display);
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--va-text);
+    letter-spacing: -0.005em;
+  }
+  .va-nbhds__zip {
+    font-family: var(--va-font-body);
+    font-size: 12px;
+    color: var(--va-gold);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .va-nbhds__zones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    margin-top: 24px;
+  }
+  .va-nbhds__zone-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--va-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 0 14px;
+  }
+  .va-nbhds__zones .va-nbhds__list {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+  @media (max-width: 900px) {
+    .va-nbhds__list--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .va-nbhds__zones { grid-template-columns: 1fr; gap: 24px; }
+  }
+  @media (max-width: 560px) {
+    .va-nbhds__list--grid { grid-template-columns: 1fr; }
+  }
+</style>
