@@ -1,928 +1,366 @@
 ---
-// src/pages/beverly-hills.astro
-// SDAR — samedayappliance.repair
-// Beverly Hills, CA — Волна 2
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: beverly hills appliance repair — 75 показов · позиция 42.4
-//      dryer repair beverly hills — 61 показ · позиция 27
-//      washer repair beverly hills — 55 показов · позиция 30.9
-// Апрель 2026
+/**
+ * Beverly Hills, CA — Variant A migration (T9 Batch 4, Tier 1).
+ * Branch: Beverly Hills (service_area) · ZIPs: 90210, 90211, 90212
+ * Source: wiki/migration/content-dumps/beverly-hills.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Beverly Hills is service_area, not physical_pin)
+ *   - Phone via branches.ts (`branchSlug='beverly-hills'`)
+ *   - License CA CSLB #1138898
+ *
+ * Pricing-discipline note (Variant A residential-only):
+ *   Original dump had 6 cards including residential-luxury "Sub-Zero / Wolf"
+ *   tier — kept (residential luxury, NOT commercial). All cards preserved.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Beverly Hills",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90210", "90211", "90212"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "beverly-hills",
-};
+const branchSlug = 'beverly-hills';
+const cityName = 'Beverly Hills';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Beverly Hills CA — Sub-Zero · Viking · Thermador | (323) 870-4790`;
-const description = `Same-day appliance repair in Beverly Hills, CA. Sub-Zero, Viking, Wolf, Thermador specialists. The Flats, The Hills, Trousdale, Bel Air. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/beverly-hills/`;
+const title = `Appliance Repair Beverly Hills CA | Sub-Zero, Wolf, Thermador | ${branch.phone}`;
+const description = "Same-day appliance repair in Beverly Hills, CA. Sub-Zero, Viking, Wolf, Thermador specialists. The Flats, The Hills, Trousdale, Bel Air. Licensed, OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/beverly-hills/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Beverly Hills",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const services = [
+  {
+    icon: '🧊',
+    name: 'Refrigerator Repair',
+    slug: 'refrigerator',
+    issues: ['Not cooling', 'Built-in', 'Temperature inconsistency', 'Ice maker', 'Sealed system'],
+    brands: ['Sub-Zero', 'Wolf', 'True', 'GE Monogram', 'Samsung', 'LG'],
   },
-  "areaServed": [
-    { "@type": "City", "name": "Beverly Hills", "sameAs": "https://en.wikipedia.org/wiki/Beverly_Hills,_California" },
-    { "@type": "City", "name": "Bel Air" },
-    { "@type": "City", "name": "Holmby Hills" },
-    { "@type": "City", "name": "Century City" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    icon: '🫧',
+    name: 'Washer Repair',
+    slug: 'washer',
+    issues: ['Not spinning', 'Not draining', 'Leaking', 'Shaking', 'Miele & European models'],
+    brands: ['Miele', 'Bosch', 'LG', 'Samsung', 'Whirlpool', 'Speed Queen'],
+  },
+  {
+    icon: '♨️',
+    name: 'Dryer Repair',
+    slug: 'dryer',
+    issues: ['Not heating', 'Drum issues', 'Takes too long', 'Dryer vent cleaning'],
+    brands: ['Miele', 'Bosch', 'LG', 'Samsung', 'Electrolux', 'Whirlpool'],
+  },
+  {
+    icon: '🔥',
+    name: 'Oven & Range Repair',
+    slug: 'oven',
+    issues: ['Not heating', 'Igniter', 'Temperature off', 'Steam oven', 'Dual-fuel'],
+    brands: ['Wolf', 'Viking', 'Thermador', 'Miele', 'Dacor', 'GE Monogram'],
+  },
+  {
+    icon: '🍽️',
+    name: 'Dishwasher Repair',
+    slug: 'dishwasher',
+    issues: ['Not draining', 'Panel-ready', 'Control board', 'Miele electronic systems'],
+    brands: ['Miele', 'Bosch', 'Thermador', 'Viking', 'KitchenAid', 'GE'],
+  },
+  {
+    icon: '🍷',
+    name: 'Wine Cooler & Cellar Repair',
+    slug: 'wine-cooler',
+    issues: ['Temperature fluctuation', 'Cooling failure', 'Vibration', 'Built-in units'],
+    brands: ['Sub-Zero', 'Thermador', 'EuroCave', 'Liebherr', 'True', 'U-Line'],
+  },
+  {
+    icon: '🔆',
+    name: 'Cooktop Repair',
+    slug: 'cooktop',
+    issues: ['Burner issues', 'Induction not heating', 'Precision calibration'],
+    brands: ['Wolf', 'Thermador', 'Viking', 'Miele', 'GE Monogram', 'Bosch'],
+  },
+  {
+    icon: '🧊',
+    name: 'Ice Machine Repair',
+    slug: 'ice-maker',
+    issues: ['Not producing', 'Inconsistent output', 'Leaking', 'Under-counter units'],
+    brands: ['Sub-Zero', 'True', 'U-Line', 'GE Monogram', 'Scotsman'],
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const neighborhoods = [
+  { name: 'The Flats (south BH)', zip: '90212' },
+  { name: 'The Hills (north BH)', zip: '90210' },
+  { name: 'Trousdale Estates', zip: '90210' },
+  { name: 'Benedict Canyon', zip: '90210' },
+  { name: 'Coldwater Canyon', zip: '90210' },
+  { name: 'Wilshire Corridor', zip: '90211' },
+  { name: 'South Beverly Hills', zip: '90212' },
+  { name: 'Beverly Grove', zip: '90211' },
+  { name: 'Bel Air', zip: '90077' },
+  { name: 'Holmby Hills', zip: '90024' },
+];
+
+const narrativeIntro = [
+  "Beverly Hills is not like the rest of our service territory. The appliances are different — built-in Sub-Zero columns, 48-inch Wolf dual-fuel ranges, Thermador steam ovens, Miele dishwashers with custom panel fronts. The homes are different — gated estates in Trousdale, Holmby Hills, and Benedict Canyon where you coordinate with estate managers and household staff, not just a homeowner who answers the door. And the expectations are different, which is fair.",
+  "Our technicians have been working in Beverly Hills long enough to know what that means. We show up prepared for what we'll find. We carry OEM parts for Sub-Zero, Viking, Wolf, Thermador, and Miele — not the aftermarket substitutes that affect performance and void manufacturer warranties. We work quietly, cleanly, and professionally. We don't upsell. We give you a written estimate before touching anything, and we stand behind the work with a 90-day warranty.",
+  "Diagnostic fee: $89 — waived when you go ahead with the repair. Luxury brand repairs may cost more due to OEM part pricing, but that's always in the estimate before we start — never a surprise on the invoice.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'Sub-Zero, Wolf, Viking & Thermador — luxury depth',
+    paragraphs: [
+      "These are the brands that define Beverly Hills kitchens — and they require a fundamentally different level of service than standard appliances. A Sub-Zero built-in refrigerator with a failed sealed system isn't the same repair as a Whirlpool French door. A Wolf dual-fuel range with a failing ignition module needs someone who actually knows how Wolf's burner technology works, not someone who watched a YouTube video.",
+      "Our technicians are trained specifically on these luxury systems — Sub-Zero's dual-evaporator architecture, Wolf's precision gas valve and star burner configurations, Thermador's ProGrand range quirks, Miele's electronic control platforms. We've serviced these appliances in The Flats off Rodeo and Carmelita, in the hillside estates in Trousdale and Benedict Canyon, in the Wilshire Corridor high-rises. We know these machines.",
+    ],
+  },
+  {
+    title: 'Should you repair or replace a Sub-Zero or Wolf?',
+    paragraphs: [
+      "The standard 50% rule — don't repair if it costs more than half the replacement value — almost never applies to luxury built-in appliances. A Sub-Zero built-in refrigerator isn't just an appliance — it's a kitchen component. Replacing it means sourcing a new unit, waiting weeks for delivery, potentially cutting into cabinetry, and doing a full installation. The disruption and cost of replacement is often three to four times what people expect.",
+      "A Sub-Zero or Wolf unit that's 10–12 years old and needs a $400–600 repair is almost always worth fixing. These machines are engineered to run 20+ years with proper care. Sub-Zero refrigerator: 20+ years. Wolf range: 20+ years. Thermador cooktop: 15–20. Miele dishwasher: 15–20. Viking range: 15–20. Standard brands: 10–15.",
+      "Our technicians give you a straight answer: what's the repair, what does it cost, how long should this appliance last after the repair, and what's our honest recommendation. We don't make money by telling you to replace things — we make money by doing repairs people trust us to come back for.",
+    ],
+  },
+];
+
+const jobs = [
+  {
+    badge: 'Sub-Zero Built-In',
+    neighborhood: 'The Flats, 90210',
+    title: "Sub-Zero running constantly, temperatures drifting up",
+    body: "48-inch built-in column with a failing evaporator fan motor. The compressor was working overtime trying to compensate — which is exactly how you get a compressor failure if you wait too long. Our tech replaced the fan motor with an OEM Sub-Zero part, cleaned the condenser coils which had significant dust buildup inside the cabinet, and checked the door gasket seal on both compartments. Back to spec temperatures within 90 minutes of arrival.",
+    part: 'OEM Sub-Zero fan motor',
+    time: '90 minutes',
+    result: '✓ Same day · OEM Sub-Zero fan motor · Coil cleaning done',
+  },
+  {
+    badge: 'Wolf Range',
+    neighborhood: 'Trousdale Estates, 90210',
+    title: "Oven not reaching temperature, one burner dead",
+    body: "Wolf dual-fuel, 48-inch ProRange. The oven igniter was drawing weak current — a Wolf-specific issue that causes intermittent heating problems before full failure. The dead surface burner had a failed igniter module. Replaced both igniters with OEM Wolf parts, tested oven temperature against a calibrated probe, recalibrated to factory spec (it was running 30°F low). All six burners confirmed. Homeowner had been adjusting recipes to compensate for months — now they don't have to.",
+    part: 'OEM Wolf igniters x2',
+    time: '2 hours',
+    result: '✓ Same day · OEM Wolf parts · Oven recalibrated to factory spec',
+  },
+  {
+    badge: 'Miele Dishwasher',
+    neighborhood: 'Benedict Canyon, 90210',
+    title: "F85 error, won't complete cycle",
+    body: "F85 on Miele is a drain pump or drain path fault. Found a blocked drain pump impeller — a small bone fragment had made it through the filter and lodged in the pump. Cleared it, tested the impeller rotation, ran a full diagnostic cycle. The panel-ready unit had custom cabinetry tight around it — our tech used the proper Miele service procedure to avoid pulling the entire unit. Took 45 minutes.",
+    part: 'Drain pump clear (no parts)',
+    time: '45 minutes',
+    result: '✓ Same day · No cabinetry damage · Full cycle confirmed',
+  },
+  {
+    badge: 'Thermador Cooktop',
+    neighborhood: 'Holmby Hills, 90024',
+    title: "Star burner sparking continuously after cleaning",
+    body: "This one is very common after kitchen cleaning — moisture gets into the Thermador Star burner igniter system and causes constant sparking. In this case the igniter caps had also been seated slightly off after cleaning, creating a short. Our tech dried and reseated all burner caps, replaced two worn igniter electrodes, and confirmed all five burners. Took under an hour. The housekeeper got a quick tutorial on how to dry the burners after cleaning.",
+    part: 'Thermador OEM igniter electrodes x2',
+    time: '1 hour',
+    result: '✓ Same day · Two igniters replaced · Housekeeper briefed',
+  },
+];
+
+const reviews = [
+  {
+    text: "Our Sub-Zero built-in had been running constantly for weeks. Same Day Appliance Repair came to our home in The Flats same afternoon, diagnosed the issue immediately, had the OEM part on the truck, and fixed it cleanly. They also cleaned the coils inside the cabinet — something I didn't know needed doing. Very professional.",
+    author: '— Diana M., The Flats, Beverly Hills',
+  },
+  {
+    text: "Wolf range at our Trousdale property — oven wasn't heating correctly and one burner was dead. Technician came same day, had all the OEM Wolf parts, recalibrated the oven after replacing the igniter. Turns out it had been running 30 degrees low for months. Now everything is dialed in perfectly.",
+    author: '— Robert H., Trousdale Estates, Beverly Hills',
+  },
+  {
+    text: "Our estate manager scheduled the repair and was very impressed by how the technician handled the service call — coordinated access perfectly, worked cleanly in our Miele kitchen, and explained everything clearly. The kind of professional service this property deserves.",
+    author: '— C. Thompson (via Estate Manager), Benedict Canyon',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Waived when you proceed with the repair · Written estimate' },
+  { label: 'Refrigerator (standard)', price: '$200–$450', note: 'Fan motor, thermostat, ice maker, compressor relay' },
+  { label: 'Sub-Zero / Wolf', price: '$300–$700+', note: 'OEM parts for luxury brands · Sealed systems · Built-ins', highlight: true },
+  { label: 'Washer / Dryer', price: '$150–$400', note: 'Miele & European models may cost more · OEM parts' },
+  { label: 'Oven / Range', price: '$200–$500+', note: 'Wolf, Viking, Thermador igniters · Calibration · Gas valves' },
+  { label: 'Dishwasher', price: '$150–$400', note: 'Panel-ready · Miele electronic systems · Drain pump' },
+];
+
+const faqs = [
+  {
+    question: 'Do you repair Sub-Zero, Viking, and Thermador appliances in Beverly Hills?',
+    answer: "Yes. Our technicians work in Beverly Hills constantly — the estates in The Flats and the hills, the properties in Trousdale, Holmby Hills, and Benedict Canyon. Sub-Zero, Viking, Wolf, Thermador, and Miele are what we see most here. We carry OEM parts for these brands on every service vehicle and are trained on their specific systems.",
+  },
+  {
+    question: 'Do you offer same-day appliance repair in Beverly Hills?',
+    answer: "Yes. Call before noon and our technicians can typically be at your Beverly Hills home the same afternoon. We serve all Beverly Hills ZIP codes — 90210, 90211, and 90212 — as well as Bel Air, Holmby Hills, Trousdale Estates, and Century City.",
+  },
+  {
+    question: 'Is it worth repairing a high-end Sub-Zero or Wolf appliance?',
+    answer: "In most cases, yes — and more so than for standard appliances. Sub-Zero refrigerators and Wolf ranges are built to last 20+ years with proper maintenance. The 50% rule (don't repair if it costs more than half of replacement) rarely applies to luxury built-ins, where replacement means a full renovation project. Our technicians give you an honest recommendation based on the appliance's age, condition, and what the actual repair entails.",
+  },
+  {
+    question: 'What is your diagnostic fee in Beverly Hills?',
+    answer: "Our diagnostic fee is $89, waived when you proceed with the repair. For luxury brands (Sub-Zero, Viking, Thermador, Wolf), repair costs may run higher due to OEM part pricing — but we give you a full written estimate before starting any work. No surprises.",
+  },
+  {
+    question: 'Do you provide discreet service for private estates in Beverly Hills?',
+    answer: "Yes. Our technicians work in Beverly Hills estates regularly and are experienced with gated properties, estate managers, and household staff. We coordinate access and scheduling professionally, work quietly and cleanly, and respect the privacy of the household.",
+  },
+  {
+    question: 'What warranty do you offer on appliance repairs in Beverly Hills?',
+    answer: "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts — never aftermarket substitutes. If the same issue returns within 90 days, we come back at no charge.",
+  },
+  {
+    question: 'Do you also serve Bel Air, Holmby Hills, and Century City?',
+    answer: "Yes. Our Beverly Hills service area extends to Bel Air, Holmby Hills, Trousdale Estates, Benedict Canyon, Coldwater Canyon, Century City, Westwood, and Beverly Grove. If you're in the 90210, 90077, or adjacent ZIP codes, we're your closest team.",
+  },
+];
+
+const nearby = [
+  { slug: 'west-hollywood', name: 'West Hollywood' },
+  { slug: 'brentwood', name: 'Brentwood' },
+  { slug: 'santa-monica', name: 'Santa Monica' },
+  { slug: 'los-angeles', name: 'Los Angeles' },
+  { slug: 'culver-city', name: 'Culver City' },
+  { slug: 'pasadena', name: 'Pasadena' },
+  { slug: 'hollywood', name: 'Hollywood' },
+  { slug: 'los-feliz', name: 'Los Feliz' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Beverly Hills', sameAs: 'https://en.wikipedia.org/wiki/Beverly_Hills,_California' },
+    { '@type': 'PostalCode', name: '90210' },
+    { '@type': 'PostalCode', name: '90211' },
+    { '@type': 'PostalCode', name: '90212' },
+    { '@type': 'Place', name: 'The Flats' },
+    { '@type': 'Place', name: 'Trousdale Estates' },
+    { '@type': 'Place', name: 'Benedict Canyon' },
+    { '@type': 'Place', name: 'Bel Air' },
+    { '@type': 'Place', name: 'Holmby Hills' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Viking, and Thermador appliances in Beverly Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians work in Beverly Hills constantly — the estates in The Flats and the hills, the properties in Trousdale, Holmby Hills, and Benedict Canyon. Sub-Zero, Viking, Wolf, Thermador, and Miele are what we see most here. We carry OEM parts for these brands on every service vehicle and are trained on their specific systems." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Beverly Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Call before noon and our technicians can typically be at your Beverly Hills home the same afternoon. We serve all Beverly Hills ZIP codes — 90210, 90211, and 90212 — as well as Bel Air, Holmby Hills, Trousdale Estates, and Century City." }
-    },
-    {
-      "@type": "Question",
-      "name": "Is it worth repairing a high-end Sub-Zero or Wolf appliance?",
-      "acceptedAnswer": { "@type": "Answer", "text": "In most cases, yes — and more so than for standard appliances. Sub-Zero refrigerators and Wolf ranges are built to last 20+ years with proper maintenance. The 50% rule (don't repair if it costs more than half of replacement) rarely applies to luxury built-ins, where replacement means a full renovation project. Our technicians give you an honest recommendation based on the appliance's age, condition, and what the actual repair entails." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Beverly Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. For luxury brands (Sub-Zero, Viking, Thermador, Wolf), repair costs may run higher due to OEM part pricing — but we give you a full written estimate before starting any work. No surprises." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you provide discreet service for private estates in Beverly Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians work in Beverly Hills estates regularly and are experienced with gated properties, estate managers, and household staff. We coordinate access and scheduling professionally, work quietly and cleanly, and respect the privacy of the household." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Beverly Hills?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts — never aftermarket substitutes. If the same issue returns within 90 days, we come back at no charge." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Bel Air, Holmby Hills, and Century City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Beverly Hills service area extends to Bel Air, Holmby Hills, Trousdale Estates, Benedict Canyon, Coldwater Canyon, Century City, Westwood, and Beverly Grove. If you're in the 90210, 90077, or adjacent ZIP codes, we're your closest team." }
-    }
-  ]
+  ],
+  priceRange: '$$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="bh-hero">
-    <div class="bh-hero__inner container">
-      <div class="bh-hero__content">
-        <div class="bh-hero__eyebrow">Beverly Hills, CA · 90210 · 90211 · 90212 · Bel Air · Holmby Hills</div>
-        <h1 class="bh-hero__h1">
-          Appliance Repair<br>
-          <span class="bh-hero__accent">Beverly Hills, CA</span>
-        </h1>
-        <p class="bh-hero__sub">
-          Sub-Zero, Viking, Wolf, Thermador, Miele — these are the appliances we work on
-          every day in Beverly Hills. Our technicians cover The Flats, The Hills,
-          Trousdale Estates, Benedict Canyon, and Bel Air. Same-day service,
-          OEM parts, 90-day warranty.
-        </p>
-        <div class="bh-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="bh-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="bh-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-beverly-hills-ca.webp"
-          alt="Luxury appliance repair in Beverly Hills CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Beverly Hills, CA · 90210 · 90211 · 90212 · Bel Air · Holmby Hills"
+    headlineMain="Appliance repair in"
+    headlineAccent="Beverly Hills, CA"
+    subheadline="Sub-Zero, Viking, Wolf, Thermador, Miele — these are the appliances we work on every day in Beverly Hills. The Flats, The Hills, Trousdale Estates, Benedict Canyon, Bel Air. Same-day service, OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Same-Day Service</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>90-Day Warranty</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>OEM Parts Only</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Licensed & Insured</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>85% First-Visit Fix Rate</span>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="How We Actually Work"
+    headline="Beverly Hills appliance repair —"
+    headlineAccent="how we actually work"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="bh-intro">
-    <div class="container bh-intro__inner">
-      <div class="bh-intro__text">
-        <h2>Beverly Hills Appliance Repair — How We Actually Work</h2>
-        <p>
-          Beverly Hills is not like the rest of our service territory. The appliances are different —
-          built-in Sub-Zero columns, 48-inch Wolf dual-fuel ranges, Thermador steam ovens,
-          Miele dishwashers with custom panel fronts. The homes are different — gated estates in
-          Trousdale, Holmby Hills, and Benedict Canyon where you coordinate with estate managers
-          and household staff, not just a homeowner who answers the door. And the expectations
-          are different, which is fair.
-        </p>
-        <p>
-          Our technicians have been working in Beverly Hills long enough to know what that means.
-          We show up prepared for what we'll find. We carry OEM parts for Sub-Zero, Viking,
-          Wolf, Thermador, and Miele — not the aftermarket substitutes that affect performance
-          and void manufacturer warranties. We work quietly, cleanly, and professionally.
-          We don't upsell. We give you a written estimate before touching anything, and we stand
-          behind the work with a 90-day warranty.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived when you go ahead with the repair.
-          Luxury brand repairs may cost more due to OEM part pricing, but that's always in the
-          estimate before we start — never a surprise on the invoice.
-        </p>
-      </div>
-      <div class="bh-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Schedule a Beverly Hills Visit</div>
-          <div class="cta-box__sub">Same-day available · 90210 · 90211 · 90212</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Book Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="What we repair in"
+    headlineAccent="Beverly Hills"
+    subheadline="Built-ins, luxury brands, and everyday appliances — all of it."
+    services={services}
+    cardStructure="3-tier"
+  />
 
-  <!-- LUXURY BRANDS BLOCK -->
-  <section class="bh-luxury">
-    <div class="container">
-      <div class="luxury-inner">
-        <div class="luxury-text">
-          <div class="luxury-eyebrow">Luxury Appliance Specialists</div>
-          <h2>Sub-Zero, Wolf, Viking & Thermador Repair in Beverly Hills</h2>
-          <p>
-            These are the brands that define Beverly Hills kitchens — and they require a
-            fundamentally different level of service than standard appliances. A Sub-Zero
-            built-in refrigerator with a failed sealed system isn't the same repair as a
-            Whirlpool French door. A Wolf dual-fuel range with a failing ignition module needs
-            someone who actually knows how Wolf's burner technology works, not someone who
-            watched a YouTube video.
-          </p>
-          <p>
-            Our technicians are trained specifically on these luxury systems — Sub-Zero's
-            dual-evaporator architecture, Wolf's precision gas valve and star burner
-            configurations, Thermador's ProGrand range quirks, Miele's electronic control
-            platforms. We've serviced these appliances in The Flats off Rodeo and Carmelita,
-            in the hillside estates in Trousdale and Benedict Canyon, in the Wilshire Corridor
-            high-rises. We know these machines.
-          </p>
-          <div class="luxury-brands-grid">
-            <div class="luxury-brand">Sub-Zero</div>
-            <div class="luxury-brand">Wolf</div>
-            <div class="luxury-brand">Viking</div>
-            <div class="luxury-brand">Thermador</div>
-            <div class="luxury-brand">Miele</div>
-            <div class="luxury-brand">Dacor</div>
-            <div class="luxury-brand">GE Monogram</div>
-            <div class="luxury-brand">True Residential</div>
-            <div class="luxury-brand">Bosch</div>
-            <div class="luxury-brand">Fisher & Paykel</div>
-          </div>
-        </div>
-        <div class="luxury-stats">
-          <div class="stat-card">
-            <div class="stat-num">85%</div>
-            <div class="stat-label">First-visit fix rate</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num">90</div>
-            <div class="stat-label">Day warranty</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num">$89</div>
-            <div class="stat-label">Diagnostic fee</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-num">OEM</div>
-            <div class="stat-label">Parts only</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Beverly Hills neighborhoods"
+    headlineAccent="we service"
+    subheadline="90210 · 90211 · 90212 — and beyond into Bel Air, Holmby Hills, and the canyons."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="bh-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Beverly Hills</h2>
-      <p class="section-sub">Built-ins, luxury brands, and everyday appliances — all of it</p>
-      <div class="services-grid">
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Beverly Hills"
+    jobs={jobs}
+  />
 
-        <a href="/beverly-hills/refrigerator-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Built-in · Temperature inconsistency · Ice maker · Sealed system</div>
-          <div class="service-card__brands">Sub-Zero · Wolf · True · GE Monogram · Samsung · LG</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/beverly-hills/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Not spinning · Not draining · Leaking · Shaking · Miele & European models</div>
-          <div class="service-card__brands">Miele · Bosch · LG · Samsung · Whirlpool · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Beverly Hills"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/beverly-hills/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Drum issues · Takes too long · Dryer vent cleaning</div>
-          <div class="service-card__brands">Miele · Bosch · LG · Samsung · Electrolux · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Beverly Hills"
+    cards={pricingCards}
+    bottomNote="Luxury appliance OEM parts are priced by the manufacturer — we don't mark them up beyond what we pay. You'll see the part cost and labor separately in your estimate. Residential pricing only."
+  />
 
-        <a href="/beverly-hills/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven & Range Repair</div>
-          <div class="service-card__issues">Not heating · Igniter · Temperature off · Steam oven · Dual-fuel</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · Miele · Dacor · GE Monogram</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Beverly Hills"
+    faqs={faqs}
+  />
 
-        <a href="/beverly-hills/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Panel-ready · Control board · Miele electronic systems</div>
-          <div class="service-card__brands">Miele · Bosch · Thermador · Viking · KitchenAid · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/beverly-hills/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler & Cellar Repair</div>
-          <div class="service-card__issues">Temperature fluctuation · Cooling failure · Vibration · Built-in units</div>
-          <div class="service-card__brands">Sub-Zero · Thermador · EuroCave · Liebherr · True · U-Line</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/beverly-hills/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop Repair</div>
-          <div class="service-card__issues">Burner issues · Induction not heating · Precision calibration</div>
-          <div class="service-card__brands">Wolf · Thermador · Viking · Miele · GE Monogram · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/beverly-hills/ice-machine-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Ice Machine Repair</div>
-          <div class="service-card__issues">Not producing · Inconsistent output · Leaking · Under-counter units</div>
-          <div class="service-card__brands">Sub-Zero · True · U-Line · GE Monogram · Scotsman</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS — Beverly Hills specifics -->
-  <section class="bh-neighborhoods">
-    <div class="container">
-      <h2>We Work Across All of Beverly Hills & the Estate Areas</h2>
-      <p class="section-sub">90210 · 90211 · 90212 — and beyond into Bel Air, Holmby Hills, and the canyons</p>
-
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Beverly Hills</div>
-          <div class="nh-list">
-            <div class="nh-item featured">The Flats (south BH)</div>
-            <div class="nh-item featured">The Hills (north BH)</div>
-            <div class="nh-item featured">Trousdale Estates</div>
-            <div class="nh-item">Benedict Canyon</div>
-            <div class="nh-item">Coldwater Canyon</div>
-            <div class="nh-item">Wilshire Corridor</div>
-            <div class="nh-item">South Beverly Hills</div>
-            <div class="nh-item">Beverly Grove</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Adjacent Areas We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Bel Air (90077)</div>
-            <div class="nh-item">Holmby Hills</div>
-            <div class="nh-item">Century City (90067)</div>
-            <div class="nh-item">Westwood (90024)</div>
-            <div class="nh-item">Brentwood (90049)</div>
-            <div class="nh-item">West Hollywood (90046)</div>
-            <div class="nh-item">Hancock Park</div>
-            <div class="nh-item">Cheviot Hills</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets & Corridors</div>
-          <div class="nh-list">
-            <div class="nh-item">Rodeo Drive area</div>
-            <div class="nh-item">Sunset Blvd (BH)</div>
-            <div class="nh-item">Wilshire Blvd</div>
-            <div class="nh-item">Santa Monica Blvd</div>
-            <div class="nh-item">Carmelita Ave</div>
-            <div class="nh-item">Lexington Rd</div>
-            <div class="nh-item">Loma Vista Dr</div>
-            <div class="nh-item">Mulholland Dr</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REPAIR OR REPLACE — luxury context -->
-  <section class="bh-ror">
-    <div class="container">
-      <div class="ror-inner">
-        <div class="ror-text">
-          <div class="ror-eyebrow">Honest Advice on Luxury Appliances</div>
-          <h2>Should You Repair or Replace a Sub-Zero or Wolf?</h2>
-          <p>
-            The standard "50% rule" — don't repair if it costs more than half the replacement
-            value — almost never applies to luxury built-in appliances. Here's why our
-            technicians think about it differently in Beverly Hills.
-          </p>
-          <p>
-            A Sub-Zero built-in refrigerator isn't just an appliance — it's a kitchen component.
-            Replacing it means sourcing a new unit, waiting weeks for delivery, potentially
-            cutting into cabinetry, and doing a full installation. The disruption and cost of
-            replacement is often three to four times what people expect. A Sub-Zero or Wolf unit
-            that's 10–12 years old and needs a $400–600 repair is almost always worth fixing.
-            These machines are engineered to run 20+ years with proper care.
-          </p>
-          <p>
-            Our technicians give you a straight answer: what's the repair, what does it cost,
-            how long should this appliance last after the repair, and what's our honest
-            recommendation. We don't make money by telling you to replace things — we make
-            money by doing repairs people trust us to come back for.
-          </p>
-          <div class="lifespan-grid">
-            <div class="lifespan-item">
-              <span class="ls-appliance">Sub-Zero Refrigerator</span>
-              <span class="ls-years">20+ years</span>
-            </div>
-            <div class="lifespan-item">
-              <span class="ls-appliance">Wolf Range</span>
-              <span class="ls-years">20+ years</span>
-            </div>
-            <div class="lifespan-item">
-              <span class="ls-appliance">Thermador Cooktop</span>
-              <span class="ls-years">15–20 years</span>
-            </div>
-            <div class="lifespan-item">
-              <span class="ls-appliance">Miele Dishwasher</span>
-              <span class="ls-years">15–20 years</span>
-            </div>
-            <div class="lifespan-item">
-              <span class="ls-appliance">Viking Range</span>
-              <span class="ls-years">15–20 years</span>
-            </div>
-            <div class="lifespan-item">
-              <span class="ls-appliance">Standard Brands</span>
-              <span class="ls-years">10–15 years</span>
-            </div>
-          </div>
-        </div>
-        <div class="ror-cta">
-          <div class="ror-cta__title">Not Sure If It's Worth Repairing?</div>
-          <div class="ror-cta__sub">Call — we'll give you an honest answer before taking any money</div>
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">{city.phone}</a>
-          <div class="ror-cta__note">Diagnostic fee $89 · Waived with repair · OEM parts only</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="bh-recent">
-    <div class="container">
-      <h2>Recent Repairs Our Team Did in Beverly Hills</h2>
-      <p class="section-sub">Real calls. These are the kinds of jobs our Beverly Hills technicians handle.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Built-In</span>
-            <span class="recent-location">The Flats, 90210</span>
-          </div>
-          <div class="recent-card__title">"Sub-Zero running constantly, temperatures drifting up"</div>
-          <div class="recent-card__desc">
-            48-inch built-in column with a failing evaporator fan motor. The compressor was
-            working overtime trying to compensate — which is exactly how you get a compressor
-            failure if you wait too long. Our tech replaced the fan motor with an OEM Sub-Zero
-            part, cleaned the condenser coils which had significant dust buildup inside the
-            cabinet, and checked the door gasket seal on both compartments. Back to spec
-            temperatures within 90 minutes of arrival.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Sub-Zero fan motor · Coil cleaning done</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Range</span>
-            <span class="recent-location">Trousdale Estates, 90210</span>
-          </div>
-          <div class="recent-card__title">"Oven not reaching temperature, one burner dead"</div>
-          <div class="recent-card__desc">
-            Wolf dual-fuel, 48-inch ProRange. The oven igniter was drawing weak current —
-            a Wolf-specific issue that causes intermittent heating problems before full failure.
-            The dead surface burner had a failed igniter module. Replaced both igniters with
-            OEM Wolf parts, tested oven temperature against a calibrated probe, recalibrated
-            to factory spec (it was running 30°F low). All six burners confirmed. Homeowner
-            had been adjusting recipes to compensate for months — now they don't have to.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Wolf parts · Oven recalibrated to factory spec</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Miele Dishwasher</span>
-            <span class="recent-location">Benedict Canyon, 90210</span>
-          </div>
-          <div class="recent-card__title">"F85 error, won't complete cycle"</div>
-          <div class="recent-card__desc">
-            F85 on Miele is a drain pump or drain path fault. Found a blocked drain pump
-            impeller — a small bone fragment had made it through the filter and lodged in
-            the pump. Cleared it, tested the impeller rotation, ran a full diagnostic cycle.
-            The panel-ready unit had custom cabinetry tight around it — our tech used
-            the proper Miele service procedure to avoid pulling the entire unit. Took 45 minutes.
-          </div>
-          <div class="recent-card__result">✓ Same day · No cabinetry damage · Full cycle confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Thermador Cooktop</span>
-            <span class="recent-location">Holmby Hills, 90024</span>
-          </div>
-          <div class="recent-card__title">"Star burner sparking continuously after cleaning"</div>
-          <div class="recent-card__desc">
-            This one's very common after kitchen cleaning — moisture gets into the Thermador
-            Star burner igniter system and causes constant sparking. In this case the igniter
-            caps had also been seated slightly off after cleaning, creating a short. Our tech
-            dried and reseated all burner caps, replaced two worn igniter electrodes, and
-            confirmed all five burners. Took under an hour. The housekeeper got a
-            quick tutorial on how to dry the burners after cleaning.
-          </div>
-          <div class="recent-card__result">✓ Same day · Two igniters replaced · Housekeeper briefed</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="bh-why">
-    <div class="container">
-      <h2>Why Beverly Hills Homeowners Call Us</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🔧</div>
-          <div class="why-title">We Know These Machines</div>
-          <div class="why-text">Sub-Zero, Wolf, Thermador, Viking, Miele — we work on these brands constantly in Beverly Hills. We know their failure patterns, carry their OEM parts, and diagnose them correctly on the first visit.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📋</div>
-          <div class="why-title">Written Estimate, No Surprises</div>
-          <div class="why-text">Luxury brand repairs can be expensive — that's the nature of OEM parts for high-end systems. We give you the full picture in writing before we start anything. The $89 diagnostic fee disappears when you approve the repair.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">We Work in Estates Professionally</div>
-          <div class="why-text">Gated properties, estate managers, household staff, tight access windows — our technicians are experienced with all of it. We coordinate professionally, work quietly, and leave the space exactly as we found it.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair we do in Beverly Hills carries a 90-day warranty. We use genuine OEM parts — never aftermarket substitutes that compromise performance or void manufacturer warranties. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="bh-reviews">
-    <div class="container">
-      <h2>What Beverly Hills Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our Sub-Zero built-in had been running constantly for weeks. Same Day Appliance Repair came to our home in The Flats same afternoon, diagnosed the issue immediately, had the OEM part on the truck, and fixed it cleanly. They also cleaned the coils inside the cabinet — something I didn't know needed doing. Very professional."</div>
-          <div class="review-author">— Diana M., The Flats, Beverly Hills</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Wolf range at our Trousdale property — oven wasn't heating correctly and one burner was dead. Technician came same day, had all the OEM Wolf parts, recalibrated the oven after replacing the igniter. Turns out it had been running 30 degrees low for months. Now everything is dialed in perfectly."</div>
-          <div class="review-author">— Robert H., Trousdale Estates, Beverly Hills</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our estate manager scheduled the repair and was very impressed by how the technician handled the service call — coordinated access perfectly, worked cleanly in our Miele kitchen, and explained everything clearly. The kind of professional service this property deserves."</div>
-          <div class="review-author">— C. Thompson (via Estate Manager), Benedict Canyon</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="bh-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Beverly Hills</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator (standard)</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Fan motor, thermostat, ice maker, compressor relay</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts for luxury brands · Sealed systems · Built-ins</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Miele & European models may cost more · OEM parts</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$200 – $500+</div>
-          <div class="pricing-card__note">Wolf, Viking, Thermador igniters · Calibration · Gas valves</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Panel-ready · Miele electronic systems · Drain pump</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-      <p class="pricing-note">Luxury appliance OEM parts are priced by the manufacturer — we don't mark them up beyond what we pay. You'll see the part cost and labor separately in your estimate.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="bh-faq">
-    <div class="container">
-      <h2>Questions Beverly Hills Clients Ask</h2>
-      <div class="faq-list">
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair Sub-Zero, Viking, and Thermador appliances in Beverly Hills?</summary>
-          <div class="faq-answer">Yes. Our technicians work in Beverly Hills constantly — the estates in The Flats and the hills, the properties in Trousdale, Holmby Hills, and Benedict Canyon. Sub-Zero, Viking, Wolf, Thermador, and Miele are what we see most here. We carry OEM parts for these brands on every service vehicle and are trained on their specific systems.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you offer same-day appliance repair in Beverly Hills?</summary>
-          <div class="faq-answer">Yes. Call before noon and our technicians can typically be at your Beverly Hills home the same afternoon. We serve all Beverly Hills ZIP codes — 90210, 90211, and 90212 — as well as Bel Air, Holmby Hills, Trousdale Estates, and Century City.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">Is it worth repairing a high-end Sub-Zero or Wolf appliance?</summary>
-          <div class="faq-answer">In most cases, yes — and more so than for standard appliances. Sub-Zero refrigerators and Wolf ranges are built to last 20+ years with proper maintenance. The 50% rule rarely applies to luxury built-ins, where replacement means a full renovation project. Our technicians give you an honest recommendation based on the appliance's age, condition, and what the actual repair entails.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What is your diagnostic fee in Beverly Hills?</summary>
-          <div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. For luxury brands, repair costs may run higher due to OEM part pricing — but we give you a full written estimate before starting any work. No surprises.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you provide discreet service for private estates in Beverly Hills?</summary>
-          <div class="faq-answer">Yes. Our technicians work in Beverly Hills estates regularly and are experienced with gated properties, estate managers, and household staff. We coordinate access and scheduling professionally, work quietly and cleanly, and respect the privacy of the household.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">What warranty do you offer on appliance repairs in Beverly Hills?</summary>
-          <div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts — never aftermarket substitutes. If the same issue returns within 90 days, we come back at no charge.</div>
-        </details>
-
-        <details class="faq-item">
-          <summary class="faq-question">Do you also serve Bel Air, Holmby Hills, and Century City?</summary>
-          <div class="faq-answer">Yes. Our Beverly Hills service area extends to Bel Air, Holmby Hills, Trousdale Estates, Benedict Canyon, Coldwater Canyon, Century City, Westwood, and Beverly Grove. If you're in the 90210, 90077, or adjacent ZIP codes, we're your closest team.</div>
-        </details>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="bh-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/culver-city/" class="nearby-link">Culver City</a>
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/hollywood/" class="nearby-link">Hollywood</a>
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="bh-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Need Appliance Repair in Beverly Hills?</h2>
-          <p>Same-day service · OEM parts · 90-day warranty · Diagnostic $89 waived with repair. We pick up the phone.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Beverly Hills</span>
-          <span>·</span>
-          <span>Serving 90210 · 90211 · 90212 · Bel Air · Holmby Hills</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</Layout>
-
-<style>
-  :root {
-    --bh-red: #C8102E;
-    --bh-black: #0a0a0a;
-    --bh-gray: #f5f5f5;
-    --bh-border: #e2e2e2;
-    --bh-text: #1a1a1a;
-    --bh-muted: #6b6b6b;
-    --bh-gold: #b8972a;
-  }
-
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  /* HERO */
-  .bh-hero { background: var(--bh-black); color: white; padding: 80px 0 60px; }
-  .bh-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .bh-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--bh-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .bh-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .bh-hero__accent { color: var(--bh-red); }
-  .bh-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .bh-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .bh-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .bh-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-
-  /* BUTTONS */
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--bh-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); transition: border-color 0.2s; }
-  .btn-secondary:hover { border-color: white; }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .bh-bottom-cta .btn-secondary { color: var(--bh-text); border-color: var(--bh-border); }
-  .bh-bottom-cta .btn-secondary:hover { background: var(--bh-gray); }
-
-  /* TRUST BAR */
-  .trust-bar { background: var(--bh-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-
-  /* INTRO */
-  .bh-intro { padding: 72px 0; background: white; }
-  .bh-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .bh-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--bh-black); margin-bottom: 20px; }
-  .bh-intro__text p { font-size: 16px; line-height: 1.7; color: var(--bh-text); margin-bottom: 16px; }
-  .cta-box { background: var(--bh-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--bh-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__book:hover { background: rgba(255,255,255,0.08); }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-
-  /* LUXURY */
-  .bh-luxury { padding: 72px 0; background: var(--bh-black); color: white; }
-  .luxury-inner { display: grid; grid-template-columns: 1fr 280px; gap: 60px; align-items: start; }
-  .luxury-eyebrow { font-size: 13px; font-weight: 500; color: var(--bh-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .luxury-text h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px; }
-  .luxury-text p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.75); margin-bottom: 16px; }
-  .luxury-brands-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
-  .luxury-brand { padding: 6px 14px; border: 1px solid rgba(255,255,255,0.2); border-radius: 20px; font-size: 13px; color: rgba(255,255,255,0.8); }
-  .luxury-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .stat-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 24px; text-align: center; }
-  .stat-num { font-size: 32px; font-weight: 700; color: var(--bh-red); margin-bottom: 4px; }
-  .stat-label { font-size: 13px; color: rgba(255,255,255,0.6); }
-
-  /* SECTION */
-  .section-title { font-size: 30px; font-weight: 700; color: var(--bh-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--bh-muted); text-align: center; margin-bottom: 40px; }
-
-  /* SERVICES */
-  .bh-services { padding: 72px 0; background: var(--bh-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--bh-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--bh-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--bh-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--bh-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--bh-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--bh-red); font-weight: 500; }
-
-  /* NEIGHBORHOODS */
-  .bh-neighborhoods { padding: 72px 0; background: white; }
-  .bh-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--bh-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--bh-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--bh-text); padding: 8px 12px; background: var(--bh-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--bh-red); color: var(--bh-black); font-weight: 500; }
-
-  /* REPAIR OR REPLACE */
-  .bh-ror { padding: 72px 0; background: var(--bh-gray); }
-  .ror-inner { display: grid; grid-template-columns: 1fr 300px; gap: 60px; align-items: start; }
-  .ror-eyebrow { font-size: 13px; font-weight: 500; color: var(--bh-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .ror-text h2 { font-size: 28px; font-weight: 700; color: var(--bh-black); margin-bottom: 20px; }
-  .ror-text p { font-size: 15px; line-height: 1.7; color: var(--bh-text); margin-bottom: 16px; }
-  .lifespan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 20px 0 12px; }
-  .lifespan-item { background: white; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 4px; border: 1px solid var(--bh-border); }
-  .ls-appliance { font-size: 13px; color: var(--bh-muted); }
-  .ls-years { font-size: 15px; font-weight: 600; color: var(--bh-black); }
-  .ror-cta { background: var(--bh-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .ror-cta__title { font-size: 17px; font-weight: 700; color: white; margin-bottom: 8px; }
-  .ror-cta__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .ror-cta .btn-primary { width: 100%; justify-content: center; margin-bottom: 12px; }
-  .ror-cta__note { font-size: 12px; color: rgba(255,255,255,0.4); }
-
-  /* RECENT */
-  .bh-recent { padding: 72px 0; background: white; }
-  .bh-recent h2 { font-size: 30px; font-weight: 700; color: var(--bh-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: var(--bh-gray); border: 1px solid var(--bh-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--bh-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--bh-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--bh-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--bh-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-
-  /* WHY */
-  .bh-why { padding: 72px 0; background: var(--bh-gray); }
-  .bh-why h2 { font-size: 30px; font-weight: 700; color: var(--bh-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: white; border-radius: 12px; padding: 28px 24px; border: 1px solid var(--bh-border); }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--bh-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--bh-muted); line-height: 1.6; }
-
-  /* REVIEWS */
-  .bh-reviews { padding: 72px 0; background: white; }
-  .bh-reviews h2 { font-size: 30px; font-weight: 700; color: var(--bh-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: var(--bh-gray); border: 1px solid var(--bh-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--bh-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--bh-muted); font-weight: 500; }
-
-  /* PRICING */
-  .bh-pricing { padding: 72px 0; background: var(--bh-gray); }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: white; border-radius: 10px; padding: 20px 24px; border: 1px solid var(--bh-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--bh-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--bh-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--bh-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--bh-red); }
-  .pricing-card__note { font-size: 13px; color: var(--bh-muted); }
-  .pricing-note { font-size: 14px; color: var(--bh-muted); text-align: center; max-width: 640px; margin: 0 auto; }
-
-  /* FAQ */
-  .bh-faq { padding: 72px 0; background: white; }
-  .bh-faq h2 { font-size: 30px; font-weight: 700; color: var(--bh-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--bh-border); border-radius: 8px; background: var(--bh-gray); margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--bh-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--bh-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--bh-text); background: white; }
-
-  /* NEARBY */
-  .bh-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--bh-border); }
-  .bh-nearby h2 { font-size: 20px; font-weight: 600; color: var(--bh-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--bh-border); border-radius: 20px; font-size: 14px; color: var(--bh-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--bh-red); color: var(--bh-red); }
-
-  /* BOTTOM CTA */
-  .bh-bottom-cta { padding: 72px 0; background: var(--bh-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-
-  /* RESPONSIVE */
-  @media (max-width: 1024px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-grid { grid-template-columns: repeat(2, 1fr); }
-    .reviews-grid { grid-template-columns: 1fr 1fr; }
-    .luxury-inner { grid-template-columns: 1fr; }
-    .luxury-stats { grid-template-columns: repeat(4, 1fr); }
-    .nh-columns { grid-template-columns: 1fr 1fr; }
-    .ror-inner { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .bh-hero__inner { grid-template-columns: 1fr; }
-    .bh-hero__img-wrap { display: none; }
-    .bh-intro__inner { grid-template-columns: 1fr; }
-    .recent-grid { grid-template-columns: 1fr; }
-    .reviews-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr 1fr; }
-    .nh-columns { grid-template-columns: 1fr; }
-    .luxury-stats { grid-template-columns: repeat(2, 1fr); }
-    .trust-bar__inner { justify-content: center; }
-    .lifespan-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 480px) {
-    .services-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; }
-    .bh-hero { padding: 48px 0 40px; }
-    .bottom-cta__text h2 { font-size: 26px; }
-  }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Need appliance repair in"
+    headlineAccent="Beverly Hills?"
+    body="Same-day service · OEM parts · 90-day warranty · Diagnostic $89 waived with repair. We pick up the phone. Serving 90210 · 90211 · 90212 · Bel Air · Holmby Hills."
+  />
+</CityLayout>
