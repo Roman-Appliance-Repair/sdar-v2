@@ -1,7 +1,12 @@
 ---
 /**
  * Footer — NAP, branches, quick links, counties, legal.
+ * Branches read from branches.ts SSOT (T13). Pending phones rendered as "Opening soon".
+ * Hours from BUSINESS_HOURS.display SSOT (T13).
  */
+
+import { BRANCHES } from '../data/branches';
+import { BUSINESS_HOURS } from '../data/business-hours';
 
 function slugFromPath(p: string) { return (p.split('/').pop() ?? '').replace(/\.astro$/, ''); }
 function slugToLabel(slug: string) {
@@ -22,13 +27,12 @@ const counties = countySlugs.map((slug) => ({
 
 const currentYear = new Date().getFullYear();
 
-const branches = [
-  { city: 'West Hollywood', phone: '(323) 870-4790', tel: '+13238704790' },
-  { city: 'Los Angeles', phone: '(424) 325-0520', tel: '+14243250520' },
-  { city: 'Thousand Oaks', phone: '(424) 208-0228', tel: '+14242080228' },
-  { city: 'Pasadena', phone: '(626) 376-4458', tel: '+16263764458' },
-  { city: 'Irvine', phone: '(213) 401-9019', tel: '+12134019019' },
-];
+const activeBranches = BRANCHES
+  .filter((b) => b.phoneStatus === 'active')
+  .map((b) => ({ city: b.name, phone: b.phone, tel: `+1${b.phone.replace(/\D/g, '')}` }));
+const pendingBranches = BRANCHES
+  .filter((b) => b.phoneStatus === 'pending')
+  .map((b) => ({ city: b.name }));
 
 const servicesLinks = [
   { label: 'Refrigerator Repair', href: '/services/refrigerator-repair/' },
@@ -80,10 +84,16 @@ const legalLinks = [
       <div class="footer-col">
         <h4>Branches</h4>
         <ul>
-          {branches.map((b) => (
+          {activeBranches.map((b) => (
             <li>
               <span class="branch-city">{b.city}</span>
               <a href={`tel:${b.tel}`} class="branch-phone">{b.phone}</a>
+            </li>
+          ))}
+          {pendingBranches.map((b) => (
+            <li>
+              <span class="branch-city">{b.city}</span>
+              <span class="branch-pending">Opening soon</span>
             </li>
           ))}
         </ul>
@@ -144,11 +154,7 @@ const legalLinks = [
 
     <!-- Hours -->
     <div class="footer-hours">
-      <strong>Hours:</strong> Monday–Saturday 8:00 AM – 8:00 PM
-      <span class="sep">·</span>
-      <span>Sunday closed</span>
-      <span class="sep">·</span>
-      <span>Phone answered 24/7</span>
+      <strong>Hours:</strong> {BUSINESS_HOURS.display}
     </div>
 
     <!-- Bottom -->
@@ -280,6 +286,14 @@ const legalLinks = [
     color: var(--white) !important;
   }
   .branch-phone:hover { color: var(--red) !important; }
+  .branch-pending {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 500;
+    font-style: italic;
+    color: rgba(255,255,255,0.45);
+    letter-spacing: 0.02em;
+  }
 
   /* Credentials strip */
   .footer-credentials {

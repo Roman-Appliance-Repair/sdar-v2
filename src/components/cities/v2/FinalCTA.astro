@@ -1,14 +1,17 @@
 ---
-/** v2 FinalCTA — Bottom CTA bar with phone + book. Address line for physical_pin. */
+/** v2 FinalCTA — Bottom CTA bar with phone + book + verbatim restoration footer (T13).
+ *  Address line shown only for physical_pin branches (NAP rule 2). */
 
-import { CITIES } from '../../../data/cities';
-import { BRANCHES, MAIN_PHONE, isPlaceholderPhone, LEGAL_ADDRESS } from '../../../data/branches';
+import { CITIES, COUNTIES } from '../../../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../../../data/branches';
 
 export interface Props {
   citySlug: string;
   cityName: string;
   headline?: string;
   body?: string;
+  /** Optional 1-2 top neighborhoods for the "Serving" line. */
+  neighborhoods?: string[];
 }
 
 const {
@@ -16,20 +19,24 @@ const {
   cityName,
   headline,
   body,
+  neighborhoods = [],
 } = Astro.props;
 
 const city = CITIES.find((c) => c.slug === citySlug)!;
 const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
 const phoneTel = `+1${phone.replace(/\D/g, '')}`;
+const countyName = COUNTIES[city.county].name;
 
-const finalHeadline = headline ?? `Need Appliance Repair in ${cityName} Today?`;
+const finalHeadline = headline ?? `Schedule Your ${cityName} Repair Today`;
 const finalBody = body ?? `Call now — same-day service available for most repairs. Diagnostic fee $89, waived with repair. 90-day warranty on all work.`;
 
-// Address line: only if branch is physical_pin (NAP rule 2)
 const addressLine = branch.type === 'physical_pin' && branch.address
   ? `${branch.address.street}, ${branch.address.city}, ${branch.address.state} ${branch.address.zip}`
   : null;
+
+const topHoods = neighborhoods.slice(0, 2).filter(Boolean);
+const servingParts = [cityName, ...topHoods, countyName];
 ---
 
 <section class="v2-final">
@@ -47,6 +54,20 @@ const addressLine = branch.type === 'physical_pin' && branch.address
       </a>
       <a href="/book/" class="v2-btn-secondary v2-btn-large">Book Online</a>
     </div>
+
+    <div class="v2-final__pillars">
+      $89 diagnostic · 90-day warranty · OEM parts · {cityName}, CA
+    </div>
+
+    <div class="v2-final__sameday">Same-day service in {branch.name}</div>
+    <div class="v2-final__dispatcher">Need repair today? Talk to a dispatcher now.</div>
+
+    <div class="v2-final__serving">
+      Serving {servingParts.join(' · ')}
+    </div>
+
+    <a href={`tel:${phoneTel}`} class="v2-final__phone-repeat">{phone}</a>
+
     <div class="v2-final__nap">
       <span>Same Day Appliance Repair</span>
       {addressLine && <><span>·</span><span>{addressLine}</span></>}
@@ -82,6 +103,37 @@ const addressLine = branch.type === 'physical_pin' && branch.address
     margin-bottom: 24px;
     flex-wrap: wrap;
   }
+  .v2-final__pillars {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 28px;
+  }
+  .v2-final__sameday {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--v2-white);
+    margin-bottom: 4px;
+  }
+  .v2-final__dispatcher {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 18px;
+  }
+  .v2-final__serving {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 12px;
+  }
+  .v2-final__phone-repeat {
+    display: inline-block;
+    font-family: var(--v2-font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--v2-red);
+    text-decoration: none;
+    margin-bottom: 18px;
+  }
+  .v2-final__phone-repeat:hover { color: var(--v2-white); }
   .v2-final__nap {
     display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
     font-size: 13px; color: rgba(255,255,255,0.4);
