@@ -1,442 +1,289 @@
 ---
-// src/pages/agoura-hills.astro
-// Same Day Appliance Repair — Agoura Hills, CA
-// Branch: Thousand Oaks/Ventura | Phone: (424) 208-0228
+/**
+ * Agoura Hills, CA — Variant A migration (T9 batch 2).
+ * Branch: Thousand Oaks · ZIP: 91301
+ * Source: wiki/migration/content-dumps/agoura-hills.md
+ *
+ * Pricing-discipline note (Variant A residential-only):
+ *   Original dump had 4 pricing cards including "Luxury Brand Repair $250-$600+"
+ *   tier. This is residential luxury (Sub-Zero/Wolf etc.) — kept as it is not
+ *   commercial. The $89 residential diagnostic, standard repair, luxury, and
+ *   warranty cards are all preserved.
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Thousand Oaks is service_area, not physical_pin)
+ *   - Phone via branches.ts (`branchSlug='thousand-oaks'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = "Agoura Hills";
-const citySlug = "agoura-hills";
-const phone = "(424) 208-0228";
-const phoneRaw = "+14242080228";
-const email = "thousandoaks@samedayappliance.repair";
-const branch = "Thousand Oaks";
+const branchSlug = 'thousand-oaks';
+const cityName = 'Agoura Hills';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const metaTitle = "Appliance Repair Agoura Hills CA | Same Day Service | (424) 208-0228";
-const metaDesc = "Same-day appliance repair in Agoura Hills, CA. Sub-Zero, Wolf, Thermador, Miele specialists. Conejo Valley. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
-
-const neighborhoods = [
-  { name: "Agoura Hills proper", zip: "91301" },
-  { name: "Cornell", zip: "91301" },
-  { name: "Ladyface Mountain area", zip: "91301" },
-  { name: "Reyes Adobe", zip: "91301" },
-  { name: "Morrison Ranch", zip: "91301" },
-  { name: "Fountainwood", zip: "91301" },
-  { name: "Chesebro Canyon area", zip: "91301" },
-  { name: "Kanan Road corridor", zip: "91301" },
-  { name: "Roadside Drive area", zip: "91301" },
-  { name: "Liberty Canyon area", zip: "91301" },
-];
+const title = `Appliance Repair Agoura Hills CA | Same Day Service | ${branch.phone}`;
+const description = 'Same-day appliance repair in Agoura Hills, CA. Sub-Zero, Wolf, Thermador, Miele specialists. Conejo Valley. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/agoura-hills/';
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
 
-const recentRepairs = [
+const neighborhoods = [
+  { name: 'Agoura Hills proper', zip: '91301' },
+  { name: 'Cornell', zip: '91301' },
+  { name: 'Ladyface Mountain area', zip: '91301' },
+  { name: 'Reyes Adobe', zip: '91301' },
+  { name: 'Morrison Ranch', zip: '91301' },
+  { name: 'Fountainwood', zip: '91301' },
+  { name: 'Chesebro Canyon area', zip: '91301' },
+  { name: 'Kanan Road corridor', zip: '91301' },
+  { name: 'Roadside Drive area', zip: '91301' },
+  { name: 'Liberty Canyon area', zip: '91301' },
+];
+
+const narrativeParagraphs = [
+  "Nobody in the appliance repair industry talks about what fire seasons do to luxury appliances in communities like Agoura Hills. We're going to, because our technicians deal with the consequences every fall.",
+  "Sub-Zero refrigerators, Wolf ranges, and Thermador units are engineered to last 20+ years with proper maintenance. The single biggest threat to that lifespan in the Agoura Hills and Conejo Valley foothills isn't use — it's particulate accumulation. The condenser coils on a Sub-Zero refrigerator are designed to be cleaned annually. In the foothill fire corridor, they need attention every 6 months during active fire seasons, and immediately after any significant smoke event in the area.",
+  "A packed condenser coil forces the compressor to overwork. The compressor is the most expensive component in a Sub-Zero — a replacement can run $800–$1,200 for the part alone. A $200 coil cleaning prevents it. We'll always tell you honestly if we think preventive maintenance is worth it for your specific unit and location.",
+  "The other Agoura Hills pattern is dryer vent accumulation. Canyon homes that back up to brush often have longer vent runs, and the combination of lint, ash, and dry conditions creates a genuine fire hazard. We inspect dryer vents on every dryer call in the Agoura Hills area and tell you the truth about what we find.",
+];
+
+const jobs = [
   {
-    title: "Sub-Zero column refrigerator — running warm after ash event",
-    neighborhood: "Ladyface Mountain area",
-    detail: "Post-fire season call in the hills above Agoura Hills — Sub-Zero 700 series column unit running but not reaching temperature. Ash and fine particulate had packed the condenser coils solid over the course of a fire season. The unit couldn't reject heat efficiently. Full coil cleaning, condenser fan inspection (fan motor had also seized from particulate), replaced the motor with an OEM Sub-Zero part. Running at proper temperature same day. This is a pattern we see every fire season in the Conejo Valley foothills.",
-    part: "Sub-Zero OEM condenser fan motor + coil cleaning",
-    time: "2.5 hours"
+    badge: 'Sub-Zero 700',
+    neighborhood: 'Ladyface Mountain area',
+    title: 'Sub-Zero column refrigerator — running warm after ash event',
+    body: "Post-fire season call in the hills above Agoura Hills — Sub-Zero 700 series column unit running but not reaching temperature. Ash and fine particulate had packed the condenser coils solid over the course of a fire season. The unit couldn't reject heat efficiently. Full coil cleaning, condenser fan inspection (fan motor had also seized from particulate), replaced the motor with an OEM Sub-Zero part. Running at proper temperature same day. This is a pattern we see every fire season in the Conejo Valley foothills.",
+    part: 'Sub-Zero OEM condenser fan motor + coil cleaning',
+    time: '2.5 hours',
+    result: '✓ Same day · OEM Sub-Zero motor · Coils cleaned',
   },
   {
+    badge: 'Thermador Range',
+    neighborhood: 'Morrison Ranch',
     title: "Thermador dual-fuel range — igniter clicking constantly, won't stop",
-    neighborhood: "Morrison Ranch",
-    detail: "Thermador PRD486WDH dual-fuel range — burner igniters cycling nonstop even after the flame was established. Classic spark module failure combined with moisture intrusion into the igniter wells from canyon fog. Replaced the spark module, cleaned and dried the igniter ports, sealed the gap around the electrode with high-temp silicone. Tested all six burners. This is a job where proper sealing prevents the callback — the moisture is a constant in these canyon-adjacent homes.",
-    part: "Thermador OEM spark module",
-    time: "2 hours"
+    body: 'Thermador PRD486WDH dual-fuel range — burner igniters cycling nonstop even after the flame was established. Classic spark module failure combined with moisture intrusion into the igniter wells from canyon fog. Replaced the spark module, cleaned and dried the igniter ports, sealed the gap around the electrode with high-temp silicone. Tested all six burners. This is a job where proper sealing prevents the callback — the moisture is a constant in these canyon-adjacent homes.',
+    part: 'Thermador OEM spark module',
+    time: '2 hours',
+    result: '✓ Same day · OEM Thermador module · Igniter ports sealed',
   },
   {
-    title: "Miele dishwasher — F11 drain error, not completing cycle",
-    neighborhood: "Fountainwood",
-    detail: "Miele G6365 fully integrated dishwasher — F11 error, cycle stopping mid-wash. Drain pump impeller had cracked, likely from a piece of bone or glass getting through the filter. Replaced the pump assembly with an OEM Miele part, cleaned the drain path completely, ran two full cycles. Customer had the unit for 8 years without any service — noted that the Agoura Hills hard water might be contributing to filter clogging. We left instructions for monthly filter rinse.",
-    part: "Miele OEM drain pump assembly",
-    time: "2 hours"
+    badge: 'Miele Dishwasher',
+    neighborhood: 'Fountainwood',
+    title: 'Miele dishwasher — F11 drain error, not completing cycle',
+    body: 'Miele G6365 fully integrated dishwasher — F11 error, cycle stopping mid-wash. Drain pump impeller had cracked, likely from a piece of bone or glass getting through the filter. Replaced the pump assembly with an OEM Miele part, cleaned the drain path completely, ran two full cycles. Customer had the unit for 8 years without any service — noted that the Agoura Hills hard water might be contributing to filter clogging. We left instructions for monthly filter rinse.',
+    part: 'Miele OEM drain pump assembly',
+    time: '2 hours',
+    result: '✓ Same day · OEM Miele pump · F11 cleared',
   },
   {
-    title: "Wolf range — oven not reaching temperature, bake element visible damage",
-    neighborhood: "Kanan Road corridor",
-    detail: "Wolf 30-inch dual fuel range — oven not reaching set temperature, would stall at around 280°F. Visual inspection showed a cracked bake element. Straightforward replacement on a Wolf, but the correct OEM part matters — aftermarket elements on Wolf units frequently fail within a year. Replaced with a genuine Wolf element, calibrated the oven temperature sensor, verified accurate temperature across three test cycles.",
-    part: "Wolf OEM bake element",
-    time: "1.5 hours"
-  }
+    badge: 'Wolf Range',
+    neighborhood: 'Kanan Road corridor',
+    title: 'Wolf range — oven not reaching temperature, bake element visible damage',
+    body: 'Wolf 30-inch dual fuel range — oven not reaching set temperature, would stall at around 280°F. Visual inspection showed a cracked bake element. Straightforward replacement on a Wolf, but the correct OEM part matters — aftermarket elements on Wolf units frequently fail within a year. Replaced with a genuine Wolf element, calibrated the oven temperature sensor, verified accurate temperature across three test cycles.',
+    part: 'Wolf OEM bake element',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM Wolf element · 3 test cycles',
+  },
+];
+
+const reviews = [
+  {
+    text: "Sub-Zero was running warm after the fires last fall. Same Day came out, said the coils were completely caked with ash — they cleaned everything and replaced the fan motor. Told me I should have them out every six months given where we live. Honest and fast.",
+    author: '— Patricia L., Ladyface Mountain area',
+  },
+  {
+    text: "Thermador range — igniters clicking constantly, wouldn't stop. Technician diagnosed it in 20 minutes, had the part on the truck. Explained that the moisture from canyon fog gets into the igniter wells and this is a common issue up here. Fixed, sealed properly, no recurrence.",
+    author: '— James K., Morrison Ranch',
+  },
+  {
+    text: "We've used Same Day for three different appliances over two years — Wolf range, Miele dishwasher, Sub-Zero wine column. Every time: same-day appointment, OEM parts, done in one visit. That consistency is rare.",
+    author: '— Rachel M., Fountainwood',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · No fuel surcharge for canyon areas' },
+  { label: 'Standard Repair', price: '$150–$350', note: 'Parts + labor · OEM parts only · Most appliances' },
+  { label: 'Luxury Brand Repair', price: '$250–$600+', note: 'Sub-Zero, Wolf, Thermador, Miele, Viking · OEM parts' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · Callback at no charge', highlight: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Agoura Hills?",
-    a: "Yes — Agoura Hills is part of our Thousand Oaks branch territory. Our technicians cover the Conejo Valley daily, including Agoura Hills, Cornell, and the canyon-adjacent neighborhoods. Call before noon for same-day service."
+    question: 'Do you offer same-day appliance repair in Agoura Hills?',
+    answer: 'Yes — Agoura Hills is part of our Thousand Oaks branch territory. Our technicians cover the Conejo Valley daily, including Agoura Hills, Cornell, and the canyon-adjacent neighborhoods. Call before noon for same-day service.',
   },
   {
-    q: "Do wildfire seasons affect appliances in Agoura Hills?",
-    a: "They do, more than most homeowners realize. Fine ash and particulate from fire season accumulates in condenser coils, dryer vents, and range vent hoods. Appliances in the Agoura Hills foothills typically need condenser cleaning more frequently than homes in flat, suburban areas. After a significant fire event in the area, we recommend having refrigerator coils inspected — a clogged coil causes the unit to overwork and can shorten compressor life significantly."
+    question: 'Do wildfire seasons affect appliances in Agoura Hills?',
+    answer: 'They do, more than most homeowners realize. Fine ash and particulate from fire season accumulates in condenser coils, dryer vents, and range vent hoods. Appliances in the Agoura Hills foothills typically need condenser cleaning more frequently than homes in flat, suburban areas. After a significant fire event in the area, we recommend having refrigerator coils inspected — a clogged coil causes the unit to overwork and can shorten compressor life significantly.',
   },
   {
-    q: "What appliance brands do you repair in Agoura Hills?",
-    a: "We service all brands including Sub-Zero, Wolf, Thermador, Miele, Viking, Bosch, KitchenAid, GE Monogram, Samsung, LG, Whirlpool, and more. Agoura Hills homes tend toward the luxury end — Sub-Zero and Wolf are common — and our Thousand Oaks technicians carry OEM parts for those brands specifically."
+    question: 'What appliance brands do you repair in Agoura Hills?',
+    answer: 'We service all brands including Sub-Zero, Wolf, Thermador, Miele, Viking, Bosch, KitchenAid, GE Monogram, Samsung, LG, Whirlpool, and more. Agoura Hills homes tend toward the luxury end — Sub-Zero and Wolf are common — and our Thousand Oaks technicians carry OEM parts for those brands specifically.',
   },
   {
-    q: "What is your diagnostic fee in Agoura Hills?",
-    a: "Our diagnostic fee is $89. It covers the trip to your home, a full appliance inspection, and a written estimate. If you approve the repair, the $89 is credited toward your invoice. No surprise fees, no fuel surcharge for the canyon areas."
+    question: 'What is your diagnostic fee in Agoura Hills?',
+    answer: 'Our diagnostic fee is $89. It covers the trip to your home, a full appliance inspection, and a written estimate. If you approve the repair, the $89 is credited toward your invoice. No surprise fees, no fuel surcharge for the canyon areas.',
   },
   {
-    q: "Do you service properties in the Agoura Hills hills and canyon areas?",
-    a: "Yes — Cornell, Ladyface Mountain, Chesebro Canyon area, Liberty Canyon, and all of the hillside neighborhoods are within our service area. We account for drive time in canyon routes and give you an accurate arrival window when you call."
+    question: 'Do you service properties in the Agoura Hills hills and canyon areas?',
+    answer: 'Yes — Cornell, Ladyface Mountain, Chesebro Canyon area, Liberty Canyon, and all of the hillside neighborhoods are within our service area. We account for drive time in canyon routes and give you an accurate arrival window when you call.',
   },
   {
-    q: "Do you repair wine coolers and beverage centers in Agoura Hills?",
-    a: "Yes. Wine coolers and built-in beverage centers are common in Agoura Hills homes. We service Sub-Zero wine columns, U-Line, True, Viking, and integrated wine units. These units have the same coil maintenance issue as refrigerators — in the fire-season foothills, they need attention more frequently."
+    question: 'Do you repair wine coolers and beverage centers in Agoura Hills?',
+    answer: 'Yes. Wine coolers and built-in beverage centers are common in Agoura Hills homes. We service Sub-Zero wine columns, U-Line, True, Viking, and integrated wine units. These units have the same coil maintenance issue as refrigerators — in the fire-season foothills, they need attention more frequently.',
   },
   {
-    q: "Do you offer a warranty on appliance repairs in Agoura Hills?",
-    a: "All repairs include a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no charge. This applies to every repair we do in Agoura Hills."
-  }
+    question: 'Do you offer a warranty on appliance repairs in Agoura Hills?',
+    answer: 'All repairs include a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no charge. This applies to every repair we do in Agoura Hills.',
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Thousand Oaks", slug: "thousand-oaks" },
-  { name: "Westlake Village", slug: "westlake-village" },
-  { name: "Calabasas", slug: "calabasas" },
-  { name: "Woodland Hills", slug: "woodland-hills" },
-  { name: "Moorpark", slug: "moorpark" },
-  { name: "Oak Park", slug: "oak-park" },
+const nearby = [
+  { slug: 'thousand-oaks', name: 'Thousand Oaks' },
+  { slug: 'westlake-village', name: 'Westlake Village' },
+  { slug: 'calabasas', name: 'Calabasas' },
+  { slug: 'woodland-hills', name: 'Woodland Hills' },
+  { slug: 'moorpark', name: 'Moorpark' },
+  { slug: 'oak-park', name: 'Oak Park' },
 ];
 
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: Thousand Oaks is service_area, not physical_pin (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Agoura Hills', sameAs: 'https://en.wikipedia.org/wiki/Agoura_Hills,_California' },
+    { '@type': 'Place', name: 'Cornell' },
+    { '@type': 'Place', name: 'Conejo Valley' },
+    { '@type': 'Place', name: 'Morrison Ranch' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Agoura Hills",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/agoura-hills/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "100 E Thousand Oaks Blvd Suite 200",
-        "addressLocality": "Thousand Oaks",
-        "addressRegion": "CA",
-        "postalCode": "91360",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Agoura Hills" },
-        { "@type": "Place", "name": "Cornell" },
-        { "@type": "Place", "name": "Conejo Valley" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "48",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
+};
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+  <HeroEditorial
+    eyebrow="Agoura Hills, CA · Ventura County · 91301 · Conejo Valley"
+    headlineMain="Appliance repair in"
+    headlineAccent="Agoura Hills, CA"
+    subheadline="Same-day service for Sub-Zero, Wolf, Thermador, Miele, and all major brands. Conejo Valley's fire-season terrain creates real maintenance needs — we know the area."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <!-- HERO -->
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Agoura Hills, CA · Ventura County · 91301 · Conejo Valley</div>
-        <h1>Appliance Repair in Agoura Hills, CA</h1>
-        <p class="city-hero-sub">Same-day service for Sub-Zero, Wolf, Thermador, Miele, and all major brands. Conejo Valley's fire-season terrain creates real maintenance needs — we know the area.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.9 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img
-          src="/images/areas/agoura-hills/appliance-repair-agoura-hills-ca.webp"
-          alt="Appliance repair technician in Agoura Hills CA"
-          width="560" height="420"
-          loading="eager"
-        />
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Fire Country"
+    headline="Luxury appliances in fire country —"
+    headlineAccent="what that actually means"
+    paragraphs={narrativeParagraphs}
+  />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Agoura Hills"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <!-- INTRO -->
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Agoura Hills — What the Canyon Terrain Does to Your Appliances</h2>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Agoura Hills areas"
+    headlineAccent="we service"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <p>Agoura Hills is one of the more interesting service calls in the Conejo Valley. The homes here are substantial — a lot of Sub-Zero column refrigerators, Wolf dual-fuel ranges, Thermador ovens, Miele dishwashers — and the terrain creates maintenance realities that most homeowners don't think about until something stops working.</p>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Agoura Hills"
+    jobs={jobs}
+  />
 
-        <p>The foothills around Agoura Hills and Cornell generate significant particulate accumulation on appliance condenser coils. In fire seasons, this compounds dramatically — fine ash infiltrates outdoor mechanical spaces and gets drawn into refrigerator condenser compartments. A Sub-Zero running warm in October after a fire event in the area almost always has the same root cause: packed coils. We see this pattern every year. It's preventable with cleaning, and it's fixable quickly when it happens.</p>
+  <Method number="05" />
 
-        <p>Canyon-adjacent homes also deal with moisture cycling — the night marine layer that rolls in through the passes, followed by dry Santa Ana conditions during the day. This is hard on igniter electrodes on Wolf and Thermador ranges, on door gaskets, and on any exposed electrical connections. Our Thousand Oaks technicians know this terrain. They live in it.</p>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Agoura Hills"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <p>Diagnostic fee is $89 — credited if you repair. Call <a href={`tel:${phoneRaw}`}>{phone}</a> and we give you a real arrival window.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Agoura Hills Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Agoura Hills"
+    cards={pricingCards}
+  />
 
-  <!-- SERVICES -->
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Agoura Hills</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Agoura Hills →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Agoura Hills"
+    faqs={faqs}
+  />
 
-  <!-- CONTEXT BLOCK — Fire/terrain + luxury brands -->
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Luxury Appliances in Fire Country — What That Actually Means</h2>
+  <NearbyLinks links={nearby} />
 
-        <p>Nobody in the appliance repair industry talks about what fire seasons do to luxury appliances in communities like Agoura Hills. We're going to, because our technicians deal with the consequences every fall.</p>
-
-        <p>Sub-Zero refrigerators, Wolf ranges, and Thermador units are engineered to last 20+ years with proper maintenance. The single biggest threat to that lifespan in the Agoura Hills and Conejo Valley foothills isn't use — it's particulate accumulation. The condenser coils on a Sub-Zero refrigerator are designed to be cleaned annually. In the foothill fire corridor, they need attention every 6 months during active fire seasons, and immediately after any significant smoke event in the area.</p>
-
-        <p>A packed condenser coil forces the compressor to overwork. The compressor is the most expensive component in a Sub-Zero — a replacement can run $800–$1,200 for the part alone. A $200 coil cleaning prevents it. We'll always tell you honestly if we think preventive maintenance is worth it for your specific unit and location.</p>
-
-        <p>The other Agoura Hills pattern is dryer vent accumulation. Canyon homes that back up to brush often have longer vent runs, and the combination of lint, ash, and dry conditions creates a genuine fire hazard. We inspect dryer vents on every dryer call in the Agoura Hills area and tell you the truth about what we find.</p>
-
-        <h3>Brands we carry OEM parts for in Agoura Hills</h3>
-        <div class="brands-list-inline">
-          <span>Sub-Zero</span>
-          <span>Wolf</span>
-          <span>Thermador</span>
-          <span>Miele</span>
-          <span>Viking</span>
-          <span>Bosch</span>
-          <span>KitchenAid</span>
-          <span>GE Monogram</span>
-          <span>Samsung</span>
-          <span>LG</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Agoura Hills Areas We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-      <p class="neighborhoods-note">We also cover Oak Park, Cornell, and surrounding unincorporated areas. Call <a href={`tel:${phoneRaw}`}>{phone}</a> if you're not sure we reach you — we probably do.</p>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Agoura Hills</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Agoura Hills Homeowners Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>We know the terrain</h3>
-          <p>Our Thousand Oaks technicians cover Agoura Hills, Westlake Village, Calabasas, and Malibu. They understand what fire season, canyon particulate, and marine layer cycling does to luxury appliances in this area. That context changes how we diagnose and what we recommend.</p>
-        </div>
-        <div class="why-item">
-          <h3>OEM parts for luxury brands</h3>
-          <p>We stock Sub-Zero, Wolf, Thermador, and Miele OEM parts on our Conejo Valley trucks. Most Agoura Hills luxury appliance calls get resolved same visit — no waiting for parts to arrive from a distributor.</p>
-        </div>
-        <div class="why-item">
-          <h3>Honest about repair vs. replace</h3>
-          <p>If your 18-year-old dryer has a failed motor and the repair cost approaches replacement cost, we'll tell you. We don't manufacture work. That honesty is how we've built a client base in Agoura Hills that calls us back.</p>
-        </div>
-        <div class="why-item">
-          <h3>90-day warranty, no exceptions</h3>
-          <p>Every repair we do in Agoura Hills carries a 90-day warranty on parts and labor. We stand behind our diagnostic work — if the same issue returns, we come back at no charge.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Agoura Hills Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Sub-Zero was running warm after the fires last fall. Same Day came out, said the coils were completely caked with ash — they cleaned everything and replaced the fan motor. Told me I should have them out every six months given where we live. Honest and fast."</p>
-          <div class="review-author">— Patricia L., Ladyface Mountain area</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Thermador range — igniters clicking constantly, wouldn't stop. Technician diagnosed it in 20 minutes, had the part on the truck. Explained that the moisture from canyon fog gets into the igniter wells and this is a common issue up here. Fixed, sealed properly, no recurrence."</p>
-          <div class="review-author">— James K., Morrison Ranch</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"We've used Same Day for three different appliances over two years — Wolf range, Miele dishwasher, Sub-Zero wine column. Every time: same-day appointment, OEM parts, done in one visit. That consistency is rare."</p>
-          <div class="review-author">— Rachel M., Fountainwood</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Agoura Hills</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Credited toward repair · Written estimate · No fuel surcharge for canyon areas</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$350</div>
-          <div class="pricing-note">Parts + labor · OEM parts only · Most appliances</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Thermador, Miele, Viking · OEM parts</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · Callback at no charge</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Agoura Hills</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby Conejo Valley Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Agoura Hills Repair Today</h2>
-      <p>Same-day service from our Thousand Oaks branch. Sub-Zero, Wolf, Thermador, and all major brands.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Agoura Hills, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Agoura Hills", "Conejo Valley", "Ventura County"]} />
-
-</Layout>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Agoura Hills repair today"
+    body="Same-day service from our Thousand Oaks branch. Sub-Zero, Wolf, Thermador, and all major brands. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>

@@ -1,406 +1,313 @@
 ---
-// src/pages/simi-valley.astro
-// Same Day Appliance Repair — Simi Valley, CA
-// Branch: Thousand Oaks/Ventura | Phone: (424) 208-0228
+/**
+ * Simi Valley, CA — Variant A migration (T9 Batch 2).
+ * Branch: Thousand Oaks · ZIPs: 93063, 93065
+ * Source: wiki/migration/content-dumps/simi-valley.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Thousand Oaks is service_area, not physical_pin)
+ *   - Phone via branches.ts (`branchSlug='thousand-oaks'`)
+ *
+ * Source-bug fix (per T9 spec):
+ *   Original neighborhood entry "Madera Road corridor" had a malformed extra
+ *   `slug:"93063"` field alongside zip:"93063". Other entries only had name + zip.
+ *   Migration drops the spurious slug field; entry now uses { name, zip } only.
+ *
+ * Special handling:
+ *   - Custom narrative uses 2 H3 sub-sections (similar to san-clemente pattern)
+ *   - Pricing keeps city-specific "Dryer Vent Service" card (preserved verbatim per dump)
+ *   - Source nearby_links had /chatsworth/ which 404s. Replaced with /oak-park/.
+ */
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = "Simi Valley";
-const citySlug = "simi-valley";
-const phone = "(424) 208-0228";
-const phoneRaw = "+14242080228";
-const email = "thousandoaks@samedayappliance.repair";
-const branch = "Thousand Oaks";
+const branchSlug = 'thousand-oaks';
+const cityName = 'Simi Valley';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const metaTitle = "Appliance Repair Simi Valley CA | Same Day Service | (424) 208-0228";
-const metaDesc = "Same-day appliance repair in Simi Valley, CA. Hard water, Santa Ana wind expertise. Refrigerator, washer, dryer, oven repair. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.";
-
-const neighborhoods = [
-  { name: "Simi Valley East", zip: "93065" },
-  { name: "Simi Valley West", zip: "93063" },
-  { name: "Wood Ranch", zip: "93065" },
-  { name: "Bridle Path", zip: "93065" },
-  { name: "Berylwood", zip: "93063" },
-  { name: "Knolls area", zip: "93063" },
-  { name: "Santa Susana Knolls", zip: "93063" },
-  { name: "Madera Road corridor", slug: "93063", zip: "93063" },
-  { name: "Cochran Street area", zip: "93065" },
-  { name: "Tapo Canyon area", zip: "93063" },
-];
+const title = `Appliance Repair Simi Valley CA | Same Day Service | ${branch.phone}`;
+const description = 'Same-day appliance repair in Simi Valley, CA. Hard water, Santa Ana wind expertise. Refrigerator, washer, dryer, oven repair. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/simi-valley/';
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🥶', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
 
-const recentRepairs = [
+// Source-bug fix: "Madera Road corridor" entry had extraneous slug:"93063" field.
+// Dropped per T9 spec — entry now uses { name, zip } only, matching schema.
+const neighborhoods = [
+  { name: 'Simi Valley East', zip: '93065' },
+  { name: 'Simi Valley West', zip: '93063' },
+  { name: 'Wood Ranch', zip: '93065' },
+  { name: 'Bridle Path', zip: '93065' },
+  { name: 'Berylwood', zip: '93063' },
+  { name: 'Knolls area', zip: '93063' },
+  { name: 'Santa Susana Knolls', zip: '93063' },
+  { name: 'Madera Road corridor', zip: '93063' },
+  { name: 'Cochran Street area', zip: '93065' },
+  { name: 'Tapo Canyon area', zip: '93063' },
+];
+
+const narrativeIntro = [
+  'Simi Valley is one of the larger cities in Ventura County — and there are two things we see here more than anywhere else in our service area: hard water damage and dryer vent problems. Below is what every Simi Valley homeowner should understand about both.',
+];
+
+const narrativeSubSections = [
   {
-    title: "Whirlpool dryer — overheating, shutting off mid-cycle",
-    neighborhood: "Wood Ranch",
-    detail: "Whirlpool WED5000DW — cycling off before the load finished, thermal fuse tripping repeatedly. The dryer vent run in this Wood Ranch home was 18 feet with two 90-degree bends, and lint had accumulated to the point where airflow was severely restricted. We cleared the vent completely, replaced the thermal fuse and the cycling thermostat (both had failed from repeated overheating), and tested air flow at the exterior vent cap. We also flagged the vent routing to the homeowner — that configuration needs cleaning every 6 months, not annually. In Santa Ana wind conditions, a restricted dryer vent in Simi Valley is a genuine fire hazard.",
-    part: "Whirlpool OEM thermal fuse + cycling thermostat",
-    time: "2.5 hours"
+    title: '1. Your water is hard — and it affects every water-connected appliance',
+    paragraphs: [
+      "The Calleguas Municipal Water District serves most of Simi Valley, and its water hardness levels are among the highest in Southern California. Hard water leaves calcium and magnesium deposits on every surface it touches. In appliances, that means:",
+      "Dishwashers accumulate scale on spray arms, inlet valves, and heating elements — resulting in poor cleaning, white film on dishes, and eventually component failure. Refrigerators with ice makers and water dispensers have their inlet valves clog and fail faster than in softer-water cities. Washing machine drum seals and inlet valve screens need more frequent attention.",
+      "We fix the immediate failure, but we also tell you what maintenance prevents the next one: consistent rinse-aid in every dishwasher cycle, a quarterly filter clean, and an inline water filter on your refrigerator supply line. These are cheap preventive measures that extend appliance lifespan significantly in Simi Valley.",
+    ],
   },
   {
-    title: "LG dishwasher — white film on dishes, spray arm clogged",
-    neighborhood: "Simi Valley East",
-    detail: "LG LDTS5552S — heavy white mineral film on all dishes, spray arm barely rotating. Calleguas Municipal Water District water is among the hardest in the region, and without consistent rinse-aid use, mineral scale accumulates fast. Full descale of the spray arms, cleaning of the filter assembly and drain path, replacement of the inlet screen. Left the homeowner with a maintenance schedule: monthly rinse-aid refill, quarterly filter clean, annual descale treatment. This is a routine issue in Simi Valley, not a defect.",
-    part: "Descale service + inlet screen replacement",
-    time: "1.5 hours"
+    title: '2. Dryer vents and fire risk in Santa Ana conditions',
+    paragraphs: [
+      "Simi Valley's location — surrounded by hills and exposed to Santa Ana wind patterns — creates elevated fire risk conditions during late summer and fall. A dryer vent clogged with lint is a fire hazard under normal conditions. In Simi Valley during a Santa Ana event, it's a more serious one.",
+      "We inspect dryer vents on every dryer repair call in Simi Valley. If the thermal fuse is failing repeatedly, we look at the vent before we replace anything. A restricted vent will keep blowing fuses indefinitely — it's not the fuse's fault. We clear the vent, replace the failed components, and document the vent condition in our service report.",
+    ],
+  },
+];
+
+const jobs = [
+  {
+    badge: 'Whirlpool Dryer',
+    neighborhood: 'Wood Ranch',
+    title: 'Whirlpool dryer — overheating, shutting off mid-cycle',
+    body: 'Whirlpool WED5000DW — cycling off before the load finished, thermal fuse tripping repeatedly. The dryer vent run in this Wood Ranch home was 18 feet with two 90-degree bends, and lint had accumulated to the point where airflow was severely restricted. We cleared the vent completely, replaced the thermal fuse and the cycling thermostat (both had failed from repeated overheating), and tested air flow at the exterior vent cap. We also flagged the vent routing to the homeowner — that configuration needs cleaning every 6 months, not annually. In Santa Ana wind conditions, a restricted dryer vent in Simi Valley is a genuine fire hazard.',
+    part: 'Whirlpool OEM thermal fuse + cycling thermostat',
+    time: '2.5 hours',
+    result: '✓ Same day · Vent cleared · 2 parts replaced',
   },
   {
-    title: "Samsung refrigerator — ice maker producing no ice for two weeks",
-    neighborhood: "Berylwood",
-    detail: "Samsung RF28R7351SR — ice maker had completely stopped. The water inlet valve had failed, a known failure point on this Samsung generation. Hard water mineral deposits had partially blocked the valve screen, then the valve solenoid failed under the strain. Replaced the inlet valve assembly with an OEM Samsung part and cleaned the supply line screen. Recommended the homeowner install an inline water filter upstream of the refrigerator — the Calleguas hard water will hit this valve again in 3-4 years without filtration.",
-    part: "Samsung OEM water inlet valve assembly",
-    time: "1.5 hours"
+    badge: 'LG Dishwasher',
+    neighborhood: 'Simi Valley East',
+    title: 'LG dishwasher — white film on dishes, spray arm clogged',
+    body: 'LG LDTS5552S — heavy white mineral film on all dishes, spray arm barely rotating. Calleguas Municipal Water District water is among the hardest in the region, and without consistent rinse-aid use, mineral scale accumulates fast. Full descale of the spray arms, cleaning of the filter assembly and drain path, replacement of the inlet screen. Left the homeowner with a maintenance schedule: monthly rinse-aid refill, quarterly filter clean, annual descale treatment. This is a routine issue in Simi Valley, not a defect.',
+    part: 'Descale service + inlet screen replacement',
+    time: '1.5 hours',
+    result: '✓ Same day · Spray arms descaled · Schedule set',
   },
   {
-    title: "GE range — oven not heating, bake element visible crack",
-    neighborhood: "Knolls area",
-    detail: "GE JS760SLSS — oven refusing to heat, bake element visibly cracked in two places. Straightforward element replacement, but we found the broil element was also discolored and showing signs of imminent failure — replaced both in one visit. Homeowner said they'd noticed the oven 'not getting as hot as it used to' for six months before the element finally gave out. These are early warning signs. We document what we observe so the customer has context.",
-    part: "GE OEM bake element + broil element",
-    time: "1.5 hours"
-  }
+    badge: 'Samsung Refrigerator',
+    neighborhood: 'Berylwood',
+    title: 'Samsung refrigerator — ice maker producing no ice for two weeks',
+    body: 'Samsung RF28R7351SR — ice maker had completely stopped. The water inlet valve had failed, a known failure point on this Samsung generation. Hard water mineral deposits had partially blocked the valve screen, then the valve solenoid failed under the strain. Replaced the inlet valve assembly with an OEM Samsung part and cleaned the supply line screen. Recommended the homeowner install an inline water filter upstream of the refrigerator — the Calleguas hard water will hit this valve again in 3-4 years without filtration.',
+    part: 'Samsung OEM water inlet valve assembly',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM Samsung valve · Filter recommended',
+  },
+  {
+    badge: 'GE Range',
+    neighborhood: 'Knolls area',
+    title: 'GE range — oven not heating, bake element visible crack',
+    body: "GE JS760SLSS — oven refusing to heat, bake element visibly cracked in two places. Straightforward element replacement, but we found the broil element was also discolored and showing signs of imminent failure — replaced both in one visit. Homeowner said they'd noticed the oven 'not getting as hot as it used to' for six months before the element finally gave out. These are early warning signs. We document what we observe so the customer has context.",
+    part: 'GE OEM bake element + broil element',
+    time: '1.5 hours',
+    result: '✓ Same day · Both elements replaced · One trip',
+  },
+];
+
+const reviews = [
+  {
+    text: "Dryer kept shutting off. Two other companies replaced the thermal fuse twice without fixing it. Same Day came out, cleared the vent, replaced the fuse and thermostat, and explained why the vent was the real problem. It's been running fine for four months.",
+    author: '— Kevin M., Wood Ranch',
+  },
+  {
+    text: "Dishwasher leaving white film on everything. They cleaned the spray arms, replaced the inlet screen, and explained the hard water issue in Simi Valley. Told me to use rinse-aid every cycle. That simple advice has made a huge difference.",
+    author: '— Sandra T., Simi Valley East',
+  },
+  {
+    text: "I manage 8 rental units in Simi Valley. Same Day is the only appliance company I call now. They pick up, show up same day, and give me written documentation. Everything a landlord needs.",
+    author: '— Robert H., Property Manager, Simi Valley',
+  },
+];
+
+// Preserves the city-specific "Dryer Vent Service" card from source dump (unique to Simi Valley).
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · Hard water assessment included' },
+  { label: 'Standard Repair', price: '$150–$380', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Dryer Vent Service', price: '$95–$150', note: 'Cleaning + inspection · Fire safety documentation · Recommended annually in Simi Valley' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Simi Valley?",
-    a: "Yes — Simi Valley is covered by our Thousand Oaks branch. We run Ventura County routes regularly and can typically have a technician at your door same-day if you call before noon. We cover both 93063 and 93065 zip codes."
+    question: 'Do you offer same-day appliance repair in Simi Valley?',
+    answer: 'Yes — Simi Valley is covered by our Thousand Oaks branch. We run Ventura County routes regularly and can typically have a technician at your door same-day if you call before noon. We cover both 93063 and 93065 zip codes.',
   },
   {
-    q: "Does hard water in Simi Valley cause extra appliance problems?",
-    a: "Yes, notably. The Calleguas Municipal Water District, which serves most of Simi Valley, delivers some of the hardest water in the region. Mineral scale accumulates on dishwasher spray arms and heating elements, clogs refrigerator water inlet valves, and builds up in washing machine drum seals. We deal with water-related appliance issues in Simi Valley at higher rates than in softer-water cities. The fix is mostly preventive: consistent rinse-aid use, periodic descaling, and an inline water filter on refrigerators."
+    question: 'Does hard water in Simi Valley cause extra appliance problems?',
+    answer: "Yes, notably. The Calleguas Municipal Water District, which serves most of Simi Valley, delivers some of the hardest water in the region. Mineral scale accumulates on dishwasher spray arms and heating elements, clogs refrigerator water inlet valves, and builds up in washing machine drum seals. We deal with water-related appliance issues in Simi Valley at higher rates than in softer-water cities. The fix is mostly preventive: consistent rinse-aid use, periodic descaling, and an inline water filter on refrigerators.",
   },
   {
-    q: "Are dryer vents a bigger concern in Simi Valley?",
-    a: "They are. Simi Valley's hot, dry summers and Santa Ana wind conditions create a fire risk when dryer vents are clogged or restricted. We inspect dryer vents on every dryer repair call in Simi Valley, and we're straightforward about what we find. A restricted vent that causes a dryer to repeatedly overheat and trip its thermal fuse is not a dryer problem — it's a vent problem, and the vent needs to be cleared before the dryer will stay fixed."
+    question: 'Are dryer vents a bigger concern in Simi Valley?',
+    answer: "They are. Simi Valley's hot, dry summers and Santa Ana wind conditions create a fire risk when dryer vents are clogged or restricted. We inspect dryer vents on every dryer repair call in Simi Valley, and we're straightforward about what we find. A restricted vent that causes a dryer to repeatedly overheat and trip its thermal fuse is not a dryer problem — it's a vent problem, and the vent needs to be cleared before the dryer will stay fixed.",
   },
   {
-    q: "What is your diagnostic fee in Simi Valley?",
-    a: "Our diagnostic fee is $89. It covers the service call, complete appliance inspection, and written estimate. If you approve the repair, the $89 is credited against your invoice."
+    question: 'What is your diagnostic fee in Simi Valley?',
+    answer: 'Our diagnostic fee is $89. It covers the service call, complete appliance inspection, and written estimate. If you approve the repair, the $89 is credited against your invoice.',
   },
   {
-    q: "Do you work with landlords and property managers in Simi Valley?",
-    a: "Yes. We work with landlords who own multi-family properties and single-family rentals in Simi Valley. If you manage multiple units and need a reliable repair service, call us. We understand that a broken appliance in a rental property needs attention quickly."
+    question: 'Do you work with landlords and property managers in Simi Valley?',
+    answer: 'Yes. We work with landlords who own multi-family properties and single-family rentals in Simi Valley. If you manage multiple units and need a reliable repair service, call us. We understand that a broken appliance in a rental property needs attention quickly.',
   },
   {
-    q: "What appliance brands do you repair in Simi Valley?",
-    a: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, and luxury brands including Sub-Zero, Wolf, and Thermador in the Wood Ranch and higher-end neighborhoods. OEM parts on the truck for the brands we see most often in Simi Valley."
+    question: 'What appliance brands do you repair in Simi Valley?',
+    answer: 'All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Maytag, Bosch, Frigidaire, and luxury brands including Sub-Zero, Wolf, and Thermador in the Wood Ranch and higher-end neighborhoods. OEM parts on the truck for the brands we see most often in Simi Valley.',
   },
   {
-    q: "Do you offer a warranty on repairs in Simi Valley?",
-    a: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge."
-  }
+    question: 'Do you offer a warranty on repairs in Simi Valley?',
+    answer: 'All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.',
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Thousand Oaks", slug: "thousand-oaks" },
-  { name: "Moorpark", slug: "moorpark" },
-  { name: "Chatsworth", slug: "chatsworth" },
-  { name: "Agoura Hills", slug: "agoura-hills" },
-  { name: "Newbury Park", slug: "newbury-park" },
-  { name: "Camarillo", slug: "camarillo" },
+// Original nearby_links had /chatsworth/ which 404s (no .astro page).
+// Replaced with /oak-park/ to keep 6 valid Ventura County / Conejo links.
+const nearby = [
+  { slug: 'thousand-oaks', name: 'Thousand Oaks' },
+  { slug: 'moorpark', name: 'Moorpark' },
+  { slug: 'oak-park', name: 'Oak Park' },
+  { slug: 'agoura-hills', name: 'Agoura Hills' },
+  { slug: 'newbury-park', name: 'Newbury Park' },
+  { slug: 'camarillo', name: 'Camarillo' },
 ];
 
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: Thousand Oaks is service_area, not physical_pin (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Simi Valley', sameAs: 'https://en.wikipedia.org/wiki/Simi_Valley,_California' },
+    { '@type': 'Place', name: 'Wood Ranch' },
+    { '@type': 'Place', name: 'Santa Susana Knolls' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Simi Valley",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/simi-valley/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "100 E Thousand Oaks Blvd Suite 200",
-        "addressLocality": "Thousand Oaks",
-        "addressRegion": "CA",
-        "postalCode": "91360",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Simi Valley" },
-        { "@type": "Place", "name": "Wood Ranch" },
-        { "@type": "Place", "name": "Santa Susana Knolls" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "67",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
+};
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Simi Valley, CA · Ventura County · 93063 · 93065</div>
-        <h1>Appliance Repair in Simi Valley, CA</h1>
-        <p class="city-hero-sub">Same-day service across all of Simi Valley. Hard water and dryer vent expertise. OEM parts, 90-day warranty. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.8 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/simi-valley/appliance-repair-simi-valley-ca.webp"
-          alt="Appliance repair technician in Simi Valley CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Simi Valley, CA · Ventura County · 93063 · 93065"
+    headlineMain="Appliance repair in"
+    headlineAccent="Simi Valley, CA"
+    subheadline="Same-day service across all of Simi Valley. Hard water and dryer vent expertise. OEM parts, 90-day warranty. $89 diagnostic — waived with repair."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Hard Water & Dryer Vents"
+    headline="Two things Simi Valley homeowners"
+    headlineAccent="should know"
+    paragraphs={narrativeIntro}
+    subSections={narrativeSubSections}
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Simi Valley — Hard Water, Big Families, Real Answers</h2>
-        <p>Simi Valley is one of the larger cities in Ventura County — 126,000 residents, a lot of families, a lot of appliances working hard. Our Thousand Oaks technicians cover Simi Valley regularly, and there are two things we see here more than anywhere else in our service area: hard water damage and dryer vent problems.</p>
-        <p>The Calleguas Municipal Water District supplies most of Simi Valley with some of the hardest water in the region. That's not an abstract concern — it shows up as clogged dishwasher spray arms, failed refrigerator water inlet valves, and scaled washing machine components on a regular basis. We fix the immediate problem and explain what caused it so you're not calling us back for the same thing in 18 months.</p>
-        <p>Simi Valley's hot dry summers and Santa Ana wind conditions also create a dryer vent fire risk that's real and underreported. We inspect dryer vents on every dryer call in Simi Valley. A thermal fuse that keeps blowing isn't a dryer problem — it's a vent problem, and we'll tell you that clearly.</p>
-        <p>Diagnostic fee is $89, credited toward the repair. Call <a href={`tel:${phoneRaw}`}>{phone}</a> — our Ventura County line, answered by someone who knows the schedule.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Simi Valley Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Simi Valley"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Simi Valley</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Simi Valley →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Simi Valley neighborhoods"
+    headlineAccent="we service"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Two Things Simi Valley Homeowners Should Know</h2>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Simi Valley"
+    jobs={jobs}
+  />
 
-        <h3>1. Your water is hard — and it affects every water-connected appliance</h3>
-        <p>The Calleguas Municipal Water District serves most of Simi Valley, and its water hardness levels are among the highest in Southern California. Hard water leaves calcium and magnesium deposits on every surface it touches. In appliances, that means:</p>
-        <p>Dishwashers accumulate scale on spray arms, inlet valves, and heating elements — resulting in poor cleaning, white film on dishes, and eventually component failure. Refrigerators with ice makers and water dispensers have their inlet valves clog and fail faster than in softer-water cities. Washing machine drum seals and inlet valve screens need more frequent attention.</p>
-        <p>We fix the immediate failure, but we also tell you what maintenance prevents the next one: consistent rinse-aid in every dishwasher cycle, a quarterly filter clean, and an inline water filter on your refrigerator supply line. These are cheap preventive measures that extend appliance lifespan significantly in Simi Valley.</p>
+  <Method number="05" />
 
-        <h3>2. Dryer vents and fire risk in Santa Ana conditions</h3>
-        <p>Simi Valley's location — surrounded by hills and exposed to Santa Ana wind patterns — creates elevated fire risk conditions during late summer and fall. A dryer vent clogged with lint is a fire hazard under normal conditions. In Simi Valley during a Santa Ana event, it's a more serious one.</p>
-        <p>We inspect dryer vents on every dryer repair call in Simi Valley. If the thermal fuse is failing repeatedly, we look at the vent before we replace anything. A restricted vent will keep blowing fuses indefinitely — it's not the fuse's fault. We clear the vent, replace the failed components, and document the vent condition in our service report.</p>
-      </div>
-    </div>
-  </section>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Simi Valley"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Simi Valley Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Simi Valley"
+    cards={pricingCards}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Simi Valley</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Simi Valley"
+    faqs={faqs}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Simi Valley Residents Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>We explain the root cause</h3>
-          <p>A Samsung ice maker that failed because the inlet valve clogged from hard water deposits is a different problem than a Samsung ice maker with a failed module. We tell you which it is and why — so you know what to prevent next time.</p>
-        </div>
-        <div class="why-item">
-          <h3>Dryer vent always inspected</h3>
-          <p>We check the dryer vent on every dryer repair in Simi Valley. A restricted vent that's been causing thermal fuse failures needs to be cleared — not just have its fuse replaced again. We fix the actual problem.</p>
-        </div>
-        <div class="why-item">
-          <h3>Landlord-friendly</h3>
-          <p>We work with Simi Valley landlords on rental property appliance repairs. We show up when we say we will, provide written service documentation, and don't leave until the job is done right. Call us if you manage multiple units.</p>
-        </div>
-        <div class="why-item">
-          <h3>OEM parts, 90-day warranty</h3>
-          <p>All repairs use manufacturer-original parts and carry a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Simi Valley Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Dryer kept shutting off. Two other companies replaced the thermal fuse twice without fixing it. Same Day came out, cleared the vent, replaced the fuse and thermostat, and explained why the vent was the real problem. It's been running fine for four months."</p>
-          <div class="review-author">— Kevin M., Wood Ranch</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Dishwasher leaving white film on everything. They cleaned the spray arms, replaced the inlet screen, and explained the hard water issue in Simi Valley. Told me to use rinse-aid every cycle. That simple advice has made a huge difference."</p>
-          <div class="review-author">— Sandra T., Simi Valley East</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"I manage 8 rental units in Simi Valley. Same Day is the only appliance company I call now. They pick up, show up same day, and give me written documentation. Everything a landlord needs."</p>
-          <div class="review-author">— Robert H., Property Manager, Simi Valley</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Simi Valley</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Credited toward repair · Written estimate · Hard water assessment included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$380</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Dryer Vent Service</div>
-          <div class="pricing-price">$95–$150</div>
-          <div class="pricing-note">Cleaning + inspection · Fire safety documentation · Recommended annually in Simi Valley</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Simi Valley</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby Ventura County Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Simi Valley Repair Today</h2>
-      <p>Same-day service across all of Simi Valley. Hard water and dryer vent expertise.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Simi Valley, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Simi Valley", "Ventura County", "Wood Ranch"]} />
-</Layout>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Simi Valley repair today"
+    body="Same-day service across all of Simi Valley. Hard water and dryer vent expertise. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>

@@ -1,400 +1,293 @@
 ---
-// src/pages/dana-point.astro
-// Same Day Appliance Repair — Dana Point, CA
-// Branch: Irvine/OC | Phone: (213) 401-9019
+/**
+ * Dana Point, CA — Variant A migration (T9 batch 2).
+ * Branch: Irvine · ZIPs: 92624, 92629
+ * Source: wiki/migration/content-dumps/dana-point.md
+ *
+ * Pricing-discipline note (Variant A residential-only):
+ *   Original 4-card pricing kept verbatim — diagnostic, standard, luxury (Sub-Zero/Wolf
+ *   etc.), and warranty. All residential. No commercial pricing in source.
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Irvine is service_area, not physical_pin)
+ *   - Phone via branches.ts (`branchSlug='irvine'`)
+ *
+ * Source-bug fix on migration:
+ *   Original nearby_links included /san-juan-capistrano/ which is a 404 (no .astro page).
+ *   Replaced with /tustin/ (valid Irvine-branch nearby city).
+ */
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = "Dana Point";
-const citySlug = "dana-point";
-const phone = "(213) 401-9019";
-const phoneRaw = "+12134019019";
-const email = "oc@samedayappliance.repair";
-const branch = "Irvine";
+const branchSlug = 'irvine';
+const cityName = 'Dana Point';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const metaTitle = "Appliance Repair Dana Point CA | Same Day Service | (213) 401-9019";
-const metaDesc = "Same-day appliance repair in Dana Point, CA. Monarch Beach, Dana Point Harbor, Capistrano Beach. Sub-Zero, Wolf & all brands. Coastal climate expertise. OEM parts, 90-day warranty.";
-
-const neighborhoods = [
-  { name: "Monarch Beach", zip: "92629" },
-  { name: "Dana Point Harbor area", zip: "92629" },
-  { name: "Capistrano Beach", zip: "92624" },
-  { name: "Lantern District", zip: "92629" },
-  { name: "Pines area", zip: "92629" },
-  { name: "Niguel Shores", zip: "92629" },
-  { name: "Ritz Cove", zip: "92629" },
-  { name: "Strand at Headlands", zip: "92629" },
-  { name: "Selva Road area", zip: "92629" },
-  { name: "Golden Lantern corridor", zip: "92629" },
-];
+const title = `Appliance Repair Dana Point CA | Same Day Service | ${branch.phone}`;
+const description = 'Same-day appliance repair in Dana Point, CA. Monarch Beach, Dana Point Harbor, Capistrano Beach. Sub-Zero, Wolf & all brands. Coastal climate expertise. OEM parts, 90-day warranty.';
+const canonical = 'https://samedayappliance.repair/dana-point/';
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
 ];
 
-const recentRepairs = [
+const neighborhoods = [
+  { name: 'Monarch Beach', zip: '92629' },
+  { name: 'Dana Point Harbor area', zip: '92629' },
+  { name: 'Capistrano Beach', zip: '92624' },
+  { name: 'Lantern District', zip: '92629' },
+  { name: 'Pines area', zip: '92629' },
+  { name: 'Niguel Shores', zip: '92629' },
+  { name: 'Ritz Cove', zip: '92629' },
+  { name: 'Strand at Headlands', zip: '92629' },
+  { name: 'Selva Road area', zip: '92629' },
+  { name: 'Golden Lantern corridor', zip: '92629' },
+];
+
+const narrativeParagraphs = [
+  "Dana Point Harbor is one of the most picturesque spots in Southern California. It's also one of the most corrosive environments for appliance components. Salt air from the harbor and the Pacific deposits fine, electrochemically active particulate on every metal surface it touches — condenser coils, fan motor bearings, burner electrodes, door gaskets, and electrical terminals.",
+  'The practical consequence for Dana Point homeowners: refrigerators need condenser coil cleaning every 4-6 months, not 12. Wolf and Viking ranges in ocean-facing homes need electrode inspections annually. Sub-Zero units within a quarter mile of the harbor show coil fouling at rates we only otherwise see in Newport Beach and Laguna Beach.',
+  "This isn't a scare tactic — it's what our technicians observe on actual service calls in Dana Point. The coils we clean in Monarch Beach look nothing like what we clean in Mission Viejo. The maintenance schedule is genuinely different, and we tell homeowners that honestly when we're on site.",
+  "For vacation rental properties or second homes that sit empty for months, the problem compounds. An unoccupied home doesn't have anyone noticing that the refrigerator is running longer than usual. By the time the owners arrive, the coils may have been restricting airflow for six months. We're available year-round for seasonal property check-ups — call us if that's relevant to your situation.",
+];
+
+const jobs = [
   {
-    title: "Sub-Zero refrigerator — not cooling, running all night",
-    neighborhood: "Monarch Beach",
-    detail: "Sub-Zero 685 built-in in a Monarch Beach home — unit running continuously but not maintaining temperature. Condenser coils completely fouled with salt-laden coastal particulate from the ocean-facing bluffs. After coil cleaning, we found the condenser fan motor had also seized from corrosion — replaced with an OEM Sub-Zero motor. Back to temperature within 90 minutes. The homeowner was a part-time resident; the unit had gone unserviced for two years. Salt air doesn't forgive gaps in maintenance.",
-    part: "Sub-Zero OEM condenser fan motor + coil cleaning",
-    time: "2 hours"
+    badge: 'Sub-Zero 685',
+    neighborhood: 'Monarch Beach',
+    title: 'Sub-Zero refrigerator — not cooling, running all night',
+    body: "Sub-Zero 685 built-in in a Monarch Beach home — unit running continuously but not maintaining temperature. Condenser coils completely fouled with salt-laden coastal particulate from the ocean-facing bluffs. After coil cleaning, we found the condenser fan motor had also seized from corrosion — replaced with an OEM Sub-Zero motor. Back to temperature within 90 minutes. The homeowner was a part-time resident; the unit had gone unserviced for two years. Salt air doesn't forgive gaps in maintenance.",
+    part: 'Sub-Zero OEM condenser fan motor + coil cleaning',
+    time: '2 hours',
+    result: '✓ Same day · OEM Sub-Zero motor · Coils cleaned',
   },
   {
-    title: "Wolf range — two burners not lighting, others fine",
-    neighborhood: "Strand at Headlands",
-    detail: "Wolf 36-inch gas range in a waterfront home at the Headlands — two front burners clicking but not igniting. Classic coastal electrode corrosion. The salt air concentration at the Headlands, sitting right above the water, is among the most aggressive in all of South OC for metal components. Replaced both corroded electrodes with OEM Wolf parts, cleaned and dried the igniter ports, applied protective dielectric grease. Tested all six burners. Advised the homeowner on a yearly electrode inspection given the exposure level.",
-    part: "Wolf OEM igniter electrodes x2",
-    time: "1.5 hours"
+    badge: 'Wolf Range',
+    neighborhood: 'Strand at Headlands',
+    title: 'Wolf range — two burners not lighting, others fine',
+    body: 'Wolf 36-inch gas range in a waterfront home at the Headlands — two front burners clicking but not igniting. Classic coastal electrode corrosion. The salt air concentration at the Headlands, sitting right above the water, is among the most aggressive in all of South OC for metal components. Replaced both corroded electrodes with OEM Wolf parts, cleaned and dried the igniter ports, applied protective dielectric grease. Tested all six burners. Advised the homeowner on a yearly electrode inspection given the exposure level.',
+    part: 'Wolf OEM igniter electrodes x2',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM Wolf electrodes · 6 burners verified',
   },
   {
-    title: "Wine cooler — temperature inconsistent, wine too warm",
-    neighborhood: "Niguel Shores",
-    detail: "U-Line 24-inch wine cooler in a Niguel Shores home — temperature swinging 10 degrees above setpoint on warm days. The thermostat control board had drifted out of calibration, a known issue on this U-Line model after 4-5 years. Replaced the control board with an OEM U-Line part, recalibrated, ran temperature verification across 24 hours before leaving a service report. Customer had two dozen bottles of Burgundy at risk — we moved quickly.",
-    part: "U-Line OEM thermostat control board",
-    time: "1.5 hours"
+    badge: 'U-Line Wine Cooler',
+    neighborhood: 'Niguel Shores',
+    title: 'Wine cooler — temperature inconsistent, wine too warm',
+    body: 'U-Line 24-inch wine cooler in a Niguel Shores home — temperature swinging 10 degrees above setpoint on warm days. The thermostat control board had drifted out of calibration, a known issue on this U-Line model after 4-5 years. Replaced the control board with an OEM U-Line part, recalibrated, ran temperature verification across 24 hours before leaving a service report. Customer had two dozen bottles of Burgundy at risk — we moved quickly.',
+    part: 'U-Line OEM thermostat control board',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM U-Line board · 24h temperature verified',
   },
   {
-    title: "Miele dishwasher — F70 error, not draining",
-    neighborhood: "Lantern District",
-    detail: "Miele G 7566 in a Lantern District renovation — F70 error (water in base tray), anti-flood device triggered. Slow leak at the circulation pump seal had let water into the base. Replaced the pump seal, cleared the base tray, reset the anti-flood sensor, ran multiple cycles to verify. Property was managed by a local property manager who needed it fixed before the next tenant arrived Friday. We prioritized accordingly and had it done Thursday afternoon.",
-    part: "Miele OEM circulation pump seal",
-    time: "2 hours"
-  }
+    badge: 'Miele G 7566',
+    neighborhood: 'Lantern District',
+    title: 'Miele dishwasher — F70 error, not draining',
+    body: 'Miele G 7566 in a Lantern District renovation — F70 error (water in base tray), anti-flood device triggered. Slow leak at the circulation pump seal had let water into the base. Replaced the pump seal, cleared the base tray, reset the anti-flood sensor, ran multiple cycles to verify. Property was managed by a local property manager who needed it fixed before the next tenant arrived Friday. We prioritized accordingly and had it done Thursday afternoon.',
+    part: 'Miele OEM circulation pump seal',
+    time: '2 hours',
+    result: '✓ Same day · OEM Miele seal · F70 cleared',
+  },
+];
+
+const reviews = [
+  {
+    text: "Sub-Zero in our Monarch Beach home failing. Same Day came out, cleaned the coils — completely coated with salt residue — and replaced the fan motor. Told us it needed service every 6 months given the location. Nobody had ever mentioned this. Running perfectly.",
+    author: '— Catherine W., Monarch Beach',
+  },
+  {
+    text: "We manage vacation rentals in Dana Point. Same Day is our go-to for appliance issues. They pick up, they show up, and they're done in one visit. That's all we need.",
+    author: '— Pacific Coast Property Management, Dana Point',
+  },
+  {
+    text: 'Wolf range burners failing on our Headlands home. Technician replaced the electrodes, explained why coastal homes need annual checks, and was done in 90 minutes. Excellent service.',
+    author: '— James P., Strand at Headlands',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Credited toward repair · Written estimate · Coastal maintenance guidance included' },
+  { label: 'Standard Repair', price: '$150–$350', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Luxury Brand Repair', price: '$250–$600+', note: 'Sub-Zero, Wolf, Miele, Thermador · OEM parts' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Dana Point?",
-    a: "Yes — Dana Point is covered by our Irvine Orange County branch. We serve all Dana Point neighborhoods including Monarch Beach, Capistrano Beach, Niguel Shores, and the Lantern District. Call before noon for same-day service in most cases."
+    question: 'Do you offer same-day appliance repair in Dana Point?',
+    answer: 'Yes — Dana Point is covered by our Irvine Orange County branch. We serve all Dana Point neighborhoods including Monarch Beach, Capistrano Beach, Niguel Shores, and the Lantern District. Call before noon for same-day service in most cases.',
   },
   {
-    q: "Does salt air from the harbor and ocean affect appliances in Dana Point?",
-    a: "Significantly. Dana Point sits directly on the coast, and the marine environment accelerates corrosion on condenser coils, fan motors, and range igniter electrodes faster than anywhere inland. Homes near Monarch Beach, the Headlands, and the harbor are most affected. We recommend condenser coil inspection every 4-6 months for ocean-adjacent properties in Dana Point — the same recommendation we give in Newport Beach and Laguna Beach."
+    question: 'Does salt air from the harbor and ocean affect appliances in Dana Point?',
+    answer: 'Significantly. Dana Point sits directly on the coast, and the marine environment accelerates corrosion on condenser coils, fan motors, and range igniter electrodes faster than anywhere inland. Homes near Monarch Beach, the Headlands, and the harbor are most affected. We recommend condenser coil inspection every 4-6 months for ocean-adjacent properties in Dana Point — the same recommendation we give in Newport Beach and Laguna Beach.',
   },
   {
-    q: "Do you service vacation rentals and second homes in Dana Point?",
-    a: "Yes. A significant portion of Dana Point's housing stock is used as vacation rentals or second homes. We work with property managers and rental management companies regularly. If you manage multiple properties in Dana Point and need a reliable repair contact, call us to discuss how we handle multi-property accounts."
+    question: 'Do you service vacation rentals and second homes in Dana Point?',
+    answer: "Yes. A significant portion of Dana Point's housing stock is used as vacation rentals or second homes. We work with property managers and rental management companies regularly. If you manage multiple properties in Dana Point and need a reliable repair contact, call us to discuss how we handle multi-property accounts.",
   },
   {
-    q: "What brands do you repair in Dana Point?",
-    a: "All major brands. Monarch Beach and the oceanfront neighborhoods tend toward Sub-Zero, Wolf, Miele, and Thermador. The Lantern District and Capistrano Beach have a broader mix. We carry OEM parts for the luxury brands and mainstream brands alike — Samsung, LG, GE, Whirlpool, KitchenAid, Bosch."
+    question: 'What brands do you repair in Dana Point?',
+    answer: 'All major brands. Monarch Beach and the oceanfront neighborhoods tend toward Sub-Zero, Wolf, Miele, and Thermador. The Lantern District and Capistrano Beach have a broader mix. We carry OEM parts for the luxury brands and mainstream brands alike — Samsung, LG, GE, Whirlpool, KitchenAid, Bosch.',
   },
   {
-    q: "Do you repair wine coolers in Dana Point?",
-    a: "Yes — wine coolers and under-counter refrigeration are common in Dana Point homes. We service Sub-Zero wine columns, U-Line, True, Perlick, and Viking wine units. Like refrigerators, wine coolers in coastal Dana Point need coil maintenance more frequently than inland units."
+    question: 'Do you repair wine coolers in Dana Point?',
+    answer: 'Yes — wine coolers and under-counter refrigeration are common in Dana Point homes. We service Sub-Zero wine columns, U-Line, True, Perlick, and Viking wine units. Like refrigerators, wine coolers in coastal Dana Point need coil maintenance more frequently than inland units.',
   },
   {
-    q: "What is your diagnostic fee in Dana Point?",
-    a: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited against your invoice."
+    question: 'What is your diagnostic fee in Dana Point?',
+    answer: 'Our diagnostic fee is $89. It covers the service call, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited against your invoice.',
   },
   {
-    q: "Do you offer a warranty on repairs in Dana Point?",
-    a: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge."
-  }
+    question: 'Do you offer a warranty on repairs in Dana Point?',
+    answer: 'All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.',
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Laguna Beach", slug: "laguna-beach" },
-  { name: "Laguna Niguel", slug: "laguna-niguel" },
-  { name: "Mission Viejo", slug: "mission-viejo" },
-  { name: "San Clemente", slug: "san-clemente" },
-  { name: "Newport Beach", slug: "newport-beach" },
-  { name: "San Juan Capistrano", slug: "san-juan-capistrano" },
+// Original nearby_links had /san-juan-capistrano/ which is a 404 (no .astro page).
+// Replaced with /tustin/ (valid Irvine-branch nearby city).
+const nearby = [
+  { slug: 'laguna-beach', name: 'Laguna Beach' },
+  { slug: 'laguna-niguel', name: 'Laguna Niguel' },
+  { slug: 'mission-viejo', name: 'Mission Viejo' },
+  { slug: 'san-clemente', name: 'San Clemente' },
+  { slug: 'newport-beach', name: 'Newport Beach' },
+  { slug: 'tustin', name: 'Tustin' },
 ];
 
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: Irvine is service_area, not physical_pin (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Dana Point', sameAs: 'https://en.wikipedia.org/wiki/Dana_Point,_California' },
+    { '@type': 'Place', name: 'Monarch Beach' },
+    { '@type': 'Place', name: 'Capistrano Beach' },
+    { '@type': 'Place', name: 'Niguel Shores' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Dana Point",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/dana-point/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "2600 Michelson Dr Suite 1700",
-        "addressLocality": "Irvine",
-        "addressRegion": "CA",
-        "postalCode": "92612",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Dana Point" },
-        { "@type": "Place", "name": "Monarch Beach" },
-        { "@type": "Place", "name": "Capistrano Beach" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.9",
-        "reviewCount": "52",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
+};
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Dana Point, CA · Orange County · 92624 · 92629</div>
-        <h1>Appliance Repair in Dana Point, CA</h1>
-        <p class="city-hero-sub">Same-day service in Monarch Beach, Capistrano Beach, Niguel Shores, and across Dana Point. Salt-air coastal expertise. Sub-Zero, Wolf, Miele & all brands. 90-day warranty.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.9 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/dana-point/appliance-repair-dana-point-ca.webp"
-          alt="Appliance repair technician in Dana Point CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Dana Point, CA · Orange County · 92624 · 92629"
+    headlineMain="Appliance repair in"
+    headlineAccent="Dana Point, CA"
+    subheadline="Same-day service in Monarch Beach, Capistrano Beach, Niguel Shores, and across Dana Point. Salt-air coastal expertise. Sub-Zero, Wolf, Miele & all brands. 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Salt Air"
+    headline="What salt air does to"
+    headlineAccent="Dana Point appliances"
+    paragraphs={narrativeParagraphs}
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Dana Point — The Coastal Reality</h2>
-        <p>Dana Point is one of the most beautiful places on the Southern California coast and one of the most demanding environments for appliances. The combination of harbor salt air and direct Pacific exposure means that appliance components corrode faster here than almost anywhere else in Orange County. Our technicians see this on every visit to Monarch Beach, the Headlands, and the harbor-adjacent neighborhoods — packed condenser coils, corroded igniter electrodes, seized fan motors.</p>
-        <p>The city also has a significant second-home and vacation rental market. If you're a property manager or manage your own Dana Point rental, you know how quickly a malfunctioning appliance becomes an emergency. We prioritize those calls and we're available seven days a week for exactly that reason.</p>
-        <p>The housing stock ranges from modest Lantern District homes to waterfront estates at Monarch Beach and Ritz Cove — Sub-Zero, Wolf, Thermador, and Miele on the high end, Samsung and LG in the mid-range. We're stocked for both. Diagnostic fee is $89, credited toward the repair. Call <a href={`tel:${phoneRaw}`}>{phone}</a> — someone real picks up.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Dana Point Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Dana Point"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Dana Point</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Dana Point →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Dana Point neighborhoods"
+    headlineAccent="we service"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>What Salt Air Does to Dana Point Appliances</h2>
-        <p>Dana Point Harbor is one of the most picturesque spots in Southern California. It's also one of the most corrosive environments for appliance components. Salt air from the harbor and the Pacific deposits fine, electrochemically active particulate on every metal surface it touches — condenser coils, fan motor bearings, burner electrodes, door gaskets, and electrical terminals.</p>
-        <p>The practical consequence for Dana Point homeowners: refrigerators need condenser coil cleaning every 4-6 months, not 12. Wolf and Viking ranges in ocean-facing homes need electrode inspections annually. Sub-Zero units within a quarter mile of the harbor show coil fouling at rates we only otherwise see in Newport Beach and Laguna Beach.</p>
-        <p>This isn't a scare tactic — it's what our technicians observe on actual service calls in Dana Point. The coils we clean in Monarch Beach look nothing like what we clean in Mission Viejo. The maintenance schedule is genuinely different, and we tell homeowners that honestly when we're on site.</p>
-        <p>For vacation rental properties or second homes that sit empty for months, the problem compounds. An unoccupied home doesn't have anyone noticing that the refrigerator is running longer than usual. By the time the owners arrive, the coils may have been restricting airflow for six months. We're available year-round for seasonal property check-ups — call us if that's relevant to your situation.</p>
-      </div>
-    </div>
-  </section>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Dana Point"
+    jobs={jobs}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Dana Point Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <Method number="05" />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Dana Point</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Dana Point"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Dana Point Homeowners Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>Coastal experience matters</h3>
-          <p>We know what salt air does to Sub-Zero coils and Wolf electrodes in Dana Point specifically. We don't just fix the symptom — we explain the cause and give you a maintenance plan that matches where you actually live.</p>
-        </div>
-        <div class="why-item">
-          <h3>Vacation rental priority</h3>
-          <p>A broken appliance in a rental property is lost revenue. We work with Dana Point property managers on short-notice repairs. Call us — we'll tell you what we can do and when.</p>
-        </div>
-        <div class="why-item">
-          <h3>Luxury brands stocked</h3>
-          <p>Sub-Zero, Wolf, Miele, Thermador, Viking, U-Line — our OC technicians carry OEM parts for the brands common in Monarch Beach and the harbor-view estates. Most calls finish same visit.</p>
-        </div>
-        <div class="why-item">
-          <h3>90-day warranty, no exceptions</h3>
-          <p>Every repair carries a 90-day warranty on parts and labor. If the same issue returns, we come back at no charge.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Dana Point"
+    cards={pricingCards}
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Dana Point Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Sub-Zero in our Monarch Beach home failing. Same Day came out, cleaned the coils — completely coated with salt residue — and replaced the fan motor. Told us it needed service every 6 months given the location. Nobody had ever mentioned this. Running perfectly."</p>
-          <div class="review-author">— Catherine W., Monarch Beach</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"We manage vacation rentals in Dana Point. Same Day is our go-to for appliance issues. They pick up, they show up, and they're done in one visit. That's all we need."</p>
-          <div class="review-author">— Pacific Coast Property Management, Dana Point</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Wolf range burners failing on our Headlands home. Technician replaced the electrodes, explained why coastal homes need annual checks, and was done in 90 minutes. Excellent service."</p>
-          <div class="review-author">— James P., Strand at Headlands</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Dana Point"
+    faqs={faqs}
+  />
 
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Dana Point</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Credited toward repair · Written estimate · Coastal maintenance guidance included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$350</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Miele, Thermador · OEM parts</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Dana Point</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby South OC Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Dana Point Repair Today</h2>
-      <p>Same-day service across all of Dana Point. Sub-Zero, Wolf, Miele, and all major brands.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Dana Point, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Dana Point", "Monarch Beach", "Orange County"]} />
-</Layout>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Dana Point repair today"
+    body="Same-day service across all of Dana Point. Sub-Zero, Wolf, Miele, and all major brands. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>

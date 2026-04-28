@@ -1,394 +1,280 @@
 ---
-// src/pages/oak-park.astro
-// Same Day Appliance Repair — Oak Park, CA
-// Branch: Thousand Oaks/Ventura | Phone: (424) 208-0228
+/**
+ * Oak Park, CA — Variant A migration (T9 Batch 2).
+ * Branch: Thousand Oaks · ZIPs: 91377
+ * Source: wiki/migration/content-dumps/oak-park.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Thousand Oaks is service_area, not physical_pin)
+ *   - Phone via branches.ts (`branchSlug='thousand-oaks'`)
+ *
+ * Trust-bar item-4 override: "No Distance Surcharge" per source dump.
+ * Note: Source neighborhoods array has only 6 entries (slimmer than standard 10) —
+ * preserved verbatim per "Lossless content" rule.
+ */
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = "Oak Park";
-const citySlug = "oak-park";
-const phone = "(424) 208-0228";
-const phoneRaw = "+14242080228";
-const email = "thousandoaks@samedayappliance.repair";
-const branch = "Thousand Oaks";
+const branchSlug = 'thousand-oaks';
+const cityName = 'Oak Park';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const metaTitle = "Appliance Repair Oak Park CA | Same Day Service | (424) 208-0228";
-const metaDesc = "Same-day appliance repair in Oak Park, CA. Conejo foothills community. All brands, OEM parts, 90-day warranty. No surcharge vs Thousand Oaks. $89 diagnostic — waived with repair.";
-
-const neighborhoods = [
-  { name: "Oak Park proper", zip: "91377" },
-  { name: "Lindero Canyon area", zip: "91377" },
-  { name: "Medea Creek area", zip: "91377" },
-  { name: "Kanan Road corridor", zip: "91377" },
-  { name: "Chesebro Road area", zip: "91377" },
-  { name: "Oak Canyon area", zip: "91377" },
-];
+const title = `Appliance Repair Oak Park CA | Same Day Service | ${branch.phone}`;
+const description = 'Same-day appliance repair in Oak Park, CA. Conejo foothills community. All brands, OEM parts, 90-day warranty. No surcharge vs Thousand Oaks. $89 diagnostic — waived with repair.';
+const canonical = 'https://samedayappliance.repair/oak-park/';
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🥶', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
 ];
 
-const recentRepairs = [
+const neighborhoods = [
+  { name: 'Oak Park proper', zip: '91377' },
+  { name: 'Lindero Canyon area', zip: '91377' },
+  { name: 'Medea Creek area', zip: '91377' },
+  { name: 'Kanan Road corridor', zip: '91377' },
+  { name: 'Chesebro Road area', zip: '91377' },
+  { name: 'Oak Canyon area', zip: '91377' },
+];
+
+const narrativeParagraphs = [
+  "Oak Park has a lot of LG appliances — the brand was very popular when most of the community's homes were last kitchen-renovated. If you have an LG French door refrigerator that's stopped cooling and it's between 5 and 10 years old, the first thing we check is warranty coverage.",
+  "LG extended its linear compressor warranty to 10 years on affected model years following class action settlements. Many homeowners don't know this. A full linear compressor replacement out of warranty runs $400-600+ in parts alone. Under warranty, the homeowner pays diagnostic and labor only — a significant difference. We check coverage on every LG compressor call in Oak Park as a matter of course, before we quote anything.",
+  "The same principle applies to Samsung ice maker wire harness failures in the 3-5 year range — we check what coverage exists before starting. It costs us a few minutes and can save you hundreds.",
+];
+
+const jobs = [
   {
-    title: "LG refrigerator — not cooling, linear compressor failure",
-    neighborhood: "Oak Park",
-    detail: "LG LRMVS3006S — not cooling at all, compressor not running. Linear compressor failure — the most common significant repair on LG French door refrigerators in the 5-7 year range. Replaced the compressor assembly with an OEM LG part under LG's extended compressor warranty (this model year was covered). Cost to homeowner was the diagnostic and labor only. Always worth checking warranty coverage on LG linear compressor failures before quoting a full repair — a significant portion of calls in this age range are still covered.",
-    part: "LG OEM linear compressor (warranty covered)",
-    time: "3 hours"
+    badge: 'LG Refrigerator',
+    neighborhood: 'Oak Park',
+    title: 'LG refrigerator — not cooling, linear compressor failure',
+    body: "LG LRMVS3006S — not cooling at all, compressor not running. Linear compressor failure — the most common significant repair on LG French door refrigerators in the 5-7 year range. Replaced the compressor assembly with an OEM LG part under LG's extended compressor warranty (this model year was covered). Cost to homeowner was the diagnostic and labor only. Always worth checking warranty coverage on LG linear compressor failures before quoting a full repair — a significant portion of calls in this age range are still covered.",
+    part: 'LG OEM linear compressor (warranty covered)',
+    time: '3 hours',
+    result: '✓ Same day · Warranty-covered compressor · Labor only',
   },
   {
+    badge: 'KitchenAid Oven',
+    neighborhood: 'Lindero Canyon area',
     title: "KitchenAid oven — oven not heating, broil works but bake doesn't",
-    neighborhood: "Lindero Canyon area",
-    detail: "KitchenAid KFGG500ESS — broil element functional, bake element completely failed. Classic single-element failure. Replaced the bake element with an OEM KitchenAid part, tested all oven modes including convection. Also checked the door gasket — slight compression loss beginning at the lower corners, flagged for the homeowner as a 6-12 month replacement item. The door seal affects temperature accuracy and efficiency; better to know early.",
-    part: "KitchenAid OEM bake element",
-    time: "1.5 hours"
+    body: 'KitchenAid KFGG500ESS — broil element functional, bake element completely failed. Classic single-element failure. Replaced the bake element with an OEM KitchenAid part, tested all oven modes including convection. Also checked the door gasket — slight compression loss beginning at the lower corners, flagged for the homeowner as a 6-12 month replacement item. The door seal affects temperature accuracy and efficiency; better to know early.',
+    part: 'KitchenAid OEM bake element',
+    time: '1.5 hours',
+    result: '✓ Same day · OEM KitchenAid element · Door gasket flagged',
   },
   {
-    title: "Whirlpool washer — F21 drain error, standing water after cycle",
-    neighborhood: "Medea Creek area",
-    detail: "Whirlpool WFW5000FW — F21 drain fault, water in the drum at cycle end. Coin trap filter packed with lint, a small sock, and three quarters — completely blocking the drain pump. Cleaned the filter and pump impeller housing, confirmed the impeller was undamaged, ran three drain cycles. Showed the homeowner the filter location and the quarterly cleaning procedure. Simple, common, 100% preventable with routine maintenance.",
-    part: "Filter cleaning service",
-    time: "45 minutes"
+    badge: 'Whirlpool Washer',
+    neighborhood: 'Medea Creek area',
+    title: 'Whirlpool washer — F21 drain error, standing water after cycle',
+    body: 'Whirlpool WFW5000FW — F21 drain fault, water in the drum at cycle end. Coin trap filter packed with lint, a small sock, and three quarters — completely blocking the drain pump. Cleaned the filter and pump impeller housing, confirmed the impeller was undamaged, ran three drain cycles. Showed the homeowner the filter location and the quarterly cleaning procedure. Simple, common, 100% preventable with routine maintenance.',
+    part: 'Filter cleaning service',
+    time: '45 minutes',
+    result: '✓ Same day · F21 cleared · Quarterly schedule set',
   },
   {
-    title: "Samsung dishwasher — LC error, leak detected",
-    neighborhood: "Kanan Road corridor",
-    detail: "Samsung DW80R9950UG — LC leak sensor error, anti-flood device activated. Water in the base tray from a slow leak at the door gasket lower seal. Replaced the door gasket with an OEM Samsung part, cleared and dried the base tray, reset the leak sensor, ran six test cycles monitoring for any seepage. The gasket had developed a small crack — more common in the 3-5 year range on this Samsung line than the manufacturer's published data suggests.",
-    part: "Samsung OEM door gasket",
-    time: "2 hours"
-  }
+    badge: 'Samsung Dishwasher',
+    neighborhood: 'Kanan Road corridor',
+    title: 'Samsung dishwasher — LC error, leak detected',
+    body: "Samsung DW80R9950UG — LC leak sensor error, anti-flood device activated. Water in the base tray from a slow leak at the door gasket lower seal. Replaced the door gasket with an OEM Samsung part, cleared and dried the base tray, reset the leak sensor, ran six test cycles monitoring for any seepage. The gasket had developed a small crack — more common in the 3-5 year range on this Samsung line than the manufacturer's published data suggests.",
+    part: 'Samsung OEM door gasket',
+    time: '2 hours',
+    result: '✓ Same day · OEM Samsung gasket · 6 cycles verified',
+  },
+];
+
+const reviews = [
+  {
+    text: "LG fridge stopped cooling — they checked warranty coverage first, found it was covered, replaced the compressor for just the labor cost. Saved us over $400. That kind of honesty is rare in any service industry.",
+    author: '— Robert M., Oak Park',
+  },
+  {
+    text: "Whirlpool washer drain error. They cleared the filter in 45 minutes, showed me where it is and how to clean it quarterly. No parts needed. Transparent, fast, done right.",
+    author: '— Jennifer K., Medea Creek area',
+  },
+  {
+    text: "KitchenAid oven, bake element failed. Fixed same day, no surcharge for Oak Park vs Thousand Oaks. Exactly what was promised. Will use again.",
+    author: '— Sandra T., Lindero Canyon',
+  },
+];
+
+const pricingCards = [
+  { label: 'Diagnostic Fee', price: '$89', note: 'Same as Thousand Oaks · No surcharge · Warranty check included' },
+  { label: 'Standard Repair', price: '$150–$380', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { label: 'Luxury Brand Repair', price: '$250–$600+', note: 'Sub-Zero, Wolf, Thermador · OEM parts' },
+  { label: 'Warranty', price: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', highlight: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Oak Park?",
-    a: "Yes — Oak Park is part of our Thousand Oaks branch service area. Our technicians run the Conejo Valley corridor regularly and cover Oak Park on the same routes as Agoura Hills and Newbury Park. Call before noon for same-day service in most cases."
+    question: 'Do you offer same-day appliance repair in Oak Park?',
+    answer: 'Yes — Oak Park is part of our Thousand Oaks branch service area. Our technicians run the Conejo Valley corridor regularly and cover Oak Park on the same routes as Agoura Hills and Newbury Park. Call before noon for same-day service in most cases.',
   },
   {
-    q: "What is your diagnostic fee in Oak Park?",
-    a: "Our diagnostic fee is $89 — the same as in Thousand Oaks and Newbury Park. There is no distance surcharge or travel fee for Oak Park. $89 diagnostic, credited toward the repair if you proceed."
+    question: 'What is your diagnostic fee in Oak Park?',
+    answer: 'Our diagnostic fee is $89 — the same as in Thousand Oaks and Newbury Park. There is no distance surcharge or travel fee for Oak Park. $89 diagnostic, credited toward the repair if you proceed.',
   },
   {
-    q: "Is there a surcharge for service in Oak Park vs Thousand Oaks?",
-    a: "No. Oak Park is within our standard Thousand Oaks branch service territory. The $89 diagnostic fee is flat regardless of where in the Conejo Valley corridor you are."
+    question: 'Is there a surcharge for service in Oak Park vs Thousand Oaks?',
+    answer: 'No. Oak Park is within our standard Thousand Oaks branch service territory. The $89 diagnostic fee is flat regardless of where in the Conejo Valley corridor you are.',
   },
   {
-    q: "What appliance brands do you repair in Oak Park?",
-    a: "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, and luxury brands including Sub-Zero, Wolf, and Thermador. OEM parts for all of these on our Conejo Valley trucks."
+    question: 'What appliance brands do you repair in Oak Park?',
+    answer: 'All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, and luxury brands including Sub-Zero, Wolf, and Thermador. OEM parts for all of these on our Conejo Valley trucks.',
   },
   {
-    q: "Does Oak Park have any specific appliance maintenance concerns?",
-    a: "Oak Park is served by local water with moderate mineral content. Like the rest of the Conejo Valley, dishwasher spray arms and refrigerator water filters benefit from regular attention. The Conejo foothills setting also means seasonal winds can carry particulate into outdoor-adjacent appliance vents — dryer vent inspection is worth doing annually."
+    question: 'Does Oak Park have any specific appliance maintenance concerns?',
+    answer: 'Oak Park is served by local water with moderate mineral content. Like the rest of the Conejo Valley, dishwasher spray arms and refrigerator water filters benefit from regular attention. The Conejo foothills setting also means seasonal winds can carry particulate into outdoor-adjacent appliance vents — dryer vent inspection is worth doing annually.',
   },
   {
-    q: "Do you check LG linear compressor warranty coverage in Oak Park?",
-    a: "Yes. LG extended its linear compressor warranty on affected models to 10 years. If you have an LG refrigerator that's not cooling and is in the 5-8 year range, it's worth a warranty check before paying for a full compressor replacement. We verify coverage as part of every LG compressor diagnosis."
+    question: 'Do you check LG linear compressor warranty coverage in Oak Park?',
+    answer: "Yes. LG extended its linear compressor warranty on affected models to 10 years. If you have an LG refrigerator that's not cooling and is in the 5-8 year range, it's worth a warranty check before paying for a full compressor replacement. We verify coverage as part of every LG compressor diagnosis.",
   },
   {
-    q: "Do you offer a warranty on repairs in Oak Park?",
-    a: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge."
-  }
+    question: 'Do you offer a warranty on repairs in Oak Park?',
+    answer: 'All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.',
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Agoura Hills", slug: "agoura-hills" },
-  { name: "Thousand Oaks", slug: "thousand-oaks" },
-  { name: "Westlake Village", slug: "westlake-village" },
-  { name: "Newbury Park", slug: "newbury-park" },
-  { name: "Moorpark", slug: "moorpark" },
-  { name: "Calabasas", slug: "calabasas" },
+const nearby = [
+  { slug: 'agoura-hills', name: 'Agoura Hills' },
+  { slug: 'thousand-oaks', name: 'Thousand Oaks' },
+  { slug: 'westlake-village', name: 'Westlake Village' },
+  { slug: 'newbury-park', name: 'Newbury Park' },
+  { slug: 'moorpark', name: 'Moorpark' },
+  { slug: 'calabasas', name: 'Calabasas' },
 ];
 
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: Thousand Oaks is service_area, not physical_pin (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'City', name: 'Oak Park', sameAs: 'https://en.wikipedia.org/wiki/Oak_Park,_Ventura_County,_California' },
+    { '@type': 'Place', name: 'Lindero Canyon' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Oak Park",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/oak-park/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "100 E Thousand Oaks Blvd Suite 200",
-        "addressLocality": "Thousand Oaks",
-        "addressRegion": "CA",
-        "postalCode": "91360",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "Place", "name": "Oak Park" },
-        { "@type": "Place", "name": "Lindero Canyon" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "27",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
+};
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Oak Park, CA · Ventura County · 91377 · Conejo Foothills</div>
-        <h1>Appliance Repair in Oak Park, CA</h1>
-        <p class="city-hero-sub">Same-day service from our Thousand Oaks branch — no surcharge. All brands, OEM parts, 90-day warranty. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.8 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/oak-park/appliance-repair-oak-park-ca.webp"
-          alt="Appliance repair technician in Oak Park CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Oak Park, CA · Ventura County · 91377 · Conejo Foothills"
+    headlineMain="Appliance repair in"
+    headlineAccent="Oak Park, CA"
+    subheadline="Same-day service from our Thousand Oaks branch — no surcharge. All brands, OEM parts, 90-day warranty. $89 diagnostic — waived with repair."
+    branchSlug={branchSlug}
+  />
+  <TrustBar item4Text="No Distance Surcharge" item4Fine="Same price as Thousand Oaks" />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>No Distance Surcharge</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="LG Compressor Warranty"
+    headline="One thing worth knowing —"
+    headlineAccent="LG compressor warranty"
+    paragraphs={narrativeParagraphs}
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Oak Park — On Our Route, Same Price</h2>
-        <p>Oak Park is an unincorporated community tucked into the Conejo foothills between Agoura Hills and Thousand Oaks. Our Thousand Oaks branch covers this corridor every day — Oak Park isn't a detour that requires a surcharge. It's where we work.</p>
-        <p>The community is predominantly established family homes from the 1970s and 80s with good-quality appliance installations. Samsung, LG, KitchenAid, Whirlpool, and Bosch are the brands we see most often. For LG refrigerators in the 5-8 year range, we always check linear compressor warranty coverage before quoting a full repair — a significant portion of calls in that age range are still under LG's extended warranty, which changes the cost equation significantly.</p>
-        <p>Diagnostic fee is $89, the same as in Thousand Oaks or Westlake Village. No distance markup. Call <a href={`tel:${phoneRaw}`}>{phone}</a>.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Oak Park Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— same as Thousand Oaks</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="Appliance repair services in"
+    headlineAccent="Oak Park"
+    services={services}
+    cardStructure="2-tier"
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Oak Park</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Oak Park →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Oak Park areas"
+    headlineAccent="we service"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>One Thing Worth Knowing: LG Compressor Warranty</h2>
-        <p>Oak Park has a lot of LG appliances — the brand was very popular when most of the community's homes were last kitchen-renovated. If you have an LG French door refrigerator that's stopped cooling and it's between 5 and 10 years old, the first thing we check is warranty coverage.</p>
-        <p>LG extended its linear compressor warranty to 10 years on affected model years following class action settlements. Many homeowners don't know this. A full linear compressor replacement out of warranty runs $400-600+ in parts alone. Under warranty, the homeowner pays diagnostic and labor only — a significant difference. We check coverage on every LG compressor call in Oak Park as a matter of course, before we quote anything.</p>
-        <p>The same principle applies to Samsung ice maker wire harness failures in the 3-5 year range — we check what coverage exists before starting. It costs us a few minutes and can save you hundreds.</p>
-      </div>
-    </div>
-  </section>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent repairs in"
+    headlineAccent="Oak Park"
+    jobs={jobs}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Oak Park Areas We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <Method number="05" />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Oak Park</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Oak Park"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Oak Park Residents Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>We check warranty first</h3>
-          <p>LG linear compressor, Samsung harness, other covered failures — we verify warranty coverage before quoting. One call can save hundreds.</p>
-        </div>
-        <div class="why-item">
-          <h3>No surcharge</h3>
-          <p>Oak Park is on our route. The $89 diagnostic is flat, same as Thousand Oaks or Westlake Village. No distance fee, no travel markup.</p>
-        </div>
-        <div class="why-item">
-          <h3>We teach maintenance</h3>
-          <p>Washer drain filter location, dishwasher descaling schedule, refrigerator coil cycle — we show you what needs attention before we leave so you don't call us back for the same thing.</p>
-        </div>
-        <div class="why-item">
-          <h3>90-day warranty</h3>
-          <p>Every repair in Oak Park carries a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Oak Park"
+    cards={pricingCards}
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Oak Park Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"LG fridge stopped cooling — they checked warranty coverage first, found it was covered, replaced the compressor for just the labor cost. Saved us over $400. That kind of honesty is rare in any service industry."</p>
-          <div class="review-author">— Robert M., Oak Park</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Whirlpool washer drain error. They cleared the filter in 45 minutes, showed me where it is and how to clean it quarterly. No parts needed. Transparent, fast, done right."</p>
-          <div class="review-author">— Jennifer K., Medea Creek area</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"KitchenAid oven, bake element failed. Fixed same day, no surcharge for Oak Park vs Thousand Oaks. Exactly what was promised. Will use again."</p>
-          <div class="review-author">— Sandra T., Lindero Canyon</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Oak Park"
+    faqs={faqs}
+  />
 
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Oak Park</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Same as Thousand Oaks · No surcharge · Warranty check included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$380</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Thermador · OEM parts</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Oak Park</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby Conejo Valley Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Oak Park Repair Today</h2>
-      <p>Same-day service from our Thousand Oaks branch. No surcharge. All brands.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · No surcharge · 90-day warranty · Oak Park, CA 91377</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Oak Park", "Conejo Valley", "Ventura County"]} />
-</Layout>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Schedule your"
+    headlineAccent="Oak Park repair today"
+    body="Same-day service from our Thousand Oaks branch. No surcharge. All brands. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayout>
