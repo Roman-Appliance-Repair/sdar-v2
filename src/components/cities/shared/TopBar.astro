@@ -4,7 +4,7 @@
  * Phone is read from branches.ts via branchSlug. NEVER hardcode phone here.
  */
 
-import { BRANCHES } from '../../../data/branches.ts';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../../../data/branches.ts';
 
 export interface Props {
   branchSlug: string;
@@ -17,7 +17,11 @@ if (!branch) {
   throw new Error(`TopBar: unknown branchSlug "${branchSlug}". Update branches.ts citiesServed or fix the city page.`);
 }
 
-const phone = branch.phone;
+// Pending branches (Rancho Cucamonga, Temecula) carry 555-prefixed placeholders.
+// Per NAP policy, do NOT show placeholders in primary CTAs — fall back to MAIN_PHONE
+// (LA branch). When real DIDs are assigned, branches.ts updates and the city pages
+// auto-correct on next build.
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
 const phoneTel = `+1${phone.replace(/\D/g, '')}`;
 ---
 

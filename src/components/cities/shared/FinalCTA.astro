@@ -4,7 +4,7 @@
  * Phone CTA pulled from branches.ts via branchSlug.
  */
 
-import { BRANCHES } from '../../../data/branches.ts';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../../../data/branches.ts';
 
 export interface Props {
   branchSlug: string;
@@ -23,7 +23,8 @@ const {
 } = Astro.props;
 
 const branch = BRANCHES.find((b) => b.slug === branchSlug);
-const phone = branch?.phone ?? '';
+const rawPhone = branch?.phone ?? MAIN_PHONE;
+const phone = isPlaceholderPhone(rawPhone) ? MAIN_PHONE : rawPhone;
 const phoneTel = `+1${phone.replace(/\D/g, '')}`;
 
 const finalHeadline = headlineMain ?? 'Schedule your repair in';
