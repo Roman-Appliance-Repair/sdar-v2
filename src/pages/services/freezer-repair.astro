@@ -1,62 +1,68 @@
 ---
 // src/pages/services/freezer-repair.astro
-// Wave 5 — Service Pages
-// Vector gaps: defrost system/heater/timer, evaporator fan, condenser coils,
-// sealed system, door seal, frost/ice buildup, food safety, chest/upright/column freezer,
-// commercial freezer, Kenmore, Sub-Zero column, 90-day warranty
-// Unique LA angle: garage freezers in SoCal heat (nobody covers this)
+// Phase 3 Tier 2 (2026-04-28) — neutral multi-county hub.
+// title/H1/description/phone neutralized to 5 SoCal counties; Service schema with 5-county
+// areaServed (was HomeAndConstructionBusiness with 8 LA cities); aggregateRating REMOVED per
+// wiki/decisions/nap-rating-policy-ssot.md; Recent Repairs distributed 2 LA + 1 OC + 1 Ventura;
+// Cities-served block → 5-county Counties block; garage-freezer SoCal heat angle preserved.
 
 import Layout from '../../layouts/Layout.astro';
 import ServiceHero from '../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../data/branches';
 
-const title = "Freezer Repair Los Angeles, CA | Same Day Service";
-const description = "Same day freezer repair across Los Angeles. Chest, upright, built-in column — all brands including Sub-Zero, Samsung, LG, Whirlpool. $89 diagnostic, 90-day warranty. (323) 870-4790.";
-const phone = "(323) 870-4790";
-const phoneRaw = "3238704790";
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+
+const title = "Freezer Repair — Same-Day Service Across Southern California | Same Day Appliance Repair";
+const description = "Same-day freezer repair across LA, Orange, Ventura, San Bernardino & Riverside counties. Chest, upright, built-in column. Sub-Zero, Samsung, LG, Whirlpool. BHGS #A49573, $89 diagnostic, 90-day warranty. Call (424) 325-0520.";
 ---
 
 <Layout title={title} description={description}>
 
-<script type="application/ld+json">
-{
+<script type="application/ld+json" set:html={JSON.stringify({
   "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Freezer Repair Los Angeles",
-  "telephone": "(323) 870-4790",
-  "url": "https://samedayappliance.repair/services/freezer-repair/",
+  "@type": "Service",
+  "serviceType": "Freezer Repair",
+  "name": "Freezer Repair — Same Day Appliance Repair",
+  "description": "Same-day freezer repair across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Chest, upright, built-in column freezers — all major and luxury brands.",
+  "provider": {
+    "@type": "LocalBusiness",
+    "name": "Same Day Appliance Repair",
+    "url": "https://samedayappliance.repair/",
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
+    ]
+  },
   "areaServed": [
-    {"@type": "City", "name": "Los Angeles"},
-    {"@type": "City", "name": "Beverly Hills"},
-    {"@type": "City", "name": "West Hollywood"},
-    {"@type": "City", "name": "Pasadena"},
-    {"@type": "City", "name": "Burbank"},
-    {"@type": "City", "name": "Glendale"},
-    {"@type": "City", "name": "Santa Monica"},
-    {"@type": "City", "name": "Silver Lake"}
+    { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+    { "@type": "AdministrativeArea", "name": "Orange County" },
+    { "@type": "AdministrativeArea", "name": "Ventura County" },
+    { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+    { "@type": "AdministrativeArea", "name": "Riverside County" }
   ],
-  "openingHoursSpecification": [
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00"},
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00"},
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00"}
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
+  "offers": {
+    "@type": "Offer",
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "price": "89.00",
+      "priceCurrency": "USD",
+      "description": "Residential diagnostic fee, applied toward repair"
+    }
   }
-}
-</script>
+})} />
 
-<script type="application/ld+json">
-{
+<script type="application/ld+json" set:html={JSON.stringify({
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "How much does freezer repair cost in Los Angeles?",
+      "name": "How much does freezer repair cost?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Our diagnostic fee is $89, applied toward the repair once you approve the work. Most residential freezer repairs run between $130 and $350. A defrost heater, thermostat, or evaporator fan replacement is toward the lower end. Compressor or sealed system work runs higher, and we'll give you an honest assessment of whether the repair makes financial sense for the age and brand of the unit. Full written estimate before any work begins."
@@ -64,15 +70,23 @@ const phoneRaw = "3238704790";
     },
     {
       "@type": "Question",
-      "name": "My freezer runs but won't get cold enough — what's wrong?",
+      "name": "Which areas of Southern California do you cover?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Three most likely causes: a failed defrost system that's allowed frost to build up on the evaporator coils and block airflow, a weakening compressor that can no longer maintain temperature, or a refrigerant leak in the sealed system. In LA's warm climate — especially in unconditioned spaces like garages — a freezer working harder than it was designed for can show these symptoms faster than usual. We diagnose the actual cause before recommending parts."
+        "text": "All five counties: Los Angeles, Orange, Ventura, San Bernardino, and Riverside. We dispatch from 8 service territories — West Hollywood (HQ), Los Angeles, Beverly Hills, Pasadena, Thousand Oaks, Irvine, Rancho Cucamonga, and Temecula — so the technician on your call is coming from the closest one. Same-day is our standard."
       }
     },
     {
       "@type": "Question",
-      "name": "Is it worth repairing a freezer or should I replace it?",
+      "name": "My freezer runs but won't get cold enough — what's wrong?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Three most likely causes: a failed defrost system that's allowed frost to build up on the evaporator coils and block airflow, a weakening compressor that can no longer maintain temperature, or a refrigerant leak in the sealed system. In SoCal's warm climate — especially in unconditioned spaces like garages from the LA Basin to the Inland Empire — a freezer working harder than it was designed for can show these symptoms faster than usual. We diagnose the actual cause before recommending parts."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When does it make sense to repair vs replace a freezer?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "It depends on the age of the unit, the brand, and what failed. A defrost heater on a 4-year-old Whirlpool is worth fixing. A compressor on a 15-year-old no-name chest freezer probably isn't. On premium brands like Sub-Zero or Thermador, repair almost always makes more sense than replacement because the unit itself is worth considerably more. We give you a straight answer before writing any repair order — if the numbers don't work, we tell you."
@@ -83,7 +97,7 @@ const phoneRaw = "3238704790";
       "name": "My freezer is in the garage — why does it struggle in summer?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "An unventilated Los Angeles garage can reach 100–110°F on a summer afternoon. Most residential freezers are rated for ambient temperatures up to 90–95°F — beyond that, the compressor runs continuously trying to maintain 0°F against an ambient environment that's 15–20 degrees above its design limit. The compressor overworks, the condenser can't shed heat, and the freezer gradually loses temperature. Annual condenser coil cleaning and making sure the freezer has adequate clearance around it are the two most effective things you can do. We check both on every garage freezer call."
+        "text": "An unventilated SoCal garage can reach 100–115°F on a summer afternoon — even hotter in the Inland Empire (San Bernardino, Riverside, Temecula) where 115°F+ ambient is normal in July and August. Most residential freezers are rated for ambient temperatures up to 90–95°F — beyond that, the compressor runs continuously trying to maintain 0°F against an ambient environment 15–25 degrees above its design limit. The compressor overworks, the condenser can't shed heat, and the freezer gradually loses temperature. Annual condenser coil cleaning and adequate clearance around the unit are the two most effective things you can do. We check both on every garage freezer call."
       }
     },
     {
@@ -99,7 +113,7 @@ const phoneRaw = "3238704790";
       "name": "Do you repair Sub-Zero and built-in column freezers?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Sub-Zero column freezers and integrated panel-ready units are among the brands we service most frequently in LA's premium home market. These units require OEM Sub-Zero parts — we source directly from authorized suppliers. We also repair Thermador, Viking, and Miele column and built-in freezers."
+        "text": "Yes. Sub-Zero column freezers and integrated panel-ready units are among the brands we service most frequently in SoCal's premium home market — Bel Air, Newport Coast, Pacific Palisades, Pasadena estates, Thousand Oaks hill homes. These units require OEM Sub-Zero parts — we source directly from authorized suppliers. We also repair Thermador, Viking, and Miele column and built-in freezers."
       }
     },
     {
@@ -111,8 +125,7 @@ const phoneRaw = "3238704790";
       }
     }
   ]
-}
-</script>
+})} />
 
 <style>
   :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
@@ -202,8 +215,8 @@ const phoneRaw = "3238704790";
 
 <!-- 01 HERO + TRUST BAR (unified ServiceHero) -->
 <ServiceHero
-  title="Freezer Repair Los Angeles"
-  subtitle="Not cold enough, too much frost, or won't run at all — food safety is the clock. Our technicians carry defrost components, fan motors, and parts for the brands common in LA homes."
+  title="Freezer Repair Across Southern California"
+  subtitle="Not cold enough, too much frost, or won't run at all — food safety is the clock. Our technicians carry defrost components, fan motors, and parts for the brands common in SoCal homes. Same-day across LA, Orange, Ventura, San Bernardino & Riverside counties."
   heroImageTitle="Freezer Repair"
 />
 
@@ -213,13 +226,13 @@ const phoneRaw = "3238704790";
     <div class="intro-grid">
       <div class="intro-body">
         <p class="section-number">01 — About This Service</p>
-        <h2 class="section-title">A freezer failure in LA has a short window before food is at risk.</h2>
+        <h2 class="section-title">A freezer failure across SoCal has a short window before food is at risk.</h2>
 
-        <p>When a freezer stops holding temperature, the urgency is different from most appliance failures. A broken dishwasher is inconvenient. A freezer that climbs above 0°F puts hundreds of dollars of food at risk within hours — and in LA's warm ambient temperatures, it happens faster than in most cities. We treat freezer calls with that urgency.</p>
+        <p>When a freezer stops holding temperature, the urgency is different from most appliance failures. A broken dishwasher is inconvenient. A freezer that climbs above 0°F puts hundreds of dollars of food at risk within hours — and in SoCal's warm ambient temperatures (especially Inland Empire summer heat hitting 110°F+), it happens faster than in most regions. We treat freezer calls with that urgency across all 5 counties.</p>
 
         <p>The failures are predictable. The defrost system is the most common culprit — when the defrost heater, defrost timer, or defrost thermostat fails, frost accumulates on the evaporator coils until airflow is completely blocked. The freezer runs continuously but can't circulate cold air. A weakening compressor or a slow refrigerant leak in the sealed system are the higher-severity failures that require more involved diagnosis. A worn door seal quietly lets warm air in 24 hours a day, forcing the compressor to compensate.</p>
 
-        <p>Our technicians carry defrost components, evaporator fan motors, and thermostat assemblies for the brands they see most in LA. For the majority of freezer calls, the repair is completed same visit.</p>
+        <p>Our technicians carry defrost components, evaporator fan motors, and thermostat assemblies for the brands they see most across SoCal. For the majority of freezer calls, the repair is completed same visit.</p>
 
         <div class="tip-box">
           <div class="tip-label">❄️ While You Wait for Us</div>
@@ -229,8 +242,8 @@ const phoneRaw = "3238704790";
 
       <aside class="sticky-cta">
         <div class="cta-label">Same Day Freezer Repair</div>
-        <a href={`tel:${phoneRaw}`} class="cta-phone">{phone}</a>
-        <a href={`tel:${phoneRaw}`} class="btn-cta">Call Now — We Pick Up</a>
+        <a href={phoneHref} class="cta-phone">{phone}</a>
+        <a href={phoneHref} class="btn-cta">Call Now — We Pick Up</a>
         <a href="/book" class="btn-cta" style="background:#222; margin-top:-4px;">Book Online</a>
         <div class="cta-sub">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
         <hr class="cta-divider" />
@@ -250,14 +263,14 @@ const phoneRaw = "3238704790";
 <section class="section section-black">
   <div class="container">
     <p class="section-number">02 — Freezer Types We Service</p>
-    <h2 class="section-title">Every configuration found in LA homes</h2>
-    <p class="lead">From a basic chest freezer in a Burbank garage to a Sub-Zero column in a Beverly Hills kitchen — the failure modes differ by type and we come prepared for each.</p>
+    <h2 class="section-title">Every configuration found in SoCal homes</h2>
+    <p class="lead">From a basic chest freezer in a Burbank garage to a Sub-Zero column in a Newport Coast kitchen — the failure modes differ by type and we come prepared for each.</p>
 
     <div class="type-grid">
       <div class="type-card">
         <div class="type-icon">📦</div>
         <h3>Chest Freezers</h3>
-        <p>Common in garages and utility spaces. Large capacity, efficient design. Most failures: defrost system, thermostat, compressor, or start relay. In LA garages, heat-related compressor stress is the most frequent issue.</p>
+        <p>Common in garages and utility spaces. Large capacity, efficient design. Most failures: defrost system, thermostat, compressor, or start relay. In SoCal garages — especially Inland Empire summer heat — compressor stress is the most frequent issue.</p>
       </div>
       <div class="type-card">
         <div class="type-icon">🗄️</div>
@@ -272,7 +285,7 @@ const phoneRaw = "3238704790";
       <div class="type-card">
         <div class="type-icon">🧊</div>
         <h3>Built-In &amp; Column Freezers</h3>
-        <p>Sub-Zero, Thermador, and Miele column freezers — common in Beverly Hills, Bel Air, and Hancock Park kitchens. Panel-ready access, OEM parts required, higher repair complexity. We carry parts for these specifically.</p>
+        <p>Sub-Zero, Thermador, and Miele column freezers — common in Beverly Hills, Bel Air, Newport Coast, Pacific Palisades, and Pasadena estate kitchens. Panel-ready access, OEM parts required, higher repair complexity. We carry parts for these specifically.</p>
       </div>
       <div class="type-card">
         <div class="type-icon">❄️</div>
@@ -282,7 +295,7 @@ const phoneRaw = "3238704790";
       <div class="type-card">
         <div class="type-icon">🏢</div>
         <h3>Commercial Freezers</h3>
-        <p>Reach-in and under-counter commercial units for restaurants and food businesses. Our commercial diagnostic fee is $120. We work on True, Turbo Air, Beverage-Air, and other commercial brands commonly found in LA kitchens.</p>
+        <p>Reach-in and under-counter commercial units for restaurants and food businesses. Our commercial diagnostic fee is $120. We work on True, Turbo Air, Beverage-Air, and other commercial brands commonly found in SoCal kitchens.</p>
       </div>
     </div>
   </div>
@@ -334,15 +347,15 @@ const phoneRaw = "3238704790";
 <!-- 06 GARAGE FREEZER SPOTLIGHT -->
 <section class="section">
   <div class="container">
-    <p class="section-number">04 — The LA Garage Freezer Problem</p>
+    <p class="section-number">04 — The SoCal Garage Freezer Problem</p>
     <h2 class="section-title">Why freezers struggle in Southern California garages</h2>
-    <p class="lead">This is the freezer issue most LA homeowners don't connect to their garage — and none of the generic repair websites mention it.</p>
+    <p class="lead">This is the freezer issue most SoCal homeowners don't connect to their garage — and none of the generic repair websites mention it.</p>
 
     <div class="garage-block">
       <div class="garage-label">🌡️ Southern California Heat &amp; Your Freezer</div>
-      <h3>Your garage gets to 100°F. Your freezer was designed for 95°F max.</h3>
-      <p>An unventilated Los Angeles garage on a July afternoon regularly reaches 100–110°F. Most residential chest and upright freezers are rated for ambient operating temperatures up to 90–95°F. When ambient temperature exceeds that range, the compressor has to work continuously to maintain 0°F — it can never rest, condenser coils overheat, and the freezer gradually loses the battle.</p>
-      <p>The result: food that isn't as frozen as it should be, a compressor that wears out years earlier than expected, significantly higher electricity bills, and eventually a call to us. The freezer wasn't broken — it was being asked to work beyond its design limits. We see this constantly in Burbank, Glendale, Pasadena, and the Valley in summer.</p>
+      <h3>Your garage gets to 110°F+. Your freezer was designed for 95°F max.</h3>
+      <p>An unventilated SoCal garage on a July afternoon regularly reaches 100–115°F — the Inland Empire (San Bernardino, Riverside, Temecula) regularly sees 115°F+, and even coastal Orange and Ventura counties hit 100°F during heat events. Most residential chest and upright freezers are rated for ambient operating temperatures up to 90–95°F. When ambient temperature exceeds that range, the compressor has to work continuously to maintain 0°F — it can never rest, condenser coils overheat, and the freezer gradually loses the battle.</p>
+      <p>The result: food that isn't as frozen as it should be, a compressor that wears out years earlier than expected, significantly higher electricity bills, and eventually a call to us. The freezer wasn't broken — it was being asked to work beyond its design limits. We see this constantly across SoCal — Burbank, Glendale, Pasadena, the Valley, OC inland cities (Anaheim, Yorba Linda), and across the entire Inland Empire in summer.</p>
       <p>The solutions aren't complicated: condenser coil cleaning (critical — dirty coils make heat shedding even worse), adequate clearance around the unit, and in some cases a small fan to improve garage ventilation. We check all of these on every garage freezer call and give you specific recommendations for your setup.</p>
 
       <div class="garage-tips">
@@ -356,7 +369,7 @@ const phoneRaw = "3238704790";
         </div>
         <div class="garage-tip">
           <strong>Ambient rating check</strong>
-          <span>Most residential freezers are rated to 90–95°F ambient. LA garages regularly exceed that in summer</span>
+          <span>Most residential freezers are rated to 90–95°F ambient. SoCal garages — especially Inland Empire — regularly exceed that in summer</span>
         </div>
         <div class="garage-tip">
           <strong>Garage ventilation helps</strong>
@@ -379,7 +392,7 @@ const phoneRaw = "3238704790";
 <section class="section section-gray">
   <div class="container">
     <p class="section-number">05 — Brands We Service</p>
-    <h2 class="section-title">Every freezer brand in Los Angeles</h2>
+    <h2 class="section-title">Every freezer brand across SoCal</h2>
 
     <div style="margin-bottom:20px;">
       <p style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; color:#888; margin:0 0 12px; font-weight:700;">Luxury &amp; Built-In</p>
@@ -419,28 +432,28 @@ const phoneRaw = "3238704790";
 
     <div class="repairs-grid">
       <div class="repair-card">
-        <div class="repair-title">Burbank · Whirlpool Chest Freezer (Garage)</div>
+        <div class="repair-title">Burbank (LA County) · Whirlpool Chest Freezer (Garage)</div>
         <h3>"Everything is thawing — freezer ran all night but it's 25°F inside"</h3>
         <p>Classic garage freezer scenario in August: the chest freezer in an unventilated Burbank garage was fighting ambient temperatures of 105°F+. The condenser coils were heavily coated with dust and pet hair — in a hot garage, clogged coils mean the compressor can't shed heat at all. The compressor was still functional but operating at its limit.</p>
         <div class="repair-detail">Deep-cleaned condenser coils, verified start relay was functioning correctly, checked door gasket for gaps (found a small worn section — replaced). Moved the freezer 3 inches from the wall to restore clearance. Temperature stabilized at 0°F within two hours. Advised customer on summer garage ventilation — the coils will need annual cleaning going forward.</div>
       </div>
 
       <div class="repair-card">
-        <div class="repair-title">Bel Air · Sub-Zero 700TF Column Freezer</div>
+        <div class="repair-title">Bel Air (LA County) · Sub-Zero 700TF Column Freezer</div>
         <h3>"Frost building up inside — getting worse every week"</h3>
         <p>Defrost heater failure on a Sub-Zero 700TF column freezer. The automatic defrost cycle had stopped running — frost was accumulating on the evaporator coils until the back wall was completely coated. The unit was running continuously but airflow was nearly blocked. Left another few weeks, it would have stopped cooling entirely.</p>
         <div class="repair-detail">Replaced defrost heater assembly and defrost thermostat (we replace both when one fails — the thermostat failure is what typically causes the heater to fail) with OEM Sub-Zero parts. Manually defrosted the coils before reassembly. Ran two defrost cycles to confirm the system was operating correctly. Unit back to normal temperature and frost-free.</div>
       </div>
 
       <div class="repair-card">
-        <div class="repair-title">Glendale · LG French Door Bottom Freezer</div>
+        <div class="repair-title">Newport Beach (Orange County) · LG French Door Bottom Freezer</div>
         <h3>"Freezer is fine near the back but warm in front — ice cream is soft"</h3>
-        <p>Evaporator fan motor failure — textbook presentation. The coils at the back of the freezer stay cold because they're right next to the evaporator, but without a working fan, cold air doesn't circulate to the front of the drawer. Ice cream near the front softens; items at the back stay frozen. Easy to diagnose once you know the pattern.</p>
+        <p>Evaporator fan motor failure — textbook presentation. The coils at the back of the freezer stay cold because they're right next to the evaporator, but without a working fan, cold air doesn't circulate to the front of the drawer. Ice cream near the front softens; items at the back stay frozen. Easy to diagnose once you know the pattern. Coastal Newport Beach humidity accelerates fan motor bearing wear on these units.</p>
         <div class="repair-detail">Replaced evaporator fan motor with OEM LG part. Tested airflow distribution across the full freezer compartment before closing up. Even temperature throughout confirmed within 30 minutes of repair. 45-minute total job.</div>
       </div>
 
       <div class="repair-card">
-        <div class="repair-title">Silver Lake · Samsung RF28 French Door</div>
+        <div class="repair-title">Thousand Oaks (Ventura County) · Samsung RF28 French Door</div>
         <h3>"Freezer is clicking every few minutes and not freezing"</h3>
         <p>Failed start relay — a small but critical component that gives the compressor an initial electrical boost when it tries to start. When the relay fails, the compressor attempts to start, can't, kicks off, and tries again in a few minutes — producing the rhythmic clicking. The compressor itself was fine. This is one of the more satisfying repairs: $40 part, 20 minutes, freezer fully restored.</p>
         <div class="repair-detail">Replaced start relay with OEM Samsung part. Verified compressor started cleanly on next cycle. Temperature pulled down to 0°F within the hour. Customer had been without a working freezer for three days — was relieved it wasn't the compressor.</div>
@@ -495,8 +508,8 @@ const phoneRaw = "3238704790";
         <p>Food safety has a clock. We prioritize freezer calls within our schedule and don't make you wait three days. Call before noon and we're typically there the same afternoon.</p>
       </div>
       <div class="problem-card">
-        <h3>We understand LA's specific conditions</h3>
-        <p>Garage freezers in SoCal heat, condenser coil cleaning, ambient temperature limits — we've seen what Southern California summers do to freezers. We check the environmental conditions on every garage call, not just the appliance.</p>
+        <h3>We understand SoCal's specific conditions</h3>
+        <p>Garage freezers in SoCal heat (especially Inland Empire summers), condenser coil cleaning, ambient temperature limits — we've seen what Southern California summers do to freezers across all 5 counties. We check the environmental conditions on every garage call, not just the appliance.</p>
       </div>
       <div class="problem-card">
         <h3>Honest about repair vs. replace</h3>
@@ -504,7 +517,7 @@ const phoneRaw = "3238704790";
       </div>
       <div class="problem-card">
         <h3>Parts on the van for first-visit fix</h3>
-        <p>Defrost heaters, defrost thermostats, evaporator fan motors, start relays, door gaskets — for Samsung, LG, Whirlpool, Sub-Zero, and the other brands we see most in LA. Most freezer repairs are completed same visit.</p>
+        <p>Defrost heaters, defrost thermostats, evaporator fan motors, start relays, door gaskets — for Samsung, LG, Whirlpool, Sub-Zero, and the other brands we see most across SoCal. Most freezer repairs are completed same visit.</p>
       </div>
     </div>
   </div>
@@ -518,20 +531,24 @@ const phoneRaw = "3238704790";
 
     <div class="faq-list">
       <div class="faq-item">
-        <h3>How much does freezer repair cost in Los Angeles?</h3>
+        <h3>How much does freezer repair cost?</h3>
         <p>Our diagnostic fee is $89, applied toward the repair once you approve the work. Most residential freezer repairs run between $130 and $350. A defrost heater, thermostat, or evaporator fan replacement is toward the lower end. Compressor or sealed system work runs higher — we give you a written estimate before any work begins and an honest assessment of whether the repair makes sense for your unit.</p>
       </div>
       <div class="faq-item">
-        <h3>My freezer runs but won't get cold enough — what's wrong?</h3>
-        <p>Three most likely causes: a failed defrost system that's allowed frost to block the evaporator coils, a weakening compressor, or a refrigerant leak. In LA's warm climate — especially in unconditioned garage spaces — a freezer working harder than it was designed for shows these symptoms faster. We diagnose the actual cause before recommending parts.</p>
+        <h3>Which areas of Southern California do you cover?</h3>
+        <p>All five counties: Los Angeles, Orange, Ventura, San Bernardino, and Riverside. We dispatch from 8 service territories so the technician on your call is coming from the closest one. Same-day is our standard.</p>
       </div>
       <div class="faq-item">
-        <h3>Is it worth repairing a freezer or should I replace it?</h3>
+        <h3>My freezer runs but won't get cold enough — what's wrong?</h3>
+        <p>Three most likely causes: a failed defrost system that's allowed frost to block the evaporator coils, a weakening compressor, or a refrigerant leak. In SoCal's warm climate — especially in unconditioned garage spaces from the LA Basin to the Inland Empire — a freezer working harder than it was designed for shows these symptoms faster. We diagnose the actual cause before recommending parts.</p>
+      </div>
+      <div class="faq-item">
+        <h3>When does it make sense to repair vs replace a freezer?</h3>
         <p>It depends on the age, brand, and what failed. A defrost heater on a 4-year-old Whirlpool is worth fixing. A compressor on a 15-year-old basic chest freezer probably isn't. On Sub-Zero, Thermador, and Viking, repair almost always makes more sense because the unit itself is worth considerably more. We give you a straight answer before writing any repair order.</p>
       </div>
       <div class="faq-item">
         <h3>My freezer is in the garage — why does it struggle in summer?</h3>
-        <p>An unventilated LA garage can reach 100–110°F in summer. Most residential freezers are rated for ambient temperatures up to 90–95°F. Above that, the compressor runs continuously and can never rest. Annual condenser coil cleaning and adequate clearance around the unit are the two most effective things you can do. We check both on every garage freezer call.</p>
+        <p>An unventilated SoCal garage can reach 100–115°F in summer (Inland Empire 115°F+ is normal). Most residential freezers are rated for ambient temperatures up to 90–95°F. Above that, the compressor runs continuously and can never rest. Annual condenser coil cleaning and adequate clearance around the unit are the two most effective things you can do. We check both on every garage freezer call.</p>
       </div>
       <div class="faq-item">
         <h3>Why is there so much frost and ice buildup in my freezer?</h3>
@@ -539,7 +556,7 @@ const phoneRaw = "3238704790";
       </div>
       <div class="faq-item">
         <h3>Do you repair Sub-Zero and built-in column freezers?</h3>
-        <p>Yes. Sub-Zero column freezers and integrated panel-ready units are among the brands we service most frequently in LA's premium home market. We source OEM Sub-Zero parts directly from authorized suppliers. We also repair Thermador, Viking, and Miele column and built-in freezers.</p>
+        <p>Yes. Sub-Zero column freezers and integrated panel-ready units are among the brands we service most frequently in SoCal's premium home market — Bel Air, Newport Coast, Pacific Palisades, Pasadena estates, Thousand Oaks hill homes. We source OEM Sub-Zero parts directly from authorized suppliers. We also repair Thermador, Viking, and Miele column and built-in freezers.</p>
       </div>
       <div class="faq-item">
         <h3>What does the 90-day warranty cover on freezer repairs?</h3>
@@ -552,8 +569,8 @@ const phoneRaw = "3238704790";
 <!-- 12 NEARBY + BOTTOM CTA -->
 <section class="section">
   <div class="container">
-    <p class="section-number">10 — Other Services &amp; Cities</p>
-    <h2 class="section-title">More appliance repairs across Los Angeles</h2>
+    <p class="section-number">10 — Other Services &amp; Counties</p>
+    <h2 class="section-title">More appliance repairs across Southern California</h2>
     <div class="nearby-links">
       <a href="/services/refrigerator-repair/">Refrigerator Repair</a>
       <a href="/services/washer-repair/">Washer Repair</a>
@@ -566,19 +583,15 @@ const phoneRaw = "3238704790";
     </div>
 
     <div style="margin-top:48px; padding-top:40px; border-top:1px solid var(--border);">
-      <p class="section-number">Cities We Serve</p>
+      <p class="section-number">Counties We Serve</p>
+      <p style="font-size:0.95rem; color:var(--muted); margin: 0 0 18px;">5 counties · 8 service territories. Same-day dispatch from the branch closest to your address.</p>
       <div class="nearby-links">
-        <a href="/burbank/">Burbank</a>
-        <a href="/glendale/">Glendale</a>
-        <a href="/pasadena/">Pasadena</a>
-        <a href="/beverly-hills/">Beverly Hills</a>
-        <a href="/west-hollywood/">West Hollywood</a>
-        <a href="/silver-lake/">Silver Lake</a>
-        <a href="/santa-monica/">Santa Monica</a>
-        <a href="/culver-city/">Culver City</a>
-        <a href="/los-feliz/">Los Feliz</a>
-        <a href="/marina-del-rey/">Marina del Rey</a>
-        <a href="/los-angeles/">Los Angeles</a>
+        <a href="/los-angeles-county/">Los Angeles County</a>
+        <a href="/orange-county/">Orange County</a>
+        <a href="/ventura-county/">Ventura County</a>
+        <a href="/san-bernardino-county/">San Bernardino County</a>
+        <a href="/riverside-county/">Riverside County</a>
+        <a href="/areas/">All Areas Served →</a>
       </div>
     </div>
   </div>
@@ -586,10 +599,10 @@ const phoneRaw = "3238704790";
 
 <section class="bottom-cta">
   <div class="container">
-    <h2>Same day freezer repair across Los Angeles</h2>
-    <p>Chest, upright, built-in column — all brands. Food safety is the clock. $89 diagnostic, 90-day warranty.</p>
+    <h2>Same-day freezer repair across Southern California</h2>
+    <p>5 counties · 8 service territories · BHGS Licensed #A49573 · 90-day warranty. Chest, upright, built-in column — all brands. Food safety is the clock. $89 diagnostic.</p>
     <div class="cta-row">
-      <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
+      <a href={phoneHref} class="btn-primary">Call {phone}</a>
       <a href="/book" class="btn-secondary">Book Online</a>
     </div>
   </div>
