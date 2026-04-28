@@ -1,0 +1,31 @@
+---
+/** CityLayoutV2 — Layout for v2 city pages.
+ *  Reuses existing Layout.astro for Notification bar, MainNav, Breadcrumbs, Footer
+ *  (all 87 city pages share the same site chrome).
+ *  This layout adds v2 design tokens + a slot for the page body. */
+
+import '../styles/v2-tokens.css';
+import Layout from './Layout.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  localBusinessSchema?: Record<string, unknown>;
+}
+
+const { title, description, canonical, localBusinessSchema } = Astro.props;
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    {localBusinessSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    )}
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </Fragment>
+  <slot />
+</Layout>
