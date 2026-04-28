@@ -1,570 +1,292 @@
 ---
-// src/pages/marina-del-rey.astro
-// SDAR — samedayappliance.repair
-// Marina del Rey, CA 90292 — Волна 2
-// Филиал: Los Angeles · (424) 325-0520
-// GSC: appliance repair marina del rey ca — 151 показов, позиция 8.1 🔥
-//      appliance repair marina del rey — 16 показов, позиция 19.4
-// Страница уже существует /marina-del-rey/ — переписываем полностью
-// Апрель 2026
+/**
+ * Marina del Rey, CA — Variant A migration (T9 Tier 1 final batch).
+ * Branch: Los Angeles · ZIP: 90292
+ * Source: wiki/migration/content-dumps/marina-del-rey.md
+ * Per-city block: CustomNarrativeMarinaDelRey (.mdr-locations — 1fr 260px
+ * sticky CTA card "In a condo building?" on black bg).
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (LA branch is service_area, not physical_pin)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ *   - License: CA CSLB #1138898
+ *   - Pricing: residential ONLY ($89). Dropped $120 commercial diagnostic
+ *     and Commercial Appliance pricing tier from legacy. Commercial work
+ *     remains in narrative + service grid + jobs + reviews where lossless
+ *     to dump.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import CustomNarrativeMarinaDelRey from '../components/cities/custom/CustomNarrativeMarinaDelRey.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Marina del Rey",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90292"],
-  phone: "(424) 325-0520",
-  phoneRaw: "+14243250520",
-  email: "info@samedayappliance.repair",
-  branch: "Los Angeles",
-  slug: "marina-del-rey",
-};
+const branchSlug = 'los-angeles';
+const cityName = 'Marina del Rey';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Marina del Rey CA 90292 — Same Day | Marina Condos | (424) 325-0520`;
-const description = `Same-day appliance repair in Marina del Rey, CA 90292. Marina condos, Oxford Triangle, Villa Marina, Via Marina. Salt air coil specialists. Sub-Zero, Wolf, all brands. Licensed, OEM parts, 90-day warranty. Call (424) 325-0520.`;
-const canonical = `https://samedayappliance.repair/marina-del-rey/`;
+const title = `Appliance Repair Marina del Rey CA — Same Day | 90292 · Via Marina · Admiralty Way · Condo HOA Ready | ${branch.phone}`;
+const description = "Same-day appliance repair in Marina del Rey, CA 90292. Marina condos, high-rise buildings, harbor-adjacent homes. HOA & building manager coordination. Salt-air specialists. Sub-Zero, Wolf, Samsung, LG. Same-day, OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/marina-del-rey/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Marina del Rey",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Los Angeles",
-    "addressLocality": "Los Angeles",
-    "addressRegion": "CA",
-    "postalCode": "90001",
-    "addressCountry": "US"
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator',
+    issues: ['Salt air coil corrosion', 'Not cooling', 'Ice maker', 'Built-in columns'],
+    brands: ['Sub-Zero', 'Samsung', 'LG', 'GE', 'Whirlpool', 'Viking'] },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer',
+    issues: ['Not draining', 'Not spinning', 'Stackable units', 'Condo hookups'],
+    brands: ['LG', 'Samsung', 'Whirlpool', 'Bosch', 'Miele', 'Maytag'] },
+  { icon: '♨️', name: 'Dryer Repair', slug: 'dryer',
+    issues: ['Not heating', 'Vent cleaning', 'Stackable', 'Gas & electric'],
+    brands: ['LG', 'Samsung', 'GE', 'Maytag', 'Whirlpool', 'Electrolux'] },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher',
+    issues: ['Not draining', 'Gasket wear (coastal)', 'Error codes', 'Leaking'],
+    brands: ['Bosch', 'Samsung', 'LG', 'KitchenAid', 'Miele', 'GE'] },
+  { icon: '🔥', name: 'Oven, Range & Stove Repair', slug: 'oven',
+    issues: ['Not heating', 'Igniter', 'Temperature calibration', 'Gas valve'],
+    brands: ['Wolf', 'Viking', 'Thermador', 'GE', 'Samsung', 'Dacor'] },
+  { icon: '🍷', name: 'Wine & Beverage Cooler', slug: 'wine-cooler',
+    issues: ['Temperature off', 'Coastal humidity', 'Compressor', 'Under-counter'],
+    brands: ['Sub-Zero', 'True', 'Liebherr', 'U-Line', 'Dacor'] },
+  { icon: '❄️', name: 'Freezer & Ice Machine Repair', slug: 'freezer',
+    issues: ['Not freezing', 'Commercial ice machine', 'Walk-in cooler'],
+    brands: ['Sub-Zero', 'True', 'Manitowoc', 'Scotsman', 'GE'] },
+  { icon: '🏪', name: 'Commercial Appliance Repair', slug: 'commercial',
+    issues: ['Restaurant ovens', 'Walk-in coolers', 'Commercial refrigerators', 'Ice machines'],
+    brands: ['True', 'Traulsen', 'Hoshizaki', 'Manitowoc', 'Hobart'] },
+];
+
+const narrativeParagraphs = [
+  "Marina del Rey is mostly condo and apartment living — Via Marina, Palawan, Bali, Mindanao, Oxford Triangle, Villa Marina, the Admiralty Way high-rises. That means HOA logistics, underground parking, elevator coordination, and shared utility hookups are part of every appliance call. We handle that side of it: the building manager call before arrival, the elevator pad request, the COI on file, the service report for the building's records.",
+  "Harbor location matters for appliances in a way most LA neighborhoods don't experience. Marina-facing first-floor units — anything within 200 feet of open water — see condenser coil corrosion at roughly twice the inland rate. We've cleaned 16-month-old coils that look like 5-year-old ones simply because the unit is one floor above a boat slip. Coil cleaning every 4 months is the right schedule for marina-adjacent units, not the standard 12.",
+  "Admiralty Way and the surrounding restaurant row also make commercial calls a regular part of our Marina del Rey schedule. Restaurant kitchens, walk-in coolers, hotel kitchens — we cover all of it.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before any work. <strong>90-day warranty</strong> on parts and labor. Weekends available.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'Marina-adjacent maintenance tip',
+    paragraphs: [
+      "If your refrigerator is within 200 feet of open water — boat slip view, first-floor marina facing, harbor-adjacent — clean the condenser coils every 4 months. Salt air deposits on metal faster here than anywhere else in our service area. We include this check on every MDR fridge call as standard diagnostic, not an add-on. A coil cleaning today is meaningfully cheaper than a compressor replacement in 18 months.",
+    ],
   },
-  "areaServed": [
-    { "@type": "City", "name": "Marina del Rey" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'Samsung Refrigerator',
+    neighborhood: 'Via Marina, 90292',
+    title: 'Fridge running loudly, not keeping temp',
+    body: "Marina-facing unit, first floor — exactly the salt air situation we see regularly. Condenser coils were heavily corroded and clogged after only 16 months. The compressor was overworking trying to compensate. Our tech cleaned the coils completely, replaced a weakened condenser fan motor, and checked door seals. Temperature stabilised within two hours. Put the owner on a 4-month coil cleaning schedule — essential for this location.",
+    result: '✓ Same day · Coil cleaning + fan motor · Maintenance schedule',
+  },
+  {
+    badge: 'LG Washer',
+    neighborhood: 'Oxford Triangle, 90292',
+    title: 'OE error, water not draining from condo unit',
+    body: "High-rise condo, fourth floor — called the building manager first to confirm elevator access and unit entry. LG OE drain error: found a blocked pump filter and a kinked drain hose where it connected to the building's shared standpipe. Cleared the filter, corrected the hose routing, ran three drain cycles. The building manager got a copy of the service report for their maintenance records. Professional coordination throughout.",
+    result: '✓ Same day · Building manager coordinated · Service report provided',
+  },
+  {
+    badge: 'Commercial Walk-in Cooler',
+    neighborhood: 'Admiralty Way restaurant, 90292',
+    title: 'Walk-in at 52°F, health inspection in the morning',
+    body: "Called at 6pm — walk-in cooler had gradually warmed overnight. Found a failed defrost heater causing ice buildup on the evaporator coils and blocking airflow. Manual defrost, replaced the heater, verified the defrost timer and thermostat. Walk-in was at 38°F by 9pm. Health inspection passed the next morning. Commercial kitchen emergencies are exactly why we keep these calls at the top of the queue.",
+    result: '✓ Evening same day · At temp by 9pm · Inspection passed',
+  },
+  {
+    badge: 'Sub-Zero Wine Storage',
+    neighborhood: 'Villa Marina, 90292',
+    title: 'Wine unit running warm, temperature fluctuating',
+    body: "Sub-Zero 424 wine storage unit — evaporator fan motor failing intermittently, causing temperature swings. The coastal humidity had accelerated the motor bearing wear. Replaced the fan motor with an OEM Sub-Zero part, cleaned the evaporator coils (light salt air deposit), and recalibrated the temperature zones. Stable at 55°F throughout both zones within 90 minutes. Owner had about 300 bottles — caught before any damage.",
+    result: '✓ Same day · OEM Sub-Zero · Both zones stable',
+  },
+];
+
+const reviews = [
+  {
+    text: "Fridge in my marina-facing unit was running loudly. Same Day came out, immediately knew it was the salt air coil issue, cleaned everything, replaced the fan motor. They even explained the 4-month maintenance schedule I should follow for this location. First repair company that actually understood coastal appliance issues.",
+    author: '— David M., Via Marina, Marina del Rey',
+  },
+  {
+    text: "High-rise condo with a washing machine issue. They coordinated with building management, came up with the right tools, fixed the drain problem in under an hour, and gave the building manager a service report. Professional from start to finish. Exactly what a condo building needs.",
+    author: '— Sarah L., Oxford Triangle, Marina del Rey',
+  },
+  {
+    text: "Restaurant walk-in on Admiralty Way hit 52°F before a health inspection. Called Same Day at 6pm, tech was there within two hours, fixed the defrost heater, cooler was at temperature by 9pm. Inspection passed the next morning. These guys understand what a commercial kitchen emergency means.",
+    author: '— Marco T., Restaurant owner, Admiralty Way',
+  },
+];
+
+const pricingCards = [
+  { label: 'Refrigerator (coastal)', price: '$200–$500', note: 'Coil cleaning · Fan motor · Inlet valve · 4-month plan', highlight: true },
+  { label: 'Sub-Zero / Wolf', price: '$300–$700+', note: 'Built-in · Wine column · OEM Sub-Zero / Wolf', highlight: true },
+  { label: 'Washer / Dryer', price: '$150–$350', note: 'Stackable · Building manager coordination · Drain' },
+  { label: 'Oven / Range', price: '$175–$420', note: 'Igniter · Calibration · Gas valve · OEM' },
+  { label: 'Dishwasher', price: '$150–$320', note: 'Coastal gasket · E24 · Drain pump · Spray arm' },
+  { label: 'Diagnostic Fee', price: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Marina del Rey, CA?',
+    answer: 'Yes. Our technicians cover all of Marina del Rey 90292 — Via Marina, Palawan Way, Bali Way, Mindanao Way, Admiralty Way, Oxford Triangle, Villa Marina, Marina Peninsula, The Shores, Fiji Way. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'Does salt air affect appliances in Marina del Rey?',
+    answer: "Yes — and at roughly twice the rate of inland LA. Marina-facing first-floor units (within 200 feet of open water) see condenser coil corrosion in 12–16 months that would normally take 4–5 years inland. Coastal Marina del Rey appliances need 4-month coil cleaning intervals instead of the standard 12. We include a coil inspection on every MDR refrigerator call.",
+  },
+  {
+    question: 'Do you service appliances in high-rise condos and HOA buildings?',
+    answer: "Yes. Most of Marina del Rey is condo and apartment living, and we handle the HOA side: building manager coordination before arrival, elevator pad requests, COI on request, written service reports for the building's maintenance records. Tell us the building when you call and we'll handle the logistics.",
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, and Viking appliances in Marina del Rey?',
+    answer: 'Yes. Built-in Sub-Zero columns, Wolf ranges, Viking pro ranges, and Thermador appliances are common in the Marina condos and harbor-adjacent homes. We carry OEM parts for all luxury brands on every vehicle and are experienced with the coastal corrosion patterns specific to MDR.',
+  },
+  {
+    question: 'Do you service commercial appliances in Marina del Rey restaurants?',
+    answer: 'Yes. Restaurant ovens, walk-in coolers, commercial refrigeration, ice machines, and related equipment along Admiralty Way and the surrounding restaurant row. Restaurant kitchen emergencies (walk-in temp drift before a health inspection, reach-in failure during service) are prioritised — call us with the timeline and we will move accordingly.',
+  },
+  {
+    question: 'What is your diagnostic fee in Marina del Rey?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before any work begins. Most Marina del Rey residential repairs run $150–$500; Sub-Zero, Wolf, and other luxury brands may run higher due to OEM part pricing.',
+  },
+  {
+    question: 'Do you also serve Venice, Playa del Rey, and Culver City?',
+    answer: 'Yes. Our Marina del Rey service extends to Venice (90291), Playa del Rey (90293), Playa Vista (90094), Mar Vista (90066), Culver City (90230), and Santa Monica.',
+  },
+];
+
+const nearby = [
+  { slug: 'santa-monica', name: 'Santa Monica' },
+  { slug: 'culver-city', name: 'Culver City' },
+  { slug: 'los-angeles', name: 'Los Angeles' },
+  { slug: 'brentwood', name: 'Brentwood' },
+  { slug: 'beverly-hills', name: 'Beverly Hills' },
+  { slug: 'pacific-palisades', name: 'Pacific Palisades' },
+  { slug: 'malibu', name: 'Malibu' },
+  { slug: 'west-hollywood', name: 'West Hollywood' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Marina del Rey', sameAs: 'https://en.wikipedia.org/wiki/Marina_del_Rey,_California' },
+    { '@type': 'Neighborhood', name: 'Via Marina' },
+    { '@type': 'Neighborhood', name: 'Oxford Triangle' },
+    { '@type': 'Neighborhood', name: 'Admiralty Way' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Marina del Rey, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Marina del Rey 90292 — the marina condo complexes along Via Marina, Palawan Way, Bali Way, and Mindanao Way, the Oxford Triangle, Villa Marina, Marina Peninsula, and properties along Admiralty Way. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Does salt air from the marina affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Marina del Rey's proximity to the ocean and the harbor means salt air exposure that accelerates corrosion on refrigerator condenser coils, dishwasher door gaskets, and outdoor grill igniter systems. Properties directly on the marina basin — along Via Marina and the boat slips — see this most acutely. Our technicians check condenser coils proactively on every Marina del Rey refrigerator call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair appliances in high-rise condos and HOA buildings in Marina del Rey?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Many Marina del Rey residents live in high-rise and mid-rise condo buildings. We work with HOA coordinators, building managers, and individual residents. We coordinate parking, elevator access, and unit entry as needed. Call us and describe your building setup — we've worked in all of them." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, and Viking appliances in Marina del Rey?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The newer luxury condo developments and renovated units in Marina del Rey often have Sub-Zero refrigerators, Wolf ranges, and Thermador appliances. Our technicians carry OEM parts for these brands and are trained on their specific systems." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair commercial appliances in Marina del Rey?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Marina del Rey's restaurant row along Admiralty Way and the hotel kitchens generate regular commercial calls. We repair commercial refrigerators, commercial ovens, walk-in coolers, and commercial ice machines. Commercial diagnostic fee is $120, waived with repair." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Marina del Rey?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89 for residential appliances, waived when you proceed with the repair. Commercial appliance diagnostic is $120, also waived with repair. We give you a complete written estimate before starting any work." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Venice, Playa del Rey, and Culver City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Marina del Rey service area extends to Venice, Playa del Rey, Playa Vista, Mar Vista, and Culver City. All are in our regular Westside coverage area." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="mdr-hero">
-    <div class="mdr-hero__inner container">
-      <div class="mdr-hero__content">
-        <div class="mdr-hero__eyebrow">Marina del Rey, CA · 90292 · Via Marina · Oxford Triangle · Villa Marina · Admiralty Way</div>
-        <h1 class="mdr-hero__h1">Appliance Repair<br><span class="mdr-hero__accent">Marina del Rey, CA</span></h1>
-        <p class="mdr-hero__sub">
-          Marina condos, high-rise buildings, harbor-adjacent homes — all of 90292.
-          Salt air hits appliances differently here. Our technicians cover every complex
-          and every street in Marina del Rey. Same-day service, OEM parts, 90-day warranty.
-        </p>
-        <div class="mdr-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="mdr-hero__rating"><span class="stars">★★★★★</span><span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span></div>
-      </div>
-      <div class="mdr-hero__img-wrap">
-        <img src="/images/areas/appliance-repair-marina-del-rey-ca.webp" alt="Appliance repair Marina del Rey CA" width="560" height="460" loading="eager" fetchpriority="high" />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Marina del Rey · 90292 · Via Marina · Oxford Triangle · Villa Marina · Admiralty Way"
+    headlineMain="Appliance repair in"
+    headlineAccent="Marina del Rey, CA"
+    subheadline="Marina condos, high-rise buildings, harbor-adjacent homes — all of 90292. Salt air hits appliances differently here. Our technicians cover every complex and every street. Same-day, OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar item4Text="Condo &amp; HOA Ready" item4Fine="Building manager · Elevator · COI" />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Condo & HOA Ready</span></div>
-    </div>
-  </section>
+  <CustomNarrativeMarinaDelRey number="01" />
 
-  <!-- INTRO -->
-  <section class="mdr-intro">
-    <div class="container mdr-intro__inner">
-      <div class="mdr-intro__text">
-        <h2>Appliance Repair in Marina del Rey — What's Different Here</h2>
-        <p>
-          Marina del Rey is almost entirely condo and apartment living — the dense complexes
-          along Via Marina, Palawan Way, Bali Way, and Mindanao Way, the Oxford Triangle,
-          Villa Marina, and the newer towers along Admiralty Way. Appliance repair here means
-          coordinating with HOA buildings, navigating underground parking, scheduling around
-          elevator availability. Our technicians have worked in all of these buildings and
-          know what the logistics look like before they arrive.
-        </p>
-        <p>
-          The harbor location matters for appliances. Properties directly on the marina basin
-          — the units with water views along Via Marina — have real salt air exposure that
-          accelerates condenser coil corrosion on refrigerators at roughly twice the rate of
-          inland LA. We check this proactively on every refrigerator call in 90292. A coil
-          cleaning that takes 20 minutes can add years to a compressor.
-        </p>
-        <p>
-          The restaurant row along Admiralty Way and the hotel kitchens generate commercial
-          appliance calls too. Walk-in cooler down, commercial oven out — we handle both and
-          understand the urgency they carry.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89 residential · $120 commercial</strong> — both waived
-          with repair. Written estimate before we start. <strong>90-day warranty</strong>.
-        </p>
-        <div class="mdr-tip">
-          <div class="mdr-tip__icon">⚓</div>
-          <div class="mdr-tip__text">
-            <strong>For marina-adjacent units:</strong> If your refrigerator is within
-            200 feet of open water — boat slip view, first-floor marina facing — clean
-            the condenser coils every 4 months. Salt air deposits on metal faster than
-            anywhere in our service area. We include this check on every MDR fridge call
-            as standard diagnostic, not an add-on.
-          </div>
-        </div>
-      </div>
-      <div class="mdr-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Marina del Rey Service</div>
-          <div class="cta-box__sub">90292 · Condos · Commercial · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="02"
+    eyebrow="Knowing the Marina"
+    headline="Appliance repair in Marina del Rey —"
+    headlineAccent="what's different here"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- SERVICES -->
-  <section class="mdr-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Marina del Rey</h2>
-      <p class="section-sub">Residential & commercial · Condo-ready · Salt air aware · 90292</p>
-      <div class="services-grid">
-        <a href="/marina-del-rey/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Salt air coil corrosion · Not cooling · Ice maker · Built-in columns</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · Viking</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/marina-del-rey/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Not draining · Not spinning · Stackable units · Condo hookups</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Bosch · Miele · Maytag</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/marina-del-rey/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Vent cleaning · Stackable · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/marina-del-rey/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Gasket wear (coastal) · Error codes · Leaking</div>
-          <div class="service-card__brands">Bosch · Samsung · LG · KitchenAid · Miele · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/marina-del-rey/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove Repair</div>
-          <div class="service-card__issues">Not heating · Igniter · Temperature calibration · Gas valve</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · GE · Samsung · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/marina-del-rey/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine & Beverage Cooler</div>
-          <div class="service-card__issues">Temperature off · Coastal humidity · Compressor · Under-counter</div>
-          <div class="service-card__brands">Sub-Zero · True · Liebherr · U-Line · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/marina-del-rey/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Machine Repair</div>
-          <div class="service-card__issues">Not freezing · Commercial ice machine · Walk-in cooler</div>
-          <div class="service-card__brands">Sub-Zero · True · Manitowoc · Scotsman · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/marina-del-rey/commercial/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🏪</div>
-          <div class="service-card__name">Commercial Appliance Repair</div>
-          <div class="service-card__issues">Restaurant ovens · Walk-in coolers · Commercial refrigerators · Ice machines</div>
-          <div class="service-card__brands">True · Traulsen · Hoshizaki · Manitowoc · Hobart</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="03"
+    eyebrow="Capabilities"
+    headline="What we repair in"
+    headlineAccent="Marina del Rey"
+    subheadline="Salt-air specialists · condo &amp; HOA ready · commercial kitchen ready · all of 90292"
+    services={services}
+    cardStructure="3-tier"
+  />
 
-  <!-- NEIGHBORHOODS / LOCATIONS -->
-  <section class="mdr-locations">
-    <div class="container">
-      <div class="loc-inner">
-        <div class="loc-text">
-          <div class="loc-eyebrow">We Know Every Part of the Marina</div>
-          <h2>All of Marina del Rey — 90292</h2>
-          <p>
-            Marina del Rey is a small ZIP — 90292 covers the entire community — but the
-            building types and access situations vary significantly. High-rise towers on
-            Admiralty Way are different from the low-rise complexes on the island channels,
-            and the marina-facing units have different appliance maintenance needs than
-            units on the interior.
-          </p>
-          <div class="loc-grid">
-            <div class="loc-zone">
-              <div class="loc-zone__title">Marina Complexes</div>
-              <div class="loc-items">
-                <span>Via Marina</span>
-                <span>Palawan Way</span>
-                <span>Bali Way</span>
-                <span>Mindanao Way</span>
-                <span>Admiralty Way</span>
-                <span>Basin complexes</span>
-              </div>
-            </div>
-            <div class="loc-zone">
-              <div class="loc-zone__title">Neighborhoods</div>
-              <div class="loc-items">
-                <span>Oxford Triangle</span>
-                <span>Villa Marina</span>
-                <span>Marina Peninsula</span>
-                <span>The Shores</span>
-                <span>Marina del Rey Hotel area</span>
-                <span>Fiji Way area</span>
-              </div>
-            </div>
-            <div class="loc-zone">
-              <div class="loc-zone__title">Nearby We Serve</div>
-              <div class="loc-items">
-                <span>Venice (90291)</span>
-                <span>Playa del Rey (90293)</span>
-                <span>Playa Vista (90094)</span>
-                <span>Mar Vista (90066)</span>
-                <span>Culver City (90230)</span>
-                <span>Santa Monica</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="loc-cta">
-          <div class="loc-cta__title">In a condo building?</div>
-          <div class="loc-cta__sub">We coordinate with HOA & building management</div>
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">{city.phone}</a>
-          <div class="loc-cta__note">$89 diagnostic · Waived with repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Jobs our team did in"
+    headlineAccent="Marina del Rey"
+    jobs={jobs}
+  />
 
-  <!-- RECENT REPAIRS -->
-  <section class="mdr-recent">
-    <div class="container">
-      <h2>Recent Jobs in Marina del Rey</h2>
-      <p class="section-sub">Real calls from 90292 — condos, restaurants, marina-facing units.</p>
-      <div class="recent-grid">
-        <div class="recent-card">
-          <div class="recent-card__header"><span class="recent-badge">Samsung Refrigerator</span><span class="recent-location">Via Marina, 90292</span></div>
-          <div class="recent-card__title">"Fridge running loudly, not keeping temp"</div>
-          <div class="recent-card__desc">Marina-facing unit, first floor — exactly the salt air situation we see regularly. Condenser coils were heavily corroded and clogged after only 16 months. The compressor was overworking trying to compensate. Our tech cleaned the coils completely, replaced a weakened condenser fan motor, and checked door seals. Temperature stabilized within two hours. Put the owner on a 4-month coil cleaning schedule — essential for this location.</div>
-          <div class="recent-card__result">✓ Same day · Coil cleaning + fan motor · Maintenance schedule</div>
-        </div>
-        <div class="recent-card">
-          <div class="recent-card__header"><span class="recent-badge">LG Washer</span><span class="recent-location">Oxford Triangle, 90292</span></div>
-          <div class="recent-card__title">"OE error, water not draining from condo unit"</div>
-          <div class="recent-card__desc">High-rise condo, fourth floor — called the building manager first to confirm elevator access and unit entry. LG OE drain error: found a blocked pump filter and a kinked drain hose where it connected to the building's shared standpipe. Cleared the filter, corrected the hose routing, ran three drain cycles. The building manager got a copy of the service report for their maintenance records. Professional coordination throughout.</div>
-          <div class="recent-card__result">✓ Same day · Building manager coordinated · Service report provided</div>
-        </div>
-        <div class="recent-card">
-          <div class="recent-card__header"><span class="recent-badge">Commercial Walk-in Cooler</span><span class="recent-location">Admiralty Way restaurant, 90292</span></div>
-          <div class="recent-card__title">"Walk-in at 52°F, health inspection in the morning"</div>
-          <div class="recent-card__desc">Called at 6pm — walk-in cooler had gradually warmed overnight. Found a failed defrost heater causing ice buildup on the evaporator coils and blocking airflow. Manual defrost, replaced the heater, verified the defrost timer and thermostat. Walk-in was at 38°F by 9pm. Health inspection passed the next morning. Commercial kitchen emergencies are exactly why we keep these calls at the top of the queue.</div>
-          <div class="recent-card__result">✓ Evening same day · At temp by 9pm · Inspection passed</div>
-        </div>
-        <div class="recent-card">
-          <div class="recent-card__header"><span class="recent-badge">Sub-Zero Wine Storage</span><span class="recent-location">Villa Marina, 90292</span></div>
-          <div class="recent-card__title">"Wine unit running warm, temperature fluctuating"</div>
-          <div class="recent-card__desc">Sub-Zero 424 wine storage unit — evaporator fan motor failing intermittently, causing temperature swings. The coastal humidity had accelerated the motor bearing wear. Replaced the fan motor with an OEM Sub-Zero part, cleaned the evaporator coils (light salt air deposit), and recalibrated the temperature zones. Stable at 55°F throughout both zones within 90 minutes. Owner had about 300 bottles — caught before any damage.</div>
-          <div class="recent-card__result">✓ Same day · OEM Sub-Zero · Both zones stable</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Method number="05" />
 
-  <!-- WHY US -->
-  <section class="mdr-why">
-    <div class="container">
-      <h2>Why Marina del Rey Residents Call Us</h2>
-      <div class="why-grid">
-        <div class="why-card"><div class="why-icon">🏢</div><div class="why-title">Condo & HOA Ready</div><div class="why-text">High-rise buildings, underground parking, elevator scheduling, building management coordination — we handle all of it. Marina del Rey is mostly condo living and we're experienced with what that means logistically.</div></div>
-        <div class="why-card"><div class="why-icon">🌊</div><div class="why-title">Salt Air Specialists</div><div class="why-text">Harbor-adjacent coil corrosion is real and we check for it on every Marina del Rey refrigerator call. Proactive coil cleaning prevents expensive compressor replacements — we explain the maintenance schedule every time.</div></div>
-        <div class="why-card"><div class="why-icon">🏪</div><div class="why-title">Commercial Kitchen Ready</div><div class="why-text">Admiralty Way restaurants, hotel kitchens, marina facilities — we respond to commercial emergencies. Walk-in cooler down before a health inspection? That's a same-day priority call.</div></div>
-        <div class="why-card"><div class="why-icon">✅</div><div class="why-title">90-Day Warranty, OEM Only</div><div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts — especially important in coastal conditions where aftermarket parts fail faster. $89 diagnostic waived with repair.</div></div>
-      </div>
-    </div>
-  </section>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Marina del Rey"
+    headlineAccent="customers say"
+    reviews={reviews}
+  />
 
-  <!-- REVIEWS -->
-  <section class="mdr-reviews">
-    <div class="container">
-      <h2>What Marina del Rey Clients Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Fridge in my marina-facing unit was running loudly. Same Day came out, immediately knew it was the salt air coil issue, cleaned everything, replaced the fan motor. They even explained the 4-month maintenance schedule I should follow for this location. First repair company that actually understood coastal appliance issues."</div><div class="review-author">— David M., Via Marina, Marina del Rey</div></div>
-        <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"High-rise condo with a washing machine issue. They coordinated with building management, came up with the right tools, fixed the drain problem in under an hour, and gave the building manager a service report. Professional from start to finish. Exactly what a condo building needs."</div><div class="review-author">— Sarah L., Oxford Triangle, Marina del Rey</div></div>
-        <div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"Restaurant walk-in on Admiralty Way hit 52°F before a health inspection. Called Same Day at 6pm, tech was there within two hours, fixed the defrost heater, cooler was at temperature by 9pm. Inspection passed the next morning. These guys understand what a commercial kitchen emergency means."</div><div class="review-author">— Marco T., Restaurant owner, Admiralty Way</div></div>
-      </div>
-    </div>
-  </section>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Marina del Rey"
+    subheadline="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    cards={pricingCards}
+  />
 
-  <!-- PRICING -->
-  <section class="mdr-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Marina del Rey</h2>
-      <p class="section-sub">Written estimate before we start. $89 residential · $120 commercial — both waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured"><div class="pricing-card__appliance">Refrigerator (coastal)</div><div class="pricing-card__range">$200 – $500</div><div class="pricing-card__note">Includes salt air coil inspection · Fan motor · Ice maker</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Washer / Dryer</div><div class="pricing-card__range">$150 – $350</div><div class="pricing-card__note">Drain pump, heating element, stackable</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Oven / Range</div><div class="pricing-card__range">$175 – $420</div><div class="pricing-card__note">Igniter, element, gas valve, calibration</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Commercial Appliance</div><div class="pricing-card__range">$200 – $700+</div><div class="pricing-card__note">Walk-in cooler · Commercial oven · Diagnostic $120</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Sub-Zero / Wolf</div><div class="pricing-card__range">$300 – $700+</div><div class="pricing-card__note">OEM parts · Coastal maintenance included</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Diagnostic Fee</div><div class="pricing-card__range">$89 / $120</div><div class="pricing-card__note">Residential / Commercial · Waived with repair</div></div>
-      </div>
-    </div>
-  </section>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Marina del Rey"
+    faqs={faqs}
+  />
 
-  <!-- FAQ -->
-  <section class="mdr-faq">
-    <div class="container">
-      <h2>Questions Marina del Rey Clients Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Marina del Rey, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Marina del Rey 90292 — the condo complexes along Via Marina, Palawan Way, Bali Way, Mindanao Way, the Oxford Triangle, Villa Marina, Marina Peninsula, and Admiralty Way. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does salt air from the marina affect appliances?</summary><div class="faq-answer">Yes. Marina del Rey's proximity to the harbor means salt air that accelerates condenser coil corrosion at roughly twice the rate of inland LA. Properties directly on the marina basin see this most acutely. Our technicians check condenser coils proactively on every Marina del Rey refrigerator call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair appliances in high-rise condos and HOA buildings?</summary><div class="faq-answer">Yes. We work with HOA coordinators, building managers, and individual residents. We coordinate parking, elevator access, and unit entry as needed. We've worked in all of Marina del Rey's major condo buildings.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero, Wolf, and Viking appliances in Marina del Rey?</summary><div class="faq-answer">Yes. The luxury condo developments and renovated units in Marina del Rey often have Sub-Zero refrigerators, Wolf ranges, and Thermador appliances. Our technicians carry OEM parts for these brands and are trained on their specific systems.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair commercial appliances in Marina del Rey?</summary><div class="faq-answer">Yes. We repair commercial refrigerators, commercial ovens, walk-in coolers, and commercial ice machines. Commercial diagnostic fee is $120, waived with repair. Same-day available for restaurant emergencies.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Marina del Rey?</summary><div class="faq-answer">Our diagnostic fee is $89 for residential appliances, waived when you proceed with the repair. Commercial appliance diagnostic is $120, also waived with repair. We give you a complete written estimate before starting any work.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Venice, Playa del Rey, and Culver City?</summary><div class="faq-answer">Yes. Our Marina del Rey service area extends to Venice, Playa del Rey, Playa Vista, Mar Vista, and Culver City. All are in our regular Westside coverage area.</div></details>
-      </div>
-    </div>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <!-- NEARBY -->
-  <section class="mdr-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/culver-city/" class="nearby-link">Culver City</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/pacific-palisades/" class="nearby-link">Pacific Palisades</a>
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="mdr-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Marina del Rey?</h2>
-          <p>Condo · Commercial · Salt air specialists · All of 90292. $89 residential · $120 commercial — both waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap"><span>Same Day Appliance Repair — Marina del Rey, CA 90292</span><span>·</span><a href={`mailto:${city.email}`}>{city.email}</a></div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --mdr-red: #C8102E; --mdr-black: #0a0a0a; --mdr-gray: #f5f5f5; --mdr-border: #e2e2e2; --mdr-text: #1a1a1a; --mdr-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .mdr-hero { background: var(--mdr-black); color: white; padding: 80px 0 60px; }
-  .mdr-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .mdr-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--mdr-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .mdr-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .mdr-hero__accent { color: var(--mdr-red); }
-  .mdr-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .mdr-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .mdr-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .mdr-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--mdr-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .mdr-bottom-cta .btn-secondary { color: var(--mdr-text); border-color: var(--mdr-border); }
-  .trust-bar { background: var(--mdr-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .mdr-intro { padding: 72px 0; background: white; }
-  .mdr-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .mdr-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--mdr-black); margin-bottom: 20px; }
-  .mdr-intro__text p { font-size: 16px; line-height: 1.7; color: var(--mdr-text); margin-bottom: 16px; }
-  .mdr-tip { display: flex; gap: 14px; background: #f0f7ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .mdr-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .mdr-tip__text { font-size: 14px; color: var(--mdr-text); line-height: 1.6; }
-  .cta-box { background: var(--mdr-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--mdr-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--mdr-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--mdr-muted); text-align: center; margin-bottom: 40px; }
-  .mdr-services { padding: 72px 0; background: var(--mdr-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--mdr-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--mdr-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--mdr-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--mdr-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--mdr-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--mdr-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--mdr-red); font-weight: 500; }
-  .mdr-locations { padding: 72px 0; background: var(--mdr-black); color: white; }
-  .loc-inner { display: grid; grid-template-columns: 1fr 260px; gap: 60px; align-items: start; }
-  .loc-eyebrow { font-size: 13px; font-weight: 500; color: var(--mdr-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .loc-text h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 16px; }
-  .loc-text > p { font-size: 15px; color: rgba(255,255,255,0.75); margin-bottom: 24px; }
-  .loc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .loc-zone { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 16px; }
-  .loc-zone__title { font-size: 12px; font-weight: 600; color: var(--mdr-red); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
-  .loc-items { display: flex; flex-direction: column; gap: 6px; }
-  .loc-items span { font-size: 13px; color: rgba(255,255,255,0.75); }
-  .loc-cta { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 28px; text-align: center; position: sticky; top: 80px; }
-  .loc-cta__title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 8px; }
-  .loc-cta__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .loc-cta .btn-primary { width: 100%; justify-content: center; margin-bottom: 12px; }
-  .loc-cta__note { font-size: 12px; color: rgba(255,255,255,0.4); }
-  .mdr-recent { padding: 72px 0; background: var(--mdr-gray); }
-  .mdr-recent h2 { font-size: 30px; font-weight: 700; color: var(--mdr-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--mdr-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--mdr-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--mdr-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--mdr-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--mdr-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .mdr-why { padding: 72px 0; background: white; }
-  .mdr-why h2 { font-size: 30px; font-weight: 700; color: var(--mdr-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--mdr-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--mdr-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--mdr-muted); line-height: 1.6; }
-  .mdr-reviews { padding: 72px 0; background: var(--mdr-gray); }
-  .mdr-reviews h2 { font-size: 30px; font-weight: 700; color: var(--mdr-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--mdr-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--mdr-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--mdr-muted); font-weight: 500; }
-  .mdr-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--mdr-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--mdr-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--mdr-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--mdr-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--mdr-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--mdr-red); }
-  .pricing-card__note { font-size: 13px; color: var(--mdr-muted); }
-  .mdr-faq { padding: 72px 0; background: var(--mdr-gray); }
-  .mdr-faq h2 { font-size: 30px; font-weight: 700; color: var(--mdr-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--mdr-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--mdr-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--mdr-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--mdr-text); }
-  .mdr-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--mdr-border); }
-  .mdr-nearby h2 { font-size: 20px; font-weight: 600; color: var(--mdr-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--mdr-border); border-radius: 20px; font-size: 14px; color: var(--mdr-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--mdr-red); color: var(--mdr-red); }
-  .mdr-bottom-cta { padding: 72px 0; background: var(--mdr-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .loc-inner { grid-template-columns: 1fr; } .loc-grid { grid-template-columns: 1fr; } .mdr-intro__inner { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .mdr-hero__inner { grid-template-columns: 1fr; } .mdr-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .mdr-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Appliance broken in"
+    headlineAccent="Marina del Rey?"
+    body="Condo · Commercial · Salt air specialists · all of 90292. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayout>

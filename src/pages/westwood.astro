@@ -1,690 +1,311 @@
 ---
-// src/pages/westwood.astro
-// SDAR — samedayappliance.repair
-// Westwood, CA 90024
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: maytag appliance repair westwood — 2 показа, поз 4.5 ⚡
-//      appliance repair westwood — нет данных, новый город
-// Конкуренты: ApplianceSmart (UCLA angle), Allsafe (UCLA+), Zaricci (luxury), LA Fixit (commercial)
-// Уникальный угол: два мира в одном ZIP — student/apartment corridor vs Little Holmby/Wilshire estates
-// Апрель 2026
+/**
+ * Westwood, CA — Variant A migration (T9 Tier 1 final batch).
+ * Branch: Los Angeles · ZIP: 90024
+ * Source: wiki/migration/content-dumps/westwood.md
+ * Per-city block: CustomNarrativeWestwood (.ww-two-worlds — Campus blue /
+ * Estates red two-zone with 4-bullet detail rows on black bg).
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (LA branch is service_area, not physical_pin)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ *   - License: CA CSLB #1138898
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import CustomNarrativeWestwood from '../components/cities/custom/CustomNarrativeWestwood.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Westwood",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90024"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "westwood",
-};
+const branchSlug = 'los-angeles';
+const cityName = 'Westwood';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Westwood CA 90024 — Same Day | UCLA · Little Holmby · Wilshire | (323) 870-4790`;
-const description = `Same-day appliance repair in Westwood, CA 90024. UCLA area apartments, Little Holmby estates, Wilshire Corridor condos, Westwood Village. All brands. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/westwood/`;
+const title = `Appliance Repair Westwood CA — Same Day | UCLA · Little Holmby · Wilshire Corridor · 90024 | ${branch.phone}`;
+const description = "Same-day appliance repair in Westwood, CA 90024. Apartments near UCLA, Little Holmby Sub-Zero estates, Wilshire Corridor luxury condos. Tenants, homeowners, building managers welcome. Same-day, OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/westwood/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Westwood",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator',
+    issues: ['Not cooling', 'Ice maker', 'Fan motor', 'Built-in Sub-Zero', 'Apartment fridge'],
+    brands: ['Sub-Zero', 'Samsung', 'LG', 'GE', 'Whirlpool', 'Wolf'] },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer',
+    issues: ['Stackable units', 'Not draining', 'Not spinning', 'Building hookups'],
+    brands: ['LG', 'Samsung', 'Bosch', 'Miele', 'Whirlpool', 'Maytag'] },
+  { icon: '♨️', name: 'Dryer Repair', slug: 'dryer',
+    issues: ['Not heating', 'Stackable', 'Ventless heat pump', 'Vent cleaning'],
+    brands: ['LG', 'Samsung', 'Miele', 'Bosch', 'GE', 'Maytag'] },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher',
+    issues: ['Not draining', 'Error codes', 'Panel-ready', 'Compact units'],
+    brands: ['Bosch', 'Miele', 'KitchenAid', 'Samsung', 'LG', 'GE'] },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven',
+    issues: ['Not heating', 'Igniter', 'Temperature off', 'Gas & electric'],
+    brands: ['Wolf', 'Viking', 'Thermador', 'GE', 'Samsung', 'Bosch'] },
+  { icon: '❄️', name: 'Freezer & Ice Maker', slug: 'freezer',
+    issues: ['Not freezing', 'Ice stopped', 'Temperature', 'Frost buildup'],
+    brands: ['Sub-Zero', 'GE', 'Samsung', 'LG', 'Whirlpool', 'True'] },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler',
+    issues: ['Temperature off', 'Compressor', 'Under-counter', 'Built-in'],
+    brands: ['Sub-Zero', 'True', 'U-Line', 'Liebherr', 'Thermador'] },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop',
+    issues: ['Igniter', 'Induction not heating', 'Hood motor', 'Vent fan'],
+    brands: ['Wolf', 'Thermador', 'GE', 'Bosch', 'Samsung', 'Broan'] },
+];
+
+const neighborhoods = [
+  { name: 'Little Holmby', zip: '90024' },
+  { name: 'Westwood Village', zip: '90024' },
+  { name: 'North Westwood Village', zip: '90024' },
+  { name: 'Wilshire Corridor', zip: '90024' },
+  { name: 'UCLA campus adjacent', zip: '90024' },
+  { name: 'South Westwood', zip: '90024' },
+  { name: 'Gayley Ave', zip: '90024' },
+  { name: 'Levering Ave', zip: '90024' },
+  { name: 'Landfair Ave', zip: '90024' },
+];
+
+const narrativeParagraphs = [
+  "Westwood is two neighborhoods in one ZIP code. Walk one direction from Wilshire and you're in the campus corridor — apartment buildings on Gayley, Levering, Landfair, dense student and grad housing, compact kitchens, stackable laundry closets, building managers coordinating access. Walk the other direction and you're in Little Holmby's leafy single-family streets south of Sunset, with Sub-Zero columns, Wolf ranges, and Thermador wall ovens behind the front doors.",
+  "Both populations share one ZIP and one repair company. Our technicians carry OEM parts for compact apartment refrigerators and Sub-Zero built-ins on the same vehicle — not two trips, not two companies. The high-rise vs estate logistics are handled day in, day out: building manager calls before arrival, elevator coordination, gate access for Little Holmby properties, written diagnostic reports for tenant-landlord situations.",
+  "Wilshire Corridor's high-rise condos add a third dimension — luxury kitchens in a building-management context. Panel-ready Sub-Zero, Bosch, and Miele appliances behind cabinetry that has to come back together exactly the way it came apart. We've done these jobs hundreds of times.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before any work. <strong>90-day warranty</strong> on parts and labor. Weekends available.",
+];
+
+const narrativeSubSections = [
+  {
+    title: 'Tenant note for Westwood renters',
+    paragraphs: [
+      "If you're renting in Westwood and your appliance is broken — you can call us directly. If the repair is the landlord's responsibility, we can prepare a diagnostic report and estimate that you can forward to your property manager. We deal with this situation regularly in 90024 and have a clean process for it. Brand, model, what failed, what the repair involves, parts cost, labor cost, total. Most property managers accept this as the basis for repair approval.",
+    ],
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Westwood" },
-    { "@type": "Neighborhood", "name": "Little Holmby" },
-    { "@type": "Neighborhood", "name": "Westwood Village" },
-    { "@type": "Neighborhood", "name": "North Westwood Village" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: 'Samsung Refrigerator',
+    neighborhood: 'Gayley Ave apartment, 90024',
+    title: 'Fridge stopped cooling completely, everything is warm',
+    body: "High-rise apartment building near campus — coordinated access with the building manager. Samsung French door: evaporator fan motor seized, leaving the fresh food section without airflow. Classic failure on this model. Replaced the fan motor with an OEM Samsung part, cleared the blocked defrost drain, ran a full defrost cycle. Back to 37°F before we left. The tenant had a grad school presentation the next morning — one less thing to worry about.",
+    result: '✓ Same day · Building coordinated · OEM Samsung · Back to temp',
+  },
+  {
+    badge: 'Sub-Zero Refrigerator',
+    neighborhood: 'Little Holmby, 90024',
+    title: 'Ice maker completely stopped — no ice for three weeks',
+    body: "Little Holmby estate — the usual logistics: estate manager coordinated, access through the side entrance. Sub-Zero 48-inch: inlet valve scaled with mineral deposits from Westwood's hard water. LADWP water hardness plus the older supply lines in the house had left the valve almost completely blocked. Replaced with an OEM Sub-Zero inlet valve, flushed the water line, swapped the in-door filter. Ice production restored within 24 hours. Service report sent to the estate manager.",
+    result: '✓ Same day · Estate coordinated · OEM Sub-Zero · Report delivered',
+  },
+  {
+    badge: 'LG Stackable Washer',
+    neighborhood: 'Levering Ave condo, 90024',
+    title: 'OE error, standing water — call is a renter, landlord unresponsive',
+    body: "Tenant called us directly after a week of no response from the landlord. LG stacked washer/dryer combo in a closet alcove — OE drain error from a blocked pump filter. Cleared the filter and blockage, ran test cycles, confirmed full drain. Prepared a written diagnostic report and estimate for the tenant to forward to the property management company. Drain working perfectly. Tenant had it in writing — situation resolved.",
+    result: '✓ Same day · Renter situation handled · Written report for landlord',
+  },
+  {
+    badge: 'Wolf Range',
+    neighborhood: 'Wilshire Corridor condo, 90024',
+    title: 'Oven running low, star burner sparking constantly',
+    body: "High-rise condo on Wilshire — Wolf 36-inch dual-fuel in a custom kitchen. Oven igniter drawing weak current (Wolf-specific: igniter glows but can't draw enough amperage to reliably open the gas valve). Burner igniter electrode worn. Replaced both with OEM Wolf parts, calibrated oven temperature — was running 24°F low. Elevator coordination needed for the building; handled before arrival. Owner was a physician; appreciated the efficiency.",
+    result: '✓ Same day · Building coordinated · OEM Wolf · Oven calibrated',
+  },
+];
+
+const reviews = [
+  {
+    text: "My fridge died the night before a big presentation. Called Same Day at 9am, tech was in my building on Gayley by 1pm, fan motor replaced, fridge back to temperature. They even coordinated with my building manager so I didn't have to. Exactly what I needed.",
+    author: '— Alex C., Gayley Ave, Westwood',
+  },
+  {
+    text: "Sub-Zero in our Little Holmby home had no ice for three weeks. Estate manager arranged it, tech came through the side entrance, replaced the mineral-scaled inlet valve, left a full service report. Professional, efficient, zero friction. Our go-to from now on.",
+    author: '— C. Morrison (Estate Manager), Little Holmby, Westwood',
+  },
+  {
+    text: "I'm a renter and my landlord was unresponsive about the broken washer. Same Day came out, fixed the drain issue, AND gave me a written report I could send to the property manager. Problem solved within 24 hours. This is exactly how repair companies should operate.",
+    author: '— Priya S., Levering Ave, Westwood',
+  },
+];
+
+const pricingCards = [
+  { label: 'Refrigerator', price: '$150–$400', note: 'Inlet valve · Fan motor · Defrost · LADWP-aware' },
+  { label: 'Sub-Zero / Wolf', price: '$300–$700+', note: 'Built-in · Star burner · OEM Sub-Zero / Wolf', highlight: true },
+  { label: 'Washer / Dryer', price: '$150–$350', note: 'Stackable · OE drain · Building manager coordination' },
+  { label: 'Oven / Range', price: '$175–$450', note: 'Igniter · Calibration · Star burner · OEM' },
+  { label: 'Dishwasher', price: '$150–$320', note: 'Panel-ready · Drain pump · Spray arm · Compact' },
+  { label: 'Diagnostic Fee', price: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Westwood, CA?',
+    answer: 'Yes. Our technicians cover all of Westwood 90024 — the campus corridor (Gayley, Levering, Landfair), Little Holmby, North Westwood Village, Wilshire Corridor, and South Westwood. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'Do you service apartment buildings near UCLA?',
+    answer: "Yes. The Gayley / Levering / Landfair / Wilshire apartment buildings are a regular part of our Westwood schedule. We coordinate with building management for access, work in compact kitchens and stackable laundry closets, and accept calls from tenants, landlords, and building managers alike. Tell us your situation when you call and we'll handle the rest.",
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, and Thermador appliances in Little Holmby?',
+    answer: "Yes. Little Holmby's estate kitchens have these brands as standard, and the Wilshire Corridor luxury condos add panel-ready Sub-Zero, Bosch, and Miele to the mix. Our technicians carry OEM parts for all luxury brands on every vehicle and are experienced with the built-in configurations common in 90024.",
+  },
+  {
+    question: 'Do you service stackable washers and compact apartment appliances?',
+    answer: "Yes. Compact apartment refrigerators, stackable washer/dryer combos, ventless heat-pump dryers, and panel-integrated dishwashers are all part of standard Westwood service. We work in narrow laundry closets and tight kitchen footprints without damage to woodwork or doorframes.",
+  },
+  {
+    question: 'What is your diagnostic fee in Westwood?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before any work. Most Westwood residential repairs run $150–$450; Sub-Zero, Wolf, and Thermador may run higher due to OEM part pricing.',
+  },
+  {
+    question: 'Are you available on weekends in Westwood?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm.',
+  },
+  {
+    question: 'Do you also serve Beverly Hills, Bel Air, and Century City?',
+    answer: 'Yes. Our Westwood service extends to Beverly Hills (90210), Bel Air (90077), Century City (90067), Brentwood (90049), West LA (90025), and Culver City.',
+  },
+];
+
+const nearby = [
+  { slug: 'beverly-hills', name: 'Beverly Hills' },
+  { slug: 'bel-air', name: 'Bel Air' },
+  { slug: 'brentwood', name: 'Brentwood' },
+  { slug: 'los-angeles', name: 'Los Angeles' },
+  { slug: 'santa-monica', name: 'Santa Monica' },
+  { slug: 'culver-city', name: 'Culver City' },
+  { slug: 'west-hollywood', name: 'West Hollywood' },
+  { slug: 'marina-del-rey', name: 'Marina del Rey' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'Neighborhood', name: 'Westwood', sameAs: 'https://en.wikipedia.org/wiki/Westwood,_Los_Angeles' },
+    { '@type': 'Neighborhood', name: 'Little Holmby' },
+    { '@type': 'Neighborhood', name: 'Westwood Village' },
+    { '@type': 'Neighborhood', name: 'Wilshire Corridor' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Westwood, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Westwood 90024 — the UCLA corridor apartments along Gayley, Landfair, and Levering, Westwood Village, North Westwood Village, Little Holmby, the Wilshire Corridor condos, and the residential streets south of Wilshire. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Do you repair appliances in apartment buildings near UCLA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Many Westwood residents live in apartment buildings — the high-rises along Wilshire, the mid-rise complexes on Gayley and Levering near campus, and the garden apartments throughout 90024. We work with tenants, landlords, and building managers. Compact kitchens, stackable washer/dryer units, no problem." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, and Thermador appliances in Little Holmby and Westwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The residential neighborhoods south of Sunset in Westwood — Little Holmby in particular — and the larger Wilshire Corridor buildings often have Sub-Zero refrigerators, Wolf ranges, and Thermador appliances. Our technicians carry OEM parts for these brands and are experienced with built-in and panel-ready kitchen configurations." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Westwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Westwood repairs run $150–$400 for standard appliances; luxury brand repairs may run higher due to OEM part pricing." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair stackable washer/dryer units and compact appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Westwood's apartment stock — particularly around UCLA — has a lot of stackable units, ventless dryers, and compact dishwashers. We repair all of these configurations and understand the limited-access situations that come with built-in apartment appliances." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Westwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Beverly Hills, Bel Air, and Century City?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Westwood service area extends to Beverly Hills (90210), Bel Air (90077), Century City, Brentwood (90049), and West Los Angeles. We're your closest team for all 90024 and adjacent properties." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="ww-hero">
-    <div class="ww-hero__inner container">
-      <div class="ww-hero__content">
-        <div class="ww-hero__eyebrow">Westwood, CA · 90024 · UCLA · Little Holmby · Westwood Village · Wilshire Corridor</div>
-        <h1 class="ww-hero__h1">
-          Appliance Repair<br>
-          <span class="ww-hero__accent">Westwood, CA</span>
-        </h1>
-        <p class="ww-hero__sub">
-          From compact apartment kitchens near UCLA to Sub-Zero estates in Little Holmby —
-          all of Westwood 90024. Same-day service, OEM parts, 90-day warranty.
-          Tenants, homeowners, building managers welcome.
-        </p>
-        <div class="ww-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="ww-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="ww-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-westwood-ca.webp"
-          alt="Appliance repair in Westwood CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Westwood · 90024 · UCLA · Little Holmby · Westwood Village · Wilshire Corridor"
+    headlineMain="Appliance repair in"
+    headlineAccent="Westwood, CA"
+    subheadline="From compact apartment kitchens near UCLA to Sub-Zero estates in Little Holmby — all of Westwood 90024. Same-day service, OEM parts, 90-day warranty. Tenants, homeowners, building managers welcome."
+    branchSlug={branchSlug}
+  />
+  <TrustBar item4Text="Apartments &amp; Estates" item4Fine="Both worlds, same service" />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Apartments & Estates</span></div>
-    </div>
-  </section>
+  <CustomNarrativeWestwood number="01" />
 
-  <!-- TWO WORLDS SECTION — главный уникальный блок -->
-  <section class="ww-two-worlds">
-    <div class="container">
-      <div class="tw-header">
-        <h2>Westwood Is Two Neighborhoods in One ZIP Code</h2>
-        <p class="tw-sub">Our technicians work in both. Same day, same quality, different situations.</p>
-      </div>
-      <div class="tw-grid">
-        <div class="tw-card tw-card--campus">
-          <div class="tw-card__label">The Campus Corridor</div>
-          <div class="tw-card__title">Apartments, condos, and buildings along Gayley, Levering, Landfair & Wilshire</div>
-          <div class="tw-card__desc">
-            High-rise and mid-rise buildings, compact kitchens, stackable laundry,
-            shared laundry rooms, building management logistics. Tenants on deadline,
-            landlords who need quick turnaround, building managers who coordinate access.
-            We work with all of them — call us and tell us your situation, we'll handle the rest.
-          </div>
-          <div class="tw-card__details">
-            <div class="tw-detail">✓ Compact kitchen appliances</div>
-            <div class="tw-detail">✓ Stackable washer/dryer units</div>
-            <div class="tw-detail">✓ Building manager coordination</div>
-            <div class="tw-detail">✓ Tenant & landlord calls both welcome</div>
-          </div>
-        </div>
-        <div class="tw-card tw-card--estates">
-          <div class="tw-card__label">Little Holmby & South Westwood</div>
-          <div class="tw-card__title">Estates, single-family homes, and Wilshire Corridor high-end condos</div>
-          <div class="tw-card__desc">
-            Little Holmby's leafy residential streets south of Sunset have some of the
-            finest kitchens in LA — Sub-Zero columns, Wolf ranges, Thermador appliances.
-            The Wilshire Corridor buildings add luxury condo kitchens. We carry OEM parts
-            for all of these brands and are experienced with the built-in configurations
-            common in this part of 90024.
-          </div>
-          <div class="tw-detail-grid">
-            <div class="tw-detail">✓ Sub-Zero / Wolf / Thermador</div>
-            <div class="tw-detail">✓ Built-in & panel-ready</div>
-            <div class="tw-detail">✓ Estate & property manager ready</div>
-            <div class="tw-detail">✓ OEM parts only</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="02"
+    eyebrow="Knowing the neighbourhood"
+    headline="Same-day appliance repair in"
+    headlineAccent="Westwood"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="ww-intro">
-    <div class="container ww-intro__inner">
-      <div class="ww-intro__text">
-        <h2>Same Day Appliance Repair in Westwood</h2>
-        <p>
-          Westwood's 90024 ZIP covers more housing diversity than almost any other in LA.
-          The apartment buildings along Gayley Avenue near UCLA — compacts, stackables,
-          frequently-moved-in-and-out appliances in high-turnover units. The luxury condos
-          along Wilshire Corridor — panel-ready Sub-Zeros and Bosch dishwashers in
-          kitchens with custom cabinetry. The residential neighborhoods of Little Holmby
-          and North Westwood Village — larger homes with appliances that have been
-          running for years and need someone who actually knows what they're doing.
-        </p>
-        <p>
-          Our technicians come prepared for all three. We have OEM parts for luxury brands
-          and standard brands on the same truck. We've been in Westwood buildings enough
-          to know that a high-rise service call has different logistics than a Little Holmby
-          estate call — and we handle both without making it the customer's problem.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong> on all parts and labor.
-        </p>
-        <div class="ww-tip">
-          <div class="ww-tip__icon">🏠</div>
-          <div class="ww-tip__text">
-            <strong>Tenant note:</strong> If you're renting in Westwood and your appliance
-            is broken — you can call us directly. If the repair is the landlord's
-            responsibility, we can prepare a diagnostic report and estimate that you
-            can forward to your property manager. We deal with this situation regularly
-            in 90024 and have a clean process for it.
-          </div>
-        </div>
-      </div>
-      <div class="ww-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Westwood Service Team</div>
-          <div class="cta-box__sub">90024 · Campus & estates · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="03"
+    eyebrow="Capabilities"
+    headline="What we repair in"
+    headlineAccent="Westwood"
+    subheadline="Apartments near UCLA &amp; Little Holmby estates · all brands · all of 90024"
+    services={services}
+    cardStructure="3-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="ww-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Westwood</h2>
-      <p class="section-sub">All brands · Apartments & estates · Compact & built-in · 90024</p>
-      <div class="services-grid">
-        <a href="/westwood/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Ice maker · Fan motor · Built-in Sub-Zero · Apartment fridge</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · Wolf</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/westwood/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Stackable units · Not draining · Not spinning · Building hookups</div>
-          <div class="service-card__brands">LG · Samsung · Bosch · Miele · Whirlpool · Maytag</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/westwood/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Stackable · Ventless heat pump · Vent cleaning</div>
-          <div class="service-card__brands">LG · Samsung · Miele · Bosch · GE · Maytag</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/westwood/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Error codes · Panel-ready · Compact units</div>
-          <div class="service-card__brands">Bosch · Miele · KitchenAid · Samsung · LG · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/westwood/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Igniter · Temperature off · Gas & electric</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · GE · Samsung · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/westwood/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker</div>
-          <div class="service-card__issues">Not freezing · Ice stopped · Temperature · Frost buildup</div>
-          <div class="service-card__brands">Sub-Zero · GE · Samsung · LG · Whirlpool · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/westwood/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">Sub-Zero · True · U-Line · Liebherr · Thermador</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-        <a href="/westwood/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter · Induction not heating · Hood motor · Vent fan</div>
-          <div class="service-card__brands">Wolf · Thermador · GE · Bosch · Samsung · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-      </div>
-    </div>
-  </section>
+  <NeighborhoodGrid
+    number="04"
+    eyebrow="Service Area"
+    headline="Westwood areas"
+    headlineAccent="we cover"
+    subheadline="Campus corridor · Little Holmby · Wilshire Corridor — all of 90024."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-  <!-- NEIGHBORHOODS -->
-  <section class="ww-neighborhoods">
-    <div class="container">
-      <h2>All of Westwood — 90024</h2>
-      <p class="section-sub">Campus corridor to residential estates — every part of the ZIP</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Westwood Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Little Holmby</div>
-            <div class="nh-item featured">Westwood Village</div>
-            <div class="nh-item featured">North Westwood Village</div>
-            <div class="nh-item">Wilshire Corridor</div>
-            <div class="nh-item">UCLA campus adjacent</div>
-            <div class="nh-item">South Westwood</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Gayley Ave</div>
-            <div class="nh-item">Levering Ave</div>
-            <div class="nh-item">Landfair Ave</div>
-            <div class="nh-item">Wilshire Blvd</div>
-            <div class="nh-item">Sunset Blvd (south)</div>
-            <div class="nh-item">Westwood Blvd</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Beverly Hills (90210)</div>
-            <div class="nh-item">Bel Air (90077)</div>
-            <div class="nh-item">Century City (90067)</div>
-            <div class="nh-item">Brentwood (90049)</div>
-            <div class="nh-item">West LA (90025)</div>
-            <div class="nh-item">Culver City</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RecentJobs
+    number="05"
+    eyebrow="Recent Repairs"
+    headline="Jobs our team did in"
+    headlineAccent="Westwood"
+    jobs={jobs}
+  />
 
-  <!-- RECENT REPAIRS -->
-  <section class="ww-recent">
-    <div class="container">
-      <h2>Recent Jobs in Westwood</h2>
-      <p class="section-sub">Real calls from 90024 — apartments, estates, and everything in between.</p>
-      <div class="recent-grid">
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Gayley Ave apartment, 90024</span>
-          </div>
-          <div class="recent-card__title">"Fridge stopped cooling completely, everything is warm"</div>
-          <div class="recent-card__desc">
-            High-rise apartment building near campus — coordinated access with the building
-            manager. Samsung French door: evaporator fan motor seized, leaving the fresh
-            food section without airflow. Classic failure on this model. Replaced the fan
-            motor with an OEM Samsung part, cleared the blocked defrost drain, ran a
-            full defrost cycle. Back to 37°F before we left. The tenant had a grad school
-            presentation the next morning — one less thing to worry about.
-          </div>
-          <div class="recent-card__result">✓ Same day · Building coordinated · OEM Samsung · Back to temp</div>
-        </div>
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Refrigerator</span>
-            <span class="recent-location">Little Holmby, 90024</span>
-          </div>
-          <div class="recent-card__title">"Ice maker completely stopped — no ice for three weeks"</div>
-          <div class="recent-card__desc">
-            Little Holmby estate — the usual logistics: estate manager coordinated,
-            access through the side entrance. Sub-Zero 48-inch: inlet valve scaled
-            with mineral deposits from Westwood's hard water. LADWP water hardness
-            plus the older supply lines in the house had left the valve almost completely
-            blocked. Replaced with an OEM Sub-Zero inlet valve, flushed the water line,
-            swapped the in-door filter. Ice production restored within 24 hours.
-            Service report sent to the estate manager.
-          </div>
-          <div class="recent-card__result">✓ Same day · Estate coordinated · OEM Sub-Zero · Report delivered</div>
-        </div>
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Stackable Washer</span>
-            <span class="recent-location">Levering Ave condo, 90024</span>
-          </div>
-          <div class="recent-card__title">"OE error, standing water — call is a renter, landlord unresponsive"</div>
-          <div class="recent-card__desc">
-            Tenant called us directly after a week of no response from the landlord.
-            LG stacked washer/dryer combo in a closet alcove — OE drain error from a
-            blocked pump filter. Cleared the filter and blockage, ran test cycles,
-            confirmed full drain. Prepared a written diagnostic report and estimate
-            for the tenant to forward to the property management company. Drain working
-            perfectly. Tenant had it in writing — situation resolved.
-          </div>
-          <div class="recent-card__result">✓ Same day · Renter situation handled · Written report for landlord</div>
-        </div>
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Range</span>
-            <span class="recent-location">Wilshire Corridor condo, 90024</span>
-          </div>
-          <div class="recent-card__title">"Oven running low, star burner sparking constantly"</div>
-          <div class="recent-card__desc">
-            High-rise condo on Wilshire — Wolf 36-inch dual-fuel in a custom kitchen.
-            Oven igniter drawing weak current (Wolf-specific: igniter glows but can't
-            draw enough amperage to reliably open the gas valve). Burner igniter electrode
-            worn. Replaced both with OEM Wolf parts, calibrated oven temperature — was
-            running 24°F low. Elevator coordination needed for the building; handled
-            before arrival. Owner was a physician; appreciated the efficiency.
-          </div>
-          <div class="recent-card__result">✓ Same day · Building coordinated · OEM Wolf · Oven calibrated</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Method number="06" />
 
-  <!-- WHY US -->
-  <section class="ww-why">
-    <div class="container">
-      <h2>Why Westwood Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🏢</div>
-          <div class="why-title">Apartments & Buildings Ready</div>
-          <div class="why-text">High-rises, mid-rises, garden apartments — we coordinate with building managers, work in compact kitchens, handle stackable units. Tenants and landlords both welcome. We can prepare diagnostic reports for property management if needed.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏛️</div>
-          <div class="why-title">Estate Service for Little Holmby</div>
-          <div class="why-text">Sub-Zero, Wolf, Thermador in the Little Holmby estates and larger Westwood homes — we carry OEM parts, coordinate with estate managers, and deliver the same professional service expected in these properties.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">⏱️</div>
-          <div class="why-title">Actually Same Day</div>
-          <div class="why-text">Westwood residents — professors, medical professionals, students — run on tight schedules. Call before noon and we're typically there that afternoon. We cover Westwood as a regular part of our Westside route, not a special trip.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts — from Sub-Zero to Samsung. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Reviews
+    number="07"
+    eyebrow="Word of Mouth"
+    headline="What Westwood"
+    headlineAccent="customers say"
+    reviews={reviews}
+  />
 
-  <!-- REVIEWS -->
-  <section class="ww-reviews">
-    <div class="container">
-      <h2>What Westwood Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"My fridge died the night before a big presentation. Called Same Day at 9am, tech was in my building on Gayley by 1pm, fan motor replaced, fridge back to temperature. They even coordinated with my building manager so I didn't have to. Exactly what I needed."</div>
-          <div class="review-author">— Alex C., Gayley Ave, Westwood</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero in our Little Holmby home had no ice for three weeks. Estate manager arranged it, tech came through the side entrance, replaced the mineral-scaled inlet valve, left a full service report. Professional, efficient, zero friction. Our go-to from now on."</div>
-          <div class="review-author">— C. Morrison (Estate Manager), Little Holmby, Westwood</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"I'm a renter and my landlord was unresponsive about the broken washer. Same Day came out, fixed the drain issue, AND gave me a written report I could send to the property manager. Problem solved within 24 hours. This is exactly how repair companies should operate."</div>
-          <div class="review-author">— Priya S., Levering Ave, Westwood</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <Pricing
+    number="08"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Westwood"
+    subheadline="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    cards={pricingCards}
+  />
 
-  <!-- PRICING -->
-  <section class="ww-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Westwood</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card"><div class="pricing-card__appliance">Refrigerator</div><div class="pricing-card__range">$150 – $400</div><div class="pricing-card__note">Fan motor, ice maker, thermostat · Apartment & built-in</div></div>
-        <div class="pricing-card featured"><div class="pricing-card__appliance">Sub-Zero / Wolf</div><div class="pricing-card__range">$300 – $700+</div><div class="pricing-card__note">OEM parts · Built-in · Hard water inlet valve</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Washer / Dryer</div><div class="pricing-card__range">$150 – $350</div><div class="pricing-card__note">Stackable · Drain pump · Heating element · Ventless</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Oven / Range</div><div class="pricing-card__range">$175 – $450</div><div class="pricing-card__note">Igniter, element, Wolf calibration · OEM</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Dishwasher</div><div class="pricing-card__range">$150 – $320</div><div class="pricing-card__note">Drain pump, door latch, spray arm · Compact ok</div></div>
-        <div class="pricing-card"><div class="pricing-card__appliance">Diagnostic Fee</div><div class="pricing-card__range">$89</div><div class="pricing-card__note">Waived when you proceed with the repair</div></div>
-      </div>
-    </div>
-  </section>
+  <FAQ
+    number="09"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Westwood"
+    faqs={faqs}
+  />
 
-  <!-- FAQ -->
-  <section class="ww-faq">
-    <div class="container">
-      <h2>Questions Westwood Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Westwood, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Westwood 90024 — the UCLA corridor along Gayley, Landfair, and Levering, Westwood Village, Little Holmby, the Wilshire Corridor condos, and the residential streets south of Wilshire. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair appliances in apartment buildings near UCLA?</summary><div class="faq-answer">Yes. We work with tenants, landlords, and building managers. Compact kitchens, stackable washer/dryer units, building elevator coordination — we handle all of it. If you're a tenant and need documentation for your landlord, we can prepare a written diagnostic report.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero, Wolf, and Thermador appliances in Little Holmby and Westwood?</summary><div class="faq-answer">Yes. Little Holmby estates and the Wilshire Corridor buildings often have Sub-Zero refrigerators, Wolf ranges, and Thermador appliances. We carry OEM parts for these brands and are experienced with built-in and panel-ready kitchen configurations.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair stackable washer/dryer units and compact appliances?</summary><div class="faq-answer">Yes. Westwood's apartment stock has a lot of stackable units, ventless dryers, and compact dishwashers. We repair all of these configurations and understand the limited-access situations that come with built-in apartment appliances.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Westwood?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Westwood repairs run $150–$400 for standard appliances; luxury brand repairs may run higher due to OEM part pricing.</div></details>
-        <details class="faq-item"><summary class="faq-question">What warranty do you offer on appliance repairs in Westwood?</summary><div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Beverly Hills, Bel Air, and Century City?</summary><div class="faq-answer">Yes. Our Westwood service area extends to Beverly Hills (90210), Bel Air (90077), Century City, Brentwood (90049), and West LA. We're your closest team for all 90024 and adjacent properties.</div></details>
-      </div>
-    </div>
-  </section>
+  <NearbyLinks links={nearby} />
 
-  <!-- NEARBY -->
-  <section class="ww-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/bel-air/" class="nearby-link">Bel Air</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/culver-city/" class="nearby-link">Culver City</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/marina-del-rey/" class="nearby-link">Marina del Rey</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="ww-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Westwood?</h2>
-          <p>Campus corridor · Little Holmby · Wilshire Corridor · All of 90024. Apartments, estates, condos. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Westwood, CA 90024</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --ww-red: #C8102E; --ww-black: #0a0a0a; --ww-gray: #f5f5f5; --ww-border: #e2e2e2; --ww-text: #1a1a1a; --ww-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .ww-hero { background: var(--ww-black); color: white; padding: 80px 0 60px; }
-  .ww-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .ww-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--ww-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .ww-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .ww-hero__accent { color: var(--ww-red); }
-  .ww-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .ww-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .ww-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .ww-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--ww-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .ww-bottom-cta .btn-secondary { color: var(--ww-text); border-color: var(--ww-border); }
-  .trust-bar { background: var(--ww-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  /* TWO WORLDS */
-  .ww-two-worlds { padding: 72px 0; background: var(--ww-black); color: white; }
-  .tw-header { text-align: center; margin-bottom: 40px; }
-  .tw-header h2 { font-size: 30px; font-weight: 700; color: white; margin-bottom: 8px; }
-  .tw-sub { font-size: 16px; color: rgba(255,255,255,0.6); }
-  .tw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .tw-card { border-radius: 14px; padding: 32px; border: 1px solid rgba(255,255,255,0.1); }
-  .tw-card--campus { background: rgba(0,80,200,0.12); border-color: rgba(0,80,200,0.3); }
-  .tw-card--estates { background: rgba(200,16,46,0.10); border-color: rgba(200,16,46,0.3); }
-  .tw-card__label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
-  .tw-card__title { font-size: 16px; font-weight: 600; color: white; margin-bottom: 14px; line-height: 1.4; }
-  .tw-card__desc { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 18px; }
-  .tw-card__details, .tw-detail-grid { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px; }
-  .tw-detail { font-size: 13px; color: rgba(255,255,255,0.65); }
-  /* INTRO */
-  .ww-intro { padding: 72px 0; background: white; }
-  .ww-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .ww-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--ww-black); margin-bottom: 20px; }
-  .ww-intro__text p { font-size: 16px; line-height: 1.7; color: var(--ww-text); margin-bottom: 16px; }
-  .ww-tip { display: flex; gap: 14px; background: #f0f7ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .ww-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .ww-tip__text { font-size: 14px; color: var(--ww-text); line-height: 1.6; }
-  .cta-box { background: var(--ww-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--ww-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--ww-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--ww-muted); text-align: center; margin-bottom: 40px; }
-  .ww-services { padding: 72px 0; background: var(--ww-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--ww-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--ww-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--ww-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--ww-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--ww-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--ww-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--ww-red); font-weight: 500; }
-  .ww-neighborhoods { padding: 72px 0; background: white; }
-  .ww-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--ww-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--ww-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--ww-text); padding: 8px 12px; background: var(--ww-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--ww-red); color: var(--ww-black); font-weight: 500; }
-  .ww-recent { padding: 72px 0; background: var(--ww-gray); }
-  .ww-recent h2 { font-size: 30px; font-weight: 700; color: var(--ww-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--ww-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--ww-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--ww-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--ww-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--ww-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .ww-why { padding: 72px 0; background: white; }
-  .ww-why h2 { font-size: 30px; font-weight: 700; color: var(--ww-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--ww-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--ww-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--ww-muted); line-height: 1.6; }
-  .ww-reviews { padding: 72px 0; background: var(--ww-gray); }
-  .ww-reviews h2 { font-size: 30px; font-weight: 700; color: var(--ww-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--ww-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--ww-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--ww-muted); font-weight: 500; }
-  .ww-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--ww-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--ww-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--ww-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--ww-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--ww-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--ww-red); }
-  .pricing-card__note { font-size: 13px; color: var(--ww-muted); }
-  .ww-faq { padding: 72px 0; background: var(--ww-gray); }
-  .ww-faq h2 { font-size: 30px; font-weight: 700; color: var(--ww-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--ww-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--ww-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--ww-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--ww-text); }
-  .ww-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--ww-border); }
-  .ww-nearby h2 { font-size: 20px; font-weight: 600; color: var(--ww-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--ww-border); border-radius: 20px; font-size: 14px; color: var(--ww-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--ww-red); color: var(--ww-red); }
-  .ww-bottom-cta { padding: 72px 0; background: var(--ww-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .ww-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } .tw-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 768px) { .ww-hero__inner { grid-template-columns: 1fr; } .ww-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .ww-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Appliance broken in"
+    headlineAccent="Westwood?"
+    body="Campus corridor · Little Holmby · Wilshire Corridor · all of 90024. Apartments, estates, condos. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayout>
