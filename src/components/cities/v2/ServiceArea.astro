@@ -1,0 +1,83 @@
+---
+/** v2 ServiceArea — Neighborhoods grid + Key streets line. */
+
+export interface Neighborhood { name: string; zip: string; featured?: boolean; }
+
+export interface Props {
+  cityName: string;
+  zips: string[];
+  neighborhoods: Neighborhood[];
+  keyStreets: string[];
+}
+
+const { cityName, zips, neighborhoods, keyStreets } = Astro.props;
+---
+
+<section class="v2-area">
+  <div class="v2-container">
+    <h2 class="v2-section-title">We Serve All of {cityName}</h2>
+    <p class="v2-section-sub">
+      Our technicians cover every neighborhood and street — ZIP codes {zips.join(', ')}.
+    </p>
+    <div class="v2-area__grid">
+      {neighborhoods.map((n) => (
+        <div class={`v2-area__card ${n.featured ? 'v2-area__card--featured' : ''}`}>
+          <div class="v2-area__name">{n.name}</div>
+          <div class="v2-area__zip">{n.zip}</div>
+        </div>
+      ))}
+    </div>
+    {keyStreets.length > 0 && (
+      <div class="v2-area__streets">
+        <span class="v2-area__streets-label">Key streets we service:</span>
+        <span>{keyStreets.join(' · ')}</span>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .v2-area { padding: 72px 0; background: var(--v2-white); }
+  .v2-section-title {
+    font-family: var(--v2-font-display);
+    font-size: 30px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 8px; text-align: center;
+  }
+  .v2-section-sub {
+    font-size: 16px; color: var(--v2-muted); text-align: center;
+    margin: 0 0 40px; font-family: var(--v2-font-body);
+  }
+  .v2-area__grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .v2-area__card {
+    background: var(--v2-gray);
+    border: 1px solid var(--v2-border);
+    border-radius: 10px;
+    padding: 18px 16px;
+    text-align: center;
+    transition: border-color 0.2s, transform 0.2s;
+    font-family: var(--v2-font-body);
+  }
+  .v2-area__card--featured {
+    background: #fff5f7;
+    border-color: var(--v2-red);
+  }
+  .v2-area__name { font-size: 14px; font-weight: 600; color: var(--v2-black); margin-bottom: 4px; }
+  .v2-area__zip { font-size: 12px; color: var(--v2-muted); }
+  .v2-area__streets {
+    background: var(--v2-gray);
+    padding: 16px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    color: var(--v2-text);
+    line-height: 1.6;
+    font-family: var(--v2-font-body);
+  }
+  .v2-area__streets-label { font-weight: 600; color: var(--v2-black); margin-right: 8px; }
+  @media (max-width: 1024px) { .v2-area__grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 600px) { .v2-area__grid { grid-template-columns: repeat(2, 1fr); } }
+</style>

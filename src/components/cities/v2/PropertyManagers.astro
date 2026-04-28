@@ -1,0 +1,129 @@
+---
+/** v2 PropertyManagers — Airbnb / Property Manager block.
+ *  Photo slot 5 (property-managers) embedded right side. */
+
+import { CITIES } from '../../../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../../../data/branches';
+
+export interface Props {
+  citySlug: string;
+  cityName: string;
+  eyebrow?: string;
+  headline: string;
+  paragraphs: string[];
+  bullets: string[];
+  ctaTitle?: string;
+  ctaSub?: string;
+  ctaNote?: string;
+}
+
+const {
+  citySlug,
+  cityName,
+  eyebrow = 'For Hosts & Property Managers',
+  headline,
+  paragraphs,
+  bullets,
+  ctaTitle = 'Property Managers & Hosts',
+  ctaSub = 'Call to discuss service agreements and priority scheduling',
+  ctaNote = 'Available Mon–Fri 7am–9pm · Sat 8am–7pm',
+} = Astro.props;
+
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+const phone = isPlaceholderPhone(branch.phone) ? MAIN_PHONE : branch.phone;
+const phoneTel = `+1${phone.replace(/\D/g, '')}`;
+
+const photoSrc = `/images/cities/${citySlug}/property-managers.webp`;
+const photoAlt = `Airbnb appliance repair ${cityName} property management`;
+---
+
+<section class="v2-prop">
+  <div class="v2-container">
+    <div class="v2-prop__inner">
+      <div class="v2-prop__text">
+        <div class="v2-prop__eyebrow">{eyebrow}</div>
+        <h2 class="v2-prop__h2">{headline}</h2>
+        {paragraphs.map((p) => (<p class="v2-prop__p" set:html={p}></p>))}
+        <ul class="v2-prop__bullets">
+          {bullets.map((b) => (
+            <li>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              <span set:html={b}></span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="v2-prop__side">
+        <div class="v2-photo-slot v2-prop__photo">
+          <picture>
+            <source srcset={photoSrc} type="image/webp" />
+            <img src={photoSrc} alt={photoAlt} width="540" height="320" loading="lazy" onerror="this.style.display='none'" />
+          </picture>
+          <svg class="v2-photo-slot__icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M12 28 L32 12 L52 28 V52 H40 V36 H24 V52 H12 Z"/>
+          </svg>
+        </div>
+        <div class="v2-prop__cta">
+          <div class="v2-prop__cta-title">{ctaTitle}</div>
+          <div class="v2-prop__cta-sub">{ctaSub}</div>
+          <a href={`tel:${phoneTel}`} class="v2-btn-primary v2-prop__cta-phone">{phone}</a>
+          <div class="v2-prop__cta-note">{ctaNote}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-prop { padding: 72px 0; background: var(--v2-gray); }
+  .v2-prop__inner {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 60px;
+    align-items: start;
+  }
+  .v2-prop__eyebrow {
+    font-size: 13px; font-weight: 500; color: var(--v2-red);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 12px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-prop__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 28px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 18px;
+  }
+  .v2-prop__p {
+    font-size: 16px; line-height: 1.7;
+    color: var(--v2-text);
+    margin: 0 0 16px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-prop__bullets { list-style: none; padding: 0; margin: 24px 0 0; }
+  .v2-prop__bullets li {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 8px 0;
+    font-size: 15px; color: var(--v2-text);
+    font-family: var(--v2-font-body);
+  }
+  .v2-prop__bullets svg { color: var(--v2-red); flex-shrink: 0; margin-top: 4px; }
+  .v2-prop__photo { aspect-ratio: 16 / 10; margin-bottom: 16px; }
+  .v2-prop__cta {
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    position: sticky;
+    top: 80px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-prop__cta-title { font-size: 16px; font-weight: 700; color: var(--v2-black); margin-bottom: 6px; }
+  .v2-prop__cta-sub { font-size: 13px; color: var(--v2-muted); margin-bottom: 18px; }
+  .v2-prop__cta-phone { width: 100%; justify-content: center; }
+  .v2-prop__cta-note { font-size: 12px; color: var(--v2-muted); margin-top: 12px; }
+  @media (max-width: 1024px) { .v2-prop__inner { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,51 @@
+---
+/** v2 ReviewsBlock — 3 testimonials. Per-review stars OK (NOT aggregateRating). */
+
+export interface Testimonial { stars?: number; text: string; author: string; }
+export interface Props { cityName: string; testimonials: Testimonial[]; }
+
+const { cityName, testimonials } = Astro.props;
+---
+
+<section class="v2-reviews">
+  <div class="v2-container">
+    <h2 class="v2-section-title">What People in {cityName} Say About Us</h2>
+    <div class="v2-reviews__grid">
+      {testimonials.map((t) => (
+        <article class="v2-reviews__card">
+          <div class="v2-reviews__stars" aria-label={`${t.stars ?? 5} out of 5 stars`}>{'★'.repeat(t.stars ?? 5)}</div>
+          <p class="v2-reviews__text" set:html={t.text}></p>
+          <div class="v2-reviews__author">{t.author}</div>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-reviews { padding: 72px 0; background: var(--v2-gray); }
+  .v2-section-title {
+    font-family: var(--v2-font-display);
+    font-size: 30px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 40px; text-align: center;
+  }
+  .v2-reviews__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .v2-reviews__card {
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 12px;
+    padding: 28px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-reviews__stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; letter-spacing: 2px; }
+  .v2-reviews__text {
+    font-size: 14px; color: var(--v2-text); line-height: 1.7;
+    margin: 0 0 16px; font-style: italic;
+  }
+  .v2-reviews__author { font-size: 13px; color: var(--v2-muted); font-weight: 500; }
+  @media (max-width: 1024px) { .v2-reviews__grid { grid-template-columns: 1fr; } }
+</style>

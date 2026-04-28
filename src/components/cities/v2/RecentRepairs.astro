@@ -1,0 +1,106 @@
+---
+/** v2 RecentRepairs — 4 job cards with appliance + location + quote + body + outcome.
+ *  Photo slot 4 (recent-repair) embedded between cards 2 and 3. */
+
+export interface RecentJob {
+  appliance: string;
+  location: string;
+  quote: string;
+  description: string;
+  outcome: string;
+}
+
+export interface Props {
+  citySlug: string;
+  cityName: string;
+  jobs: RecentJob[];
+  subhead?: string;
+}
+
+const {
+  citySlug,
+  cityName,
+  jobs,
+  subhead = 'Not made up. These are actual calls our technicians handled.',
+} = Astro.props;
+
+const photoSrc = `/images/cities/${citySlug}/recent-repair.webp`;
+const photoAlt = `OEM appliance part replacement ${cityName}`;
+---
+
+<section class="v2-recent">
+  <div class="v2-container">
+    <h2 class="v2-section-title">Jobs Our Team Did in {cityName} — Real Repairs</h2>
+    <p class="v2-section-sub">{subhead}</p>
+    <div class="v2-recent__grid">
+      {jobs.map((j, i) => (
+        <>
+          <article class="v2-recent__card">
+            <header class="v2-recent__head">
+              <span class="v2-recent__badge">{j.appliance}</span>
+              <span class="v2-recent__loc">{j.location}</span>
+            </header>
+            <h3 class="v2-recent__title">"{j.quote}"</h3>
+            <p class="v2-recent__body" set:html={j.description}></p>
+            <div class="v2-recent__outcome">{j.outcome}</div>
+          </article>
+          {i === 1 && (
+            <div class="v2-photo-slot v2-recent__photo">
+              <picture>
+                <source srcset={photoSrc} type="image/webp" />
+                <img src={photoSrc} alt={photoAlt} width="540" height="540" loading="lazy" onerror="this.style.display='none'" />
+              </picture>
+              <svg class="v2-photo-slot__icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+                <circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="8"/>
+              </svg>
+            </div>
+          )}
+        </>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-recent { padding: 72px 0; background: var(--v2-white); }
+  .v2-section-title {
+    font-family: var(--v2-font-display);
+    font-size: 30px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 8px; text-align: center;
+  }
+  .v2-section-sub {
+    font-size: 16px; color: var(--v2-muted); text-align: center;
+    margin: 0 0 40px; font-family: var(--v2-font-body);
+  }
+  .v2-recent__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .v2-recent__card {
+    background: var(--v2-gray);
+    border: 1px solid var(--v2-border);
+    border-radius: 12px;
+    padding: 24px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-recent__head {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 6px; margin-bottom: 12px;
+  }
+  .v2-recent__badge {
+    background: var(--v2-red); color: var(--v2-white);
+    font-size: 11px; font-weight: 600; padding: 3px 10px;
+    border-radius: 20px;
+  }
+  .v2-recent__loc { font-size: 12px; color: var(--v2-muted); }
+  .v2-recent__title {
+    font-family: var(--v2-font-display);
+    font-size: 16px; font-weight: 600; color: var(--v2-black);
+    margin: 0 0 10px; font-style: italic;
+  }
+  .v2-recent__body { font-size: 14px; color: var(--v2-text); line-height: 1.6; margin: 0 0 12px; }
+  .v2-recent__outcome { font-size: 13px; color: #2a7a2a; font-weight: 500; }
+  .v2-recent__photo { aspect-ratio: 1 / 1; }
+  @media (max-width: 1024px) { .v2-recent__grid { grid-template-columns: 1fr; } }
+</style>

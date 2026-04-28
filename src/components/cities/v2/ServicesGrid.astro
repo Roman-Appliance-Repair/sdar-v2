@@ -1,0 +1,91 @@
+---
+/** v2 ServicesGrid — 8 service cards (icon + name + issues + brands + Learn more →).
+ *  Service links route to canonical /services/{slug}-repair/ hubs (Option C). */
+
+export interface ServiceCard {
+  icon: string;
+  name: string;
+  /** slug WITHOUT "-repair" suffix; component appends it */
+  slug: string;
+  issues: string;
+  brands: string;
+}
+
+export interface Props {
+  cityName: string;
+  subhead?: string;
+  services: ServiceCard[];
+}
+
+const {
+  cityName,
+  subhead = 'All major brands · Gas & electric · Residential focus',
+  services,
+} = Astro.props;
+
+const toHref = (slug: string) => {
+  const cleaned = slug.replace(/^\/+|\/+$/g, '').replace(/-repair$/, '');
+  return `/services/${cleaned}-repair/`;
+};
+---
+
+<section class="v2-services">
+  <div class="v2-container">
+    <h2 class="v2-section-title">Appliances We Repair in {cityName}</h2>
+    <p class="v2-section-sub">{subhead}</p>
+    <div class="v2-services__grid">
+      {services.map((s) => (
+        <a href={toHref(s.slug)} class="v2-svc-card">
+          <div class="v2-svc-card__icon" aria-hidden="true">{s.icon}</div>
+          <div class="v2-svc-card__name">{s.name}</div>
+          <div class="v2-svc-card__issues">{s.issues}</div>
+          <div class="v2-svc-card__brands">{s.brands}</div>
+          <div class="v2-svc-card__cta">Learn more →</div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-services { padding: 72px 0; background: var(--v2-gray); }
+  .v2-section-title {
+    font-family: var(--v2-font-display);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--v2-black);
+    margin: 0 0 8px;
+    text-align: center;
+  }
+  .v2-section-sub {
+    font-size: 16px;
+    color: var(--v2-muted);
+    text-align: center;
+    margin: 0 0 40px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-services__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .v2-svc-card {
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 12px;
+    padding: 24px 20px;
+    text-decoration: none;
+    color: var(--v2-text);
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: block;
+    font-family: var(--v2-font-body);
+  }
+  .v2-svc-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); text-decoration: none; }
+  .v2-svc-card__icon { font-size: 28px; margin-bottom: 10px; }
+  .v2-svc-card__name { font-size: 16px; font-weight: 600; color: var(--v2-black); margin-bottom: 8px; }
+  .v2-svc-card__issues { font-size: 13px; color: var(--v2-muted); line-height: 1.5; margin-bottom: 8px; }
+  .v2-svc-card__brands { font-size: 12px; color: var(--v2-muted); margin-bottom: 12px; }
+  .v2-svc-card__cta { font-size: 13px; color: var(--v2-red); font-weight: 500; }
+  @media (max-width: 1024px) { .v2-services__grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 480px) { .v2-services__grid { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,101 @@
+---
+/** v2 CustomNarrative — Generic slot for unique H2 blocks not covered by standard 22.
+ *  Used when content-dump has a city-unique narrative block (e.g. Two Encinos, Three Sections,
+ *  Salt-air gradient, Wine Cellar Spotlight). Optional embedded photo slot. */
+
+export interface SubSection { title: string; paragraphs: string[]; }
+
+export interface Props {
+  eyebrow?: string;
+  headline: string;
+  paragraphs?: string[];
+  subSections?: SubSection[];
+  photoCitySlug?: string;
+  photoFilename?: string;
+  photoAlt?: string;
+  background?: 'white' | 'gray' | 'black';
+}
+
+const {
+  eyebrow,
+  headline,
+  paragraphs = [],
+  subSections = [],
+  photoCitySlug,
+  photoFilename,
+  photoAlt = '',
+  background = 'white',
+} = Astro.props;
+
+const showPhoto = photoCitySlug && photoFilename;
+const photoSrc = showPhoto ? `/images/cities/${photoCitySlug}/${photoFilename}` : null;
+---
+
+<section class={`v2-custom v2-custom--${background}`}>
+  <div class="v2-container">
+    {eyebrow && <div class="v2-custom__eyebrow">{eyebrow}</div>}
+    <h2 class="v2-custom__h2">{headline}</h2>
+    <div class="v2-custom__body">
+      {paragraphs.map((p) => (<p class="v2-custom__p" set:html={p}></p>))}
+      {subSections.map((s) => (
+        <div class="v2-custom__sub">
+          <h3 class="v2-custom__sub-title">{s.title}</h3>
+          {s.paragraphs.map((p) => (<p class="v2-custom__p" set:html={p}></p>))}
+        </div>
+      ))}
+      {showPhoto && (
+        <div class="v2-photo-slot v2-custom__photo">
+          <picture>
+            <source srcset={photoSrc} type="image/webp" />
+            <img src={photoSrc} alt={photoAlt} width="1200" height="500" loading="lazy" onerror="this.style.display='none'" />
+          </picture>
+          <svg class="v2-photo-slot__icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <circle cx="32" cy="32" r="20"/>
+          </svg>
+        </div>
+      )}
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-custom { padding: 72px 0; }
+  .v2-custom--white { background: var(--v2-white); }
+  .v2-custom--gray { background: var(--v2-gray); }
+  .v2-custom--black { background: var(--v2-black); color: var(--v2-white); }
+  .v2-custom__eyebrow {
+    font-size: 13px; font-weight: 500; color: var(--v2-red);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 12px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-custom__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 28px; font-weight: 700;
+    margin: 0 0 24px;
+    color: var(--v2-black);
+  }
+  .v2-custom--black .v2-custom__h2 { color: var(--v2-white); }
+  .v2-custom__body { max-width: 780px; }
+  .v2-custom__p {
+    font-family: var(--v2-font-body);
+    font-size: 16px; line-height: 1.7;
+    color: var(--v2-text);
+    margin: 0 0 16px;
+  }
+  .v2-custom--black .v2-custom__p { color: rgba(255,255,255,0.8); }
+  .v2-custom__sub {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--v2-border);
+  }
+  .v2-custom--black .v2-custom__sub { border-color: rgba(255,255,255,0.1); }
+  .v2-custom__sub-title {
+    font-family: var(--v2-font-display);
+    font-size: 20px; font-weight: 600;
+    margin: 0 0 12px;
+    color: var(--v2-black);
+  }
+  .v2-custom--black .v2-custom__sub-title { color: var(--v2-white); }
+  .v2-custom__photo { aspect-ratio: 16 / 9; margin: 24px 0; }
+</style>

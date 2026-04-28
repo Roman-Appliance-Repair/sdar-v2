@@ -1,0 +1,63 @@
+---
+/** v2 IntroNarrative — H2 + paragraphs + sticky BookingCard right side.
+ *  Photo slot 2 (neighborhood) optionally rendered after this block (handled in layout). */
+
+import BookingCard from './BookingCard.astro';
+
+export interface Props {
+  citySlug: string;
+  cityName: string;
+  headline: string;
+  paragraphs: string[];
+  bookingTitle?: string;
+  bookingSub?: string;
+}
+
+const {
+  citySlug,
+  cityName,
+  headline,
+  paragraphs,
+  bookingTitle = 'Book Same-Day Service',
+  bookingSub = `${cityName} · Available Today`,
+} = Astro.props;
+---
+
+<section class="v2-intro">
+  <div class="v2-container v2-intro__inner">
+    <div class="v2-intro__text">
+      <h2 class="v2-intro__h2">{headline}</h2>
+      {paragraphs.map((p) => (<p class="v2-intro__p" set:html={p}></p>))}
+    </div>
+    <div class="v2-intro__cta">
+      <BookingCard citySlug={citySlug} title={bookingTitle} sub={bookingSub} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-intro { padding: 72px 0; background: var(--v2-white); }
+  .v2-intro__inner {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 60px;
+    align-items: start;
+  }
+  .v2-intro__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 30px;
+    font-weight: 700;
+    color: var(--v2-black);
+    margin: 0 0 20px;
+  }
+  .v2-intro__p {
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--v2-text);
+    margin: 0 0 16px;
+    font-family: var(--v2-font-body);
+  }
+  @media (max-width: 1024px) {
+    .v2-intro__inner { grid-template-columns: 1fr; }
+  }
+</style>

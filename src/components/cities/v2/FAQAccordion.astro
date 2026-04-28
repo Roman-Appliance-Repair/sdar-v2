@@ -1,0 +1,82 @@
+---
+/** v2 FAQAccordion — details/summary + auto-generated FAQPage JSON-LD.
+ *  Single source: schema = HTML 1:1 from same `faqs` prop array. */
+
+export interface FAQ { question: string; answer: string; schemaAnswer?: string; }
+export interface Props { cityName: string; faqs: FAQ[]; }
+
+const { cityName, faqs } = Astro.props;
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.schemaAnswer ?? f.answer.replace(/<[^>]+>/g, '') },
+  })),
+};
+---
+
+<section class="v2-faq">
+  <div class="v2-container">
+    <h2 class="v2-section-title">Frequently Asked Questions — Appliance Repair {cityName}</h2>
+    <div class="v2-faq__list">
+      {faqs.map((f) => (
+        <details class="v2-faq__item">
+          <summary class="v2-faq__q">
+            <span>{f.question}</span>
+            <span class="v2-faq__chev" aria-hidden="true">+</span>
+          </summary>
+          <div class="v2-faq__a" set:html={f.answer}></div>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+
+<style>
+  .v2-faq { padding: 72px 0; background: var(--v2-gray); }
+  .v2-section-title {
+    font-family: var(--v2-font-display);
+    font-size: 30px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 40px; text-align: center;
+  }
+  .v2-faq__list {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  .v2-faq__item {
+    border: 1px solid var(--v2-border);
+    border-radius: 8px;
+    background: var(--v2-white);
+    margin-bottom: 10px;
+    overflow: hidden;
+    font-family: var(--v2-font-body);
+  }
+  .v2-faq__q {
+    padding: 18px 24px;
+    font-size: 16px; font-weight: 600;
+    color: var(--v2-black);
+    cursor: pointer;
+    list-style: none;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .v2-faq__q::-webkit-details-marker { display: none; }
+  .v2-faq__chev {
+    font-size: 22px;
+    color: var(--v2-red);
+    flex-shrink: 0;
+    margin-left: 16px;
+    transition: transform 0.2s;
+  }
+  .v2-faq__item[open] .v2-faq__chev { transform: rotate(45deg); }
+  .v2-faq__a {
+    padding: 0 24px 20px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--v2-text);
+  }
+</style>
