@@ -1,682 +1,296 @@
 ---
-// src/pages/calabasas.astro
-// SDAR — samedayappliance.repair
-// Calabasas, CA 91301 · 91302
-// Филиал: Los Angeles · (424) 325-0520
-// GSC: appliance repair calabasas — 7 показов, позиция 1.0 🔥
-//      calabasas dryer repair — 13 показов, позиция 8.7 ⚡
-// Конкуренты: все Sub-Zero/Viking specialists без местной специфики
-// Уникальный угол: gated communities + canyon dust/dry air + estate/property manager service
-// Апрель 2026
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
+const citySlug = 'calabasas';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = {
-  name: "Calabasas",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91301", "91302"],
-  phone: "(424) 325-0520",
-  phoneRaw: "+14243250520",
-  email: "info@samedayappliance.repair",
-  branch: "Los Angeles",
-  slug: "calabasas",
-};
+const cityName = 'Calabasas';
+const zips = ['91301', '91302'];
 
-const title = `Appliance Repair Calabasas CA — Same Day | Gated Communities · Sub-Zero · Wolf | (424) 325-0520`;
-const description = `Same-day appliance repair in Calabasas, CA 91301 & 91302. The Oaks, The Estates, Hidden Hills adjacent. Canyon climate specialists. Sub-Zero, Wolf, Viking, Thermador. Licensed, OEM parts, 90-day warranty. Call (424) 325-0520.`;
-const canonical = `https://samedayappliance.repair/calabasas/`;
+const title = `Appliance Repair Calabasas CA | Gated Community & Canyon Specialists | ${branch.phone}`;
+const description = "Same-day appliance repair in Calabasas, CA 91301 & 91302. The Oaks, The Estates, Hidden Hills. Sub-Zero, Wolf, Viking, Thermador. Gated community ready. OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/calabasas/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Calabasas",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Los Angeles",
-    "addressLocality": "Los Angeles",
-    "addressRegion": "CA",
-    "postalCode": "90001",
-    "addressCountry": "US"
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Calabasas', sameAs: 'https://en.wikipedia.org/wiki/Calabasas,_California' },
+    { '@type': 'Place', name: 'The Oaks of Calabasas' },
+    { '@type': 'Place', name: 'The Estates at Calabasas' },
+    { '@type': 'Place', name: 'Hidden Hills' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Calabasas", "sameAs": "https://en.wikipedia.org/wiki/Calabasas,_California" },
-    { "@type": "Neighborhood", "name": "The Oaks of Calabasas" },
-    { "@type": "Neighborhood", "name": "The Estates at Calabasas" },
-    { "@type": "City", "name": "Hidden Hills" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Calabasas, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians serve all of Calabasas — The Oaks, The Estates at Calabasas, Calabasas Park Estates, Park Sorrento, Old Calabasas, Liberty Canyon, and Las Virgenes Road corridor — as well as Hidden Hills, Agoura Hills, and West Hills. We cover ZIP codes 91301 and 91302. Call before noon for same-day afternoon service." }
-    },
-    {
-      "@type": "Question",
-      "name": "Can you service appliances inside gated communities in Calabasas?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians regularly work inside Calabasas's gated communities — The Oaks, The Estates, and others. We coordinate guard gate access in advance when needed, work with estate managers and household staff, and handle the logistics of secured entry professionally. Let us know your gate situation when you call and we'll handle it." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does the canyon climate in Calabasas affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Santa Monica Mountains canyon environment means dry air, dust, and seasonal particulate from the surrounding terrain and fire season. Refrigerator condenser coils accumulate dust faster in this environment than in coastal or urban areas, causing compressors to overwork. Dryer vents in canyon properties are also higher fire risk. Our technicians check coil condition and dryer vent airflow proactively on every Calabasas call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, Thermador, and Viking appliances in Calabasas?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Sub-Zero, Wolf, Thermador, Viking, and Miele are common in Calabasas kitchens. Our technicians are trained on all of these brands, carry OEM parts on every service vehicle, and are experienced working in the custom built-in kitchen configurations common to Calabasas estates." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair outdoor kitchen and BBQ appliances in Calabasas?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Calabasas properties with outdoor entertaining areas often have outdoor refrigerators, outdoor-rated ice makers, and built-in BBQ grill igniter systems. Igniter electrodes in outdoor applications corrode faster from canyon air exposure. We repair and service outdoor kitchen appliances." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Calabasas?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Luxury brand repairs may run higher due to OEM part pricing — always disclosed upfront, never a surprise." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Hidden Hills, Agoura Hills, and Thousand Oaks?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Calabasas service area extends to Hidden Hills, Agoura Hills, West Hills, Westlake Village, and Thousand Oaks. All are within our regular Conejo Valley / western LA County coverage." }
-    }
-  ]
-};
+const introParagraphs = [
+  "Calabasas isn't a typical service call. The homes here run larger than most of LA County, and the kitchens are correspondingly complex — Sub-Zero columns, Wolf dual-fuel ranges, Thermador steam ovens, Miele panel-front dishwashers as the standard luxury suite. Many properties are inside gated communities — The Oaks, The Estates, Calabasas Park Estates — where guard gate coordination is part of how the appointment runs.",
+  "The canyon environment matters too. Dry air and Santa Monica Mountains particulate, compounded by fire season, mean condenser coils accumulate dust faster than in coastal or urban LA. A coil that goes 12–18 months in Malibu or Santa Monica may need attention every 6 months in canyon-adjacent Calabasas. We see this pattern consistently in 91301 and 91302.",
+  "Dryer vents are a separate fire-season concern. A lint-packed vent terminating against a canyon-facing wall is a serious hazard during Santa Ana conditions. We inspect dryer vents on every dryer call in Calabasas and tell you the truth about what we find.",
+  `Diagnostic fee is $89, credited toward repair. Written estimate before we start. 90-day warranty, OEM parts only. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for same-day service across all of Calabasas.`,
+  "<strong>Canyon climate tip:</strong> In Calabasas and the Las Virgenes corridor, pull your refrigerator out and check the condenser coils every 6 months. Canyon dust loads coils faster than anywhere else in our service area. Clean coils prevent compressor overwork — the most expensive failure on any refrigerator. We include this inspection on every Calabasas fridge call.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Canyon dust coils · Not cooling · Ice maker · Built-in columns · Sub-Zero', brands: 'Sub-Zero · Wolf · True · Samsung · LG · GE Monogram' },
+  { icon: '🔥', name: 'Oven, Range & Steam Oven', slug: 'oven', issues: 'Not heating · Igniter · Temperature off · Steam oven · Dual-fuel', brands: 'Wolf · Viking · Thermador · Miele · GE Monogram · Dacor' },
+  { icon: '♨️', name: 'Dryer Repair + Vent Inspection', slug: 'dryer', issues: 'Not heating · Vent fire hazard · Canyon dust buildup · Gas & electric', brands: 'LG · Samsung · GE · Miele · Maytag · Whirlpool' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'Not draining · Not spinning · Miele & European · Laundry room', brands: 'Miele · LG · Samsung · Whirlpool · Bosch · Speed Queen' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not draining · Panel-ready · Error codes · Miele systems · Leaking', brands: 'Miele · Bosch · Thermador · Viking · KitchenAid · GE' },
+  { icon: '🍷', name: 'Wine Cooler & Cellar Cooling', slug: 'wine-cooler', issues: 'Temperature off · Canyon humidity swings · Compressor · Built-in', brands: 'Sub-Zero · True · EuroCave · Liebherr · WhisperKOOL · U-Line' },
+  { icon: '🌿', name: 'Outdoor Kitchen Appliances', slug: 'bbq', issues: 'BBQ igniter · Outdoor fridge · Outdoor ice maker · Canyon corrosion', brands: 'Viking · Wolf · True · Lynx · Bull · Blaze' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Igniter clicking · Induction not heating · Hood motor · Filter', brands: 'Wolf · Thermador · Viking · Miele · Bosch · Dacor' },
+];
+
+const neighborhoods = [
+  { name: 'The Oaks of Calabasas', zip: '91302', featured: true },
+  { name: 'The Estates at Calabasas', zip: '91302', featured: true },
+  { name: 'Calabasas Park Estates', zip: '91302', featured: true },
+  { name: 'Park Sorrento', zip: '91302' },
+  { name: 'Old Calabasas', zip: '91302' },
+  { name: 'Liberty Canyon', zip: '91301' },
+  { name: 'Mulholland corridor', zip: '91302' },
+  { name: 'Las Virgenes Rd area', zip: '91302' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero Built-In',
+    location: 'The Oaks, Calabasas 91302',
+    quote: 'Running loudly, not holding temperature since fire season',
+    description: "Estate in The Oaks — coordinated guard gate access before arrival. Sub-Zero 48-inch column: condenser coils heavily packed with fine canyon particulate that had accumulated over roughly 8 months. Fire season in Calabasas drives significantly more airborne dust than the rest of the year. Cleaned the coil assembly completely, replaced the condenser fan motor that had started to seize from the added load, rechecked door seals. Back to temperature within an hour. Homeowner put on a 6-month coil inspection schedule.",
+    outcome: '✓ Same day · Gate coordinated · OEM Sub-Zero fan motor · 6-month plan',
+  },
+  {
+    appliance: 'Wolf Range',
+    location: 'Calabasas Park Estates, 91302',
+    quote: "Oven won't come up to temperature, star burner sparking",
+    description: "Wolf 36-inch dual-fuel — oven igniter drawing weak current, star burner igniter corroded from dry canyon air. Replaced oven igniter and burner electrode with OEM Wolf parts. Calibrated oven temperature (was running 22°F low). Tested all burners. The estate manager had scheduled the call and coordinated the homeowner's housekeeper for access — everything was handled smoothly without the homeowner needing to be present.",
+    outcome: '✓ Same day · Estate manager coordinated · Oven calibrated',
+  },
+  {
+    appliance: 'LG Dryer',
+    location: 'Old Calabasas, 91302',
+    quote: 'Two cycles to dry anything, vent looked clogged',
+    description: "Older property off Calabasas Rd — dryer vent ran a long path through the garage and terminated on the east wall facing the canyon. Significant lint plus fine canyon dust in the duct. Cleared the full run, replaced the thermal fuse, confirmed exterior vent cap was functioning. Single-cycle drying from the first test. The homeowner mentioned fire season concern about the vent — we confirmed the run was clean and the termination cap had a proper fire screen.",
+    outcome: '✓ Same day · Vent cleared · Fire screen confirmed',
+  },
+  {
+    appliance: 'Outdoor Refrigerator',
+    location: 'The Estates, Calabasas 91301',
+    quote: 'Outdoor fridge by the pool not cooling',
+    description: "True outdoor-rated undercounter refrigerator on a covered patio. Canyon conditions had accelerated coil corrosion on the exterior-exposed unit — more aggressive than we'd see on an indoor unit. Cleaned and treated the coils, replaced the condenser fan, rechecked the door gasket seal (showing UV degradation from sun exposure). Recommended annual coil maintenance for outdoor units in canyon-facing locations. Operating at 38°F by end of visit.",
+    outcome: '✓ Same day · Outdoor True refrigerator · Annual plan advised',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Gated Community Ready',
+    body: 'The Oaks, The Estates, Calabasas Park Estates, Hidden Hills — gate coordination is part of every appointment we run in Calabasas. We arrange access in advance with property managers, estate managers, gate guards, or housekeepers so the appointment runs smoothly.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Canyon Climate Specialists',
+    body: 'Dry canyon air, Santa Monica Mountains particulate, fire-season ash — all of this loads condenser coils, dryer vents, and outdoor appliances faster than coastal or urban LA. We inspect for these specific patterns on every Calabasas call.',
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Luxury Brand Expertise',
+    body: 'Sub-Zero columns, Wolf dual-fuel ranges, Thermador steam ovens, Miele panel-integrated dishwashers, Viking outdoor kitchens — we carry OEM parts for every luxury brand on every Calabasas vehicle.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair we do in Calabasas carries a 90-day warranty on parts and labor. We use OEM parts on every job. Same issue returns within 90 days — we come back at no charge.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Our Sub-Zero in The Oaks was running constantly and we couldn\'t figure out why. Same Day coordinated with our gate, came out that afternoon, found the canyon dust buildup on the coils — showed me photos. Replaced the fan motor, cleaned everything, explained the 6-month schedule for this area. Exactly the knowledgeable service we needed."',
+    author: '— Jennifer M., The Oaks of Calabasas',
+  },
+  {
+    stars: 5,
+    text: '"Wolf range igniter and oven issues. Our estate manager arranged the call. Technician came same day, had all OEM Wolf parts, recalibrated the oven — turns out it had been 22 degrees low for months. The whole interaction was professional and easy. Our manager said it was the smoothest service call they\'d coordinated."',
+    author: '— The Taylor Estate, Calabasas Park Estates',
+  },
+  {
+    stars: 5,
+    text: '"Dryer had been taking forever and I was worried about fire season with the canyon-facing vent. They came out, cleared the full duct run, confirmed the fire screen was intact, replaced the thermal fuse. The peace of mind on the vent situation alone was worth it. Very thorough, very professional."',
+    author: '— David K., Old Calabasas',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Sub-Zero / Wolf / Thermador', range: '$300–$700+', note: 'OEM parts · Built-in column · Pro range · Gate coordination', featured: true },
+  { appliance: 'Refrigerator (Standard)', range: '$200–$450', note: 'Canyon coil cleaning · Ice maker · Fan motor' },
+  { appliance: 'Dryer + Vent Inspection', range: '$150–$320', note: 'Vent cleaning · Thermal fuse · Fire screen check' },
+  { appliance: 'Oven / Range', range: '$200–$500+', note: 'Igniter · Element · Temperature calibration · Steam oven' },
+  { appliance: 'Dishwasher / Washer', range: '$150–$400', note: 'Panel-ready · Drain · Error codes' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Calabasas?',
+    answer: "Yes — Calabasas is on our regular Westside route. We cover both 91301 and 91302 daily, including The Oaks, The Estates, Calabasas Park Estates, Old Calabasas, and the Las Virgenes corridor. Call before noon for same-day service.",
+  },
+  {
+    question: 'Do you service gated communities like The Oaks, The Estates, and Hidden Hills?',
+    answer: "Yes. The Oaks of Calabasas, The Estates at Calabasas, Calabasas Park Estates, and Hidden Hills all have gate coordination requirements. Tell us when you call who manages access — property manager, estate manager, gate guard, or housekeeper — and we coordinate in advance so the appointment runs smoothly.",
+  },
+  {
+    question: "How does Calabasas's canyon climate affect appliances?",
+    answer: "The combination of dry canyon air and Santa Monica Mountains particulate — compounded during fire season — loads refrigerator condenser coils faster than coastal or urban LA. A coil that goes 12–18 months elsewhere may need attention every 6 months in canyon-adjacent Calabasas. Outdoor appliances also see accelerated coil corrosion. We inspect for these patterns on every relevant call.",
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, Thermador, and Viking in Calabasas?',
+    answer: "Yes. Sub-Zero columns, Wolf dual-fuel ranges, Thermador steam ovens, Miele panel-integrated dishwashers, and Viking outdoor kitchens are common in Calabasas estates. We carry OEM parts for all of these brands on every Calabasas vehicle.",
+  },
+  {
+    question: 'Do you repair outdoor BBQ and outdoor kitchen appliances in Calabasas?',
+    answer: "Yes. Outdoor BBQ igniter failures, outdoor refrigerator cooling issues, outdoor ice maker problems — all common in Calabasas given the canyon corrosion environment. We service Viking, Wolf, True, Lynx, Bull, and Blaze outdoor kitchen brands.",
+  },
+  {
+    question: 'What is your diagnostic fee in Calabasas?',
+    answer: "Our diagnostic fee is $89. It covers the trip, full appliance inspection, and a written estimate. If you proceed with the repair, the $89 is credited toward your invoice.",
+  },
+  {
+    question: 'Do you also serve Hidden Hills, Agoura Hills, and Thousand Oaks from Calabasas?',
+    answer: "Yes — our Calabasas-area routes also cover Hidden Hills, Agoura Hills, Westlake Village, Thousand Oaks, West Hills, and Malibu. Same-day service is typically available across this corridor.",
+  },
+];
+
+const nearbyCities = [
+  { name: 'Malibu', slug: 'malibu' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Santa Monica', slug: 'santa-monica' },
+  { name: 'Brentwood', slug: 'brentwood' },
+  { name: 'Pacific Palisades', slug: 'pacific-palisades' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Burbank', slug: 'burbank' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Calabasas, CA"
+    subheadline="Gated communities, canyon estates, luxury kitchens — and the unique appliance challenges that come with living in the Santa Monica Mountains corridor. Sub-Zero, Wolf, Viking, Thermador. Same-day service, OEM parts, 90-day warranty."
+    zips={zips}
+    tier={1}
+  />
 
-  <!-- HERO -->
-  <section class="cal-hero">
-    <div class="cal-hero__inner container">
-      <div class="cal-hero__content">
-        <div class="cal-hero__eyebrow">Calabasas, CA · 91301 & 91302 · The Oaks · The Estates · Hidden Hills</div>
-        <h1 class="cal-hero__h1">
-          Appliance Repair<br>
-          <span class="cal-hero__accent">Calabasas, CA</span>
-        </h1>
-        <p class="cal-hero__sub">
-          Gated communities, canyon estates, luxury kitchens — and the unique
-          appliance challenges that come with living in the Santa Monica Mountains
-          corridor. Sub-Zero, Wolf, Viking, Thermador. Same-day service,
-          OEM parts, 90-day warranty.
-        </p>
-        <div class="cal-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="cal-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="cal-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-calabasas-ca.webp"
-          alt="Appliance repair in Calabasas CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>Gated Community Ready</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Calabasas — What's Different Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Calabasas Service Team"
+    bookingSub="91301 · 91302 · Gated ready · Same day"
+  />
 
-  <!-- INTRO -->
-  <section class="cal-intro">
-    <div class="container cal-intro__inner">
-      <div class="cal-intro__text">
-        <h2>Appliance Repair in Calabasas — What's Different Here</h2>
-        <p>
-          Calabasas isn't a typical service call. The homes are larger, the kitchens
-          are more complex — Sub-Zero columns, Wolf ranges, Thermador steam ovens,
-          Miele dishwashers with panel fronts — and many properties are inside gated
-          communities where showing up unannounced isn't how it works. The Oaks,
-          The Estates at Calabasas, Calabasas Park Estates — our technicians coordinate
-          guard gate access before arrival, work with estate managers and household staff,
-          and handle the logistics without burdening the homeowner.
-        </p>
-        <p>
-          The canyon environment matters too. Dry air and particulate from the Santa
-          Monica Mountains — compounded during fire season — means refrigerator condenser
-          coils accumulate dust significantly faster than in coastal or urban areas.
-          A coil that might go 12–18 months in Malibu or Santa Monica may need attention
-          every 6 months in a canyon-adjacent property in Calabasas. We check this
-          proactively on every refrigerator call here.
-        </p>
-        <p>
-          Dryer vents in Calabasas properties are also worth paying attention to — both
-          for efficiency and because in a fire-season-aware community, a lint-packed vent
-          is a serious hazard. We inspect airflow on every dryer call.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong> on all parts and labor.
-          OEM parts only — never aftermarket.
-        </p>
-        <div class="cal-tip">
-          <div class="cal-tip__icon">🏔️</div>
-          <div class="cal-tip__text">
-            <strong>Canyon climate tip:</strong> In Calabasas and the Las Virgenes corridor,
-            pull your refrigerator out and check the condenser coils every 6 months.
-            Canyon dust loads coils faster than anywhere else in our service area.
-            Clean coils prevent compressor overwork — the most expensive failure on
-            any refrigerator. We include this inspection on every Calabasas fridge call.
-          </div>
-        </div>
-      </div>
-      <div class="cal-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Calabasas Service Team</div>
-          <div class="cta-box__sub">91301 · 91302 · Gated ready · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Calabasas"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="cal-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Calabasas</h2>
-      <p class="section-sub">Luxury & standard brands · Indoor & outdoor · Canyon climate aware</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="Calabasas Communities We Service"
+    subheadline="From The Oaks to Old Calabasas — every part of 91301 and 91302."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={['Las Virgenes Rd', 'Mulholland Hwy', 'Calabasas Rd', 'Ventura Blvd (Calabasas)', 'Lost Hills Rd', 'Agoura Rd']}
+  />
 
-        <a href="/calabasas/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Canyon dust coils · Not cooling · Ice maker · Built-in columns · Sub-Zero</div>
-          <div class="service-card__brands">Sub-Zero · Wolf · True · Samsung · LG · GE Monogram</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Calabasas"
+    jobs={recentJobs}
+  />
 
-        <a href="/calabasas/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Steam Oven</div>
-          <div class="service-card__issues">Not heating · Igniter · Temperature off · Steam oven · Dual-fuel</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · Miele · GE Monogram · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Calabasas Homeowners Call Us"
+    reasons={whyReasons}
+  />
 
-        <a href="/calabasas/dryer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Inspection</div>
-          <div class="service-card__issues">Not heating · Vent fire hazard · Canyon dust buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Miele · Maytag · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Calabasas Clients Say"
+    testimonials={testimonials}
+  />
 
-        <a href="/calabasas/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Not draining · Not spinning · Miele & European · Laundry room</div>
-          <div class="service-card__brands">Miele · LG · Samsung · Whirlpool · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Calabasas"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/calabasas/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Panel-ready · Error codes · Miele systems · Leaking</div>
-          <div class="service-card__brands">Miele · Bosch · Thermador · Viking · KitchenAid · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Calabasas"
+    faqs={faqs}
+  />
 
-        <a href="/calabasas/wine-cellar-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler & Cellar Cooling</div>
-          <div class="service-card__issues">Temperature off · Canyon humidity swings · Compressor · Built-in</div>
-          <div class="service-card__brands">Sub-Zero · True · EuroCave · Liebherr · WhisperKOOL · U-Line</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-        <a href="/calabasas/outdoor-appliance-repair/" class="service-card">
-          <div class="service-card__icon">🌿</div>
-          <div class="service-card__name">Outdoor Kitchen Appliances</div>
-          <div class="service-card__issues">BBQ igniter · Outdoor fridge · Outdoor ice maker · Canyon corrosion</div>
-          <div class="service-card__brands">Viking · Wolf · True · Lynx · Bull · Blaze</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/calabasas/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter clicking · Induction not heating · Hood motor · Filter</div>
-          <div class="service-card__brands">Wolf · Thermador · Viking · Miele · Bosch · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS / COMMUNITIES -->
-  <section class="cal-communities">
-    <div class="container">
-      <h2>All of Calabasas & Surrounding Communities</h2>
-      <p class="section-sub">91301 & 91302 — gated and open communities throughout the canyon corridor</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Calabasas Communities</div>
-          <div class="nh-list">
-            <div class="nh-item featured">The Oaks of Calabasas</div>
-            <div class="nh-item featured">The Estates at Calabasas</div>
-            <div class="nh-item featured">Calabasas Park Estates</div>
-            <div class="nh-item">Park Sorrento</div>
-            <div class="nh-item">Old Calabasas</div>
-            <div class="nh-item">Liberty Canyon</div>
-            <div class="nh-item">Mulholland corridor</div>
-            <div class="nh-item">Las Virgenes Rd area</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Adjacent Areas We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Hidden Hills (91302)</div>
-            <div class="nh-item">Agoura Hills (91301)</div>
-            <div class="nh-item">West Hills (91307)</div>
-            <div class="nh-item">Westlake Village (91362)</div>
-            <div class="nh-item">Thousand Oaks (91360)</div>
-            <div class="nh-item">Malibu (90265)</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Corridors</div>
-          <div class="nh-list">
-            <div class="nh-item">Las Virgenes Rd</div>
-            <div class="nh-item">Mulholland Hwy</div>
-            <div class="nh-item">Calabasas Rd</div>
-            <div class="nh-item">Ventura Blvd (Calabasas)</div>
-            <div class="nh-item">Lost Hills Rd</div>
-            <div class="nh-item">Agoura Rd</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="cal-recent">
-    <div class="container">
-      <h2>Recent Jobs in Calabasas</h2>
-      <p class="section-sub">Real calls from 91301 and 91302 — gated estates, canyon homes, luxury kitchens.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Built-In</span>
-            <span class="recent-location">The Oaks, Calabasas 91302</span>
-          </div>
-          <div class="recent-card__title">"Running loudly, not holding temperature since fire season"</div>
-          <div class="recent-card__desc">
-            Estate in The Oaks — coordinated guard gate access before arrival.
-            Sub-Zero 48-inch column: condenser coils heavily packed with fine canyon
-            particulate that had accumulated over roughly 8 months. Fire season
-            in Calabasas drives significantly more airborne dust than the rest of
-            the year. Cleaned the coil assembly completely, replaced the condenser
-            fan motor that had started to seize from the added load, rechecked
-            door seals. Back to temperature within an hour. Homeowner put on a
-            6-month coil inspection schedule.
-          </div>
-          <div class="recent-card__result">✓ Same day · Gate coordinated · OEM Sub-Zero fan motor · 6-month plan</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Range</span>
-            <span class="recent-location">Calabasas Park Estates, 91302</span>
-          </div>
-          <div class="recent-card__title">"Oven won't come up to temperature, star burner sparking"</div>
-          <div class="recent-card__desc">
-            Wolf 36-inch dual-fuel — oven igniter drawing weak current, star burner
-            igniter corroded from dry canyon air. Replaced oven igniter and burner
-            electrode with OEM Wolf parts. Calibrated oven temperature (was running
-            22°F low). Tested all burners. The estate manager had scheduled the call
-            and coordinated the homeowner's housekeeper for access — everything was
-            handled smoothly without the homeowner needing to be present.
-          </div>
-          <div class="recent-card__result">✓ Same day · Estate manager coordinated · Oven calibrated</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Dryer</span>
-            <span class="recent-location">Old Calabasas, 91302</span>
-          </div>
-          <div class="recent-card__title">"Two cycles to dry anything, vent looked clogged"</div>
-          <div class="recent-card__desc">
-            Older property off Calabasas Rd — dryer vent ran a long path through the
-            garage and terminated on the east wall facing the canyon. Significant lint
-            plus fine canyon dust in the duct. Cleared the full run, replaced the
-            thermal fuse, confirmed exterior vent cap was functioning. Single-cycle
-            drying from the first test. The homeowner mentioned fire season concern
-            about the vent — we confirmed the run was clean and the termination cap
-            had a proper fire screen.
-          </div>
-          <div class="recent-card__result">✓ Same day · Vent cleared · Fire screen confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Outdoor Refrigerator</span>
-            <span class="recent-location">The Estates, Calabasas 91301</span>
-          </div>
-          <div class="recent-card__title">"Outdoor fridge by the pool not cooling"</div>
-          <div class="recent-card__desc">
-            True outdoor-rated undercounter refrigerator on a covered patio. Canyon
-            conditions had accelerated coil corrosion on the exterior-exposed unit —
-            more aggressive than we'd see on an indoor unit. Cleaned and treated
-            the coils, replaced the condenser fan, rechecked the door gasket seal
-            (showing UV degradation from sun exposure). Recommended annual coil
-            maintenance for outdoor units in canyon-facing locations. Operating at
-            38°F by end of visit.
-          </div>
-          <div class="recent-card__result">✓ Same day · Outdoor True refrigerator · Annual plan advised</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="cal-why">
-    <div class="container">
-      <h2>Why Calabasas Homeowners Call Us</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🔐</div>
-          <div class="why-title">Gated Community Ready</div>
-          <div class="why-text">We coordinate guard gate access before arrival — not when we're sitting at the gate. Estate managers, household staff, property managers: we work with whoever runs the logistics. The homeowner doesn't need to be involved if they prefer not to be.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏔️</div>
-          <div class="why-title">Canyon Climate Specialists</div>
-          <div class="why-text">Dry air, canyon dust, and fire season particulate hit appliances harder in Calabasas than anywhere else in our coverage. We check condenser coils and dryer vents proactively on every call here — it's that consistent a factor in this environment.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🔧</div>
-          <div class="why-title">Luxury Brand Expertise</div>
-          <div class="why-text">Sub-Zero, Wolf, Thermador, Viking, Miele — we carry OEM parts for these brands on every Calabasas vehicle. We're trained on their specific systems and experienced in the custom cabinetry installations common to Calabasas estates.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — no aftermarket substitutes that compromise performance on luxury systems. $89 diagnostic waived with repair. Written estimate every time.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="cal-reviews">
-    <div class="container">
-      <h2>What Calabasas Clients Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our Sub-Zero in The Oaks was running constantly and we couldn't figure out why. Same Day coordinated with our gate, came out that afternoon, found the canyon dust buildup on the coils — showed me photos. Replaced the fan motor, cleaned everything, explained the 6-month schedule for this area. Exactly the knowledgeable service we needed."</div>
-          <div class="review-author">— Jennifer M., The Oaks of Calabasas</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Wolf range igniter and oven issues. Our estate manager arranged the call. Technician came same day, had all OEM Wolf parts, recalibrated the oven — turns out it had been 22 degrees low for months. The whole interaction was professional and easy. Our manager said it was the smoothest service call they'd coordinated."</div>
-          <div class="review-author">— The Taylor Estate, Calabasas Park Estates</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Dryer had been taking forever and I was worried about fire season with the canyon-facing vent. They came out, cleared the full duct run, confirmed the fire screen was intact, replaced the thermal fuse. The peace of mind on the vent situation alone was worth it. Very thorough, very professional."</div>
-          <div class="review-author">— David K., Old Calabasas</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="cal-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Calabasas</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf / Thermador</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Built-in · Canyon coil inspection included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator (standard)</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Fan motor, ice maker, coil cleaning, thermostat</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dryer + Vent Inspection</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Heating element, thermal fuse, vent fire hazard check</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$200 – $500+</div>
-          <div class="pricing-card__note">Wolf/Viking igniter, calibration, gas valve · OEM</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher / Washer</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Miele & European models may cost more · OEM parts</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="cal-faq">
-    <div class="container">
-      <h2>Questions Calabasas Clients Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Calabasas, CA?</summary><div class="faq-answer">Yes. Our technicians serve all of Calabasas — The Oaks, The Estates, Calabasas Park Estates, Park Sorrento, Old Calabasas, Liberty Canyon — as well as Hidden Hills and Agoura Hills. ZIP codes 91301 and 91302. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Can you service appliances inside gated communities in Calabasas?</summary><div class="faq-answer">Yes. We coordinate guard gate access before arrival, work with estate managers and household staff, and handle secured entry professionally. Let us know your gate situation when you call and we'll handle the logistics.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does the canyon climate in Calabasas affect appliances?</summary><div class="faq-answer">Yes. Dry air, canyon dust, and fire season particulate cause refrigerator condenser coils to accumulate debris faster than in coastal or urban areas. Dryer vents are also higher fire risk. We check coil condition and dryer vent airflow proactively on every Calabasas call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero, Wolf, Thermador, and Viking appliances in Calabasas?</summary><div class="faq-answer">Yes. Sub-Zero, Wolf, Thermador, Viking, and Miele are common in Calabasas kitchens. Our technicians are trained on these brands, carry OEM parts on every service vehicle, and are experienced in custom built-in kitchen configurations.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair outdoor kitchen and BBQ appliances in Calabasas?</summary><div class="faq-answer">Yes. Outdoor refrigerators, outdoor ice makers, and built-in BBQ igniter systems all see accelerated wear in the canyon environment. We repair and service outdoor kitchen appliances in Calabasas.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Calabasas?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Luxury brand repairs may run higher due to OEM part pricing — always disclosed upfront.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Hidden Hills, Agoura Hills, and Thousand Oaks?</summary><div class="faq-answer">Yes. Our Calabasas service area extends to Hidden Hills, Agoura Hills, West Hills, Westlake Village, and Thousand Oaks. All within our regular western LA County coverage.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="cal-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/pacific-palisades/" class="nearby-link">Pacific Palisades</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="cal-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Calabasas?</h2>
-          <p>Gated communities · Canyon climate specialists · Luxury brands · All of 91301 & 91302. $89 diagnostic waived with repair. 90-day warranty. OEM parts.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Calabasas, CA 91301 & 91302</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --cal-red: #C8102E; --cal-black: #0a0a0a; --cal-gray: #f5f5f5; --cal-border: #e2e2e2; --cal-text: #1a1a1a; --cal-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .cal-hero { background: var(--cal-black); color: white; padding: 80px 0 60px; }
-  .cal-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .cal-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--cal-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .cal-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .cal-hero__accent { color: var(--cal-red); }
-  .cal-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .cal-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .cal-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .cal-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--cal-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .cal-bottom-cta .btn-secondary { color: var(--cal-text); border-color: var(--cal-border); }
-  .trust-bar { background: var(--cal-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .cal-intro { padding: 72px 0; background: white; }
-  .cal-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .cal-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--cal-black); margin-bottom: 20px; }
-  .cal-intro__text p { font-size: 16px; line-height: 1.7; color: var(--cal-text); margin-bottom: 16px; }
-  .cal-tip { display: flex; gap: 14px; background: #f5f0e8; border: 1px solid #d4b896; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .cal-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .cal-tip__text { font-size: 14px; color: var(--cal-text); line-height: 1.6; }
-  .cta-box { background: var(--cal-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--cal-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--cal-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--cal-muted); text-align: center; margin-bottom: 40px; }
-  .cal-services { padding: 72px 0; background: var(--cal-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--cal-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--cal-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--cal-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--cal-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--cal-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--cal-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--cal-red); font-weight: 500; }
-  .cal-communities { padding: 72px 0; background: white; }
-  .cal-communities h2 { font-size: 30px; font-weight: 700; color: var(--cal-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--cal-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--cal-text); padding: 8px 12px; background: var(--cal-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--cal-red); color: var(--cal-black); font-weight: 500; }
-  .cal-recent { padding: 72px 0; background: var(--cal-gray); }
-  .cal-recent h2 { font-size: 30px; font-weight: 700; color: var(--cal-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--cal-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--cal-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--cal-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--cal-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--cal-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .cal-why { padding: 72px 0; background: white; }
-  .cal-why h2 { font-size: 30px; font-weight: 700; color: var(--cal-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--cal-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--cal-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--cal-muted); line-height: 1.6; }
-  .cal-reviews { padding: 72px 0; background: var(--cal-gray); }
-  .cal-reviews h2 { font-size: 30px; font-weight: 700; color: var(--cal-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--cal-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--cal-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--cal-muted); font-weight: 500; }
-  .cal-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--cal-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--cal-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--cal-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--cal-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--cal-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--cal-red); }
-  .pricing-card__note { font-size: 13px; color: var(--cal-muted); }
-  .cal-faq { padding: 72px 0; background: var(--cal-gray); }
-  .cal-faq h2 { font-size: 30px; font-weight: 700; color: var(--cal-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--cal-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--cal-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--cal-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--cal-text); }
-  .cal-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--cal-border); }
-  .cal-nearby h2 { font-size: 20px; font-weight: 600; color: var(--cal-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--cal-border); border-radius: 20px; font-size: 14px; color: var(--cal-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--cal-red); color: var(--cal-red); }
-  .cal-bottom-cta { padding: 72px 0; background: var(--cal-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .cal-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .cal-hero__inner { grid-template-columns: 1fr; } .cal-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .cal-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Calabasas?"
+    body="Gated communities · Canyon climate specialists · Luxury brands · All of 91301 & 91302. $89 diagnostic waived with repair. 90-day warranty. OEM parts."
+  />
+</CityLayoutV2>

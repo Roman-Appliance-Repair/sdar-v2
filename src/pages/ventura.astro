@@ -1,406 +1,325 @@
 ---
-// src/pages/ventura.astro
-// Same Day Appliance Repair — Ventura, CA
-// Branch: Thousand Oaks/Ventura | Phone: (424) 208-0228
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+const citySlug = 'ventura';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = "Ventura";
-const citySlug = "ventura";
-const phone = "(424) 208-0228";
-const phoneRaw = "+14242080228";
-const email = "thousandoaks@samedayappliance.repair";
-const branch = "Thousand Oaks";
+const cityName = "Ventura";
+const zips = ["93001", "93003", "93004"];
 
-const metaTitle = "Appliance Repair Ventura CA | Same Day Service | (424) 208-0228";
-const metaDesc = "Same-day appliance repair in Ventura, CA. Harbor, Midtown, Pierpont Beach, East Ventura. Salt air expertise. Sub-Zero, Wolf & all brands. OEM parts, 90-day warranty. $89 diagnostic.";
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
-const neighborhoods = [
-  { name: "Ventura Harbor area", zip: "93001" },
-  { name: "Pierpont Beach", zip: "93001" },
-  { name: "Downtown / Mission District", zip: "93001" },
-  { name: "Midtown Ventura", zip: "93003" },
-  { name: "East Ventura", zip: "93004" },
-  { name: "Ondulando", zip: "93003" },
-  { name: "Poinsettia area", zip: "93004" },
-  { name: "Saticoy area", zip: "93004" },
-  { name: "Ventura Keys", zip: "93001" },
-  { name: "Westpark", zip: "93003" },
+const title = `Appliance Repair Ventura CA | Same Day Service | ${phone}`;
+const description = "Same-day appliance repair in Ventura, CA. Harbor, Midtown, Pierpont Beach, East Ventura. Salt air expertise. Sub-Zero, Wolf & all brands. OEM parts, 90-day warranty. $89 diagnostic.";
+const canonical = "https://samedayappliance.repair/ventura/";
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "HomeAndConstructionBusiness",
+  name: branch.fullName,
+  image: "https://samedayappliance.repair/images/logo.webp",
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { "@type": "City", name: "Ventura", sameAs: "https://en.wikipedia.org/wiki/Ventura,_California" },
+    { "@type": "Place", name: "Ventura Harbor" },
+    { "@type": "Place", name: "Pierpont Beach" },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: "$$",
+  license: "CA CSLB #1138898",
+  aggregateRating: {
+    "@type": "AggregateRating",
+    ratingValue: "4.6",
+    reviewCount: "37",
+    bestRating: "5",
+  },
+};
+
+const introParagraphs = [
+  "Ventura is one of the more characterful cities in our service area — an actual coastal city with a working harbor, a historic Mission district, older neighborhoods with real history, and newer developments spreading east toward Camarillo. It's not a planned community and it's not trying to be. The appliances here reflect that range.",
+  "The harbor area, Pierpont Beach, and Ventura Keys are exposed to Pacific salt air in the same way that Monarch Beach in Dana Point and Newport Peninsula are. Salt particulate deposits on condenser coils, corrodes range igniter electrodes, and degrades door gaskets. Harbor-adjacent homes in Ventura need the same 6-month coil cleaning cycle we recommend in Newport Beach — not because we're selling maintenance, but because the Pacific doesn't distinguish between zip codes.",
+  "The older housing stock downtown and in the Mission District brings its own considerations. Appliances in these homes may be on their second or third owner. We repair them as long as the economics make sense and tell you when they don't. Honest assessment, written estimate, no pressure.",
+  `Diagnostic fee is $89, credited toward the repair. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
 ];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
 ];
 
-const recentRepairs = [
+const venturaContextNarrative = {
+  headline: "Three Things That Make Ventura Different for Appliance Repair",
+  paragraphs: [],
+  subSections: [
+    {
+      title: "1. The harbor and ocean are close — and your appliances know it",
+      paragraphs: [
+        "Ventura Harbor sits at the western edge of the city, and the Pacific runs along the entire southern boundary. The marine air that rolls off that water carries salt particulate that deposits on condenser coils, corrodes metal contacts, and accelerates wear on appliance components. Harbor-area homes, Pierpont Beach, and Ventura Keys see the most exposure. If your refrigerator is within a mile of the water in Ventura, the 12-month coil cleaning recommendation doesn't apply — we've seen 4-6 month cycles produce the same buildup that takes 12 months inland.",
+      ],
+    },
+    {
+      title: "2. The old housing stock has character — and age",
+      paragraphs: [
+        "The neighborhoods around downtown Ventura, the Mission, and the older flatland streets have homes that were built when appliances were built to last. Some of those older appliances are still running — and worth fixing. Others have been replaced with newer units that have their own failure patterns. We work on both. When a repair doesn't make economic sense, we'll tell you before we start, not after.",
+      ],
+    },
+    {
+      title: "3. Viking igniter misdiagnosis is common here",
+      paragraphs: [
+        "The Ondulando neighborhood and several Ventura hillside communities have a high density of Viking ranges. Viking oven F5 errors almost always mean a weak igniter — a $120-150 OEM part. We've seen multiple Ventura homeowners quoted control board replacements ($600+) for this exact failure. We diagnose correctly and charge you for the part that actually failed.",
+      ],
+    },
+  ],
+};
+
+const neighborhoods = [
+  { name: 'Ventura Harbor area', zip: '93001', featured: true },
+  { name: 'Pierpont Beach', zip: '93001', featured: true },
+  { name: 'Downtown / Mission District', zip: '93001' },
+  { name: 'Midtown Ventura', zip: '93003' },
+  { name: 'East Ventura', zip: '93004' },
+  { name: 'Ondulando', zip: '93003' },
+  { name: 'Poinsettia area', zip: '93004' },
+  { name: 'Saticoy area', zip: '93004' },
+  { name: 'Ventura Keys', zip: '93001' },
+  { name: 'Westpark', zip: '93003' },
+];
+
+const recentJobs = [
   {
-    title: "GE refrigerator — not cooling, frost buildup on back wall",
-    neighborhood: "Pierpont Beach",
-    detail: "GE Profile PFE28KYNFS in a Pierpont Beach home steps from the water — not cooling properly, frost visible on the back interior wall. Defrost heater had failed, allowing ice to build up on the evaporator coil and block airflow. After defrosting the coil, we replaced the defrost heater assembly and the defrost thermostat, which was also reading out of spec. Also cleaned the condenser coils — significant salt particulate buildup from the harbor-adjacent location. Complete repair in two hours. The coastal proximity means salt air gets into the coil compartment; we explained the maintenance cycle going forward.",
-    part: "GE OEM defrost heater + thermostat",
-    time: "2 hours"
+    appliance: 'GE Profile Refrigerator',
+    location: 'Pierpont Beach',
+    quote: '"GE refrigerator — not cooling, frost buildup on back wall"',
+    description: "GE Profile PFE28KYNFS in a Pierpont Beach home steps from the water — not cooling properly, frost visible on the back interior wall. Defrost heater had failed, allowing ice to build up on the evaporator coil and block airflow. After defrosting the coil, we replaced the defrost heater assembly and the defrost thermostat, which was also reading out of spec. Also cleaned the condenser coils — significant salt particulate buildup from the harbor-adjacent location. Complete repair in two hours. The coastal proximity means salt air gets into the coil compartment; we explained the maintenance cycle going forward.",
+    outcome: '✓ Same day · GE OEM defrost heater + thermostat · 2 hours',
   },
   {
-    title: "LG washer — DE1 error, door won't lock",
-    neighborhood: "Midtown Ventura",
-    detail: "LG front-loader WM3900HWA — DE1 door latch error, cycle refusing to start. Door latch assembly had failed — the plastic latch tab had cracked from repeated use. Replaced the full door latch assembly with an OEM LG part. While we were there, the customer mentioned the machine had been making a slight grinding sound for two months — checked the drum bearing, found early wear but not yet causing issues. Noted it for the homeowner: this one has maybe 6-12 months before it needs attention. Better to know than to be surprised.",
-    part: "LG OEM door latch assembly",
-    time: "1 hour"
+    appliance: 'LG Front-Loader Washer',
+    location: 'Midtown Ventura',
+    quote: '"LG washer — DE1 error, door won\'t lock"',
+    description: "LG front-loader WM3900HWA — DE1 door latch error, cycle refusing to start. Door latch assembly had failed — the plastic latch tab had cracked from repeated use. Replaced the full door latch assembly with an OEM LG part. While we were there, the customer mentioned the machine had been making a slight grinding sound for two months — checked the drum bearing, found early wear but not yet causing issues. Noted it for the homeowner: this one has maybe 6-12 months before it needs attention. Better to know than to be surprised.",
+    outcome: '✓ Same day · LG OEM door latch assembly · 1 hour',
   },
   {
-    title: "Viking range — oven not preheating, F5 error code",
-    neighborhood: "Ondulando",
-    detail: "Viking VGIC5366BSS — F5 error on the oven display, preheating stalling at 180°F. Bake igniter had weakened and was failing to draw sufficient current to open the gas valve. This is the most common Viking oven failure and one we see regularly. Replaced the oven igniter with an OEM Viking part, tested preheat cycle to 350°F, 400°F, and 450°F before leaving. Customer had been told by another company it was the control board — a $600+ part. It was the igniter — a $120 part.",
-    part: "Viking OEM oven igniter",
-    time: "1.5 hours"
+    appliance: 'Viking Range',
+    location: 'Ondulando',
+    quote: '"Viking range — oven not preheating, F5 error code"',
+    description: "Viking VGIC5366BSS — F5 error on the oven display, preheating stalling at 180°F. Bake igniter had weakened and was failing to draw sufficient current to open the gas valve. This is the most common Viking oven failure and one we see regularly. Replaced the oven igniter with an OEM Viking part, tested preheat cycle to 350°F, 400°F, and 450°F before leaving. Customer had been told by another company it was the control board — a $600+ part. It was the igniter — a $120 part.",
+    outcome: '✓ Same day · Viking OEM oven igniter · 1.5 hours',
   },
   {
-    title: "Bosch dishwasher — E22 filter error, not draining completely",
-    neighborhood: "East Ventura",
-    detail: "Bosch SHPM88Z75N — E22 filter blocked code, 2 inches of water remaining after cycle. Filter and mesh screen completely clogged with food debris. Cleaned the filter assembly, checked the drain pump impeller (clear), ran diagnostic cycle. Hard water mineral deposits on the spray arm ports were also contributing to poor performance — descaled the upper and lower arms. Ventura's water hardness isn't as extreme as Simi Valley but it's enough to affect dishwasher performance over time without regular maintenance.",
-    part: "Filter cleaning + descale service",
-    time: "1 hour"
-  }
+    appliance: 'Bosch Dishwasher',
+    location: 'East Ventura',
+    quote: '"Bosch dishwasher — E22 filter error, not draining completely"',
+    description: "Bosch SHPM88Z75N — E22 filter blocked code, 2 inches of water remaining after cycle. Filter and mesh screen completely clogged with food debris. Cleaned the filter assembly, checked the drain pump impeller (clear), ran diagnostic cycle. Hard water mineral deposits on the spray arm ports were also contributing to poor performance — descaled the upper and lower arms. Ventura's water hardness isn't as extreme as Simi Valley but it's enough to affect dishwasher performance over time without regular maintenance.",
+    outcome: '✓ Same day · Filter cleaning + descale service · 1 hour',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Coastal experience',
+    body: "We know what Ventura Harbor salt air does to condenser coils and range electrodes. We find it, explain it, and give you a maintenance plan that fits where you actually live.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'We diagnose correctly',
+    body: 'Viking F5 errors are igniters, not control boards. GE frost buildup is a defrost heater, not a sealed system problem. We find the actual failed component before recommending parts.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Honest on old appliances',
+    body: "Ventura has older housing stock. When an old appliance comes up for repair, we tell you if it's worth fixing — and what the repair will actually cost — before we start.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-day warranty, standard',
+    body: 'Every repair includes a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"GE fridge near Pierpont Beach — frost buildup inside, not cooling. They fixed the defrost heater and cleaned the coils. Explained the salt air issue for harbor-area homes. Straightforward, fast, done right."',
+    author: '— Laura M., Pierpont Beach',
+  },
+  {
+    stars: 5,
+    text: '"Viking range F5 error. Another company quoted me a control board at $650. Same Day came out, said it was the igniter, fixed it for $180. Tested every temperature setting before leaving. This is what honest service looks like."',
+    author: '— Michael R., Ondulando',
+  },
+  {
+    stars: 5,
+    text: '"LG washer door latch. Fast, same day, clean, professional. Technician noticed the drum bearing starting to wear and flagged it — no pressure, just information. That kind of service builds trust."',
+    author: '— Sandra K., Midtown Ventura',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate · Coastal assessment included' },
+  { appliance: 'Standard Repair', range: '$150–$380', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Luxury Brand Repair', range: '$250–$600+', note: 'Sub-Zero, Wolf, Viking, Thermador · OEM parts' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Ventura?",
-    a: "Yes — Ventura is covered by our Thousand Oaks branch. We run regular Ventura County routes that include Ventura, Camarillo, Oxnard, and Moorpark. Call before noon for same-day service. We cover all Ventura neighborhoods from the harbor to East Ventura."
+    question: "Do you offer same-day appliance repair in Ventura?",
+    answer: "Yes — Ventura is covered by our Thousand Oaks branch. We run regular Ventura County routes that include Ventura, Camarillo, Oxnard, and Moorpark. Call before noon for same-day service. We cover all Ventura neighborhoods from the harbor to East Ventura.",
   },
   {
-    q: "Does living near Ventura Harbor or the Pacific affect appliances?",
-    a: "It does. The harbor area, Pierpont Beach, and Ventura Keys are exposed to the same salt-laden marine air that affects appliances in Newport Beach and Dana Point. Condenser coils on refrigerators accumulate salt particulate faster, and metal components like range igniter electrodes corrode more quickly than inland. We recommend condenser coil cleaning every 6 months for harbor-adjacent and beachfront properties in Ventura."
+    question: "Does living near Ventura Harbor or the Pacific affect appliances?",
+    answer: "It does. The harbor area, Pierpont Beach, and Ventura Keys are exposed to the same salt-laden marine air that affects appliances in Newport Beach and Dana Point. Condenser coils on refrigerators accumulate salt particulate faster, and metal components like range igniter electrodes corrode more quickly than inland. We recommend condenser coil cleaning every 6 months for harbor-adjacent and beachfront properties in Ventura.",
   },
   {
-    q: "What is your diagnostic fee in Ventura?",
-    a: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and written estimate. If you proceed with the repair, the $89 is credited against your invoice."
+    question: "What is your diagnostic fee in Ventura?",
+    answer: "Our diagnostic fee is $89. It covers the service call, full appliance inspection, and written estimate. If you proceed with the repair, the $89 is credited against your invoice.",
   },
   {
-    q: "Do you repair older appliances in Ventura's older neighborhoods?",
-    a: "Yes. Downtown Ventura and the Mission District have older housing stock with appliances that may be 10-20 years old. We repair older units as long as the repair makes economic sense — and we'll tell you honestly when it doesn't. Parts availability is generally good for appliances up to 15 years old."
+    question: "Do you repair older appliances in Ventura's older neighborhoods?",
+    answer: "Yes. Downtown Ventura and the Mission District have older housing stock with appliances that may be 10-20 years old. We repair older units as long as the repair makes economic sense — and we'll tell you honestly when it doesn't. Parts availability is generally good for appliances up to 15 years old.",
   },
   {
-    q: "What brands do you service in Ventura?",
-    a: "All major brands: GE, Samsung, LG, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, and luxury brands including Sub-Zero, Wolf, Viking, Thermador, and Miele. The Ondulando and higher hillside neighborhoods tend toward luxury brands; the downtown and midtown areas have mainstream brands. We carry OEM parts for both."
+    question: "What brands do you service in Ventura?",
+    answer: "All major brands: GE, Samsung, LG, Whirlpool, KitchenAid, Bosch, Maytag, Frigidaire, and luxury brands including Sub-Zero, Wolf, Viking, Thermador, and Miele. The Ondulando and higher hillside neighborhoods tend toward luxury brands; the downtown and midtown areas have mainstream brands. We carry OEM parts for both.",
   },
   {
-    q: "Do you repair Viking ranges in Ventura?",
-    a: "Yes. Viking ranges are common in the Ondulando area and other established Ventura neighborhoods. The most frequent Viking failure we see is the oven igniter — a straightforward repair that's often misdiagnosed as a control board issue. We diagnose correctly and replace the right part."
+    question: "Do you repair Viking ranges in Ventura?",
+    answer: "Yes. Viking ranges are common in the Ondulando area and other established Ventura neighborhoods. The most frequent Viking failure we see is the oven igniter — a straightforward repair that's often misdiagnosed as a control board issue. We diagnose correctly and replace the right part.",
   },
   {
-    q: "Do you offer a warranty on repairs in Ventura?",
-    a: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge."
-  }
+    question: "Do you offer a warranty on repairs in Ventura?",
+    answer: "All repairs include a 90-day warranty on parts and labor. Same issue returns within 90 days — we come back at no charge.",
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Camarillo", slug: "camarillo" },
-  { name: "Oxnard", slug: "oxnard" },
-  { name: "Thousand Oaks", slug: "thousand-oaks" },
-  { name: "Moorpark", slug: "moorpark" },
-  { name: "Newbury Park", slug: "newbury-park" },
-  { name: "Ojai", slug: "ojai" },
+const nearbyCities = [
+  { name: 'Camarillo', slug: 'camarillo' },
+  { name: 'Oxnard', slug: 'oxnard' },
+  { name: 'Thousand Oaks', slug: 'thousand-oaks' },
+  { name: 'Moorpark', slug: 'moorpark' },
+  { name: 'Newbury Park', slug: 'newbury-park' },
+  { name: 'Ojai', slug: 'ojai' },
 ];
-
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Ventura",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/ventura/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "100 E Thousand Oaks Blvd Suite 200",
-        "addressLocality": "Thousand Oaks",
-        "addressRegion": "CA",
-        "postalCode": "91360",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Ventura" },
-        { "@type": "Place", "name": "Ventura Harbor" },
-        { "@type": "Place", "name": "Pierpont Beach" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "19:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "09:00", "closes": "17:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.8",
-        "reviewCount": "61",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Ventura, CA"
+    subheadline="Same-day service from the harbor to East Ventura. Coastal salt air expertise. Sub-Zero, Wolf, Viking & all major brands. $89 diagnostic — waived with repair."
+    zips={zips}
+    tier={3}
+  />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Ventura, CA · Ventura County · 93001 · 93003 · 93004</div>
-        <h1>Appliance Repair in Ventura, CA</h1>
-        <p class="city-hero-sub">Same-day service from the harbor to East Ventura. Coastal salt air expertise. Sub-Zero, Wolf, Viking & all major brands. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.8 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/ventura/appliance-repair-ventura-ca.webp"
-          alt="Appliance repair technician in Ventura CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>Licensed & Insured</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Ventura — A Real Coastal City"
+    paragraphs={introParagraphs}
+    bookingTitle="Ventura Service"
+    bookingSub="93001 · 93003 · 93004 · Same Day"
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Appliance Repair in Ventura — A Real Coastal City</h2>
-        <p>Ventura is one of the more characterful cities in our service area — an actual coastal city with a working harbor, a historic Mission district, older neighborhoods with real history, and newer developments spreading east toward Camarillo. It's not a planned community and it's not trying to be. The appliances here reflect that range.</p>
-        <p>The harbor area, Pierpont Beach, and Ventura Keys are exposed to Pacific salt air in the same way that Monarch Beach in Dana Point and Newport Peninsula are. Salt particulate deposits on condenser coils, corrodes range igniter electrodes, and degrades door gaskets. Harbor-adjacent homes in Ventura need the same 6-month coil cleaning cycle we recommend in Newport Beach — not because we're selling maintenance, but because the Pacific doesn't distinguish between zip codes.</p>
-        <p>The older housing stock downtown and in the Mission District brings its own considerations. Appliances in these homes may be on their second or third owner. We repair them as long as the economics make sense and tell you when they don't. Honest assessment, written estimate, no pressure.</p>
-        <p>Diagnostic fee is $89, credited toward the repair. Call <a href={`tel:${phoneRaw}`}>{phone}</a>.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Ventura Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— credited if you repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Ventura"
+    services={services}
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Ventura</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/${citySlug}/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Ventura →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={venturaContextNarrative.headline}
+    paragraphs={venturaContextNarrative.paragraphs}
+    subSections={venturaContextNarrative.subSections}
+    background="white"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Three Things That Make Ventura Different for Appliance Repair</h2>
+  <ServiceArea
+    cityName={cityName}
+    headline="Ventura Neighborhoods We Service"
+    subheadline="From the harbor to East Ventura — every part of the city."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <h3>1. The harbor and ocean are close — and your appliances know it</h3>
-        <p>Ventura Harbor sits at the western edge of the city, and the Pacific runs along the entire southern boundary. The marine air that rolls off that water carries salt particulate that deposits on condenser coils, corrodes metal contacts, and accelerates wear on appliance components. Harbor-area homes, Pierpont Beach, and Ventura Keys see the most exposure. If your refrigerator is within a mile of the water in Ventura, the 12-month coil cleaning recommendation doesn't apply — we've seen 4-6 month cycles produce the same buildup that takes 12 months inland.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Ventura"
+    jobs={recentJobs}
+  />
 
-        <h3>2. The old housing stock has character — and age</h3>
-        <p>The neighborhoods around downtown Ventura, the Mission, and the older flatland streets have homes that were built when appliances were built to last. Some of those older appliances are still running — and worth fixing. Others have been replaced with newer units that have their own failure patterns. We work on both. When a repair doesn't make economic sense, we'll tell you before we start, not after.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Ventura Residents Call Us"
+    reasons={whyReasons}
+  />
 
-        <h3>3. Viking igniter misdiagnosis is common here</h3>
-        <p>The Ondulando neighborhood and several Ventura hillside communities have a high density of Viking ranges. Viking oven F5 errors almost always mean a weak igniter — a $120-150 OEM part. We've seen multiple Ventura homeowners quoted control board replacements ($600+) for this exact failure. We diagnose correctly and charge you for the part that actually failed.</p>
-      </div>
-    </div>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Ventura Clients Say"
+    testimonials={testimonials}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Ventura Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Ventura"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Ventura</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Ventura"
+    faqs={faqs}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">04</div>
-      <h2>Why Ventura Residents Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>Coastal experience</h3>
-          <p>We know what Ventura Harbor salt air does to condenser coils and range electrodes. We find it, explain it, and give you a maintenance plan that fits where you actually live.</p>
-        </div>
-        <div class="why-item">
-          <h3>We diagnose correctly</h3>
-          <p>Viking F5 errors are igniters, not control boards. GE frost buildup is a defrost heater, not a sealed system problem. We find the actual failed component before recommending parts.</p>
-        </div>
-        <div class="why-item">
-          <h3>Honest on old appliances</h3>
-          <p>Ventura has older housing stock. When an old appliance comes up for repair, we tell you if it's worth fixing — and what the repair will actually cost — before we start.</p>
-        </div>
-        <div class="why-item">
-          <h3>90-day warranty, standard</h3>
-          <p>Every repair includes a 90-day warranty on parts and labor. Same issue returns — we come back at no charge.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Ventura County Cities"
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Ventura Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"GE fridge near Pierpont Beach — frost buildup inside, not cooling. They fixed the defrost heater and cleaned the coils. Explained the salt air issue for harbor-area homes. Straightforward, fast, done right."</p>
-          <div class="review-author">— Laura M., Pierpont Beach</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Viking range F5 error. Another company quoted me a control board at $650. Same Day came out, said it was the igniter, fixed it for $180. Tested every temperature setting before leaving. This is what honest service looks like."</p>
-          <div class="review-author">— Michael R., Ondulando</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"LG washer door latch. Fast, same day, clean, professional. Technician noticed the drum bearing starting to wear and flagged it — no pressure, just information. That kind of service builds trust."</p>
-          <div class="review-author">— Sandra K., Midtown Ventura</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Ventura</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">Credited toward repair · Written estimate · Coastal assessment included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$380</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Viking, Thermador · OEM parts</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">05</div>
-      <h2>Frequently Asked Questions — Ventura</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby Ventura County Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Ventura Repair Today</h2>
-      <p>Same-day service from the harbor to East Ventura. Sub-Zero, Wolf, Viking, and all major brands.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Ventura, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Ventura", "Ventura County", "Ventura Harbor"]} />
-</Layout>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Ventura Repair Today"
+    body="Same-day service from the harbor to East Ventura. Sub-Zero, Wolf, Viking, and all major brands. $89 diagnostic · 90-day warranty · OEM parts."
+  />
+</CityLayoutV2>

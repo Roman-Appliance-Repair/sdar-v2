@@ -1,455 +1,336 @@
 ---
-// src/pages/moreno-valley.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = "Moreno Valley";
-const citySlug = "moreno-valley";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["92551", "92553", "92555", "92557"];
-const county = "Riverside";
+const citySlug = 'moreno-valley';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Moreno Valley';
+const zips = ['92551', '92553', '92555', '92557'];
+
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
 const title = `Appliance Repair Moreno Valley CA — Same Day | All Brands | ${phone}`;
 const description = `Same-day appliance repair in Moreno Valley CA. Refrigerator, washer, dryer, oven, dishwasher & more. Sunnymead, Towngate, March ARB area. Licensed. OEM parts. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/moreno-valley/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Moreno Valley' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Moreno Valley is the second-largest city in Riverside County — a sprawling, diverse, working-class community anchored by March Air Reserve Base, two hospital systems, and a large school district. The housing stock built out rapidly through the 1980s and 1990s, and those appliances are now 15–25 years into their lifespan. Whirlpool, GE, and Maytag from the original installations have given way to Samsung, LG, and KitchenAid in renovated homes and newer developments, but a huge portion of Moreno Valley's residential calls involve machines that are simply old and hitting their first major failure.",
+  "March Air Reserve Base creates a specific service dynamic we don't see in many other cities. Military families PCS in and out regularly, and the homes they move into have maintenance histories that are often unknown — vents never cleaned, filters never replaced, coils never touched. We treat military household calls with this in mind: we inspect the full maintenance picture when we're there, not just the presenting failure.",
+  "The climate is standard Inland Valley: 100–108°F summers, dry and dusty, hard water throughout Riverside County. Condenser coil cleaning in May — before the heat arrives — is the single most effective preventive step Moreno Valley homeowners can take. We recommend it on every applicable service call, and we perform it as part of every summer refrigerator diagnosis.",
+  `Same-day coverage across all Moreno Valley ZIP codes. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
+];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🫧', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🍳', name: 'Stove & Cooktop Repair', slug: 'stove' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
+
+const morenoValleyContextNarrative = {
+  headline: "Moreno Valley's Appliance Profile — What We Find and Why",
+  subSections: [
+    {
+      title: '1980s–1990s Tract Housing — The Dominant Stock',
+      paragraphs: [
+        "The majority of Moreno Valley's residential neighborhoods — Sunnymead, Towngate, the corridors along Nason Street, Frederick Street, and Cactus Avenue — were developed rapidly during the 1980s and '90s. These are the homes driving most of our call volume: tract houses with 15–25 year old appliances hitting their first serious mechanical failures. The pattern is consistent — drive coupling wear on Whirlpool top-loaders, thermal fuse failures on GE and Maytag dryers from restricted vent runs, compressor strain on refrigerators that have never had condenser coil cleaning.",
+        "These machines are almost always worth repairing. A 1998 Whirlpool top-loader with a worn drive coupling costs $120–$140 to fix and has years of life left. A 2002 GE refrigerator with summer coil failure costs $89–$130 to service. Replacement costs $800–$1,200. We give honest numbers after diagnosis and let homeowners make informed decisions.",
+      ],
+    },
+    {
+      title: 'March Air Reserve Base — Military Household Specifics',
+      paragraphs: [
+        "March ARB is one of the largest Air Force Reserve installations on the West Coast, and the surrounding neighborhoods house active duty and reserve families who rotate through on a regular basis. When a new family PCS's into base-adjacent housing, the appliances in that home may have had 3–4 previous occupants — with no maintenance history. Vents are blocked with lint from 5 years of use. Condenser coils are loaded from 3 families of opening and closing the refrigerator. Water filters haven't been replaced in 2 years.",
+        "We look at the full maintenance picture when we service a military household call in Moreno Valley. If the presenting problem is a blown thermal fuse and we find an 18-foot vent run packed solid, we fix both. If we're there for an ice maker and the filter is 22 months old, we note it. Military families deserve an appliance service that accounts for their specific circumstances.",
+      ],
+    },
+    {
+      title: 'Newer Developments — Highland Hills, El Sobrante',
+      paragraphs: [
+        "Highland Hills and El Sobrante represent Moreno Valley's newer residential growth — 2000s–2010s development with Samsung, LG, and KitchenAid appliances now 10–15 years old. These are squarely in their first failure window: LG linear inverter compressor relay failures, Samsung ice maker issues, KitchenAid E1/F9 flooding errors from scale-blocked pump impellers. We carry OEM parts for all of these on the truck.",
+      ],
+    },
+    {
+      title: 'Hard Water and Summer Heat',
+      paragraphs: [
+        "Riverside County water is consistently hard, and Moreno Valley is no exception. Dishwasher filter cleaning every 3 months, ice maker descaling every 18 months, refrigerator water filter every 4 months. In summer heat that regularly reaches 105–108°F, condenser coils need cleaning in May before the heat stress begins — not in October after something breaks. We include these recommendations as a matter of course on every applicable service call.",
+      ],
+    },
+  ],
+};
 
 const neighborhoods = [
-  { name: "Sunnymead", zip: "92553" },
-  { name: "Towngate", zip: "92553" },
-  { name: "Highland Hills", zip: "92555" },
-  { name: "El Sobrante", zip: "92555" },
-  { name: "March ARB Area", zip: "92551" },
-  { name: "Edgemont", zip: "92557" },
-  { name: "Mead Valley", zip: "92553" },
-  { name: "Nason St Corridor", zip: "92553" },
-  { name: "Frederick St Area", zip: "92553" },
-  { name: "Box Springs Area", zip: "92557" },
-  { name: "Cactus Ave Corridor", zip: "92555" },
-  { name: "Perris Border", zip: "92551" },
+  { name: 'Sunnymead', zip: '92553' },
+  { name: 'Towngate', zip: '92553' },
+  { name: 'Highland Hills', zip: '92555' },
+  { name: 'El Sobrante', zip: '92555' },
+  { name: 'March ARB Area', zip: '92551' },
+  { name: 'Edgemont', zip: '92557' },
+  { name: 'Mead Valley', zip: '92553' },
+  { name: 'Nason St Corridor', zip: '92553' },
+  { name: 'Frederick St Area', zip: '92553' },
+  { name: 'Box Springs Area', zip: '92557' },
+  { name: 'Cactus Ave Corridor', zip: '92555' },
+  { name: 'Perris Border', zip: '92551' },
 ];
 
-const faqItems = [
+const recentJobs = [
   {
-    q: "Do you offer same-day appliance repair in Moreno Valley?",
-    a: `Yes — same-day service is available throughout Moreno Valley including Sunnymead, Towngate, Highland Hills, El Sobrante, the March ARB area, and Edgemont. Call ${phone} before noon for same-day scheduling. We cover all Moreno Valley ZIP codes — 92551, 92553, 92555, and 92557 — without a trip surcharge.`
-  },
-  {
-    q: "Do you service appliances for military families near March Air Reserve Base?",
-    a: "Yes. March ARB is one of our regular service areas in Moreno Valley. We understand the specific dynamics of military households — PCS moves that leave appliances in varying condition, base-adjacent housing with consistent appliance profiles, and the reliability expectations that come with active duty life. We treat military family calls with the same priority we give all occupied-property repairs."
-  },
-  {
-    q: "My appliances are 10-15 years old — is it worth fixing them?",
-    a: "Usually yes for mechanically sound machines. Moreno Valley's housing stock from the 1980s and 1990s has appliances now in the 10–20 year range. A Whirlpool or GE with a worn actuator, thermal fuse, or pump is almost always worth repairing — these are simple mechanical failures on machines with life left in them. We give honest numbers after diagnosis and never push replacement when repair makes sense."
-  },
-  {
-    q: "What brands do you repair in Moreno Valley?",
-    a: "All major brands. Moreno Valley's 1980s–1990s housing stock runs Whirlpool, GE, and Maytag heavily. Newer developments and renovated homes have Samsung, LG, and KitchenAid. We carry OEM parts for all generations on the truck."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `$89, applied directly to the repair cost when you proceed. No hidden trip charge to Moreno Valley. We quote on-site after diagnosis — what we quote is what appears on the invoice.`
-  },
-  {
-    q: "Why does my refrigerator fail every summer in Moreno Valley?",
-    a: "Moreno Valley's summers regularly hit 100–108°F, and that heat stress is the primary cause of refrigerator failures from June through September. Condenser coils that were managing fine in April fail when the ambient temperature climbs 30 degrees. In MV's dry, dusty environment, coils load up faster than coastal cities. Every summer refrigerator call we make here starts with coil inspection and cleaning before anything else. Annual cleaning should be done in May — before the heat arrives."
-  },
-  {
-    q: "Our family does a lot of laundry — washer breaks more than expected?",
-    a: "Heavy-use households run washers at 2–3x the manufacturer's assumed rate. Moreno Valley has a significant proportion of large family households running 10+ loads per week. Bearing wear, door gasket deterioration, and drum seal failures all show up earlier under heavy use. A front-loader in a large household needs bearing inspection by year 7–8, not year 10–12. We account for use intensity when advising on repair versus replace."
-  },
-];
-
-const recentRepairs = [
-  {
-    title: "Samsung RF28R7551SR — warm, 22E error, Towngate home",
-    neighborhood: "Towngate, 92553",
+    appliance: 'Samsung RF28R7551SR',
+    location: 'Towngate, 92553',
+    quote: 'warm, 22E error, Towngate home',
     description: "2018 Samsung French-door, 22E ice room sensor error. Root cause: failed defrost heater had allowed the evaporator to frost completely solid. Replaced the defrost heater assembly with OEM Samsung parts, manually defrosted the coil, confirmed 38°F recovery within 40 minutes. Also found condenser coils loaded with dust — 16 months since last cleaning. In Moreno Valley's summer heat this coil condition would have caused an independent failure even without the defrost issue. Cleaned the coils and briefed the homeowner on a 6-month maintenance schedule.",
-    note: "In Moreno Valley heat, 6-month coil cleaning is the right interval. Annual is not enough."
+    outcome: '✓ In Moreno Valley heat, 6-month coil cleaning is the right interval. Annual is not enough.',
   },
   {
-    title: "Whirlpool WTW5000DW top-loader — clicking, no agitation, 14 years old",
-    neighborhood: "Sunnymead, 92553",
-    description: "14-year-old Whirlpool top-loader, agitator clicking and failing to engage. Classic shift actuator failure — the motor and transmission were both solid. Replaced the actuator assembly with an OEM Whirlpool part. Repair: $89 diagnostic + $95 parts and labor. Total: $184. The homeowner had been quoted $650–$750 for a replacement machine by two other companies. Machine is mechanically sound and running cleanly. We told them to expect another 5+ years from it.",
-    note: "14-year-old Whirlpool with a bad actuator: $184 repair vs $700 replacement. Always diagnose first."
+    appliance: 'Whirlpool WTW5000DW top-loader',
+    location: 'Sunnymead, 92553',
+    quote: 'clicking, no agitation, 14 years old',
+    description: '14-year-old Whirlpool top-loader, agitator clicking and failing to engage. Classic shift actuator failure — the motor and transmission were both solid. Replaced the actuator assembly with an OEM Whirlpool part. Repair: $89 diagnostic + $95 parts and labor. Total: $184. The homeowner had been quoted $650–$750 for a replacement machine by two other companies. Machine is mechanically sound and running cleanly. We told them to expect another 5+ years from it.',
+    outcome: '✓ 14-year-old Whirlpool with a bad actuator: $184 repair vs $700 replacement. Always diagnose first.',
   },
   {
-    title: "LG DLEX3700V dryer — no heat, thermal fuse blown, March ARB area",
-    neighborhood: "March ARB area, 92551",
+    appliance: 'LG DLEX3700V dryer',
+    location: 'March ARB area, 92551',
+    quote: 'no heat, thermal fuse blown, March ARB area',
     description: "Military family, LG dryer no heat. Blown thermal fuse — confirmed. Traced the root cause to a 17-foot vent run through the garage interior with a lint trap that had never been cleaned. Cleared the full vent, replaced the thermal fuse and high-limit thermostat together (on LG dryers, always replace both), confirmed airflow at exterior. Also found the heating element operating at 82% capacity — replaced it while open. Family had recently PCS'd to the area and the previous occupants had clearly never maintained the vent.",
-    note: "Military PCS homes: always check vent history. Previous occupants may have never maintained it."
+    outcome: '✓ Military PCS homes: always check vent history. Previous occupants may have never maintained it.',
   },
   {
-    title: "GE GFE28GYNFS — ice maker not producing, water fine, 2020 model",
-    neighborhood: "El Sobrante, 92555",
-    description: "4-year-old GE French-door, ice maker silent, water dispenser fine. Isolated to the ice maker inlet valve secondary solenoid — independent failure from the water solenoid. Also found significant mineral scale in the ice maker mold from Riverside County hard water — 4 years without any descaling, unusual for such a new machine but not uncommon in areas with hard water. Replaced the valve assembly with OEM GE parts, descaled the mold, replaced the water filter (13 months old), adjusted the freezer set point to +2°F. Ice production restored same visit.",
-    note: "Even new appliances need ice maker descaling in Riverside County hard water. Don't wait for failure."
+    appliance: 'GE GFE28GYNFS',
+    location: 'El Sobrante, 92555',
+    quote: 'ice maker not producing, water fine, 2020 model',
+    description: '4-year-old GE French-door, ice maker silent, water dispenser fine. Isolated to the ice maker inlet valve secondary solenoid — independent failure from the water solenoid. Also found significant mineral scale in the ice maker mold from Riverside County hard water — 4 years without any descaling, unusual for such a new machine but not uncommon in areas with hard water. Replaced the valve assembly with OEM GE parts, descaled the mold, replaced the water filter (13 months old), adjusted the freezer set point to +2°F. Ice production restored same visit.',
+    outcome: "✓ Even new appliances need ice maker descaling in Riverside County hard water. Don't wait for failure.",
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Moreno Valley",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Moreno Valley",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const whyReasons = [
+  {
+    iconKey: 'shield' as const,
+    title: 'Honest repair vs. replace',
+    body: "Moreno Valley has a lot of 15–25 year old appliances that are worth repairing. We don't push replacement when repair is the right call. After diagnosis, we give you the real numbers and let you decide.",
   },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    iconKey: 'team' as const,
+    title: 'Military families — we get it',
+    body: 'March ARB families PCS into homes with unknown maintenance histories. We inspect the full picture when we service a military household — not just the presenting failure. If the vent has never been cleaned, we note it. If the filter is overdue, we say so.',
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Root cause, not just the symptom',
+    body: "A blown thermal fuse means something caused it. A Samsung error code points to a system. A dishwasher that doesn't clean is scale until proven otherwise. We find the actual cause before recommending parts — saving you from callbacks.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Summer heat expertise',
+    body: "105°F summers in Moreno Valley mean condenser coil cleaning isn't optional — it's preventive. We recommend it on every applicable call and do it as part of every summer refrigerator diagnosis. Clean in May, not October.",
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
-};
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Old Whirlpool washer stopped agitating. Every other company said replace it. Same Day diagnosed a bad actuator for $95. 14-year-old machine running perfectly. Really grateful they actually tried to fix it."',
+    author: '— Patricia M., Sunnymead',
+  },
+  {
+    stars: 5,
+    text: '"Military family at March ARB — new to the area. LG dryer not heating. Tech found the vent completely blocked from previous tenants and replaced the fuse and thermostat together. Checked everything else too. Exactly the thorough service we needed."',
+    author: '— SSgt James R., March ARB area',
+  },
+  {
+    stars: 5,
+    text: '"Samsung fridge in our Towngate home failed in July with a 22E error. Same Day came same afternoon — defrost heater failure plus loaded coils. Fixed both. Explained the summer maintenance schedule. Very knowledgeable."',
+    author: '— Linda & Carlos V., Towngate',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator Repair', range: '$120–$420', note: 'Compressor relay · Coil cleaning · Inlet valve · Fan motor' },
+  { appliance: 'Washer Repair', range: '$120–$360', note: 'Bearing + seal set · Drain pump · Shock absorbers · Hall sensor' },
+  { appliance: 'Dryer Repair', range: '$120–$300', note: 'Thermal fuse + limiter set · Heating element · Vent path' },
+  { appliance: 'Dishwasher Repair', range: '$89–$340', note: 'Drain pump · Spray arm · Filter · E24 / F9 errors' },
+  { appliance: 'Oven / Range Repair', range: '$130–$380', note: 'Igniter · Bake element · Gas valve · Calibration' },
+  { appliance: 'Ice Maker Repair', range: '$120–$260', note: 'Inlet valve · Mold descaling · Filter · Set point' },
+  { appliance: 'Condenser Coil Cleaning', range: '$89–$140', note: 'Summer heat preventive · 6-month interval' },
+  { appliance: 'Dryer Vent Cleaning', range: '$89–$140', note: 'Long runs · Lint clearance · Airflow check' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Moreno Valley?',
+    answer: `Yes — same-day service is available throughout Moreno Valley including Sunnymead, Towngate, Highland Hills, El Sobrante, the March ARB area, and Edgemont. Call ${phone} before noon for same-day scheduling. We cover all Moreno Valley ZIP codes — 92551, 92553, 92555, and 92557 — without a trip surcharge.`,
+  },
+  {
+    question: 'Do you service appliances for military families near March Air Reserve Base?',
+    answer: 'Yes. March ARB is one of our regular service areas in Moreno Valley. We understand the specific dynamics of military households — PCS moves that leave appliances in varying condition, base-adjacent housing with consistent appliance profiles, and the reliability expectations that come with active duty life. We treat military family calls with the same priority we give all occupied-property repairs.',
+  },
+  {
+    question: 'My appliances are 10-15 years old — is it worth fixing them?',
+    answer: "Usually yes for mechanically sound machines. Moreno Valley's housing stock from the 1980s and 1990s has appliances now in the 10–20 year range. A Whirlpool or GE with a worn actuator, thermal fuse, or pump is almost always worth repairing — these are simple mechanical failures on machines with life left in them. We give honest numbers after diagnosis and never push replacement when repair makes sense.",
+  },
+  {
+    question: 'What brands do you repair in Moreno Valley?',
+    answer: "All major brands. Moreno Valley's 1980s–1990s housing stock runs Whirlpool, GE, and Maytag heavily. Newer developments and renovated homes have Samsung, LG, and KitchenAid. We carry OEM parts for all generations on the truck.",
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: '$89, applied directly to the repair cost when you proceed. No hidden trip charge to Moreno Valley. We quote on-site after diagnosis — what we quote is what appears on the invoice.',
+  },
+  {
+    question: 'Why does my refrigerator fail every summer in Moreno Valley?',
+    answer: "Moreno Valley's summers regularly hit 100–108°F, and that heat stress is the primary cause of refrigerator failures from June through September. Condenser coils that were managing fine in April fail when the ambient temperature climbs 30 degrees. In MV's dry, dusty environment, coils load up faster than coastal cities. Every summer refrigerator call we make here starts with coil inspection and cleaning before anything else. Annual cleaning should be done in May — before the heat arrives.",
+  },
+  {
+    question: 'Our family does a lot of laundry — washer breaks more than expected?',
+    answer: "Heavy-use households run washers at 2–3x the manufacturer's assumed rate. Moreno Valley has a significant proportion of large family households running 10+ loads per week. Bearing wear, door gasket deterioration, and drum seal failures all show up earlier under heavy use. A front-loader in a large household needs bearing inspection by year 7–8, not year 10–12. We account for use intensity when advising on repair versus replace.",
+  },
+];
+
+const nearbyCities = [
+  { name: 'Riverside', slug: 'riverside' },
+  { name: 'Hemet', slug: 'hemet' },
+  { name: 'Menifee', slug: 'menifee' },
+  { name: 'Corona', slug: 'corona' },
+  { name: 'Redlands', slug: 'redlands' },
+  { name: 'Murrieta', slug: 'murrieta' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Moreno Valley"
+    subheadline="Same-day service in Sunnymead, Towngate, Highland Hills, El Sobrante, March ARB area, and throughout Moreno Valley. All brands, OEM parts, licensed."
+    zips={zips}
+    tier={3}
+  />
 
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">Riverside County · ZIP 92551, 92553, 92555, 92557</p>
-        <h1>Appliance Repair<br><span class="accent">Moreno Valley</span></h1>
-        <p class="hero-sub">Same-day service in Sunnymead, Towngate, Highland Hills, El Sobrante, March ARB area, and throughout Moreno Valley. All brands, OEM parts, licensed.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🪖</span><span>Military Families Welcome</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Moreno Valley — The IE's Second-Largest City Has Its Own Profile"
+    paragraphs={introParagraphs}
+    bookingTitle="Moreno Valley"
+    bookingSub="Same-Day Service"
+  />
 
-  <section class="intro-section container">
-    <div class="intro-content">
-      <h2>Appliance Repair in Moreno Valley — The IE's Second-Largest City Has Its Own Profile</h2>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Moreno Valley"
+    services={services}
+  />
 
-      <p>Moreno Valley is the second-largest city in Riverside County — a sprawling, diverse, working-class community anchored by March Air Reserve Base, two hospital systems, and a large school district. The housing stock built out rapidly through the 1980s and 1990s, and those appliances are now 15–25 years into their lifespan. Whirlpool, GE, and Maytag from the original installations have given way to Samsung, LG, and KitchenAid in renovated homes and newer developments, but a huge portion of Moreno Valley's residential calls involve machines that are simply old and hitting their first major failure.</p>
+  <CustomNarrative
+    headline={morenoValleyContextNarrative.headline}
+    subSections={morenoValleyContextNarrative.subSections}
+    background="white"
+  />
 
-      <p>March Air Reserve Base creates a specific service dynamic we don't see in many other cities. Military families PCS in and out regularly, and the homes they move into have maintenance histories that are often unknown — vents never cleaned, filters never replaced, coils never touched. We treat military household calls with this in mind: we inspect the full maintenance picture when we're there, not just the presenting failure.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Neighborhoods We Service in Moreno Valley"
+    subheadline="We cover all of Moreno Valley — Sunnymead, Towngate, Highland Hills, El Sobrante, March ARB area, and every neighborhood in between. No travel surcharge to any Moreno Valley ZIP code."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>The climate is standard Inland Valley: 100–108°F summers, dry and dusty, hard water throughout Riverside County. Condenser coil cleaning in May — before the heat arrives — is the single most effective preventive step Moreno Valley homeowners can take. We recommend it on every applicable service call, and we perform it as part of every summer refrigerator diagnosis.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Moreno Valley"
+    jobs={recentJobs}
+  />
 
-      <p>Same-day coverage across all Moreno Valley ZIP codes. Call {phone}.</p>
-    </div>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Moreno Valley Residents Call Us"
+    reasons={whyReasons}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Moreno Valley</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ Military Families — March ARB</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ Hard Water Specialists</li>
-        <li>✓ 90-Day Warranty</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Moreno Valley Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Moreno Valley</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Typical Repair Pricing in Moreno Valley"
+    subhead="Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>Moreno Valley's Appliance Profile — What We Find and Why</h2>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Moreno Valley Appliance Repair — FAQ"
+    faqs={faqs}
+  />
 
-        <h3>1980s–1990s Tract Housing — The Dominant Stock</h3>
-        <p>The majority of Moreno Valley's residential neighborhoods — Sunnymead, Towngate, the corridors along Nason Street, Frederick Street, and Cactus Avenue — were developed rapidly during the 1980s and '90s. These are the homes driving most of our call volume: tract houses with 15–25 year old appliances hitting their first serious mechanical failures. The pattern is consistent — drive coupling wear on Whirlpool top-loaders, thermal fuse failures on GE and Maytag dryers from restricted vent runs, compressor strain on refrigerators that have never had condenser coil cleaning.</p>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-        <p>These machines are almost always worth repairing. A 1998 Whirlpool top-loader with a worn drive coupling costs $120–$140 to fix and has years of life left. A 2002 GE refrigerator with summer coil failure costs $89–$130 to service. Replacement costs $800–$1,200. We give honest numbers after diagnosis and let homeowners make informed decisions.</p>
-
-        <h3>March Air Reserve Base — Military Household Specifics</h3>
-        <p>March ARB is one of the largest Air Force Reserve installations on the West Coast, and the surrounding neighborhoods house active duty and reserve families who rotate through on a regular basis. When a new family PCS's into base-adjacent housing, the appliances in that home may have had 3–4 previous occupants — with no maintenance history. Vents are blocked with lint from 5 years of use. Condenser coils are loaded from 3 families of opening and closing the refrigerator. Water filters haven't been replaced in 2 years.</p>
-
-        <p>We look at the full maintenance picture when we service a military household call in Moreno Valley. If the presenting problem is a blown thermal fuse and we find an 18-foot vent run packed solid, we fix both. If we're there for an ice maker and the filter is 22 months old, we note it. Military families deserve an appliance service that accounts for their specific circumstances.</p>
-
-        <h3>Newer Developments — Highland Hills, El Sobrante</h3>
-        <p>Highland Hills and El Sobrante represent Moreno Valley's newer residential growth — 2000s–2010s development with Samsung, LG, and KitchenAid appliances now 10–15 years old. These are squarely in their first failure window: LG linear inverter compressor relay failures, Samsung ice maker issues, KitchenAid E1/F9 flooding errors from scale-blocked pump impellers. We carry OEM parts for all of these on the truck.</p>
-
-        <h3>Hard Water and Summer Heat</h3>
-        <p>Riverside County water is consistently hard, and Moreno Valley is no exception. Dishwasher filter cleaning every 3 months, ice maker descaling every 18 months, refrigerator water filter every 4 months. In summer heat that regularly reaches 105–108°F, condenser coils need cleaning in May before the heat stress begins — not in October after something breaks. We include these recommendations as a matter of course on every applicable service call.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Moreno Valley</h2>
-      <p>We cover all of Moreno Valley — Sunnymead, Towngate, Highland Hills, El Sobrante, March ARB area, and every neighborhood in between. No travel surcharge to any Moreno Valley ZIP code.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Perris and Hemet — same dispatch, no surcharge. Call {phone}.</p>
-  </section>
-
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">03</div>
-      <h2>Recent Repairs in Moreno Valley</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <section class="why-section container">
-    <div class="context-number">04</div>
-    <h2>Why Moreno Valley Residents Call Us</h2>
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>Honest repair vs. replace</h3>
-        <p>Moreno Valley has a lot of 15–25 year old appliances that are worth repairing. We don't push replacement when repair is the right call. After diagnosis, we give you the real numbers and let you decide.</p>
-      </div>
-      <div class="why-item">
-        <h3>Military families — we get it</h3>
-        <p>March ARB families PCS into homes with unknown maintenance histories. We inspect the full picture when we service a military household — not just the presenting failure. If the vent has never been cleaned, we note it. If the filter is overdue, we say so.</p>
-      </div>
-      <div class="why-item">
-        <h3>Root cause, not just the symptom</h3>
-        <p>A blown thermal fuse means something caused it. A Samsung error code points to a system. A dishwasher that doesn't clean is scale until proven otherwise. We find the actual cause before recommending parts — saving you from callbacks.</p>
-      </div>
-      <div class="why-item">
-        <h3>Summer heat expertise</h3>
-        <p>105°F summers in Moreno Valley mean condenser coil cleaning isn't optional — it's preventive. We recommend it on every applicable call and do it as part of every summer refrigerator diagnosis. Clean in May, not October.</p>
-      </div>
-    </div>
-
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Old Whirlpool washer stopped agitating. Every other company said replace it. Same Day diagnosed a bad actuator for $95. 14-year-old machine running perfectly. Really grateful they actually tried to fix it."</p>
-        <p class="reviewer">— Patricia M., Sunnymead</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Military family at March ARB — new to the area. LG dryer not heating. Tech found the vent completely blocked from previous tenants and replaced the fuse and thermostat together. Checked everything else too. Exactly the thorough service we needed."</p>
-        <p class="reviewer">— SSgt James R., March ARB area</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Samsung fridge in our Towngate home failed in July with a 22E error. Same Day came same afternoon — defrost heater failure plus loaded coils. Fixed both. Explained the summer maintenance schedule. Very knowledgeable."</p>
-        <p class="reviewer">— Linda &amp; Carlos V., Towngate</p>
-      </div>
-    </div>
-
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Moreno Valley</h3>
-      <p>Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item"><span class="pi-service">Refrigerator Repair</span><span class="pi-range">$120–$420</span></div>
-        <div class="price-item"><span class="pi-service">Washer Repair</span><span class="pi-range">$120–$360</span></div>
-        <div class="price-item"><span class="pi-service">Dryer Repair</span><span class="pi-range">$120–$300</span></div>
-        <div class="price-item"><span class="pi-service">Dishwasher Repair</span><span class="pi-range">$89–$340</span></div>
-        <div class="price-item"><span class="pi-service">Oven / Range Repair</span><span class="pi-range">$130–$380</span></div>
-        <div class="price-item"><span class="pi-service">Ice Maker Repair</span><span class="pi-range">$120–$260</span></div>
-        <div class="price-item"><span class="pi-service">Condenser Coil Cleaning</span><span class="pi-range">$89–$140</span></div>
-        <div class="price-item"><span class="pi-service">Dryer Vent Cleaning</span><span class="pi-range">$89–$140</span></div>
-      </div>
-      <p class="pricing-note">$89 diagnostic applied to repair cost. No trip charge to any Moreno Valley ZIP code.</p>
-    </div>
-  </section>
-
-  <section class="faq-section container">
-    <h2>Moreno Valley Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/riverside/">Riverside</a>
-      <a href="/hemet/">Hemet</a>
-      <a href="/perris/">Perris</a>
-      <a href="/menifee/">Menifee</a>
-      <a href="/corona/">Corona</a>
-      <a href="/redlands/">Redlands</a>
-    </div>
-  </section>
-
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Moreno Valley Today?</h2>
-      <p>Same-day service in Sunnymead, Towngate, Highland Hills, El Sobrante, March ARB area, and all Moreno Valley neighborhoods.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero{background:var(--color-bg);padding:5rem 0 4rem}
-.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:.75rem}
-h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
-h1 .accent{color:var(--color-accent)}
-.hero-sub{font-size:1.05rem;color:var(--color-text-muted);margin-bottom:2rem;max-width:48ch}
-.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
-.hero-trust{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.85rem;color:var(--color-text-muted)}
-.trust-bar{background:var(--color-accent);padding:1rem 0}
-.trust-bar-inner{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap}
-.trust-item{display:flex;align-items:center;gap:.5rem;color:#fff;font-size:.875rem;font-weight:600}
-.intro-section{display:grid;grid-template-columns:1fr 300px;gap:4rem;padding-top:4rem;padding-bottom:4rem}
-.intro-content h2{font-size:1.6rem;margin-bottom:1.25rem}
-.intro-content p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
-.sticky-cta-box{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem;position:sticky;top:5rem;height:fit-content}
-.scb-city{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--color-accent);margin-bottom:.25rem}
-.scb-phone{font-size:1.4rem;font-weight:800;margin-bottom:1.25rem}
-.btn-block{display:block;width:100%;text-align:center;margin-bottom:.75rem}
-.scb-list{list-style:none;padding:0;margin:1.25rem 0;font-size:.875rem}
-.scb-list li{padding:.3rem 0;border-bottom:1px solid var(--color-border);color:var(--color-text-body)}
-.scb-hours{font-size:.8rem;color:var(--color-text-muted);text-align:center}
-.services-section{background:var(--color-surface);padding:4rem 0}
-.services-section h2{text-align:center;font-size:1.75rem;margin-bottom:2rem}
-.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.service-card{background:var(--color-bg);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem 1rem;text-align:center;text-decoration:none;color:var(--color-text);transition:border-color .2s,transform .2s;display:flex;flex-direction:column;align-items:center;gap:.75rem}
-.service-card:hover{border-color:var(--color-accent);transform:translateY(-2px)}
-.svc-icon{font-size:2rem}
-.svc-name{font-size:.9rem;font-weight:600}
-.context-block{padding:4rem 0}
-.context-inner{display:grid;grid-template-columns:80px 1fr;gap:2rem}
-.context-number{font-size:4rem;font-weight:900;color:var(--color-accent);opacity:.2;line-height:1}
-.context-body h2{font-size:1.6rem;margin-bottom:1.25rem}
-.context-body h3{font-size:1.1rem;font-weight:700;margin:1.75rem 0 .75rem}
-.context-body p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
-.neighborhoods-section{padding:4rem 0}
-.section-intro{margin-bottom:2rem}
-.section-intro h2{font-size:1.6rem;margin-bottom:.75rem}
-.neighborhoods-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.nbhd-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1rem 1.25rem}
-.nbhd-name{display:block;font-weight:600;margin-bottom:.25rem}
-.nbhd-zip{font-size:.8rem;color:var(--color-text-muted)}
-.nbhd-note{margin-top:1.5rem;font-size:.875rem;color:var(--color-text-muted)}
-.repairs-section{padding:4rem 0}
-.section-header{display:flex;align-items:baseline;gap:1rem;margin-bottom:2rem}
-.section-header h2{font-size:1.6rem}
-.repairs-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-.repair-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem}
-.repair-title{font-size:1rem;font-weight:700;margin-bottom:.5rem}
-.repair-location{font-size:.8rem;color:var(--color-accent);margin-bottom:1rem}
-.repair-desc{font-size:.9rem;line-height:1.7;color:var(--color-text-body);margin-bottom:1rem}
-.repair-note{font-size:.85rem;color:var(--color-text-muted);border-top:1px solid var(--color-border);padding-top:.75rem}
-.why-section{padding:4rem 0}
-.why-section h2{font-size:1.6rem;margin-bottom:2rem}
-.why-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:3rem}
-.why-item{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem}
-.why-item h3{font-size:1rem;margin-bottom:.5rem}
-.why-item p{font-size:.9rem;color:var(--color-text-body);line-height:1.7}
-.reviews-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem;margin-bottom:3rem}
-.review-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem}
-.stars{color:#f59e0b;font-size:1rem;margin-bottom:.75rem}
-.review-card p{font-size:.875rem;line-height:1.65;color:var(--color-text-body);margin-bottom:.75rem}
-.reviewer{font-size:.8rem;color:var(--color-text-muted)}
-.pricing-block{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:2rem}
-.pricing-block h3{margin-bottom:.5rem}
-.pricing-block>p{font-size:.9rem;color:var(--color-text-muted);margin-bottom:1.5rem}
-.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.price-item{display:flex;flex-direction:column;gap:.25rem}
-.pi-service{font-size:.85rem;color:var(--color-text-muted)}
-.pi-range{font-size:1rem;font-weight:700}
-.pricing-note{font-size:.8rem;color:var(--color-text-muted);margin-top:1.25rem}
-.faq-section{padding:4rem 0}
-.faq-section h2{font-size:1.6rem;margin-bottom:2rem}
-.faq-list{display:flex;flex-direction:column;gap:.75rem}
-.faq-item{border:1px solid var(--color-border);border-radius:.5rem;background:var(--color-surface)}
-.faq-q{padding:1.25rem 1.5rem;font-weight:600;cursor:pointer;list-style:none}
-.faq-a{padding:0 1.5rem 1.25rem;font-size:.9rem;line-height:1.7;color:var(--color-text-body)}
-.nearby-section{padding:3rem 0}
-.nearby-section h2{font-size:1.25rem;margin-bottom:1.25rem}
-.nearby-grid{display:flex;gap:1rem;flex-wrap:wrap}
-.nearby-grid a{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.375rem;padding:.5rem 1rem;text-decoration:none;color:var(--color-text);font-size:.875rem}
-.nearby-grid a:hover{border-color:var(--color-accent);color:var(--color-accent)}
-.bottom-cta{background:var(--color-surface);border-top:1px solid var(--color-border);padding:4rem 0;text-align:center}
-.bottom-cta h2{font-size:1.75rem;margin-bottom:.75rem}
-.bottom-cta p{color:var(--color-text-muted);margin-bottom:2rem}
-.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-@media(max-width:1024px){.intro-section{grid-template-columns:1fr}.sticky-cta-box{position:static}.services-grid,.neighborhoods-grid{grid-template-columns:repeat(2,1fr)}.pricing-grid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:768px){.hero-inner{grid-template-columns:1fr}.context-inner{grid-template-columns:1fr}.repairs-grid,.why-grid,.reviews-grid{grid-template-columns:1fr}}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Moreno Valley Today?"
+    body="Same-day service in Sunnymead, Towngate, Highland Hills, El Sobrante, March ARB area, and all Moreno Valley neighborhoods."
+  />
+</CityLayoutV2>

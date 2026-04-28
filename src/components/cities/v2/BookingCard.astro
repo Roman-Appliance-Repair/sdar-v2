@@ -1,0 +1,80 @@
+---
+/** v2 BookingCard — Sticky CTA card. Phone via branches.ts. */
+
+import { CITIES } from '../../../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../../../data/branches';
+import { BUSINESS_HOURS } from '../../../data/business-hours';
+
+export interface Props {
+  citySlug: string;
+  title?: string;
+  sub?: string;
+  hours?: string;
+}
+
+const {
+  citySlug,
+  title = 'Book Same-Day Service',
+  sub = 'Available Today',
+  hours = BUSINESS_HOURS.display,
+} = Astro.props;
+
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+const phone = branch.phone;
+const phoneTel = `+1${phone.replace(/\D/g, '')}`;
+---
+
+<div class="v2-booking">
+  <div class="v2-booking__title">{title}</div>
+  <div class="v2-booking__sub">{sub}</div>
+  <a href={`tel:${phoneTel}`} class="v2-booking__phone">{phone}</a>
+  <a href="/book/" class="v2-booking__book">Schedule Online →</a>
+  <div class="v2-booking__hours">{hours}</div>
+  <div class="v2-booking__diagnostic">$89 Diagnostic — credited if you repair</div>
+</div>
+
+<style>
+  .v2-booking {
+    background: var(--v2-black);
+    color: var(--v2-white);
+    border-radius: 12px;
+    padding: 32px;
+    text-align: center;
+    position: sticky;
+    top: 80px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-booking__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .v2-booking__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
+  .v2-booking__phone {
+    display: block;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--v2-red);
+    text-decoration: none;
+    margin-bottom: 12px;
+  }
+  .v2-booking__book {
+    display: block;
+    font-size: 15px;
+    color: var(--v2-white);
+    text-decoration: none;
+    padding: 12px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    transition: background 0.2s;
+  }
+  .v2-booking__book:hover { background: rgba(255,255,255,0.08); }
+  .v2-booking__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
+  .v2-booking__diagnostic {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--v2-red);
+    letter-spacing: 0.01em;
+  }
+</style>

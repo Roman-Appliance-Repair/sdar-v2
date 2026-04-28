@@ -1,841 +1,383 @@
 ---
-// src/pages/malibu.astro
-// SDAR — samedayappliance.repair
-// Malibu, CA 90265 — Волна 2
-// Филиал: Los Angeles · (424) 325-0520
-// GSC highlights (все без страницы — чистая возможность):
-//   malibu appliance repair — 120 показов, позиция 22.1
-//   bbq grill repair malibu — 39 показов, позиция 15.6 🔥
-//   same day appliance repair malibu — 7 показов, позиция 1.0 🔥
-//   wine cooler repair malibu — 10 показов, позиция 20.4
-//   freezer repair malibu — 10 показов, позиция 17.8
-// Location gaps: Carbon Beach, Malibu Colony, Point Dume, Paradise Cove,
-//   Ramirez Canyon, Zuma Beach, Broad Beach — никто из конкурентов не использует
-// Апрель 2026
+/**
+ * Malibu, CA — v2 migrated page (T12 Wave 2 Batch A).
+ * Branch: Los Angeles — service_area (no public street address).
+ * Content source of truth: wiki/migration/content-dumps/malibu.md
+ *
+ * Two unique blocks rendered via <CustomNarrative>:
+ *   1. "From Carbon Beach to Ramirez Canyon — All of 90265" — three zone
+ *      sub-sections (Beachfront PCH, Point Dume & North, Canyons & East).
+ *   2. "Appliance Repair for Malibu Beach Houses & Vacation Rentals" —
+ *      property manager / vacation home narrative.
+ *
+ * Schema-divergence note from dump: schema-version FAQ answers (Q2, Q3, Q6)
+ * were richer than the rendered HTML versions in the legacy. Per migration
+ * contract we use the schema (richer SEO) wording verbatim.
+ *
+ * Branch isolation:
+ *   - Phone (424) 325-0520 from cities.ts → branches.ts (Los Angeles)
+ *   - No streetAddress in schema (LA is service_area; legacy had
+ *     placeholder streetAddress="Los Angeles" — explicitly removed)
+ *   - Single ZIP 90265 — all of Malibu
+ *
+ * Legacy preserved as malibu.astro.legacy.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = {
-  name: "Malibu",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90265"],
-  phone: "(424) 325-0520",
-  phoneRaw: "+14243250520",
-  email: "info@samedayappliance.repair",
-  branch: "Los Angeles",
-  slug: "malibu",
-};
+const citySlug = 'malibu';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const title = `Appliance Repair Malibu CA 90265 — Beach House · Carbon Beach · Point Dume | (424) 325-0520`;
-const description = `Same-day appliance repair in Malibu, CA 90265. Carbon Beach, Malibu Colony, Point Dume, Paradise Cove, Zuma Beach. Sub-Zero, Wolf, Viking. BBQ grill repair. Licensed, OEM parts, 90-day warranty. Call (424) 325-0520.`;
-const canonical = `https://samedayappliance.repair/malibu/`;
+const cityName = 'Malibu';
+const zips = ['90265'];
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Malibu",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Los Angeles",
-    "addressLocality": "Los Angeles",
-    "addressRegion": "CA",
-    "postalCode": "90001",
-    "addressCountry": "US"
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Malibu CA 90265 — Beach House · Carbon Beach · Point Dume | ${branch.phone}`;
+const description = "Same-day appliance repair in Malibu, CA 90265. Carbon Beach, Malibu Colony, Point Dume, Paradise Cove, Zuma Beach. Sub-Zero, Wolf, Viking. BBQ grill repair. Licensed, OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/malibu/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Malibu', sameAs: 'https://en.wikipedia.org/wiki/Malibu,_California' },
+    { '@type': 'Place', name: 'Carbon Beach' },
+    { '@type': 'Place', name: 'Malibu Colony' },
+    { '@type': 'Place', name: 'Point Dume' },
+    { '@type': 'Place', name: 'Paradise Cove' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Malibu", "sameAs": "https://en.wikipedia.org/wiki/Malibu,_California" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const introParagraphs = [
+  "Malibu is 21 miles of coastline and canyons — and almost every appliance repair situation here has something that doesn't come up in other parts of LA. The salt air off the Pacific hits condenser coils harder and faster than anywhere else in our service area. Carbon Beach and Malibu Colony homes that are right on the water can see coil corrosion in 18 months that would take four or five years in Brentwood. We check this proactively on every refrigerator call in 90265.",
+  "A lot of Malibu properties are vacation homes, second homes, or managed rentals. When the refrigerator goes down with guests arriving Friday, or the oven quits between two rental groups, that's a different urgency than a homeowner who just noticed something was off. Our technicians understand that and we don't treat those calls like standard scheduling.",
+  "We also repair outdoor BBQ and grill systems — Viking, Wolf, DCS, Lynx — which are standard equipment in Malibu outdoor kitchens and are a consistent source of calls that most appliance companies don't service at all.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for same-day across all of 90265.`,
+  "<strong>From our techs on beachfront Malibu:</strong> If you're on Carbon Beach, Malibu Colony, Malibu Road, or anywhere west of Pepperdine — clean your refrigerator condenser coils every 4 months. Salt air deposits on metal coils at roughly twice the rate of inland LA. On a Sub-Zero or Viking unit that's already expensive to repair, regular coil cleaning pays for itself many times over. We do this check on every Malibu fridge call as standard — not extra.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Salt air coil corrosion · Not cooling · Ice maker · Built-in columns', brands: 'Sub-Zero · Wolf · Viking · True · Samsung · LG' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature fluctuation · Coastal humidity · Built-in units · Wine cellar', brands: 'Sub-Zero · True · EuroCave · Liebherr · U-Line' },
+  { icon: '🔥', name: 'Oven, Range & Stove Repair', slug: 'oven', issues: 'Not heating · Igniter · Temperature calibration · Gas valve', brands: 'Wolf · Viking · Thermador · GE · Dacor · Miele' },
+  { icon: '🔆', name: 'BBQ & Outdoor Grill Repair', slug: 'bbq', issues: 'Igniter failure · Burner replacement · Gas valve · Control panel', brands: 'Viking · Wolf · DCS · Lynx · Weber · Bull' },
+  { icon: '🫧', name: 'Washer & Dryer Repair', slug: 'washer', issues: 'Not draining · Not spinning · Coastal humidity issues · Stackable', brands: 'LG · Samsung · Miele · Bosch · Speed Queen · Whirlpool' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not draining · Gasket corrosion (coastal) · Leaking · Error codes', brands: 'Miele · Bosch · KitchenAid · Thermador · Samsung' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Not freezing · Temperature off · Ice buildup · Sub-Zero column', brands: 'Sub-Zero · True · GE · Samsung · Whirlpool · U-Line' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burner won't light · Induction not heating · Corrosion issues", brands: 'Wolf · Viking · Thermador · Miele · GE · Bosch' },
+];
+
+const malibuZonesNarrative = {
+  eyebrow: 'WE KNOW EVERY PART OF MALIBU',
+  headline: 'From Carbon Beach to Ramirez Canyon — All of 90265',
+  paragraphs: [
+    "Malibu isn't one neighborhood — it's 21 miles of very different property types along PCH and up into the canyons. Our technicians know the access realities of each area: the long gated driveways at Malibu Colony, the canyon roads off Latigo and Encinal, the beachfront access at Carbon Beach and Broad Beach. When you tell us where you are in the 90265 ZIP, we know what we're driving into.",
+  ],
+  subSections: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Malibu, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Malibu 90265 — Carbon Beach, Malibu Colony, Point Dume, Paradise Cove, Zuma Beach, Broad Beach, Ramirez Canyon, Trancas Canyon, Malibu Park, Latigo Canyon, Encinal Canyon, and Corral Canyon. Call before noon for same-day service in most Malibu locations." }
+      title: 'Beachfront PCH',
+      paragraphs: [
+        'Carbon Beach · Malibu Colony · Malibu Road · Broad Beach · Zuma Beach area · Paradise Cove. Direct ocean exposure, the most aggressive salt air in our service area. Sub-Zero column refrigerators, Wolf ranges, Viking outdoor kitchens — all in conditions that age them faster than the manuals warn about. Coil cleaning every 4 months, not 12.',
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Do you repair appliances in Malibu beach houses and vacation homes?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. We work in primary residences, beach houses, and vacation rentals across Malibu. We understand that a broken appliance in a vacation home often needs faster resolution — renters leaving, owners arriving, property managers on the hook. We prioritize these calls accordingly. Call us and tell us the situation." }
+      title: 'Point Dume & North',
+      paragraphs: [
+        'Point Dume · Malibu Park · Malibu Hills · Trancas Canyon · Encinal Canyon · Zuma Canyon. Mix of beachfront and bluff-top homes plus the canyon properties heading inland. Vacation rentals are common here — fast turnaround between guests is part of how we work this zone.',
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Does the ocean air in Malibu damage appliances faster?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes, significantly. Salt air from the Pacific accelerates corrosion on refrigerator condenser coils, dishwasher door gaskets, and metal control board components. Carbon Beach and Malibu Colony homes — right on the water — see coil corrosion timelines that are roughly half of what we'd expect in inland LA. We clean and inspect condenser coils on every Malibu refrigerator call as a standard part of diagnostics, not an add-on." }
+      title: 'Canyons & East Malibu',
+      paragraphs: [
+        'Ramirez Canyon · Latigo Canyon · Corral Canyon · Malibu Junction · Pepperdine area · Big Rock Beach. Canyon humidity is its own problem — moisture intrusion in igniter wells on Wolf and Viking ranges, gasket wear on dishwashers. The drive up Ramirez Canyon is scenic but takes planning; we account for it in your arrival window.',
+      ],
     },
-    {
-      "@type": "Question",
-      "name": "Do you repair BBQ grills in Malibu?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Outdoor BBQ and grill repair is a frequent call in Malibu — igniter failures, burner replacements, gas valve issues, and control panel problems on built-in outdoor kitchen appliances. We service Viking, Wolf, DCS, Lynx, and other outdoor kitchen brands." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero, Wolf, and Viking appliances in Malibu?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Malibu homes — both the beachfront estates and the canyon properties — frequently have Sub-Zero refrigerators, Wolf ranges, and Viking appliances. Our technicians carry OEM parts for these brands on every service vehicle and are trained on their specific systems." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Malibu?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a full written estimate before starting any work. Note that Malibu's distance from our Los Angeles base means we schedule service on specific days — call us to check same-day availability in your part of the 90265 ZIP." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Topanga, Pacific Palisades, and Calabasas from Malibu?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Malibu service area extends east to Pacific Palisades and Topanga Canyon, and inland toward Calabasas and Agoura Hills. If you're in western LA County along PCH or the canyon roads, call us to confirm coverage." }
-    }
-  ]
+  ],
 };
+
+const vacationHomeNarrative = {
+  eyebrow: 'VACATION HOMES & SECOND PROPERTIES',
+  headline: 'Appliance Repair for Malibu Beach Houses & Vacation Rentals',
+  paragraphs: [
+    "A significant portion of Malibu's housing stock is not someone's primary residence. Beach houses on Carbon Beach, Malibu Colony homes, and canyon properties are often second homes or vacation rentals managed by property managers on behalf of owners who aren't necessarily in LA.",
+    "This creates a specific kind of urgency we understand well. When the Sub-Zero goes down on Wednesday and guests arrive Friday, or when a Malibu Colony rental has a broken oven between two bookings, waiting until next week isn't an option. We handle these situations directly — coordinate with property managers, work around rental schedules, and prioritize calls with this kind of time pressure.",
+    "Call us and tell us the situation honestly. We'll tell you what we can do.",
+    "<strong>How we work for Malibu vacation properties:</strong> 🏖️ Beach house specialists — we work in vacation properties regularly · 📞 Property managers welcome — coordinate with whoever handles the property · ⚡ Guest arrivals & rental turnovers — we prioritize time-sensitive situations · 🔧 Salt air maintenance — coastal-aware diagnostics on every Malibu call",
+  ],
+};
+
+const neighborhoods = [
+  { name: 'Carbon Beach', zip: '90265', featured: true },
+  { name: 'Malibu Colony', zip: '90265', featured: true },
+  { name: 'Point Dume', zip: '90265', featured: true },
+  { name: 'Paradise Cove', zip: '90265' },
+  { name: 'Malibu Road', zip: '90265' },
+  { name: 'Broad Beach', zip: '90265' },
+  { name: 'Zuma Beach area', zip: '90265' },
+  { name: 'Malibu Park', zip: '90265' },
+  { name: 'Trancas Canyon', zip: '90265' },
+  { name: 'Encinal Canyon', zip: '90265' },
+  { name: 'Ramirez Canyon', zip: '90265' },
+  { name: 'Latigo Canyon', zip: '90265' },
+  { name: 'Corral Canyon', zip: '90265' },
+  { name: 'Pepperdine area', zip: '90265' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero Refrigerator',
+    location: 'Carbon Beach, 90265',
+    quote: 'Sub-Zero running all the time, not cold enough',
+    description: "Right on the water — this was exactly what we expected. The condenser coils had heavy salt air corrosion buildup after only 14 months. The compressor was running continuously and starting to show stress. Our tech cleaned the coils completely, replaced a weakened condenser fan motor, checked the door seals which were also showing early wear, and set the owner up on a 4-month cleaning schedule. Caught it before it became a compressor replacement.",
+    outcome: '✓ Same day · Coil cleaning + fan motor · Maintenance schedule set',
+  },
+  {
+    appliance: 'Viking BBQ Grill',
+    location: 'Malibu Colony, 90265',
+    quote: "Outdoor Viking grill won't ignite, side burner dead",
+    description: "Built-in Viking outdoor kitchen — igniter modules on two main burners had corroded from salt air exposure and the side burner's gas valve was sticking. Replaced both igniter modules with OEM Viking parts, freed and cleaned the gas valve, confirmed clean ignition on all burners. Also found the drip tray hadn't been cleaned and was close to being a fire hazard. Cleaned it out and showed the housekeeper the monthly maintenance procedure.",
+    outcome: '✓ Same day · OEM Viking parts · Fire hazard prevented',
+  },
+  {
+    appliance: 'Miele Dishwasher',
+    location: 'Point Dume, 90265',
+    quote: "F70 fault, won't start, rental guests arrive tomorrow",
+    description: "Property manager called on behalf of owner — rental group had just checked out, next group arriving next day. Miele F70 is a water intake fault. Found a kinked water supply hose behind the unit and a partially clogged inlet filter from hard Malibu water. Cleared both, tested five full cycles. Machine working perfectly before we left. Property manager had backup info for the inlet filter cleaning schedule. Guests arrived to a working kitchen.",
+    outcome: '✓ Same day · Rental ready on time · Property manager briefed',
+  },
+  {
+    appliance: 'Wolf Range',
+    location: 'Ramirez Canyon, 90265',
+    quote: 'Oven barely heats, three burners clicking but not lighting',
+    description: "Canyon home, 48-inch Wolf dual-fuel. The weak oven was a failing igniter — drawing insufficient current to reliably open the gas valve. The three misfiring burners had igniter electrodes corroded from Malibu's canyon humidity. Replaced the oven igniter and all three surface electrodes with OEM Wolf parts, calibrated the oven temperature (22°F low), tested everything. The drive up Ramirez Canyon is scenic but takes planning — we left extra time for it and still finished ahead of schedule.",
+    outcome: '✓ Same day · OEM Wolf parts · Oven recalibrated +22°F',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Salt Air Experts',
+    body: "Beachfront coil corrosion, gasket wear, corroded electrodes — we see all of it in Malibu. Our technicians proactively check for coastal damage patterns on every call. We don't wait for you to notice the symptoms before addressing the cause.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Vacation Home Ready',
+    body: "Rental turnovers, guest arrivals, absent owners, property managers — we work within these constraints regularly. Tell us the situation and we'll tell you honestly what we can do and when.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'BBQ & Outdoor Kitchen Repair',
+    body: "Viking, Wolf, DCS, Lynx — outdoor grill and kitchen appliance repair that most companies skip. If your outdoor kitchen isn't working, we service it. Salt air is especially destructive to outdoor kitchen igniter systems.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts — especially important on luxury brands where aftermarket parts fail faster in coastal conditions. $89 diagnostic waived with repair.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Our Sub-Zero on Carbon Beach had been running constantly. Same Day came out, immediately identified salt air coil buildup, cleaned everything, replaced the fan motor, and put us on a 4-month maintenance schedule. They clearly know what coastal conditions do to these appliances. Very impressed."',
+    author: '— Thomas H., Carbon Beach, Malibu',
+  },
+  {
+    stars: 5,
+    text: '"We manage a vacation rental in Malibu Colony. Dishwasher went down between guest groups with only 24 hours until next check-in. Same Day Appliance Repair came out same afternoon, fixed the issue in under an hour, and left the kitchen in perfect shape. This is the kind of reliability property management requires."',
+    author: '— Jennifer L., Property Manager, Malibu Colony',
+  },
+  {
+    stars: 5,
+    text: '"Viking outdoor grill had been clicking without lighting for months. Nobody would come out to Malibu to work on it. Same Day Appliance Repair came the next day, replaced the corroded igniters, fixed the side burner, and cleaned a grease tray that was a fire hazard. Excellent service, worth every penny."',
+    author: '— Mark W., Malibu Colony, Malibu',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator', range: '$200–$500', note: 'Includes coastal coil inspection · Fan motor · Ice maker' },
+  { appliance: 'Sub-Zero / Wolf Built-In', range: '$300–$700+', note: 'OEM parts · Coastal maintenance included', featured: true },
+  { appliance: 'BBQ / Outdoor Grill', range: '$150–$400', note: 'Igniter · Gas valve · Burner · Viking / Wolf / DCS' },
+  { appliance: 'Washer / Dryer', range: '$150–$380', note: 'Drain pump · Heating element · Vent cleaning' },
+  { appliance: 'Wine Cooler', range: '$200–$500', note: 'Coastal humidity-aware diagnostics · OEM parts' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Malibu, CA?',
+    answer: 'Yes. Our technicians cover all of Malibu 90265 — Carbon Beach, Malibu Colony, Point Dume, Paradise Cove, Zuma Beach, Broad Beach, Ramirez Canyon, Trancas Canyon, Malibu Park, Latigo Canyon, Encinal Canyon, and Corral Canyon. Call before noon for same-day service in most Malibu locations.',
+  },
+  {
+    question: 'Do you repair appliances in Malibu beach houses and vacation homes?',
+    answer: "Yes. We work in primary residences, beach houses, and vacation rentals across Malibu. We understand that a broken appliance in a vacation home often needs faster resolution — renters leaving, owners arriving, property managers on the hook. We prioritize these calls accordingly. Call us and tell us the situation.",
+  },
+  {
+    question: 'Does the ocean air in Malibu damage appliances faster?',
+    answer: "Yes, significantly. Salt air from the Pacific accelerates corrosion on refrigerator condenser coils, dishwasher door gaskets, and metal control board components. Carbon Beach and Malibu Colony homes — right on the water — see coil corrosion timelines that are roughly half of what we'd expect in inland LA. We clean and inspect condenser coils on every Malibu refrigerator call as a standard part of diagnostics, not an add-on.",
+  },
+  {
+    question: 'Do you repair BBQ grills in Malibu?',
+    answer: 'Yes. Outdoor BBQ and grill repair is a frequent call in Malibu — igniter failures, burner replacements, gas valve issues, and control panel problems on built-in outdoor kitchen appliances. We service Viking, Wolf, DCS, Lynx, and other outdoor kitchen brands.',
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, and Viking appliances in Malibu?',
+    answer: 'Yes. Malibu homes — both the beachfront estates and the canyon properties — frequently have Sub-Zero refrigerators, Wolf ranges, and Viking appliances. Our technicians carry OEM parts for these brands on every service vehicle and are trained on their specific systems.',
+  },
+  {
+    question: 'What is your diagnostic fee in Malibu?',
+    answer: "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a full written estimate before starting any work. Note that Malibu's distance from our Los Angeles base means we schedule service on specific days — call us to check same-day availability in your part of the 90265 ZIP.",
+  },
+  {
+    question: 'Do you also serve Topanga, Pacific Palisades, and Calabasas from Malibu?',
+    answer: 'Yes. Our Malibu service area extends east to Pacific Palisades and Topanga Canyon, and inland toward Calabasas and Agoura Hills. If you are in western LA County along PCH or the canyon roads, call us to confirm coverage.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Pacific Palisades', slug: 'pacific-palisades' },
+  { name: 'Brentwood', slug: 'brentwood' },
+  { name: 'Santa Monica', slug: 'santa-monica' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+  { name: 'Calabasas', slug: 'calabasas' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Burbank', slug: 'burbank' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Malibu, CA"
+    subheadline="Beach houses, canyon estates, vacation homes — all of Malibu 90265. Sub-Zero, Wolf, Viking, and outdoor BBQ repair. Salt air, long driveways, property managers calling for absent owners — we've seen it all. Same-day service, OEM parts, 90-day warranty."
+    zips={zips}
+    tier={1}
+  />
 
-  <!-- HERO -->
-  <section class="ml-hero">
-    <div class="ml-hero__inner container">
-      <div class="ml-hero__content">
-        <div class="ml-hero__eyebrow">Malibu, CA · 90265 · Carbon Beach · Malibu Colony · Point Dume · Paradise Cove</div>
-        <h1 class="ml-hero__h1">
-          Appliance Repair<br>
-          <span class="ml-hero__accent">Malibu, CA</span>
-        </h1>
-        <p class="ml-hero__sub">
-          Beach houses, canyon estates, vacation homes — all of Malibu 90265.
-          Sub-Zero, Wolf, Viking, and outdoor BBQ repair. Salt air, long driveways,
-          property managers calling for absent owners — we've seen it all.
-          Same-day service, OEM parts, 90-day warranty.
-        </p>
-        <div class="ml-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="ml-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="ml-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-malibu-ca.webp"
-          alt="Appliance repair in Malibu CA 90265"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Same-Day Service</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>90-Day Warranty</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>OEM Parts Only</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Licensed & Insured</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>Beach House Specialists</span>
-      </div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Malibu — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Malibu Service Team"
+    bookingSub="90265 · Beach House · Canyon · Vacation Home"
+  />
 
-  <!-- INTRO -->
-  <section class="ml-intro">
-    <div class="container ml-intro__inner">
-      <div class="ml-intro__text">
-        <h2>Appliance Repair in Malibu — How We Actually Work Here</h2>
-        <p>
-          Malibu is 21 miles of coastline and canyons — and almost every appliance repair
-          situation here has something that doesn't come up in other parts of LA. The salt
-          air off the Pacific hits condenser coils harder and faster than anywhere else
-          in our service area. Carbon Beach and Malibu Colony homes that are right on the
-          water can see coil corrosion in 18 months that would take four or five years in
-          Brentwood. We check this proactively on every refrigerator call in 90265.
-        </p>
-        <p>
-          A lot of Malibu properties are vacation homes, second homes, or managed rentals.
-          When the refrigerator goes down with guests arriving Friday, or the oven quits
-          between two rental groups, that's a different urgency than a homeowner who
-          just noticed something was off. Our technicians understand that and we don't
-          treat those calls like standard scheduling.
-        </p>
-        <p>
-          We also repair outdoor BBQ and grill systems — Viking, Wolf, DCS, Lynx — which
-          are standard equipment in Malibu outdoor kitchens and are a consistent source
-          of calls that most appliance companies don't service at all.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start.
-          <strong>90-day warranty</strong> on parts and labor.
-        </p>
-        <div class="ml-tip">
-          <div class="ml-tip__icon">🌊</div>
-          <div class="ml-tip__text">
-            <strong>From our techs on beachfront Malibu:</strong> If you're on Carbon Beach,
-            Malibu Colony, Malibu Road, or anywhere west of Pepperdine — clean your
-            refrigerator condenser coils every 4 months. Salt air deposits on metal coils
-            at roughly twice the rate of inland LA. On a Sub-Zero or Viking unit that's
-            already expensive to repair, regular coil cleaning pays for itself many times over.
-            We do this check on every Malibu fridge call as standard — not extra.
-          </div>
-        </div>
-      </div>
-      <div class="ml-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Malibu Service Team</div>
-          <div class="cta-box__sub">90265 · Beach house · Canyon · Vacation home</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Malibu"
+    subhead="Indoor & outdoor · Luxury brands · Beach house ready · 90265"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="ml-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Malibu</h2>
-      <p class="section-sub">Indoor & outdoor · Luxury brands · Beach house ready · 90265</p>
-      <div class="services-grid">
+  <CustomNarrative
+    eyebrow={malibuZonesNarrative.eyebrow}
+    headline={malibuZonesNarrative.headline}
+    paragraphs={malibuZonesNarrative.paragraphs}
+    subSections={malibuZonesNarrative.subSections}
+    background="white"
+  />
 
-        <a href="/malibu/refrigerator-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Salt air coil corrosion · Not cooling · Ice maker · Built-in columns</div>
-          <div class="service-card__brands">Sub-Zero · Wolf · Viking · True · Samsung · LG</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ServiceArea
+    cityName={cityName}
+    headline="Malibu Areas We Service"
+    subheadline="Beachfront PCH, Point Dume, the canyons — every part of 90265."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <a href="/malibu/wine-cooler-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature fluctuation · Coastal humidity · Built-in units · Wine cellar</div>
-          <div class="service-card__brands">Sub-Zero · True · EuroCave · Liebherr · U-Line</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <CustomNarrative
+    eyebrow={vacationHomeNarrative.eyebrow}
+    headline={vacationHomeNarrative.headline}
+    paragraphs={vacationHomeNarrative.paragraphs}
+    background="gray"
+  />
 
-        <a href="/malibu/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove Repair</div>
-          <div class="service-card__issues">Not heating · Igniter · Temperature calibration · Gas valve</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · GE · Dacor · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Malibu"
+    jobs={recentJobs}
+  />
 
-        <a href="/malibu/bbq-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">BBQ & Outdoor Grill Repair</div>
-          <div class="service-card__issues">Igniter failure · Burner replacement · Gas valve · Control panel</div>
-          <div class="service-card__brands">Viking · Wolf · DCS · Lynx · Weber · Bull</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Malibu Homeowners & Property Managers Call Us"
+    reasons={whyReasons}
+  />
 
-        <a href="/malibu/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer & Dryer Repair</div>
-          <div class="service-card__issues">Not draining · Not spinning · Coastal humidity issues · Stackable</div>
-          <div class="service-card__brands">LG · Samsung · Miele · Bosch · Speed Queen · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Malibu Clients Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/malibu/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Gasket corrosion (coastal) · Leaking · Error codes</div>
-          <div class="service-card__brands">Miele · Bosch · KitchenAid · Thermador · Samsung</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Malibu"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/malibu/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer Repair</div>
-          <div class="service-card__issues">Not freezing · Temperature off · Ice buildup · Sub-Zero column</div>
-          <div class="service-card__brands">Sub-Zero · True · GE · Samsung · Whirlpool · U-Line</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Malibu Clients Ask"
+    faqs={faqs}
+  />
 
-        <a href="/malibu/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop Repair</div>
-          <div class="service-card__issues">Burner won't light · Induction not heating · Corrosion issues</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · Miele · GE · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
 
-      </div>
-    </div>
-  </section>
-
-  <!-- MALIBU LOCATIONS — главный SEO блок -->
-  <section class="ml-locations">
-    <div class="container">
-      <div class="locations-inner">
-        <div class="locations-text">
-          <div class="locations-eyebrow">We Know Every Part of Malibu</div>
-          <h2>From Carbon Beach to Ramirez Canyon — All of 90265</h2>
-          <p>
-            Malibu isn't one neighborhood — it's 21 miles of very different property types
-            along PCH and up into the canyons. Our technicians know the access realities
-            of each area: the long gated driveways at Malibu Colony, the canyon roads off
-            Latigo and Encinal, the beachfront access at Carbon Beach and Broad Beach.
-            When you tell us where you are in the 90265 ZIP, we know what we're driving into.
-          </p>
-          <div class="location-zones">
-            <div class="lz-card">
-              <div class="lz-title">Beachfront PCH</div>
-              <div class="lz-items">
-                <span>Carbon Beach</span>
-                <span>Malibu Colony</span>
-                <span>Malibu Road</span>
-                <span>Broad Beach</span>
-                <span>Zuma Beach area</span>
-                <span>Paradise Cove</span>
-              </div>
-            </div>
-            <div class="lz-card">
-              <div class="lz-title">Point Dume & North</div>
-              <div class="lz-items">
-                <span>Point Dume</span>
-                <span>Malibu Park</span>
-                <span>Malibu Hills</span>
-                <span>Trancas Canyon</span>
-                <span>Encinal Canyon</span>
-                <span>Zuma Canyon</span>
-              </div>
-            </div>
-            <div class="lz-card">
-              <div class="lz-title">Canyons & East Malibu</div>
-              <div class="lz-items">
-                <span>Ramirez Canyon</span>
-                <span>Latigo Canyon</span>
-                <span>Corral Canyon</span>
-                <span>Malibu Junction</span>
-                <span>Pepperdine area</span>
-                <span>Big Rock Beach</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="locations-cta">
-          <div class="lc-title">Not sure we cover your area?</div>
-          <div class="lc-sub">Call us — if you're in 90265, we almost certainly do</div>
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">{city.phone}</a>
-          <div class="lc-note">$89 diagnostic · Waived with repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- VACATION HOME / BEACH HOUSE SECTION -->
-  <section class="ml-vacation">
-    <div class="container">
-      <div class="vacation-inner">
-        <div class="vacation-text">
-          <div class="vacation-eyebrow">Vacation Homes & Second Properties</div>
-          <h2>Appliance Repair for Malibu Beach Houses & Vacation Rentals</h2>
-          <p>
-            A significant portion of Malibu's housing stock is not someone's primary residence.
-            Beach houses on Carbon Beach, Malibu Colony homes, and canyon properties are
-            often second homes or vacation rentals managed by property managers on behalf
-            of owners who aren't necessarily in LA.
-          </p>
-          <p>
-            This creates a specific kind of urgency we understand well. When the Sub-Zero
-            goes down on Wednesday and guests arrive Friday, or when a Malibu Colony rental
-            has a broken oven between two bookings, waiting until next week isn't an option.
-            We handle these situations directly — coordinate with property managers, work
-            around rental schedules, and prioritize calls with this kind of time pressure.
-          </p>
-          <p>
-            Call us and tell us the situation honestly. We'll tell you what we can do.
-          </p>
-        </div>
-        <div class="vacation-stats">
-          <div class="vs-item">
-            <div class="vs-icon">🏖️</div>
-            <div class="vs-text">Beach house specialists — we work in vacation properties regularly</div>
-          </div>
-          <div class="vs-item">
-            <div class="vs-icon">📞</div>
-            <div class="vs-text">Property managers welcome — coordinate with whoever handles the property</div>
-          </div>
-          <div class="vs-item">
-            <div class="vs-icon">⚡</div>
-            <div class="vs-text">Guest arrivals & rental turnovers — we prioritize time-sensitive situations</div>
-          </div>
-          <div class="vs-item">
-            <div class="vs-icon">🔧</div>
-            <div class="vs-text">Salt air maintenance — coastal-aware diagnostics on every Malibu call</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="ml-recent">
-    <div class="container">
-      <h2>Jobs Our Team Did in Malibu</h2>
-      <p class="section-sub">Real calls from around 90265. Every part of the ZIP.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Refrigerator</span>
-            <span class="recent-location">Carbon Beach, 90265</span>
-          </div>
-          <div class="recent-card__title">"Sub-Zero running all the time, not cold enough"</div>
-          <div class="recent-card__desc">
-            Right on the water — this was exactly what we expected. The condenser coils
-            had heavy salt air corrosion buildup after only 14 months. The compressor was
-            running continuously and starting to show stress. Our tech cleaned the coils
-            completely, replaced a weakened condenser fan motor, checked the door seals
-            which were also showing early wear, and set the owner up on a 4-month
-            cleaning schedule. Caught it before it became a compressor replacement.
-          </div>
-          <div class="recent-card__result">✓ Same day · Coil cleaning + fan motor · Maintenance schedule set</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Viking BBQ Grill</span>
-            <span class="recent-location">Malibu Colony, 90265</span>
-          </div>
-          <div class="recent-card__title">"Outdoor Viking grill won't ignite, side burner dead"</div>
-          <div class="recent-card__desc">
-            Built-in Viking outdoor kitchen — igniter modules on two main burners had
-            corroded from salt air exposure and the side burner's gas valve was sticking.
-            Replaced both igniter modules with OEM Viking parts, freed and cleaned the
-            gas valve, confirmed clean ignition on all burners. Also found the drip tray
-            hadn't been cleaned and was close to being a fire hazard. Cleaned it out and
-            showed the housekeeper the monthly maintenance procedure.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Viking parts · Fire hazard prevented</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Miele Dishwasher</span>
-            <span class="recent-location">Point Dume, 90265</span>
-          </div>
-          <div class="recent-card__title">"F70 fault, won't start, rental guests arrive tomorrow"</div>
-          <div class="recent-card__desc">
-            Property manager called on behalf of owner — rental group had just checked out,
-            next group arriving next day. Miele F70 is a water intake fault. Found a
-            kinked water supply hose behind the unit and a partially clogged inlet filter
-            from hard Malibu water. Cleared both, tested five full cycles. Machine working
-            perfectly before we left. Property manager had backup info for the inlet filter
-            cleaning schedule. Guests arrived to a working kitchen.
-          </div>
-          <div class="recent-card__result">✓ Same day · Rental ready on time · Property manager briefed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Range</span>
-            <span class="recent-location">Ramirez Canyon, 90265</span>
-          </div>
-          <div class="recent-card__title">"Oven barely heats, three burners clicking but not lighting"</div>
-          <div class="recent-card__desc">
-            Canyon home, 48-inch Wolf dual-fuel. The weak oven was a failing igniter —
-            drawing insufficient current to reliably open the gas valve. The three
-            misfiring burners had igniter electrodes corroded from Malibu's canyon humidity.
-            Replaced the oven igniter and all three surface electrodes with OEM Wolf
-            parts, calibrated the oven temperature (22°F low), tested everything.
-            The drive up Ramirez Canyon is scenic but takes planning — we left extra
-            time for it and still finished ahead of schedule.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Wolf parts · Oven recalibrated +22°F</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="ml-why">
-    <div class="container">
-      <h2>Why Malibu Homeowners & Property Managers Call Us</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🌊</div>
-          <div class="why-title">Salt Air Experts</div>
-          <div class="why-text">Beachfront coil corrosion, gasket wear, corroded electrodes — we see all of it in Malibu. Our technicians proactively check for coastal damage patterns on every call. We don't wait for you to notice the symptoms before addressing the cause.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">Vacation Home Ready</div>
-          <div class="why-text">Rental turnovers, guest arrivals, absent owners, property managers — we work within these constraints regularly. Tell us the situation and we'll tell you honestly what we can do and when.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🔥</div>
-          <div class="why-title">BBQ & Outdoor Kitchen Repair</div>
-          <div class="why-text">Viking, Wolf, DCS, Lynx — outdoor grill and kitchen appliance repair that most companies skip. If your outdoor kitchen isn't working, we service it. Salt air is especially destructive to outdoor kitchen igniter systems.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts — especially important on luxury brands where aftermarket parts fail faster in coastal conditions. $89 diagnostic waived with repair.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="ml-reviews">
-    <div class="container">
-      <h2>What Malibu Clients Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our Sub-Zero on Carbon Beach had been running constantly. Same Day came out, immediately identified salt air coil buildup, cleaned everything, replaced the fan motor, and put us on a 4-month maintenance schedule. They clearly know what coastal conditions do to these appliances. Very impressed."</div>
-          <div class="review-author">— Thomas H., Carbon Beach, Malibu</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"We manage a vacation rental in Malibu Colony. Dishwasher went down between guest groups with only 24 hours until next check-in. Same Day Appliance Repair came out same afternoon, fixed the issue in under an hour, and left the kitchen in perfect shape. This is the kind of reliability property management requires."</div>
-          <div class="review-author">— Jennifer L., Property Manager, Malibu Colony</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Viking outdoor grill had been clicking without lighting for months. Nobody would come out to Malibu to work on it. Same Day Appliance Repair came the next day, replaced the corroded igniters, fixed the side burner, and cleaned a grease tray that was a fire hazard. Excellent service, worth every penny."</div>
-          <div class="review-author">— Mark W., Malibu Colony, Malibu</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="ml-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Malibu</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator</div>
-          <div class="pricing-card__range">$200 – $500</div>
-          <div class="pricing-card__note">Includes coastal coil inspection · Fan motor · Ice maker</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf Built-In</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Coastal maintenance included</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">BBQ / Outdoor Grill</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Igniter · Gas valve · Burner · Viking/Wolf/DCS</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $380</div>
-          <div class="pricing-card__note">Drain pump, heating element, vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Wine Cooler</div>
-          <div class="pricing-card__range">$200 – $500</div>
-          <div class="pricing-card__note">Coastal humidity-aware diagnostics · OEM parts</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="ml-faq">
-    <div class="container">
-      <h2>Questions Malibu Clients Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item">
-          <summary class="faq-question">Do you offer same-day appliance repair in Malibu, CA?</summary>
-          <div class="faq-answer">Yes. Our technicians cover all of Malibu 90265 — Carbon Beach, Malibu Colony, Point Dume, Paradise Cove, Zuma Beach, Broad Beach, Ramirez Canyon, Trancas Canyon, Malibu Park, Latigo Canyon, Encinal Canyon, and Corral Canyon. Call before noon for same-day service in most Malibu locations.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair appliances in Malibu beach houses and vacation homes?</summary>
-          <div class="faq-answer">Yes. We work in primary residences, beach houses, and vacation rentals across Malibu. We understand that a broken appliance in a vacation home often needs faster resolution — renters leaving, owners arriving, property managers on the hook. We prioritize these calls accordingly.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Does the ocean air in Malibu damage appliances faster?</summary>
-          <div class="faq-answer">Yes, significantly. Salt air from the Pacific accelerates corrosion on refrigerator condenser coils, dishwasher door gaskets, and outdoor grill igniter systems. Carbon Beach and Malibu Colony homes — right on the water — see coil corrosion timelines that are roughly half of what we'd expect in inland LA. We clean and inspect condenser coils on every Malibu refrigerator call as standard.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair BBQ grills in Malibu?</summary>
-          <div class="faq-answer">Yes. Outdoor BBQ and grill repair is a frequent call in Malibu — igniter failures, burner replacements, gas valve issues, and control panel problems on built-in outdoor kitchen appliances. We service Viking, Wolf, DCS, Lynx, and other outdoor kitchen brands.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair Sub-Zero, Wolf, and Viking appliances in Malibu?</summary>
-          <div class="faq-answer">Yes. Malibu homes — both the beachfront estates and the canyon properties — frequently have Sub-Zero refrigerators, Wolf ranges, and Viking appliances. Our technicians carry OEM parts for these brands on every service vehicle and are trained on their specific systems.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">What is your diagnostic fee in Malibu?</summary>
-          <div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. We give you a full written estimate before starting any work. Call us to check same-day availability in your specific Malibu location.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you also serve Topanga, Pacific Palisades, and Calabasas from Malibu?</summary>
-          <div class="faq-answer">Yes. Our Malibu service area extends east to Pacific Palisades and Topanga Canyon, and inland toward Calabasas and Agoura Hills. If you're in western LA County along PCH or the canyon roads, call us to confirm coverage.</div>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="ml-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/pacific-palisades/" class="nearby-link">Pacific Palisades</a>
-        <a href="/brentwood/" class="nearby-link">Brentwood</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/calabasas/" class="nearby-link">Calabasas</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="ml-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Malibu?</h2>
-          <p>Beach house · Canyon estate · Vacation rental · BBQ · All of 90265. $89 diagnostic waived with repair. 90-day warranty. OEM parts. Salt air experts.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Malibu, CA 90265</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</Layout>
-
-<style>
-  :root {
-    --ml-red: #C8102E;
-    --ml-black: #0a0a0a;
-    --ml-gray: #f5f5f5;
-    --ml-border: #e2e2e2;
-    --ml-text: #1a1a1a;
-    --ml-muted: #6b6b6b;
-  }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  .ml-hero { background: var(--ml-black); color: white; padding: 80px 0 60px; }
-  .ml-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .ml-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--ml-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .ml-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .ml-hero__accent { color: var(--ml-red); }
-  .ml-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .ml-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .ml-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .ml-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--ml-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .ml-bottom-cta .btn-secondary { color: var(--ml-text); border-color: var(--ml-border); }
-
-  .trust-bar { background: var(--ml-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-
-  .ml-intro { padding: 72px 0; background: white; }
-  .ml-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .ml-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--ml-black); margin-bottom: 20px; }
-  .ml-intro__text p { font-size: 16px; line-height: 1.7; color: var(--ml-text); margin-bottom: 16px; }
-  .ml-tip { display: flex; gap: 14px; background: #f0f7ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .ml-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .ml-tip__text { font-size: 14px; color: var(--ml-text); line-height: 1.6; }
-  .cta-box { background: var(--ml-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--ml-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-
-  .section-title { font-size: 30px; font-weight: 700; color: var(--ml-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--ml-muted); text-align: center; margin-bottom: 40px; }
-
-  .ml-services { padding: 72px 0; background: var(--ml-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--ml-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--ml-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--ml-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--ml-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--ml-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--ml-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--ml-red); font-weight: 500; }
-
-  /* LOCATIONS */
-  .ml-locations { padding: 72px 0; background: var(--ml-black); color: white; }
-  .locations-inner { display: grid; grid-template-columns: 1fr 260px; gap: 60px; align-items: start; }
-  .locations-eyebrow { font-size: 13px; font-weight: 500; color: var(--ml-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .locations-text h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px; }
-  .locations-text p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.75); margin-bottom: 24px; }
-  .location-zones { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .lz-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 10px; padding: 16px; }
-  .lz-title { font-size: 12px; font-weight: 600; color: var(--ml-red); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
-  .lz-items { display: flex; flex-direction: column; gap: 6px; }
-  .lz-items span { font-size: 13px; color: rgba(255,255,255,0.75); }
-  .locations-cta { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 28px; text-align: center; position: sticky; top: 80px; }
-  .lc-title { font-size: 16px; font-weight: 700; color: white; margin-bottom: 8px; }
-  .lc-sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .locations-cta .btn-primary { width: 100%; justify-content: center; margin-bottom: 12px; }
-  .lc-note { font-size: 12px; color: rgba(255,255,255,0.4); }
-
-  /* VACATION HOME */
-  .ml-vacation { padding: 72px 0; background: white; }
-  .vacation-inner { display: grid; grid-template-columns: 1fr 280px; gap: 60px; align-items: start; }
-  .vacation-eyebrow { font-size: 13px; font-weight: 500; color: var(--ml-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .vacation-text h2 { font-size: 28px; font-weight: 700; color: var(--ml-black); margin-bottom: 20px; }
-  .vacation-text p { font-size: 15px; line-height: 1.7; color: var(--ml-text); margin-bottom: 16px; }
-  .vacation-stats { display: flex; flex-direction: column; gap: 16px; }
-  .vs-item { display: flex; gap: 14px; align-items: flex-start; background: var(--ml-gray); border-radius: 10px; padding: 16px; }
-  .vs-icon { font-size: 22px; flex-shrink: 0; }
-  .vs-text { font-size: 14px; color: var(--ml-text); line-height: 1.5; }
-
-  .ml-recent { padding: 72px 0; background: var(--ml-gray); }
-  .ml-recent h2 { font-size: 30px; font-weight: 700; color: var(--ml-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--ml-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--ml-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--ml-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--ml-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--ml-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-
-  .ml-why { padding: 72px 0; background: white; }
-  .ml-why h2 { font-size: 30px; font-weight: 700; color: var(--ml-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--ml-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--ml-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--ml-muted); line-height: 1.6; }
-
-  .ml-reviews { padding: 72px 0; background: var(--ml-gray); }
-  .ml-reviews h2 { font-size: 30px; font-weight: 700; color: var(--ml-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--ml-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--ml-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--ml-muted); font-weight: 500; }
-
-  .ml-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--ml-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--ml-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--ml-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--ml-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--ml-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--ml-red); }
-  .pricing-card__note { font-size: 13px; color: var(--ml-muted); }
-
-  .ml-faq { padding: 72px 0; background: var(--ml-gray); }
-  .ml-faq h2 { font-size: 30px; font-weight: 700; color: var(--ml-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--ml-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--ml-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--ml-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--ml-text); }
-
-  .ml-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--ml-border); }
-  .ml-nearby h2 { font-size: 20px; font-weight: 600; color: var(--ml-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--ml-border); border-radius: 20px; font-size: 14px; color: var(--ml-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--ml-red); color: var(--ml-red); }
-
-  .ml-bottom-cta { padding: 72px 0; background: var(--ml-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-
-  @media (max-width: 1024px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-grid { grid-template-columns: repeat(2, 1fr); }
-    .reviews-grid { grid-template-columns: 1fr 1fr; }
-    .locations-inner { grid-template-columns: 1fr; }
-    .location-zones { grid-template-columns: 1fr 1fr; }
-    .vacation-inner { grid-template-columns: 1fr; }
-    .ml-intro__inner { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .ml-hero__inner { grid-template-columns: 1fr; }
-    .ml-hero__img-wrap { display: none; }
-    .recent-grid { grid-template-columns: 1fr; }
-    .reviews-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr 1fr; }
-    .location-zones { grid-template-columns: 1fr; }
-    .trust-bar__inner { justify-content: center; }
-  }
-  @media (max-width: 480px) {
-    .services-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; }
-    .ml-hero { padding: 48px 0 40px; }
-    .bottom-cta__text h2 { font-size: 26px; }
-  }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Malibu?"
+    body="Beach house · Canyon estate · Vacation rental · BBQ · All of 90265. $89 diagnostic waived with repair. 90-day warranty. OEM parts. Salt air experts."
+  />
+</CityLayoutV2>

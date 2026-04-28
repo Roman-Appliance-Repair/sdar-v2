@@ -1,593 +1,367 @@
 ---
-// src/pages/rancho-cucamonga.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
-import CTA from '../components/CTA.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = "Rancho Cucamonga";
-const citySlug = "rancho-cucamonga";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["91701", "91730", "91737", "91739"];
-const county = "San Bernardino";
-const branch = "Pasadena";
+const citySlug = 'rancho-cucamonga';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Rancho Cucamonga';
+const zips = ['91701', '91730', '91737', '91739'];
+
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
 const title = `Appliance Repair Rancho Cucamonga CA — Same Day | All Brands | ${phone}`;
 const description = `Same-day appliance repair in Rancho Cucamonga. Refrigerator, washer, dryer, oven & more. Sub-Zero, Samsung, LG, Whirlpool. Licensed. OEM parts. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/rancho-cucamonga/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Rancho Cucamonga', sameAs: 'https://en.wikipedia.org/wiki/Rancho_Cucamonga,_California' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Rancho Cucamonga is one of the more interesting service markets we cover. On one end of the spectrum you've got the Alta Loma tract homes — solid 1980s and '90s single-family houses where Whirlpool and Maytag are still running well past their expected lifespan. On the other end, you've got the newer estates near Victoria Gardens and Day Creek where Sub-Zero columns, Wolf ranges, and 48-inch built-in refrigerators are standard. Our techs work both worlds in the same day.",
+  "The climate here is something no other part of our service area matches. Inland Empire summers hit 105–112°F regularly. That's not the same as Pasadena at 98°F or even the Valley at 102°F. At those sustained temperatures, condenser coils clog faster, compressors run hotter, and appliances that would last 15 years in a coastal climate start showing stress at year 10. We've seen Sub-Zero units in Etiwanda with coil packs that looked like they hadn't been cleaned in a decade — owners had no idea condenser maintenance was even a thing.",
+  "There's also the dust factor. Rancho Cucamonga sits at the foot of the San Gabriel Mountains and gets strong Santa Ana winds that push fine particulate through everything. Dryer vent runs in the tract homes here are often 15–20 feet through the garage — longer than the recommended maximum. When you combine that run length with Inland Empire dust, lint accumulates fast. We clear blocked dryer vents on almost every third dryer call in this city.",
+  `Same-day coverage is available across all four ZIP codes — 91701, 91730, 91737, and 91739. Call us at <a href="tel:${phoneRaw}">${phone}</a>.`,
+];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🫧', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🍳', name: 'Stove & Cooktop Repair', slug: 'stove' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
 ];
+
+const heatNarrative = {
+  headline: 'What Inland Empire Heat Does to Your Appliances',
+  paragraphs: [
+    "This is something we talk about with almost every Rancho Cucamonga customer, because most people don't realize how much climate affects appliance lifespan and maintenance schedules.",
+    "<strong>Refrigerators work harder here than anywhere else we service.</strong> When ambient temperature is 108°F, your fridge compressor is running against a 68-degree differential to hold 40°F inside. That's a sustained load that coastal California appliances rarely face. The result: condenser coils clog faster from the combination of dust and heat cycling, compressors run hotter and wear faster, and door gaskets harden and crack from the dry heat. In coastal cities, we recommend condenser cleaning every 12 months. In Rancho Cucamonga, every 6 months is the right call.",
+    "<strong>Dryer vent runs are a specific problem here.</strong> The tract homes in Terra Vista and Victoria Groves were built with long internal vent routes — often through the garage or a back hallway. Runs of 15–20 feet, with one or two 90-degree bends, are common. At that length, lint accumulates quickly and restricts airflow. In Inland Empire summers, a restricted dryer vent can push exhaust temps high enough to be a genuine fire hazard. If your dryer takes more than one cycle to dry a load, that's the first thing to check.",
+    "<strong>West-facing appliance placement is an underappreciated factor.</strong> In homes throughout Etiwanda and North Etiwanda, kitchens often face west — and in summer, western walls absorb significant radiant heat by mid-afternoon. A refrigerator or wine cooler sitting against a west-facing wall in a Rancho Cucamonga kitchen is working against an additional 10–15°F of ambient load compared to an interior wall. We often recommend leaving extra clearance on the back and sides, and increasing cleaning frequency accordingly.",
+  ],
+  subSections: [
+    {
+      title: 'Maintenance Schedule for Rancho Cucamonga Homes',
+      paragraphs: [
+        "<strong>Refrigerator condenser coils:</strong> Every 6 months (not 12) — especially in homes near the foothills with heavy dust.",
+        "<strong>Dryer vent:</strong> Every 12 months if your run is under 10 feet — every 6 months if longer.",
+        "<strong>Refrigerator door gaskets:</strong> Check annually — heat cycling causes hardening and cracking faster here.",
+        "<strong>Dishwasher filter:</strong> Monthly cleaning — hard water deposits accumulate faster in SB County water.",
+        "<strong>Sub-Zero condenser:</strong> Every 6 months minimum — this is documented in the Sub-Zero owner manual for warm climates.",
+      ],
+    },
+  ],
+};
+
+const housingNarrative = {
+  headline: "Rancho Cucamonga Housing Stock — What's in These Homes",
+  paragraphs: [
+    "Rancho Cucamonga isn't one type of city — it's three or four different markets layered on top of each other, and our technicians know all of them.",
+  ],
+  subSections: [
+    {
+      title: 'Alta Loma (91701) — Older Single-Family Stock',
+      paragraphs: [
+        "Alta Loma is where Rancho Cucamonga got its start — hillside single-family homes mostly built between 1970 and 1995. These homes run older Whirlpool, Maytag, and GE appliances that are well past their published lifespans but often still functional. The most common calls here are worn-out dryer heating elements, refrigerator defrost system failures, and dishwasher pump assemblies. We see a lot of Kenmore (Sears-branded Whirlpool) units that people have had for 20 years and want to keep running. Usually worth repairing if the compressor or motor is still solid.",
+      ],
+    },
+    {
+      title: 'Terra Vista & Victoria Groves (91730) — Planned Community, Mid-Range',
+      paragraphs: [
+        "Terra Vista was one of the first master-planned communities in the Inland Empire — built through the 1980s and '90s with a consistent housing stock. These homes tend to have mid-range Samsung, LG, and Whirlpool appliances from the 2010s, now aging into the 7–12 year failure window. Samsung French-door refrigerators and LG front-load washers dominate. Ice maker failures, door-in-door actuator problems, and washer bearing wear are the most common calls. We keep Samsung and LG OEM parts stocked specifically for this area.",
+      ],
+    },
+    {
+      title: 'Etiwanda & North Etiwanda (91739) — Newer Tract Homes',
+      paragraphs: [
+        "Etiwanda has seen significant development in the last 15 years — newer tract homes, often in HOA-managed communities, with appliances in the 3–10 year range. These tend to be Samsung, LG, and Bosch. Still under manufacturer warranty in some cases — we help owners navigate warranty claims before they pay out of pocket. Common issues: Samsung ice maker problems, LG compressor failures in the newer linear inverter models (watch for the class-action relevant models), and Bosch dishwasher E24 drain errors from hard water accumulation.",
+      ],
+    },
+    {
+      title: 'Victoria Gardens Area & Day Creek (91739) — Luxury Homes',
+      paragraphs: [
+        "The newer luxury developments near Victoria Gardens shopping center and along Day Creek Boulevard have Sub-Zero, Wolf, Viking, and Thermador as standard equipment. These homes also tend to have wine coolers and beverage centers. Sub-Zero condenser cleaning in this climate is critical — we've opened units here that are only 4–5 years old but have never been cleaned, with coil packs fully blocked. We stock OEM Sub-Zero and Wolf parts and don't sub out luxury appliance work to general technicians.",
+      ],
+    },
+  ],
+};
 
 const neighborhoods = [
-  { name: "Alta Loma", zip: "91701" },
-  { name: "Etiwanda", zip: "91739" },
-  { name: "Terra Vista", zip: "91730" },
-  { name: "Victoria Groves", zip: "91730" },
-  { name: "Victoria Gardens Area", zip: "91739" },
-  { name: "North Etiwanda", zip: "91739" },
-  { name: "Rancho Etiwanda", zip: "91739" },
-  { name: "Day Creek", zip: "91739" },
-  { name: "Haven Ave Corridor", zip: "91730" },
-  { name: "Foothill Blvd", zip: "91730" },
-  { name: "Cucamonga (Historic)", zip: "91730" },
-  { name: "Red Hill", zip: "91737" },
+  { name: 'Alta Loma', zip: '91701' },
+  { name: 'Etiwanda', zip: '91739' },
+  { name: 'Terra Vista', zip: '91730' },
+  { name: 'Victoria Groves', zip: '91730' },
+  { name: 'Victoria Gardens Area', zip: '91739' },
+  { name: 'North Etiwanda', zip: '91739' },
+  { name: 'Rancho Etiwanda', zip: '91739' },
+  { name: 'Day Creek', zip: '91739' },
+  { name: 'Haven Ave Corridor', zip: '91730' },
+  { name: 'Foothill Blvd', zip: '91730' },
+  { name: 'Cucamonga (Historic)', zip: '91730' },
+  { name: 'Red Hill', zip: '91737' },
 ];
 
-const faqItems = [
+const recentJobs = [
   {
-    q: "Do you offer same-day appliance repair in Rancho Cucamonga?",
-    a: `Yes — same-day service is available throughout Rancho Cucamonga, including Alta Loma, Etiwanda, Terra Vista, and Victoria Gardens. Call ${phone} before noon and we'll typically have a technician out the same day. We cover ZIP codes 91701, 91730, 91737, and 91739.`
-  },
-  {
-    q: "Why does my refrigerator seem to struggle more in summer?",
-    a: "Rancho Cucamonga's Inland Empire heat — routinely 105–112°F in July and August — puts serious strain on condenser coils and compressors. If your fridge is working harder than usual, not maintaining temperature, or the compressor runs constantly, the condenser coil is usually the first thing we check. In this climate, it should be cleaned every 6 months, not 12."
-  },
-  {
-    q: "What brands do you repair in Rancho Cucamonga?",
-    a: "All of them. Samsung and LG dominate the newer tract homes in Terra Vista and Victoria Groves. Whirlpool and Maytag are standard in older Alta Loma homes. The estates near Victoria Gardens and Red Hill tend to run Sub-Zero, Wolf, and Viking. We carry OEM parts for all of these and don't sub out to third parties."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `Our diagnostic fee is $89 — and that's applied directly to the repair cost the moment you say yes. No hidden trip charge. What we quote is what appears on the invoice.`
-  },
-  {
-    q: "Do you repair Sub-Zero refrigerators in Rancho Cucamonga?",
-    a: "Yes. Sub-Zero repair is something our technicians handle regularly. Rancho Cucamonga has a mix of Sub-Zero 700 and 600 series in the higher-end neighborhoods near Victoria Gardens. Common issues in this climate: condenser buildup from Inland Empire dust, evaporator fan failures, and door gasket wear from heat cycling. We stock OEM Sub-Zero parts and don't use aftermarket substitutes."
-  },
-  {
-    q: "My dryer takes two cycles to dry — what's wrong?",
-    a: "In most Rancho Cucamonga homes we service, the culprit is one of two things: a clogged dryer vent (common in tract homes where vent runs can stretch 15–20 feet through the garage), or a failing heating element. We inspect both on every dryer call. A blocked vent is also a fire hazard — if you haven't had it cleaned in two years, it's time."
-  },
-  {
-    q: "Do you service commercial appliances in Rancho Cucamonga?",
-    a: "Yes. We service restaurant equipment, walk-in coolers and freezers, and commercial laundry. Rancho Cucamonga has a busy commercial corridor along Foothill Blvd and near Victoria Gardens — we respond to commercial calls with priority scheduling. Diagnostic fee for commercial is $120, applied to the repair."
-  },
-];
-
-const recentRepairs = [
-  {
-    title: "Sub-Zero 650 not cooling — compressor ran constantly",
-    neighborhood: "Victoria Gardens area, 91739",
+    appliance: 'Sub-Zero 650',
+    location: 'Victoria Gardens area, 91739',
+    quote: 'not cooling — compressor ran constantly',
     description: "Customer called early on a Thursday — Sub-Zero 650 had been cycling all night and the fridge section was sitting at 52°F. Classic condenser overload from Inland Empire summer heat. When we opened the unit, the condenser coils were packed solid — the family had never had them cleaned in seven years of living there. Cleared the coils, tested the compressor load, and found the fan blade was also cracked and causing vibration. Replaced both the fan and cleaned the coils. Unit was holding 38°F by afternoon.",
-    note: "Condenser cleaning in this climate is not optional. Every six months."
+    outcome: 'Condenser cleaning in this climate is not optional. Every six months.',
   },
   {
-    title: "Samsung RF28 — ice maker not making ice, error code 14E",
-    neighborhood: "Terra Vista, 91730",
+    appliance: 'Samsung RF28',
+    location: 'Terra Vista, 91730',
+    quote: 'ice maker not making ice, error code 14E',
     description: "The 14E on this model points to an ice room temperature sensor — but the actual root cause here was a kinked water inlet line in the door hinge. We see this on Samsung French-door units that have been opened and closed thousands of times over five years. The line crimps gradually. Replaced the inlet valve assembly and cleared the 14E. The customer had been told by another company it was the main control board — it wasn't. Control board replacement would have been $380+. This was $145 parts and labor.",
-    note: "Error codes tell you where to look. They don't always tell you why."
+    outcome: "Error codes tell you where to look. They don't always tell you why.",
   },
   {
-    title: "Whirlpool Cabrio washer — won't spin, F5 E2 code",
-    neighborhood: "Alta Loma, 91701",
+    appliance: 'Whirlpool Cabrio washer',
+    location: 'Alta Loma, 91701',
+    quote: "won't spin, F5 E2 code",
     description: "F5 E2 on the Cabrio is a lid lock failure. But on this particular unit — about eight years old — the lid lock itself was fine. The issue was the actuator tab that triggers the switch had broken off. Common failure point on this generation of Cabrio. We had the part on the truck. Repair took about an hour including diagnosis and testing.",
-    note: "Alta Loma has a lot of these 2015–2018 Cabrio units. We keep actuator assemblies stocked."
+    outcome: 'Alta Loma has a lot of these 2015–2018 Cabrio units. We keep actuator assemblies stocked.',
   },
   {
-    title: "LG LRMVS3006S — French door fridge warm top section, freezer fine",
-    neighborhood: "Etiwanda, 91739",
+    appliance: 'LG LRMVS3006S',
+    location: 'Etiwanda, 91739',
+    quote: 'French door fridge warm top section, freezer fine',
     description: "Warm fridge, cold freezer is almost always an evaporator fan issue on these dual-evaporator LG units. Pulled the back panel and found the fan motor had seized — heat stress from the Etiwanda summer had pushed the motor past its tolerance. The fridge was also positioned against a west-facing wall, which compounds the heat load. Replaced the evaporator fan motor with an OEM LG part and advised the owner to leave a few inches of clearance on the back.",
-    note: "West-facing walls in Rancho Cucamonga add 10–15°F of ambient heat load on appliances sitting against them."
+    outcome: 'West-facing walls in Rancho Cucamonga add 10–15°F of ambient heat load on appliances sitting against them.',
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Rancho Cucamonga",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Rancho Cucamonga",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'We pick up the phone',
+    body: `Not a call center. Not a dispatch queue. When you call ${phone}, someone who actually knows the schedule picks up and gives you an honest answer about when we can be there. Usually same day if you call before noon.`,
   },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    iconKey: 'parts' as const,
+    title: 'OEM parts — not aftermarket',
+    body: "We don't use third-party parts from Amazon or off-brand suppliers. OEM parts fit correctly, last longer, and don't void manufacturer warranties. In a market with a lot of discount competitors, this is a real difference.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Honest diagnosis before we quote',
+    body: "The $89 diagnostic fee means we actually look at your appliance before we tell you what it'll cost. We don't quote over the phone based on symptoms. What we quote is what appears on the invoice.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: "We know what's in these houses",
+    body: 'Rancho Cucamonga has a specific mix of appliance generations — 1990s Whirlpool in Alta Loma, mid-2010s Samsung and LG in Terra Vista, newer Sub-Zero in the luxury tracts. Our technicians come prepared for what\'s actually here, not generic brands.',
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
-};
+const testimonials = [
+  {
+    stars: 5,
+    text: '"My Samsung fridge in Terra Vista stopped making ice and the display was showing an error code. Called Same Day and they were out the same afternoon. Tech knew exactly what it was — had the part on his truck. Two hours and done. Really impressed."',
+    author: '— Daniel K., Terra Vista',
+  },
+  {
+    stars: 5,
+    text: '"Sub-Zero hadn\'t been serviced in years and was running warm in the summer heat. The technician found the condenser was completely blocked. He cleaned it thoroughly and explained the 6-month maintenance schedule for our climate. Really knowledgeable."',
+    author: '— Patricia M., Victoria Gardens area',
+  },
+  {
+    stars: 4,
+    text: '"Whirlpool dryer in our Alta Loma house was taking two cycles to dry everything. Turned out the vent run through our garage was partially blocked and the heating element was weak. Fixed both. Fair price, showed up on time."',
+    author: '— Marcus T., Alta Loma',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator Repair', range: '$150–$450', note: 'Fan motor · Coil cleaning · Inlet valve · Compressor relay' },
+  { appliance: 'Washer Repair', range: '$140–$380', note: 'Drain pump · Bearing · Actuator · Lid lock' },
+  { appliance: 'Dryer Repair', range: '$120–$320', note: 'Heating element · Thermal fuse · Vent path' },
+  { appliance: 'Dishwasher Repair', range: '$130–$360', note: 'Drain pump · Filter · Spray arm · E24 errors' },
+  { appliance: 'Oven / Range Repair', range: '$140–$400', note: 'Igniter · Bake element · Gas valve · Calibration' },
+  { appliance: 'Sub-Zero Repair', range: '$250–$650', note: 'OEM Sub-Zero parts · Coil cleaning · Fan motor' },
+  { appliance: 'Condenser Coil Cleaning', range: '$89–$150', note: '6-month interval recommended for this climate' },
+  { appliance: 'Dryer Vent Cleaning', range: '$89–$140', note: 'Long tract-home vent runs cleared completely' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Rancho Cucamonga?',
+    answer: `Yes — same-day service is available throughout Rancho Cucamonga, including Alta Loma, Etiwanda, Terra Vista, and Victoria Gardens. Call ${phone} before noon and we'll typically have a technician out the same day. We cover ZIP codes 91701, 91730, 91737, and 91739.`,
+  },
+  {
+    question: 'Why does my refrigerator seem to struggle more in summer?',
+    answer: "Rancho Cucamonga's Inland Empire heat — routinely 105–112°F in July and August — puts serious strain on condenser coils and compressors. If your fridge is working harder than usual, not maintaining temperature, or the compressor runs constantly, the condenser coil is usually the first thing we check. In this climate, it should be cleaned every 6 months, not 12.",
+  },
+  {
+    question: 'What brands do you repair in Rancho Cucamonga?',
+    answer: 'All of them. Samsung and LG dominate the newer tract homes in Terra Vista and Victoria Groves. Whirlpool and Maytag are standard in older Alta Loma homes. The estates near Victoria Gardens and Red Hill tend to run Sub-Zero, Wolf, and Viking. We carry OEM parts for all of these and don\'t sub out to third parties.',
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: 'Our diagnostic fee is $89 — and that\'s applied directly to the repair cost the moment you say yes. No hidden trip charge. What we quote is what appears on the invoice.',
+  },
+  {
+    question: 'Do you repair Sub-Zero refrigerators in Rancho Cucamonga?',
+    answer: "Yes. Sub-Zero repair is something our technicians handle regularly. Rancho Cucamonga has a mix of Sub-Zero 700 and 600 series in the higher-end neighborhoods near Victoria Gardens. Common issues in this climate: condenser buildup from Inland Empire dust, evaporator fan failures, and door gasket wear from heat cycling. We stock OEM Sub-Zero parts and don't use aftermarket substitutes.",
+  },
+  {
+    question: "My dryer takes two cycles to dry — what's wrong?",
+    answer: "In most Rancho Cucamonga homes we service, the culprit is one of two things: a clogged dryer vent (common in tract homes where vent runs can stretch 15–20 feet through the garage), or a failing heating element. We inspect both on every dryer call. A blocked vent is also a fire hazard — if you haven't had it cleaned in two years, it's time.",
+  },
+  {
+    question: 'Do you service commercial appliances in Rancho Cucamonga?',
+    answer: 'Yes. We service restaurant equipment, walk-in coolers and freezers, and commercial laundry. Rancho Cucamonga has a busy commercial corridor along Foothill Blvd and near Victoria Gardens — we respond to commercial calls with priority scheduling. Call us for commercial pricing.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Chino Hills', slug: 'chino-hills' },
+  { name: 'Upland', slug: 'upland' },
+  { name: 'Ontario', slug: 'ontario' },
+  { name: 'Fontana', slug: 'fontana' },
+  { name: 'San Bernardino', slug: 'san-bernardino' },
+  { name: 'Redlands', slug: 'redlands' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Rancho Cucamonga"
+    subheadline="Same-day service in Alta Loma, Etiwanda, Terra Vista, Victoria Gardens, and throughout the Inland Empire. All brands, OEM parts, licensed technicians."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- ═══════════════════════════════════════════
-       HERO
-  ═══════════════════════════════════════════ -->
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">San Bernardino County · ZIP 91701, 91730, 91737, 91739</p>
-        <h1>Appliance Repair<br><span class="accent">Rancho Cucamonga</span></h1>
-        <p class="hero-sub">Same-day service in Alta Loma, Etiwanda, Terra Vista, Victoria Gardens, and throughout the Inland Empire. All brands, OEM parts, licensed technicians.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-      <div class="hero-img">
-        <img src="/images/cities/rancho-cucamonga-appliance-repair.jpg" alt="Appliance repair technician in Rancho Cucamonga" width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- ═══════════════════════════════════════════
-       TRUST BAR
-  ═══════════════════════════════════════════ -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">📋</span><span>Licensed &amp; Insured</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic — Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Rancho Cucamonga — What We've Learned Working Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Rancho Cucamonga"
+    bookingSub="Same-Day Service"
+  />
 
-  <!-- ═══════════════════════════════════════════
-       INTRO + STICKY SIDEBAR
-  ═══════════════════════════════════════════ -->
-  <section class="intro-section container">
-    <div class="intro-content">
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Rancho Cucamonga"
+    services={services}
+  />
 
-      <h2>Appliance Repair in Rancho Cucamonga — What We've Learned Working Here</h2>
+  <CustomNarrative
+    headline={heatNarrative.headline}
+    paragraphs={heatNarrative.paragraphs}
+    subSections={heatNarrative.subSections}
+    background="white"
+  />
 
-      <p>Rancho Cucamonga is one of the more interesting service markets we cover. On one end of the spectrum you've got the Alta Loma tract homes — solid 1980s and '90s single-family houses where Whirlpool and Maytag are still running well past their expected lifespan. On the other end, you've got the newer estates near Victoria Gardens and Day Creek where Sub-Zero columns, Wolf ranges, and 48-inch built-in refrigerators are standard. Our techs work both worlds in the same day.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Neighborhoods We Service in Rancho Cucamonga"
+    subheadline="We cover all of Rancho Cucamonga — Alta Loma single-family homes, Terra Vista planned communities, Etiwanda tract neighborhoods, and the luxury estates near Victoria Gardens and Day Creek. No travel surcharge within these areas."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>The climate here is something no other part of our service area matches. Inland Empire summers hit 105–112°F regularly. That's not the same as Pasadena at 98°F or even the Valley at 102°F. At those sustained temperatures, condenser coils clog faster, compressors run hotter, and appliances that would last 15 years in a coastal climate start showing stress at year 10. We've seen Sub-Zero units in Etiwanda with coil packs that looked like they hadn't been cleaned in a decade — owners had no idea condenser maintenance was even a thing.</p>
+  <CustomNarrative
+    headline={housingNarrative.headline}
+    paragraphs={housingNarrative.paragraphs}
+    subSections={housingNarrative.subSections}
+    background="gray"
+  />
 
-      <p>There's also the dust factor. Rancho Cucamonga sits at the foot of the San Gabriel Mountains and gets strong Santa Ana winds that push fine particulate through everything. Dryer vent runs in the tract homes here are often 15–20 feet through the garage — longer than the recommended maximum. When you combine that run length with Inland Empire dust, lint accumulates fast. We clear blocked dryer vents on almost every third dryer call in this city.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Rancho Cucamonga"
+    jobs={recentJobs}
+  />
 
-      <p>We're dispatched out of our Pasadena branch for Rancho Cucamonga. Same-day coverage is available across all four ZIP codes — 91701, 91730, 91737, and 91739. Call us at {phone}.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Rancho Cucamonga Residents Call Us"
+    reasons={whyReasons}
+  />
 
-    </div>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Rancho Cucamonga Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Rancho Cucamonga</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ 90-Day Warranty</li>
-        <li>✓ Licensed &amp; Insured</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Typical Repair Pricing in Rancho Cucamonga"
+    subhead="Every repair is different — these are ranges based on common repairs in this market. The $89 diagnostic fee is applied to the cost when you proceed."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <!-- ═══════════════════════════════════════════
-       SERVICES GRID
-  ═══════════════════════════════════════════ -->
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Rancho Cucamonga</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Rancho Cucamonga Appliance Repair — FAQ"
+    faqs={faqs}
+  />
 
-  <!-- ═══════════════════════════════════════════
-       INLAND EMPIRE HEAT BLOCK (City-Specific)
-  ═══════════════════════════════════════════ -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>What Inland Empire Heat Does to Your Appliances</h2>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-        <p>This is something we talk about with almost every Rancho Cucamonga customer, because most people don't realize how much climate affects appliance lifespan and maintenance schedules.</p>
-
-        <p><strong>Refrigerators work harder here than anywhere else we service.</strong> When ambient temperature is 108°F, your fridge compressor is running against a 68-degree differential to hold 40°F inside. That's a sustained load that coastal California appliances rarely face. The result: condenser coils clog faster from the combination of dust and heat cycling, compressors run hotter and wear faster, and door gaskets harden and crack from the dry heat. In coastal cities, we recommend condenser cleaning every 12 months. In Rancho Cucamonga, every 6 months is the right call.</p>
-
-        <p><strong>Dryer vent runs are a specific problem here.</strong> The tract homes in Terra Vista and Victoria Groves were built with long internal vent routes — often through the garage or a back hallway. Runs of 15–20 feet, with one or two 90-degree bends, are common. At that length, lint accumulates quickly and restricts airflow. In Inland Empire summers, a restricted dryer vent can push exhaust temps high enough to be a genuine fire hazard. If your dryer takes more than one cycle to dry a load, that's the first thing to check.</p>
-
-        <p><strong>West-facing appliance placement is an underappreciated factor.</strong> In homes throughout Etiwanda and North Etiwanda, kitchens often face west — and in summer, western walls absorb significant radiant heat by mid-afternoon. A refrigerator or wine cooler sitting against a west-facing wall in a Rancho Cucamonga kitchen is working against an additional 10–15°F of ambient load compared to an interior wall. We often recommend leaving extra clearance on the back and sides, and increasing cleaning frequency accordingly.</p>
-
-        <h3>Maintenance Schedule for Rancho Cucamonga Homes</h3>
-        <ul class="maint-list">
-          <li><strong>Refrigerator condenser coils:</strong> Every 6 months (not 12) — especially in homes near the foothills with heavy dust</li>
-          <li><strong>Dryer vent:</strong> Every 12 months if your run is under 10 feet — every 6 months if longer</li>
-          <li><strong>Refrigerator door gaskets:</strong> Check annually — heat cycling causes hardening and cracking faster here</li>
-          <li><strong>Dishwasher filter:</strong> Monthly cleaning — hard water deposits accumulate faster in SB County water</li>
-          <li><strong>Sub-Zero condenser:</strong> Every 6 months minimum — this is documented in the Sub-Zero owner manual for warm climates</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       NEIGHBORHOODS GRID
-  ═══════════════════════════════════════════ -->
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Rancho Cucamonga</h2>
-      <p>We cover all of Rancho Cucamonga — Alta Loma single-family homes, Terra Vista planned communities, Etiwanda tract neighborhoods, and the luxury estates near Victoria Gardens and Day Creek. No travel surcharge within these areas.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Not listed? Call us at {phone} — we likely cover your area. We service all of San Bernardino County west corridor including Upland, Ontario, and Fontana.</p>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       HOUSING STOCK BLOCK
-  ═══════════════════════════════════════════ -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">03</div>
-      <div class="context-body">
-        <h2>Rancho Cucamonga Housing Stock — What's in These Homes</h2>
-
-        <p>Rancho Cucamonga isn't one type of city — it's three or four different markets layered on top of each other, and our technicians know all of them.</p>
-
-        <h3>Alta Loma (91701) — Older Single-Family Stock</h3>
-        <p>Alta Loma is where Rancho Cucamonga got its start — hillside single-family homes mostly built between 1970 and 1995. These homes run older Whirlpool, Maytag, and GE appliances that are well past their published lifespans but often still functional. The most common calls here are worn-out dryer heating elements, refrigerator defrost system failures, and dishwasher pump assemblies. We see a lot of Kenmore (Sears-branded Whirlpool) units that people have had for 20 years and want to keep running. Usually worth repairing if the compressor or motor is still solid.</p>
-
-        <h3>Terra Vista &amp; Victoria Groves (91730) — Planned Community, Mid-Range</h3>
-        <p>Terra Vista was one of the first master-planned communities in the Inland Empire — built through the 1980s and '90s with a consistent housing stock. These homes tend to have mid-range Samsung, LG, and Whirlpool appliances from the 2010s, now aging into the 7–12 year failure window. Samsung French-door refrigerators and LG front-load washers dominate. Ice maker failures, door-in-door actuator problems, and washer bearing wear are the most common calls. We keep Samsung and LG OEM parts stocked specifically for this area.</p>
-
-        <h3>Etiwanda &amp; North Etiwanda (91739) — Newer Tract Homes</h3>
-        <p>Etiwanda has seen significant development in the last 15 years — newer tract homes, often in HOA-managed communities, with appliances in the 3–10 year range. These tend to be Samsung, LG, and Bosch. Still under manufacturer warranty in some cases — we help owners navigate warranty claims before they pay out of pocket. Common issues: Samsung ice maker problems, LG compressor failures in the newer linear inverter models (watch for the class-action relevant models), and Bosch dishwasher E24 drain errors from hard water accumulation.</p>
-
-        <h3>Victoria Gardens Area &amp; Day Creek (91739) — Luxury Homes</h3>
-        <p>The newer luxury developments near Victoria Gardens shopping center and along Day Creek Boulevard have Sub-Zero, Wolf, Viking, and Thermador as standard equipment. These homes also tend to have wine coolers and beverage centers. Sub-Zero condenser cleaning in this climate is critical — we've opened units here that are only 4–5 years old but have never been cleaned, with coil packs fully blocked. We stock OEM Sub-Zero and Wolf parts and don't sub out luxury appliance work to general technicians.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       RECENT REPAIRS
-  ═══════════════════════════════════════════ -->
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">04</div>
-      <h2>Recent Repairs in Rancho Cucamonga</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       WHY US + REVIEWS + PRICING
-  ═══════════════════════════════════════════ -->
-  <section class="why-section container">
-    <div class="context-number">05</div>
-    <h2>Why Rancho Cucamonga Residents Call Us</h2>
-
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>We pick up the phone</h3>
-        <p>Not a call center. Not a dispatch queue. When you call {phone}, someone who actually knows the schedule picks up and gives you an honest answer about when we can be there. Usually same day if you call before noon.</p>
-      </div>
-      <div class="why-item">
-        <h3>OEM parts — not aftermarket</h3>
-        <p>We don't use third-party parts from Amazon or off-brand suppliers. OEM parts fit correctly, last longer, and don't void manufacturer warranties. In a market with a lot of discount competitors, this is a real difference.</p>
-      </div>
-      <div class="why-item">
-        <h3>Honest diagnosis before we quote</h3>
-        <p>The $89 diagnostic fee means we actually look at your appliance before we tell you what it'll cost. We don't quote over the phone based on symptoms. What we quote is what appears on the invoice.</p>
-      </div>
-      <div class="why-item">
-        <h3>We know what's in these houses</h3>
-        <p>Rancho Cucamonga has a specific mix of appliance generations — 1990s Whirlpool in Alta Loma, mid-2010s Samsung and LG in Terra Vista, newer Sub-Zero in the luxury tracts. Our technicians come prepared for what's actually here, not generic brands.</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"My Samsung fridge in Terra Vista stopped making ice and the display was showing an error code. Called Same Day and they were out the same afternoon. Tech knew exactly what it was — had the part on his truck. Two hours and done. Really impressed."</p>
-        <p class="reviewer">— Daniel K., Terra Vista</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Sub-Zero hadn't been serviced in years and was running warm in the summer heat. The technician found the condenser was completely blocked. He cleaned it thoroughly and explained the 6-month maintenance schedule for our climate. Really knowledgeable."</p>
-        <p class="reviewer">— Patricia M., Victoria Gardens area</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★☆</div>
-        <p>"Whirlpool dryer in our Alta Loma house was taking two cycles to dry everything. Turned out the vent run through our garage was partially blocked and the heating element was weak. Fixed both. Fair price, showed up on time."</p>
-        <p class="reviewer">— Marcus T., Alta Loma</p>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Rancho Cucamonga</h3>
-      <p>Every repair is different — these are ranges based on common repairs in this market. The $89 diagnostic fee is applied to the cost when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item">
-          <span class="pi-service">Refrigerator Repair</span>
-          <span class="pi-range">$150–$450</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Washer Repair</span>
-          <span class="pi-range">$140–$380</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Repair</span>
-          <span class="pi-range">$120–$320</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Repair</span>
-          <span class="pi-range">$130–$360</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Oven / Range Repair</span>
-          <span class="pi-range">$140–$400</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Sub-Zero Repair</span>
-          <span class="pi-range">$250–$650</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Condenser Coil Cleaning</span>
-          <span class="pi-range">$89–$150</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Vent Cleaning</span>
-          <span class="pi-range">$89–$140</span>
-        </div>
-      </div>
-      <p class="pricing-note">$89 diagnostic fee applied to repair cost. Commercial diagnostic: $120.</p>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       FAQ
-  ═══════════════════════════════════════════ -->
-  <section class="faq-section container">
-    <h2>Rancho Cucamonga Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       NEARBY CITIES
-  ═══════════════════════════════════════════ -->
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/chino-hills/">Chino Hills</a>
-      <a href="/upland/">Upland</a>
-      <a href="/ontario/">Ontario</a>
-      <a href="/fontana/">Fontana</a>
-      <a href="/san-bernardino/">San Bernardino</a>
-      <a href="/redlands/">Redlands</a>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════
-       BOTTOM CTA
-  ═══════════════════════════════════════════ -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Rancho Cucamonga Today?</h2>
-      <p>Same-day service available throughout Alta Loma, Etiwanda, Terra Vista, Victoria Gardens, and all Rancho Cucamonga ZIP codes.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-/* ── Hero ── */
-.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
-.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
-h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; color: var(--color-text); margin-bottom: 1rem; }
-h1 .accent { color: var(--color-accent); }
-.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
-.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
-
-/* ── Trust Bar ── */
-.trust-bar { background: var(--color-accent); padding: 1rem 0; }
-.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
-
-/* ── Intro + Sidebar ── */
-.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
-.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-
-.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
-.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
-.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
-.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
-.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
-.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
-
-/* ── Services Grid ── */
-.services-section { background: var(--color-surface); padding: 4rem 0; }
-.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
-.svc-icon { font-size: 2rem; }
-.svc-name { font-size: .9rem; font-weight: 600; }
-
-/* ── Context Blocks ── */
-.context-block { padding: 4rem 0; }
-.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
-.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; padding-top: .25rem; }
-.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
-.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.maint-list { padding-left: 1.25rem; }
-.maint-list li { margin-bottom: .6rem; line-height: 1.6; color: var(--color-text-body); }
-
-/* ── Neighborhoods ── */
-.neighborhoods-section { padding: 4rem 0; }
-.section-intro { margin-bottom: 2rem; }
-.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
-.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
-.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
-.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
-.nbhd-note { margin-top: 1.5rem; font-size: .875rem; color: var(--color-text-muted); }
-
-/* ── Recent Repairs ── */
-.repairs-section { padding: 4rem 0; }
-.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
-.section-header h2 { font-size: 1.6rem; }
-.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
-.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
-.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
-.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
-.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
-
-/* ── Why Us ── */
-.why-section { padding: 4rem 0; }
-.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
-.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
-
-/* Reviews */
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
-.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
-.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
-.reviewer { font-size: .8rem; color: var(--color-text-muted); font-style: normal; }
-
-/* Pricing */
-.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
-.pricing-block h3 { margin-bottom: .5rem; }
-.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.price-item { display: flex; flex-direction: column; gap: .25rem; }
-.pi-service { font-size: .85rem; color: var(--color-text-muted); }
-.pi-range { font-size: 1rem; font-weight: 700; color: var(--color-text); }
-.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
-
-/* FAQ */
-.faq-section { padding: 4rem 0; }
-.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.faq-list { display: flex; flex-direction: column; gap: .75rem; }
-.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
-.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
-.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
-
-/* Nearby */
-.nearby-section { padding: 3rem 0; }
-.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
-.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
-.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
-.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
-
-/* Bottom CTA */
-.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
-.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
-.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
-.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .intro-section { grid-template-columns: 1fr; }
-  .sticky-cta-box { position: static; }
-  .services-grid { grid-template-columns: repeat(2, 1fr); }
-  .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-img { display: none; }
-  .context-inner { grid-template-columns: 1fr; }
-  .context-number { font-size: 2rem; }
-  .repairs-grid { grid-template-columns: 1fr; }
-  .why-grid { grid-template-columns: 1fr; }
-  .reviews-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Rancho Cucamonga Today?"
+    body="Same-day service available throughout Alta Loma, Etiwanda, Terra Vista, Victoria Gardens, and all Rancho Cucamonga ZIP codes."
+  />
+</CityLayoutV2>

@@ -1,508 +1,338 @@
 ---
-// src/pages/ontario.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = "Ontario";
-const citySlug = "ontario";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["91758", "91761", "91762", "91764"];
-const county = "San Bernardino";
+const citySlug = 'ontario';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Ontario';
+const zips = ['91758', '91761', '91762', '91764'];
+
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
 const title = `Appliance Repair Ontario CA — Same Day | All Brands | ${phone}`;
 const description = `Same-day appliance repair in Ontario CA. Refrigerator, washer, dryer, oven, dishwasher & more. Ontario Ranch, Downtown, South Ontario. Licensed. OEM parts. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/ontario/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Ontario', sameAs: 'https://en.wikipedia.org/wiki/Ontario,_California' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Ontario is one of the hardest-working cities in the Inland Empire — home to one of the busiest cargo airports on the West Coast, a massive logistics and warehouse corridor, and a dense, diverse residential population that spans everything from 1960s rental homes along Holt Blvd to brand-new master-planned development at Ontario Ranch. The appliance profile here reflects that diversity: older Whirlpool and GE in the established neighborhoods, Samsung and LG in mid-range homes from the 1990s and 2000s, and newer KitchenAid and Samsung in the Ontario Ranch builds.",
+  "The rental market is a significant part of who calls us in Ontario. Apartments and rental homes along Holt Blvd, Euclid, and Fourth Street need appliance repairs resolved quickly — a tenant without a working washer or refrigerator isn't just an inconvenience, it's a habitability issue. We work directly with landlords and property managers and understand the urgency that comes with an active tenancy. We communicate with both parties and aim to close every rental call the same day we open it.",
+  "The industrial environment around Ontario International Airport and the logistics corridor adds a climate factor most appliance companies don't mention: fine particulate from warehouse activity and airport ground operations settles on condenser coils faster in parts of Ontario than in purely residential cities. Homes near the airport corridor and south of the 60 freeway see measurably heavier coil loading. We account for this in every refrigerator call in that zone.",
+  `Same-day coverage across all four Ontario ZIP codes — 91758, 91761, 91762, 91764. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
+];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Stove & Cooktop Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🫧', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🍳', name: 'Stove & Cooktop Repair', slug: 'stove' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
+
+const ontarioContextNarrative = {
+  headline: "Ontario's Housing Stock — Four Distinct Markets",
+  subSections: [
+    {
+      title: 'Downtown & Holt Blvd — 1960s–1980s Mix',
+      paragraphs: [
+        "The established neighborhoods near Downtown Ontario and along Holt Boulevard represent Ontario's oldest residential stock — single-family homes and apartment complexes built from the 1960s through the '80s. Appliances here range from 15 to 25 years old, and we see a high concentration of rental properties. Whirlpool, GE, and Maytag are the dominant brands. These machines are mechanically simpler than modern units and often worth repairing at advanced age — a Whirlpool Direct Drive washer with a worn coupling is a $120 fix, not a $700 replacement. We work with landlords in this part of Ontario regularly and understand the rental urgency dynamic.",
+      ],
+    },
+    {
+      title: 'College Park, Creekside & North Ontario — 1990s–2000s Mid-Range',
+      paragraphs: [
+        "The planned neighborhoods north of the 10 freeway were developed primarily in the 1990s and 2000s. Samsung, LG, KitchenAid, and Whirlpool from this era are now 15–25 years into their lifespan. College Park and Creekside call us most often for LG linear inverter compressor relay failures (2014–2019 generation), Samsung ice maker issues, and front-load washer bearing wear. Hard water is consistent throughout Ontario — dishwasher filter cleaning and ice maker descaling are part of virtually every applicable service call in these neighborhoods.",
+      ],
+    },
+    {
+      title: 'Ontario Ranch — New Development, 2015+',
+      paragraphs: [
+        "Ontario Ranch is one of the largest master-planned communities in Southern California, built out since 2015 with homes running 2,000–4,000 square feet. Builder-grade Samsung, KitchenAid, and LG appliances from the early Ontario Ranch builds are now 7–10 years old — entering the first failure window. Ice maker issues, evaporator fan failures, and dishwasher drain errors are the common calls. The airport corridor proximity adds industrial dust exposure to coil maintenance considerations — we recommend 5-month cleaning cycles for refrigerators in this zone.",
+      ],
+    },
+    {
+      title: 'Commercial Ontario — Airport, Logistics, Restaurants',
+      paragraphs: [
+        "Ontario International Airport is one of the busiest cargo facilities in the US, and the logistics corridor around it supports dozens of warehouses, distribution centers, and commercial operations. We service break room refrigerators, commercial ice machines, undercounter coolers, and commercial laundry for businesses throughout this corridor. Restaurant and food-service equipment on Fourth Street and around Ontario Mills also falls in our service area. We aim for same-day commercial response — a failed walk-in cooler or break room fridge is a business disruption we take seriously.",
+      ],
+    },
+    {
+      title: 'Hard Water Throughout Ontario',
+      paragraphs: [
+        "Ontario water runs hard — consistent with the broader SB County profile. Dishwasher filters clog at 3-month intervals. Ice maker fill tubes scale up. Front-load washer door gaskets accumulate mineral deposits that accelerate the mold and odor issues common in Samsung and LG front-loaders. We include descaling as standard on every applicable service call and leave customers with the right maintenance schedule for their specific water quality and usage.",
+      ],
+    },
+  ],
+};
 
 const neighborhoods = [
-  { name: "Ontario Ranch", zip: "91761" },
-  { name: "Downtown Ontario", zip: "91762" },
-  { name: "South Ontario", zip: "91761" },
-  { name: "North Ontario", zip: "91764" },
-  { name: "Holt Blvd Corridor", zip: "91762" },
-  { name: "Euclid Ave Area", zip: "91762" },
-  { name: "Haven Ave Corridor", zip: "91764" },
-  { name: "Fourth St District", zip: "91762" },
-  { name: "Ontario Mills Area", zip: "91764" },
-  { name: "College Park", zip: "91764" },
-  { name: "Creekside", zip: "91761" },
-  { name: "Airport Corridor", zip: "91761" },
+  { name: 'Ontario Ranch', zip: '91761' },
+  { name: 'Downtown Ontario', zip: '91762' },
+  { name: 'South Ontario', zip: '91761' },
+  { name: 'North Ontario', zip: '91764' },
+  { name: 'Holt Blvd Corridor', zip: '91762' },
+  { name: 'Euclid Ave Area', zip: '91762' },
+  { name: 'Haven Ave Corridor', zip: '91764' },
+  { name: 'Fourth St District', zip: '91762' },
+  { name: 'Ontario Mills Area', zip: '91764' },
+  { name: 'College Park', zip: '91764' },
+  { name: 'Creekside', zip: '91761' },
+  { name: 'Airport Corridor', zip: '91761' },
 ];
 
-const faqItems = [
+const recentJobs = [
   {
-    q: "Do you offer same-day appliance repair in Ontario CA?",
-    a: `Yes — same-day service is available throughout Ontario including Ontario Ranch, Downtown, South Ontario, College Park, Creekside, and the Holt Blvd and Haven Ave corridors. Call ${phone} before noon for same-day availability. We cover all Ontario ZIP codes — 91758, 91761, 91762, and 91764 — without a trip surcharge.`
-  },
-  {
-    q: "Do you service rental properties and apartments in Ontario?",
-    a: "Yes, and it's a significant part of our Ontario call volume. Ontario has a large rental market — apartments along Holt Blvd, older rental homes near Downtown, and newer rental units in Ontario Ranch. We work directly with landlords and property managers. When a tenant reports a broken washer or a warm refrigerator, we understand the urgency — a tenant without working appliances is a habitability issue. We prioritize rental calls and communicate clearly with both landlord and tenant about scheduling and completion."
-  },
-  {
-    q: "What brands do you repair in Ontario?",
-    a: "All major brands. Ontario's housing stock runs a wide range: older GE and Whirlpool in the 1960s–1980s homes near Downtown and Holt Blvd, mid-range Samsung, LG, and Maytag in the 1990s–2000s stock, and newer KitchenAid and Samsung in Ontario Ranch. We carry OEM parts for all generations and don't use aftermarket substitutes."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `$89 for residential, applied directly to the repair cost when you proceed. $120 for commercial. No hidden trip charge to Ontario. We quote on-site after diagnosis — not over the phone based on symptoms.`
-  },
-  {
-    q: "Do you service commercial appliances for Ontario businesses?",
-    a: "Yes. Ontario's logistics corridor and commercial density around the airport and Ontario Mills mean we service break room refrigerators, commercial ice machines, restaurant ovens, and walk-in cooler units regularly. Commercial diagnostic is $120, applied to the repair. We prioritize commercial calls to minimize business downtime."
-  },
-  {
-    q: "My refrigerator runs warm every summer but works fine in winter — what's the cause?",
-    a: "Ontario summers routinely hit 100–107°F in the Inland Valley, and appliances that managed fine in mild weather get pushed past their limit in heat. The first check is always condenser coils — in Ontario's dusty environment near the airport corridor and logistics warehouses, coils load up faster than average. A refrigerator with partially clogged coils that was borderline in spring will fail outright in July. We clean and test on every summer refrigerator call."
-  },
-  {
-    q: "Is it worth repairing older appliances in Downtown Ontario or along Holt Blvd?",
-    a: "Usually yes, for mechanically sound machines. Older Whirlpool and GE appliances in Ontario's 1960s–1980s housing stock are often worth repairing — they're simpler machines with fewer electronics. A $120–$160 repair on a 20-year-old Whirlpool Direct Drive washer with a worn drive coupling often makes more sense than a $700 replacement, especially for rental properties where mid-range appliances are the right call. We give you the honest numbers after diagnosis."
-  },
-];
-
-const recentRepairs = [
-  {
-    title: "Samsung RF23M8090SG — not cooling, 22C error, Ontario Ranch 2019 build",
-    neighborhood: "Ontario Ranch, 91761",
+    appliance: 'Samsung RF23M8090SG',
+    location: 'Ontario Ranch, 91761',
+    quote: 'not cooling, 22C error, Ontario Ranch 2019 build',
     description: "2019 Samsung French-door from an Ontario Ranch new construction, 22C error — ice room temperature sensor fault. This error in summer heat usually means the ice maker compartment is warming due to a sealing issue or a defrost system problem. Found a partially failed door-in-door gasket on the ice compartment — the foam seal had compressed unevenly, allowing warm air infiltration on the right side. Also found the condenser coils moderately loaded with the fine particulate common near Ontario's airport and industrial corridors. Replaced the door-in-door gasket with an OEM Samsung part, cleaned the coils. 22C cleared, unit holding temperature within 24 hours.",
-    note: "Ontario Ranch homes near the airport corridor get more industrial dust than typical residential areas. Coil cleaning every 5–6 months."
+    outcome: 'Ontario Ranch homes near the airport corridor get more industrial dust than typical residential areas. Coil cleaning every 5–6 months.',
   },
   {
-    title: "Whirlpool WTW5000DW — won't agitate, spins fine, 2003 model",
-    neighborhood: "Holt Blvd rental property, 91762",
+    appliance: 'Whirlpool WTW5000DW',
+    location: 'Holt Blvd rental property, 91762',
+    quote: "won't agitate, spins fine, 2003 model",
     description: "Landlord called — tenant reporting washer not cleaning clothes. 21-year-old Whirlpool top-loader, agitator not moving, spin cycle fine. Classic transmission mode shift failure — the shift actuator had worn out. On a machine this age, the motor and transmission are sound, just the actuator tab needed replacement. Had the part on the truck. Repair took 50 minutes including diagnosis. Landlord had been quoted $400 for a new machine by another company. Actuator repair cost: $130 parts and labor. Tenant back up and running same afternoon.",
-    note: "Older Whirlpool Direct Drive machines are worth repairing. Mechanically simple, parts still available, motors last decades."
+    outcome: 'Older Whirlpool Direct Drive machines are worth repairing. Mechanically simple, parts still available, motors last decades.',
   },
   {
-    title: "LG LRMVS3006S — clicking, not cooling, 2016 model",
-    neighborhood: "South Ontario, 91761",
+    appliance: 'LG LRMVS3006S',
+    location: 'South Ontario, 91761',
+    quote: 'clicking, not cooling, 2016 model',
     description: "Another LG linear inverter start relay failure — this generation (2014–2019) is one of the most common calls we make in San Bernardino County. Clicking on compressor startup, unit not maintaining temperature. Tested the start relay: open circuit confirmed. Replaced it ($18 part), confirmed normal compressor operation, unit at 38°F within 40 minutes. Customer had been without a fridge for five days waiting for a compressor quote from another company. Start relay repair: $89 diagnostic + $85 labor and parts. Total savings versus incorrect compressor replacement: over $400.",
-    note: "LG 2014–2019: always check the start relay first. Same clicking symptom, $18 vs. $450 compressor."
+    outcome: 'LG 2014–2019: always check the start relay first. Same clicking symptom, $18 vs. $450 compressor.',
   },
   {
-    title: "KitchenAid KDTE334GPS dishwasher — E1 F9 error, flooding sensor",
-    neighborhood: "College Park, 91764",
+    appliance: 'KitchenAid KDTE334GPS dishwasher',
+    location: 'College Park, 91764',
+    quote: 'E1 F9 error, flooding sensor',
     description: "KitchenAid dishwasher triggering the flood sensor, shutting down mid-cycle. E1 F9 means the base pan flood sensor detected water. In College Park homes with hard water, we find two common causes: a drain pump partially blocked by mineral scale (water backs up and overflows into the base pan), or a failed door bottom gasket allowing slow leakage into the base. This unit had both — a partially blocked pump impeller and a worn door bottom gasket. Cleared the pump, replaced the gasket, reset the flood sensor. Unit running clean. Hard water maintenance briefing left with the customer.",
-    note: "E1 F9 in hard water areas almost always has a maintenance component. Address the root cause, not just the sensor."
+    outcome: 'E1 F9 in hard water areas almost always has a maintenance component. Address the root cause, not just the sensor.',
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Ontario",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Ontario",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Rental property specialists',
+    body: 'A broken appliance in an occupied rental is urgent. We coordinate directly with landlords and property managers, communicate clearly with tenants on scheduling, and close rental calls same-day whenever possible. No landlord should have to manage a habitability complaint for more than 24 hours.',
   },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    iconKey: 'shield' as const,
+    title: 'Residential and commercial',
+    body: "Whether it's a fridge in an Ontario Ranch home or a walk-in cooler in a restaurant near Fourth Street, we handle both. We prioritize commercial calls to minimize downtime — a failed ice machine or cooler during business hours is a revenue issue.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Diagnosis before the quote',
+    body: 'The $89 fee means we look at the actual appliance before recommending anything. An LG clicking sound is an $18 relay until proven otherwise — not a $450 compressor. What we quote is what appears on the invoice.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'OEM parts across all generations',
+    body: "From a 1995 GE top-loader to a 2022 Samsung French-door, we source OEM parts through proper channels. In Ontario's hot, dusty, hard-water environment, the right part matters more than usual. We don't cut corners with aftermarket components.",
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
-};
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Landlord here — tenant called about a broken washer on a Monday morning. Same Day was there by afternoon, diagnosed a worn actuator, fixed it same visit. $130 instead of buying a new machine. They handled the whole coordination with my tenant. Very smooth."',
+    author: '— Marcus J., Holt Blvd landlord',
+  },
+  {
+    stars: 5,
+    text: '"LG fridge in our Ontario Ranch home started clicking and stopped cooling. Another company quoted a compressor — $490. Same Day diagnosed a bad start relay, fixed it for under $100. Couldn\'t believe the difference. Should have called them first."',
+    author: '— Sarah & Tom P., Ontario Ranch',
+  },
+  {
+    stars: 5,
+    text: '"KitchenAid dishwasher flooding error in our College Park home. Tech found it was hard water scale blocking the pump and a worn door gasket — two issues, one visit. Explained the maintenance schedule for our water. Very knowledgeable."',
+    author: '— Linda R., College Park',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator Repair', range: '$150–$450', note: 'Compressor relay · Coil cleaning · Inlet valve · Fan motor' },
+  { appliance: 'Washer Repair', range: '$120–$380', note: 'Drive coupling · Drain pump · Bearing · Actuator' },
+  { appliance: 'Dryer Repair', range: '$120–$320', note: 'Thermal fuse · Heating element · Vent path' },
+  { appliance: 'Dishwasher Repair', range: '$89–$360', note: 'Drain pump · Spray arm · Filter · E1 F9 errors' },
+  { appliance: 'Oven / Range Repair', range: '$140–$400', note: 'Igniter · Bake element · Gas valve · Calibration' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Applied to repair cost. No trip charge to Ontario ZIP codes.' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Ontario CA?',
+    answer: `Yes — same-day service is available throughout Ontario including Ontario Ranch, Downtown, South Ontario, College Park, Creekside, and the Holt Blvd and Haven Ave corridors. Call ${phone} before noon for same-day availability. We cover all Ontario ZIP codes — 91758, 91761, 91762, and 91764 — without a trip surcharge.`,
+  },
+  {
+    question: 'Do you service rental properties and apartments in Ontario?',
+    answer: "Yes, and it's a significant part of our Ontario call volume. Ontario has a large rental market — apartments along Holt Blvd, older rental homes near Downtown, and newer rental units in Ontario Ranch. We work directly with landlords and property managers. When a tenant reports a broken washer or a warm refrigerator, we understand the urgency — a tenant without working appliances is a habitability issue. We prioritize rental calls and communicate clearly with both landlord and tenant about scheduling and completion.",
+  },
+  {
+    question: 'What brands do you repair in Ontario?',
+    answer: "All major brands. Ontario's housing stock runs a wide range: older GE and Whirlpool in the 1960s–1980s homes near Downtown and Holt Blvd, mid-range Samsung, LG, and Maytag in the 1990s–2000s stock, and newer KitchenAid and Samsung in Ontario Ranch. We carry OEM parts for all generations and don't use aftermarket substitutes.",
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: '$89 for residential, applied directly to the repair cost when you proceed. No hidden trip charge to Ontario. We quote on-site after diagnosis — not over the phone based on symptoms.',
+  },
+  {
+    question: 'Do you service commercial appliances for Ontario businesses?',
+    answer: "Yes. Ontario's logistics corridor and commercial density around the airport and Ontario Mills mean we service break room refrigerators, commercial ice machines, restaurant ovens, and walk-in cooler units regularly. Call us for commercial pricing. We prioritize commercial calls to minimize business downtime.",
+  },
+  {
+    question: "My refrigerator runs warm every summer but works fine in winter — what's the cause?",
+    answer: 'Ontario summers routinely hit 100–107°F in the Inland Valley, and appliances that managed fine in mild weather get pushed past their limit in heat. The first check is always condenser coils — in Ontario\'s dusty environment near the airport corridor and logistics warehouses, coils load up faster than average. A refrigerator with partially clogged coils that was borderline in spring will fail outright in July. We clean and test on every summer refrigerator call.',
+  },
+  {
+    question: 'Is it worth repairing older appliances in Downtown Ontario or along Holt Blvd?',
+    answer: "Usually yes, for mechanically sound machines. Older Whirlpool and GE appliances in Ontario's 1960s–1980s housing stock are often worth repairing — they're simpler machines with fewer electronics. A $120–$160 repair on a 20-year-old Whirlpool Direct Drive washer with a worn drive coupling often makes more sense than a $700 replacement, especially for rental properties where mid-range appliances are the right call. We give you the honest numbers after diagnosis.",
+  },
+];
+
+const nearbyCities = [
+  { name: 'Rancho Cucamonga', slug: 'rancho-cucamonga' },
+  { name: 'Upland', slug: 'upland' },
+  { name: 'Chino Hills', slug: 'chino-hills' },
+  { name: 'Fontana', slug: 'fontana' },
+  { name: 'Corona', slug: 'corona' },
+  { name: 'San Bernardino', slug: 'san-bernardino' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Ontario CA"
+    subheadline="Same-day service in Ontario Ranch, Downtown, South Ontario, College Park, Creekside, and throughout the city. Residential and commercial. All brands, OEM parts."
+    zips={zips}
+    tier={3}
+  />
 
-  <!-- HERO -->
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">San Bernardino County · ZIP 91758, 91761, 91762, 91764</p>
-        <h1>Appliance Repair<br><span class="accent">Ontario CA</span></h1>
-        <p class="hero-sub">Same-day service in Ontario Ranch, Downtown, South Ontario, College Park, Creekside, and throughout the city. Residential and commercial. All brands, OEM parts.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-      <div class="hero-img">
-        <img src="/images/cities/ontario-appliance-repair.jpg" alt="Appliance repair in Ontario CA" width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🏢</span><span>Residential &amp; Commercial</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Ontario CA — A City That Runs on Working Appliances"
+    paragraphs={introParagraphs}
+    bookingTitle="Ontario CA"
+    bookingSub="Same-Day Service"
+  />
 
-  <!-- INTRO + SIDEBAR -->
-  <section class="intro-section container">
-    <div class="intro-content">
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Ontario CA"
+    services={services}
+  />
 
-      <h2>Appliance Repair in Ontario CA — A City That Runs on Working Appliances</h2>
+  <CustomNarrative
+    headline={ontarioContextNarrative.headline}
+    subSections={ontarioContextNarrative.subSections}
+    background="white"
+  />
 
-      <p>Ontario is one of the hardest-working cities in the Inland Empire — home to one of the busiest cargo airports on the West Coast, a massive logistics and warehouse corridor, and a dense, diverse residential population that spans everything from 1960s rental homes along Holt Blvd to brand-new master-planned development at Ontario Ranch. The appliance profile here reflects that diversity: older Whirlpool and GE in the established neighborhoods, Samsung and LG in mid-range homes from the 1990s and 2000s, and newer KitchenAid and Samsung in the Ontario Ranch builds.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Neighborhoods We Service in Ontario CA"
+    subheadline="We cover all of Ontario — from Ontario Ranch and Creekside in the south to College Park and North Ontario near the Upland border. No travel surcharge to any Ontario ZIP code."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>The rental market is a significant part of who calls us in Ontario. Apartments and rental homes along Holt Blvd, Euclid, and Fourth Street need appliance repairs resolved quickly — a tenant without a working washer or refrigerator isn't just an inconvenience, it's a habitability issue. We work directly with landlords and property managers and understand the urgency that comes with an active tenancy. We communicate with both parties and aim to close every rental call the same day we open it.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Ontario CA"
+    jobs={recentJobs}
+  />
 
-      <p>The industrial environment around Ontario International Airport and the logistics corridor adds a climate factor most appliance companies don't mention: fine particulate from warehouse activity and airport ground operations settles on condenser coils faster in parts of Ontario than in purely residential cities. Homes near the airport corridor and south of the 60 freeway see measurably heavier coil loading. We account for this in every refrigerator call in that zone.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Ontario Residents & Property Managers Call Us"
+    reasons={whyReasons}
+  />
 
-      <p>Same-day coverage across all four Ontario ZIP codes — 91758, 91761, 91762, 91764. Commercial calls serviced at $120 diagnostic. Call {phone}.</p>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Ontario Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-    </div>
+  <PricingCards
+    cityName={cityName}
+    headline="Typical Repair Pricing in Ontario CA"
+    subhead="Every repair is quoted on-site after diagnosis. The $89 diagnostic is applied when you proceed."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Ontario CA</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ $89 Residential / $120 Commercial</li>
-        <li>✓ Rental &amp; Property Manager Priority</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ 90-Day Warranty</li>
-        <li>✓ Licensed &amp; Insured</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Ontario CA Appliance Repair — FAQ"
+    faqs={faqs}
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Ontario CA</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-  <!-- HOUSING + MARKET BLOCK -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>Ontario's Housing Stock — Four Distinct Markets</h2>
-
-        <h3>Downtown &amp; Holt Blvd — 1960s–1980s Mix</h3>
-        <p>The established neighborhoods near Downtown Ontario and along Holt Boulevard represent Ontario's oldest residential stock — single-family homes and apartment complexes built from the 1960s through the '80s. Appliances here range from 15 to 25 years old, and we see a high concentration of rental properties. Whirlpool, GE, and Maytag are the dominant brands. These machines are mechanically simpler than modern units and often worth repairing at advanced age — a Whirlpool Direct Drive washer with a worn coupling is a $120 fix, not a $700 replacement. We work with landlords in this part of Ontario regularly and understand the rental urgency dynamic.</p>
-
-        <h3>College Park, Creekside &amp; North Ontario — 1990s–2000s Mid-Range</h3>
-        <p>The planned neighborhoods north of the 10 freeway were developed primarily in the 1990s and 2000s. Samsung, LG, KitchenAid, and Whirlpool from this era are now 15–25 years into their lifespan. College Park and Creekside call us most often for LG linear inverter compressor relay failures (2014–2019 generation), Samsung ice maker issues, and front-load washer bearing wear. Hard water is consistent throughout Ontario — dishwasher filter cleaning and ice maker descaling are part of virtually every applicable service call in these neighborhoods.</p>
-
-        <h3>Ontario Ranch — New Development, 2015+</h3>
-        <p>Ontario Ranch is one of the largest master-planned communities in Southern California, built out since 2015 with homes running 2,000–4,000 square feet. Builder-grade Samsung, KitchenAid, and LG appliances from the early Ontario Ranch builds are now 7–10 years old — entering the first failure window. Ice maker issues, evaporator fan failures, and dishwasher drain errors are the common calls. The airport corridor proximity adds industrial dust exposure to coil maintenance considerations — we recommend 5-month cleaning cycles for refrigerators in this zone.</p>
-
-        <h3>Commercial Ontario — Airport, Logistics, Restaurants</h3>
-        <p>Ontario International Airport is one of the busiest cargo facilities in the US, and the logistics corridor around it supports dozens of warehouses, distribution centers, and commercial operations. We service break room refrigerators, commercial ice machines, undercounter coolers, and commercial laundry for businesses throughout this corridor. Restaurant and food-service equipment on Fourth Street and around Ontario Mills also falls in our service area. Commercial diagnostic is $120, applied to the repair. We aim for same-day commercial response — a failed walk-in cooler or break room fridge is a business disruption we take seriously.</p>
-
-        <h3>Hard Water Throughout Ontario</h3>
-        <p>Ontario water runs hard — consistent with the broader SB County profile. Dishwasher filters clog at 3-month intervals. Ice maker fill tubes scale up. Front-load washer door gaskets accumulate mineral deposits that accelerate the mold and odor issues common in Samsung and LG front-loaders. We include descaling as standard on every applicable service call and leave customers with the right maintenance schedule for their specific water quality and usage.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Ontario CA</h2>
-      <p>We cover all of Ontario — from Ontario Ranch and Creekside in the south to College Park and North Ontario near the Upland border. No travel surcharge to any Ontario ZIP code.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Montclair, Chino, and Eastvale — same dispatch, no surcharge. Call {phone}.</p>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">03</div>
-      <h2>Recent Repairs in Ontario CA</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- WHY US + REVIEWS + PRICING -->
-  <section class="why-section container">
-    <div class="context-number">04</div>
-    <h2>Why Ontario Residents &amp; Property Managers Call Us</h2>
-
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>Rental property specialists</h3>
-        <p>A broken appliance in an occupied rental is urgent. We coordinate directly with landlords and property managers, communicate clearly with tenants on scheduling, and close rental calls same-day whenever possible. No landlord should have to manage a habitability complaint for more than 24 hours.</p>
-      </div>
-      <div class="why-item">
-        <h3>Residential and commercial</h3>
-        <p>Whether it's a fridge in an Ontario Ranch home or a walk-in cooler in a restaurant near Fourth Street, we handle both. Commercial diagnostic is $120. We prioritize commercial calls to minimize downtime — a failed ice machine or cooler during business hours is a revenue issue.</p>
-      </div>
-      <div class="why-item">
-        <h3>Diagnosis before the quote</h3>
-        <p>The $89 fee means we look at the actual appliance before recommending anything. An LG clicking sound is an $18 relay until proven otherwise — not a $450 compressor. What we quote is what appears on the invoice.</p>
-      </div>
-      <div class="why-item">
-        <h3>OEM parts across all generations</h3>
-        <p>From a 1995 GE top-loader to a 2022 Samsung French-door, we source OEM parts through proper channels. In Ontario's hot, dusty, hard-water environment, the right part matters more than usual. We don't cut corners with aftermarket components.</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Landlord here — tenant called about a broken washer on a Monday morning. Same Day was there by afternoon, diagnosed a worn actuator, fixed it same visit. $130 instead of buying a new machine. They handled the whole coordination with my tenant. Very smooth."</p>
-        <p class="reviewer">— Marcus J., Holt Blvd landlord</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"LG fridge in our Ontario Ranch home started clicking and stopped cooling. Another company quoted a compressor — $490. Same Day diagnosed a bad start relay, fixed it for under $100. Couldn't believe the difference. Should have called them first."</p>
-        <p class="reviewer">— Sarah &amp; Tom P., Ontario Ranch</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"KitchenAid dishwasher flooding error in our College Park home. Tech found it was hard water scale blocking the pump and a worn door gasket — two issues, one visit. Explained the maintenance schedule for our water. Very knowledgeable."</p>
-        <p class="reviewer">— Linda R., College Park</p>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Ontario CA</h3>
-      <p>Every repair is quoted on-site after diagnosis. The $89 residential / $120 commercial diagnostic is applied when you proceed.</p>
-      <div class="pricing-grid">
-        <div class="price-item">
-          <span class="pi-service">Refrigerator Repair</span>
-          <span class="pi-range">$150–$450</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Washer Repair</span>
-          <span class="pi-range">$120–$380</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Repair</span>
-          <span class="pi-range">$120–$320</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Repair</span>
-          <span class="pi-range">$89–$360</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Oven / Range Repair</span>
-          <span class="pi-range">$140–$400</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Ice Maker Repair</span>
-          <span class="pi-range">$120–$280</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Commercial Diagnostic</span>
-          <span class="pi-range">$120</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Condenser Coil Cleaning</span>
-          <span class="pi-range">$89–$150</span>
-        </div>
-      </div>
-      <p class="pricing-note">Diagnostic applied to repair cost. No trip charge to Ontario ZIP codes.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq-section container">
-    <h2>Ontario CA Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/rancho-cucamonga/">Rancho Cucamonga</a>
-      <a href="/upland/">Upland</a>
-      <a href="/chino-hills/">Chino Hills</a>
-      <a href="/fontana/">Fontana</a>
-      <a href="/corona/">Corona</a>
-      <a href="/san-bernardino/">San Bernardino</a>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Ontario CA Today?</h2>
-      <p>Same-day residential and commercial service across Ontario Ranch, Downtown, College Park, South Ontario, and all Ontario ZIP codes.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
-.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
-h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
-h1 .accent { color: var(--color-accent); }
-.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
-.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
-.trust-bar { background: var(--color-accent); padding: 1rem 0; }
-.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
-.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
-.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
-.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
-.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
-.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
-.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
-.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
-.services-section { background: var(--color-surface); padding: 4rem 0; }
-.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
-.svc-icon { font-size: 2rem; }
-.svc-name { font-size: .9rem; font-weight: 600; }
-.context-block { padding: 4rem 0; }
-.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
-.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; }
-.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
-.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-.neighborhoods-section { padding: 4rem 0; }
-.section-intro { margin-bottom: 2rem; }
-.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
-.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
-.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
-.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
-.nbhd-note { margin-top: 1.5rem; font-size: .875rem; color: var(--color-text-muted); }
-.repairs-section { padding: 4rem 0; }
-.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
-.section-header h2 { font-size: 1.6rem; }
-.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
-.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
-.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
-.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
-.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
-.why-section { padding: 4rem 0; }
-.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
-.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
-.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
-.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
-.reviewer { font-size: .8rem; color: var(--color-text-muted); }
-.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
-.pricing-block h3 { margin-bottom: .5rem; }
-.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.price-item { display: flex; flex-direction: column; gap: .25rem; }
-.pi-service { font-size: .85rem; color: var(--color-text-muted); }
-.pi-range { font-size: 1rem; font-weight: 700; }
-.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
-.faq-section { padding: 4rem 0; }
-.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.faq-list { display: flex; flex-direction: column; gap: .75rem; }
-.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
-.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
-.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
-.nearby-section { padding: 3rem 0; }
-.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
-.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
-.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
-.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
-.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
-.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
-.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
-.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-@media (max-width: 1024px) {
-  .intro-section { grid-template-columns: 1fr; }
-  .sticky-cta-box { position: static; }
-  .services-grid, .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-img { display: none; }
-  .context-inner { grid-template-columns: 1fr; }
-  .repairs-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Ontario CA Today?"
+    body="Same-day residential and commercial service across Ontario Ranch, Downtown, College Park, South Ontario, and all Ontario ZIP codes."
+  />
+</CityLayoutV2>

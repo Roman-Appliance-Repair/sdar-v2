@@ -367,7 +367,10 @@ export const BRANCHES: Branch[] = [
   },
 
   // ─────────────────────────────────────────────────
-  // 6. RANCHO CUCAMONGA — Service Territory (placeholder phone)
+  // 6. RANCHO CUCAMONGA — Service Territory
+  // Phone is a temporary placeholder (555 pattern); active on city pages
+  // until Roman swaps in the real DID. T13-FIX flipped pending → active so
+  // SB county cities show this number rather than fall back to MAIN_PHONE.
   // ─────────────────────────────────────────────────
   {
     slug: 'rancho-cucamonga',
@@ -377,7 +380,7 @@ export const BRANCHES: Branch[] = [
     type: 'service_area',
     gbpStatus: 'pending',
     phone: '(909) 555-0100',
-    phoneStatus: 'pending',
+    phoneStatus: 'active',
     email: 'ranchocucamonga@samedayappliance.repair',
     // No internalAddress — true service territory
     geo: {
@@ -400,7 +403,10 @@ export const BRANCHES: Branch[] = [
   },
 
   // ─────────────────────────────────────────────────
-  // 7. TEMECULA — Service Territory (placeholder phone)
+  // 7. TEMECULA — Service Territory
+  // Phone is a temporary placeholder (555 pattern); active on city pages
+  // until Roman swaps in the real DID. T13-FIX flipped pending → active so
+  // Riverside county cities show this number rather than fall back to MAIN_PHONE.
   // ─────────────────────────────────────────────────
   {
     slug: 'temecula',
@@ -410,7 +416,7 @@ export const BRANCHES: Branch[] = [
     type: 'service_area',
     gbpStatus: 'pending',
     phone: '(951) 555-0200',
-    phoneStatus: 'pending',
+    phoneStatus: 'active',
     email: 'temecula@samedayappliance.repair',
     geo: {
       cityCenterLat: 33.4936,

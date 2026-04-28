@@ -1,0 +1,143 @@
+---
+/** v2 FinalCTA — Bottom CTA bar with phone + book + verbatim restoration footer (T13).
+ *  Address line shown only for physical_pin branches (NAP rule 2). */
+
+import { CITIES, COUNTIES } from '../../../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../../../data/branches';
+
+export interface Props {
+  citySlug: string;
+  cityName: string;
+  headline?: string;
+  body?: string;
+  /** Optional 1-2 top neighborhoods for the "Serving" line. */
+  neighborhoods?: string[];
+}
+
+const {
+  citySlug,
+  cityName,
+  headline,
+  body,
+  neighborhoods = [],
+} = Astro.props;
+
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+const phone = branch.phone;
+const phoneTel = `+1${phone.replace(/\D/g, '')}`;
+const countyName = COUNTIES[city.county].name;
+
+const finalHeadline = headline ?? `Schedule Your ${cityName} Repair Today`;
+const finalBody = body ?? `Call now — same-day service available for most repairs. Diagnostic fee $89, waived with repair. 90-day warranty on all work.`;
+
+const addressLine = branch.type === 'physical_pin' && branch.address
+  ? `${branch.address.street}, ${branch.address.city}, ${branch.address.state} ${branch.address.zip}`
+  : null;
+
+const topHoods = neighborhoods.slice(0, 2).filter(Boolean);
+const servingParts = [cityName, ...topHoods, countyName];
+---
+
+<section class="v2-final">
+  <div class="v2-container v2-final__inner">
+    <div class="v2-final__text">
+      <h2 class="v2-final__h2">{finalHeadline}</h2>
+      <p class="v2-final__body">{finalBody}</p>
+    </div>
+    <div class="v2-final__actions">
+      <a href={`tel:${phoneTel}`} class="v2-btn-primary v2-btn-large">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+        {phone}
+      </a>
+      <a href="/book/" class="v2-btn-secondary v2-btn-large">Book Online</a>
+    </div>
+
+    <div class="v2-final__pillars">
+      $89 diagnostic · 90-day warranty · OEM parts · {cityName}, CA
+    </div>
+
+    <div class="v2-final__sameday">Same-day service in {branch.name}</div>
+    <div class="v2-final__dispatcher">Need repair today? Talk to a dispatcher now.</div>
+
+    <div class="v2-final__serving">
+      Serving {servingParts.join(' · ')}
+    </div>
+
+    <a href={`tel:${phoneTel}`} class="v2-final__phone-repeat">{phone}</a>
+
+    <div class="v2-final__nap">
+      <span>Same Day Appliance Repair</span>
+      {addressLine && <><span>·</span><span>{addressLine}</span></>}
+      <span>·</span>
+      <a href={`mailto:${branch.email}`}>{branch.email}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-final {
+    background: var(--v2-black);
+    color: var(--v2-white);
+    padding: 72px 0;
+  }
+  .v2-final__inner { text-align: center; font-family: var(--v2-font-body); }
+  .v2-final__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 34px;
+    font-weight: 700;
+    color: var(--v2-white);
+    margin: 0 0 12px;
+  }
+  .v2-final__body {
+    font-size: 16px;
+    color: rgba(255,255,255,0.7);
+    margin: 0 0 32px;
+  }
+  .v2-final__actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .v2-final__pillars {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 28px;
+  }
+  .v2-final__sameday {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--v2-white);
+    margin-bottom: 4px;
+  }
+  .v2-final__dispatcher {
+    font-size: 14px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 18px;
+  }
+  .v2-final__serving {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    margin-bottom: 12px;
+  }
+  .v2-final__phone-repeat {
+    display: inline-block;
+    font-family: var(--v2-font-display);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--v2-red);
+    text-decoration: none;
+    margin-bottom: 18px;
+  }
+  .v2-final__phone-repeat:hover { color: var(--v2-white); }
+  .v2-final__nap {
+    display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+    font-size: 13px; color: rgba(255,255,255,0.4);
+  }
+  .v2-final__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
+  @media (max-width: 480px) { .v2-final__h2 { font-size: 26px; } }
+</style>

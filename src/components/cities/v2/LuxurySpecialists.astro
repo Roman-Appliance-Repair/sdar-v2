@@ -1,0 +1,145 @@
+---
+/** v2 LuxurySpecialists — eyebrow + H2 + paragraphs + brand pills + 4-stat scoreboard.
+ *  Photo slot 3 (luxury appliance close-up) embedded inside. */
+
+export interface Props {
+  cityName: string;
+  eyebrow?: string;
+  headline: string;
+  paragraphs: string[];
+  brands: string[];
+  stats?: Array<{ num: string; label: string }>;
+  citySlug: string;
+}
+
+const defaultStats = [
+  { num: '85%', label: 'First-visit fix rate' },
+  { num: '90', label: 'Day warranty' },
+  { num: '$89', label: 'Diagnostic fee' },
+  { num: '4.6', label: 'Google rating' },
+];
+
+const {
+  cityName,
+  eyebrow = 'Luxury Appliance Specialists',
+  headline,
+  paragraphs,
+  brands,
+  stats = defaultStats,
+  citySlug,
+} = Astro.props;
+
+const photoSrc = `/images/cities/${citySlug}/luxury-repair.webp`;
+const photoAlt = `Sub-Zero / Wolf / Thermador appliance repair ${cityName}`;
+---
+
+<section class="v2-luxury">
+  <div class="v2-container">
+    <div class="v2-luxury__inner">
+      <div class="v2-luxury__text">
+        <div class="v2-luxury__eyebrow">{eyebrow}</div>
+        <h2 class="v2-luxury__h2">{headline}</h2>
+        {paragraphs.map((p) => (<p class="v2-luxury__p" set:html={p}></p>))}
+        <div class="v2-photo-slot v2-luxury__photo">
+          <picture>
+            <source srcset={photoSrc} type="image/webp" />
+            <img src={photoSrc} alt={photoAlt} width="800" height="450" loading="lazy" onerror="this.style.display='none'" />
+          </picture>
+          <svg class="v2-photo-slot__icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <rect x="12" y="12" width="40" height="44" rx="3"/><line x1="12" y1="28" x2="52" y2="28"/><line x1="12" y1="44" x2="52" y2="44"/>
+          </svg>
+        </div>
+        <div class="v2-luxury__brands">
+          {brands.map((b) => (<div class="v2-luxury__brand">{b}</div>))}
+        </div>
+      </div>
+      <aside class="v2-luxury__stats">
+        {stats.map((s) => (
+          <div class="v2-luxury__stat">
+            <div class="v2-luxury__num">{s.num}</div>
+            <div class="v2-luxury__label">{s.label}</div>
+          </div>
+        ))}
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-luxury { padding: 72px 0; background: var(--v2-black); color: var(--v2-white); }
+  .v2-luxury__inner {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 60px;
+    align-items: start;
+  }
+  .v2-luxury__eyebrow {
+    font-size: 13px; font-weight: 500; color: var(--v2-red);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 12px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-luxury__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 28px; font-weight: 700; color: var(--v2-white);
+    margin: 0 0 18px;
+  }
+  .v2-luxury__p {
+    font-size: 15px; line-height: 1.7;
+    color: rgba(255,255,255,0.78);
+    margin: 0 0 16px;
+    font-family: var(--v2-font-body);
+  }
+  .v2-luxury__photo {
+    aspect-ratio: 16 / 9;
+    margin: 24px 0;
+  }
+  .v2-luxury__brands {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 24px;
+  }
+  .v2-luxury__brand {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 6px;
+    padding: 10px 12px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--v2-font-body);
+    color: rgba(255,255,255,0.9);
+  }
+  .v2-luxury__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .v2-luxury__stat {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 22px 16px;
+    text-align: center;
+  }
+  .v2-luxury__num {
+    font-family: var(--v2-font-display);
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--v2-red);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .v2-luxury__label {
+    font-family: var(--v2-font-body);
+    font-size: 11px;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  @media (max-width: 1024px) {
+    .v2-luxury__inner { grid-template-columns: 1fr; }
+    .v2-luxury__brands { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

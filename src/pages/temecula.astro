@@ -1,548 +1,385 @@
 ---
-// src/pages/temecula.astro
-import BaseLayout from '../layouts/BaseLayout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = "Temecula";
-const citySlug = "temecula";
-const phone = "(626) 376-4458";
-const phoneRaw = "6263764458";
-const zipCodes = ["92590", "92591", "92592"];
-const county = "Riverside";
+const citySlug = 'temecula';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = "Temecula";
+const zips = ['92590', '92591', '92592'];
+
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
 
 const title = `Appliance Repair Temecula CA — Same Day | Wine Cooler Specialists | ${phone}`;
 const description = `Same-day appliance repair in Temecula. Wine cooler, refrigerator, washer, dryer, oven & more. Redhawk, Wolf Creek, Harveston. Licensed. OEM parts. Call ${phone}.`;
+const canonical = 'https://samedayappliance.repair/temecula/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Temecula', sameAs: 'https://en.wikipedia.org/wiki/Temecula,_California' },
+    { '@type': 'PostalCode', postalCode: '92590' },
+    { '@type': 'PostalCode', postalCode: '92591' },
+    { '@type': 'PostalCode', postalCode: '92592' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Temecula is one of the more interesting service areas we cover. The city has three distinct appliance markets layered on top of each other: the planned communities in Redhawk, Wolf Creek, and Harveston with their newer Samsung and LG appliances; the wine country estates off De Portola and Rancho California Road with Sub-Zero, Wolf, and dedicated wine cellar systems; and a significant vacation rental inventory running appliances at double or triple the normal use rate.",
+  "The wine cooler calls alone make Temecula unique. Nowhere else in our Southern California service area do we see this concentration of serious wine collections — dual-zone built-in coolers, freestanding wine refrigerators, and dedicated wine cellar cooling units that maintain 55°F year-round. Most appliance companies treat wine coolers as an afterthought. We treat them the same as a Sub-Zero repair: precise diagnosis, OEM parts, temperature calibration verified before we leave.",
+  "The climate here creates a specific failure pattern we see every summer. Temecula runs cool in the morning and hot by afternoon — 30 to 40 degree swings between 6am and 3pm in July. That thermal cycling stresses compressors and condenser coils in ways that flat, steady-temperature climates don't. Appliances that were marginal in spring consistently fail in the first serious heat wave of the year. We see a predictable surge of refrigerator calls starting in late June every year.",
+  `We dispatch from our Pasadena branch for Temecula. Same-day coverage across all three ZIP codes — 92590, 92591, 92592. Call <a href="tel:${phoneRaw}">${phone}</a>.`,
+];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🌀" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🫧" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🫧', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
 ];
+
+const wineCoolerNarrative = {
+  headline: "Wine Cooler & Wine Cellar Repair in Temecula — What We Know",
+  paragraphs: [
+    "Temecula wine country means a lot of serious wine collections. We service more wine coolers and dedicated wine cellar units here than anywhere else in our coverage area. Here's what we've learned about these systems and how the Temecula climate affects them.",
+  ],
+  subSections: [
+    {
+      title: "Single-Zone vs. Dual-Zone Failures",
+      paragraphs: [
+        "Single-zone wine coolers maintain one temperature throughout. When they fail, it's usually the compressor, thermostat, or condenser fan. Dual-zone units are more complex — they have two independent temperature circuits and can fail in one zone while the other operates normally. We've seen plenty of dual-zone units where the owner assumes total failure because the top section is warm, when in fact only the upper zone thermostat or thermistor has failed — a $150–$250 repair rather than a replacement.",
+        "The Temecula climate creates a specific challenge for wine coolers: the 30–40 degree daily temperature swings in summer put thermal stress on compressors that aren't present in coastal or stable-temperature environments. A wine cooler sitting in a home where the kitchen hits 85°F in the afternoon and cools to 68°F at night is cycling hard. Condenser coils should be cleaned every 4–6 months in wine country homes.",
+      ],
+    },
+    {
+      title: "Built-In vs. Freestanding Units",
+      paragraphs: [
+        "Built-in wine coolers are designed to vent from the front — they can be installed flush in cabinetry. Freestanding units vent from the rear and need clearance. We regularly find freestanding units that have been built in without adequate clearance, forcing the compressor to run constantly and fail prematurely. If your wine cooler compressor runs without stopping, check the rear clearance before assuming the compressor is the problem.",
+      ],
+    },
+    {
+      title: "Brands We Service in Temecula Wine Country",
+      paragraphs: [
+        "EuroCave, Liebherr, Sub-Zero Wine Storage, Wine Enthusiast, Vinotemp, U-Line, Perlick, Marvel, True Residential, and Thermador. We carry OEM parts for major brands and source through manufacturer channels for specialty units. We don't use aftermarket compressors or thermostat assemblies on wine coolers — precision temperature control requires the correct parts.",
+      ],
+    },
+    {
+      title: "Wine Cellar Cooling Systems",
+      paragraphs: [
+        "Dedicated wine cellar cooling systems — split systems or self-contained through-wall units — are a step above wine coolers and require different diagnosis. We service WhisperKOOL, CellarPro, Breezaire, and Wine Guardian units. If your cellar temperature is drifting, the first checks are door seals, refrigerant level, and evaporator coil condition. A cellar that runs 5°F above set point in summer but holds temperature in winter almost always has a refrigerant issue or insufficient cooling capacity for the summer heat load.",
+      ],
+    },
+    {
+      title: "For Winery & Tasting Room Equipment",
+      paragraphs: [
+        "We service commercial refrigerators, bar coolers, undercounter wine storage, and walk-in coolers for wineries and tasting rooms along Rancho California Road and De Portola Road. Call us for commercial pricing. We prioritize tasting room calls and aim for same-day service — a failed bar cooler during weekend tasting hours is a revenue problem, not just an inconvenience.",
+      ],
+    },
+  ],
+};
+
+const housingNarrative = {
+  headline: "Temecula Housing Stock — Three Different Markets",
+  paragraphs: [],
+  subSections: [
+    {
+      title: "Redhawk, Wolf Creek & Harveston — Planned Communities",
+      paragraphs: [
+        "These are the backbone of Temecula's residential market — master-planned communities built primarily 2000–2015 with HOA management and consistent housing stock. Appliances here are Samsung, LG, KitchenAid, and Whirlpool from the mid-2010s, now in the prime failure window at 8–12 years. Samsung French-door refrigerators with ice maker issues, LG front-load washers with bearing wear, and Bosch dishwashers with hard water scale are the most common calls. Temecula water is hard — similar to the rest of Riverside County — and we descale as part of most dishwasher and ice maker calls here.",
+      ],
+    },
+    {
+      title: "Wine Country Estates — De Portola, Rancho California Rd",
+      paragraphs: [
+        "The properties off De Portola Road and the rural stretches of Rancho California Road are a different class. These are 3–10 acre estates, often with wine caves or dedicated wine storage, Wolf ranges, Sub-Zero columns, and outdoor kitchens with refrigerators and ice makers. We handle these exactly as we handle Beverly Hills estate work — OEM parts, careful handling, no aftermarket substitutes, verified temperature calibration on wine storage after every repair. The Sub-Zero evaporator fan failures we see in Temecula's inland heat are worth calling out specifically — these motors show wear 20–30% faster than identical units in coastal climates.",
+      ],
+    },
+    {
+      title: "Vacation Rental Properties — Old Town & Wine Country",
+      paragraphs: [
+        "Temecula is one of SoCal's busiest weekend destinations — wine tasting, Old Town, hot air balloons, Pechanga. A significant portion of the residential inventory runs as short-term vacation rentals with high occupancy. Appliances in active vacation rentals run at 3–5x the load of owner-occupied homes. Washers and dryers doing daily loads, refrigerators opened constantly by multiple guests, dishwashers running two or three cycles a day. We see vacation rental appliances needing service years earlier than normal. We work directly with property managers on priority scheduling — if you have a check-in Friday, call us Wednesday and we'll do everything we can to get there Thursday.",
+      ],
+    },
+    {
+      title: "Hard Water Throughout Temecula",
+      paragraphs: [
+        "Riverside County water is consistently high in dissolved minerals — calcium and magnesium levels that accelerate scale buildup in dishwashers, ice makers, and washing machines. The maintenance schedule for Temecula homes mirrors what we recommend in Chino Hills: dishwasher filter every 3 months, refrigerator water filter every 4 months, ice maker descale every 12–18 months. We include descaling as part of every ice maker and dishwasher repair call here.",
+      ],
+    },
+  ],
+};
 
 const neighborhoods = [
-  { name: "Redhawk", zip: "92592" },
-  { name: "Wolf Creek", zip: "92592" },
-  { name: "Harveston", zip: "92591" },
-  { name: "Paloma del Sol", zip: "92592" },
-  { name: "Rancho California Rd", zip: "92591" },
-  { name: "De Portola Rd Area", zip: "92592" },
-  { name: "Old Town Temecula", zip: "92590" },
-  { name: "Temeku Hills", zip: "92592" },
-  { name: "Crowne Hill", zip: "92592" },
-  { name: "Morgan Hill", zip: "92592" },
-  { name: "Temecula Wine Country", zip: "92592" },
-  { name: "Murrieta Hot Springs Rd", zip: "92591" },
+  { name: 'Redhawk', zip: '92592' },
+  { name: 'Wolf Creek', zip: '92592' },
+  { name: 'Harveston', zip: '92591' },
+  { name: 'Paloma del Sol', zip: '92592' },
+  { name: 'Rancho California Rd', zip: '92591' },
+  { name: 'De Portola Rd Area', zip: '92592' },
+  { name: 'Old Town Temecula', zip: '92590' },
+  { name: 'Temeku Hills', zip: '92592' },
+  { name: 'Crowne Hill', zip: '92592' },
+  { name: 'Morgan Hill', zip: '92592' },
+  { name: 'Temecula Wine Country', zip: '92592' },
+  { name: 'Murrieta Hot Springs Rd', zip: '92591' },
 ];
 
-const faqItems = [
+const recentJobs = [
   {
-    q: "Do you offer same-day appliance repair in Temecula?",
-    a: `Yes — same-day service is available throughout Temecula including Redhawk, Wolf Creek, Harveston, and Old Town. Call ${phone} before noon and we'll typically have a technician out the same day. We cover ZIP codes 92590, 92591, and 92592 without a trip surcharge.`
-  },
-  {
-    q: "Do you repair wine coolers and wine cellar units in Temecula?",
-    a: "Yes, and it's one of our most common calls in this area. Temecula wine country means a lot of serious wine collections — built-in single-zone and dual-zone coolers, freestanding wine refrigerators, and dedicated wine cellar cooling systems. Common failures: compressor cycling issues from temperature swings between Temecula's warm days and cool nights, thermostat drift causing temperature creep, and UV-blocking door seal degradation. We carry OEM parts for EuroCave, Wine Enthusiast, Sub-Zero, and Liebherr units, and treat wine cooler calls with the same precision as a Sub-Zero refrigerator repair."
-  },
-  {
-    q: "My refrigerator works fine in winter but runs warm every summer — why?",
-    a: "This is a Temecula-specific pattern. The temperature swing between Temecula's cool mornings and 100°F+ summer afternoons creates thermal stress cycling on compressors and condenser coils. Condenser coils that were marginal in mild weather get pushed over the edge in summer heat. When a refrigerator runs warm only in summer, condenser coil cleaning is usually the first fix. If the coils are clean and the problem persists, the start relay and condenser fan motor are next."
-  },
-  {
-    q: "What brands do you repair in Temecula?",
-    a: "All major brands. The planned communities in Redhawk, Wolf Creek, and Harveston have newer Samsung, LG, and KitchenAid appliances. The wine country estates off De Portola and Rancho California tend toward Sub-Zero, Wolf, Thermador, and Viking. Vacation rental properties run higher-use mid-range appliances that wear faster. We carry OEM parts for all of these and don't use aftermarket substitutes."
-  },
-  {
-    q: "What is your diagnostic fee?",
-    a: `$89 for residential, applied directly to the repair when you proceed. $120 for commercial. No hidden trip charge to Temecula. We quote on-site after diagnosis — what we quote is what appears on the invoice.`
-  },
-  {
-    q: "Do you service commercial appliances for wineries and restaurants in Temecula?",
-    a: "Yes. Temecula has a dense concentration of tasting rooms, winery restaurants, and Old Town eateries — we service commercial refrigerators, walk-in coolers, bar refrigerators, and commercial ice machines. Commercial diagnostic is $120 and we prioritize commercial calls to minimize downtime. A walk-in cooler failure during tasting season is an emergency — we treat it as one."
-  },
-  {
-    q: "Why do appliances in vacation rental properties fail faster?",
-    a: "Vacation rentals run appliances at much higher intensity than owner-occupied homes — washers and dryers running daily, refrigerators opened constantly, dishwashers running multiple times per day. Temecula's wine country popularity means many properties have heavy rental calendars. We see appliances in vacation rentals typically need service 30–40% earlier than comparable owner-occupied homes. We work with property managers on priority scheduling and try to turn calls around same-day for active rental calendars."
-  },
-];
-
-const recentRepairs = [
-  {
-    title: "Dual-zone wine cooler — upper zone warm, lower zone fine",
-    neighborhood: "De Portola Rd wine country estate, 92592",
+    appliance: 'Dual-zone wine cooler',
+    location: 'De Portola Rd wine country estate, 92592',
+    quote: "Dual-zone wine cooler — upper zone warm, lower zone fine",
     description: "Built-in dual-zone Liebherr unit with about 180 bottles. The upper zone was drifting to 62°F — 10 degrees above set point. Lower zone holding perfectly. Dual-zone failures are almost always zone-specific — this one had a failed thermistor in the upper zone circuit. The thermistor was sending incorrect temperature data, so the cooling system never engaged the upper evaporator. Replaced the thermistor, calibrated both zones, confirmed 24-hour stability at 55°F upper and 45°F lower. Owner had a dinner party that weekend — we were done by Thursday.",
-    note: "Dual-zone units have two independent temperature circuits. Upper zone failure doesn't affect lower zone and vice versa."
+    outcome: "✓ Same day · Dual-zone units have two independent temperature circuits. Upper zone failure doesn't affect lower zone and vice versa.",
   },
   {
-    title: "Samsung RF28R7351SR — not cooling in July, fine in April",
-    neighborhood: "Wolf Creek, 92592",
+    appliance: 'Samsung RF28R7351SR',
+    location: 'Wolf Creek, 92592',
+    quote: "Samsung RF28R7351SR — not cooling in July, fine in April",
     description: "Classic Temecula summer pattern. Samsung French-door that had been running fine all spring started struggling in July when ambient temps hit 105°F. Condenser coils were the culprit — heavily loaded with dust and pet hair, had never been cleaned in four years. In mild weather the coils managed. In summer heat they couldn't dissipate enough heat. Cleaned the coils, tested compressor load under simulated warm conditions, confirmed normal operation. Also replaced the water filter, which was 14 months old and restricting ice maker flow.",
-    note: "Clean condenser coils every 6 months in Temecula. Annually isn't enough in summer heat."
+    outcome: "✓ Same day · Clean condenser coils every 6 months in Temecula. Annually isn't enough in summer heat.",
   },
   {
-    title: "LG WKEX200HBA washer-dryer combo — not drying, error TE",
-    neighborhood: "Harveston vacation rental, 92591",
+    appliance: 'LG WKEX200HBA washer-dryer combo',
+    location: 'Harveston vacation rental, 92591',
+    quote: "LG WKEX200HBA washer-dryer combo — not drying, error TE",
     description: "Property manager called — the combo unit in a vacation rental had failed mid-week with guests checking in Friday. TE error on the LG combo is a thermistor error in the drying circuit. On this unit the thermistor had actually shorted — caused by a single large bath towel load that overheated the drum. Replaced the thermistor, ran a full test cycle, confirmed normal drying performance. Same-day call, done in three hours. Property manager had it back in service before checkout.",
-    note: "Combo units in vacation rentals take serious abuse. We prioritize these calls when there's a check-in deadline."
+    outcome: "✓ Same day · Combo units in vacation rentals take serious abuse. We prioritize these calls when there's a check-in deadline.",
   },
   {
-    title: "Sub-Zero BI-36UDF — freezer fine, fridge warm, fan noise",
-    neighborhood: "Redhawk estate, 92592",
+    appliance: 'Sub-Zero BI-36UDF',
+    location: 'Redhawk estate, 92592',
+    quote: "Sub-Zero BI-36UDF — freezer fine, fridge warm, fan noise",
     description: "Sub-Zero 36-inch undercounter fridge section running at 55°F, freezer fine. Fan noise on startup. Classic evaporator fan motor failure — the motor bearings had worn, causing both the noise and the reduced airflow to the fridge compartment. The Temecula temperature swings stress these motors more than coastal climates because the compressor cycles harder. Replaced the OEM Sub-Zero evaporator fan motor, defrosted the coils which had partially iced from reduced airflow, confirmed 38°F stability. Fridge had been down three days — owner had moved wine collection to a secondary cooler.",
-    note: "Sub-Zero fan motor failures in Inland Valley climates show up 20–30% earlier than coastal installations."
+    outcome: "✓ Same day · Sub-Zero fan motor failures in Inland Valley climates show up 20–30% earlier than coastal installations.",
   },
 ];
 
-const schema = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Temecula",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Temecula",
-    "addressRegion": "CA",
-    "addressCountry": "US"
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'Wine cooler expertise — for real',
+    body: "Most appliance companies in Temecula treat wine coolers as just another refrigerator. They're not. Dual-zone circuits, vibration dampening, UV protection, precise ±1°F temperature control. We diagnose wine coolers correctly the first time and carry OEM parts for the brands that actually matter in this market.",
   },
-  "areaServed": zipCodes.map(zip => ({ "@type": "PostalCode", "postalCode": zip })),
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    iconKey: 'team' as const,
+    title: 'We understand the Temecula heat pattern',
+    body: "The 30–40 degree daily temperature swings in Temecula summer are hard on appliances in ways that don't show up in coastal markets. We account for this in every diagnosis — what presents as a \"failing compressor\" in July is often a condenser coil that was borderline all spring and finally gave out in the heat.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Priority scheduling for vacation rentals',
+    body: "We know a dead washer with guests arriving Friday is not a routine service call. We work with Temecula property managers and vacation rental owners on urgent scheduling. Tell us your check-in date when you call — we'll tell you honestly if we can make it work.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'OEM parts, honest diagnosis',
+    body: "The $89 diagnostic fee means we look at the appliance before quoting. We don't recommend compressor replacements over the phone when a thermostat or condenser cleaning would solve it. What we quote is what appears on the invoice.",
+  },
+];
 
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqItems.map(item => ({
-    "@type": "Question",
-    "name": item.q,
-    "acceptedAnswer": { "@type": "Answer", "text": item.a }
-  }))
-};
+const testimonials = [
+  {
+    stars: 5,
+    text: "\"Wine cooler in our De Portola property stopped holding temperature. Same Day identified a failed thermistor in the upper zone — had the part, fixed it same day. Collection was at risk and they treated it like an emergency. Exactly what I needed.\"",
+    author: '— Robert A., De Portola Rd',
+  },
+  {
+    stars: 5,
+    text: "\"Samsung fridge in our Redhawk home stopped cooling in the July heat. Tech came same day, cleaned the condenser coils, replaced the water filter. Explained why this happens every summer and how to prevent it. Really appreciated the education.\"",
+    author: '— Jennifer & Tom K., Redhawk',
+  },
+  {
+    stars: 5,
+    text: "\"Property manager here — had a washer-dryer combo fail in a vacation rental with a Friday check-in. Called Wednesday, they were there Thursday morning and fixed it. They get what it means to have a rental deadline. Will use them for all my properties.\"",
+    author: '— Maria C., Temecula property manager',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator Repair', range: '$150–$450', note: 'Coil cleaning · Compressor · Ice maker · Fan motor' },
+  { appliance: 'Wine Cooler Repair', range: '$150–$480', note: 'Thermistor · Compressor · Dual-zone · OEM parts' },
+  { appliance: 'Washer Repair', range: '$140–$380', note: 'Drum · Drain pump · Bearings · Door boot' },
+  { appliance: 'Dryer Repair', range: '$120–$320', note: 'Thermistor · Vent cleaning · Element · Belt' },
+  { appliance: 'Dishwasher Repair', range: '$89–$360', note: 'Hard water descale · Spray arm · Pump · Filter' },
+  { appliance: 'Sub-Zero Repair', range: '$250–$650', note: 'OEM parts · Built-in column · Estate handling', featured: true },
+  { appliance: 'Ice Maker Repair', range: '$120–$280', note: 'Inlet valve · Mold descale · Solenoid' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Applied to repair · Written estimate · No trip charge' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Temecula?',
+    answer: `Yes — same-day service is available throughout Temecula including Redhawk, Wolf Creek, Harveston, and Old Town. Call ${phone} before noon and we'll typically have a technician out the same day. We cover ZIP codes 92590, 92591, and 92592 without a trip surcharge.`,
+  },
+  {
+    question: 'Do you repair wine coolers and wine cellar units in Temecula?',
+    answer: "Yes, and it's one of our most common calls in this area. Temecula wine country means a lot of serious wine collections — built-in single-zone and dual-zone coolers, freestanding wine refrigerators, and dedicated wine cellar cooling systems. Common failures: compressor cycling issues from temperature swings between Temecula's warm days and cool nights, thermostat drift causing temperature creep, and UV-blocking door seal degradation. We carry OEM parts for EuroCave, Wine Enthusiast, Sub-Zero, and Liebherr units, and treat wine cooler calls with the same precision as a Sub-Zero refrigerator repair.",
+  },
+  {
+    question: 'My refrigerator works fine in winter but runs warm every summer — why?',
+    answer: "This is a Temecula-specific pattern. The temperature swing between Temecula's cool mornings and 100°F+ summer afternoons creates thermal stress cycling on compressors and condenser coils. Condenser coils that were marginal in mild weather get pushed over the edge in summer heat. When a refrigerator runs warm only in summer, condenser coil cleaning is usually the first fix. If the coils are clean and the problem persists, the start relay and condenser fan motor are next.",
+  },
+  {
+    question: 'What brands do you repair in Temecula?',
+    answer: "All major brands. The planned communities in Redhawk, Wolf Creek, and Harveston have newer Samsung, LG, and KitchenAid appliances. The wine country estates off De Portola and Rancho California tend toward Sub-Zero, Wolf, Thermador, and Viking. Vacation rental properties run higher-use mid-range appliances that wear faster. We carry OEM parts for all of these and don't use aftermarket substitutes.",
+  },
+  {
+    question: 'What is your diagnostic fee?',
+    answer: "$89 for residential, applied directly to the repair when you proceed. No hidden trip charge to Temecula. We quote on-site after diagnosis — what we quote is what appears on the invoice.",
+  },
+  {
+    question: 'Do you service commercial appliances for wineries and restaurants in Temecula?',
+    answer: "Yes. Temecula has a dense concentration of tasting rooms, winery restaurants, and Old Town eateries — we service commercial refrigerators, walk-in coolers, bar refrigerators, and commercial ice machines. Call us for commercial pricing and we prioritize commercial calls to minimize downtime. A walk-in cooler failure during tasting season is an emergency — we treat it as one.",
+  },
+  {
+    question: 'Why do appliances in vacation rental properties fail faster?',
+    answer: "Vacation rentals run appliances at much higher intensity than owner-occupied homes — washers and dryers running daily, refrigerators opened constantly, dishwashers running multiple times per day. Temecula's wine country popularity means many properties have heavy rental calendars. We see appliances in vacation rentals typically need service 30–40% earlier than comparable owner-occupied homes. We work with property managers on priority scheduling and try to turn calls around same-day for active rental calendars.",
+  },
+];
+
+const nearbyCities = [
+  { name: 'Murrieta', slug: 'murrieta' },
+  { name: 'Menifee', slug: 'menifee' },
+  { name: 'Corona', slug: 'corona' },
+  { name: 'Lake Elsinore', slug: 'lake-elsinore' },
+  { name: 'Riverside', slug: 'riverside' },
+  { name: 'Chino Hills', slug: 'chino-hills' },
+];
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
-  <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Temecula, CA"
+    subheadline="Same-day service in Redhawk, Wolf Creek, Harveston, wine country estates, and throughout the Temecula Valley. Wine cooler specialists. All brands, OEM parts, licensed."
+    zips={zips}
+    tier={2}
+  />
 
-  <!-- HERO -->
-  <section class="city-hero">
-    <div class="hero-inner container">
-      <div class="hero-text">
-        <p class="eyebrow">Riverside County · ZIP 92590, 92591, 92592</p>
-        <h1>Appliance Repair<br><span class="accent">Temecula</span></h1>
-        <p class="hero-sub">Same-day service in Redhawk, Wolf Creek, Harveston, wine country estates, and throughout the Temecula Valley. Wine cooler specialists. All brands, OEM parts, licensed.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-        </div>
-        <div class="hero-trust">
-          <span>⭐ 4.6 · 37 Reviews</span>
-          <span>Licensed &amp; Insured</span>
-          <span>$89 Diagnostic</span>
-        </div>
-      </div>
-      <div class="hero-img">
-        <img src="/images/cities/temecula-appliance-repair.jpg" alt="Appliance repair in Temecula CA" width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">📅</span><span>Same-Day Availability</span></div>
-      <div class="trust-item"><span class="ti-icon">🍷</span><span>Wine Cooler Specialists</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">💲</span><span>$89 Diagnostic → Applied to Repair</span></div>
-      <div class="trust-item"><span class="ti-icon">✅</span><span>90-Day Parts &amp; Labor Warranty</span></div>
-    </div>
-  </div>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Temecula — What Makes This Market Different"
+    paragraphs={introParagraphs}
+    bookingTitle="Temecula Service"
+    bookingSub="92590 · 92591 · 92592 · Same-day"
+  />
 
-  <!-- INTRO + SIDEBAR -->
-  <section class="intro-section container">
-    <div class="intro-content">
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Temecula"
+    services={services}
+  />
 
-      <h2>Appliance Repair in Temecula — What Makes This Market Different</h2>
+  <CustomNarrative
+    headline={wineCoolerNarrative.headline}
+    paragraphs={wineCoolerNarrative.paragraphs}
+    subSections={wineCoolerNarrative.subSections}
+    background="white"
+  />
 
-      <p>Temecula is one of the more interesting service areas we cover. The city has three distinct appliance markets layered on top of each other: the planned communities in Redhawk, Wolf Creek, and Harveston with their newer Samsung and LG appliances; the wine country estates off De Portola and Rancho California Road with Sub-Zero, Wolf, and dedicated wine cellar systems; and a significant vacation rental inventory running appliances at double or triple the normal use rate.</p>
+  <ServiceArea
+    cityName={cityName}
+    headline="Neighborhoods We Service in Temecula"
+    subheadline={`From Redhawk and Wolf Creek to Old Town and the wine country estates, we cover all of Temecula. No travel surcharge to any ZIP code in 92590, 92591, or 92592. Also serving Murrieta — call ${phone}. No additional charge for service addresses on the Temecula/Murrieta border.`}
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-      <p>The wine cooler calls alone make Temecula unique. Nowhere else in our Southern California service area do we see this concentration of serious wine collections — dual-zone built-in coolers, freestanding wine refrigerators, and dedicated wine cellar cooling units that maintain 55°F year-round. Most appliance companies treat wine coolers as an afterthought. We treat them the same as a Sub-Zero repair: precise diagnosis, OEM parts, temperature calibration verified before we leave.</p>
+  <CustomNarrative
+    headline={housingNarrative.headline}
+    subSections={housingNarrative.subSections}
+    background="gray"
+  />
 
-      <p>The climate here creates a specific failure pattern we see every summer. Temecula runs cool in the morning and hot by afternoon — 30 to 40 degree swings between 6am and 3pm in July. That thermal cycling stresses compressors and condenser coils in ways that flat, steady-temperature climates don't. Appliances that were marginal in spring consistently fail in the first serious heat wave of the year. We see a predictable surge of refrigerator calls starting in late June every year.</p>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Temecula"
+    jobs={recentJobs}
+  />
 
-      <p>We dispatch from our Pasadena branch for Temecula. Same-day coverage across all three ZIP codes — 92590, 92591, 92592. Call {phone}.</p>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Temecula Residents Call Us"
+    reasons={whyReasons}
+  />
 
-    </div>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Temecula Clients Say"
+    testimonials={testimonials}
+  />
 
-    <aside class="sticky-cta-box">
-      <p class="scb-city">Temecula</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Call Now</a>
-      <a href="/book" class="btn btn-outline btn-block">Book Online</a>
-      <ul class="scb-list">
-        <li>✓ Same-Day Available</li>
-        <li>✓ Wine Cooler &amp; Cellar Specialists</li>
-        <li>✓ $89 Diagnostic → Applied to Repair</li>
-        <li>✓ OEM Parts — No Aftermarket</li>
-        <li>✓ 90-Day Warranty</li>
-        <li>✓ Licensed &amp; Insured</li>
-      </ul>
-      <p class="scb-hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</p>
-    </aside>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Typical Repair Pricing in Temecula"
+    subhead="$89 residential diagnostic applied to repair. No trip charge to Temecula ZIP codes."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <!-- SERVICES GRID -->
-  <section class="services-section">
-    <div class="container">
-      <h2>What We Repair in Temecula</h2>
-      <div class="services-grid">
-        {services.map(svc => (
-          <a href={`/${citySlug}/${svc.slug}/`} class="service-card">
-            <span class="svc-icon">{svc.icon}</span>
-            <span class="svc-name">{svc.name}</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Temecula Appliance Repair — FAQ"
+    faqs={faqs}
+  />
 
-  <!-- WINE COOLER BLOCK (City-Specific) -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">01</div>
-      <div class="context-body">
-        <h2>Wine Cooler &amp; Wine Cellar Repair in Temecula — What We Know</h2>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-        <p>Temecula wine country means a lot of serious wine collections. We service more wine coolers and dedicated wine cellar units here than anywhere else in our coverage area. Here's what we've learned about these systems and how the Temecula climate affects them.</p>
-
-        <h3>Single-Zone vs. Dual-Zone Failures</h3>
-        <p>Single-zone wine coolers maintain one temperature throughout. When they fail, it's usually the compressor, thermostat, or condenser fan. Dual-zone units are more complex — they have two independent temperature circuits and can fail in one zone while the other operates normally. We've seen plenty of dual-zone units where the owner assumes total failure because the top section is warm, when in fact only the upper zone thermostat or thermistor has failed — a $150–$250 repair rather than a replacement.</p>
-
-        <p>The Temecula climate creates a specific challenge for wine coolers: the 30–40 degree daily temperature swings in summer put thermal stress on compressors that aren't present in coastal or stable-temperature environments. A wine cooler sitting in a home where the kitchen hits 85°F in the afternoon and cools to 68°F at night is cycling hard. Condenser coils should be cleaned every 4–6 months in wine country homes.</p>
-
-        <h3>Built-In vs. Freestanding Units</h3>
-        <p>Built-in wine coolers are designed to vent from the front — they can be installed flush in cabinetry. Freestanding units vent from the rear and need clearance. We regularly find freestanding units that have been built in without adequate clearance, forcing the compressor to run constantly and fail prematurely. If your wine cooler compressor runs without stopping, check the rear clearance before assuming the compressor is the problem.</p>
-
-        <h3>Brands We Service in Temecula Wine Country</h3>
-        <p>EuroCave, Liebherr, Sub-Zero Wine Storage, Wine Enthusiast, Vinotemp, U-Line, Perlick, Marvel, True Residential, and Thermador. We carry OEM parts for major brands and source through manufacturer channels for specialty units. We don't use aftermarket compressors or thermostat assemblies on wine coolers — precision temperature control requires the correct parts.</p>
-
-        <h3>Wine Cellar Cooling Systems</h3>
-        <p>Dedicated wine cellar cooling systems — split systems or self-contained through-wall units — are a step above wine coolers and require different diagnosis. We service WhisperKOOL, CellarPro, Breezaire, and Wine Guardian units. If your cellar temperature is drifting, the first checks are door seals, refrigerant level, and evaporator coil condition. A cellar that runs 5°F above set point in summer but holds temperature in winter almost always has a refrigerant issue or insufficient cooling capacity for the summer heat load.</p>
-
-        <h3>For Winery &amp; Tasting Room Equipment</h3>
-        <p>We service commercial refrigerators, bar coolers, undercounter wine storage, and walk-in coolers for wineries and tasting rooms along Rancho California Road and De Portola Road. Commercial diagnostic is $120. We prioritize tasting room calls and aim for same-day service — a failed bar cooler during weekend tasting hours is a revenue problem, not just an inconvenience.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="neighborhoods-section container">
-    <div class="section-intro">
-      <div class="context-number">02</div>
-      <h2>Neighborhoods We Service in Temecula</h2>
-      <p>From Redhawk and Wolf Creek to Old Town and the wine country estates, we cover all of Temecula. No travel surcharge to any ZIP code in 92590, 92591, or 92592.</p>
-    </div>
-    <div class="neighborhoods-grid">
-      {neighborhoods.map(n => (
-        <div class="nbhd-card">
-          <span class="nbhd-name">{n.name}</span>
-          <span class="nbhd-zip">ZIP {n.zip}</span>
-        </div>
-      ))}
-    </div>
-    <p class="nbhd-note">Also serving Murrieta — call {phone}. No additional charge for service addresses on the Temecula/Murrieta border.</p>
-  </section>
-
-  <!-- HOUSING + VACATION RENTAL BLOCK -->
-  <section class="context-block container">
-    <div class="context-inner">
-      <div class="context-number">03</div>
-      <div class="context-body">
-        <h2>Temecula Housing Stock — Three Different Markets</h2>
-
-        <h3>Redhawk, Wolf Creek &amp; Harveston — Planned Communities</h3>
-        <p>These are the backbone of Temecula's residential market — master-planned communities built primarily 2000–2015 with HOA management and consistent housing stock. Appliances here are Samsung, LG, KitchenAid, and Whirlpool from the mid-2010s, now in the prime failure window at 8–12 years. Samsung French-door refrigerators with ice maker issues, LG front-load washers with bearing wear, and Bosch dishwashers with hard water scale are the most common calls. Temecula water is hard — similar to the rest of Riverside County — and we descale as part of most dishwasher and ice maker calls here.</p>
-
-        <h3>Wine Country Estates — De Portola, Rancho California Rd</h3>
-        <p>The properties off De Portola Road and the rural stretches of Rancho California Road are a different class. These are 3–10 acre estates, often with wine caves or dedicated wine storage, Wolf ranges, Sub-Zero columns, and outdoor kitchens with refrigerators and ice makers. We handle these exactly as we handle Beverly Hills estate work — OEM parts, careful handling, no aftermarket substitutes, verified temperature calibration on wine storage after every repair. The Sub-Zero evaporator fan failures we see in Temecula's inland heat are worth calling out specifically — these motors show wear 20–30% faster than identical units in coastal climates.</p>
-
-        <h3>Vacation Rental Properties — Old Town &amp; Wine Country</h3>
-        <p>Temecula is one of SoCal's busiest weekend destinations — wine tasting, Old Town, hot air balloons, Pechanga. A significant portion of the residential inventory runs as short-term vacation rentals with high occupancy. Appliances in active vacation rentals run at 3–5x the load of owner-occupied homes. Washers and dryers doing daily loads, refrigerators opened constantly by multiple guests, dishwashers running two or three cycles a day. We see vacation rental appliances needing service years earlier than normal. We work directly with property managers on priority scheduling — if you have a check-in Friday, call us Wednesday and we'll do everything we can to get there Thursday.</p>
-
-        <h3>Hard Water Throughout Temecula</h3>
-        <p>Riverside County water is consistently high in dissolved minerals — calcium and magnesium levels that accelerate scale buildup in dishwashers, ice makers, and washing machines. The maintenance schedule for Temecula homes mirrors what we recommend in Chino Hills: dishwasher filter every 3 months, refrigerator water filter every 4 months, ice maker descale every 12–18 months. We include descaling as part of every ice maker and dishwasher repair call here.</p>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="repairs-section container">
-    <div class="section-header">
-      <div class="context-number">04</div>
-      <h2>Recent Repairs in Temecula</h2>
-    </div>
-    <div class="repairs-grid">
-      {recentRepairs.map(r => (
-        <div class="repair-card">
-          <h3 class="repair-title">"{r.title}"</h3>
-          <p class="repair-location">📍 {r.neighborhood}</p>
-          <p class="repair-desc">{r.description}</p>
-          <p class="repair-note"><em>{r.note}</em></p>
-        </div>
-      ))}
-    </div>
-  </section>
-
-  <!-- WHY US + REVIEWS + PRICING -->
-  <section class="why-section container">
-    <div class="context-number">05</div>
-    <h2>Why Temecula Residents Call Us</h2>
-
-    <div class="why-grid">
-      <div class="why-item">
-        <h3>Wine cooler expertise — for real</h3>
-        <p>Most appliance companies in Temecula treat wine coolers as just another refrigerator. They're not. Dual-zone circuits, vibration dampening, UV protection, precise ±1°F temperature control. We diagnose wine coolers correctly the first time and carry OEM parts for the brands that actually matter in this market.</p>
-      </div>
-      <div class="why-item">
-        <h3>We understand the Temecula heat pattern</h3>
-        <p>The 30–40 degree daily temperature swings in Temecula summer are hard on appliances in ways that don't show up in coastal markets. We account for this in every diagnosis — what presents as a "failing compressor" in July is often a condenser coil that was borderline all spring and finally gave out in the heat.</p>
-      </div>
-      <div class="why-item">
-        <h3>Priority scheduling for vacation rentals</h3>
-        <p>We know a dead washer with guests arriving Friday is not a routine service call. We work with Temecula property managers and vacation rental owners on urgent scheduling. Tell us your check-in date when you call — we'll tell you honestly if we can make it work.</p>
-      </div>
-      <div class="why-item">
-        <h3>OEM parts, honest diagnosis</h3>
-        <p>The $89 diagnostic fee means we look at the appliance before quoting. We don't recommend compressor replacements over the phone when a thermostat or condenser cleaning would solve it. What we quote is what appears on the invoice.</p>
-      </div>
-    </div>
-
-    <!-- Reviews -->
-    <div class="reviews-grid">
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Wine cooler in our De Portola property stopped holding temperature. Same Day identified a failed thermistor in the upper zone — had the part, fixed it same day. Collection was at risk and they treated it like an emergency. Exactly what I needed."</p>
-        <p class="reviewer">— Robert A., De Portola Rd</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Samsung fridge in our Redhawk home stopped cooling in the July heat. Tech came same day, cleaned the condenser coils, replaced the water filter. Explained why this happens every summer and how to prevent it. Really appreciated the education."</p>
-        <p class="reviewer">— Jennifer &amp; Tom K., Redhawk</p>
-      </div>
-      <div class="review-card">
-        <div class="stars">★★★★★</div>
-        <p>"Property manager here — had a washer-dryer combo fail in a vacation rental with a Friday check-in. Called Wednesday, they were there Thursday morning and fixed it. They get what it means to have a rental deadline. Will use them for all my properties."</p>
-        <p class="reviewer">— Maria C., Temecula property manager</p>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div class="pricing-block">
-      <h3>Typical Repair Pricing in Temecula</h3>
-      <p>The $89 diagnostic fee is applied when you proceed. Every repair is quoted on-site after diagnosis.</p>
-      <div class="pricing-grid">
-        <div class="price-item">
-          <span class="pi-service">Refrigerator Repair</span>
-          <span class="pi-range">$150–$450</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Wine Cooler Repair</span>
-          <span class="pi-range">$150–$480</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Washer Repair</span>
-          <span class="pi-range">$140–$380</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dryer Repair</span>
-          <span class="pi-range">$120–$320</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Dishwasher Repair</span>
-          <span class="pi-range">$89–$360</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Sub-Zero Repair</span>
-          <span class="pi-range">$250–$650</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Ice Maker Repair</span>
-          <span class="pi-range">$120–$280</span>
-        </div>
-        <div class="price-item">
-          <span class="pi-service">Commercial Diagnostic</span>
-          <span class="pi-range">$120</span>
-        </div>
-      </div>
-      <p class="pricing-note">$89 residential diagnostic applied to repair. No trip charge to Temecula ZIP codes.</p>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="faq-section container">
-    <h2>Temecula Appliance Repair — FAQ</h2>
-    <div class="faq-list">
-      {faqItems.map(item => (
-        <details class="faq-item">
-          <summary class="faq-q">{item.q}</summary>
-          <p class="faq-a">{item.a}</p>
-        </details>
-      ))}
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="nearby-section container">
-    <h2>Also Serving Nearby Cities</h2>
-    <div class="nearby-grid">
-      <a href="/murrieta/">Murrieta</a>
-      <a href="/menifee/">Menifee</a>
-      <a href="/corona/">Corona</a>
-      <a href="/lake-elsinore/">Lake Elsinore</a>
-      <a href="/riverside/">Riverside</a>
-      <a href="/chino-hills/">Chino Hills</a>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Need Appliance Repair in Temecula Today?</h2>
-      <p>Same-day service in Redhawk, Wolf Creek, Harveston, wine country estates, and all Temecula ZIP codes. Wine cooler specialists.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Book Online</a>
-      </div>
-    </div>
-  </section>
-
-</BaseLayout>
-
-<style>
-.city-hero { background: var(--color-bg); padding: 5rem 0 4rem; }
-.hero-inner { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
-.eyebrow { font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; color: var(--color-accent); margin-bottom: .75rem; }
-h1 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
-h1 .accent { color: var(--color-accent); }
-.hero-sub { font-size: 1.05rem; color: var(--color-text-muted); margin-bottom: 2rem; max-width: 48ch; }
-.hero-ctas { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
-.hero-trust { display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: .85rem; color: var(--color-text-muted); }
-.hero-img img { width: 100%; border-radius: .5rem; object-fit: cover; }
-
-.trust-bar { background: var(--color-accent); padding: 1rem 0; }
-.trust-bar-inner { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; }
-.trust-item { display: flex; align-items: center; gap: .5rem; color: #fff; font-size: .875rem; font-weight: 600; }
-
-.intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; }
-.intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-
-.sticky-cta-box { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; position: sticky; top: 5rem; height: fit-content; }
-.scb-city { font-size: .75rem; text-transform: uppercase; letter-spacing: .1em; color: var(--color-accent); margin-bottom: .25rem; }
-.scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-.btn-block { display: block; width: 100%; text-align: center; margin-bottom: .75rem; }
-.scb-list { list-style: none; padding: 0; margin: 1.25rem 0; font-size: .875rem; }
-.scb-list li { padding: .3rem 0; border-bottom: 1px solid var(--color-border); color: var(--color-text-body); }
-.scb-hours { font-size: .8rem; color: var(--color-text-muted); text-align: center; }
-
-.services-section { background: var(--color-surface); padding: 4rem 0; }
-.services-section h2 { text-align: center; font-size: 1.75rem; margin-bottom: 2rem; }
-.services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.service-card { background: var(--color-bg); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem 1rem; text-align: center; text-decoration: none; color: var(--color-text); transition: border-color .2s, transform .2s; display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.service-card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
-.svc-icon { font-size: 2rem; }
-.svc-name { font-size: .9rem; font-weight: 600; }
-
-.context-block { padding: 4rem 0; }
-.context-inner { display: grid; grid-template-columns: 80px 1fr; gap: 2rem; }
-.context-number { font-size: 4rem; font-weight: 900; color: var(--color-accent); opacity: .2; line-height: 1; }
-.context-body h2 { font-size: 1.6rem; margin-bottom: 1.25rem; }
-.context-body h3 { font-size: 1.1rem; font-weight: 700; margin: 1.75rem 0 .75rem; }
-.context-body p { margin-bottom: 1.25rem; line-height: 1.75; color: var(--color-text-body); }
-
-.neighborhoods-section { padding: 4rem 0; }
-.section-intro { margin-bottom: 2rem; }
-.section-intro h2 { font-size: 1.6rem; margin-bottom: .75rem; }
-.neighborhoods-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.nbhd-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1rem 1.25rem; }
-.nbhd-name { display: block; font-weight: 600; margin-bottom: .25rem; }
-.nbhd-zip { font-size: .8rem; color: var(--color-text-muted); }
-.nbhd-note { margin-top: 1.5rem; font-size: .875rem; color: var(--color-text-muted); }
-
-.repairs-section { padding: 4rem 0; }
-.section-header { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 2rem; }
-.section-header h2 { font-size: 1.6rem; }
-.repairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-.repair-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 1.75rem; }
-.repair-title { font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
-.repair-location { font-size: .8rem; color: var(--color-accent); margin-bottom: 1rem; }
-.repair-desc { font-size: .9rem; line-height: 1.7; color: var(--color-text-body); margin-bottom: 1rem; }
-.repair-note { font-size: .85rem; color: var(--color-text-muted); border-top: 1px solid var(--color-border); padding-top: .75rem; }
-
-.why-section { padding: 4rem 0; }
-.why-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 3rem; }
-.why-item { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.why-item h3 { font-size: 1rem; margin-bottom: .5rem; }
-.why-item p { font-size: .9rem; color: var(--color-text-body); line-height: 1.7; }
-
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 3rem; }
-.review-card { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .5rem; padding: 1.5rem; }
-.stars { color: #f59e0b; font-size: 1rem; margin-bottom: .75rem; }
-.review-card p { font-size: .875rem; line-height: 1.65; color: var(--color-text-body); margin-bottom: .75rem; }
-.reviewer { font-size: .8rem; color: var(--color-text-muted); }
-
-.pricing-block { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .75rem; padding: 2rem; }
-.pricing-block h3 { margin-bottom: .5rem; }
-.pricing-block > p { font-size: .9rem; color: var(--color-text-muted); margin-bottom: 1.5rem; }
-.pricing-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-.price-item { display: flex; flex-direction: column; gap: .25rem; }
-.pi-service { font-size: .85rem; color: var(--color-text-muted); }
-.pi-range { font-size: 1rem; font-weight: 700; }
-.pricing-note { font-size: .8rem; color: var(--color-text-muted); margin-top: 1.25rem; }
-
-.faq-section { padding: 4rem 0; }
-.faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; }
-.faq-list { display: flex; flex-direction: column; gap: .75rem; }
-.faq-item { border: 1px solid var(--color-border); border-radius: .5rem; background: var(--color-surface); }
-.faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; }
-.faq-a { padding: 0 1.5rem 1.25rem; font-size: .9rem; line-height: 1.7; color: var(--color-text-body); }
-
-.nearby-section { padding: 3rem 0; }
-.nearby-section h2 { font-size: 1.25rem; margin-bottom: 1.25rem; }
-.nearby-grid { display: flex; gap: 1rem; flex-wrap: wrap; }
-.nearby-grid a { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: .375rem; padding: .5rem 1rem; text-decoration: none; color: var(--color-text); font-size: .875rem; }
-.nearby-grid a:hover { border-color: var(--color-accent); color: var(--color-accent); }
-
-.bottom-cta { background: var(--color-surface); border-top: 1px solid var(--color-border); padding: 4rem 0; text-align: center; }
-.bottom-cta h2 { font-size: 1.75rem; margin-bottom: .75rem; }
-.bottom-cta p { color: var(--color-text-muted); margin-bottom: 2rem; }
-.cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-
-@media (max-width: 1024px) {
-  .intro-section { grid-template-columns: 1fr; }
-  .sticky-cta-box { position: static; }
-  .services-grid, .neighborhoods-grid { grid-template-columns: repeat(2, 1fr); }
-  .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; }
-  .hero-img { display: none; }
-  .context-inner { grid-template-columns: 1fr; }
-  .repairs-grid, .why-grid, .reviews-grid { grid-template-columns: 1fr; }
-}
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Need Appliance Repair in Temecula Today?"
+    body="Same-day service in Redhawk, Wolf Creek, Harveston, wine country estates, and all Temecula ZIP codes. Wine cooler specialists."
+  />
+</CityLayoutV2>

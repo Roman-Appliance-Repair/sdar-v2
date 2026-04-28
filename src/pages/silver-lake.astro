@@ -1,786 +1,333 @@
 ---
-// src/pages/silver-lake.astro
-// SDAR — samedayappliance.repair
-// Silver Lake, CA 90026/90039 — Волна 2
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: silver lake appliance repair — 106 показов, позиция 13 ⚡
-//      appliance repair silver lake — 7 показов, позиция 7.1 🔥
-//      dishwasher repair silver lake — 2 показов, позиция 7.0 🔥
-//      dryer repair in silver lake — 25 показов, позиция 14.9 ⚡
-//      washer repair in silver lake — 15 показов, позиция 13.9 ⚡
-// Апрель 2026
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
+const citySlug = 'silver-lake';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = {
-  name: "Silver Lake",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90026", "90039"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "silver-lake",
-};
+const cityName = 'Silver Lake';
+const zips = ['90026', '90039'];
 
-const title = `Appliance Repair Silver Lake CA — Same Day | Sunset Junction · Reservoir | (323) 870-4790`;
-const description = `Same-day appliance repair in Silver Lake, CA 90026 & 90039. Sunset Junction, Ivanhoe, Micheltorena Hill, Reservoir area. Stackable units, vintage ranges, compact apartments. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/silver-lake/`;
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Silver Lake",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const title = `Appliance Repair Silver Lake CA — Same Day | Sunset Junction · Reservoir | ${branch.phone}`;
+const description = `Same-day appliance repair in Silver Lake, CA 90026 & 90039. Sunset Junction, Ivanhoe, Micheltorena Hill, Reservoir area. Stackable units, vintage ranges, compact apartments. Licensed, OEM parts, 90-day warranty. Call ${branch.phone}.`;
+const canonical = 'https://samedayappliance.repair/silver-lake/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'Neighborhood', name: 'Silver Lake' },
+    { '@type': 'Neighborhood', name: 'Sunset Junction' },
+    { '@type': 'Neighborhood', name: 'Ivanhoe' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Silver Lake" },
-    { "@type": "Neighborhood", "name": "Sunset Junction" },
-    { "@type": "Neighborhood", "name": "Ivanhoe" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const introParagraphs = [
+  "Silver Lake calls look different from other parts of our territory. The hillside homes off Effie Street and Micheltorena have stackable laundry units tucked into closets that were never designed to be laundry rooms. The mid-century bungalows around the Reservoir still have vintage ranges that a lot of repair companies won't touch. The apartment buildings along Glendale Blvd and Hyperion have a dozen units each, and when the washer in apartment 4 goes down, it's the landlord's problem on a Saturday.",
+  "Our technicians know this neighborhood. We've worked on the compact LG front-loads in the apartments off Rowena, the older O'Keefe & Merritt ranges in the Streamline Moderne houses near the Reservoir, the Bosch dishwashers in the renovated craftsmans around Sunset Junction. We don't show up and make it someone else's problem when the kitchen is tight or the appliance is older. We diagnose it and fix it.",
+  "One more thing about Silver Lake: a significant chunk of the housing is rental. We work with renters, landlords, and property managers equally — whoever needs to call, whoever needs to approve the repair. No runaround about who's the customer.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor.",
+];
+
+const services = [
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'Stackable units · Compact front-load · Not draining · Error codes · Tight spaces', brands: 'LG · Samsung · Bosch · Miele · Whirlpool · Speed Queen' },
+  { icon: '♨️', name: 'Dryer Repair', slug: 'dryer', issues: 'Not heating · Stackable · Vent cleaning · Gas & electric · Compact', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling · Ice maker · Fan motor · Older models welcome', brands: 'Samsung · LG · GE · Whirlpool · Bosch · Sub-Zero' },
+  { icon: '🔥', name: 'Oven, Stove & Vintage Range Repair', slug: 'oven', issues: "Vintage ranges welcome · Igniter · Gas valve · Not heating · O'Keefe & Merritt", brands: "GE · Samsung · Bosch · Wolf · Vintage brands · O'Keefe & Merritt" },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not draining · Not cleaning · Leaking · Error codes · Small kitchens', brands: 'Bosch · KitchenAid · Samsung · LG · GE · Miele' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Not freezing · Temperature off · Ice maker · Frost buildup', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero' },
+  { icon: '🔆', name: 'Cooktop Repair', slug: 'cooktop', issues: 'Burner issues · Induction · Gas igniter · Older cooktops', brands: 'GE · Bosch · Samsung · Thermador · Wolf · Viking' },
+  { icon: '🍷', name: 'Wine & Beverage Cooler', slug: 'wine-cooler', issues: 'Not cooling · Temperature off · Compact under-counter units', brands: 'Sub-Zero · True · Liebherr · U-Line · Dacor' },
+];
+
+const housingNarrative = {
+  eyebrow: 'SILVER LAKE HOUSING REALITY',
+  headline: 'The Appliances We Actually Work On Here',
+  paragraphs: [
+    "Silver Lake isn't a luxury appliance market — it's a real neighborhood with a wide range of housing ages, layouts, and situations. Understanding that context changes how we show up.",
+  ],
+  subSections: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Silver Lake, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Silver Lake — Sunset Junction, Ivanhoe, Micheltorena Hill, Moreno Highlands, the Reservoir area, and surrounding streets including Glendale Blvd, Hyperion Ave, Rowena Ave, and Effie Street. We serve ZIP codes 90026 and 90039. Call before noon for same-day afternoon service." }
+      title: 'Mid-Century Homes',
+      paragraphs: [
+        "The Streamline Moderne and California Ranch homes near the Reservoir often have older appliances — vintage ranges that still work but need specific parts, older refrigerator compressors, and infrastructure that a newer technician won't know how to read. We work on older machines honestly.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Do you repair stackable and compact washers and dryers in Silver Lake?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Silver Lake has a high concentration of apartments and hillside homes with compact and stackable laundry setups. Our technicians are experienced with stackable units, all-in-one combo washers/dryers, and compact front-load machines in tight laundry closets — without damaging surrounding cabinetry or flooring." }
+      title: 'Apartments & Rentals',
+      paragraphs: [
+        'Silver Lake is heavily rented. The buildings along Glendale Blvd and Hyperion have compact kitchens and stacked laundry closets. We coordinate with landlords and property managers, come prepared for tight spaces, and don\'t tell renters we "can\'t access" because the closet is small.',
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Do you repair vintage and older appliances in Silver Lake?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Silver Lake's mid-century housing stock means we regularly work on older appliances — vintage ranges, older refrigerators, and appliances that most companies won't touch because parts are harder to find. Our technicians assess each repair honestly: if a part is available and the repair makes economic sense, we do it. If not, we'll tell you." }
+      title: 'Renovated Craftsmans & New Builds',
+      paragraphs: [
+        'The renovated homes around Sunset Junction and the newer infill construction on the hillsides have modern Bosch, Samsung, and LG appliances. Same-day service, OEM parts — the standard approach for these newer systems.',
+      ],
     },
-    {
-      "@type": "Question",
-      "name": "Do you work in rental apartments in Silver Lake?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. A large portion of Silver Lake is rental housing. We work with renters, landlords, and property managers — whoever needs to schedule and approve the repair. No hassle about who's paying upfront. Call us and we'll figure out the logistics." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Silver Lake?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Silver Lake repairs run $150–$350 depending on the appliance and what's wrong." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Silver Lake?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no charge. We use genuine OEM parts only." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Echo Park, Atwater Village, and Los Feliz?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Silver Lake service area extends to Echo Park, Atwater Village, Los Feliz, Glassell Park, Highland Park, and East Hollywood. If you're in the 90026, 90039, or adjacent ZIP codes, we're your closest team." }
-    }
-  ]
+  ],
 };
+
+const neighborhoods = [
+  { name: 'Sunset Junction', zip: '90026', featured: true },
+  { name: 'Ivanhoe', zip: '90026', featured: true },
+  { name: 'Micheltorena Hill', zip: '90026', featured: true },
+  { name: 'Moreno Highlands', zip: '90039' },
+  { name: 'Silver Lake Reservoir area', zip: '90039' },
+  { name: 'Effie Street corridor', zip: '90026' },
+];
+
+const keyStreets = ['Glendale Blvd', 'Hyperion Ave', 'Rowena Ave', 'Silver Lake Blvd', 'Sunset Blvd (east)'];
+
+const recentJobs = [
+  {
+    appliance: 'LG Stackable Washer',
+    location: 'Effie Street area, 90026',
+    quote: 'UE error, shaking the whole wall',
+    description: 'Second-floor apartment, stacked LG unit in a closet with about six inches of clearance on three sides. UE (unbalanced) errors that consistent mean worn shock absorbers. Our tech worked within the closet constraints — correct disassembly sequence for the tight space — replaced both shock absorbers with OEM LG parts, recalibrated the drum, ran four test cycles. Neighbor downstairs had started lodging complaints about the shaking. Problem solved.',
+    outcome: '✓ Same day · OEM LG parts · Tight space handled cleanly',
+  },
+  {
+    appliance: "Vintage O'Keefe & Merritt Range",
+    location: 'Silver Lake Reservoir area, 90039',
+    quote: "Two burners won't light, oven pilot keeps going out",
+    description: "1950s O'Keefe & Merritt — the original range still in the original kitchen. These are not uncommon in Silver Lake's older housing stock and almost nobody will work on them. Our tech diagnosed corroded igniter contacts on the surface burners, cleaned and restored the connections, and adjusted the standing pilot in the oven that had shifted from vibration over decades. All burners lit, oven held temperature. Homeowner was emphatic about keeping the original range. We were too.",
+    outcome: '✓ Same day · Vintage range restored · No replacement needed',
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'Sunset Junction, 90026',
+    quote: 'E24 error, rental unit — tenant calling landlord daily',
+    description: 'Property manager called for a rental unit near Sunset Junction. Bosch E24 — drainage fault. Found a blocked drain hose at the disposal knockout (prior tenant had replaced the disposal but forgot to punch the plug). Cleared it, tested the drain pump which was still functional, ran three cycles. Took 35 minutes. Sent the property manager a photo report. The tenant stopped calling.',
+    outcome: '✓ Same day · Fixed in 35 min · Photo report to landlord',
+  },
+  {
+    appliance: 'Samsung Refrigerator',
+    location: 'Micheltorena Hill, 90026',
+    quote: 'Top of fridge warm, freezer fine, ice maker dead',
+    description: 'Samsung French door on Micheltorena — the hillside access made the driveway interesting but the repair itself was straightforward. Classic Samsung dual evaporator failure: upper fan motor seized, ice maker inlet valve clogged. Replaced both with OEM Samsung parts, cleared the drain, defrosted the upper coils. Confirmed even temperature throughout before leaving. The homeowner had a dinner party that weekend — they made it.',
+    outcome: '✓ Same day · OEM Samsung · Dinner party saved',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'We Work on Older Appliances',
+    body: "Vintage O'Keefe & Merritt ranges, older Frigidaires, pre-digital appliances — Silver Lake has them and most companies won't touch them. We assess each one honestly and repair what's repairable.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Tight Spaces Are Normal',
+    body: "Stacked laundry in a closet, dishwasher in a galley kitchen, refrigerator behind a door that barely opens — our technicians work in these setups constantly. We don't charge extra for access difficulty.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Renters, Landlords, Both',
+    body: 'We work with whoever needs to schedule and approve the repair. Renter calls, landlord pays — fine. Property manager coordinates access — fine. We send photo reports when requested.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, $89 Diagnostic',
+    body: 'Every repair backed by 90 days on parts and labor. OEM parts only. $89 diagnostic fee waived when you proceed with the repair. California licensed, BBB A+ rated.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"My LG stackable in a tiny closet on Effie Street was shaking the wall. Same Day Appliance came out, worked within the tight space no problem, replaced the shock absorbers, and the machine runs quietly now. They clearly know how to work in Silver Lake apartments."',
+    author: '— Jamie R., Effie Street, Silver Lake',
+  },
+  {
+    stars: 5,
+    text: `"I have a vintage O'Keefe & Merritt range from the 1950s and nobody would work on it. Same Day Appliance Repair came out same day, knew exactly what to do, fixed the burners and the pilot. The range is perfect now. Really glad someone still knows how to service these."`,
+    author: '— Marcus T., Reservoir area, Silver Lake',
+  },
+  {
+    stars: 5,
+    text: '"I manage several rentals in Silver Lake. Called about a Bosch dishwasher with an E24 error. Tech came same afternoon, fixed it in under an hour, sent me a photo report for my files. This is exactly the kind of responsive property management service I need. Already saved their number."',
+    author: '— Diana K., Property Manager, Silver Lake',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator', range: '$200 – $400', note: 'Fan motor, ice maker, thermostat, compressor relay' },
+  { appliance: 'Washer / Dryer', range: '$150 – $350', note: 'Drain pump, shock absorbers, heating element, gasket' },
+  { appliance: 'Oven / Range', range: '$175 – $400', note: 'Igniter, element, pilot, gas valve · Vintage OK' },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'Drain pump, door latch, control board, spray arm' },
+  { appliance: 'Stackable Units', range: '$150 – $350', note: 'Compact & stackable — no extra access charge' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair', featured: true },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Silver Lake, CA?',
+    answer: 'Yes. Our technicians cover all of Silver Lake — Sunset Junction, Ivanhoe, Micheltorena Hill, Moreno Highlands, the Reservoir area, and surrounding streets including Glendale Blvd, Hyperion Ave, Rowena Ave, and Effie Street. We serve ZIP codes 90026 and 90039. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'Do you repair stackable and compact washers and dryers in Silver Lake?',
+    answer: 'Yes. Silver Lake has a high concentration of apartments and hillside homes with compact and stackable laundry setups. Our technicians are experienced with stackable units, all-in-one combo washers/dryers, and compact front-load machines in tight laundry closets — without damaging surrounding cabinetry or flooring.',
+  },
+  {
+    question: 'Do you repair vintage and older appliances in Silver Lake?',
+    answer: "Yes. Silver Lake's mid-century housing stock means we regularly work on older appliances — vintage ranges, older refrigerators, and appliances that most companies won't touch because parts are harder to find. Our technicians assess each repair honestly: if a part is available and the repair makes economic sense, we do it. If not, we'll tell you.",
+  },
+  {
+    question: 'Do you work in rental apartments in Silver Lake?',
+    answer: "Yes. A large portion of Silver Lake is rental housing. We work with renters, landlords, and property managers — whoever needs to schedule and approve the repair. No hassle about who's paying upfront. Call us and we'll figure out the logistics.",
+  },
+  {
+    question: 'What is your diagnostic fee in Silver Lake?',
+    answer: "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Silver Lake repairs run $150–$350 depending on the appliance and what's wrong.",
+  },
+  {
+    question: 'What warranty do you offer on appliance repairs in Silver Lake?',
+    answer: 'All repairs come with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no charge. We use genuine OEM parts only.',
+  },
+  {
+    question: 'Do you also serve Echo Park, Atwater Village, and Los Feliz?',
+    answer: "Yes. Our Silver Lake service area extends to Echo Park, Atwater Village, Los Feliz, Glassell Park, Highland Park, and East Hollywood. If you're in the 90026, 90039, or adjacent ZIP codes, we're your closest team.",
+  },
+];
+
+const nearbyCities = [
+  { name: 'Los Feliz', slug: 'los-feliz' },
+  { name: 'Hollywood', slug: 'hollywood' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Glendale', slug: 'glendale' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Burbank', slug: 'burbank' },
+  { name: 'Pasadena', slug: 'pasadena' },
+  { name: 'Atwater Village', slug: 'atwater-village' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Silver Lake, CA"
+    subheadline="Silver Lake's mix of hillside homes, mid-century bungalows, and apartment buildings means compact stackables, vintage ranges, and everything in between. Our technicians cover all of it — 90026 and 90039, same-day, honest pricing, 90-day warranty."
+    zips={zips}
+    tier={3}
+  />
 
-  <!-- HERO -->
-  <section class="sl-hero">
-    <div class="sl-hero__inner container">
-      <div class="sl-hero__content">
-        <div class="sl-hero__eyebrow">Silver Lake, CA · 90026 · 90039 · Sunset Junction · Ivanhoe · Micheltorena Hill</div>
-        <h1 class="sl-hero__h1">
-          Appliance Repair<br>
-          <span class="sl-hero__accent">Silver Lake, CA</span>
-        </h1>
-        <p class="sl-hero__sub">
-          Silver Lake's mix of hillside homes, mid-century bungalows, and apartment buildings
-          means compact stackables, vintage ranges, and everything in between. Our technicians
-          cover all of it — 90026 and 90039, same-day, honest pricing, 90-day warranty.
-        </p>
-        <div class="sl-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="sl-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="sl-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-silver-lake-ca.webp"
-          alt="Appliance repair in Silver Lake CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Same-Day Service</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>90-Day Warranty</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>OEM Parts</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Licensed & Insured</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>Renters & Owners Welcome</span>
-      </div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Silver Lake — What Actually Shows Up Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Silver Lake Service Team"
+    bookingSub="90026 · 90039 · Same day"
+  />
 
-  <!-- INTRO -->
-  <section class="sl-intro">
-    <div class="container sl-intro__inner">
-      <div class="sl-intro__text">
-        <h2>Appliance Repair in Silver Lake — What Actually Shows Up Here</h2>
-        <p>
-          Silver Lake calls look different from other parts of our territory. The hillside homes
-          off Effie Street and Micheltorena have stackable laundry units tucked into closets
-          that were never designed to be laundry rooms. The mid-century bungalows around
-          the Reservoir still have vintage ranges that a lot of repair companies won't touch.
-          The apartment buildings along Glendale Blvd and Hyperion have a dozen units each,
-          and when the washer in apartment 4 goes down, it's the landlord's problem on a
-          Saturday.
-        </p>
-        <p>
-          Our technicians know this neighborhood. We've worked on the compact LG front-loads
-          in the apartments off Rowena, the older O'Keefe & Merritt ranges in the Streamline
-          Moderne houses near the Reservoir, the Bosch dishwashers in the renovated craftsmans
-          around Sunset Junction. We don't show up and make it someone else's problem when the
-          kitchen is tight or the appliance is older. We diagnose it and fix it.
-        </p>
-        <p>
-          One more thing about Silver Lake: a significant chunk of the housing is rental. We
-          work with renters, landlords, and property managers equally — whoever needs to call,
-          whoever needs to approve the repair. No runaround about who's the customer.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before
-          we start. <strong>90-day warranty</strong> on parts and labor.
-        </p>
-      </div>
-      <div class="sl-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Silver Lake Service Team</div>
-          <div class="cta-box__sub">90026 · 90039 · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Silver Lake"
+    subhead="Stackable, compact, vintage, modern — all of it · 90026 & 90039"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="sl-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Silver Lake</h2>
-      <p class="section-sub">Stackable, compact, vintage, modern — all of it · 90026 & 90039</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="All of Silver Lake — 90026 & 90039"
+    subheadline="From the Reservoir to Sunset Junction — every street and hillside"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={keyStreets}
+  />
 
-        <a href="/silver-lake/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Stackable units · Compact front-load · Not draining · Error codes · Tight spaces</div>
-          <div class="service-card__brands">LG · Samsung · Bosch · Miele · Whirlpool · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <CustomNarrative
+    eyebrow={housingNarrative.eyebrow}
+    headline={housingNarrative.headline}
+    paragraphs={housingNarrative.paragraphs}
+    subSections={housingNarrative.subSections}
+    background="black"
+  />
 
-        <a href="/silver-lake/dryer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair</div>
-          <div class="service-card__issues">Not heating · Stackable · Vent cleaning · Gas & electric · Compact</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Silver Lake"
+    subhead="Real calls from real streets. All three types of Silver Lake housing."
+    jobs={recentJobs}
+  />
 
-        <a href="/silver-lake/refrigerator-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Ice maker · Fan motor · Older models welcome</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Bosch · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Silver Lake Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/silver-lake/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Stove & Vintage Range Repair</div>
-          <div class="service-card__issues">Vintage ranges welcome · Igniter · Gas valve · Not heating · O'Keefe & Merritt</div>
-          <div class="service-card__brands">GE · Samsung · Bosch · Wolf · Vintage brands · O'Keefe & Merritt</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Silver Lake Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/silver-lake/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Not cleaning · Leaking · Error codes · Small kitchens</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Silver Lake"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/silver-lake/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer Repair</div>
-          <div class="service-card__issues">Not freezing · Temperature off · Ice maker · Frost buildup</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Silver Lake Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/silver-lake/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop Repair</div>
-          <div class="service-card__issues">Burner issues · Induction · Gas igniter · Older cooktops</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Thermador · Wolf · Viking</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
 
-        <a href="/silver-lake/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine & Beverage Cooler</div>
-          <div class="service-card__issues">Not cooling · Temperature off · Compact under-counter units</div>
-          <div class="service-card__brands">Sub-Zero · True · Liebherr · U-Line · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="sl-neighborhoods">
-    <div class="container">
-      <h2>All of Silver Lake — 90026 & 90039</h2>
-      <p class="section-sub">From the Reservoir to Sunset Junction — every street and hillside</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Silver Lake Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Sunset Junction</div>
-            <div class="nh-item featured">Ivanhoe</div>
-            <div class="nh-item featured">Micheltorena Hill</div>
-            <div class="nh-item">Moreno Highlands</div>
-            <div class="nh-item">Silver Lake Reservoir area</div>
-            <div class="nh-item">Effie Street corridor</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Glendale Blvd</div>
-            <div class="nh-item">Hyperion Ave</div>
-            <div class="nh-item">Rowena Ave</div>
-            <div class="nh-item">Silver Lake Blvd</div>
-            <div class="nh-item">Sunset Blvd (east)</div>
-            <div class="nh-item">Michelangelo St area</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Echo Park (90026)</div>
-            <div class="nh-item">Atwater Village (90039)</div>
-            <div class="nh-item">Los Feliz (90027)</div>
-            <div class="nh-item">Glassell Park (90065)</div>
-            <div class="nh-item">East Hollywood (90029)</div>
-            <div class="nh-item">Highland Park (90042)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- SILVER LAKE CONTEXT -->
-  <section class="sl-context">
-    <div class="container">
-      <div class="context-inner">
-        <div class="context-text">
-          <div class="context-eyebrow">Silver Lake Housing Reality</div>
-          <h2>The Appliances We Actually Work On Here</h2>
-          <p>
-            Silver Lake isn't a luxury appliance market — it's a real neighborhood with
-            a wide range of housing ages, layouts, and situations. Understanding that
-            context changes how we show up.
-          </p>
-          <div class="context-cards">
-            <div class="cc-card">
-              <div class="cc-icon">🏠</div>
-              <div class="cc-title">Mid-Century Homes</div>
-              <div class="cc-text">The Streamline Moderne and California Ranch homes near the Reservoir often have older appliances — vintage ranges that still work but need specific parts, older refrigerator compressors, and infrastructure that a newer technician won't know how to read. We work on older machines honestly.</div>
-            </div>
-            <div class="cc-card">
-              <div class="cc-icon">🏢</div>
-              <div class="cc-title">Apartments & Rentals</div>
-              <div class="cc-text">Silver Lake is heavily rented. The buildings along Glendale Blvd and Hyperion have compact kitchens and stacked laundry closets. We coordinate with landlords and property managers, come prepared for tight spaces, and don't tell renters we "can't access" because the closet is small.</div>
-            </div>
-            <div class="cc-card">
-              <div class="cc-icon">✨</div>
-              <div class="cc-title">Renovated Craftsmans & New Builds</div>
-              <div class="cc-text">The renovated homes around Sunset Junction and the newer infill construction on the hillsides have modern Bosch, Samsung, and LG appliances. Same-day service, OEM parts — the standard approach for these newer systems.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="sl-recent">
-    <div class="container">
-      <h2>Jobs Our Team Did in Silver Lake</h2>
-      <p class="section-sub">Real calls from real streets. All three types of Silver Lake housing.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Stackable Washer</span>
-            <span class="recent-location">Effie Street area, 90026</span>
-          </div>
-          <div class="recent-card__title">"UE error, shaking the whole wall"</div>
-          <div class="recent-card__desc">
-            Second-floor apartment, stacked LG unit in a closet with about six inches of
-            clearance on three sides. UE (unbalanced) errors that consistent mean worn shock
-            absorbers. Our tech worked within the closet constraints — correct disassembly
-            sequence for the tight space — replaced both shock absorbers with OEM LG parts,
-            recalibrated the drum, ran four test cycles. Neighbor downstairs had started
-            lodging complaints about the shaking. Problem solved.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM LG parts · Tight space handled cleanly</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Vintage O'Keefe & Merritt Range</span>
-            <span class="recent-location">Silver Lake Reservoir area, 90039</span>
-          </div>
-          <div class="recent-card__title">"Two burners won't light, oven pilot keeps going out"</div>
-          <div class="recent-card__desc">
-            1950s O'Keefe & Merritt — the original range still in the original kitchen.
-            These are not uncommon in Silver Lake's older housing stock and almost nobody
-            will work on them. Our tech diagnosed corroded igniter contacts on the surface
-            burners, cleaned and restored the connections, and adjusted the standing pilot
-            in the oven that had shifted from vibration over decades. All burners lit,
-            oven held temperature. Homeowner was emphatic about keeping the original range.
-            We were too.
-          </div>
-          <div class="recent-card__result">✓ Same day · Vintage range restored · No replacement needed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Sunset Junction, 90026</span>
-          </div>
-          <div class="recent-card__title">"E24 error, rental unit — tenant calling landlord daily"</div>
-          <div class="recent-card__desc">
-            Property manager called for a rental unit near Sunset Junction. Bosch E24 —
-            drainage fault. Found a blocked drain hose at the disposal knockout (prior
-            tenant had replaced the disposal but forgot to punch the plug). Cleared it,
-            tested the drain pump which was still functional, ran three cycles. Took 35
-            minutes. Sent the property manager a photo report. The tenant stopped calling.
-          </div>
-          <div class="recent-card__result">✓ Same day · Fixed in 35 min · Photo report to landlord</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Micheltorena Hill, 90026</span>
-          </div>
-          <div class="recent-card__title">"Top of fridge warm, freezer fine, ice maker dead"</div>
-          <div class="recent-card__desc">
-            Samsung French door on Micheltorena — the hillside access made the driveway
-            interesting but the repair itself was straightforward. Classic Samsung dual
-            evaporator failure: upper fan motor seized, ice maker inlet valve clogged.
-            Replaced both with OEM Samsung parts, cleared the drain, defrosted the upper
-            coils. Confirmed even temperature throughout before leaving. The homeowner
-            had a dinner party that weekend — they made it.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung · Dinner party saved</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="sl-why">
-    <div class="container">
-      <h2>Why Silver Lake Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🔩</div>
-          <div class="why-title">We Work on Older Appliances</div>
-          <div class="why-text">Vintage O'Keefe & Merritt ranges, older Frigidaires, pre-digital appliances — Silver Lake has them and most companies won't touch them. We assess each one honestly and repair what's repairable.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📐</div>
-          <div class="why-title">Tight Spaces Are Normal</div>
-          <div class="why-text">Stacked laundry in a closet, dishwasher in a galley kitchen, refrigerator behind a door that barely opens — our technicians work in these setups constantly. We don't charge extra for access difficulty.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏘️</div>
-          <div class="why-title">Renters, Landlords, Both</div>
-          <div class="why-text">We work with whoever needs to schedule and approve the repair. Renter calls, landlord pays — fine. Property manager coordinates access — fine. We send photo reports when requested.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, $89 Diagnostic</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. OEM parts only. $89 diagnostic fee waived when you proceed with the repair. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="sl-reviews">
-    <div class="container">
-      <h2>What Silver Lake Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"My LG stackable in a tiny closet on Effie Street was shaking the wall. Same Day Appliance came out, worked within the tight space no problem, replaced the shock absorbers, and the machine runs quietly now. They clearly know how to work in Silver Lake apartments."</div>
-          <div class="review-author">— Jamie R., Effie Street, Silver Lake</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"I have a vintage O'Keefe & Merritt range from the 1950s and nobody would work on it. Same Day Appliance Repair came out same day, knew exactly what to do, fixed the burners and the pilot. The range is perfect now. Really glad someone still knows how to service these."</div>
-          <div class="review-author">— Marcus T., Reservoir area, Silver Lake</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"I manage several rentals in Silver Lake. Called about a Bosch dishwasher with an E24 error. Tech came same afternoon, fixed it in under an hour, sent me a photo report for my files. This is exactly the kind of responsive property management service I need. Already saved their number."</div>
-          <div class="review-author">— Diana K., Property Manager, Silver Lake</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="sl-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Silver Lake</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator</div>
-          <div class="pricing-card__range">$200 – $400</div>
-          <div class="pricing-card__note">Fan motor, ice maker, thermostat, compressor relay</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump, shock absorbers, heating element, gasket</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$175 – $400</div>
-          <div class="pricing-card__note">Igniter, element, pilot, gas valve · Vintage OK</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Drain pump, door latch, control board, spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Stackable Units</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Compact & stackable — no extra access charge</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="sl-faq">
-    <div class="container">
-      <h2>Questions Silver Lake Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item">
-          <summary class="faq-question">Do you offer same-day appliance repair in Silver Lake, CA?</summary>
-          <div class="faq-answer">Yes. Our technicians cover all of Silver Lake — Sunset Junction, Ivanhoe, Micheltorena Hill, Moreno Highlands, the Reservoir area, and surrounding streets including Glendale Blvd, Hyperion Ave, Rowena Ave, and Effie Street. We serve ZIP codes 90026 and 90039. Call before noon for same-day afternoon service.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair stackable and compact washers and dryers in Silver Lake?</summary>
-          <div class="faq-answer">Yes. Silver Lake has a high concentration of apartments and hillside homes with compact and stackable laundry setups. Our technicians are experienced with stackable units, all-in-one combo washers/dryers, and compact front-load machines in tight laundry closets — without damaging surrounding cabinetry or flooring.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair vintage and older appliances in Silver Lake?</summary>
-          <div class="faq-answer">Yes. Silver Lake's mid-century housing stock means we regularly work on older appliances — vintage ranges, older refrigerators, and appliances that most companies won't touch. Our technicians assess each repair honestly: if a part is available and the repair makes economic sense, we do it. If not, we'll tell you.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you work in rental apartments in Silver Lake?</summary>
-          <div class="faq-answer">Yes. A large portion of Silver Lake is rental housing. We work with renters, landlords, and property managers. Call us and we'll figure out the logistics — whoever needs to schedule and approve, we make it work.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">What is your diagnostic fee in Silver Lake?</summary>
-          <div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Silver Lake repairs run $150–$350.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">What warranty do you offer on appliance repairs in Silver Lake?</summary>
-          <div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no charge. We use genuine OEM parts only.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you also serve Echo Park, Atwater Village, and Los Feliz?</summary>
-          <div class="faq-answer">Yes. Our Silver Lake service area extends to Echo Park, Atwater Village, Los Feliz, Glassell Park, Highland Park, and East Hollywood. If you're in the 90026, 90039, or adjacent ZIP codes, we're your closest team.</div>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="sl-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-        <a href="/hollywood/" class="nearby-link">Hollywood</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="sl-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Silver Lake?</h2>
-          <p>Stackable · Vintage · Compact apartment · All of 90026 & 90039. $89 diagnostic waived with repair. 90-day warranty. Renters & landlords welcome.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Silver Lake, CA 90026 · 90039</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</Layout>
-
-<style>
-  :root {
-    --sl-red: #C8102E;
-    --sl-black: #0a0a0a;
-    --sl-gray: #f5f5f5;
-    --sl-border: #e2e2e2;
-    --sl-text: #1a1a1a;
-    --sl-muted: #6b6b6b;
-  }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  .sl-hero { background: var(--sl-black); color: white; padding: 80px 0 60px; }
-  .sl-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .sl-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--sl-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .sl-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .sl-hero__accent { color: var(--sl-red); }
-  .sl-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .sl-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .sl-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .sl-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--sl-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .sl-bottom-cta .btn-secondary { color: var(--sl-text); border-color: var(--sl-border); }
-
-  .trust-bar { background: var(--sl-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-
-  .sl-intro { padding: 72px 0; background: white; }
-  .sl-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .sl-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--sl-black); margin-bottom: 20px; }
-  .sl-intro__text p { font-size: 16px; line-height: 1.7; color: var(--sl-text); margin-bottom: 16px; }
-  .cta-box { background: var(--sl-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--sl-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-
-  .section-title { font-size: 30px; font-weight: 700; color: var(--sl-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--sl-muted); text-align: center; margin-bottom: 40px; }
-
-  .sl-services { padding: 72px 0; background: var(--sl-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--sl-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--sl-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--sl-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--sl-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--sl-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--sl-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--sl-red); font-weight: 500; }
-
-  .sl-neighborhoods { padding: 72px 0; background: white; }
-  .sl-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--sl-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--sl-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--sl-text); padding: 8px 12px; background: var(--sl-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--sl-red); color: var(--sl-black); font-weight: 500; }
-
-  /* CONTEXT */
-  .sl-context { padding: 72px 0; background: var(--sl-black); color: white; }
-  .context-eyebrow { font-size: 13px; font-weight: 500; color: var(--sl-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .context-text h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .context-text > p { font-size: 15px; color: rgba(255,255,255,0.7); margin-bottom: 28px; }
-  .context-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .cc-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 24px; }
-  .cc-icon { font-size: 28px; margin-bottom: 12px; }
-  .cc-title { font-size: 16px; font-weight: 600; color: white; margin-bottom: 10px; }
-  .cc-text { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.6; }
-
-  .sl-recent { padding: 72px 0; background: var(--sl-gray); }
-  .sl-recent h2 { font-size: 30px; font-weight: 700; color: var(--sl-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--sl-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--sl-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--sl-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--sl-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--sl-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-
-  .sl-why { padding: 72px 0; background: white; }
-  .sl-why h2 { font-size: 30px; font-weight: 700; color: var(--sl-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--sl-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--sl-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--sl-muted); line-height: 1.6; }
-
-  .sl-reviews { padding: 72px 0; background: var(--sl-gray); }
-  .sl-reviews h2 { font-size: 30px; font-weight: 700; color: var(--sl-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--sl-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--sl-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--sl-muted); font-weight: 500; }
-
-  .sl-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--sl-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--sl-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--sl-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--sl-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--sl-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--sl-red); }
-  .pricing-card__note { font-size: 13px; color: var(--sl-muted); }
-
-  .sl-faq { padding: 72px 0; background: var(--sl-gray); }
-  .sl-faq h2 { font-size: 30px; font-weight: 700; color: var(--sl-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--sl-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--sl-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--sl-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--sl-text); }
-
-  .sl-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--sl-border); }
-  .sl-nearby h2 { font-size: 20px; font-weight: 600; color: var(--sl-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--sl-border); border-radius: 20px; font-size: 14px; color: var(--sl-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--sl-red); color: var(--sl-red); }
-
-  .sl-bottom-cta { padding: 72px 0; background: var(--sl-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-
-  @media (max-width: 1024px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-grid { grid-template-columns: repeat(2, 1fr); }
-    .reviews-grid { grid-template-columns: 1fr 1fr; }
-    .context-cards { grid-template-columns: 1fr; }
-    .sl-intro__inner { grid-template-columns: 1fr; }
-    .nh-columns { grid-template-columns: 1fr 1fr; }
-    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .sl-hero__inner { grid-template-columns: 1fr; }
-    .sl-hero__img-wrap { display: none; }
-    .recent-grid { grid-template-columns: 1fr; }
-    .reviews-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr 1fr; }
-    .nh-columns { grid-template-columns: 1fr; }
-    .trust-bar__inner { justify-content: center; }
-  }
-  @media (max-width: 480px) {
-    .services-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; }
-    .sl-hero { padding: 48px 0 40px; }
-    .bottom-cta__text h2 { font-size: 26px; }
-  }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Silver Lake?"
+    body="Stackable · Vintage · Compact apartment · All of 90026 & 90039. $89 diagnostic waived with repair. 90-day warranty. Renters & landlords welcome."
+  />
+</CityLayoutV2>

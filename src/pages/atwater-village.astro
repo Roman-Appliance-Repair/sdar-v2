@@ -1,687 +1,330 @@
 ---
-// src/pages/atwater-village.astro
-// SDAR — samedayappliance.repair
-// Atwater Village, Los Angeles CA 90039
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: нет данных — новый город
-// Конкуренты: TruePro (strong — O'Keefe, compact kitchens, galley, stacked),
-//             Top Tech Appliance Repair (Glendale-based, local),
-//             Appliance Attack/Billy Goldstein (owner-op, Silver Lake/AV corridor)
-// Уникальный угол: NELA creative community + 1920s Spanish bungalows +
-//                  Glendale Blvd corridor + vintage O'Keefe stoves + compact galley kitchens +
-//                  LADWP hard water + LA River neighbourhood identity
-// Апрель 2026
+/**
+ * Atwater Village, CA — v2 migrated page (T12 batch).
+ * Branch: Pasadena — service_area (per cities.ts; legacy hardcoded WeHo,
+ * but cities.ts SSOT routes 90039 to Pasadena branch via primaryBranch).
+ * Content source: legacy atwater-village.astro (dump was metadata-only).
+ *
+ * Verbatim contract: every paragraph, FAQ, recent job, review, neighborhood
+ * from the legacy preserved here. Vintage stove + LADWP hard water +
+ * compact-kitchen angles all retained.
+ *
+ * Branch isolation: phone via cities.ts → Pasadena branch (626) 376-4458.
+ * No streetAddress (service_area). All ZIPs are Atwater Village (90039).
+ *
+ * Legacy preserved as atwater-village.astro.legacy.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = {
-  name: "Atwater Village",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90039"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "atwater-village",
-};
+const citySlug = 'atwater-village';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const title = `Appliance Repair Atwater Village CA 90039 — Same Day | Glendale Blvd · Bungalows · Vintage Stoves | (323) 870-4790`;
-const description = `Same-day appliance repair in Atwater Village, CA 90039. Glendale Blvd corridor, 1920s bungalows, compact kitchens. Vintage O'Keefe & Merritt welcome. Samsung, LG, GE, Whirlpool. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/atwater-village/`;
+const cityName = 'Atwater Village';
+const zips = ['90039'];
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Atwater Village",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const title = `Appliance Repair Atwater Village CA — Same Day | Vintage Stove Friendly | ${branch.phone}`;
+const description = `Same-day appliance repair in Atwater Village, CA 90039. Glendale Blvd, Glenfeliz, LA River. O'Keefe & Merritt vintage stoves welcome. Samsung, LG, Bosch, Sub-Zero. Licensed, OEM parts, 90-day warranty. Call ${branch.phone}.`;
+const canonical = 'https://samedayappliance.repair/atwater-village/';
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Atwater Village', sameAs: 'https://en.wikipedia.org/wiki/Atwater_Village,_Los_Angeles' },
+    { '@type': 'Place', name: 'Glendale Blvd corridor' },
+    { '@type': 'Place', name: 'LA River area' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Atwater Village", "sameAs": "https://en.wikipedia.org/wiki/Atwater_Village,_Los_Angeles" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Atwater Village, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Atwater Village 90039 — Glendale Boulevard, Los Feliz Boulevard, Glenfeliz, Edenhurst Avenue, Larga Avenue, and every residential street in the neighborhood. Call before noon for same-day afternoon service." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair vintage ranges and O'Keefe & Merritt stoves in Atwater Village?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Atwater Village's 1920s Spanish bungalows and Craftsman homes frequently have vintage ranges still in operation — O'Keefe & Merritt, Wedgwood, Roper. We assess these honestly. If parts are available and the repair makes economic sense, we do it. We won't default to replacement for a well-maintained vintage stove." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you work in compact Atwater Village kitchens and tight laundry closets?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Atwater Village's bungalows often have galley-style kitchens and stacked washer-dryer closets in tight spaces. Our technicians are experienced working in constrained layouts and know how to protect original tilework, cabinetry, and hardwood floors during a repair." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does hard water in Atwater Village affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Atwater Village is LADWP territory — 230–310 mg/L hardness. Older bungalows with original galvanized pipes compound the mineral content further. Ice maker inlet valves and dishwasher spray arms scale faster here than in soft-water cities. We check for this proactively on every relevant Atwater Village call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Atwater Village?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Atwater Village?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Atwater Village repairs run $150–$400." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Silver Lake, Los Feliz, and Glendale?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Atwater Village service extends to Silver Lake, Los Feliz, Eagle Rock, Glendale, Highland Park, Glassell Park, Echo Park, and all of northeast LA. All on the same route." }
-    }
-  ]
+const introParagraphs = [
+  "Atwater Village sits between Griffith Park and the LA River — one of the most characterful pockets in northeast LA. The housing stock is predominantly 1920s and 1930s Spanish bungalows and Craftsman homes, most of them well maintained, many of them recently renovated. The kitchens reflect that history: compact galley layouts with original tile, narrow doorways, stacked washer-dryer closets where space was never abundant.",
+  "Vintage ranges are common here for the same reason they are in neighbouring Eagle Rock and Silver Lake — the original kitchens were designed around them, and they still cook beautifully. O'Keefe & Merritt, Wedgwood, Roper. We assess these honestly and don't push replacement when a repair makes more sense. A working vintage range in a Glenfeliz bungalow kitchen is worth preserving.",
+  "For modern appliances — the Samsung and LG units that come with renovations, the Bosch dishwashers installed in the updated kitchens — we carry full OEM parts on every vehicle. LADWP hard water (230–310 mg/L) is a factor throughout 90039, and older bungalows with original galvanized supply lines compound the mineral content. We check ice maker inlet valves and dishwasher spray arms for scale buildup on every relevant Atwater Village call.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong>. Weekends available.",
+];
+
+const services = [
+  { icon: '🔥', name: 'Oven, Range & Vintage Stove', slug: 'oven', issues: "O'Keefe & Merritt · Wedgwood · Gas igniter · Pilot · Thermostat · Vintage ranges", brands: 'GE · Samsung · Bosch · Wolf · Viking' },
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'LADWP hard water ice maker · Not cooling · Fan motor · Temperature', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'Stackable closet · OE / UE error · Not draining · Not spinning', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen' },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · Compact vent runs · Gas & electric', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Hard water spray arm scale · Not draining · E24 · Bosch', brands: 'Bosch · KitchenAid · Samsung · LG · GE · Miele' },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'LADWP inlet valve scale · Not freezing · Ice stopped · Frost', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Compressor · Under-counter · Built-in', brands: 'True · U-Line · Liebherr · Dacor · Sub-Zero' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Gas igniter · Burner · Induction not heating · Hood motor', brands: 'GE · Bosch · Samsung · Wolf · Thermador · Broan' },
+];
+
+const vintageNarrative = {
+  headline: 'Vintage Range Tip for Atwater Village',
+  paragraphs: [
+    "If your O'Keefe & Merritt or Wedgwood has a burner that won't light, an oven pilot that's out, or a thermostat running off-temperature — these are all repairable. Parts are still available for most common failures on these ranges. Call us before assuming it can't be done. A range that cooks this well and fits this kitchen is worth one honest diagnostic.",
+  ],
 };
+
+const neighborhoods = [
+  { name: 'Glendale Blvd corridor', zip: '90039', featured: true },
+  { name: 'Glenfeliz Ave area', zip: '90039', featured: true },
+  { name: 'Los Feliz Blvd border', zip: '90039', featured: true },
+  { name: 'Edenhurst Ave', zip: '90039' },
+  { name: 'Larga Ave', zip: '90039' },
+  { name: 'LA River adjacent streets', zip: '90039' },
+  { name: 'Atwater Village Community Garden area', zip: '90039' },
+];
+
+const keyStreets = [
+  'Glendale Blvd',
+  'Los Feliz Blvd',
+  'Glenfeliz Blvd',
+  'Brunswick Ave',
+  'Edenhurst Ave',
+  'Garden Ave',
+];
+
+const recentJobs = [
+  {
+    appliance: "O'Keefe & Merritt Range",
+    location: 'Glenfeliz Ave, 90039',
+    quote: 'Two burners dead, oven runs hot — original 1940s kitchen',
+    description: "Spanish bungalow on Glenfeliz — original kitchen, O'Keefe & Merritt still in place, never replaced. Two surface igniter contacts corroded and one gas orifice partially blocked. Oven thermostat drifting 35°F high. Cleaned and adjusted the igniter contacts, cleared the blocked orifice, recalibrated the oven thermostat. All four burners confirmed, oven accurate at 325°F, 375°F, and 425°F. The owners had been told \"it's too old to fix\" by another company. It wasn't.",
+    outcome: '✓ Same day · All burners · Oven calibrated · Worth keeping',
+  },
+  {
+    appliance: 'LG Stackable Washer',
+    location: 'Edenhurst Ave, 90039',
+    quote: "OE error in the laundry closet — can't even open the door",
+    description: 'Typical Atwater bungalow laundry closet — LG stacked unit, barely 30 inches of clearance on either side. OE drain error from a pump filter blocked by a combination of lint and hard water mineral scale. Worked carefully in the tight space without touching the original painted doorframe. Cleared the pump filter, flushed the drain line, confirmed three full cycles. Showed the owner how to access the filter quarterly in the closet configuration. LADWP mineral content was contributing to the faster-than-usual buildup.',
+    outcome: '✓ Same day · Tight space · OE resolved · Quarterly routine set',
+  },
+  {
+    appliance: 'Samsung Refrigerator',
+    location: 'Glendale Blvd corridor, 90039',
+    quote: 'Ice maker barely producing — month-long slow decline',
+    description: 'Renovated bungalow on a Glendale Blvd side street — Samsung French door installed with the kitchen remodel, but the original galvanized supply lines were still feeding the ice maker water line. LADWP hard water plus iron from the old pipes had scaled the inlet valve to about 15% capacity. Replaced with OEM Samsung inlet valve, flushed the line, replaced the 13-month-old filter. Full production by next morning. Recommended an inline sediment filter given the galvanized pipe situation — will meaningfully extend the interval between inlet valve replacements.',
+    outcome: '✓ Same day · OEM Samsung · Old pipe factor · Inline filter advised',
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'Brunswick Ave, 90039',
+    quote: 'E24 error — standing water, happened suddenly after years of fine',
+    description: 'Bosch 500 series in a renovated Atwater kitchen — E24 drain error with a full tub of standing water. Drain pump housing partially blocked, and the filter trap had significant mineral scale from LADWP hard water layered over food debris. Cleared both, ran the Bosch diagnostic cycle, confirmed full drain on three consecutive cycles. Also found the drain hose routing kinked slightly behind the unit — re-routed with proper slack. First load: clean dishes and a completely dry tub. Homeowner had lived in the house four years with no prior dishwasher issues — explained the hard water scale factor.',
+    outcome: '✓ Same day · E24 resolved · Hose re-routed · Hard water explained',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Vintage Stove Friendly',
+    body: "O'Keefe & Merritt, Wedgwood, Roper — we assess vintage ranges honestly and don't default to \"too old to fix.\" If parts are available and the repair makes economic sense, we do it. Atwater's bungalow kitchens were built around these ranges, and they're worth preserving when they can be.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Compact Kitchen Experts',
+    body: 'Galley kitchens, stacked laundry closets, narrow doorways — these are standard in Atwater Village bungalows. Our technicians work carefully in tight spaces and protect original tilework, painted woodwork, and hardwood floors. No casual tools dragged through a century-old kitchen.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'LADWP Hard Water Aware',
+    body: 'Atwater Village runs on LADWP at 230–310 mg/L. Older bungalows with galvanized supply lines add iron on top. Ice makers and dishwashers scale faster than the national average here. We check for mineral buildup proactively on every relevant call.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"O\'Keefe & Merritt in our original Glenfeliz kitchen had two dead burners and an oven running too hot. Another company told us it was too old to fix. Same Day came out, repaired everything, calibrated the oven. Works perfectly. This range is staying in this kitchen — exactly the right call."',
+    author: '— Sarah B., Glenfeliz Ave, Atwater Village',
+  },
+  {
+    stars: 5,
+    text: '"Stacked LG washer in our laundry closet with an OE error. Incredibly tight space — tech worked in there without so much as a scuff on the doorframe. Fixed the drain, showed me the quarterly maintenance step, explained the LADWP hard water connection. Exactly what you want from a repair call."',
+    author: '— Marcus T., Edenhurst Ave, Atwater Village',
+  },
+  {
+    stars: 5,
+    text: "\"Samsung fridge ice maker declining for weeks. Tech found the old galvanized pipes plus LADWP water had scaled the inlet valve, replaced it with OEM part, recommended an inline filter for our specific situation. Full ice by morning. Really appreciated the explanation — this isn't just generic advice, it's specific to our house.\"",
+    author: '— Jennifer L., Glendale Blvd area, Atwater Village',
+  },
+];
+
+const pricingTiers = [
+  { appliance: "Vintage Range (O'Keefe, Wedgwood)", range: '$150 – $300', note: 'Igniter contacts · Pilot · Thermostat · Orifice cleaning', featured: true },
+  { appliance: 'Refrigerator / Ice Maker', range: '$150 – $400', note: 'LADWP inlet valve · Galvanized pipe factor · Fan motor' },
+  { appliance: 'Washer / Dryer (incl. stackable)', range: '$150 – $350', note: 'Compact closet · Drain pump · Thermal fuse · Vent' },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'Hard water scale · E24 · Drain pump · Spray arm' },
+  { appliance: 'Modern Oven / Range', range: '$150 – $400', note: 'Gas igniter · Bake element · Calibration' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Atwater Village, CA?',
+    answer: 'Yes. Our technicians cover all of Atwater Village 90039 — Glendale Boulevard, Glenfeliz, Edenhurst, Brunswick, Larga, and every residential street. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: "Do you repair vintage ranges and O'Keefe & Merritt stoves in Atwater Village?",
+    answer: "Yes. We assess vintage ranges honestly — if parts are available and the repair makes economic sense, we do it. We won't tell you to replace a range that can be fixed and belongs in that kitchen.",
+  },
+  {
+    question: 'Do you work in compact Atwater Village kitchens and tight laundry closets?',
+    answer: "Yes. Galley kitchens and stacked laundry closets are standard in Atwater's bungalows. Our technicians work carefully in tight spaces and protect original tilework, cabinetry, and floors.",
+  },
+  {
+    question: 'Does hard water in Atwater Village affect appliances?',
+    answer: 'Yes. LADWP runs 230–310 mg/L here. Older bungalows with galvanized supply lines add iron. Ice maker inlet valves and dishwasher spray arms scale faster than average. We check proactively on every relevant call.',
+  },
+  {
+    question: 'Are you available on weekends in Atwater Village?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm.',
+  },
+  {
+    question: 'What is your diagnostic fee in Atwater Village?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Atwater Village repairs run $150–$400.',
+  },
+  {
+    question: 'Do you also serve Silver Lake, Los Feliz, and Glendale?',
+    answer: 'Yes. Our Atwater Village service extends to Silver Lake, Los Feliz, Eagle Rock, Glendale, Highland Park, Glassell Park, and Echo Park. All on the same northeast LA route.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Silver Lake', slug: 'silver-lake' },
+  { name: 'Los Feliz', slug: 'los-feliz' },
+  { name: 'Eagle Rock', slug: 'eagle-rock' },
+  { name: 'Glendale', slug: 'glendale' },
+  { name: 'Burbank', slug: 'burbank' },
+  { name: 'Pasadena', slug: 'pasadena' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Atwater Village, CA"
+    subheadline="1920s bungalows, compact kitchens, vintage stoves and modern appliances side by side along the LA River. O'Keefe & Merritt welcome. Same-day service, OEM parts, 90-day warranty. Weekends available."
+    zips={zips}
+    tier={1}
+  />
 
-  <!-- HERO -->
-  <section class="av-hero">
-    <div class="av-hero__inner container">
-      <div class="av-hero__content">
-        <div class="av-hero__eyebrow">Atwater Village · 90039 · Glendale Blvd · LA River · Los Feliz Blvd · Glenfeliz Ave</div>
-        <h1 class="av-hero__h1">
-          Appliance Repair<br>
-          <span class="av-hero__accent">Atwater Village, CA</span>
-        </h1>
-        <p class="av-hero__sub">
-          1920s bungalows, compact kitchens, vintage stoves, and modern appliances
-          living side by side along the LA River. Vintage O'Keefe & Merritt welcome.
-          Same-day service, OEM parts, 90-day warranty. Weekends available.
-        </p>
-        <div class="av-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="av-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="av-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-atwater-village-ca.webp"
-          alt="Appliance repair in Atwater Village CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Vintage Stoves Welcome</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Atwater Village — Knowing the Neighbourhood"
+    paragraphs={introParagraphs}
+    bookingTitle="Atwater Village Service"
+    bookingSub="90039 · Vintage stoves · Compact kitchens"
+  />
 
-  <!-- INTRO -->
-  <section class="av-intro">
-    <div class="container av-intro__inner">
-      <div class="av-intro__text">
-        <h2>Appliance Repair in Atwater Village — Knowing the Neighbourhood</h2>
-        <p>
-          Atwater Village sits between Griffith Park and the LA River — one of the
-          most characterful pockets in northeast LA. The housing stock is predominantly
-          1920s and 1930s Spanish bungalows and Craftsman homes, most of them well
-          maintained, many of them recently renovated. The kitchens reflect that history:
-          compact galley layouts with original tile, narrow doorways, stacked
-          washer-dryer closets where space was never abundant.
-        </p>
-        <p>
-          Vintage ranges are common here for the same reason they are in neighbouring
-          Eagle Rock and Silver Lake — the original kitchens were designed around them,
-          and they still cook beautifully. O'Keefe & Merritt, Wedgwood, Roper. We assess
-          these honestly and don't push replacement when a repair makes more sense.
-          A working vintage range in a Glenfeliz bungalow kitchen is worth preserving.
-        </p>
-        <p>
-          For modern appliances — the Samsung and LG units that come with renovations,
-          the Bosch dishwashers installed in the updated kitchens — we carry full OEM
-          parts on every vehicle. LADWP hard water (230–310 mg/L) is a factor throughout
-          90039, and older bungalows with original galvanized supply lines compound the
-          mineral content. We check ice maker inlet valves and dishwasher spray arms
-          for scale buildup on every relevant Atwater Village call.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong>. Weekends available.
-        </p>
-        <div class="av-tip">
-          <div class="av-tip__icon">🍳</div>
-          <div class="av-tip__text">
-            <strong>Vintage range tip for Atwater Village:</strong> If your O'Keefe
-            & Merritt or Wedgwood has a burner that won't light, an oven pilot
-            that's out, or a thermostat running off-temperature — these are all
-            repairable. Parts are still available for most common failures on
-            these ranges. Call us before assuming it can't be done. A range that
-            cooks this well and fits this kitchen is worth one honest diagnostic.
-          </div>
-        </div>
-      </div>
-      <div class="av-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Atwater Village Service</div>
-          <div class="cta-box__sub">90039 · Vintage stoves · Compact kitchens</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Atwater Village"
+    subhead="Vintage & modern · Compact kitchens · LADWP hard water · 90039"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="av-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Atwater Village</h2>
-      <p class="section-sub">Vintage & modern · Compact kitchens · LADWP hard water · 90039</p>
-      <div class="services-grid">
+  <CustomNarrative
+    headline={vintageNarrative.headline}
+    paragraphs={vintageNarrative.paragraphs}
+    background="gray"
+  />
 
-        <a href="/atwater-village/oven-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Vintage Stove</div>
-          <div class="service-card__issues">O'Keefe & Merritt · Wedgwood · Gas igniter · Pilot · Thermostat</div>
-          <div class="service-card__brands">Vintage ranges · GE · Samsung · Bosch · Wolf · Viking</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ServiceArea
+    cityName={cityName}
+    headline="Atwater Village Areas We Service"
+    subheadline="Glendale Blvd corridor to LA River — every street in 90039"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={keyStreets}
+  />
 
-        <a href="/atwater-village/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">LADWP hard water ice maker · Not cooling · Fan motor · Temperature</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in Atwater Village"
+    jobs={recentJobs}
+  />
 
-        <a href="/atwater-village/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Stackable closet · OE / UE error · Not draining · Not spinning</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Atwater Village Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/atwater-village/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Compact vent runs · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Atwater Village Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/atwater-village/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Hard water spray arm scale · Not draining · E24 · Bosch</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Atwater Village"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/atwater-village/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">LADWP inlet valve scale · Not freezing · Ice stopped · Frost</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Atwater Village Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/atwater-village/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby nearbyCities={nearbyCities} />
 
-        <a href="/atwater-village/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · Thermador · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBOURHOODS -->
-  <section class="av-neighborhoods">
-    <div class="container">
-      <h2>All of Atwater Village — 90039</h2>
-      <p class="section-sub">Glendale Blvd to the LA River — every street in the neighbourhood</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">AV Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Glendale Blvd corridor</div>
-            <div class="nh-item featured">Glenfeliz Ave area</div>
-            <div class="nh-item featured">Los Feliz Blvd border</div>
-            <div class="nh-item">Edenhurst Ave</div>
-            <div class="nh-item">Larga Ave</div>
-            <div class="nh-item">LA River adjacent streets</div>
-            <div class="nh-item">Atwater Village Community Garden area</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Glendale Blvd</div>
-            <div class="nh-item">Los Feliz Blvd</div>
-            <div class="nh-item">Glenfeliz Blvd</div>
-            <div class="nh-item">Brunswick Ave</div>
-            <div class="nh-item">Edenhurst Ave</div>
-            <div class="nh-item">Garden Ave</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Silver Lake (90026)</div>
-            <div class="nh-item">Los Feliz (90027)</div>
-            <div class="nh-item">Eagle Rock (90041)</div>
-            <div class="nh-item">Glendale (91201–08)</div>
-            <div class="nh-item">Highland Park (90042)</div>
-            <div class="nh-item">Glassell Park (90065)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="av-recent">
-    <div class="container">
-      <h2>Recent Jobs in Atwater Village</h2>
-      <p class="section-sub">Real calls from 90039 — bungalow kitchens, vintage stoves, LADWP hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">O'Keefe & Merritt Range</span>
-            <span class="recent-location">Glenfeliz Ave, 90039</span>
-          </div>
-          <div class="recent-card__title">"Two burners dead, oven runs hot — original 1940s kitchen"</div>
-          <div class="recent-card__desc">
-            Spanish bungalow on Glenfeliz — original kitchen, O'Keefe & Merritt
-            still in place, never replaced. Two surface igniter contacts corroded
-            and one gas orifice partially blocked. Oven thermostat drifting 35°F
-            high. Cleaned and adjusted the igniter contacts, cleared the blocked
-            orifice, recalibrated the oven thermostat. All four burners confirmed,
-            oven accurate at 325°F, 375°F, and 425°F. The owners had been told
-            "it's too old to fix" by another company. It wasn't.
-          </div>
-          <div class="recent-card__result">✓ Same day · All burners · Oven calibrated · Worth keeping</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Stackable Washer</span>
-            <span class="recent-location">Edenhurst Ave, 90039</span>
-          </div>
-          <div class="recent-card__title">"OE error in the laundry closet — can't even open the door"</div>
-          <div class="recent-card__desc">
-            Typical Atwater bungalow laundry closet — LG stacked unit, barely
-            30 inches of clearance on either side. OE drain error from a pump
-            filter blocked by a combination of lint and hard water mineral scale.
-            Worked carefully in the tight space without touching the original
-            painted doorframe. Cleared the pump filter, flushed the drain line,
-            confirmed three full cycles. Showed the owner how to access the filter
-            quarterly in the closet configuration. LADWP mineral content was
-            contributing to the faster-than-usual buildup.
-          </div>
-          <div class="recent-card__result">✓ Same day · Tight space · OE resolved · Quarterly routine set</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Glendale Blvd corridor, 90039</span>
-          </div>
-          <div class="recent-card__title">"Ice maker barely producing — month-long slow decline"</div>
-          <div class="recent-card__desc">
-            Renovated bungalow on a Glendale Blvd side street — Samsung French
-            door installed with the kitchen remodel, but the original galvanized
-            supply lines were still feeding the ice maker water line. LADWP hard
-            water plus iron from the old pipes had scaled the inlet valve to about
-            15% capacity. Replaced with OEM Samsung inlet valve, flushed the line,
-            replaced the 13-month-old filter. Full production by next morning.
-            Recommended an inline sediment filter given the galvanized pipe
-            situation — will meaningfully extend the interval between inlet
-            valve replacements.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung · Old pipe factor · Inline filter advised</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Brunswick Ave, 90039</span>
-          </div>
-          <div class="recent-card__title">"E24 error — standing water, happened suddenly after years of fine"</div>
-          <div class="recent-card__desc">
-            Bosch 500 series in a renovated Atwater kitchen — E24 drain error
-            with a full tub of standing water. Drain pump housing partially
-            blocked, and the filter trap had significant mineral scale from
-            LADWP hard water layered over food debris. Cleared both, ran the
-            Bosch diagnostic cycle, confirmed full drain on three consecutive
-            cycles. Also found the drain hose routing kinked slightly behind
-            the unit — re-routed with proper slack. First load: clean dishes
-            and a completely dry tub. Homeowner had lived in the house four
-            years with no prior dishwasher issues — explained the hard water
-            scale factor.
-          </div>
-          <div class="recent-card__result">✓ Same day · E24 resolved · Hose re-routed · Hard water explained</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="av-why">
-    <div class="container">
-      <h2>Why Atwater Village Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🍳</div>
-          <div class="why-title">Vintage Stove Friendly</div>
-          <div class="why-text">O'Keefe & Merritt, Wedgwood, Roper — we assess vintage ranges honestly and don't default to "too old to fix." If parts are available and the repair makes economic sense, we do it. Atwater's bungalow kitchens were built around these ranges, and they're worth preserving when they can be.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">Compact Kitchen Experts</div>
-          <div class="why-text">Galley kitchens, stacked laundry closets, narrow doorways — these are standard in Atwater Village bungalows. Our technicians work carefully in tight spaces and protect original tilework, painted woodwork, and hardwood floors. No casual tools dragged through a century-old kitchen.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">LADWP Hard Water Aware</div>
-          <div class="why-text">Atwater Village runs on LADWP at 230–310 mg/L. Older bungalows with galvanized supply lines add iron on top. Ice makers and dishwashers scale faster than the national average here. We check for mineral buildup proactively on every relevant call.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="av-reviews">
-    <div class="container">
-      <h2>What Atwater Village Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"O'Keefe & Merritt in our original Glenfeliz kitchen had two dead burners and an oven running too hot. Another company told us it was too old to fix. Same Day came out, repaired everything, calibrated the oven. Works perfectly. This range is staying in this kitchen — exactly the right call."</div>
-          <div class="review-author">— Sarah B., Glenfeliz Ave, Atwater Village</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Stacked LG washer in our laundry closet with an OE error. Incredibly tight space — tech worked in there without so much as a scuff on the doorframe. Fixed the drain, showed me the quarterly maintenance step, explained the LADWP hard water connection. Exactly what you want from a repair call."</div>
-          <div class="review-author">— Marcus T., Edenhurst Ave, Atwater Village</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Samsung fridge ice maker declining for weeks. Tech found the old galvanized pipes plus LADWP water had scaled the inlet valve, replaced it with OEM part, recommended an inline filter for our specific situation. Full ice by morning. Really appreciated the explanation — this isn't just generic advice, it's specific to our house."</div>
-          <div class="review-author">— Jennifer L., Glendale Blvd area, Atwater Village</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="av-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Atwater Village</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Vintage Range (O'Keefe, Wedgwood)</div>
-          <div class="pricing-card__range">$150 – $300</div>
-          <div class="pricing-card__note">Igniter contacts · Pilot · Thermostat · Orifice cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">LADWP inlet valve · Galvanized pipe factor · Fan motor</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer (incl. stackable)</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Compact closet · Drain pump · Thermal fuse · Vent</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Hard water scale · E24 · Drain pump · Spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Modern Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="av-faq">
-    <div class="container">
-      <h2>Questions Atwater Village Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Atwater Village, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Atwater Village 90039 — Glendale Boulevard, Glenfeliz, Edenhurst, Brunswick, Larga, and every residential street. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair vintage ranges and O'Keefe & Merritt stoves in Atwater Village?</summary><div class="faq-answer">Yes. We assess vintage ranges honestly — if parts are available and the repair makes economic sense, we do it. We won't tell you to replace a range that can be fixed and belongs in that kitchen.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you work in compact Atwater Village kitchens and tight laundry closets?</summary><div class="faq-answer">Yes. Galley kitchens and stacked laundry closets are standard in Atwater's bungalows. Our technicians work carefully in tight spaces and protect original tilework, cabinetry, and floors.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does hard water in Atwater Village affect appliances?</summary><div class="faq-answer">Yes. LADWP runs 230–310 mg/L here. Older bungalows with galvanized supply lines add iron. Ice maker inlet valves and dishwasher spray arms scale faster than average. We check proactively on every relevant call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Atwater Village?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Atwater Village?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Atwater Village repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Silver Lake, Los Feliz, and Glendale?</summary><div class="faq-answer">Yes. Our Atwater Village service extends to Silver Lake, Los Feliz, Eagle Rock, Glendale, Highland Park, Glassell Park, and Echo Park. All on the same northeast LA route.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="av-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/silver-lake/" class="nearby-link">Silver Lake</a>
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-        <a href="/eagle-rock/" class="nearby-link">Eagle Rock</a>
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="av-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Atwater Village?</h2>
-          <p>Vintage stoves welcome · Compact kitchens · LADWP hard water aware · All of 90039. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Atwater Village, CA 90039</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --av-red: #C8102E; --av-black: #0a0a0a; --av-gray: #f5f5f5; --av-border: #e2e2e2; --av-text: #1a1a1a; --av-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .av-hero { background: var(--av-black); color: white; padding: 80px 0 60px; }
-  .av-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .av-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--av-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .av-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .av-hero__accent { color: var(--av-red); }
-  .av-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .av-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .av-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .av-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--av-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .av-bottom-cta .btn-secondary { color: var(--av-text); border-color: var(--av-border); }
-  .trust-bar { background: var(--av-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .av-intro { padding: 72px 0; background: white; }
-  .av-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .av-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--av-black); margin-bottom: 20px; }
-  .av-intro__text p { font-size: 16px; line-height: 1.7; color: var(--av-text); margin-bottom: 16px; }
-  .av-tip { display: flex; gap: 14px; background: #f5f0e8; border: 1px solid #c4a87a; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .av-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .av-tip__text { font-size: 14px; color: var(--av-text); line-height: 1.6; }
-  .cta-box { background: var(--av-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--av-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--av-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--av-muted); text-align: center; margin-bottom: 40px; }
-  .av-services { padding: 72px 0; background: var(--av-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--av-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--av-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--av-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--av-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--av-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--av-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--av-red); font-weight: 500; }
-  .av-neighborhoods { padding: 72px 0; background: white; }
-  .av-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--av-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--av-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--av-text); padding: 8px 12px; background: var(--av-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--av-red); color: var(--av-black); font-weight: 500; }
-  .av-recent { padding: 72px 0; background: var(--av-gray); }
-  .av-recent h2 { font-size: 30px; font-weight: 700; color: var(--av-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--av-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--av-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--av-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--av-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--av-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .av-why { padding: 72px 0; background: white; }
-  .av-why h2 { font-size: 30px; font-weight: 700; color: var(--av-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--av-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--av-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--av-muted); line-height: 1.6; }
-  .av-reviews { padding: 72px 0; background: var(--av-gray); }
-  .av-reviews h2 { font-size: 30px; font-weight: 700; color: var(--av-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--av-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--av-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--av-muted); font-weight: 500; }
-  .av-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--av-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--av-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--av-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--av-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--av-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--av-red); }
-  .pricing-card__note { font-size: 13px; color: var(--av-muted); }
-  .av-faq { padding: 72px 0; background: var(--av-gray); }
-  .av-faq h2 { font-size: 30px; font-weight: 700; color: var(--av-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--av-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--av-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--av-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--av-text); }
-  .av-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--av-border); }
-  .av-nearby h2 { font-size: 20px; font-weight: 600; color: var(--av-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--av-border); border-radius: 20px; font-size: 14px; color: var(--av-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--av-red); color: var(--av-red); }
-  .av-bottom-cta { padding: 72px 0; background: var(--av-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .av-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .av-hero__inner { grid-template-columns: 1fr; } .av-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .av-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Atwater Village?"
+    body="Vintage stoves welcome · Compact kitchens · LADWP hard water aware · All of 90039. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayoutV2>

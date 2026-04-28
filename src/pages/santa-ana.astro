@@ -1,422 +1,333 @@
 ---
-// src/pages/santa-ana.astro
-// Same Day Appliance Repair — Santa Ana, CA
-// Branch: Irvine | Phone: (213) 401-9019
-// Tier: T2 — full residential + commercial scope (largest city in Orange County, 310k pop)
-// Analyst-omission backfill — Santa Ana is OC's civic + commercial center
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+const citySlug = 'santa-ana';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = "Santa Ana";
-const citySlug = "santa-ana";
-const phone = "(213) 401-9019";
-const phoneRaw = "+12134019019";
-const email = "irvine@samedayappliance.repair";
-const branch = "Irvine";
+const cityName = 'Santa Ana';
+const zips = ['92701', '92703', '92704', '92705', '92706', '92707'];
 
-const metaTitle = "Appliance Repair Santa Ana CA | Same Day Service | (213) 401-9019";
-const metaDesc = "Same-day appliance repair in Santa Ana, CA. Floral Park, French Park, Downtown, Willard, Delhi, South Coast Metro. Sub-Zero, Wolf & all brands. Commercial + residential. $89 diagnostic.";
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
 
-const neighborhoods = [
-  { name: "Downtown Santa Ana", zip: "92701" },
-  { name: "Artists Village", zip: "92701" },
-  { name: "French Park (Historic)", zip: "92701" },
-  { name: "Floral Park (Historic)", zip: "92706" },
-  { name: "West Floral Park", zip: "92703" },
-  { name: "Willard / Logan", zip: "92703" },
-  { name: "Delhi", zip: "92707" },
-  { name: "South Coast Metro", zip: "92704" },
-  { name: "MainPlace / Park Santiago", zip: "92705" },
-  { name: "North Santa Ana", zip: "92705" },
-  { name: "Cabrillo Park", zip: "92701" },
-  { name: "Madison Park", zip: "92707" },
+const title = `Appliance Repair Santa Ana CA | Same Day Service | ${branch.phone}`;
+const description = "Same-day appliance repair in Santa Ana, CA. Floral Park, French Park, Downtown, Willard, Delhi, South Coast Metro. Sub-Zero, Wolf & all brands. Commercial + residential. $89 diagnostic.";
+const canonical = 'https://samedayappliance.repair/santa-ana/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Santa Ana', sameAs: 'https://en.wikipedia.org/wiki/Santa_Ana,_California' },
+    { '@type': 'Place', name: 'Downtown Santa Ana' },
+    { '@type': 'Place', name: 'Floral Park' },
+    { '@type': 'Place', name: 'French Park' },
+    { '@type': 'Place', name: 'South Coast Metro' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+// Pricing-discipline narrow: $120 commercial number dropped from intro paragraph 4 (last sentence rewritten).
+const introParagraphs = [
+  "Santa Ana is the largest city in Orange County by population (310,000+ residents) and the seat of OC government — courthouse, civic center, OC government complex, Bowers Museum, MainPlace Mall, Discovery Cube. Service work in Santa Ana shifts meaningfully based on which neighborhood you're in, more so than most OC cities, because Santa Ana is genuinely a multi-era city stitched together over a century.",
+  "Downtown Santa Ana around 4th Street + the Civic Center has the highest commercial-kitchen density in OC outside the resort cluster — Mexican restaurants, the Artists Village restaurant + gallery scene, government cafeterias, plus the small-business cluster supporting the courthouse and OC government workforce. Floral Park and French Park immediately north of Downtown are historic residential — 1920s-30s craftsman and Spanish-style homes, many renovated to luxury kitchen spec over the past decade with Sub-Zero, Wolf, and Thermador installs sitting in 90-year-old kitchen footprints. South Coast Metro at Santa Ana's southern edge near Bristol + Sunflower is the high-rise condo cluster with the South Coast Plaza retail anchor — 2010-2017 build wave, premium-luxury appliance spec, Wolf and Sub-Zero common. North Santa Ana around MainPlace + Park Santiago is mainstream-premium residential. Willard, Delhi, Madison Park to the south and west are mid-market neighborhoods with Whirlpool, Maytag, GE, Samsung, LG the typical brand mix.",
+  "Our Irvine branch runs Santa Ana on the regular OC route. Floral Park and French Park calls usually involve older renovated homes where appliance-side service has to account for legacy electrical and plumbing — we work with that, and we tell homeowners up front when something is appliance scope versus when it needs an electrician or plumber separately. South Coast Metro condo work runs comparable to Newport Beach + Irvine luxury-tier service. Downtown commercial is restaurants and small-business kitchens running both commercial-spec and high-cycle residential equipment. Mid-market neighborhoods are the standard mainstream brand mix any OC technician handles routinely.",
+  "Santa Ana also has a meaningful institutional and government appliance footprint — the Civic Center, OC Superior Court, government kitchens and cafeterias, plus hotels (DoubleTree by Hilton, Embassy Suites Anaheim South nearby) and the cluster around MainPlace + Discovery Cube + Bowers Museum. We service commercial appliances. Call us for commercial pricing.",
+  `Call <a href="tel:${phoneRaw}">${branch.phone}</a> — someone with our actual OC schedule picks up.`,
 ];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Stove Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Microwave Repair", slug: "microwave-repair", icon: "📻" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Garbage Disposal Repair", slug: "garbage-disposal-repair", icon: "🗑️" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍳', name: 'Stove Repair', slug: 'stove' },
+  { icon: '📻', name: 'Microwave Repair', slug: 'microwave' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🗑️', name: 'Garbage Disposal Repair', slug: 'garbage-disposal' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
 ];
 
-const recentRepairs = [
-  {
-    title: "Sub-Zero 700 Series — Floral Park 1930s craftsman, ice maker dripping",
-    neighborhood: "Floral Park (Historic)",
-    detail: "Sub-Zero 700TR built-in in a Floral Park craftsman near 17th Street and Flower — homeowner had been catching the drip with a towel for two months. Water inlet valve was leaking from the secondary port (the ice-maker side, not the dispenser side). Replaced the valve, flushed the water line of debris, ran a 6-cycle ice harvest test. Floral Park is one of OC's oldest historic districts (1920s-30s housing) and Sub-Zero installs in these renovated craftsmans concentrate at the 8-15 year mark on water valves — the sediment that LA basin water carries hits the secondary port harder than the primary dispense path. Documented for the homeowner.",
-    part: "Sub-Zero OEM dual-port water inlet valve",
-    time: "2 hours"
-  },
-  {
-    title: "Wolf 36\" range top — South Coast Metro condo, igniter not lighting front-left",
-    neighborhood: "South Coast Metro",
-    detail: "Wolf SRT364C 36\" gas range top in a South Coast Metro high-rise condo near Bristol and Sunflower — front-left burner clicking but not lighting. Spark electrode had cracked at the ceramic insulator (visible hairline). Replaced the electrode, cleaned the burner head, verified spark gap on all four burners + simmer burner, ran 30-second light tests. South Coast Metro condo Wolf installs cluster around the 2010-2017 build wave; we see this electrode failure consistently at the 6-9 year mark. Not a manufacturing defect — normal end-of-life for a ceramic spark insulator on a high-cycle burner.",
-    part: "Wolf OEM spark electrode + ceramic insulator",
-    time: "1.5 hours"
-  },
-  {
-    title: "Hobart commercial dishwasher — restaurant near Civic Center, no rinse cycle",
-    neighborhood: "Downtown Santa Ana / Civic Center",
-    detail: "Hobart AM15 high-temp commercial dishwasher in a Mexican restaurant near the OC Civic Center on 4th Street — wash cycle running fine, but final rinse barely producing pressure. Rinse pump impeller had a chunk of food debris jammed against it (corn husk fragment) plus the rinse-arm jets were partially clogged with hard-water scale. Cleared the impeller, descaled the rinse arm with Hobart-approved descaler, replaced the rinse-arm spray jets that had eroded past spec. Health-code rinse temp ran 184°F final (spec 180°F minimum). Downtown Santa Ana restaurant kitchens with Hobart units typically need annual rinse-system service given OC water hardness — we documented the next-service date for the operator.",
-    part: "Hobart OEM rinse-arm spray jets + descaler service",
-    time: "2.5 hours"
-  },
-  {
-    title: "LG WashTower — Willard Spanish-style, washer F-code mid-cycle",
-    neighborhood: "Willard / Logan",
-    detail: "LG WashTower (factory-stacked single-cabinet column) in a Willard 1940s Spanish-style home off Bristol — washer halting mid-cycle with F-1 sensor fault on the panel. Hall sensor on the inner drum had drifted out of spec (reading 200% high resistance at room temp). Replaced the sensor, ran factory-reset on the unified Center Control panel, verified spin extraction RPM on three test cycles. WashTower's unified-control architecture means a single sensor failure can lock both wash + dry sides — important to understand at diagnostic time. Willard's older homes have tight laundry closets that complicate the factory-stacked WashTower service access; we adjusted approach.",
-    part: "LG OEM hall sensor + control panel reset",
-    time: "2 hours"
-  }
+const historicNarrative = {
+  headline: 'Historic Floral Park and French Park — appliance work in 90-year-old kitchens',
+  paragraphs: [
+    "Floral Park (designated a historic preservation district) and French Park together hold the densest concentration of pre-WWII residential housing in OC. Streets like Flower, Heliotrope, Greenleaf, and 17th Street have 1920s craftsman bungalows; Bush Street and the surrounding French Park grid runs to 1930s Spanish-style. Most of these homes have been renovated 2-4 times across their lifespans — the kitchen you're standing in might be a 2018 luxury renovation built into a 1928 footprint with the original 1928 service panel still feeding part of it.",
+    "Practical service implications: appliance circuits in these homes are not standardized the way they are in newer construction. We've seen Sub-Zero 36\" units feeding off a 30-amp 240V circuit that was originally specified for an electric range in 1965, and Wolf range tops on a 50-amp circuit that was upgraded during the 2018 renovation but routed through an older sub-panel that may or may not handle the inrush current. We verify the electrical service before energizing a new control board on a luxury appliance in these homes — it's a five-minute multimeter check that prevents a $700 control board from getting fried by a brownout the next month.",
+    "Water-line side: the older homes often have segments of original galvanized supply line that carry sediment to refrigerator ice maker and dishwasher inlets. Sub-Zero and Bosch units in these neighborhoods see water inlet valve failures at higher rates than units in newer construction, and the failure is typically the secondary port (ice maker side) rather than the primary dispense path. We carry dual-port water inlet valves on the Irvine truck for exactly this reason.",
+  ],
+};
+
+// Pricing-discipline narrow: $120 number dropped from "Commercial diagnostic is $120 flat..." sentence in paragraph 2; replaced with pricing-neutral line. Surrounding narrative verbatim.
+const commercialNarrative = {
+  headline: 'Commercial appliance work in Santa Ana — restaurants, civic, hotels',
+  paragraphs: [
+    "Santa Ana has the densest commercial-kitchen footprint in Orange County outside the resort cluster, anchored by three demand drivers. <b>Downtown Santa Ana around 4th Street + the Civic Center</b> is OC's largest concentration of independent Mexican restaurants plus the Artists Village restaurant + bar + gallery scene — these run a mix of commercial-spec equipment (Hobart dishwashers, Vulcan ranges, walk-in coolers) and high-cycle residential-grade equipment in smaller operations. <b>South Coast Metro restaurants</b> support the South Coast Plaza retail population, the office cluster around Sunflower + Bristol, and resident traffic from the high-rise condos — typically commercial-spec across the board. <b>The Civic Center + OC Superior Court area</b> drives institutional and government cafeteria service plus hotel kitchens at the surrounding hospitality cluster.",
+    "<b>What we handle on the commercial side:</b> walk-in coolers and freezers (compressor service, evaporator cleaning, defrost-timer issues), commercial refrigeration including True, Beverage-Air, and Continental units, commercial dishwashers from Hobart, Champion, Jackson, and CMA in restaurants throughout Downtown + South Coast Metro, commercial ranges and ovens (Vulcan, Garland, Imperial, Wolf commercial), ice machines for restaurants and bars (Hoshizaki, Manitowoc, Scotsman). Call us for commercial pricing.",
+    "Hotel hospitality customers — DoubleTree by Hilton Santa Ana, Embassy Suites at MainPlace area, Residence Inn / Holiday Inn Express on the Bristol corridor — get the same diagnostic + repair workflow as residential, just at the commercial pricing tier. We coordinate with property managers when units need to be off-line for service to minimize impact on guest service and food-service operations. For the OC government and institutional side, we work through approved vendor channels where required.",
+  ],
+};
+
+const neighborhoods = [
+  { name: 'Downtown Santa Ana', zip: '92701' },
+  { name: 'Artists Village', zip: '92701' },
+  { name: 'French Park (Historic)', zip: '92701' },
+  { name: 'Floral Park (Historic)', zip: '92706' },
+  { name: 'West Floral Park', zip: '92703' },
+  { name: 'Willard / Logan', zip: '92703' },
+  { name: 'Delhi', zip: '92707' },
+  { name: 'South Coast Metro', zip: '92704' },
+  { name: 'MainPlace / Park Santiago', zip: '92705' },
+  { name: 'North Santa Ana', zip: '92705' },
+  { name: 'Cabrillo Park', zip: '92701' },
+  { name: 'Madison Park', zip: '92707' },
 ];
 
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero 700',
+    location: 'Floral Park (Historic)',
+    quote: 'Sub-Zero 700 Series — Floral Park 1930s craftsman, ice maker dripping',
+    description: "Sub-Zero 700TR built-in in a Floral Park craftsman near 17th Street and Flower — homeowner had been catching the drip with a towel for two months. Water inlet valve was leaking from the secondary port (the ice-maker side, not the dispenser side). Replaced the valve, flushed the water line of debris, ran a 6-cycle ice harvest test. Floral Park is one of OC's oldest historic districts (1920s-30s housing) and Sub-Zero installs in these renovated craftsmans concentrate at the 8-15 year mark on water valves — the sediment that LA basin water carries hits the secondary port harder than the primary dispense path. Documented for the homeowner.",
+    outcome: '✓ Same day · Sub-Zero OEM dual-port water inlet valve · 2 hours',
+  },
+  {
+    appliance: 'Wolf 36" Range Top',
+    location: 'South Coast Metro',
+    quote: 'Wolf 36" range top — South Coast Metro condo, igniter not lighting front-left',
+    description: "Wolf SRT364C 36\" gas range top in a South Coast Metro high-rise condo near Bristol and Sunflower — front-left burner clicking but not lighting. Spark electrode had cracked at the ceramic insulator (visible hairline). Replaced the electrode, cleaned the burner head, verified spark gap on all four burners + simmer burner, ran 30-second light tests. South Coast Metro condo Wolf installs cluster around the 2010-2017 build wave; we see this electrode failure consistently at the 6-9 year mark. Not a manufacturing defect — normal end-of-life for a ceramic spark insulator on a high-cycle burner.",
+    outcome: '✓ Same day · Wolf OEM spark electrode + ceramic insulator · 1.5 hours',
+  },
+  {
+    appliance: 'Hobart Commercial',
+    location: 'Downtown Santa Ana / Civic Center',
+    quote: 'Hobart commercial dishwasher — restaurant near Civic Center, no rinse cycle',
+    description: "Hobart AM15 high-temp commercial dishwasher in a Mexican restaurant near the OC Civic Center on 4th Street — wash cycle running fine, but final rinse barely producing pressure. Rinse pump impeller had a chunk of food debris jammed against it (corn husk fragment) plus the rinse-arm jets were partially clogged with hard-water scale. Cleared the impeller, descaled the rinse arm with Hobart-approved descaler, replaced the rinse-arm spray jets that had eroded past spec. Health-code rinse temp ran 184°F final (spec 180°F minimum). Downtown Santa Ana restaurant kitchens with Hobart units typically need annual rinse-system service given OC water hardness — we documented the next-service date for the operator.",
+    outcome: '✓ Same day · Hobart OEM rinse-arm spray jets + descaler service · 2.5 hours',
+  },
+  {
+    appliance: 'LG WashTower',
+    location: 'Willard / Logan',
+    quote: 'LG WashTower — Willard Spanish-style, washer F-code mid-cycle',
+    description: "LG WashTower (factory-stacked single-cabinet column) in a Willard 1940s Spanish-style home off Bristol — washer halting mid-cycle with F-1 sensor fault on the panel. Hall sensor on the inner drum had drifted out of spec (reading 200% high resistance at room temp). Replaced the sensor, ran factory-reset on the unified Center Control panel, verified spin extraction RPM on three test cycles. WashTower's unified-control architecture means a single sensor failure can lock both wash + dry sides — important to understand at diagnostic time. Willard's older homes have tight laundry closets that complicate the factory-stacked WashTower service access; we adjusted approach.",
+    outcome: '✓ Same day · LG OEM hall sensor + control panel reset · 2 hours',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Multi-era housing experience — historic to high-rise',
+    body: 'Floral Park 1928 craftsman with a Sub-Zero in the renovated kitchen. South Coast Metro 2015 condo with Wolf range top. Same Irvine technician handles both. We adjust diagnostic approach to match what the housing actually is rather than running the same playbook on every call.',
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Luxury OEM parts on the Irvine truck for South Coast Metro work',
+    body: "Wolf, Sub-Zero, Thermador, Miele OEM parts stocked on the truck. South Coast Metro condo calls don't require waiting on a parts order from out-of-state distributors — same applies to renovated Floral Park and French Park luxury kitchens.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Commercial scope alongside residential — Downtown + Civic + South Coast',
+    body: 'Santa Ana restaurants, civic + government kitchens, hotel hospitality service from the same dispatch as our residential calls. We service commercial appliances; call us for commercial pricing. Hobart + Champion + Vulcan + walk-in service from Irvine.',
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'No distance surcharge — Santa Ana is on our regular OC route',
+    body: 'Irvine branch runs the OC loop including Santa Ana daily. The $89 residential diagnostic is the same in Santa Ana as it is in Irvine, Tustin, or Newport Beach. What we quote is what you pay.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: `"Sub-Zero was leaking water onto our hardwood floor — 1929 Floral Park craftsman, hardwood we'd just refinished. Same Day's Irvine tech showed up the same afternoon, traced the leak to the secondary water valve port, replaced it, dried everything, no damage to the floor. Saved the floor. They knew exactly what was going on."`,
+    author: '— Patricia M., Floral Park',
+  },
+  {
+    stars: 5,
+    text: `"Wolf range top at our South Coast Metro condo — front burner wouldn't light. Concierge gave us three numbers; Same Day was the only one who came same-day with the OEM electrode on the truck. Hour-and-a-half service call, done. Other places quoted us a week-long parts wait."`,
+    author: '— Andrew K., South Coast Metro',
+  },
+  {
+    stars: 5,
+    text: '"Restaurant near the Civic Center — Hobart dishwasher rinse stopped working at 7pm Friday. Health code, no rinse, no service. Called Same Day; they had a tech out by 9pm Friday. Cleared the impeller, got us through the weekend, came back Monday for the full descaling service. Saved our weekend."',
+    author: '— Miguel R., Downtown Santa Ana (restaurant operator)',
+  },
+];
+
+// Pricing-discipline narrow: Commercial Diagnostic $120 card DROPPED. 5 residential cards remain.
+const pricingTiers = [
+  { appliance: 'Residential Diagnostic', range: '$89', note: 'No distance surcharge · Credited toward repair · Written estimate' },
+  { appliance: 'Standard Repair Range', range: '$150–$350', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Luxury Brand Repair', range: '$250–$600+', note: 'Sub-Zero, Wolf, Thermador, Viking · OEM parts', featured: true },
+];
+
+// Pricing-discipline narrow: Q3 commercial answer "$120" sentence replaced with pricing-neutral line. Q6 about distance surcharge — "Commercial is $120 flat" sentence rewritten. Surrounding text verbatim.
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Santa Ana?",
-    a: "Yes — Santa Ana is one of our regular OC service cities. Our Irvine branch runs Orange County routes daily and Santa Ana is the largest population center in OC at 310,000+ residents. Call before noon and we can typically dispatch a technician that afternoon. Coverage spans the seven Santa Ana ZIPs (92701-92707) and the major neighborhoods from Downtown + Civic Center + Artists Village to Floral Park, French Park, Willard, Delhi, South Coast Metro, and MainPlace area."
+    question: 'Do you offer same-day appliance repair in Santa Ana?',
+    answer: 'Yes — Santa Ana is one of our regular OC service cities. Our Irvine branch runs Orange County routes daily and Santa Ana is the largest population center in OC at 310,000+ residents. Call before noon and we can typically dispatch a technician that afternoon. Coverage spans the seven Santa Ana ZIPs (92701-92707) and the major neighborhoods from Downtown + Civic Center + Artists Village to Floral Park, French Park, Willard, Delhi, South Coast Metro, and MainPlace area.',
   },
   {
-    q: "Do you service the South Coast Metro condo high-rises?",
-    a: "Yes. South Coast Metro near Bristol + Sunflower — the high-rise condos around the South Coast Plaza area — has a concentration of Wolf, Sub-Zero, Thermador, and Miele installs from the 2010-2017 build wave. We service these regularly and our Irvine technicians know the access conventions for the larger residential towers. Property-management coordination handled when needed for off-hours building access."
+    question: 'Do you service the South Coast Metro condo high-rises?',
+    answer: 'Yes. South Coast Metro near Bristol + Sunflower — the high-rise condos around the South Coast Plaza area — has a concentration of Wolf, Sub-Zero, Thermador, and Miele installs from the 2010-2017 build wave. We service these regularly and our Irvine technicians know the access conventions for the larger residential towers. Property-management coordination handled when needed for off-hours building access.',
   },
   {
-    q: "Do you handle commercial appliances for Santa Ana restaurants and the Civic Center area?",
-    a: "Yes. Santa Ana's commercial scope is substantial — Downtown's restaurant cluster around 4th Street + the Civic Center, Artists Village restaurants and bars, the South Coast Metro restaurants supporting the office and retail population, plus government and institutional kitchens. We service commercial refrigeration (walk-in coolers, reach-ins), commercial dishwashers (Hobart, Champion, Jackson), commercial ranges (Vulcan, Garland, Imperial), and ice machines. Commercial diagnostic is $120 (vs $89 residential), waived with repair."
+    question: 'Do you handle commercial appliances for Santa Ana restaurants and the Civic Center area?',
+    answer: "Yes. Santa Ana's commercial scope is substantial — Downtown's restaurant cluster around 4th Street + the Civic Center, Artists Village restaurants and bars, the South Coast Metro restaurants supporting the office and retail population, plus government and institutional kitchens. We service commercial refrigeration (walk-in coolers, reach-ins), commercial dishwashers (Hobart, Champion, Jackson), commercial ranges (Vulcan, Garland, Imperial), and ice machines. We service commercial appliances. Call us for commercial pricing.",
   },
   {
-    q: "Floral Park and French Park have older homes — does that affect appliance service?",
-    a: "Yes, in specific ways. Floral Park's 1920s-30s housing stock and French Park's similar-era homes have been renovated repeatedly over the decades, which means the kitchen electrical service and water-line plumbing varies meaningfully from house to house. We bring this up at diagnostic — for example, an older 30-amp 240V circuit feeding a modern Sub-Zero or Wolf installation needs verification before we energize a replacement control board, and a 1930s galvanized water line feeding an ice maker carries more sediment than modern PEX. We work with the homeowner on what's appliance-side repair versus what needs an electrician or plumber separately."
+    question: 'Floral Park and French Park have older homes — does that affect appliance service?',
+    answer: "Yes, in specific ways. Floral Park's 1920s-30s housing stock and French Park's similar-era homes have been renovated repeatedly over the decades, which means the kitchen electrical service and water-line plumbing varies meaningfully from house to house. We bring this up at diagnostic — for example, an older 30-amp 240V circuit feeding a modern Sub-Zero or Wolf installation needs verification before we energize a replacement control board, and a 1930s galvanized water line feeding an ice maker carries more sediment than modern PEX. We work with the homeowner on what's appliance-side repair versus what needs an electrician or plumber separately.",
   },
   {
-    q: "What appliance brands are most common in Santa Ana homes?",
-    a: "Mixed across neighborhoods. Floral Park + French Park + South Coast Metro renovated kitchens have Sub-Zero, Wolf, Thermador, Miele, Bosch installs at the higher end. North Santa Ana + Park Santiago + MainPlace area runs mainstream-premium with KitchenAid, GE Profile, Samsung, LG, and Bosch dishwashers common. South and West Santa Ana (Willard, Delhi, Madison Park) is mid-market with Whirlpool, Maytag, GE, Frigidaire, Amana the regular mix. Our Irvine truck carries OEM parts for both luxury and mass-market brands so we don't roll up empty-handed on either type of call."
+    question: 'What appliance brands are most common in Santa Ana homes?',
+    answer: "Mixed across neighborhoods. Floral Park + French Park + South Coast Metro renovated kitchens have Sub-Zero, Wolf, Thermador, Miele, Bosch installs at the higher end. North Santa Ana + Park Santiago + MainPlace area runs mainstream-premium with KitchenAid, GE Profile, Samsung, LG, and Bosch dishwashers common. South and West Santa Ana (Willard, Delhi, Madison Park) is mid-market with Whirlpool, Maytag, GE, Frigidaire, Amana the regular mix. Our Irvine truck carries OEM parts for both luxury and mass-market brands so we don't roll up empty-handed on either type of call.",
   },
   {
-    q: "Do you charge a distance surcharge for Santa Ana?",
-    a: "No. Santa Ana is on our regular Orange County route from the Irvine branch — built into the schedule specifically so distance fees don't apply. The $89 residential diagnostic is the same in Santa Ana as it is in Irvine, Tustin, or Costa Mesa. Commercial is $120 flat. What we quote is what you pay."
+    question: 'Do you charge a distance surcharge for Santa Ana?',
+    answer: 'No. Santa Ana is on our regular Orange County route from the Irvine branch — built into the schedule specifically so distance fees don’t apply. The $89 residential diagnostic is the same in Santa Ana as it is in Irvine, Tustin, or Costa Mesa. We service commercial appliances; call us for commercial pricing. What we quote is what you pay.',
   },
   {
-    q: "What is your warranty on Santa Ana repairs?",
-    a: "All residential and commercial repairs carry a 90-day warranty on parts and labor. If the same issue returns within that window, we come back at no additional charge. CSLB License #1138898 + BBB accredited."
-  }
+    question: 'What is your warranty on Santa Ana repairs?',
+    answer: 'All residential and commercial repairs carry a 90-day warranty on parts and labor. If the same issue returns within that window, we come back at no additional charge. CSLB License #1138898 + BBB accredited.',
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Tustin", slug: "tustin" },
-  { name: "Irvine", slug: "irvine" },
-  { name: "Costa Mesa", slug: "costa-mesa" },
-  { name: "Anaheim", slug: "anaheim" },
-  { name: "Fullerton", slug: "fullerton" },
-  { name: "Newport Beach", slug: "newport-beach" },
+const nearbyCities = [
+  { name: 'Tustin', slug: 'tustin' },
+  { name: 'Irvine', slug: 'irvine' },
+  { name: 'Costa Mesa', slug: 'costa-mesa' },
+  { name: 'Anaheim', slug: 'anaheim' },
+  { name: 'Fullerton', slug: 'fullerton' },
+  { name: 'Newport Beach', slug: 'newport-beach' },
 ];
-
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Santa Ana",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/santa-ana/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "6230 Wilshire Blvd Ste A PMB 2267",
-        "addressLocality": "Los Angeles",
-        "addressRegion": "CA",
-        "postalCode": "90048",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Santa Ana" },
-        { "@type": "Place", "name": "Downtown Santa Ana" },
-        { "@type": "Place", "name": "Floral Park" },
-        { "@type": "Place", "name": "French Park" },
-        { "@type": "Place", "name": "South Coast Metro" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "20:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "20:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.6",
-        "reviewCount": "37",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Santa Ana, CA"
+    subheadline="Same-day service across Floral Park, French Park, Downtown, Willard, Delhi, and South Coast Metro. Sub-Zero, Wolf, Viking, and all major brands. Residential + commercial. $89 diagnostic — waived with repair."
+    zips={zips}
+    tier={2}
+  />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Santa Ana, CA · Orange County · 92701 · 92703 · 92704 · 92705 · 92706 · 92707</div>
-        <h1>Appliance Repair in Santa Ana, CA</h1>
-        <p class="city-hero-sub">Same-day service across Floral Park, French Park, Downtown, Willard, Delhi, and South Coast Metro. Sub-Zero, Wolf, Viking, and all major brands. Residential + commercial. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.6 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/santa-ana/appliance-repair-santa-ana-ca.webp"
-          alt="Appliance repair technician in Santa Ana CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">🏢</span><span>Commercial + Residential</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Santa Ana's split — historic Floral Park, Civic Center commercial, South Coast Metro high-rises"
+    paragraphs={introParagraphs}
+    bookingTitle="Santa Ana Service"
+    bookingSub="Available Today"
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Santa Ana's split — historic Floral Park, Civic Center commercial, South Coast Metro high-rises</h2>
-        <p>Santa Ana is the largest city in Orange County by population (310,000+ residents) and the seat of OC government — courthouse, civic center, OC government complex, Bowers Museum, MainPlace Mall, Discovery Cube. Service work in Santa Ana shifts meaningfully based on which neighborhood you're in, more so than most OC cities, because Santa Ana is genuinely a multi-era city stitched together over a century.</p>
-        <p>Downtown Santa Ana around 4th Street + the Civic Center has the highest commercial-kitchen density in OC outside the resort cluster — Mexican restaurants, the Artists Village restaurant + gallery scene, government cafeterias, plus the small-business cluster supporting the courthouse and OC government workforce. Floral Park and French Park immediately north of Downtown are historic residential — 1920s-30s craftsman and Spanish-style homes, many renovated to luxury kitchen spec over the past decade with Sub-Zero, Wolf, and Thermador installs sitting in 90-year-old kitchen footprints. South Coast Metro at Santa Ana's southern edge near Bristol + Sunflower is the high-rise condo cluster with the South Coast Plaza retail anchor — 2010-2017 build wave, premium-luxury appliance spec, Wolf and Sub-Zero common. North Santa Ana around MainPlace + Park Santiago is mainstream-premium residential. Willard, Delhi, Madison Park to the south and west are mid-market neighborhoods with Whirlpool, Maytag, GE, Samsung, LG the typical brand mix.</p>
-        <p>Our Irvine branch runs Santa Ana on the regular OC route. Floral Park and French Park calls usually involve older renovated homes where appliance-side service has to account for legacy electrical and plumbing — we work with that, and we tell homeowners up front when something is appliance scope versus when it needs an electrician or plumber separately. South Coast Metro condo work runs comparable to Newport Beach + Irvine luxury-tier service. Downtown commercial is restaurants and small-business kitchens running both commercial-spec and high-cycle residential equipment. Mid-market neighborhoods are the standard mainstream brand mix any OC technician handles routinely.</p>
-        <p>Santa Ana also has a meaningful institutional and government appliance footprint — the Civic Center, OC Superior Court, government kitchens and cafeterias, plus hotels (DoubleTree by Hilton, Embassy Suites Anaheim South nearby) and the cluster around MainPlace + Discovery Cube + Bowers Museum. Commercial diagnostic is $120 flat (residential is $89). Both waived with repair.</p>
-        <p>Call <a href={`tel:${phoneRaw}`}>{phone}</a> — someone with our actual OC schedule picks up.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Santa Ana Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Sat 8am–8pm · Sun closed · Phones answered 24/7</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Residential / $120 Commercial</strong>
-            <span>— diagnostic waived with repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Santa Ana"
+    services={services}
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Santa Ana</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/services/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Santa Ana →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={historicNarrative.headline}
+    paragraphs={historicNarrative.paragraphs}
+    background="white"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">01</div>
-      <div class="city-context-content">
-        <h2>Historic Floral Park and French Park — appliance work in 90-year-old kitchens</h2>
-        <p>Floral Park (designated a historic preservation district) and French Park together hold the densest concentration of pre-WWII residential housing in OC. Streets like Flower, Heliotrope, Greenleaf, and 17th Street have 1920s craftsman bungalows; Bush Street and the surrounding French Park grid runs to 1930s Spanish-style. Most of these homes have been renovated 2-4 times across their lifespans — the kitchen you're standing in might be a 2018 luxury renovation built into a 1928 footprint with the original 1928 service panel still feeding part of it.</p>
-        <p>Practical service implications: appliance circuits in these homes are not standardized the way they are in newer construction. We've seen Sub-Zero 36" units feeding off a 30-amp 240V circuit that was originally specified for an electric range in 1965, and Wolf range tops on a 50-amp circuit that was upgraded during the 2018 renovation but routed through an older sub-panel that may or may not handle the inrush current. We verify the electrical service before energizing a new control board on a luxury appliance in these homes — it's a five-minute multimeter check that prevents a $700 control board from getting fried by a brownout the next month.</p>
-        <p>Water-line side: the older homes often have segments of original galvanized supply line that carry sediment to refrigerator ice maker and dishwasher inlets. Sub-Zero and Bosch units in these neighborhoods see water inlet valve failures at higher rates than units in newer construction, and the failure is typically the secondary port (ice maker side) rather than the primary dispense path. We carry dual-port water inlet valves on the Irvine truck for exactly this reason.</p>
-      </div>
-    </div>
-  </section>
+  <ServiceArea
+    cityName={cityName}
+    headline="Santa Ana Neighborhoods We Service"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">02</div>
-      <h2>Santa Ana Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Santa Ana"
+    jobs={recentJobs}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">03</div>
-      <h2>Recent Repairs in Santa Ana</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={commercialNarrative.headline}
+    paragraphs={commercialNarrative.paragraphs}
+    background="gray"
+  />
 
-  <section class="city-context">
-    <div class="city-context-inner">
-      <div class="section-number">04</div>
-      <div class="city-context-content">
-        <h2>Commercial appliance work in Santa Ana — restaurants, civic, hotels</h2>
-        <p>Santa Ana has the densest commercial-kitchen footprint in Orange County outside the resort cluster, anchored by three demand drivers. <b>Downtown Santa Ana around 4th Street + the Civic Center</b> is OC's largest concentration of independent Mexican restaurants plus the Artists Village restaurant + bar + gallery scene — these run a mix of commercial-spec equipment (Hobart dishwashers, Vulcan ranges, walk-in coolers) and high-cycle residential-grade equipment in smaller operations. <b>South Coast Metro restaurants</b> support the South Coast Plaza retail population, the office cluster around Sunflower + Bristol, and resident traffic from the high-rise condos — typically commercial-spec across the board. <b>The Civic Center + OC Superior Court area</b> drives institutional and government cafeteria service plus hotel kitchens at the surrounding hospitality cluster.</p>
-        <p><b>What we handle on the commercial side:</b> walk-in coolers and freezers (compressor service, evaporator cleaning, defrost-timer issues), commercial refrigeration including True, Beverage-Air, and Continental units, commercial dishwashers from Hobart, Champion, Jackson, and CMA in restaurants throughout Downtown + South Coast Metro, commercial ranges and ovens (Vulcan, Garland, Imperial, Wolf commercial), ice machines for restaurants and bars (Hoshizaki, Manitowoc, Scotsman). Commercial diagnostic is $120 flat, waived with repair — $30 above the $89 residential rate to account for the heavier-equipment service complexity and the longer typical diagnostic time.</p>
-        <p>Hotel hospitality customers — DoubleTree by Hilton Santa Ana, Embassy Suites at MainPlace area, Residence Inn / Holiday Inn Express on the Bristol corridor — get the same diagnostic + repair workflow as residential, just at the commercial pricing tier. We coordinate with property managers when units need to be off-line for service to minimize impact on guest service and food-service operations. For the OC government and institutional side, we work through approved vendor channels where required.</p>
-      </div>
-    </div>
-  </section>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Santa Ana Residents and Businesses Call Us"
+    reasons={whyReasons}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">05</div>
-      <h2>Why Santa Ana Residents and Businesses Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>Multi-era housing experience — historic to high-rise</h3>
-          <p>Floral Park 1928 craftsman with a Sub-Zero in the renovated kitchen. South Coast Metro 2015 condo with Wolf range top. Same Irvine technician handles both. We adjust diagnostic approach to match what the housing actually is rather than running the same playbook on every call.</p>
-        </div>
-        <div class="why-item">
-          <h3>Luxury OEM parts on the Irvine truck for South Coast Metro work</h3>
-          <p>Wolf, Sub-Zero, Thermador, Miele OEM parts stocked on the truck. South Coast Metro condo calls don't require waiting on a parts order from out-of-state distributors — same applies to renovated Floral Park and French Park luxury kitchens.</p>
-        </div>
-        <div class="why-item">
-          <h3>Commercial scope alongside residential — Downtown + Civic + South Coast</h3>
-          <p>Santa Ana restaurants, civic + government kitchens, hotel hospitality service from the same dispatch as our residential calls. $120 commercial diagnostic, waived with repair. Hobart + Champion + Vulcan + walk-in service from Irvine.</p>
-        </div>
-        <div class="why-item">
-          <h3>No distance surcharge — Santa Ana is on our regular OC route</h3>
-          <p>Irvine branch runs the OC loop including Santa Ana daily. The $89 residential diagnostic is the same in Santa Ana as it is in Irvine, Tustin, or Newport Beach. What we quote is what you pay.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Santa Ana Clients Say"
+    testimonials={testimonials}
+  />
 
-  <section class="city-reviews">
-    <div class="city-reviews-inner">
-      <h2>What Santa Ana Clients Say</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Sub-Zero was leaking water onto our hardwood floor — 1929 Floral Park craftsman, hardwood we'd just refinished. Same Day's Irvine tech showed up the same afternoon, traced the leak to the secondary water valve port, replaced it, dried everything, no damage to the floor. Saved the floor. They knew exactly what was going on."</p>
-          <div class="review-author">— Patricia M., Floral Park</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Wolf range top at our South Coast Metro condo — front burner wouldn't light. Concierge gave us three numbers; Same Day was the only one who came same-day with the OEM electrode on the truck. Hour-and-a-half service call, done. Other places quoted us a week-long parts wait."</p>
-          <div class="review-author">— Andrew K., South Coast Metro</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">⭐⭐⭐⭐⭐</div>
-          <p>"Restaurant near the Civic Center — Hobart dishwasher rinse stopped working at 7pm Friday. Health code, no rinse, no service. Called Same Day; they had a tech out by 9pm Friday. Cleared the impeller, got us through the weekend, came back Monday for the full descaling service. Saved our weekend."</p>
-          <div class="review-author">— Miguel R., Downtown Santa Ana (restaurant operator)</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Santa Ana"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Santa Ana</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Residential Diagnostic</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">No distance surcharge · Credited toward repair · Written estimate</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Commercial Diagnostic</div>
-          <div class="pricing-price">$120</div>
-          <div class="pricing-note">Restaurants, hotels, civic, institutional · Credited toward repair</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair Range</div>
-          <div class="pricing-price">$150–$350</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Thermador, Viking · OEM parts</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Santa Ana"
+    faqs={faqs}
+  />
 
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">06</div>
-      <h2>Frequently Asked Questions — Santa Ana</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Orange County Cities"
+  />
 
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby Orange County Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Santa Ana Repair Today</h2>
-      <p>Same-day service across all Santa Ana ZIPs. Historic, downtown, civic, South Coast Metro, mid-market. No distance surcharge.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 residential diagnostic · $120 commercial · 90-day warranty · OEM parts · Santa Ana, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Santa Ana", "Floral Park", "South Coast Metro", "Downtown Santa Ana", "Orange County"]} />
-</Layout>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Santa Ana Repair Today"
+    body="Same-day service across all Santa Ana ZIPs. Historic, downtown, civic, South Coast Metro, mid-market. No distance surcharge."
+  />
+</CityLayoutV2>

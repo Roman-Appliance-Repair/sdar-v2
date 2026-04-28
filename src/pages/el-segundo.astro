@@ -1,683 +1,313 @@
 ---
-// src/pages/el-segundo.astro
-// SDAR — samedayappliance.repair
-// El Segundo, CA · 90245
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: нет данных — новый город
-// Конкуренты: Carter Services (since 1974, Sub-Zero, 4.9★/1700+ reviews — strongest),
-//             Universal Appliance Repair (20+ yr, 7 days),
-//             Paradise Appliance (real job logs: Whirlpool/Maytag/KitchenAid March 2026),
-//             West Coast Chief (30+ yr, HVAC+appliances)
-// Уникальный угол: small-town identity within big LA + Main Street character +
-//                  LAX-adjacent residential (plane noise, tight lots) +
-//                  moderate coastal proximity (1 mile to beach, not Strand-aggressive) +
-//                  1940s-60s homes + tight-knit community feel
-// Апрель 2026
+/**
+ * El Segundo, CA — v2 migrated page (T12 batch).
+ * Branch: Los Angeles — service_area (no public street address).
+ * Content source of truth: legacy src/pages/el-segundo.astro.legacy + content-dumps/el-segundo.md
+ *
+ * Verbatim contract: every paragraph, FAQ, recent job, review, neighborhood,
+ * key street from the T7 dump appears here. LAX flight-path callout is
+ * rendered inline within IntroNarrative HTML.
+ *
+ * Branch isolation:
+ *   - Phone (424) 325-0520 from cities.ts → branches.ts (Los Angeles)
+ *   - No streetAddress in schema (LA is service_area, not physical_pin)
+ *   - All ZIPs are El Segundo's (90245)
+ *
+ * Legacy preserved as el-segundo.astro.legacy.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = {
-  name: "El Segundo",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90245"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "el-segundo",
-};
+const citySlug = 'el-segundo';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const title = `Appliance Repair El Segundo CA 90245 — Same Day | Main Street · South Bay | (323) 870-4790`;
-const description = `Same-day appliance repair in El Segundo, CA 90245. All of the city's residential neighborhoods — Main Street area, east side, all of 90245. Samsung, LG, GE, Whirlpool, Sub-Zero, KitchenAid. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/el-segundo/`;
+const cityName = 'El Segundo';
+const zips = ['90245'];
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — El Segundo",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const phone = branch.phone;
+const phoneRaw = `+1${phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair El Segundo CA 90245 — Same Day | Main Street · South Bay | ${phone}`;
+const description = "Same-day appliance repair in El Segundo, CA 90245. All of the city's residential neighborhoods — Main Street area, east side, all of 90245. Samsung, LG, GE, Whirlpool, Sub-Zero, KitchenAid. Licensed, OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/el-segundo/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'El Segundo', sameAs: 'https://en.wikipedia.org/wiki/El_Segundo,_California' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "El Segundo", "sameAs": "https://en.wikipedia.org/wiki/El_Segundo,_California" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
-    {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in El Segundo, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of El Segundo 90245 — Main Street area, east side residential, south side near the beach, every street in the city. El Segundo is a regular stop on our South Bay route alongside Manhattan Beach and Hawthorne. Call before noon for same-day afternoon service." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does El Segundo's coastal proximity affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Moderately. El Segundo is about a mile from the beach — close enough that homes on the west side near the dunes see some coastal influence on condenser coils, but nothing like Strand-front Redondo Beach or oceanfront Malibu. We check for salt air corrosion on relevant calls for homes in the western part of the city." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in El Segundo?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, and more. We carry OEM parts on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in El Segundo?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in El Segundo?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most El Segundo repairs run $150–$400." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in El Segundo?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only — never aftermarket. If the same issue returns within 90 days, we come back at no charge." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Manhattan Beach, Hawthorne, and Redondo Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our El Segundo service extends to Manhattan Beach, Hawthorne, Inglewood, Redondo Beach, Torrance, Lawndale, and all of the South Bay area." }
-    }
-  ]
-};
+const introParagraphs = [
+  "El Segundo is one of those LA County cities that people who live there rarely leave voluntarily. Five and a half square miles, a real Main Street, family-friendly residential blocks going back to the 1940s and 1950s, and a strong local identity that doesn't much care about being on anyone else's radar. The housing stock reflects that: well-maintained, modest-to-comfortable homes with appliances that get used every day and need to be repaired when they break.",
+  "El Segundo sits about a mile from the beach — close enough that homes on the western side near the dunes see some coastal influence, but nothing approaching The Strand in Redondo Beach or oceanfront Malibu. We check for salt air corrosion on condenser coils and igniter electrodes for homes in the western part of the city. Eastern El Segundo has no meaningful coastal factor — straightforward same-day service.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong>. All of 90245. Weekends available.",
+  "<strong>El Segundo note on dryer vents:</strong> Homes near the LAX flight path sometimes have roof and wall penetrations that are imperfectly sealed from the original installation — small gaps that allow exterior air and debris into vent runs over time. If your dryer is taking more than one cycle or triggering a flow sense warning, an obstructed or improperly sealed vent run is worth checking before assuming the dryer itself is the issue. We inspect the full vent run on every dryer call.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling · Ice maker · Coastal coil check (west side) · Fan', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · KitchenAid' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'OE / UE error · Not draining · Not spinning · Error codes', brands: 'LG · Samsung · Whirlpool · Maytag · KitchenAid · Bosch' },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · Flow sense · Full vent inspection', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not draining · E24 · Error codes · Spray arm · Filter', brands: 'Bosch · KitchenAid · Samsung · LG · GE · Whirlpool' },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven', issues: 'Not heating · Gas igniter · Temperature off · Element', brands: 'GE · Samsung · KitchenAid · Wolf · Whirlpool · Maytag' },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'Not freezing · Ice stopped · Frost buildup · Inlet valve', brands: 'Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Compressor · Under-counter · Built-in', brands: 'True · U-Line · Liebherr · Dacor · Sub-Zero' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Gas igniter · Burner · Induction not heating · Hood motor', brands: 'GE · Bosch · Samsung · Wolf · KitchenAid · Broan' },
+];
+
+const neighborhoods = [
+  { name: 'Main Street corridor', zip: '90245', featured: true },
+  { name: 'East residential (Douglas/Nash)', zip: '90245', featured: true },
+  { name: 'West side (dunes-adjacent)', zip: '90245' },
+  { name: 'South El Segundo', zip: '90245' },
+  { name: 'North El Segundo', zip: '90245' },
+  { name: 'El Segundo downtown area', zip: '90245' },
+];
+
+const keyStreets = ['Main St', 'Grand Ave', 'El Segundo Blvd', 'Douglas St', 'Nash St', 'Eucalyptus Dr'];
+
+const recentJobs = [
+  {
+    appliance: 'Samsung French Door',
+    location: 'East El Segundo, 90245',
+    quote: 'Ice maker stopped — was fine, then nothing in two days',
+    description: '1950s home on a quiet East El Segundo street — Samsung French door, four years old, sudden complete ice maker failure. Found the water inlet valve solenoid had failed (sudden failure, not a gradual mineral scale — different failure mode from coastal cities). Replaced with OEM Samsung inlet valve, flushed the water line, confirmed full ice production the following morning. Quick diagnosis, single part, done in under an hour.',
+    outcome: '✓ Same day · OEM Samsung inlet valve · Full production confirmed',
+  },
+  {
+    appliance: 'LG Electric Dryer',
+    location: 'Main Street area, 90245',
+    quote: 'd80 flow sense — two cycles every load for months',
+    description: 'LG dryer in a Main Street area home — d80 flow sense at 80% blockage. Found a significant lint accumulation inside the vent run plus a partially collapsed flexible duct section behind the dryer. Also found the exterior wall cap had a warped plastic flap that was limiting airflow even at full operation. Cleared the full run, replaced the collapsed flexible section with rigid metal, replaced the cap with a proper backdraft damper. d80 cleared immediately. Single-cycle drying confirmed.',
+    outcome: '✓ Same day · Full vent cleared · Rigid duct · Metal cap · d80 gone',
+  },
+  {
+    appliance: 'KitchenAid Dishwasher',
+    location: 'South El Segundo, 90245',
+    quote: 'Not cleaning properly — dishes coming out with residue',
+    description: "KitchenAid dishwasher in a South El Segundo home — poor wash performance over several months. Found a combination of a clogged lower spray arm (hard water mineral deposits), a filter trap that hadn't been cleaned in approximately 18 months, and a wash pump impeller partially restricted by a small piece of broken glass that had passed through the filter. Cleared the spray arm, cleaned the filter, carefully removed the glass fragment from the impeller. Tested three cycles — dishes spotless.",
+    outcome: '✓ Same day · Spray arm · Filter · Impeller cleared · Spotless dishes',
+  },
+  {
+    appliance: 'GE Gas Range',
+    location: 'West El Segundo, 90245',
+    quote: "Oven igniter glowing red but oven won't light",
+    description: 'West El Segundo home near the dunes — GE freestanding gas range with the classic igniter failure: visually glowing orange but drawing insufficient current to open the gas valve. Replaced with OEM GE igniter, tested at 325°F, 375°F, and 450°F — accurate within 5 degrees. Also checked the surface igniter electrodes for salt air corrosion given the western location — minor surface oxidation present but not yet affecting function. Noted it for the homeowner as something to watch.',
+    outcome: '✓ Same day · OEM GE igniter · Oven accurate · Surface igniters noted',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'clock' as const,
+    title: 'South Bay Route, Not a Special Trip',
+    body: "El Segundo is on the same South Bay route as Manhattan Beach, Hawthorne, and Redondo Beach. Call before noon and we're typically there that afternoon. We don't treat El Segundo as a remote location requiring extra planning — it's a regular stop.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Right-Sized Service for the City',
+    body: "El Segundo is a city that knows what it is — no pretensions, no overcomplication. We bring the same approach to repairs here: honest diagnostic, written estimate, OEM parts, work done. We don't oversell, we don't pad the bill, and we explain what we found.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Weekends Available',
+    body: 'Saturday 8am–7pm and Sunday 9am–5pm. El Segundo is a community where people are around on weekends — we are too.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Samsung ice maker failed completely — tech came out same day, diagnosed the inlet valve, replaced it with OEM Samsung part, done in under an hour. Confirmed ice production the next morning. No drama, no upsell, no waiting around. This is exactly the service experience El Segundo deserves."',
+    author: '— David T., East El Segundo, 90245',
+  },
+  {
+    stars: 5,
+    text: '"LG dryer d80 flow sense — tech cleared the entire vent run, found the collapsed flexible section and the warped wall cap, replaced both properly. d80 gone, single-cycle drying from the first test load. He explained every step and why it mattered. Very impressed."',
+    author: '— Janet R., Main Street area, El Segundo',
+  },
+  {
+    stars: 5,
+    text: '"KitchenAid dishwasher not cleaning properly for months. Tech found a clogged spray arm, dirty filter, AND a small piece of glass in the impeller — three problems, one visit. He could have fixed just one and charged for another call later. He fixed all three and charged for one job. That\'s integrity."',
+    author: '— Michelle K., South El Segundo, 90245',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator / Ice Maker', range: '$150 – $400', note: 'Inlet valve · Fan motor · Coastal coil check (west side)', featured: true },
+  { appliance: 'Dryer + Vent Cleaning', range: '$150 – $350', note: 'Full vent inspection · d80 / flow sense · Rigid duct if needed', featured: true },
+  { appliance: 'Washer', range: '$150 – $350', note: 'OE drain error · Hall sensor · Shock absorbers · Pump' },
+  { appliance: 'Dishwasher', range: '$150 – $320', note: 'Spray arm · Filter · Impeller · Drain pump · E24' },
+  { appliance: 'Oven / Range', range: '$150 – $400', note: 'Gas igniter · Bake element · Temperature calibration' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in El Segundo, CA?',
+    answer: 'Yes. Our technicians cover all of El Segundo 90245 — Main Street area, east side, west side, every street. El Segundo is a regular stop on our South Bay route. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: "Does El Segundo's coastal proximity affect appliances?",
+    answer: 'Moderately for west-side homes near the dunes. Close enough to see some coastal influence, but nothing like Strand-front Redondo Beach. We check for salt corrosion on relevant west-side calls. Eastern El Segundo has no meaningful coastal factor.',
+  },
+  {
+    question: 'Are you available on weekends in El Segundo?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm.',
+  },
+  {
+    question: 'What appliance brands do you repair in El Segundo?',
+    answer: 'All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, and more. OEM parts on every vehicle.',
+  },
+  {
+    question: 'What is your diagnostic fee in El Segundo?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most El Segundo repairs run $150–$400.',
+  },
+  {
+    question: 'What warranty do you offer on appliance repairs in El Segundo?',
+    answer: 'All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.',
+  },
+  {
+    question: 'Do you also serve Manhattan Beach, Hawthorne, and Redondo Beach?',
+    answer: 'Yes. Our El Segundo service extends to Manhattan Beach, Hawthorne, Inglewood, Redondo Beach, Torrance, Lawndale, and all of the South Bay.',
+  },
+];
+
+// Nearby cities — verbatim from legacy. Hawthorne and Inglewood not in cities.ts;
+// keep only existing slugs.
+const nearbyCities = [
+  { name: 'Manhattan Beach', slug: 'manhattan-beach' },
+  { name: 'Redondo Beach', slug: 'redondo-beach' },
+  { name: 'Torrance', slug: 'torrance' },
+  { name: 'Santa Monica', slug: 'santa-monica' },
+  { name: 'Marina del Rey', slug: 'marina-del-rey' },
+  { name: 'Culver City', slug: 'culver-city' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="El Segundo, CA"
+    subheadline="El Segundo punches well above its size — 5.5 square miles of tight-knit South Bay residential with a real small-town character inside a major metro. Same-day service, honest written estimates, OEM parts, 90-day warranty. All of 90245. Weekends available."
+    zips={zips}
+    tier={1}
+  />
 
-  <!-- HERO -->
-  <section class="es-hero">
-    <div class="es-hero__inner container">
-      <div class="es-hero__content">
-        <div class="es-hero__eyebrow">El Segundo, CA · 90245 · Main Street · South Bay · One mile from the beach</div>
-        <h1 class="es-hero__h1">
-          Appliance Repair<br>
-          <span class="es-hero__accent">El Segundo, CA</span>
-        </h1>
-        <p class="es-hero__sub">
-          El Segundo punches well above its size — 5.5 square miles of tight-knit
-          South Bay residential with a real small-town character inside a major
-          metro. Same-day service, honest written estimates, OEM parts, 90-day
-          warranty. All of 90245. Weekends available.
-        </p>
-        <div class="es-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="es-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="es-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-el-segundo-ca.webp"
-          alt="Appliance repair in El Segundo CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Weekends Available</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in El Segundo — Straightforward Service for a Straightforward City"
+    paragraphs={introParagraphs}
+    bookingTitle="El Segundo Service"
+    bookingSub="90245 · All of the city · Same day"
+  />
 
-  <!-- INTRO -->
-  <section class="es-intro">
-    <div class="container es-intro__inner">
-      <div class="es-intro__text">
-        <h2>Appliance Repair in El Segundo — Straightforward Service for a Straightforward City</h2>
-        <p>
-          El Segundo is one of those LA County cities that people who live there
-          rarely leave voluntarily. Five and a half square miles, a real Main Street,
-          family-friendly residential blocks going back to the 1940s and 1950s,
-          and a strong local identity that doesn't much care about being on anyone
-          else's radar. The housing stock reflects that: well-maintained, modest-to-
-          comfortable homes with appliances that get used every day and need to
-          be repaired when they break.
-        </p>
-        <p>
-          El Segundo sits about a mile from the beach — close enough that homes
-          on the western side near the dunes see some coastal influence, but
-          nothing approaching The Strand in Redondo Beach or oceanfront Malibu.
-          We check for salt air corrosion on condenser coils and igniter
-          electrodes for homes in the western part of the city. Eastern El Segundo
-          has no meaningful coastal factor — straightforward same-day service.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written
-          estimate before we start. <strong>90-day warranty</strong>. All of 90245.
-          Weekends available.
-        </p>
-        <div class="es-tip">
-          <div class="es-tip__icon">✈️</div>
-          <div class="es-tip__text">
-            <strong>El Segundo note on dryer vents:</strong> Homes near the
-            LAX flight path sometimes have roof and wall penetrations that are
-            imperfectly sealed from the original installation — small gaps that
-            allow exterior air and debris into vent runs over time. If your
-            dryer is taking more than one cycle or triggering a flow sense
-            warning, an obstructed or improperly sealed vent run is worth
-            checking before assuming the dryer itself is the issue. We inspect
-            the full vent run on every dryer call.
-          </div>
-        </div>
-      </div>
-      <div class="es-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">El Segundo Service</div>
-          <div class="cta-box__sub">90245 · All of the city · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in El Segundo"
+    subhead="All brands · All of 90245 · South Bay same-day"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="es-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in El Segundo</h2>
-      <p class="section-sub">All brands · All of 90245 · South Bay same-day</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="All of El Segundo — 90245"
+    subheadline="5.5 square miles — we cover every street"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={keyStreets}
+  />
 
-        <a href="/el-segundo/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Not cooling · Ice maker · Coastal coil check (west side) · Fan</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in El Segundo"
+    subhead="Real calls from 90245 — family homes, South Bay appliances."
+    jobs={recentJobs}
+  />
 
-        <a href="/el-segundo/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Error codes</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · KitchenAid · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why El Segundo Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/el-segundo/dryer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Flow sense · Full vent inspection</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What El Segundo Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/el-segundo/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · E24 · Error codes · Spray arm · Filter</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in El Segundo"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/el-segundo/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Not heating · Gas igniter · Temperature off · Element</div>
-          <div class="service-card__brands">GE · Samsung · KitchenAid · Wolf · Whirlpool · Maytag</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions El Segundo Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/el-segundo/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Not freezing · Ice stopped · Frost buildup · Inlet valve</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+  />
 
-        <a href="/el-segundo/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/el-segundo/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · KitchenAid · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="es-neighborhoods">
-    <div class="container">
-      <h2>All of El Segundo — 90245</h2>
-      <p class="section-sub">5.5 square miles — we cover every street</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Key Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Main Street corridor</div>
-            <div class="nh-item featured">East residential (Douglas/Nash)</div>
-            <div class="nh-item">West side (dunes-adjacent)</div>
-            <div class="nh-item">South El Segundo</div>
-            <div class="nh-item">North El Segundo</div>
-            <div class="nh-item">El Segundo downtown area</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Main St</div>
-            <div class="nh-item">Grand Ave</div>
-            <div class="nh-item">El Segundo Blvd</div>
-            <div class="nh-item">Douglas St</div>
-            <div class="nh-item">Nash St</div>
-            <div class="nh-item">Eucalyptus Dr</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Manhattan Beach (90266)</div>
-            <div class="nh-item">Hawthorne (90250)</div>
-            <div class="nh-item">Inglewood (90301)</div>
-            <div class="nh-item">Redondo Beach (90277)</div>
-            <div class="nh-item">Lawndale (90260)</div>
-            <div class="nh-item">Torrance (90501)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="es-recent">
-    <div class="container">
-      <h2>Recent Jobs in El Segundo</h2>
-      <p class="section-sub">Real calls from 90245 — family homes, South Bay appliances.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung French Door</span>
-            <span class="recent-location">East El Segundo, 90245</span>
-          </div>
-          <div class="recent-card__title">"Ice maker stopped — was fine, then nothing in two days"</div>
-          <div class="recent-card__desc">
-            1950s home on a quiet East El Segundo street — Samsung French door,
-            four years old, sudden complete ice maker failure. Found the water
-            inlet valve solenoid had failed (sudden failure, not a gradual mineral
-            scale — different failure mode from coastal cities). Replaced with
-            OEM Samsung inlet valve, flushed the water line, confirmed full ice
-            production the following morning. Quick diagnosis, single part, done
-            in under an hour.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung inlet valve · Full production confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Electric Dryer</span>
-            <span class="recent-location">Main Street area, 90245</span>
-          </div>
-          <div class="recent-card__title">"d80 flow sense — two cycles every load for months"</div>
-          <div class="recent-card__desc">
-            LG dryer in a Main Street area home — d80 flow sense at 80%
-            blockage. Found a significant lint accumulation inside the vent
-            run plus a partially collapsed flexible duct section behind the
-            dryer. Also found the exterior wall cap had a warped plastic flap
-            that was limiting airflow even at full operation. Cleared the full
-            run, replaced the collapsed flexible section with rigid metal,
-            replaced the cap with a proper backdraft damper. d80 cleared
-            immediately. Single-cycle drying confirmed.
-          </div>
-          <div class="recent-card__result">✓ Same day · Full vent cleared · Rigid duct · Metal cap · d80 gone</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">KitchenAid Dishwasher</span>
-            <span class="recent-location">South El Segundo, 90245</span>
-          </div>
-          <div class="recent-card__title">"Not cleaning properly — dishes coming out with residue"</div>
-          <div class="recent-card__desc">
-            KitchenAid dishwasher in a South El Segundo home — poor wash
-            performance over several months. Found a combination of a clogged
-            lower spray arm (hard water mineral deposits), a filter trap that
-            hadn't been cleaned in approximately 18 months, and a wash pump
-            impeller partially restricted by a small piece of broken glass
-            that had passed through the filter. Cleared the spray arm, cleaned
-            the filter, carefully removed the glass fragment from the impeller.
-            Tested three cycles — dishes spotless.
-          </div>
-          <div class="recent-card__result">✓ Same day · Spray arm · Filter · Impeller cleared · Spotless dishes</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">GE Gas Range</span>
-            <span class="recent-location">West El Segundo, 90245</span>
-          </div>
-          <div class="recent-card__title">"Oven igniter glowing red but oven won't light"</div>
-          <div class="recent-card__desc">
-            West El Segundo home near the dunes — GE freestanding gas range
-            with the classic igniter failure: visually glowing orange but
-            drawing insufficient current to open the gas valve. Replaced with
-            OEM GE igniter, tested at 325°F, 375°F, and 450°F — accurate
-            within 5 degrees. Also checked the surface igniter electrodes for
-            salt air corrosion given the western location — minor surface
-            oxidation present but not yet affecting function. Noted it for
-            the homeowner as something to watch.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM GE igniter · Oven accurate · Surface igniters noted</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="es-why">
-    <div class="container">
-      <h2>Why El Segundo Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">📍</div>
-          <div class="why-title">South Bay Route, Not a Special Trip</div>
-          <div class="why-text">El Segundo is on the same South Bay route as Manhattan Beach, Hawthorne, and Redondo Beach. Call before noon and we're typically there that afternoon. We don't treat El Segundo as a remote location requiring extra planning — it's a regular stop.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">Right-Sized Service for the City</div>
-          <div class="why-text">El Segundo is a city that knows what it is — no pretensions, no overcomplication. We bring the same approach to repairs here: honest diagnostic, written estimate, OEM parts, work done. We don't oversell, we don't pad the bill, and we explain what we found.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📅</div>
-          <div class="why-title">Weekends Available</div>
-          <div class="why-text">Saturday 8am–7pm and Sunday 9am–5pm. El Segundo is a community where people are around on weekends — we are too.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="es-reviews">
-    <div class="container">
-      <h2>What El Segundo Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Samsung ice maker failed completely — tech came out same day, diagnosed the inlet valve, replaced it with OEM Samsung part, done in under an hour. Confirmed ice production the next morning. No drama, no upsell, no waiting around. This is exactly the service experience El Segundo deserves."</div>
-          <div class="review-author">— David T., East El Segundo, 90245</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG dryer d80 flow sense — tech cleared the entire vent run, found the collapsed flexible section and the warped wall cap, replaced both properly. d80 gone, single-cycle drying from the first test load. He explained every step and why it mattered. Very impressed."</div>
-          <div class="review-author">— Janet R., Main Street area, El Segundo</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"KitchenAid dishwasher not cleaning properly for months. Tech found a clogged spray arm, dirty filter, AND a small piece of glass in the impeller — three problems, one visit. He could have fixed just one and charged for another call later. He fixed all three and charged for one job. That's integrity."</div>
-          <div class="review-author">— Michelle K., South El Segundo, 90245</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="es-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in El Segundo</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Inlet valve · Fan motor · Coastal coil check (west side)</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Dryer + Vent Cleaning</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Full vent inspection · d80 / flow sense · Rigid duct if needed</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">OE drain error · Hall sensor · Shock absorbers · Pump</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Spray arm · Filter · Impeller · Drain pump · E24</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="es-faq">
-    <div class="container">
-      <h2>Questions El Segundo Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in El Segundo, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of El Segundo 90245 — Main Street area, east side, west side, every street. El Segundo is a regular stop on our South Bay route. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does El Segundo's coastal proximity affect appliances?</summary><div class="faq-answer">Moderately for west-side homes near the dunes. Close enough to see some coastal influence, but nothing like Strand-front Redondo Beach. We check for salt corrosion on relevant west-side calls. Eastern El Segundo has no meaningful coastal factor.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in El Segundo?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in El Segundo?</summary><div class="faq-answer">All major brands: Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in El Segundo?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most El Segundo repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">What warranty do you offer on appliance repairs in El Segundo?</summary><div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. Genuine OEM parts only. If the same issue returns within 90 days, we come back at no charge.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Manhattan Beach, Hawthorne, and Redondo Beach?</summary><div class="faq-answer">Yes. Our El Segundo service extends to Manhattan Beach, Hawthorne, Inglewood, Redondo Beach, Torrance, Lawndale, and all of the South Bay.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="es-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/manhattan-beach/" class="nearby-link">Manhattan Beach</a>
-        <a href="/redondo-beach/" class="nearby-link">Redondo Beach</a>
-        <a href="/torrance/" class="nearby-link">Torrance</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/marina-del-rey/" class="nearby-link">Marina del Rey</a>
-        <a href="/culver-city/" class="nearby-link">Culver City</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="es-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in El Segundo?</h2>
-          <p>All of 90245 · Same-day South Bay route · Weekends available. $89 diagnostic waived with repair. 90-day warranty. OEM parts.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — El Segundo, CA 90245</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --es-red: #C8102E; --es-black: #0a0a0a; --es-gray: #f5f5f5; --es-border: #e2e2e2; --es-text: #1a1a1a; --es-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .es-hero { background: var(--es-black); color: white; padding: 80px 0 60px; }
-  .es-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .es-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--es-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .es-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .es-hero__accent { color: var(--es-red); }
-  .es-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .es-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .es-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .es-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--es-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .es-bottom-cta .btn-secondary { color: var(--es-text); border-color: var(--es-border); }
-  .trust-bar { background: var(--es-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .es-intro { padding: 72px 0; background: white; }
-  .es-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .es-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--es-black); margin-bottom: 20px; }
-  .es-intro__text p { font-size: 16px; line-height: 1.7; color: var(--es-text); margin-bottom: 16px; }
-  .es-tip { display: flex; gap: 14px; background: #f0f4ff; border: 1px solid #c0cef0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .es-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .es-tip__text { font-size: 14px; color: var(--es-text); line-height: 1.6; }
-  .cta-box { background: var(--es-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--es-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--es-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--es-muted); text-align: center; margin-bottom: 40px; }
-  .es-services { padding: 72px 0; background: var(--es-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--es-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--es-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--es-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--es-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--es-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--es-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--es-red); font-weight: 500; }
-  .es-neighborhoods { padding: 72px 0; background: white; }
-  .es-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--es-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--es-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--es-text); padding: 8px 12px; background: var(--es-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--es-red); color: var(--es-black); font-weight: 500; }
-  .es-recent { padding: 72px 0; background: var(--es-gray); }
-  .es-recent h2 { font-size: 30px; font-weight: 700; color: var(--es-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--es-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--es-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--es-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--es-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--es-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .es-why { padding: 72px 0; background: white; }
-  .es-why h2 { font-size: 30px; font-weight: 700; color: var(--es-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--es-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--es-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--es-muted); line-height: 1.6; }
-  .es-reviews { padding: 72px 0; background: var(--es-gray); }
-  .es-reviews h2 { font-size: 30px; font-weight: 700; color: var(--es-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--es-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--es-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--es-muted); font-weight: 500; }
-  .es-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--es-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--es-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--es-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--es-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--es-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--es-red); }
-  .pricing-card__note { font-size: 13px; color: var(--es-muted); }
-  .es-faq { padding: 72px 0; background: var(--es-gray); }
-  .es-faq h2 { font-size: 30px; font-weight: 700; color: var(--es-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--es-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--es-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--es-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--es-text); }
-  .es-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--es-border); }
-  .es-nearby h2 { font-size: 20px; font-weight: 600; color: var(--es-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--es-border); border-radius: 20px; font-size: 14px; color: var(--es-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--es-red); color: var(--es-red); }
-  .es-bottom-cta { padding: 72px 0; background: var(--es-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .es-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .es-hero__inner { grid-template-columns: 1fr; } .es-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .es-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in El Segundo?"
+    body="All of 90245 · Same-day South Bay route · Weekends available. $89 diagnostic waived with repair. 90-day warranty. OEM parts."
+  />
+</CityLayoutV2>

@@ -1,729 +1,352 @@
 ---
-// src/pages/long-beach.astro
-// SDAR — samedayappliance.repair
-// Long Beach, CA · 90802 · 90803 · 90804 · 90806 · 90807 · 90808 · 90814 · 90815
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: нет данных — новый город
-// Конкуренты: Pacific Coast Appliance Repair (562-473-0303, 90802, 479 Yelp photos — strong local),
-//             ASAP Appliance Repair (562-317-8330, all ZIPs, generic),
-//             Long Beach Appliance Repair Works (ex-GE tech, since 2010),
-//             Sears (corporate)
-// Уникальный угол: Naples Island canal homes (ultra-luxury, salt air) +
-//                  Belmont Shore waterfront (vacation rentals, salt air) +
-//                  Bluff Park 1920s homes + Bixby Knolls mid-century +
-//                  coastal→inland gradient
-// Апрель 2026
+/**
+ * Long Beach, CA — v2 migrated page (T12 Wave 2 Batch A).
+ * Branch: Los Angeles — service_area (no public street address).
+ * Content source of truth: wiki/migration/content-dumps/long-beach.md
+ *
+ * Note on branch: dump metadata says "West Hollywood / (323) 870-4790",
+ * but cities.ts SSOT maps long-beach → los-angeles branch (424) 325-0520.
+ * cities.ts wins per migration contract.
+ *
+ * Unique block: "Long Beach — Coastal to Inland" — three-tier zone block
+ * (Canal/Waterfront, Beach/Shore, Established/Inland) rendered via
+ * <CustomNarrative> with subSections.
+ *
+ * Branch isolation:
+ *   - Phone (424) 325-0520 from cities.ts → branches.ts (Los Angeles)
+ *   - No streetAddress in schema (LA is service_area)
+ *   - All ZIPs are Long Beach (90802, 90803, 90804, 90806, 90807, 90808, 90814, 90815)
+ *
+ * Legacy preserved as long-beach.astro.legacy.
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-const city = {
-  name: "Long Beach",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90802", "90803", "90804", "90806", "90807", "90808", "90814", "90815"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "long-beach",
-};
+const citySlug = 'long-beach';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const title = `Appliance Repair Long Beach CA — Same Day | Naples Island · Belmont Shore · Bixby Knolls | (323) 870-4790`;
-const description = `Same-day appliance repair in Long Beach, CA. Naples Island, Belmont Shore, Bluff Park, Bixby Knolls, East Long Beach. Salt air specialists. Sub-Zero, Wolf, Samsung, LG — all brands. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/long-beach/`;
+const cityName = 'Long Beach';
+const zips = ['90802', '90803', '90804', '90806', '90807', '90808', '90814', '90815'];
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Long Beach",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Long Beach CA | Same Day Service | ${branch.phone}`;
+const description = "Same-day appliance repair in Long Beach, CA. Naples Island, Belmont Shore, Bluff Park, Bixby Knolls. Salt air specialists. Sub-Zero, Wolf, Samsung, LG, all brands. OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/long-beach/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Long Beach', sameAs: 'https://en.wikipedia.org/wiki/Long_Beach,_California' },
+    { '@type': 'Place', name: 'Naples Island' },
+    { '@type': 'Place', name: 'Belmont Shore' },
+    { '@type': 'Place', name: 'Bixby Knolls' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "City", "name": "Long Beach", "sameAs": "https://en.wikipedia.org/wiki/Long_Beach,_California" },
-    { "@type": "Neighborhood", "name": "Naples Island" },
-    { "@type": "Neighborhood", "name": "Belmont Shore" },
-    { "@type": "Neighborhood", "name": "Bixby Knolls" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const introParagraphs = [
+  "Long Beach is one of the largest cities in California, and it covers more ground than most. Naples Island canal homes, Belmont Shore vacation rentals, Bluff Park 1920s craftsman, Bixby Knolls mid-century, Los Altos and East Long Beach single-family homes — different appliance realities, one same-day commitment across all eight ZIP codes.",
+  "Naples Island is the most aggressive salt air environment we work in. Canal-front Sub-Zero, Wolf, and Thermador units sit in direct contact with humid waterway air. Condenser coils corrode and load up with particulate fast — units running on Naples need attention every 4 to 6 months, not the 12-month cycle we'd recommend inland.",
+  "Belmont Shore and the 2nd Street corridor mix primary residences with vacation rentals along the oceanfront. Rental priority calls are common — guests checking in tomorrow, owner out of state, dishwasher dead. We work those calls hard. Inland — Bixby Knolls, Los Altos, East Long Beach — is mid-century single-family with the standard mix of GE, Whirlpool, LG, and Samsung. Reliable, repairable, well-served by our OC and South Bay routes.",
+  `Diagnostic fee is $89 — credited toward repair. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for a real arrival window across any of Long Beach's 8 ZIP codes.`,
+];
+
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Salt air coil inspection · Not cooling · Ice maker · Built-in', brands: 'Sub-Zero · Samsung · LG · GE · Whirlpool · Thermador' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'Vacation rental priority · OE error · Not draining · Stackable', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen' },
+  { icon: '💨', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · Vent buildup · Gas & electric', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Electrolux' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not draining · Error codes · Panel-ready · Miele', brands: 'Bosch · Miele · KitchenAid · Samsung · LG · GE' },
+  { icon: '🔥', name: 'Oven, Range & Stove', slug: 'oven', issues: 'Salt air igniter · Not heating · Temperature off · Wolf', brands: 'Wolf · GE · Samsung · Bosch · Viking · KitchenAid' },
+  { icon: '🧊', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'Not freezing · Ice stopped · Salt air inlet valve · Frost', brands: 'Sub-Zero · Samsung · LG · GE · Whirlpool · True' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Compressor · Built-in · Coastal humidity', brands: 'Sub-Zero · True · U-Line · Liebherr · Dacor' },
+  { icon: '♨️', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Gas igniter · Burner · Induction not heating · Hood motor', brands: 'Wolf · Thermador · GE · Bosch · Samsung · Broan' },
+];
+
+const coastalToInlandNarrative = {
+  headline: 'Long Beach — Coastal to Inland',
+  paragraphs: [
+    "Different neighborhoods, same same-day commitment across all ZIP codes.",
+  ],
+  subSections: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Long Beach, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Long Beach — Naples Island, Belmont Shore, Bluff Park, Bixby Knolls, East Long Beach, Los Altos, Signal Hill, and all ZIP codes 90802 through 90815. Call before noon for same-day afternoon service." }
+      title: 'Canal · Waterfront — Naples Island & Alamitos Bay (90803)',
+      paragraphs: [
+        "Canal-front homes on one of LA's most prestigious waterway communities. Sub-Zero, Wolf, Thermador standard. Direct water exposure — aggressive salt air. Most complex service environment in Long Beach. Coil cleaning every 4 to 6 months, not 12. Built-in column units need door-seal checks at every visit. We carry OEM parts for Sub-Zero, Wolf, and Thermador on every Long Beach call specifically because Naples generates that volume.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Does salt air in Long Beach affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes, significantly in waterfront neighborhoods. Naples Island canal homes and Belmont Shore oceanfront properties face direct salt air exposure — condenser coils on refrigerators may need attention every 4–6 months rather than the 12 months recommended for inland homes. We inspect for salt-air corrosion on every Long Beach refrigerator call in coastal ZIP codes." }
+      title: 'Beach · Shore — Belmont Shore, Bluff Park, Belmont Heights (90803, 90814)',
+      paragraphs: [
+        "2nd Street corridor, oceanfront homes, vacation rentals. Significant salt air. Rental priority calls common. Mix of primary residences and investment properties — when guests are arriving tomorrow and the fridge is dead, we move that call to the front of the queue. Bluff Park homes with patio doors that face the ocean see more igniter corrosion than usual on Wolf and Thermador ranges — moisture comes in directly when the doors are open.",
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero and luxury appliances in Naples Island and Belmont Shore?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Naples Island and Belmont Shore homes frequently have Sub-Zero refrigerators, Wolf ranges, and high-end appliances. Our technicians carry OEM parts for these brands on every service vehicle." }
+      title: 'Established · Inland — Bixby Knolls, Los Altos, East LB (90807, 90808, 90815)',
+      paragraphs: [
+        "Mid-century single-family homes, established neighborhoods. GE, LG, Samsung, Whirlpool common. Standard repair profile — same reliable same-day service. LG front-loaders here are mostly 2014 to 2018 vintage, right in the bearing-failure window. Always replace bearing and seal as a set; half the job creates the next callback.",
+      ],
     },
-    {
-      "@type": "Question",
-      "name": "Do you prioritize vacation rental appliance repairs in Long Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Belmont Shore and Naples Island have a significant vacation rental presence. Tell us it's a rental situation when you call — we prioritize these calls to minimize guest disruption." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Long Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Long Beach?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Long Beach repairs run $150–$400 depending on the appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Seal Beach, Lakewood, and Signal Hill?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Long Beach service extends to Seal Beach, Lakewood, Signal Hill, Carson, Torrance, and all of the South Bay and coastal south LA County area." }
-    }
-  ]
+  ],
 };
+
+const neighborhoods = [
+  { name: 'Naples Island', zip: '90803', featured: true },
+  { name: 'Belmont Shore', zip: '90803', featured: true },
+  { name: 'Bluff Park', zip: '90814', featured: true },
+  { name: 'Belmont Heights', zip: '90814' },
+  { name: 'Alamitos Beach', zip: '90802' },
+  { name: 'Wrigley', zip: '90813' },
+  { name: 'Bixby Knolls', zip: '90807' },
+  { name: 'Los Altos', zip: '90815' },
+  { name: 'East Long Beach', zip: '90808' },
+  { name: 'Lakewood Village', zip: '90808' },
+  { name: 'Signal Hill', zip: '90755' },
+  { name: 'Cal Heights', zip: '90807' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero Built-In',
+    location: 'Naples Island, 90803',
+    quote: "Running constantly, louder than it's ever been",
+    description: "Naples Island canal home — Sub-Zero 48-inch built-in with condenser coils loaded with salt-air particulate from the waterway. Canal-front exposure on Naples is intense — the unit was cycling twice as often as normal. Full coil cleaning, replaced the condenser fan motor showing early heat stress from the additional load. Compressor cycling normalised within the hour. Homeowner put on a 4-month coastal inspection schedule appropriate for direct canal exposure.",
+    outcome: '✓ Same day · Salt air coils cleaned · Fan motor replaced · 4-month plan',
+  },
+  {
+    appliance: 'Samsung Refrigerator',
+    location: 'Vacation rental, Belmont Shore 90803',
+    quote: 'Fridge stopped cooling — guests checking in tomorrow',
+    description: "Property manager called for a Belmont Shore vacation rental — guests arriving next afternoon. Samsung French door: evaporator fan motor seized. Rental priority call — technician there by 11am. Replaced the OEM Samsung fan motor, confirmed 37°F before leaving. Manager sent a confirmation to guests. The stay went ahead without any disruption. Second time this property has needed salt-air coil attention — recommended a 6-month maintenance schedule given the 2nd Street beachfront location.",
+    outcome: '✓ Rental priority · OEM Samsung · 37°F confirmed · Guests unaffected',
+  },
+  {
+    appliance: 'Wolf Dual-Fuel Range',
+    location: 'Bluff Park, 90814',
+    quote: "Two burners sparking constantly — won't stop clicking",
+    description: "Bluff Park home with ocean-facing patio doors kept open during cooking — Wolf 36-inch dual-fuel with two surface igniter electrodes corroded from salt air moisture ingress. Classic pattern for Bluff Park: the ocean breeze comes in directly when the doors are open. Replaced both corroded electrodes with OEM Wolf parts, sealed the electrode wells. All six burners confirmed igniting cleanly. Advised on kitchen ventilation — use the range hood rather than the doors when cooking near the ocean.",
+    outcome: '✓ Same day · OEM Wolf · Salt air cause explained · All burners clean',
+  },
+  {
+    appliance: 'LG Washer',
+    location: 'Bixby Knolls, 90807',
+    quote: 'UE error on every spin — violent vibration mid-cycle',
+    description: "LG front-loader in a Bixby Knolls single-family — UE unbalanced load error appearing on every cycle regardless of load size. Found two rear shock absorbers near failure, creating a cant in the drum that triggered the sensor even with properly distributed loads. Replaced all four shock absorbers with OEM LG parts, levelled the machine, tested three full cycles at maximum spin. Quiet and smooth. Family had been re-spinning everything and washing half-loads for two months.",
+    outcome: '✓ Same day · OEM LG shocks · All four · Full spin confirmed',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Coastal Salt Air Specialists',
+    body: "Naples Island, Belmont Shore, Bluff Park — direct ocean and canal exposure changes everything about how appliances age. We check condenser coils proactively on every Long Beach refrigerator call, recommend 4 to 6 month cleaning schedules for true beachfront, and carry the parts most affected by salt air corrosion on every truck.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Vacation Rental Priority',
+    body: "When a Belmont Shore vacation rental loses the fridge with guests arriving tomorrow, that's a different urgency than a homeowner who noticed something was off this morning. Tell us it's a rental situation when you call — we move those to the front of the queue and can coordinate directly with property managers.",
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'All of Long Beach',
+    body: "Long Beach is large — 8 ZIP codes from the canal homes on Naples to the inland mid-century in East Long Beach. Our technicians know the city. We don't refuse calls because of distance from one neighborhood to another — same-day means same-day across all of 90802 through 90815.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: "Every repair we do in Long Beach carries a 90-day warranty on parts and labor. We use genuine OEM parts — especially important on luxury brands and on units exposed to coastal salt air, where aftermarket parts fail faster. If the same issue returns within 90 days, we come back at no charge.",
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Sub-Zero in our Naples Island canal home was running non-stop. Same Day cleaned the salt air coils, replaced the fan motor, put us on a 4-month inspection schedule for our canal location. Difference was immediate. They understood the Naples waterfront environment specifically — not generic coastal advice."',
+    author: '— Robert H., Naples Island, Long Beach',
+  },
+  {
+    stars: 5,
+    text: '"Our Belmont Shore vacation rental fridge stopped cooling the day before guests. Told Same Day it was a rental situation — they prioritised it, had a tech there by 11am, confirmed 37°F before leaving. Guests arrived to a working kitchen. This exact scenario is why rental priority service matters."',
+    author: '— Lisa T. (property manager), Belmont Shore, Long Beach',
+  },
+  {
+    stars: 5,
+    text: '"LG washer vibrating violently every spin cycle in our Bixby Knolls home. Tech came same day, replaced all four shock absorbers with OEM parts, levelled the machine, confirmed three clean cycles. Had been dealing with this for two months — done in under 90 minutes. Professional, efficient, fair price."',
+    author: '— Maria C., Bixby Knolls, Long Beach',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator + Salt Air Coil Check', range: '$200–$450', note: 'Coastal coil inspection · Fan motor · Ice maker · OEM', featured: true },
+  { appliance: 'Sub-Zero / Wolf / Thermador', range: '$300–$700+', note: 'OEM parts · Coastal maintenance included', featured: true },
+  { appliance: 'Washer / Dryer', range: '$150–$350', note: 'Drain pump · Heating element · Vent cleaning · OEM' },
+  { appliance: 'Dishwasher', range: '$150–$320', note: 'Drain · Error codes · Door seal · Bosch / Miele' },
+  { appliance: 'Oven / Range', range: '$150–$400', note: 'Igniter · Element · Temperature calibration · OEM' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Credited toward repair · Written estimate' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Long Beach?',
+    answer: 'Yes — Long Beach is part of our Los Angeles branch territory. We cover all 8 ZIP codes (90802, 90803, 90804, 90806, 90807, 90808, 90814, 90815) including Naples Island, Belmont Shore, Bluff Park, Bixby Knolls, Los Altos, and East Long Beach. Call before noon and we can typically be at your door that afternoon.',
+  },
+  {
+    question: 'Does the salt air in Long Beach damage appliances faster?',
+    answer: 'Yes, significantly. Naples Island, Belmont Shore, and Bluff Park homes — direct canal or ocean exposure — see condenser coil corrosion in 14 to 18 months that would take 4 to 5 years inland. Dishwasher door gaskets and outdoor grill igniters fail early too. We clean and inspect condenser coils on every coastal Long Beach refrigerator call as standard, not as an add-on, and recommend a 4 to 6 month cleaning schedule for true beachfront properties.',
+  },
+  {
+    question: 'Do you handle vacation rentals and short-term rentals in Long Beach?',
+    answer: "Yes. Belmont Shore, Naples Island, and the 2nd Street corridor have a lot of vacation rentals where a broken appliance between guest groups is a real emergency. Tell us it's a rental situation when you call — we prioritize those visits, coordinate directly with property managers, work around guest check-in and check-out windows, and provide service reports for property records.",
+  },
+  {
+    question: 'Do you repair Sub-Zero and Wolf appliances on Naples Island?',
+    answer: "Yes. Naples Island and Belmont Shore homes commonly have Sub-Zero refrigerators, Wolf ranges, Thermador ovens, and Miele dishwashers. We carry OEM parts for these brands on every Long Beach service vehicle. Salt air on Naples is the most aggressive in our service area — we know the failure patterns and we don't use aftermarket parts on coastal luxury appliances.",
+  },
+  {
+    question: 'Do you offer weekend appliance repair in Long Beach?',
+    answer: 'Yes. We service Long Beach Monday through Saturday, 8am–8pm. Phone is answered 24/7. Sundays we are closed for in-person service but a real person picks up if you have an urgent question — we will tell you honestly what we can do Monday morning.',
+  },
+  {
+    question: 'What is your diagnostic fee in Long Beach?',
+    answer: 'Our diagnostic fee is $89. It covers the trip, full inspection, and a written estimate with itemized parts and labor. If you approve the repair, the $89 is credited toward your invoice — no separate charge for the diagnosis.',
+  },
+  {
+    question: 'Do you also service Seal Beach, Lakewood, and Signal Hill?',
+    answer: 'Yes — Seal Beach (90740), Lakewood (90712), Signal Hill (90755), and surrounding South Bay communities are within our regular Long Beach route. Same-day availability and same OEM-parts standard. Call us if you are unsure whether your address is covered — most likely it is.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Huntington Beach', slug: 'huntington-beach' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Manhattan Beach', slug: 'manhattan-beach' },
+  { name: 'Santa Monica', slug: 'santa-monica' },
+  { name: 'Marina del Rey', slug: 'marina-del-rey' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Long Beach, CA"
+    subheadline="From Naples Island canal homes to Bixby Knolls mid-century — Long Beach covers more ground than most cities. Salt air specialists for coastal neighborhoods. Sub-Zero, Wolf, Samsung, LG, all brands. Same-day, OEM parts, 90-day warranty."
+    zips={zips}
+    tier={1}
+  />
 
-  <!-- HERO -->
-  <section class="lb2-hero">
-    <div class="lb2-hero__inner container">
-      <div class="lb2-hero__content">
-        <div class="lb2-hero__eyebrow">Long Beach, CA · Naples Island · Belmont Shore · Bluff Park · Bixby Knolls · Los Altos</div>
-        <h1 class="lb2-hero__h1">
-          Appliance Repair<br>
-          <span class="lb2-hero__accent">Long Beach, CA</span>
-        </h1>
-        <p class="lb2-hero__sub">
-          From Naples Island canal homes to Bixby Knolls mid-century — Long Beach
-          covers more ground than most cities. Salt air specialists for coastal
-          neighborhoods. Sub-Zero, Wolf, Samsung, LG, all brands. Same-day,
-          OEM parts, 90-day warranty. Weekends available.
-        </p>
-        <div class="lb2-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="lb2-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="lb2-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-long-beach-ca.webp"
-          alt="Appliance repair in Long Beach CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Rental Priority</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Long Beach — Knowing the City"
+    paragraphs={introParagraphs}
+    bookingTitle="Long Beach Service"
+    bookingSub="Available Today"
+  />
 
-  <!-- INTRO -->
-  <section class="lb2-intro">
-    <div class="container lb2-intro__inner">
-      <div class="lb2-intro__text">
-        <h2>Appliance Repair in Long Beach — Knowing the City</h2>
-        <p>
-          Long Beach is one of the largest cities in California, and it contains
-          several distinct neighbourhoods with very different appliance profiles.
-          Naples Island — the canal community just east of Alamitos Bay — has
-          some of the most spectacular waterfront homes in Southern California,
-          with kitchens to match: Sub-Zero, Wolf, Thermador are standard there.
-          The salt air on the canals is aggressive.
-        </p>
-        <p>
-          Belmont Shore on 2nd Street is a mix of beachside primary residences
-          and vacation rentals — the oceanfront properties face direct salt air,
-          and there's a meaningful vacation rental segment where a broken
-          refrigerator or dishwasher before a guest weekend is an emergency.
-          We prioritize rental calls.
-        </p>
-        <p>
-          Inland — Bixby Knolls, Los Altos, East Long Beach — is established
-          mid-century suburbia: well-maintained homes with GE, Whirlpool, LG,
-          and Samsung appliances. No salt air factor here, just a reliable same-day
-          repair with an honest written estimate.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written
-          estimate before we start. <strong>90-day warranty</strong>. Weekends
-          available.
-        </p>
-        <div class="lb2-tip">
-          <div class="lb2-tip__icon">🌊</div>
-          <div class="lb2-tip__text">
-            <strong>Salt air tip for Long Beach coastal:</strong> If your
-            refrigerator in Naples Island, Belmont Shore, or an oceanfront
-            Bluff Park home is running louder than usual or cycling more
-            frequently — salt-loaded condenser coils are the most likely
-            cause. Coastal properties need coil cleaning every 4–6 months,
-            not the 12 months recommended for inland homes. We include a
-            coil inspection on every Long Beach coastal refrigerator call.
-          </div>
-        </div>
-      </div>
-      <div class="lb2-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Long Beach Service</div>
-          <div class="cta-box__sub">All neighborhoods · Rental priority</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Long Beach"
+    services={services}
+  />
 
-  <!-- LB NEIGHBORHOOD TIERS -->
-  <section class="lb2-tiers">
-    <div class="container">
-      <h2 class="section-title">Long Beach — Coastal to Inland</h2>
-      <p class="section-sub">Different neighborhoods, same same-day commitment across all ZIP codes.</p>
-      <div class="tier-grid">
-        <div class="tier-card tier-card--waterfront">
-          <div class="tier-label">Canal · Waterfront</div>
-          <div class="tier-name">Naples Island · Alamitos Bay</div>
-          <div class="tier-desc">Canal-front homes on one of LA's most prestigious waterway communities. Sub-Zero, Wolf, Thermador standard. Direct water exposure — aggressive salt air. Most complex service environment in Long Beach.</div>
-          <div class="tier-zip">90803</div>
-        </div>
-        <div class="tier-card tier-card--coastal">
-          <div class="tier-label">Beach · Shore</div>
-          <div class="tier-name">Belmont Shore · Bluff Park · Belmont Heights</div>
-          <div class="tier-desc">2nd Street corridor, oceanfront homes, vacation rentals. Significant salt air. Rental priority calls common. Mix of primary residences and investment properties.</div>
-          <div class="tier-zip">90803 · 90814</div>
-        </div>
-        <div class="tier-card tier-card--inland">
-          <div class="tier-label">Established · Inland</div>
-          <div class="tier-name">Bixby Knolls · Los Altos · East LB</div>
-          <div class="tier-desc">Mid-century single-family homes, established neighborhoods. GE, LG, Samsung, Whirlpool common. Standard repair profile — same reliable same-day service.</div>
-          <div class="tier-zip">90807 · 90808 · 90815</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={coastalToInlandNarrative.headline}
+    paragraphs={coastalToInlandNarrative.paragraphs}
+    subSections={coastalToInlandNarrative.subSections}
+    background="white"
+  />
 
-  <!-- SERVICES -->
-  <section class="lb2-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Long Beach</h2>
-      <p class="section-sub">All brands · Coastal & inland · All ZIP codes</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="Long Beach Neighborhoods We Service"
+    subheadline="Coastal, inland, and the South Bay — every ZIP code from 90802 to 90815."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <a href="/long-beach/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Salt air coil inspection · Not cooling · Ice maker · Sub-Zero</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · Thermador</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Long Beach"
+    jobs={recentJobs}
+  />
 
-        <a href="/long-beach/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Vacation rental priority · OE error · Not draining · Stackable</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Long Beach Residents Call Us"
+    reasons={whyReasons}
+  />
 
-        <a href="/long-beach/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Long Beach Clients Say"
+    testimonials={testimonials}
+  />
 
-        <a href="/long-beach/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Not draining · Error codes · Panel-ready · Miele</div>
-          <div class="service-card__brands">Bosch · Miele · KitchenAid · Samsung · LG · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Long Beach"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/long-beach/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Stove</div>
-          <div class="service-card__issues">Salt air igniter · Not heating · Temperature off · Wolf</div>
-          <div class="service-card__brands">Wolf · GE · Samsung · Bosch · Viking · KitchenAid</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Long Beach"
+    faqs={faqs}
+  />
 
-        <a href="/long-beach/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Not freezing · Ice stopped · Salt air inlet valve · Frost</div>
-          <div class="service-card__brands">Sub-Zero · Samsung · LG · GE · Whirlpool · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Cities"
+  />
 
-        <a href="/long-beach/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Built-in · Coastal humidity</div>
-          <div class="service-card__brands">Sub-Zero · True · U-Line · Liebherr · Dacor</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/long-beach/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">Wolf · Thermador · GE · Bosch · Samsung · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="lb2-neighborhoods">
-    <div class="container">
-      <h2>All of Long Beach</h2>
-      <p class="section-sub">From Naples Island to Los Altos — every neighbourhood we cover</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Coastal Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Naples Island (90803)</div>
-            <div class="nh-item featured">Belmont Shore (90803)</div>
-            <div class="nh-item featured">Bluff Park (90814)</div>
-            <div class="nh-item">Belmont Heights (90814)</div>
-            <div class="nh-item">Alamitos Beach (90802)</div>
-            <div class="nh-item">Wrigley (90813)</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Inland Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item">Bixby Knolls (90807)</div>
-            <div class="nh-item">Los Altos (90815)</div>
-            <div class="nh-item">East Long Beach (90808)</div>
-            <div class="nh-item">Lakewood Village (90808)</div>
-            <div class="nh-item">Signal Hill (90755)</div>
-            <div class="nh-item">Cal Heights (90807)</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Seal Beach (90740)</div>
-            <div class="nh-item">Lakewood (90712)</div>
-            <div class="nh-item">Torrance (90503)</div>
-            <div class="nh-item">Carson (90745)</div>
-            <div class="nh-item">Huntington Beach (92648)</div>
-            <div class="nh-item">Compton (90220)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="lb2-recent">
-    <div class="container">
-      <h2>Recent Jobs in Long Beach</h2>
-      <p class="section-sub">Real calls from Long Beach — canal homes, beachside rentals, inland suburbia.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Built-In</span>
-            <span class="recent-location">Naples Island, 90803</span>
-          </div>
-          <div class="recent-card__title">"Running constantly, louder than it's ever been"</div>
-          <div class="recent-card__desc">
-            Naples Island canal home — Sub-Zero 48-inch built-in with condenser
-            coils loaded with salt-air particulate from the waterway. Canal-front
-            exposure on Naples is intense — the unit was cycling twice as often as
-            normal. Full coil cleaning, replaced the condenser fan motor showing
-            early heat stress from the additional load. Compressor cycling
-            normalised within the hour. Homeowner put on a 4-month coastal
-            inspection schedule appropriate for direct canal exposure.
-          </div>
-          <div class="recent-card__result">✓ Same day · Salt air coils cleaned · Fan motor replaced · 4-month plan</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Vacation rental, Belmont Shore 90803</span>
-          </div>
-          <div class="recent-card__title">"Fridge stopped cooling — guests checking in tomorrow"</div>
-          <div class="recent-card__desc">
-            Property manager called for a Belmont Shore vacation rental — guests
-            arriving next afternoon. Samsung French door: evaporator fan motor
-            seized. Rental priority call — technician there by 11am. Replaced
-            the OEM Samsung fan motor, confirmed 37°F before leaving. Manager
-            sent a confirmation to guests. The stay went ahead without any
-            disruption. Second time this property has needed salt-air coil
-            attention — recommended a 6-month maintenance schedule given the
-            2nd Street beachfront location.
-          </div>
-          <div class="recent-card__result">✓ Rental priority · OEM Samsung · 37°F confirmed · Guests unaffected</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Dual-Fuel Range</span>
-            <span class="recent-location">Bluff Park, 90814</span>
-          </div>
-          <div class="recent-card__title">"Two burners sparking constantly — won't stop clicking"</div>
-          <div class="recent-card__desc">
-            Bluff Park home with ocean-facing patio doors kept open during
-            cooking — Wolf 36-inch dual-fuel with two surface igniter
-            electrodes corroded from salt air moisture ingress. Classic pattern
-            for Bluff Park: the ocean breeze comes in directly when the doors
-            are open. Replaced both corroded electrodes with OEM Wolf parts,
-            sealed the electrode wells. All six burners confirmed igniting
-            cleanly. Advised on kitchen ventilation — use the range hood rather
-            than the doors when cooking near the ocean.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Wolf · Salt air cause explained · All burners clean</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Washer</span>
-            <span class="recent-location">Bixby Knolls, 90807</span>
-          </div>
-          <div class="recent-card__title">"UE error on every spin — violent vibration mid-cycle"</div>
-          <div class="recent-card__desc">
-            LG front-loader in a Bixby Knolls single-family — UE unbalanced
-            load error appearing on every cycle regardless of load size.
-            Found two rear shock absorbers near failure, creating a cant
-            in the drum that triggered the sensor even with properly
-            distributed loads. Replaced all four shock absorbers with OEM
-            LG parts, levelled the machine, tested three full cycles at
-            maximum spin. Quiet and smooth. Family had been re-spinning
-            everything and washing half-loads for two months.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM LG shocks · All four · Full spin confirmed</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="lb2-why">
-    <div class="container">
-      <h2>Why Long Beach Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🌊</div>
-          <div class="why-title">Coastal Salt Air Specialists</div>
-          <div class="why-text">Naples Island, Belmont Shore, and Bluff Park face real salt air corrosion — coils, igniter electrodes, and outdoor appliances all degrade faster here. We inspect for coastal damage proactively on every relevant LB call and know the maintenance intervals that actually apply near the water.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">Vacation Rental Priority</div>
-          <div class="why-text">Tell us it's a rental situation and we move it up. Belmont Shore and Naples Island have significant vacation rental populations — a broken appliance mid-guest-stay has real consequences. We prioritize these calls to protect your bookings and rating.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📍</div>
-          <div class="why-title">All of Long Beach</div>
-          <div class="why-text">From Naples Island canal homes to Bixby Knolls mid-century to East Long Beach tract houses — we cover all of it. Same OEM parts, same 90-day warranty, same $89 diagnostic waived with repair regardless of the ZIP code.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="lb2-reviews">
-    <div class="container">
-      <h2>What Long Beach Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Sub-Zero in our Naples Island canal home was running non-stop. Same Day cleaned the salt air coils, replaced the fan motor, put us on a 4-month inspection schedule for our canal location. Difference was immediate. They understood the Naples waterfront environment specifically — not generic coastal advice."</div>
-          <div class="review-author">— Robert H., Naples Island, Long Beach</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our Belmont Shore vacation rental fridge stopped cooling the day before guests. Told Same Day it was a rental situation — they prioritised it, had a tech there by 11am, confirmed 37°F before leaving. Guests arrived to a working kitchen. This exact scenario is why rental priority service matters."</div>
-          <div class="review-author">— Lisa T. (property manager), Belmont Shore, Long Beach</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG washer vibrating violently every spin cycle in our Bixby Knolls home. Tech came same day, replaced all four shock absorbers with OEM parts, levelled the machine, confirmed three clean cycles. Had been dealing with this for two months — done in under 90 minutes. Professional, efficient, fair price."</div>
-          <div class="review-author">— Maria C., Bixby Knolls, Long Beach</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="lb2-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Long Beach</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Refrigerator + Salt Air Coil Check</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Coastal inspection included · Fan motor · Sub-Zero OEM</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf / Thermador</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Naples Island · Luxury estate kitchens</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Vacation rental priority · Drain pump · Thermal fuse</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Drain pump · Error codes · Panel-ready · Miele</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Salt air igniter · Gas valve · Wolf OEM · Calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="lb2-faq">
-    <div class="container">
-      <h2>Questions Long Beach Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Long Beach, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Long Beach — Naples Island, Belmont Shore, Bluff Park, Bixby Knolls, East Long Beach, Los Altos, and all ZIP codes 90802 through 90815. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does salt air in Long Beach affect appliances?</summary><div class="faq-answer">Yes, significantly in coastal neighborhoods. Naples Island and Belmont Shore face direct salt air exposure — condenser coils may need attention every 4–6 months. We inspect for salt-air corrosion on every coastal Long Beach refrigerator call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you prioritize vacation rental appliance repairs in Long Beach?</summary><div class="faq-answer">Yes. Tell us it's a rental situation when you call. We move these calls up to minimize guest disruption and protect your rental rating.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Sub-Zero and luxury appliances in Naples Island?</summary><div class="faq-answer">Yes. Naples Island homes frequently have Sub-Zero, Wolf, and Thermador. We carry OEM parts for all luxury brands on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Long Beach?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Long Beach?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Long Beach repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Seal Beach, Lakewood, and Signal Hill?</summary><div class="faq-answer">Yes. Our Long Beach service extends to Seal Beach, Lakewood, Signal Hill, Carson, Torrance, and all of the South Bay coastal area.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="lb2-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/huntington-beach/" class="nearby-link">Huntington Beach</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/manhattan-beach/" class="nearby-link">Manhattan Beach</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-        <a href="/marina-del-rey/" class="nearby-link">Marina del Rey</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="lb2-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Long Beach?</h2>
-          <p>Naples Island · Belmont Shore · Bixby Knolls · Salt air specialists · Vacation rental priority. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Long Beach, CA</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --lb2-red: #C8102E; --lb2-black: #0a0a0a; --lb2-gray: #f5f5f5; --lb2-border: #e2e2e2; --lb2-text: #1a1a1a; --lb2-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .lb2-hero { background: var(--lb2-black); color: white; padding: 80px 0 60px; }
-  .lb2-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .lb2-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--lb2-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .lb2-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .lb2-hero__accent { color: var(--lb2-red); }
-  .lb2-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .lb2-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .lb2-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .lb2-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--lb2-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .lb2-bottom-cta .btn-secondary { color: var(--lb2-text); border-color: var(--lb2-border); }
-  .trust-bar { background: var(--lb2-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .lb2-intro { padding: 72px 0; background: white; }
-  .lb2-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .lb2-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--lb2-black); margin-bottom: 20px; }
-  .lb2-intro__text p { font-size: 16px; line-height: 1.7; color: var(--lb2-text); margin-bottom: 16px; }
-  .lb2-tip { display: flex; gap: 14px; background: #eaf4fb; border: 1px solid #87c1e0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .lb2-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .lb2-tip__text { font-size: 14px; color: var(--lb2-text); line-height: 1.6; }
-  .cta-box { background: var(--lb2-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--lb2-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .lb2-tiers { padding: 72px 0; background: var(--lb2-black); color: white; }
-  .tier-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .tier-card { border-radius: 14px; padding: 28px 24px; border: 1px solid rgba(255,255,255,0.1); }
-  .tier-card--waterfront { background: rgba(200,16,46,0.15); border-color: rgba(200,16,46,0.4); }
-  .tier-card--coastal { background: rgba(0,100,200,0.12); border-color: rgba(0,100,200,0.3); }
-  .tier-card--inland { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.12); }
-  .tier-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(255,255,255,0.5); margin-bottom: 6px; }
-  .tier-name { font-size: 16px; font-weight: 600; color: white; margin-bottom: 12px; }
-  .tier-desc { font-size: 14px; color: rgba(255,255,255,0.75); line-height: 1.6; margin-bottom: 14px; }
-  .tier-zip { font-size: 12px; color: rgba(255,255,255,0.4); font-weight: 500; }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--lb2-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--lb2-muted); text-align: center; margin-bottom: 40px; }
-  .lb2-tiers .section-title { color: white; }
-  .lb2-tiers .section-sub { color: rgba(255,255,255,0.6); }
-  .lb2-services { padding: 72px 0; background: var(--lb2-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--lb2-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--lb2-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--lb2-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--lb2-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--lb2-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--lb2-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--lb2-red); font-weight: 500; }
-  .lb2-neighborhoods { padding: 72px 0; background: white; }
-  .lb2-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--lb2-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--lb2-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--lb2-text); padding: 8px 12px; background: var(--lb2-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--lb2-red); color: var(--lb2-black); font-weight: 500; }
-  .lb2-recent { padding: 72px 0; background: var(--lb2-gray); }
-  .lb2-recent h2 { font-size: 30px; font-weight: 700; color: var(--lb2-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--lb2-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--lb2-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--lb2-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--lb2-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--lb2-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .lb2-why { padding: 72px 0; background: white; }
-  .lb2-why h2 { font-size: 30px; font-weight: 700; color: var(--lb2-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--lb2-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--lb2-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--lb2-muted); line-height: 1.6; }
-  .lb2-reviews { padding: 72px 0; background: var(--lb2-gray); }
-  .lb2-reviews h2 { font-size: 30px; font-weight: 700; color: var(--lb2-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--lb2-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--lb2-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--lb2-muted); font-weight: 500; }
-  .lb2-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--lb2-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--lb2-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--lb2-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--lb2-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--lb2-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--lb2-red); }
-  .pricing-card__note { font-size: 13px; color: var(--lb2-muted); }
-  .lb2-faq { padding: 72px 0; background: var(--lb2-gray); }
-  .lb2-faq h2 { font-size: 30px; font-weight: 700; color: var(--lb2-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--lb2-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--lb2-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--lb2-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--lb2-text); }
-  .lb2-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--lb2-border); }
-  .lb2-nearby h2 { font-size: 20px; font-weight: 600; color: var(--lb2-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--lb2-border); border-radius: 20px; font-size: 14px; color: var(--lb2-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--lb2-red); color: var(--lb2-red); }
-  .lb2-bottom-cta { padding: 72px 0; background: var(--lb2-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .lb2-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } .tier-grid { grid-template-columns: 1fr; } }
-  @media (max-width: 768px) { .lb2-hero__inner { grid-template-columns: 1fr; } .lb2-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .lb2-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Long Beach?"
+    body="Naples Island · Belmont Shore · Bixby Knolls · Salt air specialists · Vacation rental priority. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayoutV2>

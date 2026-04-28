@@ -1,351 +1,250 @@
 ---
-// src/pages/monterey-park.astro
-// Same Day Appliance Repair — Monterey Park, CA
-// Branch: Pasadena | Phone: (626) 376-4458
-// Tier: T3 — template-only scope (residential focus, no service sub-pages)
-// Migration from /areas/monterey-park/ legacy
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
-import CTA from '../components/CTA.astro';
+const citySlug = 'monterey-park';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = "Monterey Park";
-const citySlug = "monterey-park";
-const phone = "(626) 376-4458";
-const phoneRaw = "+16263764458";
-const email = "pasadena@samedayappliance.repair";
-const branch = "Pasadena";
+const cityName = "Monterey Park";
+const zips = ['91754', '91755'];
 
-const metaTitle = "Appliance Repair Monterey Park CA | Same Day | (626) 376-4458";
-const metaDesc = "Same-day appliance repair in Monterey Park, CA. Atlantic Times Square, Monterey Highlands, East LA gateway. Sub-Zero, Wolf & all brands. $89 diagnostic — waived with repair.";
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
 
-const neighborhoods = [
-  { name: "Monterey Highlands", zip: "91754" },
-  { name: "Monterey Vista", zip: "91754" },
-  { name: "Atlantic Times Square / Downtown", zip: "91754" },
-  { name: "East Monterey Park", zip: "91755" },
-  { name: "Cascades Park area", zip: "91754" },
-  { name: "South Monterey Park", zip: "91755" },
+const title = `Appliance Repair Monterey Park CA | Same Day | ${branch.phone}`;
+const description = "Same-day appliance repair in Monterey Park, CA. Atlantic Times Square, Monterey Highlands, East LA gateway. Sub-Zero, Wolf & all brands. $89 diagnostic — waived with repair.";
+const canonical = 'https://samedayappliance.repair/monterey-park/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Monterey Park', sameAs: 'https://en.wikipedia.org/wiki/Monterey_Park,_California' },
+    { '@type': 'Place', name: 'Monterey Highlands' },
+    { '@type': 'Place', name: 'Atlantic Times Square' },
+    { '@type': 'Place', name: 'Monterey Vista' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
+  },
+};
+
+const introParagraphs = [
+  "Monterey Park sits at the entrance to the West San Gabriel Valley — bordered by East LA to the south, Alhambra to the west, San Gabriel to the east. Population around 60,000, two ZIP codes (91754 and 91755), and a strong residential character that mixes hillside single-family homes (Monterey Highlands, Monterey Vista) with downtown condos near Atlantic Times Square and older duplexes through East Monterey Park.",
+  "The appliance brand mix here is meaningfully different from Pasadena or San Marino. Monterey Park has one of LA County's largest Asian-American populations (Chinese-American, Taiwanese-American, Vietnamese-American communities have been concentrated here since the 1980s), and Samsung Bespoke + Family Hub kitchens are the dominant luxury install — more so than Sub-Zero or Wolf, which tend to dominate Westside LA. We carry Samsung OEM parts (auger motors, ice-maker assemblies, French-door hinge kits, control boards) in our Pasadena truck stock for that reason. LG is a strong second-place install, especially on the laundry side.",
+  `Monterey Park is on our regular West San Gabriel Valley route — Pasadena branch dispatches technicians through Monterey Park, Alhambra, San Gabriel, and Temple City daily. No distance surcharge, $89 residential diagnostic same as anywhere else we serve. Call <a href="tel:${phoneRaw}">${branch.phone}</a> — someone with our actual Pasadena schedule picks up.`,
 ];
 
 const services = [
-  { name: "Refrigerator Repair", slug: "refrigerator-repair", icon: "❄️" },
-  { name: "Washer Repair", slug: "washer-repair", icon: "🫧" },
-  { name: "Dryer Repair", slug: "dryer-repair", icon: "💨" },
-  { name: "Dishwasher Repair", slug: "dishwasher-repair", icon: "🍽️" },
-  { name: "Oven & Range Repair", slug: "oven-repair", icon: "🔥" },
-  { name: "Stove Repair", slug: "stove-repair", icon: "🍳" },
-  { name: "Microwave Repair", slug: "microwave-repair", icon: "📻" },
-  { name: "Ice Maker Repair", slug: "ice-maker-repair", icon: "🧊" },
-  { name: "Wine Cooler Repair", slug: "wine-cooler-repair", icon: "🍷" },
-  { name: "Freezer Repair", slug: "freezer-repair", icon: "🧊" },
-  { name: "Garbage Disposal Repair", slug: "garbage-disposal-repair", icon: "🗑️" },
-  { name: "Cooktop Repair", slug: "cooktop-repair", icon: "♨️" },
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍳', name: 'Stove Repair', slug: 'stove' },
+  { icon: '📻', name: 'Microwave Repair', slug: 'microwave' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🗑️', name: 'Garbage Disposal Repair', slug: 'garbage-disposal' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' },
 ];
 
-const recentRepairs = [
+const neighborhoods = [
+  { name: 'Monterey Highlands', zip: '91754' },
+  { name: 'Monterey Vista', zip: '91754' },
+  { name: 'Atlantic Times Square / Downtown', zip: '91754' },
+  { name: 'East Monterey Park', zip: '91755' },
+  { name: 'Cascades Park area', zip: '91754' },
+  { name: 'South Monterey Park', zip: '91755' },
+];
+
+const recentJobs = [
   {
-    title: "Samsung French-door fridge — ice maker not cycling",
-    neighborhood: "Monterey Highlands",
-    detail: "Samsung RF28R7351SR in a Monterey Highlands single-family home — ice maker had stopped producing ice; refrigerator and freezer holding temp normally. Diagnosed as failed ice-maker auger motor (the rotational motor that cycles the cubes out of the mold). Replaced with Samsung OEM motor, tested through three cycles, harvest verified. Monterey Highlands has a high concentration of Samsung Bespoke and Family Hub kitchens — we see the auger-motor failure pattern at 4-6 year mark on these models. Asian-American households favor Samsung in this neighborhood; we keep the OEM auger motor in truck stock for that reason.",
-    part: "Samsung OEM ice-maker auger motor",
-    time: "1.5 hours"
+    appliance: 'Samsung French-door fridge',
+    location: 'Monterey Highlands',
+    quote: "Samsung French-door fridge — ice maker not cycling",
+    description: "Samsung RF28R7351SR in a Monterey Highlands single-family home — ice maker had stopped producing ice; refrigerator and freezer holding temp normally. Diagnosed as failed ice-maker auger motor (the rotational motor that cycles the cubes out of the mold). Replaced with Samsung OEM motor, tested through three cycles, harvest verified. Monterey Highlands has a high concentration of Samsung Bespoke and Family Hub kitchens — we see the auger-motor failure pattern at 4-6 year mark on these models. Asian-American households favor Samsung in this neighborhood; we keep the OEM auger motor in truck stock for that reason.",
+    outcome: '✓ Same day · Samsung OEM ice-maker auger motor · 1.5 hours',
   },
   {
-    title: "Bosch dishwasher — E15 error, water collecting in base",
-    neighborhood: "Atlantic Times Square / Downtown",
-    detail: "Bosch SHX-series dishwasher in a downtown Monterey Park condo near Atlantic Times Square — E15 leak-detection error halting the cycle. Water had collected in the unit's base safety pan, triggering the leak sensor. Found a hairline crack in the lower hose connection at the pump intake — small leak that had accumulated over weeks. Replaced the connection hose, dried the base pan, reset the leak sensor, ran two test cycles. Bosch E15 is one of the most-misdiagnosed dishwasher errors in our field; it's a leak detection alert, not a control board failure. Often the fix is a $40 hose, not a $400 board.",
-    part: "Bosch OEM lower hose connection",
-    time: "1.5 hours"
+    appliance: 'Bosch dishwasher',
+    location: 'Atlantic Times Square / Downtown',
+    quote: "Bosch dishwasher — E15 error, water collecting in base",
+    description: "Bosch SHX-series dishwasher in a downtown Monterey Park condo near Atlantic Times Square — E15 leak-detection error halting the cycle. Water had collected in the unit's base safety pan, triggering the leak sensor. Found a hairline crack in the lower hose connection at the pump intake — small leak that had accumulated over weeks. Replaced the connection hose, dried the base pan, reset the leak sensor, ran two test cycles. Bosch E15 is one of the most-misdiagnosed dishwasher errors in our field; it's a leak detection alert, not a control board failure. Often the fix is a $40 hose, not a $400 board.",
+    outcome: '✓ Same day · Bosch OEM lower hose connection · 1.5 hours',
   },
   {
-    title: "Whirlpool top-load washer — won't drain or spin",
-    neighborhood: "East Monterey Park",
-    detail: "Whirlpool top-load washer in an East Monterey Park duplex — wash cycle completed but water sitting in the drum, no spin. Drain pump was healthy; the lid switch had failed (older Whirlpool top-loaders use a mechanical lid switch as a safety interlock — without it the spin cycle won't engage). Replaced the lid switch, tested through full cycle. Fast, cheap fix once diagnosed correctly. The previous repair company had quoted a control-board replacement at $400+ — the actual issue was a $35 lid switch.",
-    part: "Whirlpool OEM lid switch",
-    time: "1 hour"
-  }
+    appliance: 'Whirlpool top-load washer',
+    location: 'East Monterey Park',
+    quote: "Whirlpool top-load washer — won't drain or spin",
+    description: "Whirlpool top-load washer in an East Monterey Park duplex — wash cycle completed but water sitting in the drum, no spin. Drain pump was healthy; the lid switch had failed (older Whirlpool top-loaders use a mechanical lid switch as a safety interlock — without it the spin cycle won't engage). Replaced the lid switch, tested through full cycle. Fast, cheap fix once diagnosed correctly. The previous repair company had quoted a control-board replacement at $400+ — the actual issue was a $35 lid switch.",
+    outcome: '✓ Same day · Whirlpool OEM lid switch · 1 hour',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'Samsung OEM parts on the truck',
+    body: "Monterey Park's install base skews heavily Samsung — French-door refrigerators, Bespoke kitchens, Family Hub. Our Pasadena techs carry Samsung-specific OEM parts (auger motors, ice-maker assemblies, French-door hinges) so we don't have to roll a parts order on routine Samsung calls.",
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'West San Gabriel Valley regular route',
+    body: "Pasadena branch runs Monterey Park, Alhambra, San Gabriel, Temple City daily. Same-day service is real here, not a sales claim. No distance surcharge.",
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'Honest diagnostic before parts swap',
+    body: "Bosch E15, Whirlpool no-spin, Samsung ice-maker faults — all of these get mis-diagnosed by less-experienced technicians as control-board failures requiring expensive board replacement. We test the actual subsystems first. Often the fix is a $35 lid switch or a $40 hose, not a $400 board.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Both ZIPs, every neighborhood',
+    body: "91754 and 91755, Monterey Highlands hillside to East Monterey Park duplexes — same dispatch, same diagnostic, same warranty across the city.",
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'No distance surcharge · Credited toward repair · Written estimate' },
+  { appliance: 'Standard Repair', range: '$150–$350', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Luxury Brand Repair', range: '$250–$600+', note: 'Sub-Zero, Wolf, Thermador, Viking · OEM parts' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true },
 ];
 
 const faqs = [
   {
-    q: "Do you offer same-day appliance repair in Monterey Park?",
-    a: "Yes — Monterey Park is a regular service city for our Pasadena branch. We run routes through the West San Gabriel Valley including Monterey Park, Alhambra, San Gabriel, Temple City, and Arcadia daily. Call before noon and we can typically dispatch a technician that afternoon. Coverage spans both ZIPs (91754 and 91755) and the major neighborhoods from Monterey Highlands to Atlantic Times Square."
+    question: 'Do you offer same-day appliance repair in Monterey Park?',
+    answer: "Yes — Monterey Park is a regular service city for our Pasadena branch. We run routes through the West San Gabriel Valley including Monterey Park, Alhambra, San Gabriel, Temple City, and Arcadia daily. Call before noon and we can typically dispatch a technician that afternoon. Coverage spans both ZIPs (91754 and 91755) and the major neighborhoods from Monterey Highlands to Atlantic Times Square.",
   },
   {
-    q: "What appliance brands do you service in Monterey Park?",
-    a: "All major brands including the ones we see most in Monterey Park: Samsung (Bespoke + Family Hub are especially common in Monterey Highlands), LG, Whirlpool, GE, Maytag, KitchenAid, Bosch, Frigidaire. For luxury kitchens we cover Sub-Zero, Wolf, Thermador, Miele, and Viking. Monterey Park has a particularly strong Samsung install base — Asian-American households here tend to favor Samsung — and we keep Samsung OEM parts (auger motors, control boards, ice-maker assemblies) in truck stock for that reason."
+    question: 'What appliance brands do you service in Monterey Park?',
+    answer: "All major brands including the ones we see most in Monterey Park: Samsung (Bespoke + Family Hub are especially common in Monterey Highlands), LG, Whirlpool, GE, Maytag, KitchenAid, Bosch, Frigidaire. For luxury kitchens we cover Sub-Zero, Wolf, Thermador, Miele, and Viking. Monterey Park has a particularly strong Samsung install base — Asian-American households here tend to favor Samsung — and we keep Samsung OEM parts (auger motors, control boards, ice-maker assemblies) in truck stock for that reason.",
   },
   {
-    q: "Do you charge a distance surcharge for Monterey Park?",
-    a: "No. Monterey Park is on the regular Pasadena-branch route through the West San Gabriel Valley. The $89 residential diagnostic is the same here as in Pasadena or Arcadia. What we quote is what you pay."
+    question: 'Do you charge a distance surcharge for Monterey Park?',
+    answer: "No. Monterey Park is on the regular Pasadena-branch route through the West San Gabriel Valley. The $89 residential diagnostic is the same here as in Pasadena or Arcadia. What we quote is what you pay.",
   },
   {
-    q: "Which Monterey Park neighborhoods do you cover?",
-    a: "All of them — Monterey Highlands and Monterey Vista (the residential west side of the city), Atlantic Times Square and downtown (condos + commercial mix), East Monterey Park (older single-family + duplexes), Cascades Park area, and South Monterey Park bordering East LA. Both ZIPs (91754 and 91755) are routine service areas for us."
+    question: 'Which Monterey Park neighborhoods do you cover?',
+    answer: "All of them — Monterey Highlands and Monterey Vista (the residential west side of the city), Atlantic Times Square and downtown (condos + commercial mix), East Monterey Park (older single-family + duplexes), Cascades Park area, and South Monterey Park bordering East LA. Both ZIPs (91754 and 91755) are routine service areas for us.",
   },
   {
-    q: "What is your warranty on Monterey Park repairs?",
-    a: "All repairs carry a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no additional charge. CSLB License #1138898, BBB accredited."
-  }
+    question: 'What is your warranty on Monterey Park repairs?',
+    answer: "All repairs carry a 90-day warranty on parts and labor. If the same issue returns within 90 days, we come back at no additional charge. CSLB License #1138898, BBB accredited.",
+  },
 ];
 
-const nearbyAreas = [
-  { name: "Pasadena", slug: "pasadena" },
-  { name: "Alhambra", slug: "alhambra" },
-  { name: "South Pasadena", slug: "south-pasadena" },
-  { name: "Arcadia", slug: "arcadia" },
-  { name: "San Marino", slug: "san-marino" },
-  { name: "Highland Park", slug: "highland-park" },
+const nearbyCities = [
+  { name: 'Pasadena', slug: 'pasadena' },
+  { name: 'Alhambra', slug: 'alhambra' },
+  { name: 'South Pasadena', slug: 'south-pasadena' },
+  { name: 'Arcadia', slug: 'arcadia' },
+  { name: 'San Marino', slug: 'san-marino' },
+  { name: 'Highland Park', slug: 'highland-park' },
 ];
-
-const schemaJSON = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "HomeAndConstructionBusiness",
-      "name": "Same Day Appliance Repair — Monterey Park",
-      "telephone": phoneRaw,
-      "email": email,
-      "url": "https://samedayappliance.repair/monterey-park/",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "6230 Wilshire Blvd Ste A PMB 2267",
-        "addressLocality": "Los Angeles",
-        "addressRegion": "CA",
-        "postalCode": "90048",
-        "addressCountry": "US"
-      },
-      "areaServed": [
-        { "@type": "City", "name": "Monterey Park" },
-        { "@type": "Place", "name": "Monterey Highlands" },
-        { "@type": "Place", "name": "Atlantic Times Square" },
-        { "@type": "Place", "name": "Monterey Vista" }
-      ],
-      "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "08:00", "closes": "20:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "08:00", "closes": "20:00" }
-      ],
-      "priceRange": "$$",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": "4.6",
-        "reviewCount": "37",
-        "bestRating": "5"
-      },
-      "license": "CA CSLB #1138898"
-    },
-    {
-      "@type": "FAQPage",
-      "mainEntity": faqs.map(f => ({
-        "@type": "Question",
-        "name": f.q,
-        "acceptedAnswer": { "@type": "Answer", "text": f.a }
-      }))
-    }
-  ]
-});
 ---
 
-<Layout title={metaTitle} description={metaDesc}>
-  <script type="application/ld+json" set:html={schemaJSON}></script>
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Monterey Park, CA"
+    subheadline="Same-day service across Monterey Highlands, Atlantic Times Square, and East Monterey Park. Samsung, LG, Sub-Zero, Wolf, and all major brands. $89 diagnostic — waived with repair."
+    zips={zips}
+    tier={3}
+  />
 
-  <section class="city-hero">
-    <div class="city-hero-inner">
-      <div class="city-hero-text">
-        <div class="city-eyebrow">Monterey Park, CA · Los Angeles County · 91754 · 91755</div>
-        <h1>Appliance Repair in Monterey Park, CA</h1>
-        <p class="city-hero-sub">Same-day service across Monterey Highlands, Atlantic Times Square, and East Monterey Park. Samsung, LG, Sub-Zero, Wolf, and all major brands. $89 diagnostic — waived with repair.</p>
-        <div class="city-hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="city-trust-row">
-          <span>⭐ 4.6 Google Rating</span>
-          <span>✓ Licensed & Insured</span>
-          <span>✓ CA CSLB #1138898</span>
-        </div>
-      </div>
-      <div class="city-hero-img">
-        <img src="/images/areas/monterey-park/appliance-repair-monterey-park-ca.webp"
-          alt="Appliance repair technician in Monterey Park CA"
-          width="560" height="420" loading="eager" />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <section class="trust-bar">
-    <div class="trust-bar-inner">
-      <div class="trust-item"><span class="trust-icon">⚡</span><span>Same-Day Service</span></div>
-      <div class="trust-item"><span class="trust-icon">🔧</span><span>OEM Parts</span></div>
-      <div class="trust-item"><span class="trust-icon">🛡️</span><span>90-Day Warranty</span></div>
-      <div class="trust-item"><span class="trust-icon">✅</span><span>No Distance Surcharge</span></div>
-      <div class="trust-item"><span class="trust-icon">🏅</span><span>BBB Accredited</span></div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Monterey Park — West San Gabriel Valley gateway, Samsung-heavy install base"
+    paragraphs={introParagraphs}
+    bookingTitle="Monterey Park Service"
+    bookingSub="Available Today"
+  />
 
-  <section class="city-intro">
-    <div class="city-intro-inner">
-      <div class="city-intro-content">
-        <h2>Monterey Park — West San Gabriel Valley gateway, Samsung-heavy install base</h2>
-        <p>Monterey Park sits at the entrance to the West San Gabriel Valley — bordered by East LA to the south, Alhambra to the west, San Gabriel to the east. Population around 60,000, two ZIP codes (91754 and 91755), and a strong residential character that mixes hillside single-family homes (Monterey Highlands, Monterey Vista) with downtown condos near Atlantic Times Square and older duplexes through East Monterey Park.</p>
-        <p>The appliance brand mix here is meaningfully different from Pasadena or San Marino. Monterey Park has one of LA County's largest Asian-American populations (Chinese-American, Taiwanese-American, Vietnamese-American communities have been concentrated here since the 1980s), and Samsung Bespoke + Family Hub kitchens are the dominant luxury install — more so than Sub-Zero or Wolf, which tend to dominate Westside LA. We carry Samsung OEM parts (auger motors, ice-maker assemblies, French-door hinge kits, control boards) in our Pasadena truck stock for that reason. LG is a strong second-place install, especially on the laundry side.</p>
-        <p>Monterey Park is on our regular West San Gabriel Valley route — Pasadena branch dispatches technicians through Monterey Park, Alhambra, San Gabriel, and Temple City daily. No distance surcharge, $89 residential diagnostic same as anywhere else we serve. Call <a href={`tel:${phoneRaw}`}>{phone}</a> — someone with our actual Pasadena schedule picks up.</p>
-      </div>
-      <aside class="city-sidebar">
-        <div class="city-sidebar-inner">
-          <p class="sidebar-city-label">Monterey Park Service</p>
-          <a href={`tel:${phoneRaw}`} class="btn-primary-lg">{phone}</a>
-          <p class="sidebar-hours">Mon–Sat 8am–8pm · Sun closed · Phones answered 24/7</p>
-          <a href="/book/" class="btn-secondary-sm">Book Online</a>
-          <div class="sidebar-guarantee">
-            <strong>$89 Diagnostic</strong>
-            <span>— waived with repair</span>
-          </div>
-        </div>
-      </aside>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Monterey Park"
+    services={services}
+  />
 
-  <section class="city-services">
-    <div class="city-services-inner">
-      <h2>Appliance Repair Services in Monterey Park</h2>
-      <div class="services-grid">
-        {services.map(s => (
-          <a href={`/services/${s.slug}/`} class="service-card">
-            <span class="service-icon">{s.icon}</span>
-            <span class="service-name">{s.name}</span>
-            <span class="service-cta">Monterey Park →</span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
+  <ServiceArea
+    cityName={cityName}
+    headline="Monterey Park Neighborhoods We Service"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-  <section class="city-neighborhoods">
-    <div class="city-neighborhoods-inner">
-      <div class="section-number">01</div>
-      <h2>Monterey Park Neighborhoods We Service</h2>
-      <div class="neighborhoods-grid">
-        {neighborhoods.map(n => (
-          <div class="neighborhood-card">
-            <span class="neighborhood-name">{n.name}</span>
-            <span class="neighborhood-zip">{n.zip}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Repairs in Monterey Park"
+    jobs={recentJobs}
+  />
 
-  <section class="city-repairs">
-    <div class="city-repairs-inner">
-      <div class="section-number">02</div>
-      <h2>Recent Repairs in Monterey Park</h2>
-      <div class="repairs-grid">
-        {recentRepairs.map(r => (
-          <div class="repair-card">
-            <h3 class="repair-title">"{r.title}"</h3>
-            <div class="repair-location">📍 {r.neighborhood}</div>
-            <p class="repair-detail">{r.detail}</p>
-            <div class="repair-meta">
-              <span class="repair-part">Part: {r.part}</span>
-              <span class="repair-time">⏱ {r.time}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Monterey Park Residents Call Us"
+    reasons={whyReasons}
+  />
 
-  <section class="city-why">
-    <div class="city-why-inner">
-      <div class="section-number">03</div>
-      <h2>Why Monterey Park Residents Call Us</h2>
-      <div class="why-grid">
-        <div class="why-item">
-          <h3>Samsung OEM parts on the truck</h3>
-          <p>Monterey Park's install base skews heavily Samsung — French-door refrigerators, Bespoke kitchens, Family Hub. Our Pasadena techs carry Samsung-specific OEM parts (auger motors, ice-maker assemblies, French-door hinges) so we don't have to roll a parts order on routine Samsung calls.</p>
-        </div>
-        <div class="why-item">
-          <h3>West San Gabriel Valley regular route</h3>
-          <p>Pasadena branch runs Monterey Park, Alhambra, San Gabriel, Temple City daily. Same-day service is real here, not a sales claim. No distance surcharge.</p>
-        </div>
-        <div class="why-item">
-          <h3>Honest diagnostic before parts swap</h3>
-          <p>Bosch E15, Whirlpool no-spin, Samsung ice-maker faults — all of these get mis-diagnosed by less-experienced technicians as control-board failures requiring expensive board replacement. We test the actual subsystems first. Often the fix is a $35 lid switch or a $40 hose, not a $400 board.</p>
-        </div>
-        <div class="why-item">
-          <h3>Both ZIPs, every neighborhood</h3>
-          <p>91754 and 91755, Monterey Highlands hillside to East Monterey Park duplexes — same dispatch, same diagnostic, same warranty across the city.</p>
-        </div>
-      </div>
-    </div>
-  </section>
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Monterey Park"
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-  <section class="city-pricing">
-    <div class="city-pricing-inner">
-      <h2>Repair Pricing in Monterey Park</h2>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-label">Diagnostic Fee</div>
-          <div class="pricing-price">$89</div>
-          <div class="pricing-note">No distance surcharge · Credited toward repair · Written estimate</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Standard Repair</div>
-          <div class="pricing-price">$150–$350</div>
-          <div class="pricing-note">Parts + labor · OEM parts · 90-day warranty</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-label">Luxury Brand Repair</div>
-          <div class="pricing-price">$250–$600+</div>
-          <div class="pricing-note">Sub-Zero, Wolf, Thermador, Viking · OEM parts</div>
-        </div>
-        <div class="pricing-card highlight">
-          <div class="pricing-label">Warranty</div>
-          <div class="pricing-price">90 Days</div>
-          <div class="pricing-note">All repairs · Parts & labor · No-charge callback</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Monterey Park"
+    faqs={faqs}
+  />
 
-  <section class="city-faq">
-    <div class="city-faq-inner">
-      <div class="section-number">04</div>
-      <h2>Frequently Asked Questions — Monterey Park</h2>
-      <div class="faq-list">
-        {faqs.map(f => (
-          <details class="faq-item">
-            <summary class="faq-q">{f.q}</summary>
-            <div class="faq-a">{f.a}</div>
-          </details>
-        ))}
-      </div>
-    </div>
-  </section>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby West San Gabriel Valley Cities"
+  />
 
-  <section class="city-nearby">
-    <div class="city-nearby-inner">
-      <h2>Also Serving Nearby West San Gabriel Valley Cities</h2>
-      <div class="nearby-grid">
-        {nearbyAreas.map(a => (
-          <a href={`/${a.slug}/`} class="nearby-link">Appliance Repair {a.name} →</a>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <section class="city-bottom-cta">
-    <div class="city-bottom-cta-inner">
-      <h2>Schedule Your Monterey Park Repair Today</h2>
-      <p>Same-day service, both ZIPs, all neighborhoods. Samsung specialty + all major brands.</p>
-      <div class="bottom-cta-btns">
-        <a href={`tel:${phoneRaw}`} class="btn-primary-xl">Call {phone}</a>
-        <a href="/book/" class="btn-secondary-xl">Book Online</a>
-      </div>
-      <p class="bottom-note">$89 diagnostic · 90-day warranty · OEM parts · Monterey Park, CA</p>
-    </div>
-  </section>
-
-  <CTA phone={phone} branch={branch} zones={["Monterey Park", "Monterey Highlands", "Atlantic Times Square", "West San Gabriel Valley"]} />
-</Layout>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Monterey Park Repair Today"
+    body="Same-day service, both ZIPs, all neighborhoods. Samsung specialty + all major brands."
+  />
+</CityLayoutV2>
