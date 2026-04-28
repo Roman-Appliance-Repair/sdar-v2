@@ -1,817 +1,286 @@
 ---
-// src/pages/brentwood.astro
-// SDAR — samedayappliance.repair
-// Brentwood, CA 90049 — Волна 2
-// Филиал: Los Angeles · (424) 325-0520
-// GSC: refrigerator repair brentwood — 68 показов · позиция 21.2 🔥
-//      appliance repair brentwood — 193 показов · позиция 37.9
-//      cove dishwasher repair brentwood — 9 показов · позиция 49.3 (gap)
-// Апрель 2026
+/**
+ * Brentwood, CA — Variant A migration (T9 Tier 1 complex).
+ * Branch: Los Angeles · ZIPs: 90049
+ * Source: wiki/migration/content-dumps/brentwood.md
+ * Per-city block: BrandedExpertiseBrentwood (Cove dishwasher specialty).
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (LA branch is service_area, not physical_pin)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ *   - License: CA CSLB #1138898
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import BrandedExpertiseBrentwood from '../components/cities/branded/BrandedExpertiseBrentwood.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Brentwood",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90049"],
-  phone: "(424) 325-0520",
-  phoneRaw: "+14243250520",
-  email: "info@samedayappliance.repair",
-  branch: "Los Angeles",
-  slug: "brentwood",
-};
+const branchSlug = 'los-angeles';
+const cityName = 'Brentwood';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Brentwood CA 90049 — Sub-Zero · Wolf · Cove | (424) 325-0520`;
-const description = `Same-day appliance repair in Brentwood, CA 90049. Sub-Zero, Wolf, Viking, Thermador, Cove specialists. Sullivan Canyon, Mandeville Canyon, San Vicente Blvd. Licensed, OEM parts, 90-day warranty. Call (424) 325-0520.`;
-const canonical = `https://samedayappliance.repair/brentwood/`;
+const title = `Appliance Repair Brentwood CA 90049 — Sub-Zero · Wolf · Cove | ${branch.phone}`;
+const description = "Same-day appliance repair in Brentwood, CA 90049. Sub-Zero, Wolf, Viking, Thermador, Cove specialists. Sullivan Canyon, Mandeville Canyon, San Vicente Blvd. Licensed, OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/brentwood/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Brentwood",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "Los Angeles",
-    "addressLocality": "Los Angeles",
-    "addressRegion": "CA",
-    "postalCode": "90001",
-    "addressCountry": "US"
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator',
+    issues: ['Built-in columns', 'Not cooling', 'Ice maker', 'Coil cleaning', 'Panel-ready'],
+    brands: ['Sub-Zero', 'Wolf', 'True', 'GE Monogram', 'Viking', 'Samsung'] },
+  { icon: '🍽️', name: 'Cove & Dishwasher Repair', slug: 'dishwasher',
+    issues: ['Cove drainage errors', 'Wash arm', 'Control board', 'Panel-ready Miele & Bosch'],
+    brands: ['Cove', 'Miele', 'Bosch', 'Thermador', 'KitchenAid', 'GE'] },
+  { icon: '🔥', name: 'Oven, Range & Steam Oven', slug: 'oven',
+    issues: ['Wolf dual-fuel', 'Steam oven calibration', 'Igniter', 'Temperature off'],
+    brands: ['Wolf', 'Viking', 'Thermador', 'Dacor', 'Miele', 'GE Monogram'] },
+  { icon: '🫧', name: 'Washer & Dryer Repair', slug: 'washer',
+    issues: ['Not draining', 'Not spinning', 'Vibration', 'Stackable units'],
+    brands: ['Miele', 'Bosch', 'LG', 'Samsung', 'Whirlpool', 'Speed Queen'] },
+  { icon: '🍷', name: 'Wine Cooler & Cellar', slug: 'wine-cooler',
+    issues: ['Temperature fluctuation', 'Cooling failure', 'Built-in wine storage'],
+    brands: ['Sub-Zero', 'True', 'Liebherr', 'Thermador', 'U-Line', 'EuroCave'] },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop',
+    issues: ['Wolf star burner', 'Induction', 'Hood motor', 'Vent fan'],
+    brands: ['Wolf', 'Thermador', 'Viking', 'Miele', 'GE', 'Broan'] },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer',
+    issues: ['Not freezing', 'Frost buildup', 'Temperature off', 'Built-in'],
+    brands: ['Sub-Zero', 'True', 'GE', 'Samsung', 'Whirlpool'] },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker',
+    issues: ['Not producing', 'Inconsistent output', 'Leaking', 'Under-counter'],
+    brands: ['Sub-Zero', 'True', 'U-Line', 'GE Monogram', 'Scotsman'] },
+];
+
+const neighborhoods = [
+  { name: 'Sullivan Canyon', zip: '90049' },
+  { name: 'Mandeville Canyon', zip: '90049' },
+  { name: 'Rustic Canyon', zip: '90049' },
+  { name: 'Sepulveda Pass area', zip: '90049' },
+  { name: 'North Brentwood hills', zip: '90049' },
+  { name: 'Brentwood Village', zip: '90049' },
+  { name: 'San Vicente Blvd corridor', zip: '90049' },
+  { name: 'Bundy Drive area', zip: '90049' },
+  { name: 'Barrington Ave area', zip: '90049' },
+  { name: 'Montana Ave (west end)', zip: '90049' },
+];
+
+const jobs = [
+  {
+    badge: 'Sub-Zero Built-In',
+    neighborhood: 'Sullivan Canyon, 90049',
+    title: '"Sub-Zero running loud, back wall is warm"',
+    body: "Classic built-in condenser dust buildup — the tight custom cabinetry around this unit restricted airflow more than usual, accelerating dust accumulation. Our tech accessed the condenser through the bottom grille (without pulling the unit), cleaned the coils thoroughly, replaced a condenser fan capacitor showing weakness, and checked door seal compression on both compartments. Noise gone, running temperature back to normal. The homeowner had been ignoring the noise for about six months.",
+    result: '✓ Same day · Coil cleaning + capacitor · No cabinetry moved',
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Brentwood", "sameAs": "https://en.wikipedia.org/wiki/Brentwood,_Los_Angeles" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+  {
+    badge: 'Cove Dishwasher',
+    neighborhood: 'Brentwood Village, 90049',
+    title: '"Fault code after every cycle, won\'t drain"',
+    body: 'Cove panel-ready unit installed flush with custom cabinetry. Drainage fault — turned out to be a blocked drain hose at the garbage disposal knockout plug (installer had forgotten to remove it). Classic install error. Our tech cleared the blockage, checked the drain pump impeller (clean), ran three full cycles to confirm. Whole job took 40 minutes. The kitchen designer was apparently mortified — it had been "broken" since the remodel completed.',
+    result: '✓ Same day · Drain cleared · Panel undamaged',
+  },
+  {
+    badge: 'Wolf Dual-Fuel Range',
+    neighborhood: 'Mandeville Canyon, 90049',
+    title: '"Oven won\'t reach temp, one burner dead"',
+    body: 'Wolf 48-inch DF range — oven igniter drawing insufficient current, one Star burner igniter module failed. Replaced both with OEM Wolf parts. Calibrated the oven temperature — it was running 28°F low (common after igniter degradation). Checked all six burners, both ovens, and the broiler. Homeowner mentioned they thought the oven "just ran cool" and had been cooking everything at a higher temperature for over a year.',
+    result: '✓ Same day · OEM Wolf parts · Recalibrated +28°F',
+  },
+  {
+    badge: 'Miele Washing Machine',
+    neighborhood: 'Rustic Canyon, 90049',
+    title: '"F53 error, drum intermittently not spinning"',
+    body: "Miele W1 front-load — F53 is a motor communication fault. Found a failing motor brushes assembly and a loose motor hall sensor connection. Replaced brushes with OEM Miele parts, reseated the sensor connector, ran four test cycles including a high-speed spin. The intermittent nature had made the owner think it was \"maybe fine\" for three weeks — it wasn't, and would have fully failed soon. Caught it cleanly.",
+    result: '✓ Same day · OEM Miele motor parts · 4 test cycles',
+  },
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const reviews = [
+  {
+    text: "Our Sub-Zero built-in in Sullivan Canyon was running loud for weeks. Same Day came out, cleaned the condenser inside the cabinet without moving anything, replaced a capacitor, done in under an hour. They clearly know Sub-Zero units. Very impressed.",
+    author: '— Patricia H., Sullivan Canyon, Brentwood',
+  },
+  {
+    text: "Cove dishwasher had been faulting since our kitchen remodel. Nobody would touch it. Same Day Appliance Repair actually knew the brand, came out same day, found it was a blocked drain from the install, fixed it in 40 minutes. The whole problem was there from day one.",
+    author: '— Mark T., Brentwood Village, Brentwood',
+  },
+  {
+    text: "Wolf range in our Mandeville Canyon home — oven running low and one burner out. Tech had all the OEM Wolf parts, recalibrated the oven after the repair. Turns out it had been 28 degrees low for over a year. Everything cooks correctly now for the first time in memory.",
+    author: '— Claire M., Mandeville Canyon, Brentwood',
+  },
+];
+
+const pricingCards = [
+  { label: 'Refrigerator (standard)', price: '$200–$450', note: 'Fan motor, coil cleaning, ice maker, thermostat' },
+  { label: 'Sub-Zero / Wolf Built-In', price: '$300–$700+', note: 'OEM parts · Built-in access · Sealed system work', highlight: true },
+  { label: 'Cove / Miele Dishwasher', price: '$200–$450', note: 'Panel-ready · OEM parts · Control board' },
+  { label: 'Wolf / Viking Range', price: '$250–$550', note: 'Igniters, gas valves, calibration, OEM Wolf/Viking parts' },
+  { label: 'Washer / Dryer', price: '$150–$400', note: 'Miele & European models may cost more' },
+  { label: 'Diagnostic Fee', price: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Brentwood, CA?',
+    answer: 'Yes. Our technicians cover all of Brentwood — Sullivan Canyon, Mandeville Canyon, Rustic Canyon, Brentwood Village, San Vicente Blvd corridor, and the areas bordering West LA and Westwood. We serve ZIP code 90049. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'Do you repair Cove dishwashers in Brentwood?',
+    answer: "Yes. Cove dishwashers — Fisher & Paykel's premium brand — appear frequently in Brentwood kitchen remodels. Our technicians are trained on Cove systems and carry parts specific to these units. Common issues include drainage errors, wash arm failures, and control board faults.",
+  },
+  {
+    question: 'Do you repair Sub-Zero and Wolf appliances in Brentwood?',
+    answer: 'Yes. Sub-Zero built-in refrigerators, Wolf dual-fuel ranges, and Wolf steam ovens are standard in Brentwood kitchens. Our technicians are trained on both brands, carry OEM parts, and work in custom cabinetry installations regularly. We handle built-in panel-ready units without damaging surrounding joinery.',
+  },
+  {
+    question: 'What is your diagnostic fee in Brentwood?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. For luxury brands — Sub-Zero, Wolf, Viking, Thermador, Cove — repair costs may be higher due to OEM part pricing. We give you a full written estimate before starting any work.',
+  },
+  {
+    question: 'Do you work with property managers and estate staff in Brentwood?',
+    answer: 'Yes. Brentwood has a high proportion of managed estates and properties handled by household staff. We coordinate with estate managers, work around household schedules, and can bill through property management systems. Call us to discuss how we work with your property.',
+  },
+  {
+    question: 'What warranty do you offer on appliance repairs in Brentwood?',
+    answer: 'All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back and fix it at no charge.',
+  },
+  {
+    question: 'Do you also serve Pacific Palisades, Santa Monica, and Westwood from Brentwood?',
+    answer: "Yes. Our Brentwood service area extends to Pacific Palisades, Santa Monica, Westwood, West LA, Bel Air, and Mar Vista. If you're on the Westside in the 90049, 90272, 90024, or 90025 ZIP codes, we're likely your closest team.",
+  },
+];
+
+const nearby = [
+  { slug: 'pacific-palisades', name: 'Pacific Palisades' },
+  { slug: 'santa-monica', name: 'Santa Monica' },
+  { slug: 'beverly-hills', name: 'Beverly Hills' },
+  { slug: 'west-hollywood', name: 'West Hollywood' },
+  { slug: 'los-angeles', name: 'Los Angeles' },
+  { slug: 'culver-city', name: 'Culver City' },
+  { slug: 'malibu', name: 'Malibu' },
+  { slug: 'marina-del-rey', name: 'Marina del Rey' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'Neighborhood', name: 'Brentwood', sameAs: 'https://en.wikipedia.org/wiki/Brentwood,_Los_Angeles' },
+    { '@type': 'Neighborhood', name: 'Sullivan Canyon' },
+    { '@type': 'Neighborhood', name: 'Mandeville Canyon' },
+    { '@type': 'Neighborhood', name: 'Rustic Canyon' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Brentwood, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Brentwood — Sullivan Canyon, Mandeville Canyon, Rustic Canyon, Brentwood Village, San Vicente Blvd corridor, and the areas bordering West LA and Westwood. We serve ZIP code 90049. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Do you repair Cove dishwashers in Brentwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Cove dishwashers — Fisher & Paykel's premium brand — appear frequently in Brentwood kitchen remodels. Our technicians are trained on Cove systems and carry parts specific to these units. Common issues include drainage errors, wash arm failures, and control board faults." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you repair Sub-Zero and Wolf appliances in Brentwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Sub-Zero built-in refrigerators, Wolf dual-fuel ranges, and Wolf steam ovens are standard in Brentwood kitchens. Our technicians are trained on both brands, carry OEM parts, and work in custom cabinetry installations regularly. We handle built-in panel-ready units without damaging surrounding joinery." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Brentwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. For luxury brands — Sub-Zero, Wolf, Viking, Thermador, Cove — repair costs may be higher due to OEM part pricing. We give you a full written estimate before starting any work." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you work with property managers and estate staff in Brentwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Brentwood has a high proportion of managed estates and properties handled by household staff. We coordinate with estate managers, work around household schedules, and can bill through property management systems. Call us to discuss how we work with your property." }
-    },
-    {
-      "@type": "Question",
-      "name": "What warranty do you offer on appliance repairs in Brentwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back and fix it at no charge." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Pacific Palisades, Santa Monica, and Westwood from Brentwood?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Brentwood service area extends to Pacific Palisades, Santa Monica, Westwood, West LA, Bel Air, and Mar Vista. If you're on the Westside in the 90049, 90272, 90024, or 90025 ZIP codes, we're likely your closest team." }
-    }
-  ]
+  ],
+  priceRange: '$$$',
+  license: 'CA CSLB #1138898',
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="bw-hero">
-    <div class="bw-hero__inner container">
-      <div class="bw-hero__content">
-        <div class="bw-hero__eyebrow">Brentwood, CA · 90049 · Sullivan Canyon · Mandeville Canyon · San Vicente Blvd</div>
-        <h1 class="bw-hero__h1">
-          Appliance Repair<br>
-          <span class="bw-hero__accent">Brentwood, CA</span>
-        </h1>
-        <p class="bw-hero__sub">
-          Sub-Zero, Wolf, Viking, Thermador, Cove — the appliances that define Brentwood
-          kitchens. Our technicians work in this ZIP regularly, know the canyon streets,
-          and come prepared for built-in luxury systems. Same-day service, OEM parts,
-          90-day warranty.
-        </p>
-        <div class="bw-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="bw-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="bw-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-brentwood-ca.webp"
-          alt="Appliance repair in Brentwood CA 90049"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Brentwood, CA · 90049 · Sullivan Canyon · Mandeville Canyon · San Vicente Blvd"
+    headlineMain="Appliance repair in"
+    headlineAccent="Brentwood, CA"
+    subheadline="Sub-Zero, Wolf, Viking, Thermador, Cove — the appliances that define Brentwood kitchens. Our technicians work in this ZIP regularly, know the canyon streets, and come prepared for built-in luxury systems. Same-day service, OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar item4Text="85% First-Visit Fix Rate" item4Fine="Built-in luxury work" />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span>Same-Day Service</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        <span>90-Day Warranty</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-        <span>OEM Parts Only</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        <span>Licensed & Insured</span>
-      </div>
-      <div class="trust-item">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        <span>85% First-Visit Fix Rate</span>
-      </div>
-    </div>
-  </section>
+  <BrandedExpertiseBrentwood number="01" />
 
-  <!-- INTRO -->
-  <section class="bw-intro">
-    <div class="container bw-intro__inner">
-      <div class="bw-intro__text">
-        <h2>Appliance Repair in Brentwood — What Our Technicians Actually See Here</h2>
-        <p>
-          Brentwood is one of the more consistently high-end neighborhoods we work in.
-          The kitchens in the canyon homes — Sullivan, Mandeville, Rustic — are built
-          around Sub-Zero columns, Wolf dual-fuel ranges, and increasingly, Cove dishwashers
-          since Fisher & Paykel started making serious inroads on the Westside. The homes
-          along San Vicente and in Brentwood Village tend toward the same, often with
-          custom cabinetry that makes access more complicated than a standard kitchen.
-        </p>
-        <p>
-          We work in these homes regularly. Our technicians know how to service built-in
-          Sub-Zero units without pulling out surrounding cabinetry. They carry OEM Wolf
-          parts — igniters, gas valves, oven sensors — that most general repair companies
-          don't stock. When a Cove dishwasher throws a drainage fault or a Wolf steam oven
-          loses its sensor calibration, that's a normal Tuesday for our team.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — gone when you approve the repair.
-          Written estimate before we touch anything.
-          <strong>90-day warranty</strong> on parts and labor.
-        </p>
-        <div class="bw-tip">
-          <div class="bw-tip__icon">🔧</div>
-          <div class="bw-tip__text">
-            <strong>From our techs on Brentwood built-ins:</strong> Sub-Zero built-in columns
-            in custom cabinetry collect condenser dust faster than freestanding units —
-            the airflow is tighter, there's less clearance around the coils. If your
-            built-in Sub-Zero is running loudly or the compressor cycles frequently,
-            condenser cleaning is often the fix. It takes about 20 minutes and adds
-            years to the compressor life. We check this on every Sub-Zero call in Brentwood.
-          </div>
-        </div>
-      </div>
-      <div class="bw-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Brentwood Service Team</div>
-          <div class="cta-box__sub">90049 · Sub-Zero · Wolf · Cove · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="What we repair in"
+    headlineAccent="Brentwood"
+    subheadline="Luxury brands &amp; everyday appliances · Built-ins &amp; freestanding · 90049"
+    services={services}
+    cardStructure="3-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="bw-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Brentwood</h2>
-      <p class="section-sub">Luxury brands & everyday appliances · Built-ins & freestanding · 90049</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Brentwood neighborhoods"
+    headlineAccent="we cover"
+    subheadline="Every street, every canyon, every corner of 90049."
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/brentwood/refrigerator-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Built-in columns · Not cooling · Ice maker · Coil cleaning · Panel-ready</div>
-          <div class="service-card__brands">Sub-Zero · Wolf · True · GE Monogram · Viking · Samsung</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Jobs our team did in"
+    headlineAccent="Brentwood"
+    subheadline="Real calls from real streets. Most completed same day."
+    jobs={jobs}
+  />
 
-        <a href="/brentwood/dishwasher-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Cove & Dishwasher Repair</div>
-          <div class="service-card__issues">Cove drainage errors · Wash arm · Control board · Panel-ready Miele & Bosch</div>
-          <div class="service-card__brands">Cove · Miele · Bosch · Thermador · KitchenAid · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/brentwood/oven-repair/" class="service-card">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Steam Oven</div>
-          <div class="service-card__issues">Wolf dual-fuel · Steam oven calibration · Igniter · Temperature off</div>
-          <div class="service-card__brands">Wolf · Viking · Thermador · Dacor · Miele · GE Monogram</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Brentwood"
+    headlineAccent="clients say"
+    reviews={reviews}
+  />
 
-        <a href="/brentwood/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer & Dryer Repair</div>
-          <div class="service-card__issues">Not draining · Not spinning · Vibration · Stackable units</div>
-          <div class="service-card__brands">Miele · Bosch · LG · Samsung · Whirlpool · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Brentwood"
+    subheadline="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    cards={pricingCards}
+  />
 
-        <a href="/brentwood/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler & Cellar</div>
-          <div class="service-card__issues">Temperature fluctuation · Cooling failure · Built-in wine storage</div>
-          <div class="service-card__brands">Sub-Zero · True · Liebherr · Thermador · U-Line · EuroCave</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Brentwood"
+    faqs={faqs}
+  />
 
-        <a href="/brentwood/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Wolf star burner · Induction · Hood motor · Vent fan</div>
-          <div class="service-card__brands">Wolf · Thermador · Viking · Miele · GE · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/brentwood/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer Repair</div>
-          <div class="service-card__issues">Not freezing · Frost buildup · Temperature off · Built-in</div>
-          <div class="service-card__brands">Sub-Zero · True · GE · Samsung · Whirlpool</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/brentwood/ice-maker-repair/" class="service-card">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Ice Maker Repair</div>
-          <div class="service-card__issues">Not producing · Inconsistent output · Leaking · Under-counter</div>
-          <div class="service-card__brands">Sub-Zero · True · U-Line · GE Monogram · Scotsman</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- COVE SPOTLIGHT — уникальный gap -->
-  <section class="bw-cove">
-    <div class="container">
-      <div class="cove-inner">
-        <div class="cove-text">
-          <div class="cove-eyebrow">Cove Dishwasher Specialists — Brentwood</div>
-          <h2>Cove Dishwasher Repair in Brentwood, CA</h2>
-          <p>
-            Cove — Fisher & Paykel's luxury dishwasher line — has become a common fixture
-            in Brentwood kitchen remodels over the past several years. It's a premium
-            product that most appliance repair companies in the area have never worked on.
-            Our technicians have.
-          </p>
-          <p>
-            Common Cove issues we see in Brentwood homes: drainage fault codes (the most
-            frequent call), wash arm failures on the upper rack, control board
-            communication errors on connected models, and door seal replacements on
-            older units. The panel-ready installation typical in Brentwood kitchens
-            requires careful disassembly — we don't damage the custom front panel or
-            the surrounding cabinetry.
-          </p>
-          <p>
-            We also service the full Fisher & Paykel range, Miele, Bosch, Thermador,
-            and KitchenAid dishwashers — the other brands you'll find here.
-          </p>
-        </div>
-        <div class="cove-brands">
-          <div class="cove-brand-title">Dishwasher brands we service in Brentwood</div>
-          <div class="cove-brand-list">
-            <div class="cb-item cb-item--featured">Cove (Fisher & Paykel)</div>
-            <div class="cb-item">Miele</div>
-            <div class="cb-item">Bosch</div>
-            <div class="cb-item">Thermador</div>
-            <div class="cb-item">KitchenAid</div>
-            <div class="cb-item">GE Monogram</div>
-            <div class="cb-item">Samsung</div>
-            <div class="cb-item">LG</div>
-          </div>
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary" style="margin-top: 20px; width: 100%; justify-content: center;">Call (424) 325-0520</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="bw-neighborhoods">
-    <div class="container">
-      <h2>We Cover All of Brentwood — 90049</h2>
-      <p class="section-sub">Every street, every canyon, every corner of the ZIP</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Brentwood Canyons</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Sullivan Canyon</div>
-            <div class="nh-item featured">Mandeville Canyon</div>
-            <div class="nh-item featured">Rustic Canyon</div>
-            <div class="nh-item">Sepulveda Pass area</div>
-            <div class="nh-item">North Brentwood hills</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Brentwood Neighborhoods</div>
-          <div class="nh-list">
-            <div class="nh-item">Brentwood Village</div>
-            <div class="nh-item">San Vicente Blvd corridor</div>
-            <div class="nh-item">Bundy Drive area</div>
-            <div class="nh-item">Barrington Ave area</div>
-            <div class="nh-item">Montana Ave (west end)</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby Areas We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Pacific Palisades (90272)</div>
-            <div class="nh-item">Santa Monica (90402)</div>
-            <div class="nh-item">Westwood (90024)</div>
-            <div class="nh-item">West LA (90025)</div>
-            <div class="nh-item">Bel Air (90077)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="bw-recent">
-    <div class="container">
-      <h2>Jobs Our Team Did in Brentwood</h2>
-      <p class="section-sub">Real calls from real streets. Most completed same day.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Sub-Zero Built-In</span>
-            <span class="recent-location">Sullivan Canyon, 90049</span>
-          </div>
-          <div class="recent-card__title">"Sub-Zero running loud, back wall is warm"</div>
-          <div class="recent-card__desc">
-            Classic built-in condenser dust buildup — the tight custom cabinetry around
-            this unit restricted airflow more than usual, accelerating dust accumulation.
-            Our tech accessed the condenser through the bottom grille (without pulling
-            the unit), cleaned the coils thoroughly, replaced a condenser fan capacitor
-            showing weakness, and checked door seal compression on both compartments.
-            Noise gone, running temperature back to normal. The homeowner had been
-            ignoring the noise for about six months.
-          </div>
-          <div class="recent-card__result">✓ Same day · Coil cleaning + capacitor · No cabinetry moved</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Cove Dishwasher</span>
-            <span class="recent-location">Brentwood Village, 90049</span>
-          </div>
-          <div class="recent-card__title">"Fault code after every cycle, won't drain"</div>
-          <div class="recent-card__desc">
-            Cove panel-ready unit installed flush with custom cabinetry. Drainage fault —
-            turned out to be a blocked drain hose at the garbage disposal knockout plug
-            (installer had forgotten to remove it). Classic install error. Our tech
-            cleared the blockage, checked the drain pump impeller (clean), ran three
-            full cycles to confirm. Whole job took 40 minutes. The kitchen designer was
-            apparently mortified — it had been "broken" since the remodel completed.
-          </div>
-          <div class="recent-card__result">✓ Same day · Drain cleared · Panel undamaged</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Wolf Dual-Fuel Range</span>
-            <span class="recent-location">Mandeville Canyon, 90049</span>
-          </div>
-          <div class="recent-card__title">"Oven won't reach temp, one burner dead"</div>
-          <div class="recent-card__desc">
-            Wolf 48-inch DF range — oven igniter drawing insufficient current, one Star
-            burner igniter module failed. Replaced both with OEM Wolf parts. Calibrated
-            the oven temperature — it was running 28°F low (common after igniter
-            degradation). Checked all six burners, both ovens, and the broiler.
-            Homeowner mentioned they thought the oven "just ran cool" and had been
-            cooking everything at a higher temperature for over a year.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Wolf parts · Recalibrated +28°F</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Miele Washing Machine</span>
-            <span class="recent-location">Rustic Canyon, 90049</span>
-          </div>
-          <div class="recent-card__title">"F53 error, drum intermittently not spinning"</div>
-          <div class="recent-card__desc">
-            Miele W1 front-load — F53 is a motor communication fault. Found a failing
-            motor brushes assembly and a loose motor hall sensor connection. Replaced
-            brushes with OEM Miele parts, reseated the sensor connector, ran four test
-            cycles including a high-speed spin. The intermittent nature had made the
-            owner think it was "maybe fine" for three weeks — it wasn't, and would have
-            fully failed soon. Caught it cleanly.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Miele motor parts · 4 test cycles</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="bw-why">
-    <div class="container">
-      <h2>Why Brentwood Homeowners Call Us</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🔧</div>
-          <div class="why-title">Built-In Specialists</div>
-          <div class="why-text">Sub-Zero built-ins, Wolf ranges, Cove and Miele panel-ready dishwashers — these need a different approach than freestanding appliances. We service built-ins regularly in Brentwood and know how to work within custom cabinetry without damage.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📦</div>
-          <div class="why-title">OEM Parts for Luxury Brands</div>
-          <div class="why-text">Sub-Zero, Wolf, Thermador, Cove, Miele, Viking — we carry OEM parts for all of them on every service vehicle. We don't order parts and come back next week. The parts are on the truck.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">We Work with Estate Staff</div>
-          <div class="why-text">Many Brentwood properties are managed by household staff or estate managers. We coordinate with whoever handles your property — flexible scheduling, clear communication, professional service that reflects the caliber of the home.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, No Exceptions</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="bw-reviews">
-    <div class="container">
-      <h2>What Brentwood Clients Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our Sub-Zero built-in in Sullivan Canyon was running loud for weeks. Same Day came out, cleaned the condenser inside the cabinet without moving anything, replaced a capacitor, done in under an hour. They clearly know Sub-Zero units. Very impressed."</div>
-          <div class="review-author">— Patricia H., Sullivan Canyon, Brentwood</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Cove dishwasher had been faulting since our kitchen remodel. Nobody would touch it. Same Day Appliance Repair actually knew the brand, came out same day, found it was a blocked drain from the install, fixed it in 40 minutes. The whole problem was there from day one."</div>
-          <div class="review-author">— Mark T., Brentwood Village, Brentwood</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Wolf range in our Mandeville Canyon home — oven running low and one burner out. Tech had all the OEM Wolf parts, recalibrated the oven after the repair. Turns out it had been 28 degrees low for over a year. Everything cooks correctly now for the first time in memory."</div>
-          <div class="review-author">— Claire M., Mandeville Canyon, Brentwood</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="bw-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Brentwood</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator (standard)</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Fan motor, coil cleaning, ice maker, thermostat</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf Built-In</div>
-          <div class="pricing-card__range">$300 – $700+</div>
-          <div class="pricing-card__note">OEM parts · Built-in access · Sealed system work</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Cove / Miele Dishwasher</div>
-          <div class="pricing-card__range">$200 – $450</div>
-          <div class="pricing-card__note">Panel-ready · OEM parts · Control board</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Wolf / Viking Range</div>
-          <div class="pricing-card__range">$250 – $550</div>
-          <div class="pricing-card__note">Igniters, gas valves, calibration, OEM Wolf/Viking parts</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Miele & European models may cost more</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="bw-faq">
-    <div class="container">
-      <h2>Questions Brentwood Clients Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item">
-          <summary class="faq-question">Do you offer same-day appliance repair in Brentwood, CA?</summary>
-          <div class="faq-answer">Yes. Our technicians cover all of Brentwood — Sullivan Canyon, Mandeville Canyon, Rustic Canyon, Brentwood Village, San Vicente Blvd corridor, and the areas bordering West LA and Westwood. We serve ZIP code 90049. Call before noon for same-day afternoon service.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair Cove dishwashers in Brentwood?</summary>
-          <div class="faq-answer">Yes. Cove dishwashers — Fisher & Paykel's premium brand — appear frequently in Brentwood kitchen remodels. Our technicians are trained on Cove systems and carry parts specific to these units. Common issues include drainage errors, wash arm failures, and control board faults.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you repair Sub-Zero and Wolf appliances in Brentwood?</summary>
-          <div class="faq-answer">Yes. Sub-Zero built-in refrigerators, Wolf dual-fuel ranges, and Wolf steam ovens are standard in Brentwood kitchens. Our technicians are trained on both brands, carry OEM parts, and work in custom cabinetry installations regularly. We handle built-in panel-ready units without damaging surrounding joinery.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">What is your diagnostic fee in Brentwood?</summary>
-          <div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. For luxury brands — Sub-Zero, Wolf, Viking, Thermador, Cove — repair costs may be higher due to OEM part pricing. We give you a full written estimate before starting any work.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you work with property managers and estate staff in Brentwood?</summary>
-          <div class="faq-answer">Yes. Brentwood has a high proportion of managed estates and properties handled by household staff. We coordinate with estate managers, work around household schedules, and can bill through property management systems. Call us to discuss how we work with your property.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">What warranty do you offer on appliance repairs in Brentwood?</summary>
-          <div class="faq-answer">All repairs come with a 90-day warranty on parts and labor. We use genuine OEM parts only. If the same issue returns within 90 days, we come back and fix it at no charge.</div>
-        </details>
-        <details class="faq-item">
-          <summary class="faq-question">Do you also serve Pacific Palisades, Santa Monica, and Westwood?</summary>
-          <div class="faq-answer">Yes. Our Brentwood service area extends to Pacific Palisades, Santa Monica, Westwood, West LA, Bel Air, and Mar Vista. If you're on the Westside in the 90049, 90272, 90024, or 90025 ZIP codes, we're likely your closest team.</div>
-        </details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="bw-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/pacific-palisades/" class="nearby-link">Pacific Palisades</a>
-        <a href="/santa-monica/" class="nearby-link">Santa Monica</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/culver-city/" class="nearby-link">Culver City</a>
-        <a href="/malibu/" class="nearby-link">Malibu</a>
-        <a href="/marina-del-rey/" class="nearby-link">Marina del Rey</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="bw-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Brentwood? We're on the Westside.</h2>
-          <p>Sub-Zero · Wolf · Cove · Miele · all brands — same-day service in 90049. $89 diagnostic waived with repair. 90-day warranty. OEM parts only.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Brentwood, CA 90049</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-</Layout>
-
-<style>
-  :root {
-    --bw-red: #C8102E;
-    --bw-black: #0a0a0a;
-    --bw-gray: #f5f5f5;
-    --bw-border: #e2e2e2;
-    --bw-text: #1a1a1a;
-    --bw-muted: #6b6b6b;
-  }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-
-  /* HERO */
-  .bw-hero { background: var(--bw-black); color: white; padding: 80px 0 60px; }
-  .bw-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .bw-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--bw-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .bw-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .bw-hero__accent { color: var(--bw-red); }
-  .bw-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .bw-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .bw-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .bw-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-
-  /* BUTTONS */
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--bw-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); transition: border-color 0.2s; }
-  .btn-secondary:hover { border-color: white; }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .bw-bottom-cta .btn-secondary { color: var(--bw-text); border-color: var(--bw-border); }
-
-  /* TRUST BAR */
-  .trust-bar { background: var(--bw-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-
-  /* INTRO */
-  .bw-intro { padding: 72px 0; background: white; }
-  .bw-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .bw-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--bw-black); margin-bottom: 20px; }
-  .bw-intro__text p { font-size: 16px; line-height: 1.7; color: var(--bw-text); margin-bottom: 16px; }
-  .bw-tip { display: flex; gap: 14px; background: var(--bw-gray); border: 1px solid var(--bw-border); border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .bw-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .bw-tip__text { font-size: 14px; color: var(--bw-text); line-height: 1.6; }
-  .cta-box { background: var(--bw-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--bw-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-
-  /* SECTION */
-  .section-title { font-size: 30px; font-weight: 700; color: var(--bw-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--bw-muted); text-align: center; margin-bottom: 40px; }
-
-  /* SERVICES */
-  .bw-services { padding: 72px 0; background: var(--bw-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--bw-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--bw-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--bw-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--bw-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--bw-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--bw-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--bw-red); font-weight: 500; }
-
-  /* COVE SPOTLIGHT */
-  .bw-cove { padding: 72px 0; background: var(--bw-black); color: white; }
-  .cove-inner { display: grid; grid-template-columns: 1fr 300px; gap: 60px; align-items: start; }
-  .cove-eyebrow { font-size: 13px; font-weight: 500; color: var(--bw-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
-  .cove-text h2 { font-size: 28px; font-weight: 700; color: white; margin-bottom: 20px; }
-  .cove-text p { font-size: 15px; line-height: 1.7; color: rgba(255,255,255,0.75); margin-bottom: 16px; }
-  .cove-brands { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); border-radius: 14px; padding: 28px; display: flex; flex-direction: column; gap: 0; }
-  .cove-brand-title { font-size: 12px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px; }
-  .cove-brand-list { display: flex; flex-direction: column; gap: 8px; }
-  .cb-item { padding: 8px 12px; background: rgba(255,255,255,0.06); border-radius: 6px; font-size: 14px; color: rgba(255,255,255,0.8); }
-  .cb-item--featured { background: rgba(200,16,46,0.2); border: 1px solid rgba(200,16,46,0.4); color: white; font-weight: 600; }
-
-  /* NEIGHBORHOODS */
-  .bw-neighborhoods { padding: 72px 0; background: white; }
-  .bw-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--bw-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--bw-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--bw-text); padding: 8px 12px; background: var(--bw-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--bw-red); color: var(--bw-black); font-weight: 500; }
-
-  /* RECENT */
-  .bw-recent { padding: 72px 0; background: var(--bw-gray); }
-  .bw-recent h2 { font-size: 30px; font-weight: 700; color: var(--bw-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--bw-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--bw-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--bw-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--bw-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--bw-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-
-  /* WHY */
-  .bw-why { padding: 72px 0; background: white; }
-  .bw-why h2 { font-size: 30px; font-weight: 700; color: var(--bw-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--bw-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--bw-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--bw-muted); line-height: 1.6; }
-
-  /* REVIEWS */
-  .bw-reviews { padding: 72px 0; background: var(--bw-gray); }
-  .bw-reviews h2 { font-size: 30px; font-weight: 700; color: var(--bw-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--bw-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--bw-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--bw-muted); font-weight: 500; }
-
-  /* PRICING */
-  .bw-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--bw-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--bw-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--bw-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--bw-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--bw-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--bw-red); }
-  .pricing-card__note { font-size: 13px; color: var(--bw-muted); }
-
-  /* FAQ */
-  .bw-faq { padding: 72px 0; background: var(--bw-gray); }
-  .bw-faq h2 { font-size: 30px; font-weight: 700; color: var(--bw-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--bw-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--bw-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--bw-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--bw-text); }
-
-  /* NEARBY */
-  .bw-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--bw-border); }
-  .bw-nearby h2 { font-size: 20px; font-weight: 600; color: var(--bw-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--bw-border); border-radius: 20px; font-size: 14px; color: var(--bw-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--bw-red); color: var(--bw-red); }
-
-  /* BOTTOM CTA */
-  .bw-bottom-cta { padding: 72px 0; background: var(--bw-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-
-  /* RESPONSIVE */
-  @media (max-width: 1024px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
-    .why-grid { grid-template-columns: repeat(2, 1fr); }
-    .reviews-grid { grid-template-columns: 1fr 1fr; }
-    .cove-inner { grid-template-columns: 1fr; }
-    .bw-intro__inner { grid-template-columns: 1fr; }
-    .nh-columns { grid-template-columns: 1fr 1fr; }
-    .pricing-grid { grid-template-columns: repeat(2, 1fr); }
-  }
-  @media (max-width: 768px) {
-    .bw-hero__inner { grid-template-columns: 1fr; }
-    .bw-hero__img-wrap { display: none; }
-    .recent-grid { grid-template-columns: 1fr; }
-    .reviews-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr 1fr; }
-    .nh-columns { grid-template-columns: 1fr; }
-    .trust-bar__inner { justify-content: center; }
-  }
-  @media (max-width: 480px) {
-    .services-grid { grid-template-columns: 1fr; }
-    .why-grid { grid-template-columns: 1fr; }
-    .pricing-grid { grid-template-columns: 1fr; }
-    .bw-hero { padding: 48px 0 40px; }
-    .bottom-cta__text h2 { font-size: 26px; }
-  }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Appliance broken in"
+    headlineAccent="Brentwood?"
+    body="Sub-Zero · Wolf · Cove · Miele · all brands — same-day service in 90049. $89 diagnostic waived with repair. 90-day warranty. OEM parts only."
+  />
+</CityLayout>

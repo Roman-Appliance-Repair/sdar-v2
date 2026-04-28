@@ -1,690 +1,303 @@
 ---
-// src/pages/eagle-rock.astro
-// SDAR — samedayappliance.repair
-// Eagle Rock, Los Angeles CA 90041
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: нет данных — новый город
-// Конкуренты: Everyday Appliance Repair/Jacob (strong, owner-op, knows neighborhood),
-//             Eagle Rock Appliances (4866 Eagle Rock Blvd, vintage stoves specialist),
-//             Eagle Rock Appliance Repair (25yr, wix site, generic)
-// Уникальный угол: Craftsman bungalow character, vintage O'Keefe & Merritt/Wedgwood stoves,
-//                  Colorado Blvd creative community, LADWP hard water, long-time owners + newcomers
-// Апрель 2026
+/**
+ * Eagle Rock, CA — Variant A migration (T9 Group A simple).
+ * Branch: Los Angeles · ZIPs: 90041
+ * Source: wiki/migration/content-dumps/eagle-rock.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Los Angeles is service_area)
+ *   - Phone via branches.ts (`branchSlug='los-angeles'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Eagle Rock",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90041"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "eagle-rock",
-};
+const branchSlug = 'los-angeles';
+const cityName = 'Eagle Rock';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Eagle Rock CA 90041 — Same Day | Craftsman Homes · Vintage Stoves | (323) 870-4790`;
-const description = `Same-day appliance repair in Eagle Rock, CA 90041. Colorado Blvd corridor, Dahlia Heights, Hill Drive, Historic NELA. Vintage O'Keefe & Merritt and Wedgwood stoves welcome. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/eagle-rock/`;
+const title = `Appliance Repair Eagle Rock CA — Same Day | Vintage Stoves · 90041 | ${branch.phone}`;
+const description = "Same-day appliance repair in Eagle Rock, CA 90041. Craftsman bungalows, vintage O'Keefe & Merritt and Wedgwood ranges welcome. LADWP hard water aware. Same-day, OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/eagle-rock/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Eagle Rock",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const services = [
+  { icon: '🔥', name: 'Oven, Range & Vintage Stove', slug: 'oven',
+    issues: ["O'Keefe & Merritt", 'Wedgwood', 'Roper', 'Gas igniter', 'Pilot', 'Thermostat'],
+    brands: ["O'Keefe & Merritt", 'Wedgwood', 'GE', 'Samsung', 'Bosch', 'Wolf', 'Viking'] },
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator',
+    issues: ['LADWP hard water ice maker', 'Not cooling', 'Fan motor', 'Temperature'],
+    brands: ['Samsung', 'LG', 'GE', 'Whirlpool', 'Sub-Zero', 'Bosch'] },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer',
+    issues: ['Not draining', 'Not spinning', 'Error codes', 'Hard water inlet screens'],
+    brands: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'Bosch', 'Speed Queen'] },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer',
+    issues: ['Not heating', 'Older vent runs', 'Thermal fuse', 'Lint buildup'],
+    brands: ['LG', 'Samsung', 'GE', 'Maytag', 'Whirlpool', 'Electrolux'] },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher',
+    issues: ['Hard water spray arm scale', 'Not draining', 'Error codes', 'Spots'],
+    brands: ['Bosch', 'KitchenAid', 'Samsung', 'LG', 'GE', 'Miele'] },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer',
+    issues: ['Hard water inlet valve', 'Not freezing', 'Ice stopped', 'Frost buildup'],
+    brands: ['Samsung', 'LG', 'GE', 'Whirlpool', 'Sub-Zero', 'Frigidaire'] },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler',
+    issues: ['Temperature off', 'Compressor', 'Under-counter', 'Built-in'],
+    brands: ['True', 'U-Line', 'Liebherr', 'Dacor', 'Sub-Zero'] },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop',
+    issues: ['Igniter', 'Gas burner', 'Induction not heating', 'Hood motor'],
+    brands: ['GE', 'Bosch', 'Samsung', 'Wolf', 'Thermador', 'Broan'] },
+];
+
+const neighborhoods = [
+  { name: 'Colorado Blvd corridor', zip: '90041' },
+  { name: 'Dahlia Heights', zip: '90041' },
+  { name: 'Hill Drive area', zip: '90041' },
+  { name: 'Eagle Rock Plaza adjacent', zip: '90041' },
+  { name: 'Yosemite Drive', zip: '90041' },
+  { name: 'Figueroa / NELA streets', zip: '90041' },
+  { name: 'Maywood Ave area', zip: '90041' },
+];
+
+const narrativeParagraphs = [
+  "Eagle Rock is one of the most character-rich neighborhoods in northeast LA — Craftsman bungalows and Spanish Colonial homes from the 1910s through the 1940s on Dahlia Heights, Hill Drive, and the streets south of Colorado Blvd. The housing has been preserved more carefully here than in most of LA, which means original kitchens, original woodwork, and in a meaningful number of homes, the original range still in place after 70 or 80 years.",
+  "Vintage ranges are everywhere in Eagle Rock. O'Keefe & Merritt, Wedgwood, and Roper — well-maintained, still in service, worth preserving. Most common failures on these ranges are repairable: igniter contacts, gas valves, oven thermostats, pilot assemblies. Parts remain available. We assess these honestly — when something can be fixed we fix it, when something genuinely can't we say so. We don't push replacement on a range that's still cooking well.",
+  "$150-250 for a vintage range repair is the right call almost every time when the alternative is a $2,000+ replacement that won't fit the kitchen and won't cook as well. We make that case openly because it's the truth on these specific ranges.",
+  "Modern Samsung, Bosch, and LG live in the renovated bungalows and the newer houses on the same blocks. Newcomers and long-time owners share the neighborhood and share our routes. Same trip, different appliance generation.",
+  "LADWP water in this area runs 230-310 mg/L hardness, and many of the older Eagle Rock homes still have galvanized supply lines feeding the kitchen. The combination scales ice-maker inlet valves, dishwasher spray arms, and washer inlet hoses faster than the city average. Iron from the old pipes compounds the mineral content. We test inlet valves and check for mineral deposits proactively on every relevant call.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before any work. <strong>90-day warranty</strong> on parts and labor. Weekends available.",
+];
+
+const narrativeSubSections = [
+  {
+    title: "Vintage range tip for Eagle Rock",
+    paragraphs: [
+      "If your O'Keefe &amp; Merritt or Wedgwood has a burner that won't light, an oven pilot that's out, or a thermostat that's drifting — these are all repairable. Parts are still available for most common failures on these ranges. A range this well-built and this well-suited to a Craftsman kitchen is worth fixing. Call us before you assume it can't be done.",
+    ],
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Eagle Rock", "sameAs": "https://en.wikipedia.org/wiki/Eagle_Rock,_Los_Angeles" },
-    { "@type": "Neighborhood", "name": "Dahlia Heights" },
-    { "@type": "Neighborhood", "name": "Hill Drive" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: "O'Keefe & Merritt Range",
+    neighborhood: 'Dahlia Heights, 90041',
+    title: 'Three burners not lighting, oven pilot out — been that way for months',
+    body: "1948 O'Keefe & Merritt in a Dahlia Heights Craftsman — original kitchen, range in perfect cosmetic condition, owner had been using only the back burner for months. Three surface igniter contacts corroded, oven pilot assembly out with a weakened thermocouple. Cleaned and adjusted igniter contacts on all three affected burners, relit and adjusted the oven pilot, tested the thermocouple draw, ran all four burners and both oven functions. Everything cooking perfectly. The owner had been told twice to \"just get a new stove\" — not the right advice for a range this well-maintained.",
+    result: '✓ Same day · All burners restored · Oven pilot lit · Worth keeping',
+  },
+  {
+    badge: 'Samsung Refrigerator',
+    neighborhood: 'Colorado Blvd area, 90041',
+    title: 'Ice maker almost nothing — 4-5 cubes a day maximum',
+    body: 'Newer renovation of a 1920s bungalow — Samsung French door installed with the kitchen update, but original galvanized supply lines still feeding the ice maker water line. LADWP hard water plus iron from the old pipes had completely scaled the inlet valve. Replaced the inlet valve with an OEM Samsung part, flushed the water line, installed a new in-door filter. Full production within 24 hours. Recommended an inline filter on the water supply line given the galvanized pipe situation.',
+    result: '✓ Same day · OEM Samsung · Old pipe factor addressed · Inline filter advised',
+  },
+  {
+    badge: 'LG Washer',
+    neighborhood: 'Hill Drive, 90041',
+    title: "OE drain error — standing water, won't complete a cycle",
+    body: 'LG front-load washer on Hill Drive — OE drain pump error from a partially blocked pump filter. The filter had accumulated a mix of lint and hard water mineral deposits that restricted the pump housing. Cleared the pump filter and housing, ran three full drain cycles to confirm complete function. Showed the homeowner how to access and clean the filter quarterly — in LADWP hard water territory, the mineral deposits speed up filter accumulation meaningfully compared to soft-water areas.',
+    result: '✓ Same day · OE resolved · Quarterly cleaning routine explained',
+  },
+  {
+    badge: 'Bosch Dishwasher',
+    neighborhood: 'Eagle Rock Blvd corridor, 90041',
+    title: 'E24 error, standing water — happened suddenly',
+    body: 'Bosch 500 series — E24 is a drain error. Found the drain pump partially blocked by mineral scale from LADWP hard water and a small food trap blockage in the filter. Cleared both the drain pump and the filter assembly, ran a full diagnostic cycle, confirmed complete drain on three consecutive cycles. The homeowner had just moved in and inherited the dishwasher — explained the LADWP water situation and set up a monthly maintenance tablet routine going forward.',
+    result: '✓ Same day · E24 cleared · New homeowner briefed on water quality',
+  },
+];
+
+const reviews = [
+  {
+    text: "Our 1948 O'Keefe & Merritt had three burners out and the oven pilot gone. Two other companies told us to replace it. Same Day came out, fixed everything in about two hours — all burners back, oven working perfectly. This range belongs in this kitchen. So glad we didn't replace it.",
+    author: '— Rachel M., Dahlia Heights, Eagle Rock',
+  },
+  {
+    text: 'New Samsung fridge in our renovated bungalow barely making ice. Tech figured out it was the LADWP water plus our old galvanized pipes causing the scale buildup — replaced the inlet valve, explained the water situation, recommended an inline filter. Full ice production next day. Really knowledgeable about the specific issues in this neighborhood.',
+    author: '— James T., Colorado Blvd, Eagle Rock',
+  },
+  {
+    text: "Bosch dishwasher with E24 error the week after we moved in. Same Day came out, cleared the scale and blockage, explained the LADWP water quality situation to us as new homeowners. Monthly maintenance routine set up. Great experience — exactly the kind of service this neighborhood deserves.",
+    author: '— Priya S., Eagle Rock Blvd, Eagle Rock',
+  },
+];
+
+const pricingCards = [
+  { label: "Vintage Range (O'Keefe, Wedgwood)", price: '$150–$300', note: 'Igniter · Pilot · Thermostat · Calibration · Worth keeping', highlight: true },
+  { label: 'Refrigerator / Ice Maker', price: '$150–$400', note: 'LADWP inlet valve · Fan motor · Compressor · Filter' },
+  { label: 'Dishwasher', price: '$150–$320', note: 'Hard water scale · E24 · Spray arm · Drain pump' },
+  { label: 'Washer / Dryer', price: '$150–$350', note: 'OE drain · Thermal fuse · Vent cleaning' },
+  { label: 'Modern Oven / Range', price: '$150–$400', note: 'Gas igniter · Calibration · Element · OEM' },
+  { label: 'Diagnostic Fee', price: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Eagle Rock, CA?',
+    answer: 'Yes. Our technicians cover all of Eagle Rock 90041 — Colorado Blvd corridor, Dahlia Heights, Hill Drive, Yosemite Drive, and the streets around Eagle Rock Plaza. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: "Do you repair vintage O'Keefe & Merritt and Wedgwood ranges in Eagle Rock?",
+    answer: "Yes. Vintage ranges are common in Eagle Rock's original Craftsman and Spanish Colonial kitchens, and most are repairable. Igniters, pilots, thermostats, oven seals, and gas valves are all fixable on these ranges and parts remain available. We assess honestly — we don't push replacement on a range that's still cooking well.",
+  },
+  {
+    question: 'Does LADWP hard water affect appliances in Eagle Rock?',
+    answer: 'Yes. LADWP runs 230-310 mg/L throughout this area, and many older Eagle Rock homes still have galvanized supply lines feeding the kitchen. The combination scales ice-maker inlet valves, dishwasher spray arms, and washer inlet hoses faster than average. We test for this proactively on every relevant call.',
+  },
+  {
+    question: 'Are you available on weekends in Eagle Rock?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm.',
+  },
+  {
+    question: 'What appliance brands do you service in Eagle Rock?',
+    answer: "We service all major brands — Samsung, LG, GE, Whirlpool, Maytag, Bosch, KitchenAid, Sub-Zero, Wolf, Thermador, Miele, Speed Queen — plus vintage O'Keefe & Merritt, Wedgwood, and Roper ranges that are common in Eagle Rock's original kitchens.",
+  },
+  {
+    question: 'What is your diagnostic fee in Eagle Rock?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Eagle Rock repairs run $150–$400.',
+  },
+  {
+    question: 'Do you also serve Glendale, Silver Lake, and Los Feliz?',
+    answer: 'Yes. Our Eagle Rock service extends to Glendale (91201–08), Silver Lake (90026), Los Feliz (90027), Highland Park (90042), Glassell Park (90065), and Pasadena (91101).',
+  },
+];
+
+const nearby = [
+  { slug: 'glendale', name: 'Glendale' },
+  { slug: 'silver-lake', name: 'Silver Lake' },
+  { slug: 'los-feliz', name: 'Los Feliz' },
+  { slug: 'burbank', name: 'Burbank' },
+  { slug: 'pasadena', name: 'Pasadena' },
+  { slug: 'north-hollywood', name: 'North Hollywood' },
+  { slug: 'west-hollywood', name: 'West Hollywood' },
+  { slug: 'los-angeles', name: 'Los Angeles' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'Neighborhood', name: 'Eagle Rock', sameAs: 'https://en.wikipedia.org/wiki/Eagle_Rock,_Los_Angeles' },
+    { '@type': 'Place', name: 'Dahlia Heights' },
+    { '@type': 'Place', name: 'Hill Drive' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Eagle Rock, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Eagle Rock 90041 — the Colorado Boulevard corridor, Dahlia Heights, Hill Drive, the NELA streets near Figueroa, Yosemite Drive, and every residential street in the neighborhood. Call before noon for same-day afternoon service. We're also available Saturdays and Sundays." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Do you repair vintage ranges and O'Keefe & Merritt stoves in Eagle Rock?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Eagle Rock's Craftsman bungalows and Spanish Colonial homes frequently have vintage ranges — O'Keefe & Merritt, Wedgwood, Roper — that have been running for decades. We assess these honestly. If parts are available and the repair makes economic sense, we do it. We won't turn away a well-maintained vintage stove just because it's not a modern brand." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does hard water in Eagle Rock affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Eagle Rock is served by LADWP, which delivers water at 230–310 mg/L hardness in this area. Older homes — particularly the pre-war Craftsman bungalows — may have galvanized supply pipes that add iron on top of the baseline mineral content. Ice maker inlet valves, dishwasher spray arms, and washing machine inlet screens accumulate scale faster than national average. We check for this on every Eagle Rock call involving ice makers and dishwashers." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Eagle Rock?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands, vintage and modern: O'Keefe & Merritt, Wedgwood, Roper (vintage ranges), plus Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, Sub-Zero, Wolf, Viking, Thermador, Miele, and more. We carry OEM parts on every service vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Eagle Rock?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Eagle Rock?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. We give you a complete written estimate before starting any work. Most Eagle Rock repairs run $150–$400 depending on the appliance." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Glendale, Silver Lake, and Los Feliz?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Eagle Rock service area extends to Glendale, Silver Lake, Los Feliz, Highland Park, Glassell Park, Atwater Village, and Pasadena. All within our regular northeast LA corridor." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="er-hero">
-    <div class="er-hero__inner container">
-      <div class="er-hero__content">
-        <div class="er-hero__eyebrow">Eagle Rock · 90041 · Colorado Blvd · Dahlia Heights · Hill Drive · NELA</div>
-        <h1 class="er-hero__h1">
-          Appliance Repair<br>
-          <span class="er-hero__accent">Eagle Rock, CA</span>
-        </h1>
-        <p class="er-hero__sub">
-          Craftsman bungalows, vintage kitchens, and modern appliances side by side —
-          Eagle Rock is one of the most character-rich neighborhoods in northeast LA.
-          Vintage stoves welcome. Same-day service, OEM parts, 90-day warranty.
-          Weekends available.
-        </p>
-        <div class="er-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="er-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="er-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-eagle-rock-ca.webp"
-          alt="Appliance repair in Eagle Rock CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Eagle Rock · 90041 · Colorado Blvd · Dahlia Heights · Hill Drive · NELA"
+    headlineMain="Appliance repair in"
+    headlineAccent="Eagle Rock, CA"
+    subheadline="Craftsman bungalows, vintage kitchens, and modern appliances side by side — Eagle Rock is one of the most character-rich neighborhoods in northeast LA. Vintage stoves welcome. Same-day service, OEM parts, 90-day warranty. Weekends available."
+    branchSlug={branchSlug}
+  />
+  <TrustBar item4Text="Vintage Stoves Welcome" item4Fine="O'Keefe · Wedgwood · Roper" />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Vintage Stoves Welcome</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Knowing the neighbourhood"
+    headline="Appliance repair in Eagle Rock —"
+    headlineAccent="what makes this neighbourhood different"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="er-intro">
-    <div class="container er-intro__inner">
-      <div class="er-intro__text">
-        <h2>Appliance Repair in Eagle Rock — What Makes This Neighborhood Different</h2>
-        <p>
-          Eagle Rock has one of the most distinct housing characters in northeast LA.
-          The Craftsman bungalows and Spanish Colonial homes that line Dahlia Heights,
-          Hill Drive, and the streets south of Colorado Boulevard were built in the
-          1910s through 1940s — and a meaningful number of them have never had
-          their original kitchens fully gutted. That means vintage ranges: O'Keefe
-          & Merritt, Wedgwood, Roper. Well-maintained, still cooking, and absolutely
-          worth preserving.
-        </p>
-        <p>
-          We don't turn these away. If parts are available and the repair makes
-          economic sense — and it usually does — we do it. A $150–$250 repair on
-          a vintage range that cooks beautifully and fits perfectly in a Craftsman
-          kitchen is almost always the right call. We assess vintage stoves honestly
-          and won't push you toward unnecessary replacement.
-        </p>
-        <p>
-          For modern appliances — the Samsung refrigerators, Bosch dishwashers,
-          LG washers that newcomers bring in as they renovate — we carry full OEM
-          parts and handle those on the same trip. Eagle Rock is a neighborhood of
-          long-time owners and recent arrivals living next door to each other,
-          and our service reflects that range.
-        </p>
-        <p>
-          Hard water matters here too. Eagle Rock is LADWP territory — 230–310 mg/L
-          hardness — and the older Craftsman homes with original galvanized supply
-          pipes add iron to the mix. Ice maker inlet valves and dishwasher spray arms
-          scale up faster than national average. We check on every relevant call.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong>. Weekends available.
-        </p>
-        <div class="er-tip">
-          <div class="er-tip__icon">🍳</div>
-          <div class="er-tip__text">
-            <strong>Vintage range tip for Eagle Rock:</strong> If your O'Keefe & Merritt
-            or Wedgwood has a burner that won't light, an oven pilot that's out, or
-            a thermostat that's drifting — these are all repairable. Parts are still
-            available for most common failures on these ranges. A range this well-built
-            and this well-suited to a Craftsman kitchen is worth fixing. Call us
-            before you assume it can't be done.
-          </div>
-        </div>
-      </div>
-      <div class="er-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Eagle Rock Service Team</div>
-          <div class="cta-box__sub">90041 · Vintage stoves · Modern brands</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="What we repair in"
+    headlineAccent="Eagle Rock"
+    services={services}
+    cardStructure="3-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="er-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Eagle Rock</h2>
-      <p class="section-sub">Vintage & modern · All brands · LADWP hard water aware · 90041</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Eagle Rock areas"
+    headlineAccent="we cover"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/eagle-rock/oven-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Vintage Stove</div>
-          <div class="service-card__issues">O'Keefe & Merritt · Wedgwood · Roper · Gas igniter · Pilot · Thermostat</div>
-          <div class="service-card__brands">Vintage ranges · GE · Samsung · Bosch · Wolf · Viking</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent jobs in"
+    headlineAccent="Eagle Rock"
+    jobs={jobs}
+  />
 
-        <a href="/eagle-rock/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">LADWP hard water ice maker · Not cooling · Fan motor · Temperature</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/eagle-rock/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">Not draining · Not spinning · Error codes · Hard water inlet screens</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Eagle Rock"
+    headlineAccent="customers say"
+    reviews={reviews}
+  />
 
-        <a href="/eagle-rock/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Older vent runs · Thermal fuse · Lint buildup</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Eagle Rock"
+    cards={pricingCards}
+  />
 
-        <a href="/eagle-rock/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Hard water spray arm scale · Not draining · Error codes · Spots</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Eagle Rock"
+    faqs={faqs}
+  />
 
-        <a href="/eagle-rock/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Hard water inlet valve · Not freezing · Ice stopped · Frost buildup</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/eagle-rock/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/eagle-rock/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Igniter · Gas burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · Thermador · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="er-neighborhoods">
-    <div class="container">
-      <h2>All of Eagle Rock — 90041</h2>
-      <p class="section-sub">Colorado Blvd corridor to Dahlia Heights — every part of the neighborhood</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Eagle Rock Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Colorado Blvd corridor</div>
-            <div class="nh-item featured">Dahlia Heights</div>
-            <div class="nh-item featured">Hill Drive area</div>
-            <div class="nh-item">Eagle Rock Plaza adjacent</div>
-            <div class="nh-item">Yosemite Drive</div>
-            <div class="nh-item">Figueroa / NELA streets</div>
-            <div class="nh-item">Maywood Ave area</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">Colorado Blvd</div>
-            <div class="nh-item">Eagle Rock Blvd</div>
-            <div class="nh-item">Figueroa St</div>
-            <div class="nh-item">Yosemite Dr</div>
-            <div class="nh-item">Hill Dr</div>
-            <div class="nh-item">Norwalk Ave</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Glendale (91201–08)</div>
-            <div class="nh-item">Silver Lake (90026)</div>
-            <div class="nh-item">Los Feliz (90027)</div>
-            <div class="nh-item">Highland Park (90042)</div>
-            <div class="nh-item">Glassell Park (90065)</div>
-            <div class="nh-item">Pasadena (91101)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="er-recent">
-    <div class="container">
-      <h2>Recent Jobs in Eagle Rock</h2>
-      <p class="section-sub">Real calls from 90041 — vintage kitchens, Craftsman bungalows, LADWP hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">O'Keefe & Merritt Range</span>
-            <span class="recent-location">Dahlia Heights, 90041</span>
-          </div>
-          <div class="recent-card__title">"Three burners not lighting, oven pilot out — been that way for months"</div>
-          <div class="recent-card__desc">
-            1948 O'Keefe & Merritt in a Dahlia Heights Craftsman — original kitchen,
-            range in perfect cosmetic condition, owner had been using only the back
-            burner for months. Three surface igniter contacts corroded, oven pilot
-            assembly out with a weakened thermocouple. Cleaned and adjusted igniter
-            contacts on all three affected burners, relit and adjusted the oven pilot,
-            tested the thermocouple draw, ran all four burners and both oven functions.
-            Everything cooking perfectly. The owner had been told twice to "just get
-            a new stove" — not the right advice for a range this well-maintained.
-          </div>
-          <div class="recent-card__result">✓ Same day · All burners restored · Oven pilot lit · Worth keeping</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Colorado Blvd area, 90041</span>
-          </div>
-          <div class="recent-card__title">"Ice maker almost nothing — 4-5 cubes a day maximum"</div>
-          <div class="recent-card__desc">
-            Newer renovation of a 1920s bungalow — Samsung French door installed
-            with the kitchen update, but original galvanized supply lines still feeding
-            the ice maker water line. LADWP hard water plus iron from the old pipes had
-            completely scaled the inlet valve. Replaced the inlet valve with an OEM
-            Samsung part, flushed the water line, installed a new in-door filter.
-            Full production within 24 hours. Recommended an inline filter on the
-            water supply line given the galvanized pipe situation.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung · Old pipe factor addressed · Inline filter advised</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Washer</span>
-            <span class="recent-location">Hill Drive, 90041</span>
-          </div>
-          <div class="recent-card__title">"OE drain error — standing water, won't complete a cycle"</div>
-          <div class="recent-card__desc">
-            LG front-load washer on Hill Drive — OE drain pump error from a partially
-            blocked pump filter. The filter had accumulated a mix of lint and hard
-            water mineral deposits that restricted the pump housing. Cleared the pump
-            filter and housing, ran three full drain cycles to confirm complete
-            function. Showed the homeowner how to access and clean the filter quarterly —
-            in LADWP hard water territory, the mineral deposits speed up filter
-            accumulation meaningfully compared to soft-water areas.
-          </div>
-          <div class="recent-card__result">✓ Same day · OE resolved · Quarterly cleaning routine explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bosch Dishwasher</span>
-            <span class="recent-location">Eagle Rock Blvd corridor, 90041</span>
-          </div>
-          <div class="recent-card__title">"E24 error, standing water — happened suddenly"</div>
-          <div class="recent-card__desc">
-            Bosch 500 series — E24 is a drain error. Found the drain pump partially
-            blocked by mineral scale from LADWP hard water and a small food trap blockage
-            in the filter. Cleared both the drain pump and the filter assembly, ran
-            a full diagnostic cycle, confirmed complete drain on three consecutive
-            cycles. The homeowner had just moved in and inherited the dishwasher —
-            explained the LADWP water situation and set up a monthly maintenance
-            tablet routine going forward.
-          </div>
-          <div class="recent-card__result">✓ Same day · E24 cleared · New homeowner briefed on water quality</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="er-why">
-    <div class="container">
-      <h2>Why Eagle Rock Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🍳</div>
-          <div class="why-title">Vintage Stove Friendly</div>
-          <div class="why-text">O'Keefe & Merritt, Wedgwood, Roper — we assess vintage ranges honestly and don't default to "just get a new one." If parts are available and the repair makes economic sense, we do it. Eagle Rock's Craftsman kitchens deserve technicians who understand what's worth keeping.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">LADWP Hard Water Aware</div>
-          <div class="why-text">Eagle Rock is LADWP territory — 230–310 mg/L — and older Craftsman homes with galvanized pipes add iron on top. Ice makers and dishwashers scale faster here. We test inlet valves and check for mineral deposits on every relevant call.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏡</div>
-          <div class="why-title">Old Homes & New Appliances Both</div>
-          <div class="why-text">Eagle Rock has long-time owners who've kept the original kitchen, and newcomers who've renovated with Samsung and Bosch. We handle both on the same trip — vintage range in the morning, modern refrigerator in the afternoon. Same neighborhood, same quality.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="er-reviews">
-    <div class="container">
-      <h2>What Eagle Rock Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Our 1948 O'Keefe & Merritt had three burners out and the oven pilot gone. Two other companies told us to replace it. Same Day came out, fixed everything in about two hours — all burners back, oven working perfectly. This range belongs in this kitchen. So glad we didn't replace it."</div>
-          <div class="review-author">— Rachel M., Dahlia Heights, Eagle Rock</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"New Samsung fridge in our renovated bungalow barely making ice. Tech figured out it was the LADWP water plus our old galvanized pipes causing the scale buildup — replaced the inlet valve, explained the water situation, recommended an inline filter. Full ice production next day. Really knowledgeable about the specific issues in this neighborhood."</div>
-          <div class="review-author">— James T., Colorado Blvd, Eagle Rock</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Bosch dishwasher with E24 error the week after we moved in. Same Day came out, cleared the scale and blockage, explained the LADWP water quality situation to us as new homeowners. Monthly maintenance routine set up. Great experience — exactly the kind of service this neighborhood deserves."</div>
-          <div class="review-author">— Priya S., Eagle Rock Blvd, Eagle Rock</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="er-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Eagle Rock</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Vintage Range (O'Keefe, Wedgwood)</div>
-          <div class="pricing-card__range">$150 – $300</div>
-          <div class="pricing-card__note">Igniter contacts, pilot, thermocouple, oven thermostat</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">LADWP hard water inlet valve · Fan motor · OEM</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Hard water scale · Drain pump · Spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Drain pump · Thermal fuse · Vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Modern Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Igniter · Bake element · Gas valve · Calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="er-faq">
-    <div class="container">
-      <h2>Questions Eagle Rock Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Eagle Rock, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Eagle Rock 90041 — Colorado Boulevard corridor, Dahlia Heights, Hill Drive, Yosemite Drive, Eagle Rock Blvd, and every residential street. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair vintage ranges and O'Keefe & Merritt stoves in Eagle Rock?</summary><div class="faq-answer">Yes. Eagle Rock's Craftsman homes often have vintage ranges still running. We assess these honestly — if parts are available and the repair makes economic sense, we do it. We won't tell you to replace a range that can be fixed.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does hard water in Eagle Rock affect appliances?</summary><div class="faq-answer">Yes. Eagle Rock uses LADWP at 230–310 mg/L hardness. Older homes with galvanized pipes compound the effect. Ice maker inlet valves and dishwasher spray arms scale up faster than national average. We check for this on every relevant Eagle Rock call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Eagle Rock?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Eagle Rock?</summary><div class="faq-answer">Vintage and modern: O'Keefe & Merritt, Wedgwood, Roper, plus Samsung, LG, GE, Whirlpool, Bosch, KitchenAid, Sub-Zero, Wolf, Viking, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Eagle Rock?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Eagle Rock repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Glendale, Silver Lake, and Los Feliz?</summary><div class="faq-answer">Yes. Our Eagle Rock service extends to Glendale, Silver Lake, Los Feliz, Highland Park, Glassell Park, Atwater Village, and Pasadena. All within our regular northeast LA corridor.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="er-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/silver-lake/" class="nearby-link">Silver Lake</a>
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/north-hollywood/" class="nearby-link">North Hollywood</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="er-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Eagle Rock?</h2>
-          <p>Craftsman bungalows · Vintage stoves welcome · LADWP hard water aware · All of 90041. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Eagle Rock, CA 90041</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --er-red: #C8102E; --er-black: #0a0a0a; --er-gray: #f5f5f5; --er-border: #e2e2e2; --er-text: #1a1a1a; --er-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .er-hero { background: var(--er-black); color: white; padding: 80px 0 60px; }
-  .er-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .er-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--er-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .er-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .er-hero__accent { color: var(--er-red); }
-  .er-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .er-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .er-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .er-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--er-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .er-bottom-cta .btn-secondary { color: var(--er-text); border-color: var(--er-border); }
-  .trust-bar { background: var(--er-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .er-intro { padding: 72px 0; background: white; }
-  .er-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .er-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--er-black); margin-bottom: 20px; }
-  .er-intro__text p { font-size: 16px; line-height: 1.7; color: var(--er-text); margin-bottom: 16px; }
-  .er-tip { display: flex; gap: 14px; background: #f5f0e8; border: 1px solid #c4a87a; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .er-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .er-tip__text { font-size: 14px; color: var(--er-text); line-height: 1.6; }
-  .cta-box { background: var(--er-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--er-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--er-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--er-muted); text-align: center; margin-bottom: 40px; }
-  .er-services { padding: 72px 0; background: var(--er-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--er-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--er-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--er-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--er-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--er-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--er-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--er-red); font-weight: 500; }
-  .er-neighborhoods { padding: 72px 0; background: white; }
-  .er-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--er-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--er-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--er-text); padding: 8px 12px; background: var(--er-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--er-red); color: var(--er-black); font-weight: 500; }
-  .er-recent { padding: 72px 0; background: var(--er-gray); }
-  .er-recent h2 { font-size: 30px; font-weight: 700; color: var(--er-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--er-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--er-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--er-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--er-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--er-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .er-why { padding: 72px 0; background: white; }
-  .er-why h2 { font-size: 30px; font-weight: 700; color: var(--er-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--er-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--er-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--er-muted); line-height: 1.6; }
-  .er-reviews { padding: 72px 0; background: var(--er-gray); }
-  .er-reviews h2 { font-size: 30px; font-weight: 700; color: var(--er-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--er-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--er-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--er-muted); font-weight: 500; }
-  .er-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--er-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--er-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--er-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--er-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--er-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--er-red); }
-  .pricing-card__note { font-size: 13px; color: var(--er-muted); }
-  .er-faq { padding: 72px 0; background: var(--er-gray); }
-  .er-faq h2 { font-size: 30px; font-weight: 700; color: var(--er-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--er-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--er-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--er-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--er-text); }
-  .er-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--er-border); }
-  .er-nearby h2 { font-size: 20px; font-weight: 600; color: var(--er-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--er-border); border-radius: 20px; font-size: 14px; color: var(--er-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--er-red); color: var(--er-red); }
-  .er-bottom-cta { padding: 72px 0; background: var(--er-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .er-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .er-hero__inner { grid-template-columns: 1fr; } .er-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .er-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Appliance broken in"
+    headlineAccent="Eagle Rock?"
+    body="Craftsman bungalows · Vintage stoves welcome · LADWP hard water aware · All of 90041. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayout>

@@ -1,686 +1,300 @@
 ---
-// src/pages/highland-park.astro
-// SDAR — samedayappliance.repair
-// Highland Park, Los Angeles CA 90042
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: dryer repair highland park — 1 показ, поз 100
-//      oven repair highland park — 1 показ, поз 99
-// Конкуренты: Highland Park Appliance Attack/Billy (323-484-3246, local, Nextdoor rep),
-//             Top Notch LA (323-827-7237, good tone, knows Craftsman),
-//             appliancela.com (AI spam), aplusappliancepro.com (template)
-// Уникальный угол: NELA gentrification mix + Figueroa/York Blvd corridors +
-//                  Craftsman & Victorian homes 1900s–1920s + vintage stoves +
-//                  long-time families + new residents + LADWP hard water
-// Апрель 2026
+/**
+ * Highland Park, CA — Variant A migration (T9 Group A simple).
+ * Branch: Pasadena · ZIPs: 90042
+ * Source: wiki/migration/content-dumps/highland-park.md
+ *
+ * NAP & Rating Policy SSOT compliance:
+ *   - aggregateRating omitted from schema
+ *   - streetAddress omitted (Pasadena is service_area)
+ *   - Phone via branches.ts (`branchSlug='pasadena'`)
+ */
 
-import Layout from '../layouts/Layout.astro';
+import CityLayout from '../layouts/CityLayout.astro';
+import HeroEditorial from '../components/cities/shared/HeroEditorial.astro';
+import TrustBar from '../components/cities/shared/TrustBar.astro';
+import RepairGrid from '../components/cities/shared/RepairGrid.astro';
+import CustomNarrative from '../components/cities/shared/CustomNarrative.astro';
+import NeighborhoodGrid from '../components/cities/shared/NeighborhoodGrid.astro';
+import RecentJobs from '../components/cities/shared/RecentJobs.astro';
+import Method from '../components/cities/shared/Method.astro';
+import Reviews from '../components/cities/shared/Reviews.astro';
+import Pricing from '../components/cities/shared/Pricing.astro';
+import FAQ from '../components/cities/shared/FAQ.astro';
+import NearbyLinks from '../components/cities/shared/NearbyLinks.astro';
+import FinalCTA from '../components/cities/shared/FinalCTA.astro';
+import { BRANCHES } from '../data/branches.ts';
 
-const city = {
-  name: "Highland Park",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["90042"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "highland-park",
-};
+const branchSlug = 'pasadena';
+const cityName = 'Highland Park';
+const branch = BRANCHES.find((b) => b.slug === branchSlug)!;
 
-const title = `Appliance Repair Highland Park CA 90042 — Same Day | Figueroa · York Blvd · Craftsman Homes | (323) 870-4790`;
-const description = `Same-day appliance repair in Highland Park, CA 90042. Figueroa St, York Blvd, Avenue 50 corridor. Vintage O'Keefe & Merritt welcome. Samsung, LG, GE, Whirlpool — all brands. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/highland-park/`;
+const title = `Appliance Repair Highland Park CA — Same Day | Vintage Stoves · 90042 | ${branch.phone}`;
+const description = "Same-day appliance repair in Highland Park, CA 90042. Craftsman and Victorian homes off Figueroa and York. Vintage O'Keefe & Merritt and Wedgwood ranges welcome. LADWP hard water aware. Same-day, OEM parts, 90-day warranty.";
+const canonical = 'https://samedayappliance.repair/highland-park/';
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Highland Park",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const services = [
+  { icon: '🔥', name: 'Oven, Range & Vintage Stove', slug: 'oven',
+    issues: ["O'Keefe & Merritt", 'Wedgwood', 'Gas igniter', 'Pilot', 'Thermostat', 'Vintage ranges'],
+    brands: ["O'Keefe & Merritt", 'Wedgwood', 'GE', 'Samsung', 'Bosch', 'Wolf', 'Viking'] },
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator',
+    issues: ['LADWP hard water ice maker', 'Not cooling', 'Fan motor', 'Temperature'],
+    brands: ['Samsung', 'LG', 'GE', 'Whirlpool', 'Sub-Zero', 'Bosch'] },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer',
+    issues: ['OE / UE error', 'Not draining', 'Not spinning', 'Stackable'],
+    brands: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'Bosch', 'Speed Queen'] },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer',
+    issues: ['Not heating', 'Thermal fuse', 'Vent buildup', 'Gas & electric'],
+    brands: ['LG', 'Samsung', 'GE', 'Maytag', 'Whirlpool', 'Electrolux'] },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher',
+    issues: ['Hard water spray arm', 'Not draining', 'E24', 'Error codes'],
+    brands: ['Bosch', 'KitchenAid', 'Samsung', 'LG', 'GE', 'Miele'] },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer',
+    issues: ['LADWP inlet valve scale', 'Not freezing', 'Ice stopped', 'Frost'],
+    brands: ['Samsung', 'LG', 'GE', 'Whirlpool', 'Sub-Zero', 'Frigidaire'] },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler',
+    issues: ['Temperature off', 'Compressor', 'Under-counter', 'Built-in'],
+    brands: ['True', 'U-Line', 'Liebherr', 'Dacor', 'Sub-Zero'] },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop',
+    issues: ['Gas igniter', 'Burner', 'Induction not heating', 'Hood motor'],
+    brands: ['GE', 'Bosch', 'Samsung', 'Wolf', 'Thermador', 'Broan'] },
+];
+
+const neighborhoods = [
+  { name: 'Figueroa Street corridor', zip: '90042' },
+  { name: 'York Boulevard area', zip: '90042' },
+  { name: 'Avenue 50 · Avenue 57', zip: '90042' },
+  { name: 'Marmion Way', zip: '90042' },
+  { name: 'North Ave 56 area', zip: '90042' },
+  { name: 'Piedmont Ave', zip: '90042' },
+  { name: 'Museum Drive hilltop homes', zip: '90042' },
+];
+
+const narrativeParagraphs = [
+  "Highland Park is one of the oldest and most layered neighborhoods in LA — Craftsman bungalows and Victorian homes from the 1900s and 1910s line the streets off Figueroa and York. The Avenues are a working canvas of long-time families who've been here for generations alongside newer residents who came for the coffee shops, natural-wine bars, and vintage record stores along Figueroa.",
+  "On the same block you'll find an original Craftsman with a 1930s O'Keefe & Merritt still cooking dinner every night, and a renovated Victorian with a brand-new Bosch dishwasher and Samsung French-door fridge. Both homes are part of the same neighborhood. We service both.",
+  "Vintage ranges deserve honest attention. O'Keefe & Merritt, Wedgwood, and Roper still in original Craftsman kitchens — most are repairable, parts remain available for the most common failures. We assess these openly: $89 diagnostic plus parts is almost always a better outcome than a $2,000+ replacement that won't fit and won't cook as well.",
+  "LADWP water in this area runs 230-310 mg/L hardness, and many of the older Highland Park homes still have galvanized supply lines feeding the kitchen. The mineral content compounds with iron from the old pipes — it's the dual factor that scales ice-maker inlet valves, dishwasher spray arms, and washer inlet hoses faster than average. We test inlet valves and check for mineral deposits proactively on every relevant call.",
+  "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before any work. <strong>90-day warranty</strong> on parts and labor. Weekends available.",
+];
+
+const narrativeSubSections = [
+  {
+    title: "Vintage stove tip for Highland Park",
+    paragraphs: [
+      "If your O'Keefe &amp; Merritt has a burner that won't light, an oven pilot that's out, or a thermostat drifting off temperature — these are all repairable. Parts remain available for the most common failures on these ranges. Don't let anyone tell you it can't be fixed before you've had an honest diagnostic. One call is all it takes to find out.",
+    ],
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Highland Park", "sameAs": "https://en.wikipedia.org/wiki/Highland_Park,_Los_Angeles" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
-};
+];
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const jobs = [
+  {
+    badge: "O'Keefe & Merritt Range",
+    neighborhood: 'Avenue 50 corridor, 90042',
+    title: 'Oven pilot out, one burner igniter dead — original 1930s kitchen',
+    body: "Craftsman bungalow on a side street off Avenue 50 — original kitchen with the O'Keefe & Merritt still in place. Oven pilot assembly out, thermocouple weakened; one surface burner igniter contact fully corroded. Relit and adjusted the oven pilot, replaced the thermocouple, cleaned and adjusted the corroded igniter contact. All four burners confirmed, oven heating accurately and holding temperature. Owner had inherited the house and the range together — very relieved to keep it.",
+    result: '✓ Same day · Pilot lit · Thermocouple replaced · All burners confirmed',
+  },
+  {
+    badge: 'LG Washer',
+    neighborhood: 'York Blvd area, 90042',
+    title: "LE error — motor fault in the app, machine won't spin at all",
+    body: "Renovated York Blvd craftsman — LG front-loader LE motor error. Ran the LG SmartDiagnosis through the app first: confirmed hall sensor fault on the rotor. Replaced the hall sensor with an OEM LG part, cleared the error through the app diagnostic, ran three full wash cycles at different spin speeds. Zero LE codes. The owner was a UX designer who appreciated that we used the machine's own diagnostic protocol before reaching for a wrench.",
+    result: '✓ Same day · Smart diagnosis first · OEM LG hall sensor · App clear',
+  },
+  {
+    badge: 'Samsung Refrigerator',
+    neighborhood: 'Figueroa side street, 90042',
+    title: 'Ice maker producing almost nothing — been declining for months',
+    body: "1910s Victorian with a recent kitchen renovation — Samsung French door, but the original galvanized supply lines still running behind the walls. LADWP hard water plus iron from the old pipes had scaled the inlet valve to about 10% capacity. Replaced with OEM Samsung inlet valve, flushed the water line, installed a new filter (15 months old). Full production by next morning. Explained the dual factor — LADWP mineral content plus the galvanized pipes — and recommended an inline sediment filter ahead of the water line.",
+    result: '✓ Same day · OEM Samsung · Galvanized pipe factor · Inline filter advised',
+  },
+  {
+    badge: 'GE Electric Dryer',
+    neighborhood: 'Marmion Way, 90042',
+    title: 'No heat — takes three cycles to dry anything, electric bill spiked',
+    body: "Older GE electric dryer in a Marmion Way home — thermal fuse blown from a vent run that had accumulated years of lint inside a partially kinked flexible duct section. The kink had restricted airflow enough to cause heat buildup but not a complete blockage, letting the problem build slowly. Replaced the thermal fuse, straightened and secured the duct run, cleared the accumulated lint, replaced the exterior vent cap with a metal backdraft damper. Single-cycle drying confirmed on the first test load. The spike in the electricity bill was the first sign something was wrong — the dryer had been compensating for months.",
+    result: '✓ Same day · Thermal fuse · Duct straightened · Single cycle · Cause explained',
+  },
+];
+
+const reviews = [
+  {
+    text: "O'Keefe & Merritt in our original Avenue 50 bungalow kitchen — pilot out, one burner dead. Same Day came out, fixed everything, explained what had failed and why. Range is working perfectly. So glad to have found someone who treats these as worth keeping, not just something to replace.",
+    author: '— Carlos M., Avenue 50, Highland Park',
+  },
+  {
+    text: "LG washer LE error. Tech used the SmartDiagnosis app protocol before opening the machine, confirmed the exact issue, replaced the hall sensor with OEM parts, cleared it through the app. Clean, methodical, honest. As someone who works in tech it was refreshing to see a repair done with actual diagnostic rigor.",
+    author: '— Priya K., York Blvd, Highland Park',
+  },
+  {
+    text: "GE dryer stopped heating and my electricity bill was through the roof. Tech found a partially kinked duct that had been building up lint for years — explained that the energy spike was the first warning sign. Fixed the duct, replaced the fuse, installed a proper vent cap. Single cycle drying from the first test load.",
+    author: '— Ana R., Marmion Way, Highland Park',
+  },
+];
+
+const pricingCards = [
+  { label: "Vintage Range (O'Keefe, Wedgwood)", price: '$150–$300', note: 'Igniter · Pilot · Thermostat · Calibration · Worth keeping', highlight: true },
+  { label: 'Refrigerator / Ice Maker', price: '$150–$400', note: 'LADWP inlet valve · Fan motor · Compressor · Filter' },
+  { label: 'Washer / Dryer', price: '$150–$350', note: 'OE drain · Thermal fuse · Vent · Stackable' },
+  { label: 'Dishwasher', price: '$150–$320', note: 'Hard water scale · E24 · Spray arm · Drain pump' },
+  { label: 'Modern Oven / Range', price: '$150–$400', note: 'Gas igniter · Calibration · Element · OEM' },
+  { label: 'Diagnostic Fee', price: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Highland Park, CA?',
+    answer: 'Yes. Our technicians cover all of Highland Park 90042 — Figueroa Street corridor, York Boulevard, Avenue 50 through Avenue 57, Marmion Way, Piedmont Ave, and the Museum Drive hilltop homes. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: "Do you repair vintage O'Keefe & Merritt and Wedgwood ranges in Highland Park?",
+    answer: "Yes. Vintage ranges are common in Highland Park's original Craftsman and Victorian kitchens, and most are repairable. Igniters, pilots, thermostats, oven seals, and gas valves are all fixable on these ranges and parts remain available. We assess honestly — we don't push replacement on a range that's still cooking well.",
+  },
+  {
+    question: 'Does LADWP hard water affect appliances in Highland Park?',
+    answer: 'Yes. LADWP runs 230-310 mg/L throughout this area, and many older Highland Park homes still have galvanized supply lines feeding the kitchen. The combination scales ice-maker inlet valves, dishwasher spray arms, and washer inlet hoses faster than average. We test for this proactively on every relevant call.',
+  },
+  {
+    question: 'Are you available on weekends in Highland Park?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm.',
+  },
+  {
+    question: 'What appliance brands do you service in Highland Park?',
+    answer: "We service all major brands — Samsung, LG, GE, Whirlpool, Maytag, Bosch, KitchenAid, Sub-Zero, Wolf, Thermador, Miele, Speed Queen — plus vintage O'Keefe & Merritt, Wedgwood, and Roper ranges that are common in Highland Park's original kitchens.",
+  },
+  {
+    question: 'What is your diagnostic fee in Highland Park?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Highland Park repairs run $150–$400.',
+  },
+  {
+    question: 'Do you also serve Eagle Rock, Glassell Park, and Mount Washington?',
+    answer: 'Yes. Our Highland Park route also covers Eagle Rock (90041), Glassell Park (90065), Atwater Village (90039), Mount Washington (90065), Cypress Park (90065), and Silver Lake (90026).',
+  },
+];
+
+const nearby = [
+  { slug: 'eagle-rock', name: 'Eagle Rock' },
+  { slug: 'atwater-village', name: 'Atwater Village' },
+  { slug: 'silver-lake', name: 'Silver Lake' },
+  { slug: 'los-feliz', name: 'Los Feliz' },
+  { slug: 'glendale', name: 'Glendale' },
+  { slug: 'pasadena', name: 'Pasadena' },
+  { slug: 'west-hollywood', name: 'West Hollywood' },
+  { slug: 'los-angeles', name: 'Los Angeles' },
+];
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: `+1${branch.phone.replace(/\D/g, '')}`,
+  email: branch.email,
+  // streetAddress omitted: branch is service_area (NAP policy rule 2).
+  areaServed: [
+    { '@type': 'Neighborhood', name: 'Highland Park', sameAs: 'https://en.wikipedia.org/wiki/Highland_Park,_Los_Angeles' },
+  ],
+  openingHoursSpecification: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Highland Park, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Highland Park 90042 — Figueroa Street, York Boulevard, Avenue 50, North Avenue 56, Marmion Way, Piedmont Avenue, and every residential street. Call before noon for same-day afternoon service." }
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+      opens: '07:00',
+      closes: '21:00',
     },
-    {
-      "@type": "Question",
-      "name": "Do you repair vintage stoves and O'Keefe & Merritt ranges in Highland Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Highland Park's Craftsman and Victorian homes frequently have vintage ranges — O'Keefe & Merritt, Wedgwood, Roper — still in their original kitchens. We assess these honestly and repair them when parts are available and it makes economic sense. We don't push replacement for a well-maintained range." }
-    },
-    {
-      "@type": "Question",
-      "name": "Does hard water in Highland Park affect appliances?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Highland Park is LADWP territory at 230–310 mg/L hardness. Many of the older homes still have original galvanized supply pipes that add iron on top of the baseline mineral content. Ice maker inlet valves and dishwasher spray arms accumulate scale faster here. We check for this proactively on every relevant Highland Park call." }
-    },
-    {
-      "@type": "Question",
-      "name": "Are you available on weekends in Highland Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
-    },
-    {
-      "@type": "Question",
-      "name": "What appliance brands do you repair in Highland Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "All major brands — vintage and modern: O'Keefe & Merritt, Wedgwood, Roper, plus Samsung, LG, GE, Whirlpool, KitchenAid, Bosch, Maytag, and more. OEM parts on every vehicle." }
-    },
-    {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Highland Park?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Highland Park repairs run $150–$400." }
-    },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Eagle Rock, Glassell Park, and Mount Washington?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Highland Park service extends to Eagle Rock, Glassell Park, Mount Washington, Cypress Park, Atwater Village, Silver Lake, and all of northeast LA." }
-    }
-  ]
+  ],
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  // aggregateRating omitted per NAP & Rating Policy SSOT.
 };
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  branchSlug={branchSlug}
+>
+  <script type="application/ld+json" slot="head-scripts" set:html={JSON.stringify(localBusinessSchema)} />
 
-  <!-- HERO -->
-  <section class="hp-hero">
-    <div class="hp-hero__inner container">
-      <div class="hp-hero__content">
-        <div class="hp-hero__eyebrow">Highland Park · 90042 · Figueroa St · York Blvd · Avenue 50 · Marmion Way</div>
-        <h1 class="hp-hero__h1">
-          Appliance Repair<br>
-          <span class="hp-hero__accent">Highland Park, CA</span>
-        </h1>
-        <p class="hp-hero__sub">
-          Northeast LA's most storied neighbourhood — Craftsman homes, original kitchens,
-          vintage stoves, and modern appliances living side by side on the same block.
-          Vintage O'Keefe & Merritt welcome. Same-day service, OEM parts, 90-day warranty.
-        </p>
-        <div class="hp-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="hp-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="hp-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-highland-park-ca.webp"
-          alt="Appliance repair in Highland Park CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <HeroEditorial
+    eyebrow="Highland Park · 90042 · Figueroa St · York Blvd · Avenue 50 · Marmion Way"
+    headlineMain="Appliance repair in"
+    headlineAccent="Highland Park, CA"
+    subheadline="Northeast LA's most storied neighbourhood — Craftsman homes, original kitchens, vintage stoves, and modern appliances living side by side on the same block. Vintage O'Keefe & Merritt welcome. Same-day service, OEM parts, 90-day warranty."
+    branchSlug={branchSlug}
+  />
+  <TrustBar item4Text="Vintage Stoves Welcome" item4Fine="O'Keefe · Wedgwood · Roper" />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Vintage Stoves Welcome</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    number="01"
+    eyebrow="Knowing the neighbourhood"
+    headline="Appliance repair in Highland Park —"
+    headlineAccent="the full picture"
+    paragraphs={narrativeParagraphs}
+    subSections={narrativeSubSections}
+  />
 
-  <!-- INTRO -->
-  <section class="hp-intro">
-    <div class="container hp-intro__inner">
-      <div class="hp-intro__text">
-        <h2>Appliance Repair in Highland Park — The Full Picture</h2>
-        <p>
-          Highland Park is one of LA's oldest and most layered neighbourhoods. The streets
-          off Figueroa and York are lined with Craftsman bungalows and Victorian homes
-          from the 1900s and 1910s — many of them meticulously maintained, some still
-          with original kitchens. The Avenues corridor has long-time families who have
-          lived here for generations. The blocks near the coffee shops and natural wine
-          bars have newer residents who've renovated with Samsung and Bosch. Both are
-          part of the same 90042, and both need appliances that work.
-        </p>
-        <p>
-          Vintage ranges are a regular part of the landscape here. O'Keefe & Merritt,
-          Wedgwood, Roper — built into Craftsman kitchens that were designed around them
-          and haven't changed since. We assess these honestly. If the repair makes sense
-          and parts are available, we do it. A 1940s O'Keefe & Merritt that fits a
-          Highland Park kitchen perfectly is worth one honest diagnostic before anyone
-          considers replacement.
-        </p>
-        <p>
-          LADWP hard water is a consistent factor across all of Northeast LA, and
-          Highland Park is no exception. The older homes with original galvanized supply
-          lines compound the mineral content — ice maker inlet valves and dishwasher
-          spray arms scale significantly faster here than national average. We check
-          for this on every relevant call.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate
-          before we start. <strong>90-day warranty</strong>. Weekends available.
-        </p>
-        <div class="hp-tip">
-          <div class="hp-tip__icon">🍳</div>
-          <div class="hp-tip__text">
-            <strong>Vintage stove tip for Highland Park:</strong> If your O'Keefe
-            & Merritt has a burner that won't light, an oven pilot that's out,
-            or a thermostat drifting off temperature — these are all repairable.
-            Parts remain available for the most common failures on these ranges.
-            Don't let anyone tell you it can't be fixed before you've had an
-            honest diagnostic. One call is all it takes to find out.
-          </div>
-        </div>
-      </div>
-      <div class="hp-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Highland Park Service</div>
-          <div class="cta-box__sub">90042 · Vintage stoves · NELA same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <RepairGrid
+    number="02"
+    eyebrow="Capabilities"
+    headline="What we repair in"
+    headlineAccent="Highland Park"
+    services={services}
+    cardStructure="3-tier"
+  />
 
-  <!-- SERVICES -->
-  <section class="hp-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Highland Park</h2>
-      <p class="section-sub">Vintage & modern · LADWP hard water aware · All of 90042</p>
-      <div class="services-grid">
+  <NeighborhoodGrid
+    number="03"
+    eyebrow="Service Area"
+    headline="Highland Park areas"
+    headlineAccent="we cover"
+    neighborhoods={neighborhoods}
+    mode="flat"
+  />
 
-        <a href="/highland-park/oven-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Vintage Stove</div>
-          <div class="service-card__issues">O'Keefe & Merritt · Wedgwood · Gas igniter · Pilot · Thermostat</div>
-          <div class="service-card__brands">Vintage ranges · GE · Samsung · Bosch · Wolf · Viking</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentJobs
+    number="04"
+    eyebrow="Recent Repairs"
+    headline="Recent jobs in"
+    headlineAccent="Highland Park"
+    jobs={jobs}
+  />
 
-        <a href="/highland-park/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">LADWP hard water ice maker · Not cooling · Fan motor · Temperature</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Method number="05" />
 
-        <a href="/highland-park/washer-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Stackable</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Reviews
+    number="06"
+    eyebrow="Word of Mouth"
+    headline="What Highland Park"
+    headlineAccent="customers say"
+    reviews={reviews}
+  />
 
-        <a href="/highland-park/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Vent buildup · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Electrolux</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <Pricing
+    number="07"
+    eyebrow="Pricing"
+    headline="Repair pricing in"
+    headlineAccent="Highland Park"
+    cards={pricingCards}
+  />
 
-        <a href="/highland-park/dishwasher-repair/" class="service-card">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Hard water spray arm · Not draining · E24 · Bosch</div>
-          <div class="service-card__brands">Bosch · KitchenAid · Samsung · LG · GE · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQ
+    number="08"
+    eyebrow="Questions"
+    headline="Frequently asked questions —"
+    headlineAccent="Highland Park"
+    faqs={faqs}
+  />
 
-        <a href="/highland-park/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">LADWP inlet valve scale · Not freezing · Ice stopped · Frost</div>
-          <div class="service-card__brands">Samsung · LG · GE · Whirlpool · Sub-Zero · Frigidaire</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <NearbyLinks links={nearby} />
 
-        <a href="/highland-park/wine-cooler-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Compressor · Under-counter · Built-in</div>
-          <div class="service-card__brands">True · U-Line · Liebherr · Dacor · Sub-Zero</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/highland-park/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gas igniter · Burner · Induction not heating · Hood motor</div>
-          <div class="service-card__brands">GE · Bosch · Samsung · Wolf · Thermador · Broan</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBOURHOODS -->
-  <section class="hp-neighborhoods">
-    <div class="container">
-      <h2>All of Highland Park — 90042</h2>
-      <p class="section-sub">Figueroa to the hilltops — every part of the neighbourhood</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">HP Areas</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Figueroa Street corridor</div>
-            <div class="nh-item featured">York Boulevard area</div>
-            <div class="nh-item featured">Avenue 50 · Avenue 57</div>
-            <div class="nh-item">Marmion Way</div>
-            <div class="nh-item">North Ave 56 area</div>
-            <div class="nh-item">Piedmont Ave</div>
-            <div class="nh-item">Museum Drive hilltop homes</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Key Streets</div>
-          <div class="nh-list">
-            <div class="nh-item">N. Figueroa St</div>
-            <div class="nh-item">York Blvd</div>
-            <div class="nh-item">Ave 50–57</div>
-            <div class="nh-item">Marmion Way</div>
-            <div class="nh-item">Piedmont Ave</div>
-            <div class="nh-item">Cypress Ave</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Eagle Rock (90041)</div>
-            <div class="nh-item">Glassell Park (90065)</div>
-            <div class="nh-item">Atwater Village (90039)</div>
-            <div class="nh-item">Mount Washington (90065)</div>
-            <div class="nh-item">Cypress Park (90065)</div>
-            <div class="nh-item">Silver Lake (90026)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="hp-recent">
-    <div class="container">
-      <h2>Recent Jobs in Highland Park</h2>
-      <p class="section-sub">Real calls from 90042 — Craftsman kitchens, vintage stoves, LADWP hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">O'Keefe & Merritt Range</span>
-            <span class="recent-location">Avenue 50 corridor, 90042</span>
-          </div>
-          <div class="recent-card__title">"Oven pilot out, one burner igniter dead — original 1930s kitchen"</div>
-          <div class="recent-card__desc">
-            Craftsman bungalow on a side street off Avenue 50 — original kitchen
-            with the O'Keefe & Merritt still in place. Oven pilot assembly out,
-            thermocouple weakened; one surface burner igniter contact fully corroded.
-            Relit and adjusted the oven pilot, replaced the thermocouple, cleaned
-            and adjusted the corroded igniter contact. All four burners confirmed,
-            oven heating accurately and holding temperature. Owner had inherited
-            the house and the range together — very relieved to keep it.
-          </div>
-          <div class="recent-card__result">✓ Same day · Pilot lit · Thermocouple replaced · All burners confirmed</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">LG Washer</span>
-            <span class="recent-location">York Blvd area, 90042</span>
-          </div>
-          <div class="recent-card__title">"LE error — motor fault in the app, machine won't spin at all"</div>
-          <div class="recent-card__desc">
-            Renovated York Blvd craftsman — LG front-loader LE motor error.
-            Ran the LG SmartDiagnosis through the app first: confirmed hall sensor
-            fault on the rotor. Replaced the hall sensor with an OEM LG part,
-            cleared the error through the app diagnostic, ran three full wash
-            cycles at different spin speeds. Zero LE codes. The owner was a UX
-            designer who appreciated that we used the machine's own diagnostic
-            protocol before reaching for a wrench.
-          </div>
-          <div class="recent-card__result">✓ Same day · Smart diagnosis first · OEM LG hall sensor · App clear</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Figueroa side street, 90042</span>
-          </div>
-          <div class="recent-card__title">"Ice maker producing almost nothing — been declining for months"</div>
-          <div class="recent-card__desc">
-            1910s Victorian with a recent kitchen renovation — Samsung French door,
-            but the original galvanized supply lines still running behind the walls.
-            LADWP hard water plus iron from the old pipes had scaled the inlet valve
-            to about 10% capacity. Replaced with OEM Samsung inlet valve, flushed
-            the water line, installed a new filter (15 months old). Full production
-            by next morning. Explained the dual factor — LADWP mineral content
-            plus the galvanized pipes — and recommended an inline sediment filter
-            ahead of the water line.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung · Galvanized pipe factor · Inline filter advised</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">GE Electric Dryer</span>
-            <span class="recent-location">Marmion Way, 90042</span>
-          </div>
-          <div class="recent-card__title">"No heat — takes three cycles to dry anything, electric bill spiked"</div>
-          <div class="recent-card__desc">
-            Older GE electric dryer in a Marmion Way home — thermal fuse blown
-            from a vent run that had accumulated years of lint inside a partially
-            kinked flexible duct section. The kink had restricted airflow enough
-            to cause heat buildup but not a complete blockage, letting the problem
-            build slowly. Replaced the thermal fuse, straightened and secured the
-            duct run, cleared the accumulated lint, replaced the exterior vent cap
-            with a metal backdraft damper. Single-cycle drying confirmed on the
-            first test load. The spike in the electricity bill was the first sign
-            something was wrong — the dryer had been compensating for months.
-          </div>
-          <div class="recent-card__result">✓ Same day · Thermal fuse · Duct straightened · Single cycle · Cause explained</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="hp-why">
-    <div class="container">
-      <h2>Why Highland Park Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🍳</div>
-          <div class="why-title">Vintage Stove Friendly</div>
-          <div class="why-text">O'Keefe & Merritt, Wedgwood, Roper — Highland Park's Craftsman kitchens were built around these ranges. We assess them honestly: if parts are available and the repair makes sense, we do it. We don't push replacement for a well-maintained vintage range that belongs in that kitchen.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">LADWP Hard Water Aware</div>
-          <div class="why-text">Highland Park runs on LADWP at 230–310 mg/L. The older homes with galvanized supply lines compound the effect — ice makers and dishwashers scale faster than national average. We test inlet valves and check for mineral deposits proactively on every relevant call.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">🏠</div>
-          <div class="why-title">Long-Time Residents & New Arrivals Both</div>
-          <div class="why-text">Highland Park is a neighbourhood of families who've been here for decades and newer residents who've just renovated. We serve both without making assumptions. Same OEM parts, same $89 diagnostic waived with repair, same 90-day warranty regardless of the address.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+. Weekends available.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="hp-reviews">
-    <div class="container">
-      <h2>What Highland Park Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"O'Keefe & Merritt in our original Avenue 50 bungalow kitchen — pilot out, one burner dead. Same Day came out, fixed everything, explained what had failed and why. Range is working perfectly. So glad to have found someone who treats these as worth keeping, not just something to replace."</div>
-          <div class="review-author">— Carlos M., Avenue 50, Highland Park</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"LG washer LE error. Tech used the SmartDiagnosis app protocol before opening the machine, confirmed the exact issue, replaced the hall sensor with OEM parts, cleared it through the app. Clean, methodical, honest. As someone who works in tech it was refreshing to see a repair done with actual diagnostic rigor."</div>
-          <div class="review-author">— Priya K., York Blvd, Highland Park</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"GE dryer stopped heating and my electricity bill was through the roof. Tech found a partially kinked duct that had been building up lint for years — explained that the energy spike was the first warning sign. Fixed the duct, replaced the fuse, installed a proper vent cap. Single cycle drying from the first test load."</div>
-          <div class="review-author">— Ana R., Marmion Way, Highland Park</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="hp-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Highland Park</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Vintage Range (O'Keefe, Wedgwood)</div>
-          <div class="pricing-card__range">$150 – $300</div>
-          <div class="pricing-card__note">Igniter · Pilot · Thermocouple · Thermostat calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator / Ice Maker</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">LADWP inlet valve · Galvanized pipe factor · Fan motor</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Hall sensor · Drain pump · Thermal fuse · Vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher</div>
-          <div class="pricing-card__range">$150 – $320</div>
-          <div class="pricing-card__note">Hard water scale · E24 · Drain pump · Spray arm</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Modern Oven / Range</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">Gas igniter · Bake element · Temperature calibration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="hp-faq">
-    <div class="container">
-      <h2>Questions Highland Park Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Highland Park, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Highland Park 90042 — Figueroa Street, York Boulevard, Avenue 50, Marmion Way, Piedmont Avenue, and every residential street. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair vintage stoves and O'Keefe & Merritt ranges in Highland Park?</summary><div class="faq-answer">Yes. We assess vintage ranges honestly — if parts are available and the repair makes economic sense, we do it. We don't push replacement for a well-maintained range that belongs in its kitchen.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does hard water in Highland Park affect appliances?</summary><div class="faq-answer">Yes. LADWP runs 230–310 mg/L in 90042. Older homes with galvanized pipes add iron. Ice maker inlet valves and dishwasher spray arms scale faster than average. We check proactively on every relevant call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Highland Park?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What appliance brands do you repair in Highland Park?</summary><div class="faq-answer">All brands — vintage and modern: O'Keefe & Merritt, Wedgwood, plus Samsung, LG, GE, Whirlpool, Bosch, KitchenAid, and more. OEM parts on every vehicle.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Highland Park?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Highland Park repairs run $150–$400.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Eagle Rock, Glassell Park, and Mount Washington?</summary><div class="faq-answer">Yes. Our Highland Park service extends to Eagle Rock, Glassell Park, Mount Washington, Cypress Park, Atwater Village, Silver Lake, and all of northeast LA.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="hp-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/eagle-rock/" class="nearby-link">Eagle Rock</a>
-        <a href="/atwater-village/" class="nearby-link">Atwater Village</a>
-        <a href="/silver-lake/" class="nearby-link">Silver Lake</a>
-        <a href="/los-feliz/" class="nearby-link">Los Feliz</a>
-        <a href="/glendale/" class="nearby-link">Glendale</a>
-        <a href="/pasadena/" class="nearby-link">Pasadena</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="hp-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Highland Park?</h2>
-          <p>Vintage stoves welcome · LADWP hard water aware · Figueroa · York · Avenue 50 · All of 90042. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Highland Park, CA 90042</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --hp-red: #C8102E; --hp-black: #0a0a0a; --hp-gray: #f5f5f5; --hp-border: #e2e2e2; --hp-text: #1a1a1a; --hp-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .hp-hero { background: var(--hp-black); color: white; padding: 80px 0 60px; }
-  .hp-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .hp-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--hp-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .hp-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .hp-hero__accent { color: var(--hp-red); }
-  .hp-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .hp-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .hp-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .hp-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--hp-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .hp-bottom-cta .btn-secondary { color: var(--hp-text); border-color: var(--hp-border); }
-  .trust-bar { background: var(--hp-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .hp-intro { padding: 72px 0; background: white; }
-  .hp-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .hp-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--hp-black); margin-bottom: 20px; }
-  .hp-intro__text p { font-size: 16px; line-height: 1.7; color: var(--hp-text); margin-bottom: 16px; }
-  .hp-tip { display: flex; gap: 14px; background: #f5f0e8; border: 1px solid #c4a87a; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .hp-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .hp-tip__text { font-size: 14px; color: var(--hp-text); line-height: 1.6; }
-  .cta-box { background: var(--hp-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--hp-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--hp-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--hp-muted); text-align: center; margin-bottom: 40px; }
-  .hp-services { padding: 72px 0; background: var(--hp-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--hp-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--hp-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--hp-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--hp-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--hp-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--hp-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--hp-red); font-weight: 500; }
-  .hp-neighborhoods { padding: 72px 0; background: white; }
-  .hp-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--hp-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--hp-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--hp-text); padding: 8px 12px; background: var(--hp-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--hp-red); color: var(--hp-black); font-weight: 500; }
-  .hp-recent { padding: 72px 0; background: var(--hp-gray); }
-  .hp-recent h2 { font-size: 30px; font-weight: 700; color: var(--hp-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--hp-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--hp-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--hp-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--hp-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--hp-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .hp-why { padding: 72px 0; background: white; }
-  .hp-why h2 { font-size: 30px; font-weight: 700; color: var(--hp-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--hp-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--hp-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--hp-muted); line-height: 1.6; }
-  .hp-reviews { padding: 72px 0; background: var(--hp-gray); }
-  .hp-reviews h2 { font-size: 30px; font-weight: 700; color: var(--hp-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--hp-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--hp-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--hp-muted); font-weight: 500; }
-  .hp-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--hp-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--hp-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--hp-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--hp-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--hp-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--hp-red); }
-  .pricing-card__note { font-size: 13px; color: var(--hp-muted); }
-  .hp-faq { padding: 72px 0; background: var(--hp-gray); }
-  .hp-faq h2 { font-size: 30px; font-weight: 700; color: var(--hp-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--hp-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--hp-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--hp-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--hp-text); }
-  .hp-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--hp-border); }
-  .hp-nearby h2 { font-size: 20px; font-weight: 600; color: var(--hp-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--hp-border); border-radius: 20px; font-size: 14px; color: var(--hp-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--hp-red); color: var(--hp-red); }
-  .hp-bottom-cta { padding: 72px 0; background: var(--hp-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .hp-intro__inner { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .hp-hero__inner { grid-template-columns: 1fr; } .hp-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .hp-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    branchSlug={branchSlug}
+    cityName={cityName}
+    headlineMain="Appliance broken in"
+    headlineAccent="Highland Park?"
+    body="Vintage stoves welcome · LADWP hard water aware · Figueroa · York · Avenue 50 · All of 90042. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayout>
