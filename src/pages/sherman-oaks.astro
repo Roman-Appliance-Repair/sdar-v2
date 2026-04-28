@@ -1,743 +1,355 @@
 ---
-// src/pages/sherman-oaks.astro
-// SDAR — samedayappliance.repair
-// Sherman Oaks, CA · 91401 · 91403 · 91411 · 91423
-// Филиал: West Hollywood · (323) 870-4790
-// GSC: appliance repair sherman oaks ca — 103 показа, позиция 48 (!!)
-//      jennair appliance repair sherman oaks — 14 показов, позиция 10.4 (почти топ-10!)
-//      gaggenau appliance repair sherman oaks — 12 показов, поз 25.8
-//      thermador refrigerator repair sherman oaks — 11 показов, поз 35
-//      commercial appliance maintenance sherman oaks — 11 показов, поз 21
-// Конкуренты: IP Tech Appliance (14320 Addison St 91423, Eugene, Jenn-Air/Sub-Zero specialist),
-//             All Trust Appliance ($85 diagnostic, CA Lic #50744),
-//             Sherman Oaks Premier Appliance (818-717-7030, massive brands list)
-// Уникальный угол: Jenn-Air + Gaggenau luxury signal (GSC) + 91423 hillside homes +
-//                  two-zone: Mulholland hillside (luxury) vs Valley floor (standard) +
-//                  LADWP hard water + Ventura Blvd corridor
-// Апрель 2026
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
-import Layout from '../layouts/Layout.astro';
+const citySlug = 'sherman-oaks';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
 
-const city = {
-  name: "Sherman Oaks",
-  state: "CA",
-  county: "Los Angeles",
-  zips: ["91401", "91403", "91411", "91423"],
-  phone: "(323) 870-4790",
-  phoneRaw: "+13238704790",
-  email: "support@samedayappliance.repair",
-  branch: "West Hollywood",
-  slug: "sherman-oaks",
-};
+const cityName = 'Sherman Oaks';
+const zips = ['91401', '91403', '91411', '91423'];
 
-const title = `Appliance Repair Sherman Oaks CA — Same Day | Jenn-Air · Gaggenau · Sub-Zero · Ventura Blvd | (323) 870-4790`;
-const description = `Same-day appliance repair in Sherman Oaks, CA. Jenn-Air, Gaggenau, Sub-Zero, Wolf, Thermador, Samsung, LG — all brands. 91403, 91423, 91401, 91411. Licensed, OEM parts, 90-day warranty. Call (323) 870-4790.`;
-const canonical = `https://samedayappliance.repair/sherman-oaks/`;
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
 
-const schemaLocalBusiness = {
-  "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Sherman Oaks",
-  "image": "https://samedayappliance.repair/images/logo.webp",
-  "url": canonical,
-  "telephone": city.phoneRaw,
-  "email": city.email,
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "8746 Rangely Ave",
-    "addressLocality": "West Hollywood",
-    "addressRegion": "CA",
-    "postalCode": "90048",
-    "addressCountry": "US"
+const title = `Appliance Repair Sherman Oaks CA — Same Day | Jenn-Air · Gaggenau · Sub-Zero · Ventura Blvd | ${branch.phone}`;
+const description = `Same-day appliance repair in Sherman Oaks, CA. Jenn-Air, Gaggenau, Sub-Zero, Wolf, Thermador, Samsung, LG — all brands. 91403, 91423, 91401, 91411. Licensed, OEM parts, 90-day warranty. Call ${branch.phone}.`;
+const canonical = 'https://samedayappliance.repair/sherman-oaks/';
+
+const localBusinessSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'Neighborhood', name: 'Sherman Oaks', sameAs: 'https://en.wikipedia.org/wiki/Sherman_Oaks,_Los_Angeles' },
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'CA CSLB #1138898',
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.6',
+    reviewCount: '37',
+    bestRating: '5',
   },
-  "areaServed": [
-    { "@type": "Neighborhood", "name": "Sherman Oaks", "sameAs": "https://en.wikipedia.org/wiki/Sherman_Oaks,_Los_Angeles" }
-  ],
-  "openingHoursSpecification": [
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
-    { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
-  ],
-  "priceRange": "$$",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.6",
-    "reviewCount": "37",
-    "bestRating": "5"
-  }
 };
 
-const schemaFAQ = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": [
+const luxuryBrandsNarrative = {
+  headline: 'Sherman Oaks Luxury Brands — We Know These Systems',
+  paragraphs: [
+    'The 91423 hillside homes search for these brands specifically. So do we.',
+  ],
+  subSections: [
     {
-      "@type": "Question",
-      "name": "Do you offer same-day appliance repair in Sherman Oaks, CA?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our technicians cover all of Sherman Oaks — Ventura Boulevard corridor, Mulholland Drive hillside homes, and all ZIP codes 91401, 91403, 91411, and 91423. Call before noon for same-day afternoon service." }
+      title: 'Jenn-Air',
+      paragraphs: [
+        'Column refrigerators · French door · Pro-style ranges · Panel-ready dishwashers · Built-in ovens.',
+        'Most-searched brand in Sherman Oaks. Control board failures, cooling issues, and ice maker problems are common in JA column units. OEM Jenn-Air parts on every vehicle.',
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Do you repair Jenn-Air appliances in Sherman Oaks?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Jenn-Air refrigerators, ranges, dishwashers, and built-in appliances are common throughout Sherman Oaks — particularly in the 91423 hillside homes. Our technicians carry OEM Jenn-Air parts on every vehicle and are familiar with the specific failure modes of Jenn-Air column refrigerators, French door models, and pro-style ranges." }
+      title: 'Gaggenau',
+      paragraphs: [
+        'Steam combination ovens · Vario cooktops · Column refrigeration · Dishwashers.',
+        'Gaggenau requires specific technical knowledge — particularly for the steam combi oven systems and Vario induction cooktops. We carry OEM Gaggenau parts and are trained on these systems.',
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Do you repair Gaggenau appliances in Sherman Oaks?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Gaggenau ovens, cooktops, and dishwashers require specific expertise and genuine OEM parts. Our technicians are trained on Gaggenau's unique systems and carry parts for the most common Gaggenau failures in the Sherman Oaks area." }
+      title: 'Sub-Zero · Wolf',
+      paragraphs: [
+        'Built-in refrigeration · Pro ranges · Dual-fuel · Outdoor.',
+        'Standard in Sherman Oaks 91423 hillside kitchens. OEM parts, LADWP hard water inlet valve checks included.',
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Does LADWP hard water affect appliances in Sherman Oaks?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Sherman Oaks is LADWP territory at 230–310 mg/L hardness. Ice maker inlet valves and dishwasher spray arms accumulate mineral deposits faster here. We check for this proactively on every relevant Sherman Oaks call." }
+      title: 'Thermador',
+      paragraphs: [
+        'Star burner ranges · Built-in refrigeration · Steam ovens.',
+        'Thermador star burner igniter failures common in heavily-used Valley kitchens. OEM parts on vehicle.',
+      ],
     },
     {
-      "@type": "Question",
-      "name": "Are you available on weekends in Sherman Oaks?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Saturday 8am–7pm and Sunday 9am–5pm." }
+      title: 'Bertazzoni',
+      paragraphs: [
+        'Italian pro-style ranges · Electric & gas · Dishwashers.',
+        'Increasingly common in Sherman Oaks renovations. Our technicians are trained on Bertazzoni-specific ignition and control systems.',
+      ],
     },
     {
-      "@type": "Question",
-      "name": "What is your diagnostic fee in Sherman Oaks?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Sherman Oaks repairs run $150–$500 depending on brand and appliance." }
+      title: 'All Standard Brands',
+      paragraphs: [
+        'Samsung · LG · GE · Whirlpool · Bosch · KitchenAid · Maytag.',
+        'Valley floor homes and condos — same same-day commitment, same $89 diagnostic waived with repair.',
+      ],
     },
-    {
-      "@type": "Question",
-      "name": "Do you also serve Encino, Studio City, and Van Nuys?",
-      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Our Sherman Oaks service extends to Encino, Studio City, North Hollywood, Van Nuys, Tarzana, Reseda, and all of the San Fernando Valley." }
-    }
-  ]
+  ],
 };
+
+const introParagraphs = [
+  "Sherman Oaks divides fairly naturally along Mulholland Drive. South of Ventura Boulevard, heading up toward the 91423 ZIP, the homes are larger and the kitchens reflect it: Jenn-Air column refrigerators, Gaggenau cooktops, Sub-Zero built-ins. These appliances require OEM parts and technicians who know their specific failure modes — not generic Valley service.",
+  "North of Ventura — the 91401 and 91411 corridors — is established suburban Sherman Oaks: well-maintained homes and condos with LG, Samsung, GE, and Whirlpool. Standard brands, standard repair needs, same reliable same-day service and the same $89 diagnostic waived with repair.",
+  "LADWP hard water runs throughout all of Sherman Oaks at 230–310 mg/L. This affects ice maker inlet valves and dishwasher spray arms consistently across all ZIP codes — we check for mineral deposits proactively on every relevant call. Luxury brands like Jenn-Air and Gaggenau are not immune: their inlet valve systems and dishwasher fill circuits scale from LADWP water just like any other brand.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong>. Weekends available. Call <a href="tel:${phoneRaw}">${branch.phone}</a>.`,
+  "<strong>LADWP hard water tip for Sherman Oaks:</strong> Jenn-Air and Gaggenau owners — LADWP mineral content at 230–310 mg/L affects your luxury appliances the same way it affects a standard Samsung. A Jenn-Air column refrigerator's fill valve scales gradually; a Gaggenau dishwasher's fill circuit needs periodic descaling. We check for this proactively on every Sherman Oaks call involving these brands — it's a consistent finding in 91423.",
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Jenn-Air column · Sub-Zero built-in · LADWP ice maker · Not cooling', brands: 'Jenn-Air · Sub-Zero · Samsung · LG · GE · Thermador' },
+  { icon: '🔥', name: 'Oven, Range & Pro Range', slug: 'oven', issues: 'Gaggenau steam combi · Jenn-Air pro range · Wolf · Thermador star burner', brands: 'Gaggenau · Jenn-Air · Wolf · Thermador · Bertazzoni · GE' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Gaggenau fill circuit · Jenn-Air panel-ready · LADWP scale · Not draining', brands: 'Gaggenau · Jenn-Air · Miele · Bosch · KitchenAid · Samsung' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'OE / UE error · Not draining · Not spinning · Error codes', brands: 'LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen' },
+  { icon: '♨️', name: 'Dryer Repair + Vent Cleaning', slug: 'dryer', issues: 'Not heating · Thermal fuse · Hillside vent runs · Gas & electric', brands: 'LG · Samsung · GE · Maytag · Whirlpool · Miele' },
+  { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'Jenn-Air ice · LADWP inlet valve · Not freezing · Sub-Zero', brands: 'Jenn-Air · Sub-Zero · Samsung · LG · GE · True' },
+  { icon: '🍷', name: 'Wine Cellar & Cooler Repair', slug: 'wine-cooler', issues: 'Temperature off · Sub-Zero wine · WhisperKOOL · Compressor', brands: 'Sub-Zero · EuroCave · True · Liebherr · U-Line' },
+  { icon: '🔆', name: 'Cooktop & Range Hood', slug: 'cooktop', issues: 'Gaggenau Vario · Jenn-Air induction · Wolf star burner · Hood motor', brands: 'Gaggenau · Jenn-Air · Wolf · Thermador · Bertazzoni · Bosch' },
+];
+
+const neighborhoods = [
+  { name: 'Mulholland Drive homes', zip: '91423', featured: true },
+  { name: 'Ventura Blvd south side', zip: '91423', featured: true },
+  { name: 'Longridge Estates area', zip: '91423' },
+  { name: 'Royal Oaks Dr', zip: '91423' },
+  { name: 'Roscomare Rd area', zip: '91423' },
+  { name: 'Ventura Blvd corridor', zip: '91403' },
+  { name: 'Van Nuys Blvd', zip: '91401' },
+  { name: 'Sepulveda Blvd', zip: '91411' },
+  { name: 'Sherman Oaks central', zip: '91403' },
+  { name: 'Woodman Ave corridor', zip: '91401' },
+];
+
+const recentJobs = [
+  {
+    appliance: 'Jenn-Air Column Fridge',
+    location: 'Mulholland hillside, 91423',
+    quote: '"Not cooling evenly — warm on the left, fine on the right"',
+    description: '91423 hillside home — Jenn-Air 36-inch column refrigerator with uneven temperature: left side inconsistent, right side at set point. Found a failed evaporator fan motor on the left column and a damper assembly partially stuck from LADWP mineral accumulation on the control mechanism. Replaced the OEM Jenn-Air evaporator fan motor, freed and cleaned the damper, ran a full Jenn-Air diagnostic cycle. Both columns at set temperature and cycling evenly. Jenn-Air column units have a specific failure pattern on the damper in LADWP territory — mineral scale is the consistent culprit.',
+    outcome: '✓ Same day · OEM Jenn-Air fan + damper · Both columns even · LADWP factor noted',
+  },
+  {
+    appliance: 'Gaggenau Steam Oven',
+    location: 'Ventura Blvd south, 91423',
+    quote: '"E3 error — steam function completely gone"',
+    description: 'Gaggenau BSP 221 steam combination oven — E3 water system fault. Found the steam generator descaling required (LADWP mineral scale build-up in the water tank heating element), and the water level sensor fouled. Ran the Gaggenau-specified descaling procedure, cleaned and recalibrated the water level sensor, tested all steam functions: steam bake, steam roast, and full steam mode all confirmed operational. Recommended monthly descaling cycle appropriate for LADWP water — Gaggenau specifies this for hard water areas and 91423 qualifies.',
+    outcome: '✓ Same day · E3 resolved · All steam modes confirmed · Monthly descale schedule',
+  },
+  {
+    appliance: 'Samsung Refrigerator',
+    location: 'Sherman Oaks central, 91403',
+    quote: '"Ice maker declining for months — filter changes not helping"',
+    description: 'Standard Sherman Oaks home — Samsung French door, ice maker output declining despite regular filter changes. LADWP mineral scale on the inlet valve had progressed past what filter changes could address — the valve solenoid itself was restricted. Replaced with OEM Samsung inlet valve, flushed the water line, confirmed full production. Explained the difference between filter replacement (addresses contaminants) and inlet valve replacement (addresses mechanical restriction from mineral buildup) — the homeowner had been changing filters every 3 months and wondering why output kept declining.',
+    outcome: '✓ Same day · OEM Samsung valve · Full production · Filter vs valve explained',
+  },
+  {
+    appliance: 'Bertazzoni Range',
+    location: 'Woodman Ave corridor, 91401',
+    quote: '"Two burners clicking and won\'t ignite — recent kitchen reno"',
+    description: "Sherman Oaks home with a recent renovation — Bertazzoni 36-inch pro range installed 14 months ago, two burner igniters failing. Found moisture trapped in the igniter wells from a recent cleaning — Bertazzoni's sealed burner design can trap water if cleaned with excessive moisture before the igniter assemblies are fully dry. Dried both electrode wells with compressed air, tested — one recovered fully, one electrode had developed a crack and needed replacement. OEM Bertazzoni electrode replaced, all six burners confirmed. Provided cleaning guidance specific to the sealed burner design.",
+    outcome: '✓ Same day · OEM Bertazzoni electrode · All burners · Cleaning guidance given',
+  },
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'Jenn-Air & Gaggenau Expertise',
+    body: 'Jenn-Air column refrigerators, French door units, and pro-style ranges have specific failure patterns we know well. Gaggenau steam combi ovens and Vario cooktops require OEM parts and specific technical training — not generic luxury repair. We carry OEM parts for both brands.',
+  },
+  {
+    iconKey: 'shield' as const,
+    title: 'LADWP Hard Water Aware',
+    body: 'Sherman Oaks runs on LADWP at 230–310 mg/L throughout all ZIP codes. Jenn-Air column refrigerator dampers, Gaggenau steam generators, and Samsung ice makers all accumulate mineral deposits faster here. We check proactively on every relevant call.',
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Hillside to Valley Floor',
+    body: "91423 hillside estates with Jenn-Air and Gaggenau, 91403 valley floor homes with Samsung and LG — same same-day commitment, same OEM parts, same 90-day warranty. We don't tier our service quality by ZIP code.",
+  },
+  {
+    iconKey: 'clock' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.',
+  },
+];
+
+const testimonials = [
+  {
+    stars: 5,
+    text: '"Jenn-Air column fridge with uneven temperature. Tech found the fan motor failure and LADWP damper issue, replaced both with OEM Jenn-Air parts, explained the specific LADWP mineral pattern in this model. Both columns even. This is exactly the level of expertise a Jenn-Air appliance deserves — not generic appliance repair."',
+    author: '— Catherine R., Mulholland hillside, Sherman Oaks 91423',
+  },
+  {
+    stars: 5,
+    text: '"Gaggenau steam oven E3 error. Tech ran the full Gaggenau descaling procedure, cleaned the water level sensor, tested all steam modes before leaving. Put us on a monthly descaling schedule for LADWP water. This isn\'t a repair company that guesses on luxury brands — they actually know these systems."',
+    author: '— Michael T., Ventura Blvd south, Sherman Oaks 91423',
+  },
+  {
+    stars: 5,
+    text: '"Samsung ice maker declining despite regular filter changes. Tech explained the difference between filter replacement and inlet valve replacement — the filters weren\'t the issue, the valve was. Replaced the OEM Samsung valve, full production, problem solved. Really appreciated an explanation that actually made sense."',
+    author: '— David K., Sherman Oaks central, 91403',
+  },
+];
+
+const pricingTiers = [
+  { appliance: 'Jenn-Air / Gaggenau', range: '$300–$800+', note: 'OEM parts · Column fridge · Steam combi · Vario cooktop · LADWP factor', featured: true },
+  { appliance: 'Sub-Zero / Wolf / Thermador', range: '$300–$800+', note: 'OEM parts · 91423 hillside estates · Built-in refrigeration', featured: true },
+  { appliance: 'Refrigerator (standard)', range: '$150–$400', note: 'LADWP inlet valve · Fan motor · Ice maker · Temperature' },
+  { appliance: 'Washer / Dryer', range: '$150–$350', note: 'Hall sensor · Drain pump · Thermal fuse · Vent cleaning' },
+  { appliance: 'Dishwasher / Oven', range: '$150–$450', note: 'LADWP scale · Gaggenau descale · Gas igniter · Error codes' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' },
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Sherman Oaks, CA?',
+    answer: 'Yes. Our technicians cover all of Sherman Oaks — Ventura Boulevard corridor, Mulholland Drive hillside homes, and all ZIP codes 91401, 91403, 91411, and 91423. Call before noon for same-day afternoon service.',
+  },
+  {
+    question: 'Do you repair Jenn-Air appliances in Sherman Oaks?',
+    answer: 'Yes. Jenn-Air refrigerators, ranges, dishwashers, and built-in appliances are common throughout Sherman Oaks — particularly in the 91423 hillside homes. Our technicians carry OEM Jenn-Air parts on every vehicle and are familiar with the specific failure modes of Jenn-Air column refrigerators, French door models, and pro-style ranges.',
+  },
+  {
+    question: 'Do you repair Gaggenau appliances in Sherman Oaks?',
+    answer: "Yes. Gaggenau ovens, cooktops, and dishwashers require specific expertise and genuine OEM parts. Our technicians are trained on Gaggenau's unique systems and carry parts for the most common Gaggenau failures in the Sherman Oaks area.",
+  },
+  {
+    question: 'Does LADWP hard water affect appliances in Sherman Oaks?',
+    answer: 'Yes. Sherman Oaks is LADWP territory at 230–310 mg/L hardness. Ice maker inlet valves and dishwasher spray arms accumulate mineral deposits faster here. We check for this proactively on every relevant Sherman Oaks call.',
+  },
+  {
+    question: 'Are you available on weekends in Sherman Oaks?',
+    answer: 'Yes. Saturday 8am–7pm and Sunday 9am–5pm.',
+  },
+  {
+    question: 'What is your diagnostic fee in Sherman Oaks?',
+    answer: 'Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Sherman Oaks repairs run $150–$500 depending on brand and appliance.',
+  },
+  {
+    question: 'Do you also serve Encino, Studio City, and Van Nuys?',
+    answer: 'Yes. Our Sherman Oaks service extends to Encino, Studio City, North Hollywood, Van Nuys, Tarzana, Reseda, and all of the San Fernando Valley.',
+  },
+];
+
+const nearbyCities = [
+  { name: 'Studio City', slug: 'studio-city' },
+  { name: 'North Hollywood', slug: 'north-hollywood' },
+  { name: 'Burbank', slug: 'burbank' },
+  { name: 'West Hollywood', slug: 'west-hollywood' },
+  { name: 'Beverly Hills', slug: 'beverly-hills' },
+  { name: 'Los Angeles', slug: 'los-angeles' },
+  { name: 'Calabasas', slug: 'calabasas' },
+  { name: 'Thousand Oaks', slug: 'thousand-oaks' },
+];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
-  <script type="application/ld+json" set:html={JSON.stringify(schemaLocalBusiness)} />
-  <script type="application/ld+json" set:html={JSON.stringify(schemaFAQ)} />
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Sherman Oaks, CA"
+    subheadline="Jenn-Air, Gaggenau, Sub-Zero, Wolf — the hillside homes above Mulholland have premium kitchens that need premium service. The Valley floor has Samsung, LG, and GE that need reliable same-day. We cover all of it. OEM parts, 90-day warranty. Weekends available."
+    zips={zips}
+    tier={1}
+  />
 
-  <!-- HERO -->
-  <section class="so-hero">
-    <div class="so-hero__inner container">
-      <div class="so-hero__content">
-        <div class="so-hero__eyebrow">Sherman Oaks · 91403 · 91423 · Ventura Blvd · Mulholland hillside · Valley floor</div>
-        <h1 class="so-hero__h1">
-          Appliance Repair<br>
-          <span class="so-hero__accent">Sherman Oaks, CA</span>
-        </h1>
-        <p class="so-hero__sub">
-          Jenn-Air, Gaggenau, Sub-Zero, Wolf — the hillside homes above Mulholland
-          have premium kitchens that need premium service. The Valley floor has
-          Samsung, LG, and GE that need reliable same-day. We cover all of it.
-          OEM parts, 90-day warranty. Weekends available.
-        </p>
-        <div class="so-hero__ctas">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            Call {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary">Book Online</a>
-        </div>
-        <div class="so-hero__rating">
-          <span class="stars">★★★★★</span>
-          <span class="rating-text">4.6 · Google reviews · BBB A+ · Licensed & Insured</span>
-        </div>
-      </div>
-      <div class="so-hero__img-wrap">
-        <img
-          src="/images/areas/appliance-repair-sherman-oaks-ca.webp"
-          alt="Appliance repair in Sherman Oaks CA"
-          width="560"
-          height="460"
-          loading="eager"
-          fetchpriority="high"
-        />
-      </div>
-    </div>
-  </section>
+  <TrustBadgesRow />
 
-  <!-- TRUST BAR -->
-  <section class="trust-bar">
-    <div class="container trust-bar__inner">
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Same-Day Service</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span>90-Day Warranty</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg><span>OEM Parts Only</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg><span>Licensed & Insured</span></div>
-      <div class="trust-item"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg><span>Jenn-Air · Gaggenau</span></div>
-    </div>
-  </section>
+  <CustomNarrative
+    headline={luxuryBrandsNarrative.headline}
+    paragraphs={luxuryBrandsNarrative.paragraphs}
+    subSections={luxuryBrandsNarrative.subSections}
+    background="gray"
+  />
 
-  <!-- LUXURY BRANDS HIGHLIGHT -->
-  <section class="so-brands">
-    <div class="container">
-      <h2 class="section-title">Sherman Oaks Luxury Brands — We Know These Systems</h2>
-      <p class="section-sub">The 91423 hillside homes search for these brands specifically. So do we.</p>
-      <div class="brands-grid">
-        <div class="brand-card brand-card--featured">
-          <div class="brand-name">Jenn-Air</div>
-          <div class="brand-detail">Column refrigerators · French door · Pro-style ranges · Panel-ready dishwashers · Built-in ovens</div>
-          <div class="brand-note">Most-searched brand in Sherman Oaks. Control board failures, cooling issues, and ice maker problems are common in JA column units. OEM Jenn-Air parts on every vehicle.</div>
-        </div>
-        <div class="brand-card brand-card--featured">
-          <div class="brand-name">Gaggenau</div>
-          <div class="brand-detail">Steam combination ovens · Vario cooktops · Column refrigeration · Dishwashers</div>
-          <div class="brand-note">Gaggenau requires specific technical knowledge — particularly for the steam combi oven systems and Vario induction cooktops. We carry OEM Gaggenau parts and are trained on these systems.</div>
-        </div>
-        <div class="brand-card">
-          <div class="brand-name">Sub-Zero · Wolf</div>
-          <div class="brand-detail">Built-in refrigeration · Pro ranges · Dual-fuel · Outdoor</div>
-          <div class="brand-note">Standard in Sherman Oaks 91423 hillside kitchens. OEM parts, LADWP hard water inlet valve checks included.</div>
-        </div>
-        <div class="brand-card">
-          <div class="brand-name">Thermador</div>
-          <div class="brand-detail">Star burner ranges · Built-in refrigeration · Steam ovens</div>
-          <div class="brand-note">Thermador star burner igniter failures common in heavily-used Valley kitchens. OEM parts on vehicle.</div>
-        </div>
-        <div class="brand-card">
-          <div class="brand-name">Bertazzoni</div>
-          <div class="brand-detail">Italian pro-style ranges · Electric & gas · Dishwashers</div>
-          <div class="brand-note">Increasingly common in Sherman Oaks renovations. Our technicians are trained on Bertazzoni-specific ignition and control systems.</div>
-        </div>
-        <div class="brand-card">
-          <div class="brand-name">All Standard Brands</div>
-          <div class="brand-detail">Samsung · LG · GE · Whirlpool · Bosch · KitchenAid · Maytag</div>
-          <div class="brand-note">Valley floor homes and condos — same same-day commitment, same $89 diagnostic waived with repair.</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Sherman Oaks — Two Neighborhoods, One Service"
+    paragraphs={introParagraphs}
+    bookingTitle="Sherman Oaks Service"
+    bookingSub="91403 · 91423 · Jenn-Air · Gaggenau · Same day"
+  />
 
-  <!-- INTRO -->
-  <section class="so-intro">
-    <div class="container so-intro__inner">
-      <div class="so-intro__text">
-        <h2>Appliance Repair in Sherman Oaks — Two Neighborhoods, One Service</h2>
-        <p>
-          Sherman Oaks divides fairly naturally along Mulholland Drive. South of
-          Ventura Boulevard, heading up toward the 91423 ZIP, the homes are larger
-          and the kitchens reflect it: Jenn-Air column refrigerators, Gaggenau
-          cooktops, Sub-Zero built-ins. These appliances require OEM parts and
-          technicians who know their specific failure modes — not generic Valley
-          service.
-        </p>
-        <p>
-          North of Ventura — the 91401 and 91411 corridors — is established
-          suburban Sherman Oaks: well-maintained homes and condos with LG, Samsung,
-          GE, and Whirlpool. Standard brands, standard repair needs, same reliable
-          same-day service and the same $89 diagnostic waived with repair.
-        </p>
-        <p>
-          LADWP hard water runs throughout all of Sherman Oaks at 230–310 mg/L.
-          This affects ice maker inlet valves and dishwasher spray arms consistently
-          across all ZIP codes — we check for mineral deposits proactively on every
-          relevant call. Luxury brands like Jenn-Air and Gaggenau are not immune:
-          their inlet valve systems and dishwasher fill circuits scale from LADWP
-          water just like any other brand.
-        </p>
-        <p>
-          Diagnostic fee: <strong>$89</strong> — waived with repair. Written
-          estimate before we start. <strong>90-day warranty</strong>. Weekends
-          available.
-        </p>
-        <div class="so-tip">
-          <div class="so-tip__icon">💧</div>
-          <div class="so-tip__text">
-            <strong>LADWP hard water tip for Sherman Oaks:</strong> Jenn-Air
-            and Gaggenau owners — LADWP mineral content at 230–310 mg/L affects
-            your luxury appliances the same way it affects a standard Samsung.
-            A Jenn-Air column refrigerator's fill valve scales gradually;
-            a Gaggenau dishwasher's fill circuit needs periodic descaling.
-            We check for this proactively on every Sherman Oaks call involving
-            these brands — it's a consistent finding in 91423.
-          </div>
-        </div>
-      </div>
-      <div class="so-intro__cta-box">
-        <div class="cta-box">
-          <div class="cta-box__title">Sherman Oaks Service</div>
-          <div class="cta-box__sub">91403 · 91423 · Jenn-Air · Gaggenau · Same day</div>
-          <a href={`tel:${city.phoneRaw}`} class="cta-box__phone">{city.phone}</a>
-          <a href="/book/" class="cta-box__book">Schedule Online →</a>
-          <div class="cta-box__hours">Mon–Fri 7am–9pm · Sat 8am–7pm · Sun 9am–5pm</div>
-        </div>
-      </div>
-    </div>
-  </section>
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Sherman Oaks"
+    subhead="Jenn-Air · Gaggenau · Sub-Zero · All brands · LADWP hard water aware · All ZIP codes"
+    services={services}
+  />
 
-  <!-- SERVICES -->
-  <section class="so-services">
-    <div class="container">
-      <h2 class="section-title">What We Repair in Sherman Oaks</h2>
-      <p class="section-sub">Jenn-Air · Gaggenau · Sub-Zero · All brands · LADWP hard water aware · All ZIP codes</p>
-      <div class="services-grid">
+  <ServiceArea
+    cityName={cityName}
+    headline="All of Sherman Oaks — 91401 · 91403 · 91411 · 91423"
+    subheadline="Valley floor to Mulholland hillside — every neighbourhood covered"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
 
-        <a href="/sherman-oaks/refrigerator-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🧊</div>
-          <div class="service-card__name">Refrigerator Repair</div>
-          <div class="service-card__issues">Jenn-Air column · Sub-Zero built-in · LADWP ice maker · Not cooling</div>
-          <div class="service-card__brands">Jenn-Air · Sub-Zero · Samsung · LG · GE · Thermador</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Recent Jobs in Sherman Oaks"
+    jobs={recentJobs}
+  />
 
-        <a href="/sherman-oaks/oven-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🔥</div>
-          <div class="service-card__name">Oven, Range & Pro Range</div>
-          <div class="service-card__issues">Gaggenau steam combi · Jenn-Air pro range · Wolf · Thermador star burner</div>
-          <div class="service-card__brands">Gaggenau · Jenn-Air · Wolf · Thermador · Bertazzoni · GE</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Sherman Oaks Calls Us Back"
+    reasons={whyReasons}
+  />
 
-        <a href="/sherman-oaks/dishwasher-repair/" class="service-card service-card--highlight">
-          <div class="service-card__icon">🍽️</div>
-          <div class="service-card__name">Dishwasher Repair</div>
-          <div class="service-card__issues">Gaggenau fill circuit · Jenn-Air panel-ready · LADWP scale · Not draining</div>
-          <div class="service-card__brands">Gaggenau · Jenn-Air · Miele · Bosch · KitchenAid · Samsung</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <ReviewsBlock
+    cityName={cityName}
+    headline="What Sherman Oaks Customers Are Saying"
+    testimonials={testimonials}
+  />
 
-        <a href="/sherman-oaks/washer-repair/" class="service-card">
-          <div class="service-card__icon">🫧</div>
-          <div class="service-card__name">Washer Repair</div>
-          <div class="service-card__issues">OE / UE error · Not draining · Not spinning · Error codes</div>
-          <div class="service-card__brands">LG · Samsung · Whirlpool · Maytag · Bosch · Speed Queen</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Sherman Oaks"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    tiers={pricingTiers}
+    footnote={false}
+  />
 
-        <a href="/sherman-oaks/dryer-repair/" class="service-card">
-          <div class="service-card__icon">♨️</div>
-          <div class="service-card__name">Dryer Repair + Vent Cleaning</div>
-          <div class="service-card__issues">Not heating · Thermal fuse · Hillside vent runs · Gas & electric</div>
-          <div class="service-card__brands">LG · Samsung · GE · Maytag · Whirlpool · Miele</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Sherman Oaks Customers Ask"
+    faqs={faqs}
+  />
 
-        <a href="/sherman-oaks/freezer-repair/" class="service-card">
-          <div class="service-card__icon">❄️</div>
-          <div class="service-card__name">Freezer & Ice Maker Repair</div>
-          <div class="service-card__issues">Jenn-Air ice · LADWP inlet valve · Not freezing · Sub-Zero</div>
-          <div class="service-card__brands">Jenn-Air · Sub-Zero · Samsung · LG · GE · True</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
 
-        <a href="/sherman-oaks/wine-cellar-repair/" class="service-card">
-          <div class="service-card__icon">🍷</div>
-          <div class="service-card__name">Wine Cellar & Cooler Repair</div>
-          <div class="service-card__issues">Temperature off · Sub-Zero wine · WhisperKOOL · Compressor</div>
-          <div class="service-card__brands">Sub-Zero · EuroCave · True · Liebherr · U-Line</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-        <a href="/sherman-oaks/cooktop-repair/" class="service-card">
-          <div class="service-card__icon">🔆</div>
-          <div class="service-card__name">Cooktop & Range Hood</div>
-          <div class="service-card__issues">Gaggenau Vario · Jenn-Air induction · Wolf star burner · Hood motor</div>
-          <div class="service-card__brands">Gaggenau · Jenn-Air · Wolf · Thermador · Bertazzoni · Bosch</div>
-          <div class="service-card__cta">Learn more →</div>
-        </a>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- NEIGHBORHOODS -->
-  <section class="so-neighborhoods">
-    <div class="container">
-      <h2>All of Sherman Oaks — 91401 · 91403 · 91411 · 91423</h2>
-      <p class="section-sub">Valley floor to Mulholland hillside — every neighbourhood covered</p>
-      <div class="nh-columns">
-        <div class="nh-col">
-          <div class="nh-col__title">Hillside / South (91423)</div>
-          <div class="nh-list">
-            <div class="nh-item featured">Mulholland Drive homes</div>
-            <div class="nh-item featured">Ventura Blvd south side</div>
-            <div class="nh-item">Longridge Estates area</div>
-            <div class="nh-item">Royal Oaks Dr</div>
-            <div class="nh-item">Roscomare Rd area</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Valley Floor (91401 · 91403 · 91411)</div>
-          <div class="nh-list">
-            <div class="nh-item">Ventura Blvd corridor</div>
-            <div class="nh-item">Van Nuys Blvd</div>
-            <div class="nh-item">Sepulveda Blvd</div>
-            <div class="nh-item">Sherman Oaks central</div>
-            <div class="nh-item">Woodman Ave corridor</div>
-          </div>
-        </div>
-        <div class="nh-col">
-          <div class="nh-col__title">Nearby We Serve</div>
-          <div class="nh-list">
-            <div class="nh-item">Studio City (91604)</div>
-            <div class="nh-item">Encino (91316)</div>
-            <div class="nh-item">Van Nuys (91401)</div>
-            <div class="nh-item">North Hollywood (91601)</div>
-            <div class="nh-item">Tarzana (91356)</div>
-            <div class="nh-item">Burbank (91502)</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- RECENT REPAIRS -->
-  <section class="so-recent">
-    <div class="container">
-      <h2>Recent Jobs in Sherman Oaks</h2>
-      <p class="section-sub">Real calls from 91403 and 91423 — luxury kitchens, hillside homes, LADWP hard water.</p>
-      <div class="recent-grid">
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Jenn-Air Column Fridge</span>
-            <span class="recent-location">Mulholland hillside, 91423</span>
-          </div>
-          <div class="recent-card__title">"Not cooling evenly — warm on the left, fine on the right"</div>
-          <div class="recent-card__desc">
-            91423 hillside home — Jenn-Air 36-inch column refrigerator with
-            uneven temperature: left side inconsistent, right side at set
-            point. Found a failed evaporator fan motor on the left column
-            and a damper assembly partially stuck from LADWP mineral
-            accumulation on the control mechanism. Replaced the OEM
-            Jenn-Air evaporator fan motor, freed and cleaned the damper,
-            ran a full Jenn-Air diagnostic cycle. Both columns at set
-            temperature and cycling evenly. Jenn-Air column units have a
-            specific failure pattern on the damper in LADWP territory —
-            mineral scale is the consistent culprit.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Jenn-Air fan + damper · Both columns even · LADWP factor noted</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Gaggenau Steam Oven</span>
-            <span class="recent-location">Ventura Blvd south, 91423</span>
-          </div>
-          <div class="recent-card__title">"E3 error — steam function completely gone"</div>
-          <div class="recent-card__desc">
-            Gaggenau BSP 221 steam combination oven — E3 water system
-            fault. Found the steam generator descaling required (LADWP
-            mineral scale build-up in the water tank heating element),
-            and the water level sensor fouled. Ran the Gaggenau-specified
-            descaling procedure, cleaned and recalibrated the water level
-            sensor, tested all steam functions: steam bake, steam roast,
-            and full steam mode all confirmed operational. Recommended
-            monthly descaling cycle appropriate for LADWP water — Gaggenau
-            specifies this for hard water areas and 91423 qualifies.
-          </div>
-          <div class="recent-card__result">✓ Same day · E3 resolved · All steam modes confirmed · Monthly descale schedule</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Samsung Refrigerator</span>
-            <span class="recent-location">Sherman Oaks central, 91403</span>
-          </div>
-          <div class="recent-card__title">"Ice maker declining for months — filter changes not helping"</div>
-          <div class="recent-card__desc">
-            Standard Sherman Oaks home — Samsung French door, ice maker
-            output declining despite regular filter changes. LADWP mineral
-            scale on the inlet valve had progressed past what filter changes
-            could address — the valve solenoid itself was restricted.
-            Replaced with OEM Samsung inlet valve, flushed the water line,
-            confirmed full production. Explained the difference between
-            filter replacement (addresses contaminants) and inlet valve
-            replacement (addresses mechanical restriction from mineral
-            buildup) — the homeowner had been changing filters every 3
-            months and wondering why output kept declining.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Samsung valve · Full production · Filter vs valve explained</div>
-        </div>
-
-        <div class="recent-card">
-          <div class="recent-card__header">
-            <span class="recent-badge">Bertazzoni Range</span>
-            <span class="recent-location">Woodman Ave corridor, 91401</span>
-          </div>
-          <div class="recent-card__title">"Two burners clicking and won't ignite — recent kitchen reno"</div>
-          <div class="recent-card__desc">
-            Sherman Oaks home with a recent renovation — Bertazzoni 36-inch
-            pro range installed 14 months ago, two burner igniters failing.
-            Found moisture trapped in the igniter wells from a recent
-            cleaning — Bertazzoni's sealed burner design can trap water
-            if cleaned with excessive moisture before the igniter
-            assemblies are fully dry. Dried both electrode wells with
-            compressed air, tested — one recovered fully, one electrode
-            had developed a crack and needed replacement. OEM Bertazzoni
-            electrode replaced, all six burners confirmed. Provided
-            cleaning guidance specific to the sealed burner design.
-          </div>
-          <div class="recent-card__result">✓ Same day · OEM Bertazzoni electrode · All burners · Cleaning guidance given</div>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- WHY US -->
-  <section class="so-why">
-    <div class="container">
-      <h2>Why Sherman Oaks Calls Us Back</h2>
-      <div class="why-grid">
-        <div class="why-card">
-          <div class="why-icon">🍳</div>
-          <div class="why-title">Jenn-Air & Gaggenau Expertise</div>
-          <div class="why-text">Jenn-Air column refrigerators, French door units, and pro-style ranges have specific failure patterns we know well. Gaggenau steam combi ovens and Vario cooktops require OEM parts and specific technical training — not generic luxury repair. We carry OEM parts for both brands.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">💧</div>
-          <div class="why-title">LADWP Hard Water Aware</div>
-          <div class="why-text">Sherman Oaks runs on LADWP at 230–310 mg/L throughout all ZIP codes. Jenn-Air column refrigerator dampers, Gaggenau steam generators, and Samsung ice makers all accumulate mineral deposits faster here. We check proactively on every relevant call.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">📍</div>
-          <div class="why-title">Hillside to Valley Floor</div>
-          <div class="why-text">91423 hillside estates with Jenn-Air and Gaggenau, 91403 valley floor homes with Samsung and LG — same same-day commitment, same OEM parts, same 90-day warranty. We don't tier our service quality by ZIP code.</div>
-        </div>
-        <div class="why-card">
-          <div class="why-icon">✅</div>
-          <div class="why-title">90-Day Warranty, OEM Only</div>
-          <div class="why-text">Every repair backed by 90 days on parts and labor. Genuine OEM parts only — never aftermarket. $89 diagnostic waived with repair. Written estimate before we start. California licensed, BBB A+ rated. Weekends available.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- REVIEWS -->
-  <section class="so-reviews">
-    <div class="container">
-      <h2>What Sherman Oaks Customers Are Saying</h2>
-      <div class="reviews-grid">
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Jenn-Air column fridge with uneven temperature. Tech found the fan motor failure and LADWP damper issue, replaced both with OEM Jenn-Air parts, explained the specific LADWP mineral pattern in this model. Both columns even. This is exactly the level of expertise a Jenn-Air appliance deserves — not generic appliance repair."</div>
-          <div class="review-author">— Catherine R., Mulholland hillside, Sherman Oaks 91423</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Gaggenau steam oven E3 error. Tech ran the full Gaggenau descaling procedure, cleaned the water level sensor, tested all steam modes before leaving. Put us on a monthly descaling schedule for LADWP water. This isn't a repair company that guesses on luxury brands — they actually know these systems."</div>
-          <div class="review-author">— Michael T., Ventura Blvd south, Sherman Oaks 91423</div>
-        </div>
-        <div class="review-card">
-          <div class="review-stars">★★★★★</div>
-          <div class="review-text">"Samsung ice maker declining despite regular filter changes. Tech explained the difference between filter replacement and inlet valve replacement — the filters weren't the issue, the valve was. Replaced the OEM Samsung valve, full production, problem solved. Really appreciated an explanation that actually made sense."</div>
-          <div class="review-author">— David K., Sherman Oaks central, 91403</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- PRICING -->
-  <section class="so-pricing">
-    <div class="container">
-      <h2 class="section-title">Appliance Repair Costs in Sherman Oaks</h2>
-      <p class="section-sub">Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Jenn-Air / Gaggenau</div>
-          <div class="pricing-card__range">$300 – $800+</div>
-          <div class="pricing-card__note">OEM parts · Column fridge · Steam combi · Vario cooktop · LADWP factor</div>
-        </div>
-        <div class="pricing-card featured">
-          <div class="pricing-card__appliance">Sub-Zero / Wolf / Thermador</div>
-          <div class="pricing-card__range">$300 – $800+</div>
-          <div class="pricing-card__note">OEM parts · 91423 hillside estates · Built-in refrigeration</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Refrigerator (standard)</div>
-          <div class="pricing-card__range">$150 – $400</div>
-          <div class="pricing-card__note">LADWP inlet valve · Fan motor · Ice maker · Temperature</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Washer / Dryer</div>
-          <div class="pricing-card__range">$150 – $350</div>
-          <div class="pricing-card__note">Hall sensor · Drain pump · Thermal fuse · Vent cleaning</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Dishwasher / Oven</div>
-          <div class="pricing-card__range">$150 – $450</div>
-          <div class="pricing-card__note">LADWP scale · Gaggenau descale · Gas igniter · Error codes</div>
-        </div>
-        <div class="pricing-card">
-          <div class="pricing-card__appliance">Diagnostic Fee</div>
-          <div class="pricing-card__range">$89</div>
-          <div class="pricing-card__note">Waived when you proceed with the repair</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="so-faq">
-    <div class="container">
-      <h2>Questions Sherman Oaks Customers Ask</h2>
-      <div class="faq-list">
-        <details class="faq-item"><summary class="faq-question">Do you offer same-day appliance repair in Sherman Oaks, CA?</summary><div class="faq-answer">Yes. Our technicians cover all of Sherman Oaks — Mulholland Drive hillside, Ventura Blvd corridor, and all ZIP codes 91401, 91403, 91411, and 91423. Call before noon for same-day afternoon service.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Jenn-Air appliances in Sherman Oaks?</summary><div class="faq-answer">Yes. Jenn-Air column refrigerators, French door units, pro-style ranges, and panel-ready dishwashers are common throughout Sherman Oaks 91423. We carry OEM Jenn-Air parts and know the specific failure patterns on these models.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you repair Gaggenau appliances in Sherman Oaks?</summary><div class="faq-answer">Yes. Gaggenau steam combination ovens, Vario cooktops, and dishwashers require specific technical knowledge and OEM parts. We're trained on Gaggenau systems and carry parts for the most common failures.</div></details>
-        <details class="faq-item"><summary class="faq-question">Does LADWP hard water affect appliances in Sherman Oaks?</summary><div class="faq-answer">Yes. LADWP runs 230–310 mg/L throughout Sherman Oaks — including in luxury Jenn-Air and Gaggenau appliances. We check for LADWP mineral deposits proactively on every relevant call.</div></details>
-        <details class="faq-item"><summary class="faq-question">Are you available on weekends in Sherman Oaks?</summary><div class="faq-answer">Yes. Saturday 8am–7pm and Sunday 9am–5pm.</div></details>
-        <details class="faq-item"><summary class="faq-question">What is your diagnostic fee in Sherman Oaks?</summary><div class="faq-answer">Our diagnostic fee is $89, waived when you proceed with the repair. Written estimate before we start. Most Sherman Oaks repairs run $150–$500.</div></details>
-        <details class="faq-item"><summary class="faq-question">Do you also serve Encino, Studio City, and Van Nuys?</summary><div class="faq-answer">Yes. Our Sherman Oaks service extends to Encino, Studio City, North Hollywood, Van Nuys, Tarzana, and all of the San Fernando Valley.</div></details>
-      </div>
-    </div>
-  </section>
-
-  <!-- NEARBY -->
-  <section class="so-nearby">
-    <div class="container">
-      <h2>Also Serving Nearby Areas</h2>
-      <div class="nearby-grid">
-        <a href="/studio-city/" class="nearby-link">Studio City</a>
-        <a href="/north-hollywood/" class="nearby-link">North Hollywood</a>
-        <a href="/burbank/" class="nearby-link">Burbank</a>
-        <a href="/west-hollywood/" class="nearby-link">West Hollywood</a>
-        <a href="/beverly-hills/" class="nearby-link">Beverly Hills</a>
-        <a href="/los-angeles/" class="nearby-link">Los Angeles</a>
-        <a href="/calabasas/" class="nearby-link">Calabasas</a>
-        <a href="/thousand-oaks/" class="nearby-link">Thousand Oaks</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOTTOM CTA -->
-  <section class="so-bottom-cta">
-    <div class="container">
-      <div class="bottom-cta__inner">
-        <div class="bottom-cta__text">
-          <h2>Appliance broken in Sherman Oaks?</h2>
-          <p>Jenn-Air · Gaggenau · Sub-Zero · Wolf · LADWP hard water aware · All of 91401, 91403, 91411, 91423. $89 diagnostic waived with repair. 90-day warranty.</p>
-        </div>
-        <div class="bottom-cta__actions">
-          <a href={`tel:${city.phoneRaw}`} class="btn-primary btn-large">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-            {city.phone}
-          </a>
-          <a href="/book/" class="btn-secondary btn-large">Book Online</a>
-        </div>
-        <div class="bottom-cta__nap">
-          <span>Same Day Appliance Repair — Sherman Oaks, CA</span>
-          <span>·</span>
-          <a href={`mailto:${city.email}`}>{city.email}</a>
-        </div>
-      </div>
-    </div>
-  </section>
-</Layout>
-
-<style>
-  :root { --so-red: #C8102E; --so-black: #0a0a0a; --so-gray: #f5f5f5; --so-border: #e2e2e2; --so-text: #1a1a1a; --so-muted: #6b6b6b; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-  .so-hero { background: var(--so-black); color: white; padding: 80px 0 60px; }
-  .so-hero__inner { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-  .so-hero__eyebrow { font-size: 13px; font-weight: 500; color: var(--so-red); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-  .so-hero__h1 { font-size: clamp(36px, 5vw, 52px); font-weight: 700; line-height: 1.1; margin-bottom: 20px; color: white; }
-  .so-hero__accent { color: var(--so-red); }
-  .so-hero__sub { font-size: 17px; line-height: 1.6; color: rgba(255,255,255,0.75); margin-bottom: 32px; max-width: 520px; }
-  .so-hero__ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
-  .so-hero__rating { display: flex; align-items: center; gap: 10px; }
-  .stars { color: #FFD700; font-size: 18px; letter-spacing: 2px; }
-  .rating-text { font-size: 14px; color: rgba(255,255,255,0.7); }
-  .so-hero__img-wrap img { width: 100%; height: auto; border-radius: 12px; object-fit: cover; }
-  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--so-red); color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; transition: background 0.2s; }
-  .btn-primary:hover { background: #a50e25; }
-  .btn-secondary { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: white; padding: 14px 28px; border-radius: 8px; font-weight: 600; font-size: 16px; text-decoration: none; border: 1.5px solid rgba(255,255,255,0.35); }
-  .btn-large { padding: 16px 36px; font-size: 17px; }
-  .so-bottom-cta .btn-secondary { color: var(--so-text); border-color: var(--so-border); }
-  .trust-bar { background: var(--so-red); padding: 16px 0; }
-  .trust-bar__inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-  .trust-item { display: flex; align-items: center; gap: 8px; color: white; font-size: 14px; font-weight: 500; }
-  .so-brands { padding: 72px 0; background: var(--so-gray); }
-  .brands-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-  .brand-card { background: white; border: 1px solid var(--so-border); border-radius: 12px; padding: 22px; }
-  .brand-card--featured { border-color: var(--so-red); background: #fff5f7; }
-  .brand-name { font-size: 18px; font-weight: 700; color: var(--so-black); margin-bottom: 6px; }
-  .brand-card--featured .brand-name { color: var(--so-red); }
-  .brand-detail { font-size: 13px; color: var(--so-muted); margin-bottom: 10px; line-height: 1.4; }
-  .brand-note { font-size: 13px; color: var(--so-text); line-height: 1.5; }
-  .section-title { font-size: 30px; font-weight: 700; color: var(--so-black); margin-bottom: 8px; text-align: center; }
-  .section-sub { font-size: 16px; color: var(--so-muted); text-align: center; margin-bottom: 40px; }
-  .so-intro { padding: 72px 0; background: white; }
-  .so-intro__inner { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
-  .so-intro__text h2 { font-size: 28px; font-weight: 700; color: var(--so-black); margin-bottom: 20px; }
-  .so-intro__text p { font-size: 16px; line-height: 1.7; color: var(--so-text); margin-bottom: 16px; }
-  .so-tip { display: flex; gap: 14px; background: #eef6ff; border: 1px solid #b8d4f0; border-radius: 10px; padding: 16px 20px; margin-top: 24px; }
-  .so-tip__icon { font-size: 20px; flex-shrink: 0; }
-  .so-tip__text { font-size: 14px; color: var(--so-text); line-height: 1.6; }
-  .cta-box { background: var(--so-black); color: white; border-radius: 12px; padding: 32px; text-align: center; position: sticky; top: 80px; }
-  .cta-box__title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .cta-box__sub { font-size: 13px; color: rgba(255,255,255,0.6); margin-bottom: 24px; }
-  .cta-box__phone { display: block; font-size: 24px; font-weight: 700; color: var(--so-red); text-decoration: none; margin-bottom: 12px; }
-  .cta-box__book { display: block; font-size: 15px; color: white; text-decoration: none; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; margin-bottom: 16px; }
-  .cta-box__hours { font-size: 12px; color: rgba(255,255,255,0.5); }
-  .so-services { padding: 72px 0; background: var(--so-gray); }
-  .services-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
-  .service-card { background: white; border: 1px solid var(--so-border); border-radius: 12px; padding: 24px 20px; text-decoration: none; color: var(--so-text); transition: box-shadow 0.2s, transform 0.2s; display: block; }
-  .service-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); }
-  .service-card--highlight { border-color: var(--so-red); background: #fff5f7; }
-  .service-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .service-card__name { font-size: 16px; font-weight: 600; color: var(--so-black); margin-bottom: 8px; }
-  .service-card__issues { font-size: 13px; color: var(--so-muted); line-height: 1.5; margin-bottom: 8px; }
-  .service-card__brands { font-size: 12px; color: var(--so-muted); margin-bottom: 12px; }
-  .service-card__cta { font-size: 13px; color: var(--so-red); font-weight: 500; }
-  .so-neighborhoods { padding: 72px 0; background: white; }
-  .so-neighborhoods h2 { font-size: 30px; font-weight: 700; color: var(--so-black); margin-bottom: 8px; text-align: center; }
-  .nh-columns { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-  .nh-col__title { font-size: 13px; font-weight: 600; color: var(--so-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px; }
-  .nh-list { display: flex; flex-direction: column; gap: 8px; }
-  .nh-item { font-size: 14px; color: var(--so-text); padding: 8px 12px; background: var(--so-gray); border-radius: 6px; }
-  .nh-item.featured { background: #fff5f7; border: 1px solid var(--so-red); color: var(--so-black); font-weight: 500; }
-  .so-recent { padding: 72px 0; background: var(--so-gray); }
-  .so-recent h2 { font-size: 30px; font-weight: 700; color: var(--so-black); margin-bottom: 8px; text-align: center; }
-  .recent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .recent-card { background: white; border: 1px solid var(--so-border); border-radius: 12px; padding: 24px; }
-  .recent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 6px; }
-  .recent-badge { background: var(--so-red); color: white; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-  .recent-location { font-size: 12px; color: var(--so-muted); }
-  .recent-card__title { font-size: 15px; font-weight: 600; color: var(--so-black); margin-bottom: 10px; font-style: italic; }
-  .recent-card__desc { font-size: 14px; color: var(--so-text); line-height: 1.6; margin-bottom: 12px; }
-  .recent-card__result { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  .so-why { padding: 72px 0; background: white; }
-  .so-why h2 { font-size: 30px; font-weight: 700; color: var(--so-black); margin-bottom: 40px; text-align: center; }
-  .why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-  .why-card { background: var(--so-gray); border-radius: 12px; padding: 28px 24px; }
-  .why-icon { font-size: 28px; margin-bottom: 14px; }
-  .why-title { font-size: 16px; font-weight: 600; color: var(--so-black); margin-bottom: 10px; }
-  .why-text { font-size: 14px; color: var(--so-muted); line-height: 1.6; }
-  .so-reviews { padding: 72px 0; background: var(--so-gray); }
-  .so-reviews h2 { font-size: 30px; font-weight: 700; color: var(--so-black); margin-bottom: 40px; text-align: center; }
-  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-  .review-card { background: white; border: 1px solid var(--so-border); border-radius: 12px; padding: 28px; }
-  .review-stars { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
-  .review-text { font-size: 14px; color: var(--so-text); line-height: 1.7; margin-bottom: 16px; font-style: italic; }
-  .review-author { font-size: 13px; color: var(--so-muted); font-weight: 500; }
-  .so-pricing { padding: 72px 0; background: white; }
-  .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
-  .pricing-card { background: var(--so-gray); border-radius: 10px; padding: 20px 24px; border: 1px solid var(--so-border); }
-  .pricing-card.featured { background: #fff5f7; border-color: var(--so-red); }
-  .pricing-card__appliance { font-size: 14px; color: var(--so-muted); margin-bottom: 6px; }
-  .pricing-card__range { font-size: 22px; font-weight: 700; color: var(--so-black); margin-bottom: 6px; }
-  .pricing-card.featured .pricing-card__range { color: var(--so-red); }
-  .pricing-card__note { font-size: 13px; color: var(--so-muted); }
-  .so-faq { padding: 72px 0; background: var(--so-gray); }
-  .so-faq h2 { font-size: 30px; font-weight: 700; color: var(--so-black); margin-bottom: 40px; text-align: center; }
-  .faq-list { max-width: 800px; margin: 0 auto; }
-  .faq-item { border: 1px solid var(--so-border); border-radius: 8px; background: white; margin-bottom: 10px; overflow: hidden; }
-  .faq-question { padding: 18px 24px; font-size: 16px; font-weight: 600; color: var(--so-black); cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
-  .faq-question::after { content: '+'; font-size: 22px; color: var(--so-red); flex-shrink: 0; margin-left: 16px; }
-  details[open] .faq-question::after { content: '−'; }
-  .faq-answer { padding: 0 24px 20px; font-size: 15px; line-height: 1.7; color: var(--so-text); }
-  .so-nearby { padding: 48px 0; background: white; border-top: 1px solid var(--so-border); }
-  .so-nearby h2 { font-size: 20px; font-weight: 600; color: var(--so-black); margin-bottom: 20px; text-align: center; }
-  .nearby-grid { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-  .nearby-link { padding: 8px 20px; border: 1px solid var(--so-border); border-radius: 20px; font-size: 14px; color: var(--so-text); text-decoration: none; transition: border-color 0.2s, color 0.2s; }
-  .nearby-link:hover { border-color: var(--so-red); color: var(--so-red); }
-  .so-bottom-cta { padding: 72px 0; background: var(--so-black); color: white; }
-  .bottom-cta__inner { text-align: center; }
-  .bottom-cta__text h2 { font-size: 34px; font-weight: 700; color: white; margin-bottom: 12px; }
-  .bottom-cta__text p { font-size: 16px; color: rgba(255,255,255,0.7); margin-bottom: 32px; }
-  .bottom-cta__actions { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; flex-wrap: wrap; }
-  .bottom-cta__nap { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; font-size: 13px; color: rgba(255,255,255,0.4); }
-  .bottom-cta__nap a { color: rgba(255,255,255,0.4); text-decoration: none; }
-  @media (max-width: 1024px) { .services-grid { grid-template-columns: repeat(2, 1fr); } .why-grid { grid-template-columns: repeat(2, 1fr); } .reviews-grid { grid-template-columns: 1fr 1fr; } .so-intro__inner { grid-template-columns: 1fr; } .brands-grid { grid-template-columns: repeat(2, 1fr); } .nh-columns { grid-template-columns: 1fr 1fr; } .pricing-grid { grid-template-columns: repeat(2, 1fr); } }
-  @media (max-width: 768px) { .so-hero__inner { grid-template-columns: 1fr; } .so-hero__img-wrap { display: none; } .recent-grid { grid-template-columns: 1fr; } .reviews-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr 1fr; } .brands-grid { grid-template-columns: 1fr; } .nh-columns { grid-template-columns: 1fr; } .trust-bar__inner { justify-content: center; } }
-  @media (max-width: 480px) { .services-grid { grid-template-columns: 1fr; } .why-grid { grid-template-columns: 1fr; } .pricing-grid { grid-template-columns: 1fr; } .so-hero { padding: 48px 0 40px; } .bottom-cta__text h2 { font-size: 26px; } }
-</style>
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance broken in Sherman Oaks?"
+    body="Jenn-Air · Gaggenau · Sub-Zero · Wolf · LADWP hard water aware · All of 91401, 91403, 91411, 91423. $89 diagnostic waived with repair. 90-day warranty."
+  />
+</CityLayoutV2>
