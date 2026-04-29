@@ -391,7 +391,7 @@ export const BRANCHES: Branch[] = [
     gbpName: 'Same Day Appliance Repair Rancho Cucamonga',
     type: 'service_area',
     gbpStatus: 'pending',
-    phone: '(909) 555-0100',
+    phone: '(909) 457-1030',
     phoneStatus: 'active',
     email: 'ranchocucamonga@samedayappliance.repair',
     // No internalAddress — true service territory
@@ -428,7 +428,7 @@ export const BRANCHES: Branch[] = [
     gbpName: 'Same Day Appliance Repair Temecula',
     type: 'service_area',
     gbpStatus: 'pending',
-    phone: '(951) 555-0200',
+    phone: '(951) 577-3877',
     phoneStatus: 'active',
     email: 'temecula@samedayappliance.repair',
     geo: {
