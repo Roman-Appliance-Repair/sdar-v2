@@ -1,27 +1,34 @@
 ---
+import { MAIN_PHONE, MAIN_PHONE_TEL } from '../data/branches';
+import BrandBranchesGrid from './BrandBranchesGrid.astro';
+
 export interface Props {
   brandName: string;
   brandSlug: string;
   categories: { label: string; url: string }[];
+  /**
+   * Marker for placeholder noindex mode. The component itself does NOT emit a
+   * <meta name="robots"> tag (it doesn't render Layout). Pages using this component
+   * should pass the same value to their own <Layout noindex={...}> when they want the
+   * placeholder excluded from search indexes. Default false — per-page decision.
+   * Wired up by SSOT cleanup PR (refactor/brands-ssot-cleanup, 2026-04-28).
+   */
+  noindex?: boolean;
 }
 
-const { brandName, brandSlug, categories } = Astro.props;
+const { brandName, brandSlug, categories, noindex = false } = Astro.props;
 ---
 
 <!-- ── HERO ── -->
 <section class="hero">
   <div class="hero-inner">
     <div class="hero-content">
-      <p class="hero-eyebrow">LOS ANGELES · 90048 · 90046 · 90026 · 90036</p>
-      <h1>{brandName} Appliance Repair Los Angeles</h1>
-      <p class="hero-sub">We service all {brandName} appliances across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Content rolling out Q2 2026.</p>
+      <p class="hero-eyebrow">Serving 5 SoCal Counties · 8 Branches</p>
+      <h1>{brandName} Appliance Repair</h1>
+      <p class="hero-sub">We service all {brandName} appliances across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Repair scope expanding.</p>
       <div class="hero-ctas">
-        <a href="tel:+14243250520" class="btn-primary">☎ (424) 325-0520</a>
+        <a href={`tel:${MAIN_PHONE_TEL}`} class="btn-primary">☎ {MAIN_PHONE}</a>
         <a href="/contact/" class="btn-outline">Book Online</a>
-      </div>
-      <div class="hero-rating">
-        <span class="stars">★★★★★</span>
-        <span>4.6 · 37 reviews · Google</span>
       </div>
     </div>
     <div class="hero-img-wrap">
@@ -44,6 +51,8 @@ const { brandName, brandSlug, categories } = Astro.props;
   </div>
 </div>
 
+<BrandBranchesGrid />
+
 <!-- ── CATEGORIES ── -->
 <section class="cats">
   <div class="container">
@@ -63,7 +72,7 @@ const { brandName, brandSlug, categories } = Astro.props;
 <!-- ── FOOTER NOTE ── -->
 <section class="foot-note">
   <div class="container">
-    <p>Detailed {brandName} pages coming soon. In the meantime, see <a href="/services/">all appliance repair services</a> or call <a href="tel:+14243250520">(424) 325-0520</a> for same-day service.</p>
+    <p>Detailed {brandName} pages coming soon. In the meantime, see <a href="/services/">all appliance repair services</a> or call <a href={`tel:${MAIN_PHONE_TEL}`}>{MAIN_PHONE}</a> for same-day service.</p>
   </div>
 </section>
 
@@ -123,15 +132,6 @@ const { brandName, brandSlug, categories } = Astro.props;
     font-weight: 500;
     text-decoration: none;
   }
-  .hero-rating {
-    margin-top: 28px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 13px;
-    color: rgba(255,255,255,.55);
-  }
-  .stars { color: #f59e0b; letter-spacing: 2px; }
   .hero-img-wrap {
     border-radius: 12px;
     overflow: hidden;
