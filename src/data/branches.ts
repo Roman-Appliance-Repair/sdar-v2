@@ -87,6 +87,12 @@ export interface Branch {
   primaryCounty: 'los-angeles' | 'orange' | 'ventura' | 'san-bernardino' | 'riverside';
   /** All cities served by this branch (city slugs) */
   citiesServed: string[];
+  /** Curated 3-4 neighborhood/city names to display on brand pages.
+   *  Different from citiesServed (slugs): these are pre-formatted display strings
+   *  for "areas served" subline in BrandBranchesGrid cards. Curated to avoid
+   *  overlap with adjacent branches (e.g. WeHo doesn't display Beverly Hills
+   *  since BH has its own branch). */
+  displayAreas: string[];
 }
 
 export const BRANCHES: Branch[] = [
@@ -128,6 +134,7 @@ export const BRANCHES: Branch[] = [
       'fairfax',
       'hancock-park',
     ],
+    displayAreas: ['West Hollywood', 'Hollywood', 'Hancock Park', 'Mid-Wilshire'],
   },
 
   // ─────────────────────────────────────────────────
@@ -162,6 +169,7 @@ export const BRANCHES: Branch[] = [
     citiesServed: [
       'beverly-hills',
     ],
+    displayAreas: ['Beverly Hills', 'Beverly Glen', 'Trousdale Estates'],
   },
 
   // ─────────────────────────────────────────────────
@@ -230,6 +238,7 @@ export const BRANCHES: Branch[] = [
       'woodland-hills',
       'koreatown',
     ],
+    displayAreas: ['Brentwood', 'Santa Monica', 'Westwood', 'Malibu'],
   },
 
   // ─────────────────────────────────────────────────
@@ -276,6 +285,7 @@ export const BRANCHES: Branch[] = [
       'altadena',
       'temple-city',
     ],
+    displayAreas: ['Pasadena', 'Arcadia', 'South Pasadena', 'San Marino'],
   },
 
   // ─────────────────────────────────────────────────
@@ -319,6 +329,7 @@ export const BRANCHES: Branch[] = [
       'simi-valley',
       'ventura',
     ],
+    displayAreas: ['Thousand Oaks', 'Westlake Village', 'Newbury Park'],
   },
 
   // ─────────────────────────────────────────────────
@@ -364,6 +375,7 @@ export const BRANCHES: Branch[] = [
       'villa-park',
       'yorba-linda',
     ],
+    displayAreas: ['Irvine', 'Newport Beach', 'Costa Mesa', 'Tustin'],
   },
 
   // ─────────────────────────────────────────────────
@@ -400,6 +412,7 @@ export const BRANCHES: Branch[] = [
       'san-bernardino',
       'upland',
     ],
+    displayAreas: ['Rancho Cucamonga', 'Upland', 'Ontario', 'Fontana'],
   },
 
   // ─────────────────────────────────────────────────
@@ -435,6 +448,7 @@ export const BRANCHES: Branch[] = [
       'murrieta',
       'riverside',
     ],
+    displayAreas: ['Temecula', 'Murrieta', 'Menifee'],
   },
 ];
 
