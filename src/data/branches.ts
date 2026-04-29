@@ -445,6 +445,11 @@ export const BRANCHES: Branch[] = [
 /** Main HQ phone — TopBar, Hero CTA, Layout default */
 export const MAIN_PHONE = '(424) 325-0520';
 
+/** Main HQ phone in tel:-link format (e.g. for `<a href={`tel:${MAIN_PHONE_TEL}`}>`).
+ *  Derived from MAIN_PHONE — keep these in lockstep. Used by brand placeholders + any
+ *  surface that needs a phone tel: link without re-deriving the format inline. */
+export const MAIN_PHONE_TEL = '+1' + MAIN_PHONE.replace(/\D/g, '');
+
 /** Legal entity address — for footer legal line and Organization schema */
 export const LEGAL_ADDRESS = {
   entity: 'HVAC 777 LLC',
