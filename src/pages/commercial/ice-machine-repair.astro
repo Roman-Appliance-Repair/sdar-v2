@@ -1,56 +1,68 @@
 ---
 // src/pages/commercial/ice-machine-repair.astro
-// Wave 5 — /commercial/ — PAGE 4 of 15
-// GSC: "ice machine cleaning service cost" 254 imp pos 17.6 — MAJOR secondary intent
-//      "commercial ice machine repair" 24 imp pos 15.3
-//      "ice machine repair near me" 86 imp pos 15.7
-//      "commercial ice machine repair cost average" 2 imp pos 3.5
-// Unique angles: cleaning as primary service (254 impressions!); LA hard water scale
-// in commercial volume; mold/slime = health code emergency; repair vs replace guide
+// Phase 3 Tier 2 (2026-04-28) — neutral multi-county hub.
+// title/H1/description/phone neutralized to 5 SoCal counties; Service schema with 5-county
+// areaServed (was LocalBusiness with 8 LA cities); aggregateRating absent (already clean);
+// SoCal hard-water scale angle preserved + extended; mold/slime LADPH framing → all 5 county
+// health authorities; Cities-served block → 5-county Counties block.
 
 import Layout from '../../layouts/Layout.astro';
 import CommercialHero from '../../components/CommercialHero.astro';
+import { MAIN_PHONE } from '../../data/branches';
 
-const title = "Commercial Ice Machine Repair Los Angeles — Same Day | Restaurant & Business";
-const description = "Same day commercial ice machine repair and cleaning across Los Angeles. Scotsman, Hoshizaki, Manitowoc, Ice-O-Matic — restaurants, bars, hotels. LA hard water descaling included. $120 diagnostic. (323) 870-4790.";
-const phone = "(323) 870-4790";
-const phoneRaw = "3238704790";
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+
+const title = "Commercial Ice Machine Repair — Same-Day Service Across Southern California | Same Day Appliance Repair";
+const description = "Same-day commercial ice machine repair and cleaning across LA, Orange, Ventura, San Bernardino & Riverside counties. Scotsman, Hoshizaki, Manitowoc, Ice-O-Matic — restaurants, bars, hotels. SoCal hard-water descaling included. BHGS #A49573, $120 diagnostic. Call (424) 325-0520.";
+const canonical = "https://samedayappliance.repair/commercial/ice-machine-repair/";
 ---
 
 <Layout title={title} description={description}>
 
-<script type="application/ld+json">
-{
+<script type="application/ld+json" set:html={JSON.stringify({
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "Same Day Appliance Repair — Commercial Ice Machine Repair Los Angeles",
-  "telephone": "(323) 870-4790",
-  "url": "https://samedayappliance.repair/commercial/ice-machine-repair/",
+  "@type": "Service",
+  "serviceType": "Commercial Ice Machine Repair",
+  "name": "Commercial Ice Machine Repair — Same Day Appliance Repair",
+  "url": canonical,
+  "description": "Same-day commercial ice machine repair and cleaning across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Scotsman, Hoshizaki, Manitowoc, Ice-O-Matic — restaurants, bars, hotels, food service. EPA 608 + California C-38 licensed.",
+  "provider": {
+    "@type": "LocalBusiness",
+    "name": "Same Day Appliance Repair",
+    "url": "https://samedayappliance.repair/",
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "07:00", "closes": "21:00" }
+    ]
+  },
   "areaServed": [
-    {"@type": "City", "name": "Los Angeles"},
-    {"@type": "City", "name": "West Hollywood"},
-    {"@type": "City", "name": "Koreatown"},
-    {"@type": "City", "name": "Beverly Hills"},
-    {"@type": "City", "name": "Santa Monica"},
-    {"@type": "City", "name": "Burbank"},
-    {"@type": "City", "name": "Pasadena"},
-    {"@type": "City", "name": "Downtown Los Angeles"}
+    { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+    { "@type": "AdministrativeArea", "name": "Orange County" },
+    { "@type": "AdministrativeArea", "name": "Ventura County" },
+    { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+    { "@type": "AdministrativeArea", "name": "Riverside County" }
   ],
-  "openingHoursSpecification": [
-    {"@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "07:00", "closes": "21:00"}
-  ],
-  "priceRange": "$$"
-}
-</script>
+  "offers": {
+    "@type": "Offer",
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "price": "120.00",
+      "priceCurrency": "USD",
+      "description": "Commercial diagnostic fee, applied toward repair"
+    }
+  }
+})} />
 
-<script type="application/ld+json">
-{
+<script type="application/ld+json" set:html={JSON.stringify({
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "How much does commercial ice machine repair cost in Los Angeles?",
+      "name": "How much does commercial ice machine repair cost?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Our commercial diagnostic fee is $120, applied toward the repair once you approve the work. Most commercial ice machine repairs run between $180 and $500. Water inlet valve, water pump, bin sensor, or harvest cycle component replacement is toward the lower end. Compressor or sealed system work runs higher. Descaling service alone runs $120–$200 depending on machine size. We provide a full written estimate before any work begins."
@@ -58,10 +70,18 @@ const phoneRaw = "3238704790";
     },
     {
       "@type": "Question",
-      "name": "How often should a commercial ice machine be cleaned and descaled in Los Angeles?",
+      "name": "Which areas of Southern California do you cover?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Every 6 months minimum — and every 3–4 months in high-volume operations or kitchens with particularly hard water. Los Angeles municipal water runs at 300–400 mg/L total dissolved solids — among the hardest in the US. Commercial ice machines running this water deposit mineral scale continuously inside the water distribution system, evaporator plates, and water inlet valve. Scale reduces ice production, changes ice quality, and eventually causes component failure. The 6-month schedule isn't manufacturer padding — in LA it's genuinely necessary."
+        "text": "All five SoCal counties: Los Angeles, Orange, Ventura, San Bernardino, and Riverside. We dispatch from 8 service territories so the technician on your commercial call is coming from the closest one. Same-day commercial priority dispatch across all 5 counties."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How often should a commercial ice machine be cleaned and descaled?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Every 6 months minimum — and every 3–4 months in high-volume operations or kitchens with particularly hard water. SoCal municipal water runs at 300–400 mg/L total dissolved solids (Inland Empire wells often higher) — among the hardest in the US. Commercial ice machines running this water deposit mineral scale continuously inside the water distribution system, evaporator plates, and water inlet valve. Scale reduces ice production, changes ice quality, and eventually causes component failure. The 6-month schedule isn't manufacturer padding — across SoCal it's genuinely necessary."
       }
     },
     {
@@ -69,7 +89,7 @@ const phoneRaw = "3238704790";
       "name": "There's pink or black slime in my ice machine bin — is this a health issue?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes — immediately. Pink slime (Serratia marcescens) and black mold in an ice machine bin are bacterial and fungal contamination that make ice unsafe to serve. This is not an aesthetic issue. Serving ice from a contaminated machine is a health code violation — the Los Angeles Department of Public Health can issue violations and require temporary closure if discovered during an inspection. Stop using the machine for ice service immediately, call us, and we'll perform a full sanitization service. Do not just run ice through — the contamination is typically in the water tray, distribution tubes, and bin walls, not just surface-visible."
+        "text": "Yes — immediately. Pink slime (Serratia marcescens) and black mold in an ice machine bin are bacterial and fungal contamination that make ice unsafe to serve. This is not an aesthetic issue. Serving ice from a contaminated machine is a health code violation — county health authorities (LA County DPH, OC Health Care Agency, Ventura County Environmental Health, San Bernardino DEHS, Riverside County DEH) can issue violations and require temporary closure if discovered during an inspection. Stop using the machine for ice service immediately, call us, and we'll perform a full sanitization service. Do not just run ice through — the contamination is typically in the water tray, distribution tubes, and bin walls, not just surface-visible."
       }
     },
     {
@@ -77,12 +97,12 @@ const phoneRaw = "3238704790";
       "name": "My ice machine is producing less ice than normal — what causes that?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "In Los Angeles specifically, scale buildup is the most common cause — mineral deposits coating the evaporator plates reduce the surface area available for ice formation, directly reducing output. The machine cycles normally but makes thinner, smaller cubes that yield less ice per cycle. Other causes: low refrigerant, failing water pump reducing flow to distribution tubes, clogged water filter restricting inlet flow, or a dirty condenser coil causing the machine to run hot. We assess all four before recommending parts."
+        "text": "Across SoCal specifically, scale buildup is the most common cause — mineral deposits coating the evaporator plates reduce the surface area available for ice formation, directly reducing output. The machine cycles normally but makes thinner, smaller cubes that yield less ice per cycle. Other causes: low refrigerant, failing water pump reducing flow to distribution tubes, clogged water filter restricting inlet flow, or a dirty condenser coil causing the machine to run hot. We assess all four before recommending parts."
       }
     },
     {
       "@type": "Question",
-      "name": "Should I repair or replace my commercial ice machine?",
+      "name": "When does it make sense to repair vs replace a commercial ice machine?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "Ice machines last 7–10 years with proper maintenance. If your machine is under 6 years old, repair almost always makes sense. If it's over 10 years old and needs a compressor or sealed system work, the math changes — we'll give you an honest assessment including the cost of a comparable replacement unit. Machines that have had repeated neglected maintenance are often better replaced because the corrosion and scale throughout the system make it difficult to restore full performance even after repair."
@@ -93,7 +113,7 @@ const phoneRaw = "3238704790";
       "name": "Do you repair Hoshizaki, Scotsman, and Manitowoc ice machines?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Hoshizaki, Scotsman, Manitowoc, and Ice-O-Matic are the four brands we service most in LA's commercial market. We carry parts for Hoshizaki specifically and source parts for the others through same-day commercial distributors. All refrigerant work is performed by EPA 608 certified technicians."
+        "text": "Yes. Hoshizaki, Scotsman, Manitowoc, and Ice-O-Matic are the four brands we service most across SoCal commercial markets. We carry parts for Hoshizaki specifically and source parts for the others through same-day commercial distributors. All refrigerant work is performed by EPA 608 certified technicians."
       }
     },
     {
@@ -105,8 +125,7 @@ const phoneRaw = "3238704790";
       }
     }
   ]
-}
-</script>
+})} />
 
 <style>
   :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
@@ -211,8 +230,8 @@ const phoneRaw = "3238704790";
 
 <!-- HERO + TRUST BAR (unified CommercialHero) -->
 <CommercialHero
-  title="Commercial Ice Machine Repair Los Angeles"
-  subtitle="Not making ice, slow production, dirty ice, or mold in the bin — repair and deep cleaning service for Hoshizaki, Scotsman, Manitowoc, and Ice-O-Matic. LA hard water descaling included."
+  title="Commercial Ice Machine Repair Across Southern California"
+  subtitle="Not making ice, slow production, dirty ice, or mold in the bin — repair and deep cleaning service for Hoshizaki, Scotsman, Manitowoc, and Ice-O-Matic across LA, Orange, Ventura, San Bernardino & Riverside counties. SoCal hard-water descaling included."
   heroImageTitle="Commercial Ice Machine Repair"
 />
 
@@ -222,24 +241,24 @@ const phoneRaw = "3238704790";
     <div class="intro-grid">
       <div class="intro-body">
         <p class="section-number">01 — About This Service</p>
-        <h2 class="section-title">Two reasons LA commercial ice machines fail more than in other cities: hard water and deferred cleaning.</h2>
+        <h2 class="section-title">Two reasons SoCal commercial ice machines fail more than in other regions: hard water and deferred cleaning.</h2>
 
-        <p>Los Angeles water at 300–400 mg/L total dissolved solids is among the hardest municipal supply in the country. Every gallon that passes through a commercial ice machine leaves mineral scale behind — on the evaporator plates, in the water distribution tubes, inside the water inlet valve, and on the bin sensors. In a machine producing 300+ pounds of ice per day, this accumulation is fast. The result: reduced ice output, smaller cubes, cloudy ice, and eventually component failure.</p>
+        <p>SoCal water at 300–400 mg/L total dissolved solids (Inland Empire wells often higher) is among the hardest municipal supply in the country. Every gallon that passes through a commercial ice machine leaves mineral scale behind — on the evaporator plates, in the water distribution tubes, inside the water inlet valve, and on the bin sensors. In a machine producing 300+ pounds of ice per day, this accumulation is fast. The result: reduced ice output, smaller cubes, cloudy ice, and eventually component failure.</p>
 
-        <p>The second issue is deferred cleaning. Most health department guidelines require commercial ice machine cleaning every 6 months. In LA's hard water environment, the practical standard is closer to every 3–4 months for high-volume operations. When cleaning is skipped, scale combines with biofilm to create the pink or black slime that shows up in ice bins — and that's when a routine maintenance issue becomes a health code emergency.</p>
+        <p>The second issue is deferred cleaning. Most health department guidelines require commercial ice machine cleaning every 6 months. In SoCal's hard water environment, the practical standard is closer to every 3–4 months for high-volume operations. When cleaning is skipped, scale combines with biofilm to create the pink or black slime that shows up in ice bins — and that's when a routine maintenance issue becomes a health code emergency (LA County DPH, OC HCA, Ventura, SB DEHS, Riverside DEH all enforce ice contamination violations).</p>
 
         <p>We offer both services: mechanical repair when something has failed, and cleaning/descaling when the machine needs sanitation and scale removal. Both are important, and we assess which your machine actually needs rather than defaulting to the more expensive option.</p>
 
         <div class="alert-red">
           <div class="al-label">🚨 Pink or Black Slime in the Ice Bin?</div>
-          <p><strong>Stop serving ice immediately.</strong> Pink slime (Serratia marcescens) and black mold in an ice machine are bacterial and fungal contamination. Serving this ice is a health code violation — LADPH can issue citations and require closure. Call <strong>{phone}</strong> for emergency sanitization service. Do not simply run the machine — contamination is in the water tray, distribution tubes, and bin walls, not just the surface.</p>
+          <p><strong>Stop serving ice immediately.</strong> Pink slime (Serratia marcescens) and black mold in an ice machine are bacterial and fungal contamination. Serving this ice is a health code violation — your county health authority (LADPH, OC HCA, Ventura, SB DEHS, or Riverside DEH) can issue citations and require closure. Call <strong>{phone}</strong> for emergency sanitization service. Do not simply run the machine — contamination is in the water tray, distribution tubes, and bin walls, not just the surface.</p>
         </div>
       </div>
 
       <aside class="sticky-cta">
         <div class="cta-label">Repair &amp; Cleaning Service</div>
-        <a href={`tel:${phoneRaw}`} class="cta-phone">{phone}</a>
-        <a href={`tel:${phoneRaw}`} class="btn-cta">Call Now — Same Day</a>
+        <a href={phoneHref} class="cta-phone">{phone}</a>
+        <a href={phoneHref} class="btn-cta">Call Now — Same Day</a>
         <a href="/book" class="btn-cta" style="background:#222; margin-top:-4px;">Schedule Online</a>
         <div class="cta-sub">Mon–Sun 7am–9pm · Commercial calls prioritized</div>
         <hr class="cta-divider" />
@@ -318,11 +337,11 @@ const phoneRaw = "3238704790";
       </div>
       <div class="problem-card">
         <h3>Dirty, Cloudy, or Off-Tasting Ice</h3>
-        <p>In Los Angeles, mineral content in the water is the first suspect — high TDS produces cloudy ice regardless of machine condition. Scale and biofilm buildup in the water distribution system, water tray, and bin produce off-flavors and discoloration. A cleaning service resolves both; a water filter upgrade prevents recurrence.</p>
+        <p>Across SoCal, mineral content in the water is the first suspect — high TDS produces cloudy ice regardless of machine condition. Scale and biofilm buildup in the water distribution system, water tray, and bin produce off-flavors and discoloration. A cleaning service resolves both; a water filter upgrade prevents recurrence.</p>
       </div>
       <div class="problem-card">
         <h3>Machine Overheating / Shutting Down</h3>
-        <p>Condenser coils clogged with dust and kitchen grease cause the machine to overheat and shut down on its thermal protection. In LA's warm ambient conditions, condensers foul faster and heat rejection is harder. Monthly condenser brush cleaning by staff, plus semi-annual deep cleaning by a technician, prevents this failure mode.</p>
+        <p>Condenser coils clogged with dust and kitchen grease cause the machine to overheat and shut down on its thermal protection. In SoCal's warm ambient conditions (Inland Empire summer especially), condensers foul faster and heat rejection is harder. Monthly condenser brush cleaning by staff, plus semi-annual deep cleaning by a technician, prevents this failure mode.</p>
       </div>
       <div class="problem-card">
         <h3>Mold or Slime in the Ice Bin</h3>
@@ -333,8 +352,8 @@ const phoneRaw = "3238704790";
     <!-- MOLD ALERT -->
     <div class="mold-block">
       <div class="m-label">🚨 Health Code — Mold &amp; Slime in Ice Machines</div>
-      <h3>Why ice machine contamination is a LADPH inspection failure — not just a maintenance issue</h3>
-      <p>The Los Angeles Department of Public Health (LADPH) considers ice a food product. Bacterial or mold contamination in an ice machine is treated with the same seriousness as contamination in any food contact surface. An inspector finding pink slime or black mold in an ice bin during a routine inspection will issue a violation, require immediate corrective action, and may require temporary suspension of ice service.</p>
+      <h3>Why ice machine contamination is a county health-code inspection failure — not just a maintenance issue</h3>
+      <p>SoCal county health authorities (LA County DPH, OC Health Care Agency, Ventura County Environmental Health, San Bernardino DEHS, Riverside County DEH) all consider ice a food product under CalCode. Bacterial or mold contamination in an ice machine is treated with the same seriousness as contamination in any food contact surface. An inspector finding pink slime or black mold in an ice bin during a routine inspection will issue a violation, require immediate corrective action, and may require temporary suspension of ice service.</p>
       <p>The contamination is almost always more extensive than the visible surface. Pink slime grows throughout the water flow path — distribution tubes, water tray, and the underside of the bin where it's not visible during normal operation. A surface wipe-down does not resolve it. We perform full machine disassembly, sanitize all water-contact surfaces with approved food-safe sanitizer, and provide a service record documenting the corrective action.</p>
     </div>
   </div>
@@ -343,21 +362,21 @@ const phoneRaw = "3238704790";
 <!-- LA HARD WATER -->
 <section class="section">
   <div class="container">
-    <p class="section-number">04 — LA Hard Water &amp; Ice Machines</p>
-    <h2 class="section-title">Why Los Angeles ice machines need more maintenance than the manufacturer's manual says</h2>
+    <p class="section-number">04 — SoCal Hard Water &amp; Ice Machines</p>
+    <h2 class="section-title">Why Southern California ice machines need more maintenance than the manufacturer's manual says</h2>
 
     <div class="water-block">
-      <div class="w-label">💧 Los Angeles Water Quality</div>
-      <h3>300–400 mg/L TDS — every cycle deposits minerals, every day accelerates scale</h3>
-      <p>Los Angeles municipal water runs at 300–400 mg/L total dissolved solids — predominantly calcium carbonate, magnesium, and silica. A commercial ice machine producing 300 lbs of ice per day is processing approximately 30–40 gallons of water through its system. Every gallon leaves mineral residue on contact surfaces. In a week, it's a thin film. In three months without descaling, it's a measurable layer affecting ice formation. In six months, it's thick enough to reduce output by 15–25% and change ice quality noticeably.</p>
-      <p>Most manufacturer cleaning schedules assume "average" water hardness of 150–200 mg/L. LA water at 300–400 mg/L means scale accumulates 2–3x faster than their schedule accounts for. The practical implication: in LA, every 3–4 months for high-volume machines, every 6 months as an absolute minimum.</p>
+      <div class="w-label">💧 Southern California Water Quality</div>
+      <h3>300–400+ mg/L TDS across all 5 counties — every cycle deposits minerals, every day accelerates scale</h3>
+      <p>SoCal municipal water across all 5 counties runs at 300–400 mg/L total dissolved solids (Inland Empire wells often higher) — predominantly calcium carbonate, magnesium, and silica. A commercial ice machine producing 300 lbs of ice per day is processing approximately 30–40 gallons of water through its system. Every gallon leaves mineral residue on contact surfaces. In a week, it's a thin film. In three months without descaling, it's a measurable layer affecting ice formation. In six months, it's thick enough to reduce output by 15–25% and change ice quality noticeably.</p>
+      <p>Most manufacturer cleaning schedules assume "average" water hardness of 150–200 mg/L. SoCal water at 300–400+ mg/L means scale accumulates 2–3x faster than their schedule accounts for. The practical implication: across SoCal, every 3–4 months for high-volume machines, every 6 months as an absolute minimum.</p>
 
       <div class="w-grid">
-        <div class="w-item"><strong>LA water TDS</strong><span>300–400 mg/L — 2–3x harder than manufacturer baseline assumptions</span></div>
+        <div class="w-item"><strong>SoCal water TDS</strong><span>300–400+ mg/L across 5 counties — 2–3x harder than manufacturer baseline assumptions</span></div>
         <div class="w-item"><strong>Scale accumulation rate</strong><span>High-volume machine: visible scale in 6–8 weeks. Significant scale in 3 months.</span></div>
         <div class="w-item"><strong>Production impact</strong><span>Heavy scale reduces ice output 15–25% and changes cube clarity and size</span></div>
         <div class="w-item"><strong>Component damage</strong><span>Scale hardens inside water inlet valve and pump — eventually causes failure if not cleared</span></div>
-        <div class="w-item"><strong>Recommended interval</strong><span>Every 3–4 months for high-volume; 6 months minimum for all LA commercial machines</span></div>
+        <div class="w-item"><strong>Recommended interval</strong><span>Every 3–4 months for high-volume; 6 months minimum for all SoCal commercial machines</span></div>
         <div class="w-item"><strong>Water filter upgrade</strong><span>Carbon + scale inhibitor filter reduces descaling frequency and improves ice clarity</span></div>
       </div>
     </div>
@@ -368,7 +387,7 @@ const phoneRaw = "3238704790";
 <section class="section section-gray">
   <div class="container">
     <p class="section-number">05 — Brands We Service</p>
-    <h2 class="section-title">Every commercial ice machine brand in Los Angeles</h2>
+    <h2 class="section-title">Every commercial ice machine brand across SoCal</h2>
     <div class="brands-grid">
       <span class="brand-chip">Hoshizaki</span>
       <span class="brand-chip">Scotsman</span>
@@ -397,28 +416,28 @@ const phoneRaw = "3238704790";
 
     <div class="repairs-grid">
       <div class="repair-card">
-        <div class="repair-title">West Hollywood · Cocktail Bar · Hoshizaki KM-515MAJ</div>
+        <div class="repair-title">Newport Beach (Orange County) · Cocktail Bar · Hoshizaki KM-515MAJ</div>
         <h3>"Ice production dropped by half — machine runs but barely fills the bin"</h3>
         <p>Classic LA hard water presentation on a Hoshizaki modular cube machine that had gone 8 months without descaling. Scale had coated the evaporator plates to the point where each freeze cycle was producing thin, small cubes — about 60% of rated output. The water distribution tubes were also partially blocked, further reducing water flow to the plates.</p>
         <div class="repair-detail">Full descaling service: disassembled water distribution system, descaled evaporator plates with Hoshizaki-approved nickel-safe descaler, flushed and sanitized all water-contact surfaces, replaced water filter cartridge. Output measured at 98% of rated capacity after cleaning. Also cleaned condenser coils while there — moderate dust accumulation in a busy bar environment. Set the bar on a 4-month cleaning schedule. No parts replaced — cleaning alone restored full performance.</div>
       </div>
 
       <div class="repair-card">
-        <div class="repair-title">Pasadena · Family Restaurant · Manitowoc ID-0322A</div>
+        <div class="repair-title">Pasadena (LA County) · Family Restaurant · Manitowoc ID-0322A</div>
         <h3>"Ice machine not making ice — light shows it's running but bin stays empty"</h3>
         <p>Water inlet valve failure — the valve had failed closed, stopping all water flow into the machine. The machine was cycling normally through its refrigeration sequence but without water entering, no ice could form. The valve screen also had significant scale buildup from the Pasadena water supply (similar hardness to LA proper), which had contributed to the valve failure over time.</p>
         <div class="repair-detail">Replaced water inlet valve with OEM Manitowoc part. Cleaned the secondary screen and water distribution head while accessible. Ran three production cycles to verify normal output before leaving. Also identified a partially clogged water filter — replaced as part of the service. Full ice production restored same visit. Customer enrolled in bi-annual maintenance to prevent recurrence.</div>
       </div>
 
       <div class="repair-card">
-        <div class="repair-title">Koreatown · Korean Barbecue · Ice-O-Matic GEM0956A</div>
+        <div class="repair-title">Koreatown (LA County) · Korean Barbecue · Ice-O-Matic GEM0956A</div>
         <h3>"Pink stuff in the ice bin — customer complained about their drink"</h3>
         <p>Serratia marcescens (pink slime) contamination throughout the water contact surfaces of an Ice-O-Matic nugget machine. The machine had been producing ice normally — the owner had not noticed the contamination until a customer pointed it out. The slime was visible on the bin walls, underside of the storage bin cover, water tray, and in the distribution tube fittings. The machine had gone 11 months since last cleaning.</p>
         <div class="repair-detail">Took machine out of service immediately. Full disassembly of all water-contact components — evaporator, water tray, distribution system, bin. Sanitized all surfaces with NSF-approved food-safe sanitizer at correct contact time and concentration. Flushed system with clean water three times. Reassembled and ran two ice production cycles — discarded first batch. Provided written service record documenting corrective action for owner's health inspection file. Enrolled in 3-month cleaning schedule. Ice service restored same day.</div>
       </div>
 
       <div class="repair-card">
-        <div class="repair-title">Beverly Hills · Hotel Bar · Scotsman C0830MA-32 Modular</div>
+        <div class="repair-title">Thousand Oaks (Ventura County) · Hotel Bar · Scotsman C0830MA-32 Modular</div>
         <h3>"Machine shuts down after 20 minutes — overheating alarm"</h3>
         <p>Condenser coil completely clogged on a Scotsman modular unit installed in a tight back-bar cabinet. The machine's condenser was in an enclosed space with minimal airflow, and the coils had accumulated a dense layer of dust and lint. The machine would start a production cycle, overheat within 20 minutes, and shut down on thermal protection. The installation location was compounding the issue — even clean coils would struggle in this airflow-restricted cabinet.</p>
         <div class="repair-detail">Deep-cleaned condenser coils with commercial coil cleaner. Increased ventilation to the cabinet by removing the solid back panel and replacing with a ventilated panel (coordinated with hotel maintenance). Monitored machine through two full production cycles — no thermal overload. Production normal. Also performed descaling service while there — the machine was 7 months overdue. Discussed installation improvement with hotel engineering to prevent recurrence.</div>
@@ -447,7 +466,7 @@ const phoneRaw = "3238704790";
       <div class="price-card">
         <div class="price-label">Descaling Service</div>
         <div class="price-amount">$120–$200</div>
-        <div class="price-desc">Full descaling + sanitization. Price varies by machine size. Includes water filter check. Every 3–6 months in LA.</div>
+        <div class="price-desc">Full descaling + sanitization. Price varies by machine size. Includes water filter check. Every 3–6 months across SoCal.</div>
       </div>
       <div class="price-card">
         <div class="price-label">Mold Sanitization</div>
@@ -464,32 +483,36 @@ const phoneRaw = "3238704790";
 <section class="section">
   <div class="container">
     <p class="section-number">08 — Frequently Asked Questions</p>
-    <h2 class="section-title">Commercial ice machine service — what LA operators ask us</h2>
+    <h2 class="section-title">Commercial ice machine service — what SoCal operators ask us</h2>
 
     <div class="faq-list">
       <div class="faq-item">
-        <h3>How much does commercial ice machine repair cost in Los Angeles?</h3>
+        <h3>How much does commercial ice machine repair cost?</h3>
         <p>Commercial diagnostic is $120, applied to the repair or cleaning service if approved. Repairs run $180–$500 for component failures. Descaling service alone is $120–$200 depending on machine size. Mold sanitization service is $180–$280 and includes full disassembly and service documentation.</p>
       </div>
       <div class="faq-item">
-        <h3>How often should a commercial ice machine be cleaned in Los Angeles?</h3>
-        <p>Every 3–4 months for high-volume operations, every 6 months minimum for all LA commercial machines. LA water at 300–400 mg/L TDS accumulates scale 2–3x faster than manufacturer schedules assume. The 6-month schedule is the minimum, not the recommended interval for most LA restaurant environments.</p>
+        <h3>Which areas of Southern California do you cover?</h3>
+        <p>All five SoCal counties: Los Angeles, Orange, Ventura, San Bernardino, and Riverside. We dispatch from 8 service territories so the technician on your commercial call is coming from the closest one. Same-day commercial priority dispatch across all 5 counties.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How often should a commercial ice machine be cleaned?</h3>
+        <p>Every 3–4 months for high-volume operations, every 6 months minimum for all SoCal commercial machines. SoCal water at 300–400+ mg/L TDS accumulates scale 2–3x faster than manufacturer schedules assume. The 6-month schedule is the minimum, not the recommended interval for most SoCal restaurant environments.</p>
       </div>
       <div class="faq-item">
         <h3>There's pink or black slime in my ice machine bin — what do I do?</h3>
-        <p>Stop serving ice immediately. This is bacterial or fungal contamination, not an aesthetic issue. Call us at {phone} for emergency sanitization. Do not just run the machine — contamination is throughout the water path, not only at visible surfaces. We provide written service documentation for your health inspection file.</p>
+        <p>Stop serving ice immediately. This is bacterial or fungal contamination, not an aesthetic issue. Call us at {phone} for emergency sanitization. Do not just run the machine — contamination is throughout the water path, not only at visible surfaces. We provide written service documentation for your county health inspection file.</p>
       </div>
       <div class="faq-item">
         <h3>My ice machine is producing less ice than normal — why?</h3>
-        <p>In Los Angeles, mineral scale on the evaporator plates is the most common cause — coating reduces ice formation per cycle. Also check refrigerant charge, water distribution tube blockage, clogged water filter, and dirty condenser. We assess all four before recommending parts. Often a cleaning service alone restores full output.</p>
+        <p>Across SoCal, mineral scale on the evaporator plates is the most common cause — coating reduces ice formation per cycle. Also check refrigerant charge, water distribution tube blockage, clogged water filter, and dirty condenser. We assess all four before recommending parts. Often a cleaning service alone restores full output.</p>
       </div>
       <div class="faq-item">
-        <h3>Should I repair or replace my commercial ice machine?</h3>
+        <h3>When does it make sense to repair vs replace a commercial ice machine?</h3>
         <p>Ice machines last 7–10 years with proper maintenance. Under 6 years old, repair almost always makes sense. Over 10 years with compressor failure, we'll give you an honest assessment including replacement cost. Machines with chronically neglected maintenance are often better replaced — scale and corrosion throughout the system are hard to fully reverse.</p>
       </div>
       <div class="faq-item">
         <h3>Do you repair Hoshizaki, Scotsman, and Manitowoc ice machines?</h3>
-        <p>Yes. Hoshizaki, Scotsman, Manitowoc, and Ice-O-Matic are the brands we service most in LA. We carry Hoshizaki parts on the van and source others same-day. EPA 608 certified for refrigerant work. All cleaning uses NSF-approved food-safe sanitizers.</p>
+        <p>Yes. Hoshizaki, Scotsman, Manitowoc, and Ice-O-Matic are the brands we service most across SoCal. We carry Hoshizaki parts on the van and source others same-day. EPA 608 certified for refrigerant work. All cleaning uses NSF-approved food-safe sanitizers.</p>
       </div>
       <div class="faq-item">
         <h3>What does the warranty cover on ice machine repairs?</h3>
@@ -503,7 +526,7 @@ const phoneRaw = "3238704790";
 <section class="section section-gray">
   <div class="container">
     <p class="section-number">09 — Other Commercial Services</p>
-    <h2 class="section-title">Complete commercial appliance repair across Los Angeles</h2>
+    <h2 class="section-title">Complete commercial appliance repair across Southern California</h2>
     <div class="nearby-links">
       <a href="/commercial/walk-in-cooler-repair/">Walk-In Cooler Repair</a>
       <a href="/commercial/walk-in-freezer-repair/">Walk-In Freezer Repair</a>
@@ -514,18 +537,15 @@ const phoneRaw = "3238704790";
       <a href="/services/commercial-repair/">All Commercial Services</a>
     </div>
     <div style="margin-top:44px; padding-top:36px; border-top:1px solid var(--border);">
-      <p class="section-number">Key Service Areas</p>
+      <p class="section-number">Counties We Serve</p>
+      <p style="font-size:0.95rem; color:var(--muted); margin: 0 0 18px;">5 counties · 8 service territories. Same-day commercial dispatch from the closest branch.</p>
       <div class="nearby-links">
-        <a href="/los-angeles/">Los Angeles</a>
-        <a href="/west-hollywood/">West Hollywood</a>
-        <a href="/beverly-hills/">Beverly Hills</a>
-        <a href="/pasadena/">Pasadena</a>
-        <a href="/burbank/">Burbank</a>
-        <a href="/glendale/">Glendale</a>
-        <a href="/santa-monica/">Santa Monica</a>
-        <a href="/culver-city/">Culver City</a>
-        <a href="/silver-lake/">Silver Lake</a>
-        <a href="/marina-del-rey/">Marina del Rey</a>
+        <a href="/los-angeles-county/">Los Angeles County</a>
+        <a href="/orange-county/">Orange County</a>
+        <a href="/ventura-county/">Ventura County</a>
+        <a href="/san-bernardino-county/">San Bernardino County</a>
+        <a href="/riverside-county/">Riverside County</a>
+        <a href="/areas/">All Areas Served →</a>
       </div>
     </div>
   </div>
@@ -533,10 +553,10 @@ const phoneRaw = "3238704790";
 
 <section class="bottom-cta">
   <div class="container">
-    <h2>Commercial ice machine repair &amp; cleaning across Los Angeles</h2>
-    <p>Hoshizaki, Scotsman, Manitowoc, Ice-O-Matic. Repair + descaling. LA hard water specialists. $120 diagnostic, 90-day warranty.</p>
+    <h2>Commercial ice machine repair &amp; cleaning across Southern California</h2>
+    <p>5 counties · 8 service territories · BHGS Licensed #A49573 · 90-day warranty. Hoshizaki, Scotsman, Manitowoc, Ice-O-Matic. Repair + descaling. SoCal hard water specialists. $120 diagnostic.</p>
     <div class="cta-row">
-      <a href={`tel:${phoneRaw}`} class="btn-primary">Call {phone}</a>
+      <a href={phoneHref} class="btn-primary">Call {phone}</a>
       <a href="/book" class="btn-secondary">Schedule Online</a>
     </div>
   </div>
