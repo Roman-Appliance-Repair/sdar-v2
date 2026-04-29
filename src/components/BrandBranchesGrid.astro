@@ -1,0 +1,169 @@
+---
+/**
+ * BrandBranchesGrid.astro
+ *
+ * Dynamic branch list for brand pages — reads BRANCHES from src/data/branches.ts
+ * and renders one card per branch. When the BRANCHES array changes (new branch
+ * added, phone DID swapped, displayAreas curated), every brand page consuming
+ * this component updates automatically — no per-page edits required.
+ *
+ * Closes audit P1-4 (no file imports from branches.ts) and P1-6 (hardcoded
+ * 5-branch grid out of sync with 8-branch branches.ts reality).
+ *
+ * Self-contained: scoped CSS, no external style dependencies.
+ *
+ * Phone fallback: if a branch has phoneStatus === 'pending' (placeholder DID),
+ * the card shows MAIN_PHONE instead so users always reach a real number.
+ *
+ * Props:
+ *   showHeader  — render the <h2> + intro sentence above the grid (default: true).
+ *                 Pattern A pages already have their own service-areas heading,
+ *                 so they pass showHeader={false} and just get the grid.
+ */
+
+import { BRANCHES, MAIN_PHONE, MAIN_PHONE_TEL, isPlaceholderPhone } from '../data/branches';
+
+export interface Props {
+  showHeader?: boolean;
+}
+
+const { showHeader = true } = Astro.props;
+
+interface BranchCard {
+  name: string;
+  displayPhone: string;
+  telLink: string;
+  areas: string;
+}
+
+const cards: BranchCard[] = BRANCHES.map((b) => {
+  // Brand pages serve a cross-county audience seeing all 8 cards together.
+  // Fall back to MAIN_PHONE when the branch has no real DID yet — either via
+  // explicit phoneStatus=='pending' or by detecting the 555-XXXX placeholder
+  // pattern. (City pages preserve T13-FIX behavior — they don't use this
+  // component and continue showing the 555 territory number.)
+  const isPending = b.phoneStatus === 'pending' || isPlaceholderPhone(b.phone);
+  const displayPhone = isPending ? MAIN_PHONE : b.phone;
+  const telLink = isPending
+    ? MAIN_PHONE_TEL
+    : '+1' + b.phone.replace(/\D/g, '');
+  return {
+    name: b.name,
+    displayPhone,
+    telLink,
+    areas: b.displayAreas.join(', '),
+  };
+});
+---
+
+<section class="brand-branches">
+  <div class="brand-branches-inner">
+    {showHeader && (
+      <>
+        <p class="eyebrow-sub">Where we work</p>
+        <h2>Local branches across Southern California</h2>
+        <p class="intro">
+          Eight branches covering Los Angeles, Orange, Ventura, San Bernardino,
+          and Riverside counties. Same-day routing on calls before 1 PM.
+        </p>
+      </>
+    )}
+    <div class="branch-grid">
+      {cards.map((c) => (
+        <div class="branch-card">
+          <h3>{c.name}</h3>
+          <p class="branch-phone">
+            <a href={`tel:${c.telLink}`}>{c.displayPhone}</a>
+          </p>
+          <p class="branch-area">{c.areas}</p>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .brand-branches {
+    padding: 72px 24px;
+  }
+  .brand-branches-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .eyebrow-sub {
+    font-size: 13px;
+    color: #C8102E;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  h2 {
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+    font-family: 'Playfair Display', Georgia, serif;
+    color: #0a0a0a;
+  }
+  .intro {
+    margin-bottom: 28px;
+    color: #1a1a1a;
+    line-height: 1.6;
+    max-width: 720px;
+  }
+
+  .branch-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+
+  .branch-card {
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #e2e2e2;
+    border-radius: 8px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .branch-card:hover {
+    border-color: #C8102E;
+    transform: translateY(-1px);
+  }
+  .branch-card h3 {
+    font-size: 16px;
+    font-weight: 700;
+    margin: 0 0 6px;
+    color: #0a0a0a;
+  }
+  .branch-phone {
+    font-size: 14px;
+    margin: 0 0 8px;
+    color: #1a1a1a;
+  }
+  .branch-phone a {
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .branch-phone a:hover {
+    color: #C8102E;
+  }
+  .branch-area {
+    font-size: 12px;
+    color: #6b6b6b;
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 1024px) {
+    .branch-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (max-width: 560px) {
+    .branch-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
