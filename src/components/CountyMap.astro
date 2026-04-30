@@ -1,0 +1,197 @@
+---
+/**
+ * CountyMap.astro — Leaflet-based interactive map of cities served in a given county.
+ *
+ * Usage:  <CountyMap county="los-angeles-county" height="420px" />
+ *
+ * Loads Leaflet 1.9.4 from CDN. Uses OpenStreetMap tiles (no API key).
+ * Markers in site --red. Click a marker → city page. Hover → tooltip with city name.
+ */
+
+export interface Props {
+  county: string;
+  height?: string;
+}
+
+const { county, height = '400px' } = Astro.props;
+
+interface CityPin { name: string; lat: number; lng: number; url: string; }
+interface CountyData { center: [number, number]; zoom: number; cities: CityPin[]; }
+
+const COUNTIES: Record<string, CountyData> = {
+  'los-angeles-county': {
+    center: [34.0522, -118.2437], zoom: 10,
+    cities: [
+      { name: 'Los Angeles', lat: 34.0522, lng: -118.2437, url: '/los-angeles/' },
+      { name: 'West Hollywood', lat: 34.0900, lng: -118.3617, url: '/west-hollywood/' },
+      { name: 'Beverly Hills', lat: 34.0736, lng: -118.4004, url: '/beverly-hills/' },
+      { name: 'Santa Monica', lat: 34.0195, lng: -118.4912, url: '/santa-monica/' },
+      { name: 'Pasadena', lat: 34.1478, lng: -118.1445, url: '/pasadena/' },
+      { name: 'Glendale', lat: 34.1425, lng: -118.2551, url: '/glendale/' },
+      { name: 'Burbank', lat: 34.1808, lng: -118.3090, url: '/burbank/' },
+      { name: 'Malibu', lat: 34.0259, lng: -118.7798, url: '/malibu/' },
+      { name: 'Long Beach', lat: 33.7701, lng: -118.1937, url: '/long-beach/' },
+      { name: 'Manhattan Beach', lat: 33.8847, lng: -118.4109, url: '/manhattan-beach/' },
+      { name: 'Culver City', lat: 34.0211, lng: -118.3965, url: '/culver-city/' },
+      { name: 'Sherman Oaks', lat: 34.1508, lng: -118.4492, url: '/sherman-oaks/' },
+      { name: 'Woodland Hills', lat: 34.1684, lng: -118.6059, url: '/woodland-hills/' },
+      { name: 'Encino', lat: 34.1595, lng: -118.5010, url: '/encino/' },
+      { name: 'Studio City', lat: 34.1397, lng: -118.3870, url: '/studio-city/' },
+      { name: 'Silver Lake', lat: 34.0869, lng: -118.2701, url: '/silver-lake/' },
+      { name: 'Marina del Rey', lat: 33.9803, lng: -118.4517, url: '/marina-del-rey/' },
+      { name: 'Koreatown', lat: 34.0586, lng: -118.3012, url: '/koreatown/' },
+      { name: 'Redondo Beach', lat: 33.8492, lng: -118.3884, url: '/redondo-beach/' },
+      { name: 'Calabasas', lat: 34.1575, lng: -118.6603, url: '/calabasas/' },
+      { name: 'Pacific Palisades', lat: 34.0785, lng: -118.5265, url: '/pacific-palisades/' },
+      { name: 'Highland Park', lat: 34.1100, lng: -118.1887, url: '/highland-park/' },
+      { name: 'Atwater Village', lat: 34.1161, lng: -118.2564, url: '/atwater-village/' },
+      { name: 'Eagle Rock', lat: 34.1295, lng: -118.2095, url: '/eagle-rock/' },
+      { name: 'Los Feliz', lat: 34.1050, lng: -118.2834, url: '/los-feliz/' },
+      { name: 'Brentwood', lat: 34.0560, lng: -118.4772, url: '/brentwood/' },
+    ],
+  },
+  'orange-county': {
+    center: [33.7175, -117.8311], zoom: 11,
+    cities: [
+      { name: 'Newport Beach', lat: 33.6189, lng: -117.9289, url: '/newport-beach/' },
+      { name: 'Laguna Beach', lat: 33.5422, lng: -117.7831, url: '/laguna-beach/' },
+      { name: 'Irvine', lat: 33.6846, lng: -117.8265, url: '/irvine/' },
+      { name: 'Huntington Beach', lat: 33.6595, lng: -117.9988, url: '/huntington-beach/' },
+      { name: 'Costa Mesa', lat: 33.6411, lng: -117.9187, url: '/costa-mesa/' },
+      { name: 'Anaheim', lat: 33.8353, lng: -117.9145, url: '/anaheim/' },
+      { name: 'Mission Viejo', lat: 33.6000, lng: -117.6719, url: '/mission-viejo/' },
+      { name: 'Dana Point', lat: 33.4669, lng: -117.6981, url: '/dana-point/' },
+      { name: 'Laguna Niguel', lat: 33.5225, lng: -117.7078, url: '/laguna-niguel/' },
+      { name: 'Yorba Linda', lat: 33.8886, lng: -117.8131, url: '/yorba-linda/' },
+      { name: 'Fullerton', lat: 33.8704, lng: -117.9242, url: '/fullerton/' },
+      { name: 'Tustin', lat: 33.7458, lng: -117.8261, url: '/tustin/' },
+      { name: 'San Clemente', lat: 33.4269, lng: -117.6119, url: '/san-clemente/' },
+      { name: 'Villa Park', lat: 33.8142, lng: -117.8131, url: '/villa-park/' },
+    ],
+  },
+  'riverside-county': {
+    center: [33.7500, -117.1500], zoom: 10,
+    cities: [
+      { name: 'Temecula', lat: 33.4936, lng: -117.1484, url: '/temecula/' },
+      { name: 'Murrieta', lat: 33.5539, lng: -117.2139, url: '/murrieta/' },
+      { name: 'Corona', lat: 33.8753, lng: -117.5664, url: '/corona/' },
+      { name: 'Menifee', lat: 33.6971, lng: -117.1850, url: '/menifee/' },
+      { name: 'Lake Elsinore', lat: 33.6681, lng: -117.3273, url: '/lake-elsinore/' },
+      { name: 'Riverside', lat: 33.9806, lng: -117.3755, url: '/riverside/' },
+      { name: 'Moreno Valley', lat: 33.9425, lng: -117.2297, url: '/moreno-valley/' },
+      { name: 'Hemet', lat: 33.7475, lng: -116.9719, url: '/hemet/' },
+    ],
+  },
+  'san-bernardino-county': {
+    center: [34.1083, -117.2898], zoom: 10,
+    cities: [
+      { name: 'Rancho Cucamonga', lat: 34.1064, lng: -117.5931, url: '/rancho-cucamonga/' },
+      { name: 'Chino Hills', lat: 33.9939, lng: -117.7326, url: '/chino-hills/' },
+      { name: 'Upland', lat: 34.0975, lng: -117.6484, url: '/upland/' },
+      { name: 'Ontario', lat: 34.0633, lng: -117.6509, url: '/ontario/' },
+      { name: 'Redlands', lat: 34.0556, lng: -117.1825, url: '/redlands/' },
+      { name: 'Loma Linda', lat: 34.0483, lng: -117.2611, url: '/loma-linda/' },
+      { name: 'Fontana', lat: 34.0922, lng: -117.4350, url: '/fontana/' },
+      { name: 'San Bernardino', lat: 34.1083, lng: -117.2898, url: '/san-bernardino/' },
+    ],
+  },
+  'ventura-county': {
+    center: [34.2805, -119.0000], zoom: 11,
+    cities: [
+      { name: 'Thousand Oaks', lat: 34.1706, lng: -118.8376, url: '/thousand-oaks/' },
+      { name: 'Westlake Village', lat: 34.1469, lng: -118.8520, url: '/westlake-village/' },
+      { name: 'Agoura Hills', lat: 34.1531, lng: -118.7606, url: '/agoura-hills/' },
+      { name: 'Camarillo', lat: 34.2164, lng: -119.0376, url: '/camarillo/' },
+      { name: 'Simi Valley', lat: 34.2694, lng: -118.7815, url: '/simi-valley/' },
+      { name: 'Moorpark', lat: 34.2853, lng: -118.8817, url: '/moorpark/' },
+      { name: 'Ventura', lat: 34.2805, lng: -119.2945, url: '/ventura/' },
+      { name: 'Newbury Park', lat: 34.1836, lng: -118.9131, url: '/newbury-park/' },
+      { name: 'Oak Park', lat: 34.1806, lng: -118.7606, url: '/oak-park/' },
+    ],
+  },
+};
+
+const data = COUNTIES[county];
+if (!data) {
+  throw new Error(`CountyMap: unknown county "${county}". Add it to COUNTIES in CountyMap.astro.`);
+}
+
+const containerId = `county-map-${county}`;
+---
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" crossorigin="" />
+<script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" crossorigin="" defer></script>
+
+<div class="county-map-wrap">
+  <div id={containerId} class="county-map" style={`height: ${height};`} role="img" aria-label="Map of cities served"></div>
+</div>
+
+<script is:inline define:vars={{ containerId, data }}>
+  (function () {
+    function initMap() {
+      if (typeof L === 'undefined') {
+        return setTimeout(initMap, 60);
+      }
+      const el = document.getElementById(containerId);
+      if (!el || el.dataset.cmInit === '1') return;
+      el.dataset.cmInit = '1';
+
+      const map = L.map(containerId, { scrollWheelZoom: false }).setView(data.center, data.zoom);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy; OpenStreetMap contributors',
+      }).addTo(map);
+
+      const pinHtml = '<div class="cmm-pin" aria-hidden="true"></div>';
+      const icon = L.divIcon({
+        className: 'county-map-marker',
+        html: pinHtml,
+        iconSize: [20, 20],
+        iconAnchor: [10, 10],
+      });
+
+      data.cities.forEach(function (c) {
+        const m = L.marker([c.lat, c.lng], { icon: icon, title: c.name }).addTo(map);
+        m.bindTooltip(c.name, { direction: 'top', offset: [0, -8] });
+        m.on('click', function () { window.location.href = c.url; });
+      });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMap);
+    } else {
+      initMap();
+    }
+  })();
+</script>
+
+<style is:global>
+  .county-map-marker .cmm-pin {
+    width: 20px;
+    height: 20px;
+    background: #C8102E;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .county-map-marker:hover .cmm-pin {
+    background: #ff1f47;
+    transform: scale(1.18);
+  }
+</style>
+
+<style>
+  .county-map-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .county-map {
+    width: 100%;
+    border: 1px solid var(--border, #e2e2e2);
+    border-radius: 10px;
+    overflow: hidden;
+    z-index: 1;
+  }
+</style>
