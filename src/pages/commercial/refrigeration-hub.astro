@@ -1,37 +1,102 @@
 ---
-// src/pages/commercial/refrigeration.astro
-import BaseLayout from '../../layouts/BaseLayout.astro';
+// src/pages/commercial/refrigeration-hub.astro
+// Routing hub for commercial refrigeration sub-services. T15 (2026-04-29):
+// migrated from BaseLayout to standard Layout + CommercialHero, neutralized
+// from LA-locked to 5-county, hardcoded WeHo phone replaced with MAIN_PHONE,
+// 6 sub-page routing cards added, Service + FAQPage schema, no aggregateRating.
+import Layout from '../../layouts/Layout.astro';
+import CommercialHero from '../../components/CommercialHero.astro';
+import { MAIN_PHONE } from '../../data/branches';
 
-const phone = "(323) 870-4790";
-const phoneRaw = "3238704790";
+const title = "Commercial Refrigeration Repair — All Equipment, All Brands | Same Day Appliance Repair";
+const description = `Same-day commercial refrigeration repair across LA, Orange, Ventura, San Bernardino & Riverside counties. Walk-in coolers, walk-in freezers, ice machines, commercial refrigerators, bar refrigerators, showcase units. All brands. EPA 608 certified. $120 diagnostic. Call ${MAIN_PHONE}.`;
+const canonical = "https://samedayappliance.repair/commercial/refrigeration-hub/";
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
 
-const title = `Commercial Refrigeration Repair Los Angeles & SoCal — All Brands | ${phone}`;
-const description = `Expert commercial refrigeration repair in Los Angeles, Orange County & SoCal. Walk-ins, reach-ins, prep tables, display cases, ice machines. All brands. EPA-certified. Same-day response. Call ${phone}.`;
+// 6 dedicated sub-pages — primary routing destinations
+const subServices = [
+  {
+    icon: "🧊",
+    name: "Walk-In Cooler Repair",
+    href: "/commercial/walk-in-cooler-repair/",
+    desc: "Walk-in refrigeration system service for restaurants, grocery, agricultural, healthcare, and ghost kitchens. Compressor, evaporator, condenser, defrost, door gasket, drain line. EPA 608 + C-38 licensed.",
+  },
+  {
+    icon: "❄️",
+    name: "Walk-In Freezer Repair",
+    href: "/commercial/walk-in-freezer-repair/",
+    desc: "Walk-in freezer service for protein, ice cream, and frozen distribution. -10°F to 10°F operation, defrost system, temperature control, and door heater work. Same architecture as walk-in cooler, different setpoints.",
+  },
+  {
+    icon: "🧊",
+    name: "Ice Machine Repair",
+    href: "/commercial/ice-machine-repair/",
+    desc: "Hoshizaki, Manitowoc, Scotsman, Ice-O-Matic. Cuber, flaker, nugget, and undercounter models. Cleaning, descaling, water filter service, and full mechanical repair. NSF-compliant maintenance available.",
+  },
+  {
+    icon: "🍴",
+    name: "Commercial Refrigerator Repair",
+    href: "/commercial/refrigerator-repair/",
+    desc: "Reach-ins, prep tables, mega tops, undercounters. True, Turbo Air, Beverage-Air, Traulsen, Delfield, Continental. Thermostat, defrost, fan motor, compressor, gasket service.",
+  },
+  {
+    icon: "🍺",
+    name: "Bar Refrigerator Repair",
+    href: "/commercial/bar-refrigerator-repair/",
+    desc: "Back bar coolers, undercounter bottle coolers, direct-draw beer coolers. Perlick, Beverage-Air HR, True T-series, Krowne. Door heater, condenser cleaning, thermostat service for bar environments.",
+  },
+  {
+    icon: "🏪",
+    name: "Showcase Refrigerator Repair",
+    href: "/commercial/showcase-refrigerator-repair/",
+    desc: "Glass-door display merchandisers, open-air display, and deli cases. Anti-sweat heater, mullion heater, display lighting, and refrigeration circuit service for retail and grocery.",
+  },
+];
+
+// Equipment without dedicated sub-pages — supplementary cards (no link)
+const supplementaryServices = [
+  {
+    icon: "🥗",
+    name: "Prep Tables & Mega Tops",
+    desc: "Pan rail temperature compliance, cutting board, worktop, and refrigeration circuit service for sandwich, pizza, and prep stations.",
+  },
+  {
+    icon: "🥬",
+    name: "Drop-In Cold Pans & Salad Bars",
+    desc: "Remote condensing cold food tables, ingredient bins, and salad bar refrigeration. Institutional cafeteria specialists.",
+  },
+  {
+    icon: "🍻",
+    name: "Draft Beer & Glycol Systems",
+    desc: "Glycol power packs, trunk line systems, and font coolers for multi-tap draft beer installations. Perlick and custom glycol systems.",
+  },
+];
 
 const featuredBrands = [
-  { name: "Hoshizaki", path: "/brands/commercial/hoshizaki-repair/", desc: "Ice machines (KM, KML, F, DCM), reach-ins, sushi cases" },
+  { name: "Hoshizaki",        path: "/brands/commercial/hoshizaki-repair/",         desc: "Ice machines (KM, KML, F, DCM), reach-ins, sushi cases" },
   { name: "True Refrigeration", path: "/brands/commercial/true-refrigeration-repair/", desc: "T-series reach-ins, GDM merchandisers, TSSU prep tables, R-290" },
-  { name: "Traulsen", path: "/brands/commercial/traulsen-repair/", desc: "G-series, RHT half-door, blast chillers, INTELA-TRAUL" },
-  { name: "Beverage-Air", path: "/brands/commercial/beverage-air-repair/", desc: "SP reach-ins, HR back bar, UCR undercounter, DR display" },
-  { name: "Perlick", path: "/brands/commercial/perlick-repair/", desc: "Glycol draft beer systems, HC back bar, HP luxury, dual-zone wine" },
-  { name: "Delfield", path: "/brands/commercial/delfield-repair/", desc: "N-series reach-ins, mega tops, drop-in cold pans, salad bars" },
+  { name: "Traulsen",         path: "/brands/commercial/traulsen-repair/",          desc: "G-series, RHT half-door, blast chillers, INTELA-TRAUL" },
+  { name: "Beverage-Air",     path: "/brands/commercial/beverage-air-repair/",      desc: "SP reach-ins, HR back bar, UCR undercounter, DR display" },
+  { name: "Perlick",          path: "/brands/commercial/perlick-repair/",           desc: "Glycol draft beer systems, HC back bar, HP luxury, dual-zone wine" },
+  { name: "Delfield",         path: "/brands/commercial/delfield-repair/",          desc: "N-series reach-ins, mega tops, drop-in cold pans, salad bars" },
 ];
 
 const additionalBrands = [
   {
     name: "Turbo Air",
     category: "Reach-In / Display",
-    notes: "M3 and M3F series reach-ins. PRO series. Common in Asian restaurants and mid-market food service. Compressor overload in SoCal summer heat is the most frequent call. Condenser cleaning every 4–5 months recommended.",
+    notes: "M3 and M3F series reach-ins. PRO series. Common in mid-market food service across the SoCal corridor. Compressor overload in summer heat is the most frequent call. Condenser cleaning every 4–5 months recommended.",
   },
   {
     name: "Hussmann",
     category: "Grocery / Retail Display",
-    notes: "Open-air and glass door reach-in display cases standard in LA grocery stores and markets. Hussmann serves the supermarket and convenience store segment. Mullion heater and anti-sweat heater failures are common in display case work.",
+    notes: "Open-air and glass door reach-in display cases standard in regional grocery stores and markets. Hussmann serves the supermarket and convenience store segment. Mullion heater and anti-sweat heater failures are common in display case work.",
   },
   {
     name: "Victory Refrigeration",
     category: "Reach-In / Specialty",
-    notes: "VS and VR series reach-ins. Victory undercounters are common in QSR and fast casual kitchens throughout SoCal. Door gasket and thermostat failures are the primary service calls. Strong parts availability from their ITW lineage.",
+    notes: "VS and VR series reach-ins. Victory undercounters are common in QSR and fast casual kitchens throughout the region. Door gasket and thermostat failures are the primary service calls. Strong parts availability from their ITW lineage.",
   },
   {
     name: "Continental Refrigerator",
@@ -66,7 +131,7 @@ const additionalBrands = [
   {
     name: "Arctic Air",
     category: "Budget Reach-In",
-    notes: "AR and AF series reach-ins. Arctic Air is the entry point for commercial refrigeration in small restaurants and food trucks throughout SoCal. Door gasket and thermostat failures are primary calls.",
+    notes: "AR and AF series reach-ins. Arctic Air is the entry point for commercial refrigeration in small restaurants and food trucks throughout the region. Door gasket and thermostat failures are primary calls.",
   },
   {
     name: "Frigoglass",
@@ -76,12 +141,12 @@ const additionalBrands = [
   {
     name: "AHT Cooling Systems",
     category: "Open Display",
-    notes: "Open-air horizontal display freezers standard in LA's ethnic grocery and convenience store markets. Defrost system service and evaporator fan maintenance are the primary calls.",
+    notes: "Open-air horizontal display freezers standard in ethnic grocery and convenience store markets across SoCal. Defrost system service and evaporator fan maintenance are the primary calls.",
   },
   {
     name: "Coldline",
     category: "Italian Reach-In",
-    notes: "Stainless reach-ins and worktops designed to European standards. Common in Italian and European restaurant operations in LA. Parts sourcing through European channels when needed.",
+    notes: "Stainless reach-ins and worktops designed to European standards. Common in Italian and European restaurant operations across the region. Parts sourcing through European channels when needed.",
   },
   {
     name: "Felix Storch / Summit",
@@ -96,102 +161,173 @@ const additionalBrands = [
   {
     name: "Everest Refrigeration",
     category: "Glass Door Display",
-    notes: "EBGR and EBB series glass door reach-ins. Everest serves the value commercial display segment. Anti-sweat heater and door seal service are common calls in the SoCal market.",
+    notes: "EBGR and EBB series glass door reach-ins. Everest serves the value commercial display segment. Anti-sweat heater and door seal service are common calls in regional commercial display markets.",
   },
   {
     name: "Turbo Air (Refrigerated Display)",
     category: "Open Display / Deli",
-    notes: "TOM and TOMD open deli cases. Turbo Air's open display refrigeration is standard in LA's deli and prepared food counter segment. Defrost and fan motor service.",
+    notes: "TOM and TOMD open deli cases. Turbo Air's open display refrigeration is standard in regional deli and prepared food counter segments. Defrost and fan motor service.",
   },
 ];
 
-const serviceTypes = [
-  { icon: "🧊", name: "Reach-In Refrigerators & Freezers", desc: "One, two, and three-door commercial reach-ins across all major brands. Thermostat, defrost system, door gasket, fan motor, and compressor service." },
-  { icon: "🥗", name: "Prep Tables & Mega Tops", desc: "Pan rail temperature compliance, cutting board, worktop, and refrigeration circuit service for sandwich, pizza, and prep stations." },
-  { icon: "🍺", name: "Back Bar Coolers & Undercounters", desc: "Back bar, undercounter, and direct draw beer coolers. Door heater wire, condenser cleaning, and thermostat service for bar environments." },
-  { icon: "🏪", name: "Glass Door Display Cases", desc: "Glass door reach-in merchandisers, open-air display, and deli cases. Anti-sweat heater, mullion heater, and display lighting service." },
-  { icon: "🏭", name: "Walk-In Coolers & Freezers", desc: "Walk-in refrigeration system service including evaporator units, condensing units, door gaskets, and temperature control systems." },
-  { icon: "❄️", name: "Drop-In Cold Pans & Salad Bars", desc: "Remote condensing cold food tables, ingredient bins, and salad bar refrigeration. Institutional cafeteria specialists." },
-  { icon: "🍺", name: "Draft Beer & Glycol Systems", desc: "Glycol power packs, trunk line systems, and font coolers for multi-tap draft beer installations. Perlick and custom glycol systems." },
-  { icon: "🧊", name: "Ice Machines", desc: "Hoshizaki, Manitowoc, Scotsman, and Ice-O-Matic ice machine repair, cleaning, and preventive maintenance." },
+const industries = [
+  {
+    h: "Restaurants & Fine Dining",
+    p: "From neighborhood taquerias to Michelin-starred kitchens. Reach-in, prep table, and walk-in service with same-day priority for service-hour failures.",
+  },
+  {
+    h: "Hotels & Hospitality",
+    p: "Luxury resort kitchens, banquet prep, grab-and-go, and bar service across coastal LA, Orange, and Ventura county properties. Multi-unit PM contracts for facility managers.",
+  },
+  {
+    h: "Healthcare & Institutional",
+    p: "Major hospital systems and affiliated clinics throughout the five-county region. HACCP documentation provided. Patient care food service treated with appropriate urgency.",
+  },
+  {
+    h: "Schools & Universities",
+    p: "K-12 districts, UC and CSU campus dining, and culinary programs. Institutional prep table and reach-in service with HACCP compliance documentation.",
+  },
+  {
+    h: "Bars & Craft Beverage",
+    p: "Back bar coolers, undercounters, glycol draft beer systems, and taproom equipment. Friday and weekend emergency priority — bar downtime is revenue loss.",
+  },
+  {
+    h: "Grocery & Convenience",
+    p: "Display case, open-air reach-in, and walk-in service for grocery stores, delis, and convenience stores throughout the SoCal corridor.",
+  },
 ];
 
-const schema = {
+const faqs = [
+  {
+    q: "What is your response time for commercial refrigeration emergencies?",
+    a: `Same-day response for commercial refrigeration failures throughout all five SoCal counties — Los Angeles, Orange, Ventura, San Bernardino, and Riverside. Call ${phone} immediately — we dispatch from the nearest of our 8 service territories with commercial parts stocked. For walk-in failures and HACCP-critical equipment, we treat every call as time-sensitive. Same-day availability is best with morning calls; afternoon coverage depends on dispatch routing.`,
+  },
+  {
+    q: "What is your commercial diagnostic fee?",
+    a: "$120 commercial diagnostic, applied directly to the repair cost when you proceed. No hidden trip charge across our five-county service area. We quote on-site after diagnosis — what we quote is what appears on the invoice.",
+  },
+  {
+    q: "Do you service R-290 propane refrigerant equipment?",
+    a: "Yes. Current-production True THAC, Perlick HP, and select Hoshizaki models run R-290 propane refrigerant. R-290 requires EPA 608 certified technicians with specific hydrocarbon training. We are fully certified and equipped. Never allow an uncertified technician to work on R-290 equipment.",
+  },
+  {
+    q: "Do you provide HACCP temperature documentation with service calls?",
+    a: "Yes. For institutional operators — schools, hospitals, corporate cafeterias — we provide temperature log documentation appropriate for HACCP compliance records. When we respond to a CCP exceedance event, the documentation covers the equipment failure, corrective action taken, and temperature verification post-repair.",
+  },
+  {
+    q: "Do you offer preventive maintenance contracts?",
+    a: `Yes. PM contracts are available for restaurants, hotels, healthcare facilities, and institutional operators running multiple commercial refrigeration units. Contracts are structured by equipment count and service frequency — typically monthly, quarterly, or semi-annual depending on equipment type and use intensity. Call ${phone} for a quote.`,
+  },
+  {
+    q: "What areas do you cover for commercial refrigeration service?",
+    a: "All five SoCal counties: Los Angeles, Orange, Ventura, San Bernardino, and Riverside. Dispatched from 8 service territories — West Hollywood (HQ), Los Angeles, Beverly Hills, Pasadena, Thousand Oaks, Irvine, Rancho Cucamonga, and Temecula. No travel surcharge within these service areas. Same-day availability varies by location and time of call — call before noon for best same-day availability.",
+  },
+];
+
+const serviceSchema = {
   "@context": "https://schema.org",
-  "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — Commercial Refrigeration",
-  "telephone": phone,
-  "email": "info@samedayappliance.repair",
-  "areaServed": ["Los Angeles", "Orange County", "Ventura County", "San Bernardino County", "Riverside County"],
-  "priceRange": "$$",
+  "@type": "Service",
+  "serviceType": "Commercial Refrigeration Repair",
+  "name": "Commercial Refrigeration Repair — Same Day Appliance Repair",
+  "url": canonical,
+  "description": "Same-day commercial refrigeration repair across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Walk-in coolers and freezers, ice machines, reach-ins, prep tables, bar refrigerators, showcase units, drop-in cold pans, and draft beer glycol systems. EPA 608 certified. All major brands.",
+  "provider": {
+    "@type": "LocalBusiness",
+    "name": "Same Day Appliance Repair",
+    "url": "https://samedayappliance.repair/",
+    "telephone": phone,
+    "priceRange": "$$",
+  },
+  "areaServed": [
+    { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+    { "@type": "AdministrativeArea", "name": "Orange County" },
+    { "@type": "AdministrativeArea", "name": "Ventura County" },
+    { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+    { "@type": "AdministrativeArea", "name": "Riverside County" },
+  ],
+  "offers": {
+    "@type": "Offer",
+    "priceSpecification": {
+      "@type": "PriceSpecification",
+      "price": "120.00",
+      "priceCurrency": "USD",
+      "description": "Commercial diagnostic fee, applied toward repair",
+    },
+  },
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map((f) => ({
+    "@type": "Question",
+    "name": f.q,
+    "acceptedAnswer": { "@type": "Answer", "text": f.a },
+  })),
 };
 ---
 
-<BaseLayout title={title} description={description}>
-  <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
 
-  <!-- HERO -->
-  <section class="hub-hero">
-    <div class="container hero-inner">
-      <div class="hero-text">
-        <p class="eyebrow">Commercial Refrigeration — Los Angeles &amp; Southern California</p>
-        <h1>Commercial Refrigeration<br><span class="accent">Repair &amp; Service</span></h1>
-        <p class="hero-sub">All commercial refrigeration brands. All equipment types. EPA-certified technicians. Same-day emergency response throughout Los Angeles, Orange County, Ventura County, and the Inland Empire.</p>
-        <div class="hero-ctas">
-          <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-          <a href="/book" class="btn btn-outline btn-lg">Request Service</a>
-        </div>
-        <div class="hero-trust">
-          <span>EPA 608 Certified</span>
-          <span>$120 Commercial Diagnostic</span>
-          <span>HACCP Documentation</span>
-          <span>Same-Day Response</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- TRUST BAR -->
-  <div class="trust-bar">
-    <div class="container trust-bar-inner">
-      <div class="trust-item"><span class="ti-icon">⚡</span><span>Same-Day Emergency Response</span></div>
-      <div class="trust-item"><span class="ti-icon">🔬</span><span>EPA 608 Certified</span></div>
-      <div class="trust-item"><span class="ti-icon">📋</span><span>HACCP Documentation</span></div>
-      <div class="trust-item"><span class="ti-icon">🔧</span><span>OEM Parts Only</span></div>
-      <div class="trust-item"><span class="ti-icon">📄</span><span>PM Contracts Available</span></div>
-    </div>
-  </div>
+  <CommercialHero
+    title="Commercial Refrigeration Repair"
+    subtitle="All commercial refrigeration brands. All equipment types. EPA-certified technicians. Same-day emergency response across all five SoCal counties — Los Angeles, Orange, Ventura, San Bernardino, and Riverside. $120 diagnostic, applied to repair."
+    heroImageTitle="Commercial Refrigeration Repair"
+    trustBarItems={[
+      '⚡ Same-Day Emergency Response',
+      '🏅 EPA 608 Certified',
+      '📄 HACCP Documentation',
+      '🔧 OEM Parts Only',
+      '✅ PM Contracts Available',
+    ]}
+    showBranches={true}
+  />
 
   <!-- INTRO -->
   <section class="intro-section container">
     <div class="intro-content">
       <h2>Commercial Refrigeration Repair Throughout Southern California</h2>
-      <p>When commercial refrigeration fails, the clock starts immediately. A walk-in cooler in a Los Angeles restaurant holds $3,000–$15,000 of perishable inventory. A prep table above 41°F during lunch service is a HACCP critical control point event. A hospital cafeteria reach-in failure before breakfast service requires documented corrective action. The commercial refrigeration service we provide is built around these realities — same-day dispatch, EPA 608 certified technicians, OEM parts stocked on the truck for the most common brands and failure modes in the SoCal market.</p>
-      <p>We service the full spectrum of commercial refrigeration equipment: from Hoshizaki KM-series ice machines in LA's sushi restaurant density to Traulsen blast chillers in hotel production kitchens to Perlick glycol draft beer systems in craft bars to Delfield drop-in cold pans in LAUSD school cafeterias. This is not general appliance work — commercial refrigeration requires EPA 608 certification, R-290 capability for current-generation equipment, and the diagnostic knowledge to distinguish a compressor failure from a condenser coil problem from a defrost system issue before recommending parts.</p>
-      <p>$120 commercial diagnostic, applied to the repair. Call {phone}.</p>
+      <p>When commercial refrigeration fails, the clock starts immediately. A walk-in cooler in a SoCal restaurant holds $3,000–$15,000 of perishable inventory. A prep table above 41°F during lunch service is a HACCP critical control point event. A hospital cafeteria reach-in failure before breakfast service requires documented corrective action. The commercial refrigeration service we provide is built around these realities — same-day dispatch, EPA 608 certified technicians, OEM parts stocked on the truck for the most common brands and failure modes in the SoCal market.</p>
+      <p>We service the full spectrum of commercial refrigeration equipment: from Hoshizaki KM-series ice machines in regional sushi restaurants to Traulsen blast chillers in hotel production kitchens to Perlick glycol draft beer systems in craft bars to Delfield drop-in cold pans in K-12 school cafeterias. This is not general appliance work — commercial refrigeration requires EPA 608 certification, R-290 capability for current-generation equipment, and the diagnostic knowledge to distinguish a compressor failure from a condenser coil problem from a defrost system issue before recommending parts.</p>
+      <p>$120 commercial diagnostic, applied to the repair. Call <a href={`tel:${phoneRaw}`} class="phone-inline">{phone}</a>.</p>
     </div>
     <aside class="sticky-cta-box">
       <p class="scb-label">Commercial Refrigeration</p>
       <p class="scb-phone">{phone}</p>
       <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Emergency Call</a>
-      <a href="/book" class="btn btn-outline btn-block">Schedule Service</a>
+      <a href="/contact/" class="btn btn-outline btn-block">Schedule Service</a>
       <ul class="scb-list">
-        <li>✓ $120 Diagnostic → Applied to Repair</li>
-        <li>✓ EPA 608 + R-290 Certified</li>
-        <li>✓ All Major Brands</li>
-        <li>✓ HACCP Documentation</li>
-        <li>✓ PM Contracts Available</li>
-        <li>✓ LA, OC, Ventura, IE Coverage</li>
+        <li>$120 Diagnostic — Applied to Repair</li>
+        <li>EPA 608 + R-290 Certified</li>
+        <li>All Major Brands</li>
+        <li>HACCP Documentation</li>
+        <li>PM Contracts Available</li>
+        <li>5-County SoCal Coverage</li>
       </ul>
     </aside>
   </section>
 
-  <!-- SERVICE TYPES -->
+  <!-- EQUIPMENT WE SERVICE: routing cards to 6 sub-pages + 3 supplementary -->
   <section class="services-section">
     <div class="container">
       <h2>Equipment We Service</h2>
+      <p class="section-sub">Six dedicated repair pages cover our most-requested commercial refrigeration equipment, each with detailed problem diagnostics, brand coverage, and pricing. Plus supplementary equipment we service on the same dispatch.</p>
       <div class="services-grid">
-        {serviceTypes.map(s => (
+        {subServices.map((s) => (
+          <a href={s.href} class="service-card service-card--linked">
+            <span class="svc-icon">{s.icon}</span>
+            <div class="svc-body">
+              <h3>{s.name}</h3>
+              <p>{s.desc}</p>
+              <span class="svc-cta">View Service →</span>
+            </div>
+          </a>
+        ))}
+        {supplementaryServices.map((s) => (
           <div class="service-card">
             <span class="svc-icon">{s.icon}</span>
             <div class="svc-body">
@@ -207,9 +343,9 @@ const schema = {
   <!-- FEATURED BRANDS -->
   <section class="featured-section container">
     <h2>Featured Brand Specialists</h2>
-    <p class="section-sub">Deep technical coverage for the six most common commercial refrigeration brands in SoCal. Full diagnostic guides, product line breakdowns, and SoCal-specific failure analysis.</p>
+    <p class="section-sub">Deep technical coverage for the six most common commercial refrigeration brands across our service area. Full diagnostic guides, product line breakdowns, and field-tested failure analysis.</p>
     <div class="featured-grid">
-      {featuredBrands.map(b => (
+      {featuredBrands.map((b) => (
         <a href={b.path} class="featured-card">
           <span class="fc-name">{b.name}</span>
           <span class="fc-desc">{b.desc}</span>
@@ -225,7 +361,7 @@ const schema = {
       <h2>All Commercial Refrigeration Brands We Service</h2>
       <p class="section-sub">We service every commercial refrigeration brand operating in the SoCal market. Below is our technical summary for brands beyond our six featured specialists.</p>
       <div class="brands-grid">
-        {additionalBrands.map(b => (
+        {additionalBrands.map((b) => (
           <div class="brand-card">
             <div class="brand-header">
               <span class="brand-name">{b.name}</span>
@@ -240,32 +376,14 @@ const schema = {
 
   <!-- INDUSTRIES -->
   <section class="industries-section container">
-    <h2>Industries We Serve in SoCal</h2>
+    <h2>Industries We Serve</h2>
     <div class="industries-grid">
-      <div class="ind-card">
-        <h3>Restaurants &amp; Fine Dining</h3>
-        <p>From neighborhood taquerias to Michelin-starred kitchens. Reach-in, prep table, and walk-in service with same-day priority for service-hour failures.</p>
-      </div>
-      <div class="ind-card">
-        <h3>Hotels &amp; Hospitality</h3>
-        <p>Beverly Hills and Santa Monica resort kitchens, banquet prep, grab-and-go, and bar service. Multi-unit PM contracts for facility managers.</p>
-      </div>
-      <div class="ind-card">
-        <h3>Healthcare &amp; Institutional</h3>
-        <p>Cedars-Sinai, UCLA, Kaiser, and affiliated facilities. HACCP documentation provided. Patient care food service treated with appropriate urgency.</p>
-      </div>
-      <div class="ind-card">
-        <h3>Schools &amp; Universities</h3>
-        <p>LAUSD, UC and CSU campus dining, culinary programs. Institutional prep table and reach-in service with HACCP compliance documentation.</p>
-      </div>
-      <div class="ind-card">
-        <h3>Bars &amp; Craft Beverage</h3>
-        <p>Back bar coolers, undercounters, glycol draft beer systems, and taproom equipment. Friday and weekend emergency priority — bar downtime is revenue loss.</p>
-      </div>
-      <div class="ind-card">
-        <h3>Grocery &amp; Convenience</h3>
-        <p>Display case, open-air reach-in, and walk-in service for grocery stores, delis, and convenience stores throughout the SoCal corridor.</p>
-      </div>
+      {industries.map((i) => (
+        <div class="ind-card">
+          <h3>{i.h}</h3>
+          <p>{i.p}</p>
+        </div>
+      ))}
     </div>
   </section>
 
@@ -273,30 +391,12 @@ const schema = {
   <section class="faq-section container">
     <h2>Commercial Refrigeration Service — FAQ</h2>
     <div class="faq-list">
-      <details class="faq-item">
-        <summary class="faq-q">What is your response time for commercial refrigeration emergencies?</summary>
-        <p class="faq-a">Same-day response for commercial refrigeration failures throughout Los Angeles and Orange County. Call {phone} immediately — we dispatch from the nearest location with commercial parts stocked. For walk-in failures and HACCP-critical equipment, we treat every call as time-sensitive. Ventura County and Inland Empire coverage is typically same-day with morning calls.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">What is your commercial diagnostic fee?</summary>
-        <p class="faq-a">$120 commercial diagnostic, applied directly to the repair cost when you proceed. No hidden trip charge throughout SoCal. We quote on-site after diagnosis — what we quote is what appears on the invoice.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">Do you service R-290 propane refrigerant equipment?</summary>
-        <p class="faq-a">Yes. Current-production True THAC, Perlick HP, and select Hoshizaki models run R-290 propane refrigerant. R-290 requires EPA 608 certified technicians with specific hydrocarbon training. We are fully certified and equipped. Never allow an uncertified technician to work on R-290 equipment.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">Do you provide HACCP temperature documentation with service calls?</summary>
-        <p class="faq-a">Yes. For institutional operators — schools, hospitals, corporate cafeterias — we provide temperature log documentation appropriate for HACCP compliance records. When we respond to a CCP exceedance event, the documentation covers the equipment failure, corrective action taken, and temperature verification post-repair.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">Do you offer preventive maintenance contracts?</summary>
-        <p class="faq-a">Yes. PM contracts are available for restaurants, hotels, healthcare facilities, and institutional operators running multiple commercial refrigeration units. Contracts are structured by equipment count and service frequency — typically monthly, quarterly, or semi-annual depending on equipment type and use intensity. Call {phone} for a quote.</p>
-      </details>
-      <details class="faq-item">
-        <summary class="faq-q">What areas do you cover for commercial refrigeration service?</summary>
-        <p class="faq-a">Los Angeles County (all cities), Orange County, Ventura County, San Bernardino County, and Riverside County. No travel surcharge within these service areas. Same-day availability varies by location and time of call — call before noon for best same-day availability.</p>
-      </details>
+      {faqs.map((f) => (
+        <details class="faq-item">
+          <summary class="faq-q">{f.q}</summary>
+          <p class="faq-a" set:html={f.a} />
+        </details>
+      ))}
     </div>
   </section>
 
@@ -304,77 +404,93 @@ const schema = {
   <section class="bottom-cta">
     <div class="container">
       <h2>Commercial Refrigeration Down? We Respond Today.</h2>
-      <p>Same-day emergency service for all commercial refrigeration equipment throughout Los Angeles, Orange County, Ventura County, and the Inland Empire. EPA 608 certified. OEM parts. HACCP documentation.</p>
+      <p>Same-day emergency service for all commercial refrigeration equipment across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. EPA 608 certified. OEM parts. HACCP documentation.</p>
       <div class="cta-buttons">
         <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/book" class="btn btn-outline btn-lg">Schedule Service</a>
+        <a href="/contact/" class="btn btn-outline btn-lg">Schedule Service</a>
       </div>
     </div>
   </section>
-
-</BaseLayout>
+</Layout>
 
 <style>
-.hub-hero{background:var(--color-bg);padding:5rem 0 4rem;border-bottom:1px solid var(--color-border)}
-.hero-inner{max-width:760px}
-.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:.75rem}
-h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
-.accent{color:var(--color-accent)}
-.hero-sub{font-size:1.05rem;color:var(--color-text-muted);margin-bottom:2rem;max-width:52ch}
-.hero-ctas{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1.5rem}
-.hero-trust{display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.8rem;color:var(--color-text-muted)}
-.trust-bar{background:var(--color-accent);padding:1rem 0}
-.trust-bar-inner{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap}
-.trust-item{display:flex;align-items:center;gap:.5rem;color:#fff;font-size:.875rem;font-weight:600}
-.intro-section{display:grid;grid-template-columns:1fr 300px;gap:4rem;padding-top:4rem;padding-bottom:4rem}
-.intro-content h2{font-size:1.6rem;margin-bottom:1.25rem}
-.intro-content p{margin-bottom:1.25rem;line-height:1.75;color:var(--color-text-body)}
-.sticky-cta-box{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.75rem;position:sticky;top:5rem;height:fit-content}
-.scb-label{font-size:.75rem;text-transform:uppercase;letter-spacing:.1em;color:var(--color-accent);margin-bottom:.25rem}
-.scb-phone{font-size:1.4rem;font-weight:800;margin-bottom:1.25rem}
-.btn-block{display:block;width:100%;text-align:center;margin-bottom:.75rem}
-.scb-list{list-style:none;padding:0;margin:1.25rem 0;font-size:.8rem}
-.scb-list li{padding:.3rem 0;border-bottom:1px solid var(--color-border);color:var(--color-text-body)}
-.services-section{background:var(--color-surface);padding:4rem 0;border-top:1px solid var(--color-border)}
-.services-section h2{text-align:center;font-size:1.6rem;margin-bottom:2rem}
-.services-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-.service-card{background:var(--color-bg);border:1px solid var(--color-border);border-radius:.5rem;padding:1.25rem;display:flex;gap:1rem;align-items:start}
-.svc-icon{font-size:1.5rem;flex-shrink:0}
-.svc-body h3{font-size:.9rem;font-weight:700;margin-bottom:.3rem}
-.svc-body p{font-size:.8rem;color:var(--color-text-muted);line-height:1.5}
-.featured-section{padding:4rem 0}
-.featured-section h2{font-size:1.6rem;margin-bottom:.75rem}
-.section-sub{color:var(--color-text-muted);margin-bottom:2rem;font-size:.9rem;max-width:65ch}
-.featured-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
-.featured-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.75rem;padding:1.5rem;text-decoration:none;color:var(--color-text);display:flex;flex-direction:column;gap:.4rem;transition:border-color .2s,transform .2s}
-.featured-card:hover{border-color:var(--color-accent);transform:translateY(-2px)}
-.fc-name{font-size:1rem;font-weight:800;color:var(--color-accent)}
-.fc-desc{font-size:.825rem;color:var(--color-text-muted);line-height:1.5;flex:1}
-.fc-cta{font-size:.8rem;font-weight:600;color:var(--color-accent)}
-.brands-section{background:var(--color-surface);border-top:1px solid var(--color-border);padding:4rem 0}
-.brands-section h2{font-size:1.6rem;margin-bottom:.75rem}
-.brands-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:2rem}
-.brand-card{background:var(--color-bg);border:1px solid var(--color-border);border-radius:.5rem;padding:1.25rem}
-.brand-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:.6rem}
-.brand-name{font-weight:700;font-size:.95rem}
-.brand-cat{font-size:.75rem;color:var(--color-accent);background:rgba(var(--color-accent-rgb),.1);padding:.2rem .5rem;border-radius:.25rem}
-.brand-notes{font-size:.825rem;color:var(--color-text-muted);line-height:1.6}
-.industries-section{padding:4rem 0}
-.industries-section h2{font-size:1.6rem;margin-bottom:2rem}
-.industries-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.25rem}
-.ind-card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:.5rem;padding:1.5rem}
-.ind-card h3{font-size:.95rem;margin-bottom:.6rem;color:var(--color-accent)}
-.ind-card p{font-size:.875rem;color:var(--color-text-body);line-height:1.65}
-.faq-section{padding:4rem 0}
-.faq-section h2{font-size:1.6rem;margin-bottom:2rem}
-.faq-list{display:flex;flex-direction:column;gap:.75rem}
-.faq-item{border:1px solid var(--color-border);border-radius:.5rem;background:var(--color-surface)}
-.faq-q{padding:1.25rem 1.5rem;font-weight:600;cursor:pointer;list-style:none}
-.faq-a{padding:0 1.5rem 1.25rem;font-size:.9rem;line-height:1.7;color:var(--color-text-body)}
-.bottom-cta{background:var(--color-accent);padding:4rem 0;text-align:center}
-.bottom-cta h2{font-size:1.75rem;margin-bottom:.75rem;color:#fff}
-.bottom-cta>div>p{color:rgba(255,255,255,.85);margin-bottom:2rem}
-.cta-buttons{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-@media(max-width:1024px){.intro-section{grid-template-columns:1fr}.sticky-cta-box{position:static}.services-grid{grid-template-columns:repeat(2,1fr)}.featured-grid{grid-template-columns:1fr 1fr}.brands-grid{grid-template-columns:1fr 1fr}.industries-grid{grid-template-columns:1fr 1fr}}
-@media(max-width:768px){.services-grid,.featured-grid,.brands-grid,.industries-grid{grid-template-columns:1fr}}
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .btn { display: inline-block; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; text-decoration: none; }
+  .btn-primary { background: #C8102E; color: #fff; }
+  .btn-outline { border: 1.5px solid rgba(0,0,0,0.25); color: #1a1a1a; }
+  .btn-block { display: block; width: 100%; text-align: center; margin-bottom: 10px; }
+  .btn-lg { padding: 16px 34px; font-size: 16px; }
+  .phone-inline { color: #C8102E; font-weight: 700; text-decoration: none; }
+
+  .intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; align-items: start; }
+  .intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; line-height: 1.2; }
+  .intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: #333; }
+  .sticky-cta-box { background: #f5f5f5; border: 1px solid #e2e2e2; border-radius: 0.75rem; padding: 1.75rem; position: sticky; top: 5rem; }
+  .scb-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #C8102E; margin-bottom: 0.25rem; }
+  .scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
+  .sticky-cta-box .btn-outline { background: #fff; border-color: #d4d4d4; }
+  .scb-list { list-style: none; padding: 0; margin: 1.25rem 0 0; font-size: 0.82rem; color: #555; }
+  .scb-list li { padding: 0.4rem 0; border-bottom: 1px solid #e2e2e2; padding-left: 1.1rem; position: relative; }
+  .scb-list li::before { content: "✓"; position: absolute; left: 0; color: #C8102E; font-weight: 700; }
+  .scb-list li:last-child { border-bottom: none; }
+
+  .services-section { background: #f5f5f5; padding: 4rem 0; border-top: 1px solid #e2e2e2; }
+  .services-section h2 { text-align: center; font-size: 1.6rem; margin-bottom: 0.75rem; }
+  .section-sub { text-align: center; color: #6b6b6b; margin: 0 auto 2rem; font-size: 0.95rem; max-width: 65ch; line-height: 1.6; }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .service-card { background: #fff; border: 1px solid #e2e2e2; border-radius: 0.5rem; padding: 1.5rem; display: flex; gap: 1rem; align-items: start; text-decoration: none; color: #1a1a1a; transition: border-color .2s, transform .2s; }
+  .service-card--linked:hover { border-color: #C8102E; transform: translateY(-2px); }
+  .svc-icon { font-size: 1.75rem; flex-shrink: 0; line-height: 1; }
+  .svc-body h3 { font-size: 1rem; font-weight: 700; margin: 0 0 0.5rem; color: #1a1a1a; }
+  .svc-body p { font-size: 0.85rem; color: #555; line-height: 1.55; margin: 0 0 0.6rem; }
+  .svc-cta { font-size: 0.8rem; font-weight: 700; color: #C8102E; }
+
+  .featured-section { padding: 4rem 24px; }
+  .featured-section h2 { font-size: 1.6rem; margin-bottom: 0.75rem; text-align: center; }
+  .featured-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .featured-card { background: #fafafa; border: 1px solid #e2e2e2; border-radius: 0.75rem; padding: 1.5rem; text-decoration: none; color: #1a1a1a; display: flex; flex-direction: column; gap: 0.45rem; transition: border-color .2s, transform .2s; }
+  .featured-card:hover { border-color: #C8102E; transform: translateY(-2px); }
+  .fc-name { font-size: 1.05rem; font-weight: 800; color: #C8102E; }
+  .fc-desc { font-size: 0.85rem; color: #555; line-height: 1.55; flex: 1; }
+  .fc-cta { font-size: 0.82rem; font-weight: 700; color: #C8102E; }
+
+  .brands-section { background: #f5f5f5; border-top: 1px solid #e2e2e2; padding: 4rem 0; }
+  .brands-section h2 { font-size: 1.6rem; margin-bottom: 0.75rem; text-align: center; }
+  .brands-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
+  .brand-card { background: #fff; border: 1px solid #e2e2e2; border-radius: 0.5rem; padding: 1.25rem; }
+  .brand-header { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+  .brand-name { font-weight: 700; font-size: 0.95rem; }
+  .brand-cat { font-size: 0.72rem; color: #C8102E; background: rgba(200,16,46,0.08); padding: 0.2rem 0.5rem; border-radius: 0.25rem; white-space: nowrap; }
+  .brand-notes { font-size: 0.83rem; color: #555; line-height: 1.6; margin: 0; }
+
+  .industries-section { padding: 4rem 24px; }
+  .industries-section h2 { font-size: 1.6rem; margin-bottom: 2rem; text-align: center; }
+  .industries-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+  .ind-card { background: #fafafa; border: 1px solid #e2e2e2; border-radius: 0.5rem; padding: 1.5rem; }
+  .ind-card h3 { font-size: 0.98rem; margin: 0 0 0.6rem; color: #C8102E; font-weight: 700; }
+  .ind-card p { font-size: 0.88rem; color: #444; line-height: 1.65; margin: 0; }
+
+  .faq-section { padding: 4rem 24px; }
+  .faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; text-align: center; }
+  .faq-list { display: flex; flex-direction: column; gap: 0.75rem; }
+  .faq-item { border: 1px solid #e2e2e2; border-radius: 0.5rem; background: #fafafa; }
+  .faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; font-size: 0.98rem; }
+  .faq-q::-webkit-details-marker { display: none; }
+  .faq-a { padding: 0 1.5rem 1.25rem; font-size: 0.92rem; line-height: 1.7; color: #444; margin: 0; }
+  .faq-a a { color: #C8102E; font-weight: 700; text-decoration: none; }
+
+  .bottom-cta { background: #0a0a0a; padding: 4rem 24px; text-align: center; color: #fff; }
+  .bottom-cta h2 { font-size: 1.75rem; margin: 0 0 0.75rem; color: #fff; }
+  .bottom-cta p { color: rgba(255,255,255,0.75); margin: 0 auto 2rem; max-width: 65ch; }
+  .bottom-cta .btn-outline { color: #fff; border-color: rgba(255,255,255,0.35); }
+  .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+
+  @media (max-width: 1024px) {
+    .intro-section { grid-template-columns: 1fr; }
+    .sticky-cta-box { position: static; }
+    .services-grid, .featured-grid, .brands-grid, .industries-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 768px) {
+    .services-grid, .featured-grid, .brands-grid, .industries-grid { grid-template-columns: 1fr; }
+  }
 </style>
