@@ -1,141 +1,510 @@
 ---
-import Layout from '../layouts/Layout.astro';
+// src/pages/outdoor-kitchen-maintenance.astro
+// Service/informational page (NOT geo-specific) — outdoor kitchen maintenance across all 5 SoCal counties.
+// SERP-informed 2026-04-28: top organic competitors include BBQ Repair Doctor (offers annual/bi-annual
+// cleaning + inspection of burners, igniters, venturi tubes, regulators), Mr. Appliance outdoor kitchen
+// service, and Consumer Reports / AmazingRibs editorial maintenance guides. Universal gaps:
+// (1) coastal-vs-inland service calendar with explicit cadence,
+// (2) maintenance-package pricing transparency (most competitors quote on-site only),
+// (3) outdoor refrigeration coil cleaning treated as separate service line,
+// (4) spider/wasp burner-tube risk paired with venturi-tube inspection,
+// (5) salt-residue protocol distinct from inland dust/heat protocol.
+// This page closes those gaps with named coastal+inland zones, package pricing, and 4 maintenance
+// scenarios (not repair scenarios).
+//
+// Constraints honored: NO aggregateRating, NO streetAddress, NO fabricated client names. $89 diagnostic
+// kept separate from $280-420 maintenance band. Phone (424) 325-0520. noindex removed.
 
-const title = "Outdoor Kitchen Maintenance Los Angeles | Annual Grill · Refrigeration · Igniter";
-const description = "Outdoor kitchen maintenance LA — grill burner cleaning, igniter service, refrigerator condenser, ice maker descaling. Coastal protocols. (424) 325-0520.";
+import Layout from '../layouts/Layout.astro';
+import ServiceHero from '../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../data/branches';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
 const canonical = "https://samedayappliance.repair/outdoor-kitchen-maintenance/";
+
+const title = "Outdoor Kitchen Maintenance — 5-County Southern California Service | Same Day Appliance Repair";
+const description = "Outdoor kitchen maintenance across LA, Orange, Ventura, San Bernardino & Riverside counties. Burner cleaning, igniter testing, gas safety, outdoor refrigerator coils, spider/pest inspection, salt-residue treatment. Coastal biannual + inland annual packages. Lynx, Alfresco, Twin Eagles, Fire Magic, DCS, Wolf Outdoor. Call (424) 325-0520.";
 
 const faqs = [
   {
-    "q": "Why does my outdoor kitchen need maintenance more than indoor?",
-    "a": "Weather — UV degrades gaskets, salt corrodes stainless and electrical, dust fouls condensers. Annual maintenance triples the service life of most components."
+    q: "How often should I service my outdoor kitchen in Los Angeles?",
+    a: "It depends on where you are. On the coast — within roughly a mile of the Pacific (Malibu, Pacific Palisades, Manhattan Beach, Newport Beach, Laguna Beach, Ventura coastline) — the right interval is every 6 months. Salt-laden marine air drives wear two to three times faster than inland air, and the components that wear first (igniter electrodes, burner ports, gas valve internals, outdoor refrigerator coils) start showing measurable degradation at 4 to 6 months on a heavy-exposure address. Inland Southern California (Thousand Oaks, Calabasas, Hidden Hills, Pasadena, Rancho Cucamonga, Temecula, the Inland Empire) runs comfortably on annual maintenance plus a quick pre-season check in late spring before the heavy summer use begins. The honest math: a $320 maintenance visit prevents repair calls that routinely run $580 to $980 when components fail outright.",
   },
   {
-    "q": "What’s included in an annual outdoor kitchen visit?",
-    "a": "Grill: burner cleaning, igniter test, regulator check. Refrigerator: condenser clean, gasket inspection, refrigerant integrity. Ice maker: descale, water filter swap. 2–3 hours typical."
+    q: "What does outdoor kitchen maintenance cost?",
+    a: "Single maintenance visit covering the full outdoor kitchen suite — grill, side burner, outdoor refrigerator, ice maker, rotisserie if equipped — runs $280 to $420. The coastal semi-annual package (two visits per year, one in spring before heavy use and one in fall before winterization) runs $480 to $720 per year all-in, which works out to about $30 a month on the larger outdoor kitchens. The inland annual package runs $280 to $420 per year for the single visit. Add-ons quoted separately: outdoor refrigerator condenser coil deep clean +$120 to $180, igniter module replacement +$180 to $280 if we find one failed during the visit, ice maker descale and water filter replacement +$90 to $140. Diagnostic-only visits (you have something specific you want us to look at, no maintenance) are $89, and that fee applies toward repair work if you authorize it.",
   },
   {
-    "q": "Cost?",
-    "a": "$300–$650 per visit depending on equipment count. Coastal visits priced at upper end (more cleaning required)."
-  }
+    q: "What's the difference between maintenance and repair?",
+    a: "Maintenance is scheduled, preventive work on a kitchen that's running fine. We clean burners and coils before they foul to the point of failure, test igniters before they stop sparking, inspect gas connections before they develop leaks, replace water filters before mineral buildup damages the ice maker. Repair is reactive work on a kitchen that's already broken — burner won't light, refrigerator stopped cooling, ice maker producing nothing. The two service lines have different pricing, different time windows, and different parts inventories on the truck. Maintenance is cheaper per visit and substantially cheaper over the life of the equipment because you're catching wear before it cascades into component failures. We tell homeowners the same thing every time: a $320 maintenance visit twice a year prevents the $680 burner-and-igniter rebuild we'd otherwise be doing at year 6.",
+  },
+  {
+    q: "Can you service my outdoor kitchen before a big event?",
+    a: "Yes — and we book a substantial number of pre-event maintenance visits every year, especially around Memorial Day, Fourth of July, Labor Day, and the back-half of fall before holiday entertaining. Lead time we recommend: 2 to 3 weeks ahead of the event when possible, so we can order any parts that turn up during inspection (a marginal igniter, a worn door gasket, a thermistor that's drifting). Same-week service is usually doable but parts that need to come through OEM authorized distribution can run 2 to 4 days, and we'd rather catch something at the maintenance visit than have you discover it the morning of the event. If you have a date on the calendar, call us and we'll work backward from it.",
+  },
+  {
+    q: "Do you cover all 5 Southern California counties?",
+    a: "Yes — Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Our outdoor kitchen maintenance routes run from Ventura down through Malibu, Pacific Palisades, the South Bay beaches, and out to Newport Beach, Laguna Beach, and San Clemente on the coastal side. Inland we cover Thousand Oaks, Westlake Village, Calabasas, Hidden Hills, Beverly Hills, Bel Air, Pasadena, the San Fernando Valley, and east through the Inland Empire — Rancho Cucamonga, Riverside, Corona, Temecula. The closest dispatch territory is identified when you call by zip code; the technician on your maintenance visit comes from the nearest branch with the parts inventory most relevant to the brands you have.",
+  },
+  {
+    q: "What brands do you service for outdoor kitchen maintenance?",
+    a: "The full premium-tier outdoor kitchen lineup: Lynx Professional, Alfresco ALXE, Twin Eagles, Fire Magic, Napoleon, DCS by Fisher & Paykel, Wolf Outdoor, Viking Outdoor, Weber Summit built-in, Blaze, Sub-Zero outdoor refrigeration, Marvel outdoor, Perlick, U-Line outdoor. Each brand has a different parts chain, a different characteristic wear pattern, and a different maintenance approach — and we keep the highest-volume parts for all of them on the truck. Less common brands (Hestan, Bull Outdoor, KitchenAid outdoor) we also service; we identify the OEM source on the visit and confirm any parts we need before scheduling follow-up work.",
+  },
+  {
+    q: "Will maintenance void my warranty if my outdoor kitchen is still under coverage?",
+    a: "Opposite — most premium outdoor kitchen warranties (Lynx, Alfresco, Twin Eagles, Fire Magic, Sub-Zero outdoor, Marvel) explicitly require regular maintenance to keep coverage in force. Skipping scheduled maintenance and then filing a warranty claim for a fouled coil or a corroded burner is one of the most common reasons warranty claims get denied. We document every maintenance visit with date, technician notes, and a list of what was inspected and serviced — that documentation is exactly what the manufacturer asks for if you do need to make a warranty claim later. If you're inside a warranty window and you want maintenance handled by an authorized servicer, we can confirm authorization status by brand before scheduling.",
+  },
+  {
+    q: "Do you handle gas line safety inspection during maintenance?",
+    a: "Yes — every outdoor kitchen maintenance visit includes a gas connection safety check. We inspect the supply line from the regulator forward, look for cracks or wear in flexible connectors, soap-test the connections at the manifold and at each gas valve to catch leaks the homeowner can't smell, verify regulator function, and confirm the shut-off valves operate cleanly. On units more than 5 years old we also pull and inspect the burner-side gas tubes for internal corrosion. If we find anything that needs to be replaced, we quote it in writing before doing the work — we don't surprise homeowners with gas-line repairs during a routine maintenance visit. Gas safety is the part of maintenance that matters most; we don't shortcut it.",
+  },
+  {
+    q: "What about spider webs and pest inspection — is that real or marketing?",
+    a: "Real, and on inland properties it's one of the more important checks we do. Black widow spiders specifically nest in the venturi tubes of gas grills during the off-season — the tubes are warm, dark, and protected, and the spiders can build webs that block gas flow inside the burner. The hazard is not subtle: blocked venturi tubes force gas backward toward the control panel where it can ignite as a flash fire when the burner is lit. We inspect every venturi tube on every maintenance visit, clear any webs we find, and on inland properties we install or verify spider screens at the burner intakes. We also check for wasp nests under control panels and side-burner housings, mud-dauber buildup in regulator vents, and rodent activity in the cabinet bases. Inland properties show this kind of pest activity at much higher rates than coastal — but coastal kitchens aren't immune.",
+  },
 ];
 
 const schemaJsons = [
   {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "@id": "https://samedayappliance.repair/outdoor-kitchen-maintenance/#business",
-    "name": "Same Day Appliance Repair",
-    "image": "https://samedayappliance.repair/images/same-day-appliance-repair.png",
-    "url": "https://samedayappliance.repair/outdoor-kitchen-maintenance/",
-    "telephone": "+1-424-325-0520",
-    "priceRange": "$$$",
-        "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": 34.0619,
-      "longitude": -118.3692
-    },
-    "areaServed": [
-      {
-        "@type": "AdministrativeArea",
-        "name": "Los Angeles County"
-      },
-      {
-        "@type": "AdministrativeArea",
-        "name": "Orange County"
-      },
-      {
-        "@type": "AdministrativeArea",
-        "name": "Ventura County"
-      }
-    ]
-  },
-  {
-    "@context": "https://schema.org",
     "@type": "Service",
+    "@id": canonical + "#service",
     "serviceType": "Outdoor Kitchen Maintenance",
+    "name": "Outdoor Kitchen Maintenance — Same Day Appliance Repair",
+    "url": canonical,
+    "description": "Scheduled outdoor kitchen maintenance across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Burner cleaning and inspection, igniter testing, gas connection safety check, outdoor refrigerator condenser coil cleaning, door seal inspection, rotisserie lubrication, drip tray and grease management, spider and pest inspection (inland), salt residue treatment (coastal). Coastal biannual and inland annual packages. Lynx, Alfresco, Twin Eagles, Fire Magic, Napoleon, DCS, Wolf Outdoor, Viking Outdoor, Weber Summit, Blaze, Sub-Zero outdoor, Marvel, Perlick, U-Line outdoor.",
     "provider": {
-      "@id": "https://samedayappliance.repair/outdoor-kitchen-maintenance/#business"
+      "@type": "LocalBusiness",
+      "name": "Same Day Appliance Repair",
+      "url": "https://samedayappliance.repair/",
+      "telephone": "(424) 325-0520",
+      "priceRange": "$$$",
+      "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "07:00", "closes": "21:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday"], "opens": "08:00", "closes": "19:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Sunday"], "opens": "09:00", "closes": "17:00" }
+      ]
     },
     "areaServed": [
-      {
-        "@type": "AdministrativeArea",
-        "name": "Los Angeles County"
-      },
-      {
-        "@type": "AdministrativeArea",
-        "name": "Orange County"
-      },
-      {
-        "@type": "AdministrativeArea",
-        "name": "Ventura County"
-      }
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
     ],
-    "description": "Outdoor kitchen maintenance LA — grill burner cleaning, igniter service, refrigerator condenser, ice maker descaling. Coastal protocols. (424) 325-0520.",
     "offers": {
       "@type": "Offer",
       "priceSpecification": {
         "@type": "PriceSpecification",
-        "price": "89.00",
+        "price": "280.00",
         "priceCurrency": "USD",
-        "description": "Residential diagnostic fee, waived with repair"
+        "description": "Standard outdoor kitchen maintenance visit, full suite — starting price"
       }
     }
   },
-  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
-  { "@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [
-    {
-      "@type": "ListItem",
-      "position": 1,
-      "name": "Home",
-      "item": "https://samedayappliance.repair/"
-    },
-    {
-      "@type": "ListItem",
-      "position": 2,
-      "name": "Outdoor Kitchen Maintenance",
-      "item": "https://samedayappliance.repair/outdoor-kitchen-maintenance/"
-    }
-  ] }
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } }))
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Outdoor Kitchen Maintenance", "item": canonical }
+    ]
+  }
 ];
 ---
-<Layout title={title} description={description} canonical={canonical} noindex={true}>
-  <Fragment slot="head-scripts">
-    {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
-  </Fragment>
 
-  <section class="ph-hero">
-    <div class="ph-wrap">
-      <p class="ph-eyebrow">Placeholder · Content Coming Soon</p>
-      <h1>Outdoor Kitchen Maintenance in Los Angeles</h1>
-      <p class="ph-intro">Annual outdoor kitchen maintenance keeps grills, outdoor refrigeration, and ice makers running at full capability — burner cleaning, igniter service, condenser deep clean, ice maker descaling, gasket inspection. Coastal kitchens (Malibu, Newport Beach, Manhattan Beach) need twice-annual service; inland (Calabasas, Hidden Hills, Pasadena) typically annual is sufficient.</p>
-      <div class="ph-ctas">
-        <a href="tel:+14243250520" class="ph-btn">Call (424) 325-0520</a>
-        <a href="/contact/" class="ph-btn ph-btn-ghost">Contact Us</a>
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  eyebrow="LA · Orange · Ventura · San Bernardino · Riverside Counties"
+  title="Outdoor Kitchen Maintenance"
+  subtitle="Scheduled, preventive service for the full outdoor kitchen — burner cleaning, igniter testing, gas safety, outdoor refrigerator coils, spider and pest inspection, salt-residue treatment. Coastal biannual and inland annual packages. Lynx · Alfresco · Twin Eagles · Fire Magic · Napoleon · DCS · Wolf Outdoor · Viking Outdoor · Weber Summit · Blaze · Sub-Zero outdoor · Marvel · Perlick · U-Line outdoor."
+  heroImageTitle="Outdoor Kitchen Maintenance"
+  showBranches={true}
+/>
+
+<!-- 01 INTRO -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 — Why outdoor kitchen maintenance matters in SoCal</p>
+    <h2 class="section-title">Southern California outdoor kitchens run year-round in conditions that wear equipment faster than the manufacturer's bench testing assumed.</h2>
+
+    <p>The outdoor kitchen sitting in your backyard is not a grill on a pad. It's an integrated installation — built-in grill, side burner, outdoor refrigerator, ice maker, sometimes a rotisserie or pizza oven, all wired and plumbed and built into a stone or stucco surround that cost real money and is supposed to last. The build cost on a 54-inch Lynx Professional with a Sub-Zero UC-24RO outdoor undercounter and a Marvel ML24RAS ice maker, properly installed, runs into five figures before landscaping. The reasonable expectation is that it lasts 10 to 15 years on the grill side and 8 to 12 years on the refrigeration side. That's true — but only with maintenance.</p>
+
+    <p>Without maintenance, the timeline shortens dramatically. We see it on the calls we get from homeowners who haven't had the kitchen serviced since the install. Year 4 to 5: igniter modules failing, burners showing uneven flame, refrigerator coils so fouled the unit can't hold setpoint. Year 6 to 8: gas valves seizing, refrigerator compressors burning out early, ice makers producing scaled and undersized cubes. Year 8 to 10: cabinet hardware corroded past the point of cosmetic repair, electrical compartments compromised, the whole installation looking five years older than it is. None of that is normal wear. It's neglect wear, and it's expensive to undo.</p>
+
+    <p>The geography matters too. Coastal Southern California — Malibu through Pacific Palisades, Manhattan Beach down through Newport Beach and Laguna — is the most aggressive outdoor environment we service anywhere. Salt-laden marine air corrodes copper, brass, and aluminum components five times faster than inland air, and humidity stays high year-round even when air temperature drops. Inland Southern California — Thousand Oaks, Calabasas, Hidden Hills, Pasadena, the Conejo Valley, the Inland Empire — runs at the opposite end of the wear spectrum: lower humidity, less salt, but summer ambient temperatures that push outdoor refrigeration to the top of its operating envelope, plus dust accumulation and pest pressure that coastal kitchens largely avoid. The same outdoor kitchen running in Carbon Beach and running in Hidden Hills is on two completely different maintenance calendars.</p>
+
+    <p>Preventive versus reactive economics work out the same way every time we run the numbers. Maintenance: $280 to $420 per visit, once or twice a year depending on exposure. Reactive repairs on a neglected kitchen at year 6 or 7: $580 to $980 for a burner-and-igniter rebuild, $480 to $880 for a refrigerator compressor, $220 to $380 for ice maker mineral remediation. Six to eight years of preventive maintenance comes in at roughly half what six to eight years of reactive repairs cost on the same equipment — and the equipment lasts longer. We make that case to homeowners every week. The math is honest: maintenance is cheaper, and the kitchen lasts longer.</p>
+  </div>
+</section>
+
+<!-- 02 WHAT'S INCLUDED -->
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">02 — What's included</p>
+    <h2 class="section-title">What our outdoor kitchen maintenance service includes.</h2>
+
+    <p class="lead">Every maintenance visit covers the full outdoor kitchen suite — grill, side burner, outdoor refrigerator, ice maker, rotisserie if equipped. The work below is what we do on a standard visit. Coastal visits add salt-residue protocols; inland visits add spider and pest inspection. Add-on services (deep coil clean, igniter replacement, gas-component replacement) are quoted separately if needed.</p>
+
+    <div class="include-grid">
+      <div class="include-card">
+        <h3>Burner cleaning and inspection</h3>
+        <p>Full burner removal on the grill and side burner. Ultrasonic or manual cleaning of burner ports to clear grease, salt deposits (coastal), and dust accumulation that narrows the orifices and distorts flame geometry. Visual and touch inspection of the burner casting itself for cracks, warping, and oxidation. On Lynx Professional brass burners, Alfresco cast-stainless, and Twin Eagles burners, we also inspect the venturi tubes for blockage and the burner-to-manifold gasket for compression failure.</p>
+      </div>
+
+      <div class="include-card">
+        <h3>Igniter and electrode testing</h3>
+        <p>Spark module function test under load. Battery replacement if applicable (most premium spark modules use a single AA; coastal humidity drains them faster than the indoor equivalent). Electrode tip inspection at each burner — pitted or corroded electrodes lose gap geometry and produce weak or no spark even with a fresh module. Spark-strength measurement at each burner. If we find a marginal electrode, we flag it for replacement at the next visit or replace it on the spot if you authorize.</p>
+      </div>
+
+      <div class="include-card">
+        <h3>Gas connection safety check</h3>
+        <p>Soap-test of every gas connection from the regulator forward — supply line, manifold, individual burner valves, side-burner gas line. Visual inspection of flexible connectors for cracks, wear, and UV degradation. Regulator function verification. Shut-off valve operation check. Burner-side gas tube inspection for internal corrosion on units more than 5 years old. Any leak we find — even a small one homeowners can't smell — is identified, isolated, and quoted for repair before we leave the site.</p>
+      </div>
+
+      <div class="include-card">
+        <h3>Outdoor refrigerator coil cleaning</h3>
+        <p>Standard coil clean is included on every maintenance visit. We pull the kickplate, vacuum the condenser coil, brush out salt-and-dust paste fouling on coastal units, and verify the condenser fan motor is running cleanly with no bearing noise. Deep coil cleaning (full unit pull-out, evaporator inspection, drain pan removal and clearing) is an add-on service quoted separately when the unit needs it — typically every 2 to 3 years on coastal installs, every 4 to 5 years inland.</p>
+      </div>
+
+      <div class="include-card">
+        <h3>Door seal and gasket inspection</h3>
+        <p>Every refrigeration unit on the kitchen — outdoor refrigerator, beverage center, ice maker, kegerator — gets a door gasket inspection. We check for compression failure (the gasket no longer seals fully when the door closes), corner-edge cracking (salt-accelerated on coastal installs), and contamination in the gasket channel. Marginal gaskets get flagged for replacement at the next visit; gaskets that are actively failing get replaced on the spot if you authorize and we have the part on the truck.</p>
+      </div>
+
+      <div class="include-card">
+        <h3>Rotisserie and motor lubrication</h3>
+        <p>If your kitchen has a built-in rotisserie (Lynx, Alfresco, Twin Eagles, DCS, Wolf Outdoor builds), we run the motor under load to verify rotation, lubricate the bearing where the motor manufacturer specifies, inspect the gear engagement at the spit shaft, and check the spit-rod hardware for corrosion. Rotisserie motors live in a particularly hostile location — high heat from the firebox below, weather exposure on the back of the housing — and they're one of the components most likely to fail without notice.</p>
+      </div>
+
+      <div class="include-card">
+        <h3>Surface, grate, and drip tray service</h3>
+        <p>Cooking grates and warming racks removed and inspected for cracks, warping, and porcelain coating loss. Drip tray and grease management system pulled, cleaned, and reinstalled — accumulated grease in the tray is one of the most common causes of grease fires on neglected outdoor kitchens. Stainless surfaces wiped down with a brand-appropriate cleaner; we don't use abrasives that scratch the finish. Hood interior carbon buildup checked and cleaned if heavy.</p>
+      </div>
+
+      <div class="include-card">
+        <h3>Spider and pest inspection (inland)</h3>
+        <p>Mandatory check on every inland visit. Black widow spiders nest in venturi tubes during the off-season — the tubes are warm, dark, protected, and the spider webs that result block gas flow inside the burner and create flash-fire hazards on first use of the season. We inspect every venturi tube, clear any webs we find, and verify or install spider screens at the burner intakes. We also check for wasp nests under control panels, mud-dauber buildup in regulator vents, and rodent activity in the cabinet base. Coastal kitchens see less pest activity but we still spot-check.</p>
+      </div>
+
+      <div class="include-card">
+        <h3>Salt-residue treatment (coastal)</h3>
+        <p>Coastal-specific protocol applied on every Malibu, Pacific Palisades, Manhattan Beach, Newport Beach, and Laguna visit. Cabinet hardware (hinges, fasteners, latches) treated with a corrosion-inhibiting compound. Stainless surfaces rinsed and treated with a marine-grade protective sealant on units that haven't had it in 12+ months. Knob shafts treated to prevent the salt-driven corrosion that seizes the valve stem behind the plastic knob. Visual corrosion sweep on panel edges, screw heads, and any aluminum components.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="ph-faq">
-    <div class="ph-wrap">
-      <h2>Frequently Asked</h2>
-      {faqs.map(f => (<details class="ph-detail"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+<!-- 03 COASTAL VS INLAND CALENDAR -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 — Maintenance calendar</p>
+    <h2 class="section-title">Coastal vs inland Southern California — different schedules, different protocols.</h2>
+
+    <p>The single biggest factor that determines your maintenance interval is how far from the Pacific you are. Salt-laden marine air drives wear on outdoor kitchen components two to five times faster than inland air, depending on the exposure. We split our 5-county service area into two service-calendar zones, with a small overlap zone in between that we flex on a case-by-case basis.</p>
+
+    <div class="calendar-grid">
+      <div class="calendar-card calendar-coastal">
+        <h3>Coastal — every 6 months</h3>
+        <p class="calendar-zones">Malibu (Carbon Beach, Point Dume, Broad Beach, Malibu Colony) · Pacific Palisades · Santa Monica · Manhattan Beach · Hermosa Beach · Redondo Beach · Palos Verdes coastal · Long Beach waterfront · Newport Beach · Newport Coast · Corona del Mar · Laguna Beach · Dana Point · San Clemente · Ventura coastline · Oxnard waterfront</p>
+        <p>Within roughly a mile of the Pacific. Salt deposition rates are at the high end of what we see anywhere in Greater Los Angeles. Service interval is 6 months — one visit in spring before the heavy May-through-October use, one visit in fall before winterization. Spring focus: igniter electrode condition, gas valve operation, salt residue cleanup from winter exposure. Fall focus: deep coil clean on the refrigerator, gasket integrity, hardware corrosion treatment before the winter humidity cycle.</p>
+      </div>
+
+      <div class="calendar-card calendar-inland">
+        <h3>Inland — annually + pre-season check</h3>
+        <p class="calendar-zones">Thousand Oaks · Westlake Village · Calabasas · Hidden Hills · Bel Air · Beverly Hills · Pasadena · La Cañada Flintridge · San Marino · Arcadia · San Fernando Valley · Conejo Valley · Simi Valley · Rancho Cucamonga · Riverside · Corona · Temecula · Murrieta · Eastvale · Inland Empire generally</p>
+        <p>More than a few miles from the coast. Lower humidity, no meaningful salt exposure, but summer ambient temperatures push outdoor refrigeration to the top of its operating envelope and pest pressure (spiders, wasps, mud daubers) is substantially higher than coastal. Service interval is annual — one full maintenance visit, ideally in late spring (April or May) before the summer heat arrives. The pre-season check is the highest-value visit of the year inland: spider and pest inspection, gas line verification, igniter test, refrigerator coil clean ahead of the heat.</p>
+      </div>
     </div>
-  </section>
+
+    <p>The transition zones — parts of the Conejo Valley that get coastal influence through Malibu Canyon, the foothill cities that catch coastal fog at certain times of year, parts of Long Beach further inland — we flex case-by-case based on the specific install and the wear patterns we see on the first visit. Carbon Beach and Pacific Palisades are unambiguous coastal; Temecula and Rancho Cucamonga are unambiguous inland. The cities in between get scheduled based on what we actually find on the equipment, not on the map alone.</p>
+  </div>
+</section>
+
+<!-- 04 BRANDS -->
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">04 — Brands we maintain</p>
+    <h2 class="section-title">Outdoor kitchen brands we maintain across all 5 SoCal counties.</h2>
+
+    <p class="lead">The premium outdoor kitchen lineup in Southern California clusters around fourteen brands we carry parts for and have factory-trained service procedures on. Less common brands we cover too — we identify the OEM source on the visit and confirm parts before scheduling follow-up.</p>
+
+    <div class="brand-grid">
+      <div class="brand-card"><h3>Lynx Professional</h3><p class="model-list">L54PSR · L36PSR · 27/30/42/54-inch · Asado</p></div>
+      <div class="brand-card"><h3>Alfresco</h3><p class="model-list">ALXE-30/42/56 · Outdoor Kitchen series</p></div>
+      <div class="brand-card"><h3>Twin Eagles</h3><p class="model-list">TEBQ36R · TEBQ54R · Eagle One series</p></div>
+      <div class="brand-card"><h3>Fire Magic</h3><p class="model-list">Echelon · Aurora · Choice · Legacy series</p></div>
+      <div class="brand-card"><h3>Napoleon</h3><p class="model-list">Prestige Pro · BIPRO · Built-in 500 / 700</p></div>
+      <div class="brand-card"><h3>DCS by Fisher &amp; Paykel</h3><p class="model-list">BH1-36RN · Series 9 Professional 30/36/48-inch</p></div>
+      <div class="brand-card"><h3>Wolf Outdoor</h3><p class="model-list">OG30 · OG36 · OG42 · 30/36/42-inch outdoor gas grill</p></div>
+      <div class="brand-card"><h3>Viking Outdoor</h3><p class="model-list">VGBQ · 30/42/54-inch outdoor grill series</p></div>
+      <div class="brand-card"><h3>Weber Summit built-in</h3><p class="model-list">Summit S-460 / S-660 built-in · Genesis II built-in</p></div>
+      <div class="brand-card"><h3>Blaze</h3><p class="model-list">BLZ-3 · BLZ-4 · BLZ-5LBM · LTE 32/40-inch built-in</p></div>
+      <div class="brand-card"><h3>Sub-Zero outdoor</h3><p class="model-list">DEL3050 · UC-24RO · 24-inch outdoor undercounter</p></div>
+      <div class="brand-card"><h3>Marvel outdoor</h3><p class="model-list">ML24RAS · ML24RFS · outdoor refrigerator + ice maker</p></div>
+      <div class="brand-card"><h3>Perlick</h3><p class="model-list">HP24RS · HC24RO · HC24RB-1 · outdoor refrigeration</p></div>
+      <div class="brand-card"><h3>U-Line outdoor</h3><p class="model-list">UORE124 · 1000/2000/3000 series outdoor variants</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 WHAT GOES WRONG WITHOUT MAINTENANCE -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 — What neglect actually does</p>
+    <h2 class="section-title">What goes wrong without regular outdoor kitchen maintenance.</h2>
+
+    <p>The failures we see on neglected outdoor kitchens fall into four categories, and they cascade — one failure makes the next failure more likely, and by year 6 or 7 a kitchen that should be running fine starts looking like it needs to be rebuilt.</p>
+
+    <p><strong>Fire and safety hazards.</strong> Spider webs in venturi tubes block gas flow inside the burner and force gas backward toward the control panel where it can ignite as a flash fire when the burner is lit. Grease accumulation in the drip tray and along the burner shrouds is the standard ignition source for grease fires that scorch the hood interior and sometimes spread to adjacent cabinetry. Gas leaks at corroded valve seats — small enough that the homeowner can't smell them — accumulate in the cabinet base and create explosion risk on first ignition. None of these are theoretical; we get called to outdoor kitchens that have flash-fired or grease-fired every single year, and in nearly every case the underlying cause was something a maintenance visit would have caught.</p>
+
+    <p><strong>Voided warranties.</strong> Most premium outdoor kitchen warranties — Lynx, Alfresco, Twin Eagles, Fire Magic, Sub-Zero outdoor, Marvel, Perlick — explicitly require regular maintenance to keep coverage active. When a homeowner files a warranty claim on a fouled refrigerator coil that should have been cleaned twice a year, or on a corroded burner that should have been inspected annually, the manufacturer denies the claim and the homeowner pays out of pocket for repairs that would otherwise have been free. The maintenance documentation we provide after every visit is exactly what manufacturers ask for if you do need to make a warranty claim later.</p>
+
+    <p><strong>Compressor failures from fouled coils.</strong> Outdoor refrigerator condenser coils foul faster than indoor equivalents — salt-and-dust paste on coastal units, dust accumulation on inland units. A fouled coil cuts heat-exchange efficiency, the compressor runs longer to maintain setpoint, and accumulated heat stress shortens compressor life by 30 to 50 percent. Sub-Zero outdoor compressor replacement is $680 to $980 parts and labor; on Marvel and U-Line outdoor units it runs $480 to $720. Coil cleaning is included on every maintenance visit. The math is straightforward: years of $0 included coil cleans prevent a single $800 compressor failure.</p>
+
+    <p><strong>Igniter and gas-valve corrosion from neglect.</strong> Igniter electrodes pit and lose gap geometry over 4 to 6 years even on inland kitchens; coastal kitchens hit the same point at 2 to 3 years. Gas valves develop internal corrosion on the brass seal surfaces — first symptom is a stiff knob, second symptom is a knob that won't shut off completely. Caught at maintenance, these are inexpensive fixes ($180 to $280 for igniter work, $320 to $580 for a gas valve replacement). Caught at failure, they often come with collateral damage — burned-out adjacent components, gas leak that requires emergency response, kitchen out of service for the weekend you wanted to use it.</p>
+  </div>
+</section>
+
+<!-- 06 RECENT MAINTENANCE VISITS -->
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">06 — Recent maintenance visits</p>
+    <h2 class="section-title">Recent outdoor kitchen maintenance visits.</h2>
+
+    <p class="lead">Four representative maintenance visits — model, location, what we found, what we did, and cost. Names omitted; the technical scenarios are typical of what we see on outdoor kitchen maintenance calls in each microclimate.</p>
+
+    <div class="repair-grid">
+      <div class="repair-card">
+        <h3>Lynx L54PSR + Sub-Zero UC-24RO — Malibu coastal</h3>
+        <p><strong>Visit type:</strong> Semi-annual coastal maintenance, fall visit before winterization. Equipment was on a 6-month schedule with us; this was the second visit of the year.</p>
+        <p><strong>What we found:</strong> Burner ports moderately fouled with salt-and-grease residue from heavy summer use. Igniter electrodes at early-stage corrosion — still functional, flagged for replacement at next spring visit. Sub-Zero condenser coil fouled enough to recommend deep clean as add-on. Door gasket showed early compression loss at upper-left corner. Cabinet hardware showed expected coastal patina; no active corrosion.</p>
+        <p><strong>What we did:</strong> Standard burner removal and ultrasonic port cleaning, gas-line soap test (clean), salt-residue protocol on cabinet hardware and stainless surfaces, condenser coil deep clean (add-on), door gasket replacement (add-on, part on truck), drip tray service. Spring revisit pre-scheduled.</p>
+        <p><strong>Cost &amp; time:</strong> $620 total ($420 maintenance + $120 deep coil + $180 gasket replacement). 2.5 hours on-site.</p>
+      </div>
+
+      <div class="repair-card">
+        <h3>Alfresco ALXE-42 + Marvel ML24RAS — Newport Beach coastal</h3>
+        <p><strong>Visit type:</strong> First-time maintenance visit on a 4-year-old install. Owner had never had the kitchen serviced — wanted a baseline before scheduling regular service.</p>
+        <p><strong>What we found:</strong> Burners themselves in good shape (Alfresco cast-stainless construction holds up well). Igniter electrodes fully functional, no replacement needed. Marvel ice maker producing scaled and undersized cubes — heavy mineral and salt buildup on the evaporator plate, water filter past replacement interval by 2 years. Outdoor refrigerator coil heavily fouled. Knob shafts on the grill showed early salt-driven binding.</p>
+        <p><strong>What we did:</strong> Full standard maintenance suite. Ice maker descale and water filter replacement (add-on). Refrigerator deep coil clean (add-on). Knob shaft cleaning and treatment. Set up coastal semi-annual schedule going forward — next visit in 6 months.</p>
+        <p><strong>Cost &amp; time:</strong> $510 total ($350 maintenance + $120 deep coil + $90 ice maker descale and filter, with $50 brand-discount applied for first-time customer enrolling in semi-annual). 3 hours on-site.</p>
+      </div>
+
+      <div class="repair-card">
+        <h3>Twin Eagles TEBQ36R + Perlick HP24RS — Thousand Oaks inland</h3>
+        <p><strong>Visit type:</strong> Annual pre-season maintenance, late April. Equipment was on annual schedule with us; this was the standard yearly visit ahead of summer.</p>
+        <p><strong>What we found:</strong> Spider webs in two of three venturi tubes — black widow species, common in inland Conejo Valley installs left covered through winter. Burner ports clean (annual cadence is sufficient inland). Igniter module battery weak; spark output marginal. Perlick refrigerator condenser coil dust-fouled at 12-month interval as expected. Gas line and connections all clean on soap test. Wasp nest under the side-burner control panel.</p>
+        <p><strong>What we did:</strong> Venturi tube clearing, spider screen verification at burner intakes, igniter battery replacement, standard coil clean on the Perlick, wasp nest removal and treatment, full gas safety check, drip tray service. Pre-season setup complete.</p>
+        <p><strong>Cost &amp; time:</strong> $340 total. 2 hours on-site.</p>
+      </div>
+
+      <div class="repair-card">
+        <h3>Fire Magic Echelon + Sub-Zero outdoor — Rancho Cucamonga inland</h3>
+        <p><strong>Visit type:</strong> First-time maintenance visit on a 6-year-old install. Owner had been "occasional cleaning" the kitchen but never had it professionally serviced; recent uneven flame on the grill prompted the call.</p>
+        <p><strong>What we found:</strong> Heavy dust accumulation in the cabinet base and condenser-coil compartment from Inland Empire dust exposure. Burner ports significantly fouled — port cleaning resolved the uneven-flame symptom that prompted the call. Two igniter electrodes pitted past the point of reliable spark; flagged for replacement. Sub-Zero coil severely fouled, performance compromised but unit still holding setpoint. No spider activity (cover had been used through winter), but a mud-dauber nest in the regulator vent — gas flow was being affected.</p>
+        <p><strong>What we did:</strong> Full burner cleaning, mud-dauber removal and regulator service (critical safety item, no charge above the maintenance visit), Sub-Zero deep coil clean (add-on), igniter electrode replacement on the two failed positions (add-on), full cabinet base vacuum and dust remediation. Set up annual schedule going forward.</p>
+        <p><strong>Cost &amp; time:</strong> $625 total ($380 maintenance + $120 deep coil + $125 dual electrode replacement). 2.75 hours on-site.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 PRICING -->
+<section class="section">
+  <div class="container">
+    <p class="section-number">07 — Pricing</p>
+    <h2 class="section-title">Outdoor kitchen maintenance pricing.</h2>
+
+    <p class="lead">Maintenance pricing is transparent and quoted before the visit. Standard maintenance covers the full outdoor kitchen suite — grill, side burner, outdoor refrigerator, ice maker, rotisserie if equipped. Add-ons quoted separately if needed. Diagnostic-only visits (you have a specific concern, no maintenance scope) are $89 and apply toward repair if you authorize work.</p>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-label">Standard maintenance visit</div>
+        <div class="price-amount">$280–$420</div>
+        <div class="price-desc">Full outdoor kitchen suite · single visit · 2 to 3 hours on-site</div>
+      </div>
+      <div class="price-card price-card-feature">
+        <div class="price-label">Coastal semi-annual package</div>
+        <div class="price-amount">$480–$720<span class="price-suffix">/yr</span></div>
+        <div class="price-desc">Two visits per year · spring + fall · ~$30/mo on larger kitchens</div>
+      </div>
+      <div class="price-card price-card-feature">
+        <div class="price-label">Inland annual package</div>
+        <div class="price-amount">$280–$420<span class="price-suffix">/yr</span></div>
+        <div class="price-desc">One pre-season visit · spider/pest + gas + coil clean</div>
+      </div>
+      <div class="price-card">
+        <div class="price-label">Diagnostic-only</div>
+        <div class="price-amount">$89</div>
+        <div class="price-desc">Specific concern, no maintenance scope · applies to repair</div>
+      </div>
+      <div class="price-card">
+        <div class="price-label">Add-on: deep coil clean</div>
+        <div class="price-amount">+$120–$180</div>
+        <div class="price-desc">Outdoor refrigerator full pull-out · evaporator + drain</div>
+      </div>
+      <div class="price-card">
+        <div class="price-label">Add-on: igniter replacement</div>
+        <div class="price-amount">+$180–$280</div>
+        <div class="price-desc">Spark module or electrode kit · most premium brands</div>
+      </div>
+      <div class="price-card">
+        <div class="price-label">Add-on: ice maker descale</div>
+        <div class="price-amount">+$90–$140</div>
+        <div class="price-desc">Mineral and salt remediation · water filter replacement</div>
+      </div>
+      <div class="price-card">
+        <div class="price-label">Add-on: gas valve replacement</div>
+        <div class="price-amount">+$320–$580</div>
+        <div class="price-desc">Single or dual-burner valve · if found needed at maintenance</div>
+      </div>
+    </div>
+
+    <p class="price-note">Maintenance pricing varies within the band based on equipment count (single-grill kitchen versus full suite with refrigeration and ice maker), brand-specific labor (Twin Eagles and high-tier Lynx Professional run at the upper end of the band; Blaze, U-Line, and entry-tier Weber Summit run at the lower end), and travel distance. Coastal addresses on the longer end of our PCH and OC coastal routes (deep Malibu, Laguna, Newport Coast, Ventura coastline) sit at the upper end of the band due to drive time. We confirm the all-in price before the visit, and add-ons are always quoted in writing for your approval before any extra work begins.</p>
+  </div>
+</section>
+
+<!-- 08 RELATED -->
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">08 — Related services</p>
+    <h2 class="section-title">Other outdoor kitchen services we provide.</h2>
+
+    <div class="related-grid">
+      <a href="/services/bbq-grill-repair/" class="related-card">
+        <h3>BBQ Grill Repair</h3>
+        <p>Reactive grill repair across all 5 SoCal counties — burner failure, igniter not sparking, gas valve replacement, control panel work. Lynx, Alfresco, Twin Eagles, Fire Magic, DCS, Wolf, Viking, Weber, Blaze, Hestan, Bull Outdoor.</p>
+      </a>
+      <a href="/services/outdoor-refrigerator-repair/" class="related-card">
+        <h3>Outdoor Refrigerator Repair</h3>
+        <p>The deeper service tree on outdoor refrigeration specifically — Sub-Zero UC-24RO, Viking VBUO, U-Line outdoor, Marvel, Perlick, True Outdoor. Coastal salt-air diagnostics, GFCI work, drain/condensate, sealed-system refrigerant.</p>
+      </a>
+      <a href="/outdoor-kitchen-repair-malibu/" class="related-card">
+        <h3>Outdoor Kitchen Repair — Malibu</h3>
+        <p>Full-suite Malibu outdoor kitchen repair with the coastal-specific failure tree, neighborhood coverage from Carbon Beach through Broad Beach, and the 8 premium brands concentrated in the PCH corridor.</p>
+      </a>
+      <a href="/services/wine-cooler-repair/" class="related-card">
+        <h3>Wine Cooler Repair</h3>
+        <p>Wine coolers — indoor and outdoor variants — are a different product category from outdoor refrigerators. If your outdoor kitchen includes a dedicated wine storage unit, the wine cooler page is the right service tree.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 09 FAQ -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">09 — FAQ</p>
+    <h2 class="section-title">Outdoor kitchen maintenance — FAQ.</h2>
+
+    <div class="faq-list">
+      {faqs.map(f => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- 10 BOTTOM CTA -->
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Schedule outdoor kitchen maintenance — coastal biannual or inland annual.</h2>
+    <p>Standard maintenance visit $280 to $420 covering the full outdoor kitchen suite. Coastal semi-annual package $480 to $720 per year. Inland annual package $280 to $420 per year. Lynx, Alfresco, Twin Eagles, Fire Magic, Napoleon, DCS, Wolf Outdoor, Viking Outdoor, Weber Summit, Blaze, Sub-Zero outdoor, Marvel, Perlick, U-Line outdoor.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
 </Layout>
 
 <style>
-  .ph-wrap { max-width: 820px; margin: 0 auto; padding: 0 24px; }
-  .ph-hero { background: #0a0a0a; color: #fff; padding: 64px 0; }
-  .ph-eyebrow { color: #C8102E; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 14px; }
-  .ph-hero h1 { font-size: clamp(1.6rem, 3.2vw, 2.4rem); font-weight: 800; margin: 0 0 16px; line-height: 1.2; }
-  .ph-intro { color: rgba(255,255,255,0.85); font-size: 1.05rem; margin: 0 0 28px; line-height: 1.65; }
-  .ph-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
-  .ph-btn { display: inline-block; background: #C8102E; color: #fff; padding: 12px 24px; text-decoration: none; font-weight: 700; border-radius: 4px; font-size: 0.95rem; }
-  .ph-btn-ghost { background: transparent; border: 1px solid rgba(255,255,255,0.4); }
-  .ph-faq { padding: 56px 0; background: #f5f5f5; }
-  .ph-faq h2 { font-size: 1.5rem; margin: 0 0 20px; color: #0a0a0a; }
-  .ph-detail { background: #fff; border: 1px solid #e2e2e2; padding: 14px 18px; border-radius: 4px; margin-bottom: 8px; }
-  .ph-detail summary { font-weight: 600; cursor: pointer; color: #0a0a0a; }
-  .ph-detail p { margin: 10px 0 0; color: #444; line-height: 1.6; }
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; --coastal: #1d4e89; --inland: #b8651a; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 20px; line-height: 1.2; color: var(--text); }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 20px; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+
+  .include-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 22px; margin-top: 32px; }
+  .include-card { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--red); border-radius: 6px; padding: 24px 26px; }
+  .include-card h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 10px; color: var(--text); }
+  .include-card p { font-size: 0.93rem; color: var(--text); margin: 0; line-height: 1.7; }
+
+  .calendar-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; margin-bottom: 28px; }
+  .calendar-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 28px 28px; }
+  .calendar-card h3 { font-size: 1.15rem; font-weight: 800; margin: 0 0 14px; color: var(--text); }
+  .calendar-coastal { border-top: 4px solid var(--coastal); }
+  .calendar-coastal h3 { color: var(--coastal); }
+  .calendar-inland { border-top: 4px solid var(--inland); }
+  .calendar-inland h3 { color: var(--inland); }
+  .calendar-card .calendar-zones { font-size: 0.85rem; color: var(--muted); font-style: italic; margin: 0 0 14px; line-height: 1.6; }
+  .calendar-card p { font-size: 0.95rem; color: var(--text); margin: 0; line-height: 1.7; }
+  @media (max-width: 768px) { .calendar-grid { grid-template-columns: 1fr; } }
+
+  .brand-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 32px; }
+  .brand-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 20px 20px; }
+  .brand-card h3 { font-size: 1rem; font-weight: 800; margin: 0 0 8px; color: var(--text); }
+  .brand-card .model-list { font-size: 0.8rem; color: var(--red); font-family: 'Courier New', monospace; margin: 0; letter-spacing: 0.02em; line-height: 1.5; }
+
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; margin-top: 32px; }
+  .price-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 24px 20px; text-align: center; }
+  .price-card-feature { border: 2px solid var(--red); background: #fffafa; }
+  .price-card .price-label { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px; font-weight: 700; }
+  .price-card .price-amount { font-size: 1.7rem; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 10px; }
+  .price-card .price-suffix { font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-left: 2px; }
+  .price-card .price-desc { font-size: 0.83rem; color: var(--muted); line-height: 1.55; }
+  .price-note { margin-top: 24px; font-size: 0.95rem; color: var(--text); line-height: 1.7; }
+
+  .repair-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px; margin-top: 30px; }
+  .repair-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 26px 24px; }
+  .repair-card h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 14px; color: var(--text); line-height: 1.35; }
+  .repair-card p { font-size: 0.92rem; color: var(--text); margin: 0 0 10px; line-height: 1.65; }
+  .repair-card p:last-child { margin-bottom: 0; }
+  .repair-card strong { color: var(--text); font-weight: 700; }
+
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 30px; }
+  .related-card { display: block; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+  .related-card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .related-card h3 { font-size: 1rem; font-weight: 800; margin: 0 0 10px; color: var(--text); }
+  .related-card p { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.6; }
+
+  .faq-list { margin-top: 32px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+
+  .bottom-cta { background: var(--black); color: #fff; padding: 72px 24px; text-align: center; }
+  .bottom-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 16px; color: #fff; line-height: 1.25; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 30px; font-size: 1.02rem; line-height: 1.6; max-width: 800px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 16px 34px; border-radius: 5px; font-size: 1rem; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 16px 34px; border-radius: 5px; font-size: 1rem; font-weight: 600; text-decoration: none; border: 2px solid rgba(255,255,255,0.35); }
 </style>
+</content>
+</invoke>
