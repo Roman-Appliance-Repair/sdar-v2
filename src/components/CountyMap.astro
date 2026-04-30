@@ -16,9 +16,23 @@ export interface Props {
 const { county, height = '400px' } = Astro.props;
 
 interface CityPin { name: string; lat: number; lng: number; url: string; }
-interface CountyData { center: [number, number]; zoom: number; cities: CityPin[]; }
+interface CountyData { center: [number, number]; zoom: number; cities: CityPin[]; markerType?: 'city' | 'branch'; }
 
 const COUNTIES: Record<string, CountyData> = {
+  'all': {
+    center: [34.0, -118.0], zoom: 8,
+    markerType: 'branch',
+    cities: [
+      { name: 'West Hollywood Branch', lat: 34.0900, lng: -118.3617, url: '/west-hollywood/' },
+      { name: 'Beverly Hills Branch', lat: 34.0736, lng: -118.4004, url: '/beverly-hills/' },
+      { name: 'Los Angeles Branch', lat: 34.0522, lng: -118.2437, url: '/los-angeles/' },
+      { name: 'Pasadena Branch', lat: 34.1478, lng: -118.1445, url: '/pasadena/' },
+      { name: 'Thousand Oaks Branch', lat: 34.1706, lng: -118.8376, url: '/thousand-oaks/' },
+      { name: 'Irvine Branch', lat: 33.6846, lng: -117.8265, url: '/irvine/' },
+      { name: 'Rancho Cucamonga Branch', lat: 34.1064, lng: -117.5931, url: '/rancho-cucamonga/' },
+      { name: 'Temecula Branch', lat: 33.4936, lng: -117.1484, url: '/temecula/' },
+    ],
+  },
   'los-angeles-county': {
     center: [34.0522, -118.2437], zoom: 10,
     cities: [
@@ -142,17 +156,19 @@ const containerId = `county-map-${county}`;
         attribution: '&copy; OpenStreetMap contributors',
       }).addTo(map);
 
-      const pinHtml = '<div class="cmm-pin" aria-hidden="true"></div>';
+      const isBranch = data.markerType === 'branch';
+      const size = isBranch ? 28 : 20;
       const icon = L.divIcon({
-        className: 'county-map-marker',
-        html: pinHtml,
-        iconSize: [20, 20],
-        iconAnchor: [10, 10],
+        className: 'county-map-marker' + (isBranch ? ' county-map-marker--branch' : ''),
+        html: '<div class="cmm-pin' + (isBranch ? ' cmm-pin--branch' : '') + '" aria-hidden="true"></div>',
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
       });
 
       data.cities.forEach(function (c) {
         const m = L.marker([c.lat, c.lng], { icon: icon, title: c.name }).addTo(map);
-        m.bindTooltip(c.name, { direction: 'top', offset: [0, -8] });
+        const tip = isBranch ? (c.name + ' &mdash; click for service area') : c.name;
+        m.bindTooltip(tip, { direction: 'top', offset: [0, -8] });
         m.on('click', function () { window.location.href = c.url; });
       });
     }
@@ -178,6 +194,15 @@ const containerId = `county-map-${county}`;
   .county-map-marker:hover .cmm-pin {
     background: #ff1f47;
     transform: scale(1.18);
+  }
+  .county-map-marker--branch .cmm-pin--branch {
+    width: 28px;
+    height: 28px;
+    border-width: 3px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.5), 0 0 0 4px rgba(200, 16, 46, 0.18);
+  }
+  .county-map-marker--branch:hover .cmm-pin--branch {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.55), 0 0 0 6px rgba(200, 16, 46, 0.28);
   }
 </style>
 
