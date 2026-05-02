@@ -1,17 +1,268 @@
 ---
+// src/pages/brands/amana-laundry-repair.astro
+// Niche combo — Amana washer + dryer repair (~0 GSC impressions; brand portfolio completion).
+// Parent: /brands/amana/. Voice consistency with amana.astro: Iowa heritage, Whirlpool platform
+// (since 2006), value-tier positioning, NTW/NED model series, Whirlpool F-codes.
 import Layout from '../../layouts/Layout.astro';
-import BrandDetailPlaceholder from '../../components/BrandDetailPlaceholder.astro';
+import ServiceHero from '../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../data/branches';
 
-const title = "Amana Laundry Repair | Southern California | Same Day Service";
-const description = "Expert Amana laundry repair across Southern California. Same-day appointments, OEM parts, licensed technicians. Call (424) 325-0520.";
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/brands/amana-laundry-repair/";
+
+const title = "Amana Washer & Dryer Repair — NTW · NED Top-Load | Same Day Appliance Repair";
+const description = `Amana laundry repair across Southern California — NTW top-load washers, NED dryers. Whirlpool-platform parts, value-tier service. F01, F02, F26 diagnostics. $89 diagnostic, applied toward repair. Call ${phone}.`;
+
+const faqs = [
+  {
+    q: "What does an F02 code on my Amana washer mean?",
+    a: "F02 on Amana NTW top-loaders is a long-drain code: the washer detected that water didn't drain in the expected cycle time. The fault tree, in order: (1) clogged drain pump filter or drain hose — most common, $0 parts cost if cleared during the diagnostic; (2) failed drain pump — $145-$245 replacement; (3) blocked house drain line behind the washer — homeowner plumbing issue we identify but don't fix; (4) faulty pressure switch giving wrong water-level reading. We work the cheap items first. About a third of F02 calls resolve at the drain pump filter clean-out with no parts cost.",
+  },
+  {
+    q: "My Amana dryer drum spins but the clothes won't dry — what's wrong?",
+    a: "Three likely causes on Amana NED electric dryers: (1) clogged dryer vent — the most common cause and a fire hazard; we inspect and clear it as standard procedure; (2) failed heating element — element burns out around year 8-12 on typical-use machines, $285-$425 replacement; (3) blown thermal fuse triggered by a vent restriction event (the fuse is doing its job, but it won't reset — it has to be replaced and the underlying restriction cleared). Gas NED dryers add a fourth path: failed gas valve coil or igniter. We check the vent first on every dryer call because clearing a clogged vent is the cheapest fix and fixes a fire hazard at the same time.",
+  },
+  {
+    q: "How much does Amana washer or dryer repair cost?",
+    a: `Diagnostic is $89, applied toward the repair when you approve work. Amana pricing typically lands at the lower end of the Whirlpool-platform band. Common Amana laundry repair ranges: lid switch $145-$245; drain pump $145-$245; drive belt or motor coupling $185-$285; water inlet valve $185-$285; pressure switch $185-$285; dryer thermal fuse + vent inspection $145-$245; dryer heating element $285-$425; dryer drum belt + idler pulley $185-$285; central control unit (CCU) $345-$525. We give a written estimate before any work begins. On year-10+ Amana units we'll tell you out loud when repair cost approaches 50% of replacement.`,
+  },
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Amana Washer and Dryer Repair",
+    "name": "Amana Laundry Repair — Same Day Appliance Repair",
+    "url": canonical,
+    "description": "Same-day Amana washer and dryer repair across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. NTW top-load washers, NED electric and gas dryers. Whirlpool-platform parts and diagnostic procedures. F01 / F02 / F26 fault codes, lid switches, drain pumps, drive couplers, heating elements, drum belts, thermal fuses. $89 residential diagnostic, applied toward repair.",
+    "provider": {
+      "@type": "LocalBusiness",
+      "name": "Same Day Appliance Repair",
+      "url": "https://samedayappliance.repair/",
+      "telephone": phone,
+      "priceRange": "$$",
+    },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" },
+    ],
+    "offers": {
+      "@type": "Offer",
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "price": "89.00",
+        "priceCurrency": "USD",
+        "description": "Residential diagnostic fee, applied toward repair",
+      },
+    },
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Brands", "item": "https://samedayappliance.repair/brands/" },
+      { "@type": "ListItem", "position": 3, "name": "Amana", "item": "https://samedayappliance.repair/brands/amana/" },
+      { "@type": "ListItem", "position": 4, "name": "Amana Laundry Repair", "item": canonical },
+    ],
+  },
+];
 ---
 
-<Layout title={title} description={description}>
-  <BrandDetailPlaceholder
-    brandName="Amana"
-    brandSlug="amana"
-    category="Laundry"
-    categorySlug="washer-repair"
-    hubUrl="/brands/amana/"
-  />
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  eyebrow="LA · Orange · Ventura · San Bernardino · Riverside Counties"
+  title="Amana Washer & Dryer Repair — Across Southern California"
+  subtitle="NTW top-load washers, NED gas and electric dryers. Whirlpool-platform parts on every truck. F01, F02, F26 diagnostics. $89 diagnostic, applied toward repair. Same day across five SoCal counties."
+  heroImageTitle="Amana Laundry Repair"
+  showBranches={true}
+/>
+
+<!-- 01 INTRO -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 — About this service</p>
+    <h2 class="section-title">Amana laundry on the Whirlpool platform.</h2>
+
+    <p>Amana laundry is the value-tier line within the Whirlpool family — entry-spec top-load washers (NTW series) and matching dryers (NED series in gas and electric configurations) built on the same engineering platform that underpins Whirlpool Centennial and equivalent Maytag entry-tier models. From a service standpoint that's good news: parts cross-reference cleanly across the three brands, our trucks carry the components most likely to fail on Amana, and our techs use the same Whirlpool F-code diagnostic tree we use on hundreds of laundry calls a year. <a href="/brands/amana/">Brand hub</a> covers Amana's full appliance lineup; this page is washer + dryer specific.</p>
+
+    <p>Amana laundry sits at a price point that shapes the repair calculation: NTW washers and NED dryers are designed to run reliably to year 10-12 with normal household use, after which repair-vs-replace tilts harder toward replacement than it does on Whirlpool's mid-tier or Maytag's heavy-duty lines. We tell homeowners the math out loud at diagnostic — if the repair quote approaches 50% of a comparable replacement on a year-12+ Amana unit, replacement is usually the call. Under year 8, repair almost always wins.</p>
+  </div>
+</section>
+
+<!-- 02 COMMON FAILURES -->
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">02 — Common failures</p>
+    <h2 class="section-title">What we diagnose most often on Amana washers and dryers.</h2>
+
+    <div class="problem-grid">
+      <div class="problem-card">
+        <h3>NTW lid switch failure (year 3-6)</h3>
+        <p>The most common Amana washer call. Lid switch fails open and the washer won't agitate or spin (the safety logic stops the cycle when the lid is interpreted as open). F26 fault code points directly here. Replacement is straightforward: pull the top panel, swap the switch, verify continuity. About 70% of "won't agitate" or "won't spin" calls on NTW units trace to the lid switch rather than the motor or drive system.</p>
+      </div>
+      <div class="problem-card">
+        <h3>NTW drain pump and F02 (year 6-9)</h3>
+        <p>F02 is a long-drain code — the washer didn't pump out water in the cycle window. Order of diagnosis: clogged pump filter (cheap), kinked or clogged drain hose (cheap), failed drain pump (mid-range part), blocked house drain (homeowner plumbing). About a third of F02 calls resolve at the filter clean-out with no parts cost. Pump replacement on the remaining cases.</p>
+      </div>
+      <div class="problem-card">
+        <h3>NED dryer not heating (year 8-12)</h3>
+        <p>The single most-asked dryer question. On electric NED units, failed heating element is the common cause — element burns out around year 8-12 on typical use. On gas NED units, igniter or gas valve coil. Both can also be triggered by a clogged vent that overheats and trips the thermal fuse — we check vent restriction every dryer call because it's the cheapest fix and clearing it addresses a fire hazard at the same time.</p>
+      </div>
+      <div class="problem-card">
+        <h3>NED drum belt + idler pulley (year 6-9)</h3>
+        <p>Squealing or thumping during drum rotation, eventually failing to turn at all. Drum belts on Amana NED dryers (shared platform with Whirlpool) wear at year 6-9 in typical-use households. Replacement is bundled with idler pulley inspection — if the pulley is worn, replacing the belt without it just shortens the new belt's life. We replace as a paired service when the pulley shows wear.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 03 MODELS + F-CODES -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 — Amana models and F-codes</p>
+    <h2 class="section-title">NTW washers, NED dryers, Whirlpool diagnostic tree.</h2>
+
+    <p><strong>Amana NTW top-load washers:</strong> NTW4516, NTW4519, NTW4605, NTW4655, NTW4775 — entry-tier top-load washers with mechanical agitator, glass lid, basic electronic controls. Mechanically similar to Whirlpool Centennial WTW base-spec models. Common service: lid switch, drain pump, drive belt, motor coupling, water inlet valve, pressure switch.</p>
+
+    <p><strong>Amana NED dryers (gas + electric):</strong> NED4655 (electric), NGD4655 (gas), NED4500, NGD4500 — matching pair-mates for the NTW washer line. Electric units use a 240V heating element; gas units use a hot-surface igniter and gas valve. Common service items shared with Whirlpool dryer platform.</p>
+
+    <p><strong>Whirlpool F-codes that apply to Amana laundry:</strong></p>
+
+    <ul class="bullet-list">
+      <li><strong>F01:</strong> Central control unit (CCU) fault. Often resolves with a hard reset (unplug 60 seconds, restore power); persistent F01 indicates CCU replacement.</li>
+      <li><strong>F02:</strong> Long drain — water not pumped out in cycle window. Diagnostic order: filter, hose, pump, house drain.</li>
+      <li><strong>F26:</strong> Lid switch fault. Direct path to lid-switch replacement.</li>
+      <li><strong>F70 / F71 series:</strong> User interface or communication faults between control board and panel. Connector reseat first; replacement second.</li>
+    </ul>
+
+    <p>Pre-2006 Amana washers and dryers (pre-Whirlpool acquisition) we still service when parts can be sourced; the older Amana platform had different internals and we identify production year from the model and serial tag before scheduling.</p>
+  </div>
+</section>
+
+<!-- 04 PRICING -->
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">04 — Pricing</p>
+    <h2 class="section-title">Amana washer and dryer repair pricing.</h2>
+
+    <p class="lead">Diagnostic is $89, applied toward the repair when you approve work. Amana pricing typically lands at the lower end of the Whirlpool-platform band given the value-tier positioning. Written estimate before any parts go on.</p>
+
+    <div class="pricing-grid">
+      <div class="price-card">
+        <div class="price-label">Diagnostic</div>
+        <div class="price-amount">$89</div>
+        <div class="price-desc">Waived when you approve repair</div>
+      </div>
+      <div class="price-card">
+        <div class="price-label">Standard washer band</div>
+        <div class="price-amount">$145–$285</div>
+        <div class="price-desc">Lid switch · drain pump · water valve</div>
+      </div>
+      <div class="price-card">
+        <div class="price-label">Standard dryer band</div>
+        <div class="price-amount">$145–$285</div>
+        <div class="price-desc">Thermal fuse · drum belt · vent service</div>
+      </div>
+      <div class="price-card">
+        <div class="price-label">Major component</div>
+        <div class="price-amount">$285–$525</div>
+        <div class="price-desc">Heating element · CCU · motor coupling</div>
+      </div>
+    </div>
+
+    <p class="price-note">Cross-platform parts compatibility means most Amana repairs complete same-day with parts already on the truck. Year-10+ units approaching 50% of replacement cost typically tilt toward replacement — we tell you the math at diagnostic so the decision is yours, not ours.</p>
+  </div>
+</section>
+
+<!-- 05 FAQ -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 — FAQ</p>
+    <h2 class="section-title">Amana laundry repair — common questions.</h2>
+
+    <div class="faq-list">
+      {faqs.map((f) => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- 06 BOTTOM CTA -->
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Amana washer or dryer down? Same-day service across Southern California.</h2>
+    <p>$89 diagnostic, applied toward the repair. NTW washers, NED dryers, Whirlpool-platform parts on every truck — value-tier laundry service across all five SoCal counties.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
 </Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 20px; line-height: 1.2; color: var(--text); }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 20px; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .bullet-list { margin: 20px 0; padding-left: 24px; }
+  .bullet-list li { margin-bottom: 10px; font-size: 1rem; line-height: 1.7; color: var(--text); }
+
+  .problem-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+  .problem-card { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--red); border-radius: 6px; padding: 26px 28px; }
+  .problem-card h3 { font-size: 1.1rem; font-weight: 800; margin: 0 0 12px; color: var(--text); }
+  .problem-card p { font-size: 0.95rem; color: var(--text); margin: 0; line-height: 1.7; }
+  @media (max-width: 768px) { .problem-grid { grid-template-columns: 1fr; } }
+
+  .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 32px; }
+  .price-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 26px 22px; text-align: center; }
+  .price-card .price-label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 10px; font-weight: 700; }
+  .price-card .price-amount { font-size: 1.85rem; font-weight: 800; color: var(--text); line-height: 1; margin-bottom: 10px; }
+  .price-card .price-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.55; }
+  .price-note { margin-top: 24px; font-size: 0.95rem; color: var(--text); line-height: 1.7; }
+
+  .faq-list { margin-top: 32px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+
+  .bottom-cta { background: var(--black); color: #fff; padding: 72px 24px; text-align: center; }
+  .bottom-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 16px; color: #fff; line-height: 1.25; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 30px; font-size: 1.02rem; line-height: 1.6; }
+  .cta-row { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 16px 34px; border-radius: 5px; font-size: 1rem; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 16px 34px; border-radius: 5px; font-size: 1rem; font-weight: 600; text-decoration: none; border: 2px solid rgba(255,255,255,0.35); }
+</style>
