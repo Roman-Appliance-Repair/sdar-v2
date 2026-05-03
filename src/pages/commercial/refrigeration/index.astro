@@ -1,496 +1,449 @@
 ---
-// src/pages/commercial/refrigeration-hub.astro
-// Routing hub for commercial refrigeration sub-services. T15 (2026-04-29):
-// migrated from BaseLayout to standard Layout + CommercialHero, neutralized
-// from LA-locked to 5-county, hardcoded WeHo phone replaced with MAIN_PHONE,
-// 6 sub-page routing cards added, Service + FAQPage schema, no aggregateRating.
+// src/pages/commercial/refrigeration/index.astro
+// PILLAR PAGE — Commercial Refrigeration cluster (Cluster 2 anchor).
+// SEO target: "commercial refrigeration repair" 7,099 vol/mo, KD 13. GSC positions 5-11
+// already indexed; pillar upgrade to top-3 within 4-8 weeks expected per Roadmap.
+// Voice + structure matched to outdoor pillar 76caa2a. EPA 608 differentiator surfaced
+// minimum 6 times in body. 24/7 phones answered + no emergency surcharge as competitive
+// differentiator. Honest scope (no supermarket racks, no ammonia, no CO2). FDA Food Code
+// 41°F threshold awareness. SSOT note: aggregateRating REMOVED per 2026-04-27 policy
+// (memory file + commit 76caa2a outdoor-pillar precedent), pending GMB API integration.
 import Layout from '../../../layouts/Layout.astro';
-import CommercialHero from '../../../components/CommercialHero.astro';
+import ServiceHero from '../../../components/ServiceHero.astro';
 import { MAIN_PHONE } from '../../../data/branches';
 
-const title = "Commercial Refrigeration Repair — All Equipment, All Brands | Same Day Appliance Repair";
-const description = `Same-day commercial refrigeration repair across LA, Orange, Ventura, San Bernardino & Riverside counties. Walk-in coolers, walk-in freezers, ice machines, commercial refrigerators, bar refrigerators, showcase units. All brands. EPA 608 certified. $120 diagnostic. Call ${MAIN_PHONE}.`;
-const canonical = "https://samedayappliance.repair/commercial/refrigeration-hub/";
 const phone = MAIN_PHONE;
 const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/commercial/refrigeration/";
 
-// 6 dedicated sub-pages — primary routing destinations
-const subServices = [
-  {
-    icon: "🧊",
-    name: "Walk-In Cooler Repair",
-    href: "/commercial/walk-in-cooler-repair/",
-    desc: "Walk-in refrigeration system service for restaurants, grocery, agricultural, healthcare, and ghost kitchens. Compressor, evaporator, condenser, defrost, door gasket, drain line. EPA 608 + C-38 licensed.",
-  },
-  {
-    icon: "❄️",
-    name: "Walk-In Freezer Repair",
-    href: "/commercial/walk-in-freezer-repair/",
-    desc: "Walk-in freezer service for protein, ice cream, and frozen distribution. -10°F to 10°F operation, defrost system, temperature control, and door heater work. Same architecture as walk-in cooler, different setpoints.",
-  },
-  {
-    icon: "🧊",
-    name: "Ice Machine Repair",
-    href: "/commercial/ice-machine-repair/",
-    desc: "Hoshizaki, Manitowoc, Scotsman, Ice-O-Matic. Cuber, flaker, nugget, and undercounter models. Cleaning, descaling, water filter service, and full mechanical repair. NSF-compliant maintenance available.",
-  },
-  {
-    icon: "🍴",
-    name: "Commercial Refrigerator Repair",
-    href: "/commercial/refrigerator-repair/",
-    desc: "Reach-ins, prep tables, mega tops, undercounters. True, Turbo Air, Beverage-Air, Traulsen, Delfield, Continental. Thermostat, defrost, fan motor, compressor, gasket service.",
-  },
-  {
-    icon: "🍺",
-    name: "Bar Refrigerator Repair",
-    href: "/commercial/bar-refrigerator-repair/",
-    desc: "Back bar coolers, undercounter bottle coolers, direct-draw beer coolers. Perlick, Beverage-Air HR, True T-series, Krowne. Door heater, condenser cleaning, thermostat service for bar environments.",
-  },
-  {
-    icon: "🏪",
-    name: "Showcase Refrigerator Repair",
-    href: "/commercial/showcase-refrigerator-repair/",
-    desc: "Glass-door display merchandisers, open-air display, and deli cases. Anti-sweat heater, mullion heater, display lighting, and refrigeration circuit service for retail and grocery.",
-  },
-];
-
-// Equipment without dedicated sub-pages — supplementary cards (no link)
-const supplementaryServices = [
-  {
-    icon: "🥗",
-    name: "Prep Tables & Mega Tops",
-    desc: "Pan rail temperature compliance, cutting board, worktop, and refrigeration circuit service for sandwich, pizza, and prep stations.",
-  },
-  {
-    icon: "🥬",
-    name: "Drop-In Cold Pans & Salad Bars",
-    desc: "Remote condensing cold food tables, ingredient bins, and salad bar refrigeration. Institutional cafeteria specialists.",
-  },
-  {
-    icon: "🍻",
-    name: "Draft Beer & Glycol Systems",
-    desc: "Glycol power packs, trunk line systems, and font coolers for multi-tap draft beer installations. Perlick and custom glycol systems.",
-  },
-];
-
-const featuredBrands = [
-  { name: "Hoshizaki",        path: "/brands/commercial/hoshizaki-repair/",         desc: "Ice machines (KM, KML, F, DCM), reach-ins, sushi cases" },
-  { name: "True Refrigeration", path: "/brands/commercial/true-refrigeration-repair/", desc: "T-series reach-ins, GDM merchandisers, TSSU prep tables, R-290" },
-  { name: "Traulsen",         path: "/brands/commercial/traulsen-repair/",          desc: "G-series, RHT half-door, blast chillers, INTELA-TRAUL" },
-  { name: "Beverage-Air",     path: "/brands/commercial/beverage-air-repair/",      desc: "SP reach-ins, HR back bar, UCR undercounter, DR display" },
-  { name: "Perlick",          path: "/brands/commercial/perlick-repair/",           desc: "Glycol draft beer systems, HC back bar, HP luxury, dual-zone wine" },
-  { name: "Delfield",         path: "/brands/commercial/delfield-repair/",          desc: "N-series reach-ins, mega tops, drop-in cold pans, salad bars" },
-];
-
-const additionalBrands = [
-  {
-    name: "Turbo Air",
-    category: "Reach-In / Display",
-    notes: "M3 and M3F series reach-ins. PRO series. Common in mid-market food service across the SoCal corridor. Compressor overload in summer heat is the most frequent call. Condenser cleaning every 4–5 months recommended.",
-  },
-  {
-    name: "Hussmann",
-    category: "Grocery / Retail Display",
-    notes: "Open-air and glass door reach-in display cases standard in regional grocery stores and markets. Hussmann serves the supermarket and convenience store segment. Mullion heater and anti-sweat heater failures are common in display case work.",
-  },
-  {
-    name: "Victory Refrigeration",
-    category: "Reach-In / Specialty",
-    notes: "VS and VR series reach-ins. Victory undercounters are common in QSR and fast casual kitchens throughout the region. Door gasket and thermostat failures are the primary service calls. Strong parts availability from their ITW lineage.",
-  },
-  {
-    name: "Continental Refrigerator",
-    category: "Reach-In / Worktop",
-    notes: "SWF and SW series worktops. Continental reach-ins are common in school cafeterias and institutional kitchens — often alongside Delfield. Built to similar commercial standards. Thermostat and fan motor failures are the primary calls.",
-  },
-  {
-    name: "Randell",
-    category: "Prep Table / Worktop",
-    notes: "9000 series worktops and prep tables. Randell is particularly common in hospital and healthcare foodservice — they make USDA-compliant refrigerated patient tray systems. Pan rail temperature compliance is the critical service issue.",
-  },
-  {
-    name: "Migali",
-    category: "Reach-In / Back Bar",
-    notes: "C-series reach-ins and back bar coolers. Migali fills the budget commercial tier below Beverage-Air — common in new restaurant openings and small operators. Compressor and thermostat failures are the most common calls.",
-  },
-  {
-    name: "Avantco",
-    category: "Budget Commercial",
-    notes: "Avantco reach-ins and sandwich units are standard in startup and small-format food service. Chinese-manufactured to US-market specs. OEM parts availability varies by vintage — we source through verified channels.",
-  },
-  {
-    name: "Kool-It",
-    category: "Back Bar / Undercounter",
-    notes: "KSM and KBB back bar and undercounter units. Kool-It serves the value bar equipment market. Condenser cleaning and thermostat service are the typical calls.",
-  },
-  {
-    name: "Maxx Cold",
-    category: "Reach-In / Display",
-    notes: "MXR and MXCR series. Maxx Cold reach-ins are common in growing food service operations transitioning from residential to commercial equipment. Fan motor and thermostat service.",
-  },
-  {
-    name: "Arctic Air",
-    category: "Budget Reach-In",
-    notes: "AR and AF series reach-ins. Arctic Air is the entry point for commercial refrigeration in small restaurants and food trucks throughout the region. Door gasket and thermostat failures are primary calls.",
-  },
-  {
-    name: "Frigoglass",
-    category: "Beverage Display",
-    notes: "European-spec glass door merchandisers common in beverage distribution accounts and specialty retailers. Anti-sweat heater service and condenser maintenance.",
-  },
-  {
-    name: "AHT Cooling Systems",
-    category: "Open Display",
-    notes: "Open-air horizontal display freezers standard in ethnic grocery and convenience store markets across SoCal. Defrost system service and evaporator fan maintenance are the primary calls.",
-  },
-  {
-    name: "Coldline",
-    category: "Italian Reach-In",
-    notes: "Stainless reach-ins and worktops designed to European standards. Common in Italian and European restaurant operations across the region. Parts sourcing through European channels when needed.",
-  },
-  {
-    name: "Felix Storch / Summit",
-    category: "Specialty / Undercounter",
-    notes: "Summit undercounter and ADA-compliant refrigerators. Felix Storch brands are common in healthcare environments requiring ADA-compliant reach. Thermostat and fan motor service.",
-  },
-  {
-    name: "Southbend",
-    category: "Commercial Kitchen",
-    notes: "Southbend primarily manufactures commercial ranges and ovens, but their refrigerated base units and undercounters appear in commercial kitchens alongside Southbend cooking equipment.",
-  },
-  {
-    name: "Everest Refrigeration",
-    category: "Glass Door Display",
-    notes: "EBGR and EBB series glass door reach-ins. Everest serves the value commercial display segment. Anti-sweat heater and door seal service are common calls in regional commercial display markets.",
-  },
-  {
-    name: "Turbo Air (Refrigerated Display)",
-    category: "Open Display / Deli",
-    notes: "TOM and TOMD open deli cases. Turbo Air's open display refrigeration is standard in regional deli and prepared food counter segments. Defrost and fan motor service.",
-  },
-];
-
-const industries = [
-  {
-    h: "Restaurants & Fine Dining",
-    p: "From neighborhood taquerias to Michelin-starred kitchens. Reach-in, prep table, and walk-in service with same-day priority for service-hour failures.",
-  },
-  {
-    h: "Hotels & Hospitality",
-    p: "Luxury resort kitchens, banquet prep, grab-and-go, and bar service across coastal LA, Orange, and Ventura county properties. Multi-unit PM contracts for facility managers.",
-  },
-  {
-    h: "Healthcare & Institutional",
-    p: "Major hospital systems and affiliated clinics throughout the five-county region. HACCP documentation provided. Patient care food service treated with appropriate urgency.",
-  },
-  {
-    h: "Schools & Universities",
-    p: "K-12 districts, UC and CSU campus dining, and culinary programs. Institutional prep table and reach-in service with HACCP compliance documentation.",
-  },
-  {
-    h: "Bars & Craft Beverage",
-    p: "Back bar coolers, undercounters, glycol draft beer systems, and taproom equipment. Friday and weekend emergency priority — bar downtime is revenue loss.",
-  },
-  {
-    h: "Grocery & Convenience",
-    p: "Display case, open-air reach-in, and walk-in service for grocery stores, delis, and convenience stores throughout the SoCal corridor.",
-  },
-];
+const title = "Commercial Refrigeration Repair Los Angeles | Walk-In, Reach-In, Prep Table — EPA 608 Certified";
+const description = "Commercial refrigeration repair across SoCal: walk-in coolers/freezers, reach-in, prep tables, display cases. EPA 608 certified, 24/7 emergency. Same-day. (424) 325-0520.";
 
 const faqs = [
   {
-    q: "What is your response time for commercial refrigeration emergencies?",
-    a: `Same-day response for commercial refrigeration failures throughout all five SoCal counties — Los Angeles, Orange, Ventura, San Bernardino, and Riverside. Call ${phone} immediately — we dispatch from the nearest of our 8 service territories with commercial parts stocked. For walk-in failures and HACCP-critical equipment, we treat every call as time-sensitive. Same-day availability is best with morning calls; afternoon coverage depends on dispatch routing.`,
+    q: "How fast can you respond to a commercial refrigeration emergency?",
+    a: "Phones answered 24/7. Dispatch scheduling 8 AM to 8 PM Mon-Sat for technician arrival. Most emergency calls in central LA see same-day arrival within 2 to 4 hours of the call. Outer service areas (Riverside, San Bernardino) usually next-day. We do not charge an emergency surcharge. Diagnostic is $120 regardless of time of day.",
   },
   {
-    q: "What is your commercial diagnostic fee?",
-    a: "$120 commercial diagnostic, applied directly to the repair cost when you proceed. No hidden trip charge across our five-county service area. We quote on-site after diagnosis — what we quote is what appears on the invoice.",
+    q: "Do you service True, Turbo Air, Traulsen, Beverage-Air, and Perlick?",
+    a: "Yes. These are our most common commercial refrigeration brands. We carry the most common service parts (condenser fan motors, evaporator fan motors, defrost timers, gaskets) on the van for these brands. Hoshizaki commercial, Continental, Delfield, Hussmann, Federal Industries, Victory, Migali, Norlake, Avantco, Maxx Cold also serviced.",
   },
   {
-    q: "Do you service R-290 propane refrigerant equipment?",
-    a: "Yes. Current-production True THAC, Perlick HP, and select Hoshizaki models run R-290 propane refrigerant. R-290 requires EPA 608 certified technicians with specific hydrocarbon training. We are fully certified and equipped. Never allow an uncertified technician to work on R-290 equipment.",
+    q: "My walk-in is at 48°F. Is the food still safe?",
+    a: "FDA Food Code requires cold-hold at 41°F or below. Above 41°F, time-temperature documentation matters: food can stay at 45 to 50°F for limited periods (typically 4 hours per FDA) before requiring discard. The clock starts when the temp exceeded 41°F, not when you noticed. We arrive, diagnose, repair, and document temperature recovery for your records.",
   },
   {
-    q: "Do you provide HACCP temperature documentation with service calls?",
-    a: "Yes. For institutional operators — schools, hospitals, corporate cafeterias — we provide temperature log documentation appropriate for HACCP compliance records. When we respond to a CCP exceedance event, the documentation covers the equipment failure, corrective action taken, and temperature verification post-repair.",
+    q: "What's EPA 608 and why does it matter?",
+    a: "EPA 608 is federal certification required for anyone handling refrigerant in stationary equipment. Section 608 of the Clean Air Act prohibits venting refrigerant and requires certified technicians for repair and recharge. Many appliance repair companies servicing residential don't carry 608, making their commercial work illegal. We're EPA 608 Universal certified, which covers all refrigerant types we encounter (R-22 legacy, R-134a, R-404A, R-448A, R-449A, R-507, R-454B, R-290).",
   },
   {
-    q: "Do you offer preventive maintenance contracts?",
-    a: `Yes. PM contracts are available for restaurants, hotels, healthcare facilities, and institutional operators running multiple commercial refrigeration units. Contracts are structured by equipment count and service frequency — typically monthly, quarterly, or semi-annual depending on equipment type and use intensity. Call ${phone} for a quote.`,
+    q: "Do you do walk-in installations?",
+    a: "No. We service existing walk-ins. New walk-in installation is a different trade involving rough-in plumbing, electrical, and condensing unit roof mounting. We work with several authorized walk-in installers in SoCal and can refer.",
   },
   {
-    q: "What areas do you cover for commercial refrigeration service?",
-    a: "All five SoCal counties: Los Angeles, Orange, Ventura, San Bernardino, and Riverside. Dispatched from 8 service territories — West Hollywood (HQ), Los Angeles, Beverly Hills, Pasadena, Thousand Oaks, Irvine, Rancho Cucamonga, and Temecula. No travel surcharge within these service areas. Same-day availability varies by location and time of call — call before noon for best same-day availability.",
+    q: "My display case glass keeps fogging. What's wrong?",
+    a: "Three usual causes: (1) anti-condensation heater wire failed in the door frame, the most common cause and replacement is available for most brands; (2) internal humidity from improper defrost cycle; (3) glass-edge desiccant breached at an old gasket. We diagnose and quote.",
+  },
+  {
+    q: "My refrigerant is slowly leaking. Can you just keep recharging?",
+    a: "No, and neither can any other licensed contractor. EPA 608 Section 608 regulations require leak repair before recharge on systems exceeding certain charge thresholds. We identify the leak with electronic leak detector or UV dye, repair the leak, evacuate the system, and recharge. Continuous recharge without repair is an EPA violation.",
   },
 ];
 
-const serviceSchema = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  "serviceType": "Commercial Refrigeration Repair",
-  "name": "Commercial Refrigeration Repair — Same Day Appliance Repair",
-  "url": canonical,
-  "description": "Same-day commercial refrigeration repair across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Walk-in coolers and freezers, ice machines, reach-ins, prep tables, bar refrigerators, showcase units, drop-in cold pans, and draft beer glycol systems. EPA 608 certified. All major brands.",
-  "provider": {
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
     "@type": "LocalBusiness",
+    "@id": canonical + "#business",
     "name": "Same Day Appliance Repair",
-    "url": "https://samedayappliance.repair/",
+    "url": canonical,
     "telephone": phone,
-    "priceRange": "$$",
+    "priceRange": "$$$",
+    "description": "Commercial refrigeration repair across all five SoCal counties. Walk-in coolers and freezers, reach-in coolers and freezers, prep tables, display cases, undercounter refrigerators, wine cellar cooling. EPA 608 Universal certified. Phones answered 24/7, no emergency surcharge. CSLB #1138898. BBB A+ accredited.",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "6230 Wilshire Blvd Ste A PMB 2267",
+      "addressLocality": "Los Angeles",
+      "addressRegion": "CA",
+      "postalCode": "90048",
+      "addressCountry": "US",
+    },
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" },
+    ],
   },
-  "areaServed": [
-    { "@type": "AdministrativeArea", "name": "Los Angeles County" },
-    { "@type": "AdministrativeArea", "name": "Orange County" },
-    { "@type": "AdministrativeArea", "name": "Ventura County" },
-    { "@type": "AdministrativeArea", "name": "San Bernardino County" },
-    { "@type": "AdministrativeArea", "name": "Riverside County" },
-  ],
-  "offers": {
-    "@type": "Offer",
-    "priceSpecification": {
-      "@type": "PriceSpecification",
-      "price": "120.00",
-      "priceCurrency": "USD",
-      "description": "Commercial diagnostic fee, applied toward repair",
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Commercial Refrigeration Repair",
+    "name": "Commercial Refrigeration Repair — Same Day Appliance Repair",
+    "url": canonical,
+    "description": "Commercial refrigeration repair across all five SoCal counties: walk-in coolers and freezers, reach-in coolers and freezers, prep tables (cold rail and storage), display cases (self-contained and remote-condensed), undercounter refrigerators, wine cellar cooling. Brands serviced include True (T-23, T-49, TPP, TSSU), Turbo Air (M3R, MSR, PRT, MST), Traulsen (G-Series, R-Series), Beverage-Air (HR1, HR2, SP, DP), Perlick (HP15, HP24, BBR, BC), Hoshizaki commercial, Continental (CPA, CPP), Delfield, Hussmann, Federal Industries, Victory, Migali, Norlake, Avantco, Maxx Cold. EPA 608 Universal certified for refrigerants R-22, R-134a, R-404A, R-448A, R-449A, R-507, R-454B, R-290. CSLB #1138898. Phones answered 24/7, no emergency surcharge.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" },
+    ],
+    "offers": {
+      "@type": "Offer",
+      "priceRange": "$120-$4200",
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "price": "120.00",
+        "priceCurrency": "USD",
+        "description": "Commercial-tier diagnostic fee, applied toward repair. No emergency surcharge.",
+      },
     },
   },
-};
-
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "mainEntity": faqs.map((f) => ({
-    "@type": "Question",
-    "name": f.q,
-    "acceptedAnswer": { "@type": "Answer", "text": f.a },
-  })),
-};
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Commercial", "item": "https://samedayappliance.repair/commercial/" },
+      { "@type": "ListItem", "position": 3, "name": "Refrigeration", "item": canonical },
+    ],
+  },
+];
 ---
 
 <Layout title={title} description={description} canonical={canonical}>
-  <Fragment slot="head-scripts">
-    <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
-    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
-  </Fragment>
 
-  <CommercialHero
-    title="Commercial Refrigeration Repair"
-    subtitle="All commercial refrigeration brands. All equipment types. EPA-certified technicians. Same-day emergency response across all five SoCal counties — Los Angeles, Orange, Ventura, San Bernardino, and Riverside. $120 diagnostic, applied to repair."
-    heroImageTitle="Commercial Refrigeration Repair"
-    trustBarItems={[
-      '⚡ Same-Day Emergency Response',
-      '🏅 EPA 608 Certified',
-      '📄 HACCP Documentation',
-      '🔧 OEM Parts Only',
-      '✅ PM Contracts Available',
-    ]}
-    showBranches={true}
-  />
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
 
-  <!-- INTRO -->
-  <section class="intro-section container">
-    <div class="intro-content">
-      <h2>Commercial Refrigeration Repair Throughout Southern California</h2>
-      <p>When commercial refrigeration fails, the clock starts immediately. A walk-in cooler in a SoCal restaurant holds $3,000–$15,000 of perishable inventory. A prep table above 41°F during lunch service is a HACCP critical control point event. A hospital cafeteria reach-in failure before breakfast service requires documented corrective action. The commercial refrigeration service we provide is built around these realities — same-day dispatch, EPA 608 certified technicians, OEM parts stocked on the truck for the most common brands and failure modes in the SoCal market.</p>
-      <p>We service the full spectrum of commercial refrigeration equipment: from Hoshizaki KM-series ice machines in regional sushi restaurants to Traulsen blast chillers in hotel production kitchens to Perlick glycol draft beer systems in craft bars to Delfield drop-in cold pans in K-12 school cafeterias. This is not general appliance work — commercial refrigeration requires EPA 608 certification, R-290 capability for current-generation equipment, and the diagnostic knowledge to distinguish a compressor failure from a condenser coil problem from a defrost system issue before recommending parts.</p>
-      <p>$120 commercial diagnostic, applied to the repair. Call <a href={`tel:${phoneRaw}`} class="phone-inline">{phone}</a>.</p>
+<ServiceHero
+  eyebrow="True · Turbo Air · Traulsen · Beverage-Air · Hoshizaki · Perlick · Delfield"
+  title="Commercial Refrigeration Repair Los Angeles"
+  subtitle="Walk-in coolers and freezers, reach-in units, prep tables, display cases, undercounter refrigerators across LA, Orange, Ventura, Riverside. EPA 608 certified. 24/7 emergency dispatch."
+  heroImageTitle="Commercial Refrigeration Repair"
+  showBranches={true}
+/>
+
+<!-- 01 INTRO -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 · What we do</p>
+    <h2 class="section-title">When the walk-in hits 50°F at 11 AM and lunch service starts at 11:30, the math changes fast.</h2>
+
+    <p>Spoiled inventory, lost service, health code exposure. Commercial refrigeration is not residential refrigeration. Different sealed-system architecture, different refrigerants, different repair economics, different stakes.</p>
+
+    <p>Our techs service commercial refrigeration across LA County, Orange County, Ventura, San Bernardino, Riverside. Walk-in coolers and freezers (the boxes you walk into, 8x8 to 14x20 typical for restaurant operations). Reach-in coolers and freezers (the upright units in prep lines). Prep tables (the salad and sandwich stations with reach-in storage below the cutting surface). Display cases (deli, bakery, beverage). Undercounter refrigerators. Wine cellar cooling for hospitality.</p>
+
+    <p>EPA 608 Universal certification covers every refrigerant we encounter in commercial work: R-22 legacy systems still running in older walk-ins, R-404A on most current systems, R-448A and R-449A retrofits, the R-454B and R-290 transitions on newest equipment. CSLB #1138898. BBB A+. Phones answered 24/7 because commercial refrigeration failures don't happen during business hours.</p>
+
+    <p>We don't do supermarket multiplexed rack systems with remote condensers, that's a specialty C-38 contractor trade. We don't do ammonia or CO2 industrial refrigeration. Different trades entirely. We service the equipment that powers restaurants, bars, hotels, cafés, ice cream shops, butchers, fishmongers, and groceries.</p>
+  </div>
+</section>
+
+<!-- 02 CATEGORIES -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">02 · What we service</p>
+    <h2 class="section-title">Six commercial refrigeration categories.</h2>
+
+    <h3 class="cat-h3">Walk-In Coolers and Freezers</h3>
+    <p>The big boxes. Restaurant walk-ins typically run R-404A on systems built 2010 to 2020, transitioning to R-448A or R-449A on newer installs. Common failures we see in coastal LA: condenser fan motor seizure (3 to 6 years on coastal restaurants in Santa Monica, Manhattan Beach, Newport Beach due to salt-air dust load), evaporator coil icing from defrost cycle issues, door gasket failure (commercial gaskets see 50 to 200 cycles per day), compressor short-cycling on ambient heat, refrigerant slow leak. EPA 608 required for any sealed system work.</p>
+    <p>Walk-in coolers run 36 to 40°F. Walk-in freezers run -10 to 0°F. Different evaporator design, different defrost requirements (electric defrost on freezers, off-cycle on coolers). Same general architecture but different repair playbook. See <a href="/commercial/refrigeration/walk-in-cooler-repair/">walk-in cooler repair</a> and <a href="/commercial/refrigeration/walk-in-freezer-repair/">walk-in freezer repair</a>.</p>
+
+    <h3 class="cat-h3">Reach-In Coolers and Freezers</h3>
+    <p>The upright units in commercial kitchens, single, double, triple door. Brands we service constantly: True (T-23, T-49 most common), Turbo Air (M3R series), Traulsen (G Series, R Series), Beverage-Air (HR1, HR2 horizontal reach-ins), Continental, Migali, Victory, Norlake, Avantco, Maxx Cold.</p>
+    <p>Common failures: condenser fan motor (1,800 to 3,000 RPM motors run 24/7, 4 to 6 year typical service life), evaporator fan motor, door gasket compression at the hinge side first, defrost timer (electromechanical timers on legacy units, defrost boards on modern), thermostat failure, compressor relay and start components. EPA 608 for sealed system work. See <a href="/commercial/refrigeration/reach-in-cooler-repair/">reach-in cooler repair</a> and <a href="/commercial/refrigeration/reach-in-freezer-repair/">reach-in freezer repair</a>.</p>
+
+    <h3 class="cat-h3">Prep Tables (Salad / Sandwich Refrigerated Prep Stations)</h3>
+    <p>Cold rail at top, refrigerated drawers or doors below, cutting surface in front. Most are True (TPP series), Turbo Air (PRT, MST series), Continental (CPP series), Beverage-Air (SP, DP series). Critical for sandwich shops, taquerias, salad concepts. The cold rail temperature spec is 41°F or below per FDA Food Code. Failing prep tables become health code violations fast.</p>
+    <p>Common failures: cold rail temperature drift (most common, needs evaporator cleaning plus sometimes thermostat adjustment), pan condensation pooling (drain blockage), door gasket compression on the storage section, compressor short-cycling on heavy-load operations. See <a href="/commercial/refrigeration/prep-table-repair/">prep table repair</a>.</p>
+
+    <h3 class="cat-h3">Display Cases</h3>
+    <p>Deli cases, bakery cases, beverage merchandisers, open-air refrigerated displays. Brands: Hussmann (most common in LA grocery), Federal Industries, Howard McCray, True (TG series glass-door merchandisers), Hoshizaki commercial display, Beverage-Air. Glass door defrost issues, internal humidity, lighting harness failures, condenser fan motors.</p>
+    <p>We service both self-contained units (compressor inside the case) and remote-condensed displays where the condenser is on the roof or in a back room. Self-contained: any LA-area appliance shop with EPA 608 can service. Remote-condensed: this is where most shops decline because they don't understand the line set work. We service these. See <a href="/commercial/refrigeration/display-case-repair/">display case repair</a>.</p>
+
+    <h3 class="cat-h3">Undercounter Refrigerators and Drawers</h3>
+    <p>Smaller commercial reach-ins designed to fit under prep counters. Common in bars (back-bar bottle storage), small kitchens, mobile units. Perlick (HP15, HP24, independent Wisconsin manufacturer since 1917), True (TUC series), Hoshizaki commercial, Krowne, Glastender. Service profile similar to reach-ins but more compact. EPA 608 for sealed system. See <a href="/commercial/refrigeration/undercounter-refrigerator-repair/">undercounter refrigerator repair</a>.</p>
+
+    <h3 class="cat-h3">Wine Cellar Cooling (Restaurant / Hospitality)</h3>
+    <p>Restaurant wine cellars and luxury hospitality wine displays use specialized cooling: typically Wine Guardian, CellarPro, KoolR for cellar systems, plus integrated wine refrigeration in dining rooms. Different temperature targets (55°F for red, 50°F for white, varying humidity 50 to 70%). EPA 608 for sealed system work.</p>
+  </div>
+</section>
+
+<!-- 03 TYPICAL FAILURES -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 · Typical failure scenarios</p>
+    <h2 class="section-title">In rough order of how often we get called.</h2>
+
+    <ol class="num-list">
+      <li><strong>"Walk-in is at 50°F and rising."</strong> Emergency call, often during service hours. Nine times out of ten: condenser fan motor failed or condenser coil fouled with kitchen grease and dust load. Verifying with thermometer probe placement (top of box vs floor), checking refrigerant pressures with gauges, inspecting condenser. Repair time 1 to 3 hours typical, parts on the van for most common motor sizes.</li>
+      <li><strong>"Reach-in cooler temperature climbing overnight."</strong> Usually defrost timer issue or evaporator fan failure. Reach-in lost 20°F overnight = inventory at risk by morning. Diagnostic: check if defrost cycle stuck on (ice forms, restricts airflow, temp climbs) or evap fan stopped (warm air doesn't circulate, sensor reads but cooling never reaches food).</li>
+      <li><strong>"Prep table cold rail running warm."</strong> Number one prep table issue. Cause: evaporator coil iced or grease-fouled. Solution: deep clean of evap coil and condenser, check defrost cycle on units that have one, verify thermostat calibration. Often no parts needed once cleaned.</li>
+      <li><strong>"Compressor running constantly, never cycling off."</strong> Short-cycling or never-shutoff. Diagnostic: refrigerant charge (low or high?), condenser cleanliness, ambient temperature load (is the kitchen reaching 95°F+ in summer and overwhelming the system?), age of compressor. Sometimes capacitor failure, sometimes refrigerant leak, sometimes compressor mechanical wear.</li>
+      <li><strong>"Door not sealing, visible gap."</strong> Door gasket compressed or torn. Commercial gaskets typically last 3 to 5 years with heavy use (50 to 200 door cycles per day). Replacement straightforward but model-specific (different brands use different gasket profiles: magnetic, dart, etc.).</li>
+      <li><strong>"Walk-in floor has water under the door."</strong> Drain pan heater failure, or drain line frozen, or evaporator dripping outside the pan. Three different fixes depending on which it is.</li>
+      <li><strong>"Refrigerant slow leak."</strong> System needs recharge every few months. EPA 608 requires leak repair before recharge. We identify with electronic leak detector or UV dye, repair the leak, evacuate, recharge. Cannot legally just keep adding refrigerant.</li>
+      <li><strong>"Display case glass fogging."</strong> Humidity control issue, often electric heat element on glass frame failed or glass-edge desiccant breached.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 04 REAL STORIES -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">04 · Recent jobs</p>
+    <h2 class="section-title">Real repair stories from the last few weeks.</h2>
+
+    <p class="lead">Composite examples; model numbers, ages, and prices are accurate to typical scope.</p>
+
+    <div class="story">
+      <h3>West Hollywood · True T-49F two-door reach-in freezer, 8 years old</h3>
+      <p>Restaurant on Sunset Blvd. Saturday 6 PM, dinner service, freezer at 25°F instead of -5°F. Tech dispatched 25 minutes from West Hollywood branch. Diagnosed: defrost timer stuck in defrost mode, ice melted, refroze, restricted airflow. Replaced timer (electromechanical Paragon 8141, common True spec part), forced manual defrost cycle, monitored pulldown. Restored to -5°F in 4 hours. Service continued. Total: $120 emergency surcharge waived (we don't do that) plus $185 part plus 1.5 hours = $475 all-in.</p>
     </div>
-    <aside class="sticky-cta-box">
-      <p class="scb-label">Commercial Refrigeration</p>
-      <p class="scb-phone">{phone}</p>
-      <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-block">Emergency Call</a>
-      <a href="/contact/" class="btn btn-outline btn-block">Schedule Service</a>
-      <ul class="scb-list">
-        <li>$120 Diagnostic — Applied to Repair</li>
-        <li>EPA 608 + R-290 Certified</li>
-        <li>All Major Brands</li>
-        <li>HACCP Documentation</li>
-        <li>PM Contracts Available</li>
-        <li>5-County SoCal Coverage</li>
-      </ul>
-    </aside>
-  </section>
 
-  <!-- EQUIPMENT WE SERVICE: routing cards to 6 sub-pages + 3 supplementary -->
-  <section class="services-section">
-    <div class="container">
-      <h2>Equipment We Service</h2>
-      <p class="section-sub">Six dedicated repair pages cover our most-requested commercial refrigeration equipment, each with detailed problem diagnostics, brand coverage, and pricing. Plus supplementary equipment we service on the same dispatch.</p>
-      <div class="services-grid">
-        {subServices.map((s) => (
-          <a href={s.href} class="service-card service-card--linked">
-            <span class="svc-icon">{s.icon}</span>
-            <div class="svc-body">
-              <h3>{s.name}</h3>
-              <p>{s.desc}</p>
-              <span class="svc-cta">View Service →</span>
-            </div>
-          </a>
-        ))}
-        {supplementaryServices.map((s) => (
-          <div class="service-card">
-            <span class="svc-icon">{s.icon}</span>
-            <div class="svc-body">
-              <h3>{s.name}</h3>
-              <p>{s.desc}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+    <div class="story">
+      <h3>Beverly Hills · Federal Industries deli case, 11 years old</h3>
+      <p>Bakery. Glass front constantly fogging, customer complaints about visibility. Diagnosed: glass-frame heater wire (anti-condensation heater in the door frame) had open-circuited at one corner. Federal Industries part, 5-day order from supplier. Returned with part, replaced heater wire, tested defrost-condensation cycle through 24 hours. Working. Total: $120 plus $340 part plus 2.5 hours across 2 visits = $720.</p>
     </div>
-  </section>
 
-  <!-- FEATURED BRANDS -->
-  <section class="featured-section container">
-    <h2>Featured Brand Specialists</h2>
-    <p class="section-sub">Deep technical coverage for the six most common commercial refrigeration brands across our service area. Full diagnostic guides, product line breakdowns, and field-tested failure analysis.</p>
-    <div class="featured-grid">
-      {featuredBrands.map((b) => (
-        <a href={b.path} class="featured-card">
-          <span class="fc-name">{b.name}</span>
-          <span class="fc-desc">{b.desc}</span>
-          <span class="fc-cta">View Service →</span>
-        </a>
-      ))}
+    <div class="story">
+      <h3>Pasadena · Beverage-Air HR1 reach-in cooler, 6 years old</h3>
+      <p>Coffee shop. Temp climbing over weekend, owner found Sunday afternoon at 48°F. Tech dispatched Monday morning (Sunday phone answered, dispatch scheduled). Found: condenser coil completely impacted with coffee grounds and bakery flour (real cause discovered during inspection, grinder vented near condenser intake). Cleaned condenser thoroughly, recommended airflow change for future. No parts needed. Total: $120 plus 1.5 hours = $360. Customer relocated grinder.</p>
     </div>
-  </section>
 
-  <!-- ADDITIONAL BRANDS -->
-  <section class="brands-section">
-    <div class="container">
-      <h2>All Commercial Refrigeration Brands We Service</h2>
-      <p class="section-sub">We service every commercial refrigeration brand operating in the SoCal market. Below is our technical summary for brands beyond our six featured specialists.</p>
-      <div class="brands-grid">
-        {additionalBrands.map((b) => (
-          <div class="brand-card">
-            <div class="brand-header">
-              <span class="brand-name">{b.name}</span>
-              <span class="brand-cat">{b.category}</span>
-            </div>
-            <p class="brand-notes">{b.notes}</p>
-          </div>
-        ))}
-      </div>
+    <div class="story">
+      <h3>Marina del Rey · walk-in cooler 8x10, 12 years old, R-404A</h3>
+      <p>Restaurant. Cooler at 48°F for two days before they called us. Ambient outside 78°F. Diagnosed: refrigerant leak at evaporator coil joint (corrosion failure at brazed joint near coil). EPA 608 leak repair: pumped down, brazed joint repair, vacuum to 500 microns, recharged with R-404A to nameplate spec. Pulldown to 38°F in 6 hours. Total: $120 plus $480 refrigerant plus $620 labor plus $180 leak detection and brazing supplies = $1,400. Inventory loss separate insurance issue.</p>
     </div>
-  </section>
 
-  <!-- INDUSTRIES -->
-  <section class="industries-section container">
-    <h2>Industries We Serve</h2>
-    <div class="industries-grid">
-      {industries.map((i) => (
-        <div class="ind-card">
-          <h3>{i.h}</h3>
-          <p>{i.p}</p>
-        </div>
-      ))}
+    <div class="story">
+      <h3>Santa Monica · Perlick HP15 undercounter back-bar refrigerator, 7 years old, R-134a</h3>
+      <p>Bar. Not cooling, ice cream sandwiches melting. Coastal salt-air corrosion on condenser fan motor caused seizure. Replaced fan motor (Perlick OEM). Cleaned condenser coil while there. Tested. Total: $120 plus $290 part plus 45 minutes = $480.</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FAQ -->
-  <section class="faq-section container">
-    <h2>Commercial Refrigeration Service — FAQ</h2>
+<!-- 05 HONEST SCOPE -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 · Honest scope</p>
+    <h2 class="section-title">What we do, and what we don't.</h2>
+
+    <p><strong>We service:</strong></p>
+    <ul class="bullet-list">
+      <li>Walk-in coolers and walk-in freezers (self-contained or pre-piped split systems)</li>
+      <li>Reach-in coolers and freezers (single, double, triple door, all major brands)</li>
+      <li>Prep tables (cold rail and refrigerated storage configurations)</li>
+      <li>Display cases (self-contained and remote-condensed)</li>
+      <li>Undercounter refrigerators and beverage centers</li>
+      <li>Wine cellar cooling (commercial / hospitality)</li>
+      <li>Refrigerated drawers (chef base, equipment stand drawers)</li>
+      <li>Defrost systems (electromechanical and electronic defrost boards)</li>
+      <li>All EPA-permitted refrigerants: R-22 (legacy), R-134a, R-404A, R-448A, R-449A, R-507, R-454B, R-290 (where applicable per safety codes)</li>
+    </ul>
+
+    <p><strong>We don't do:</strong></p>
+    <ul class="bullet-list">
+      <li>Supermarket multiplexed rack systems with remote condensers (specialty C-38 contractor trade)</li>
+      <li>Ammonia (R-717) industrial refrigeration (different trade entirely, different certifications)</li>
+      <li>CO2 (R-744) cascade refrigeration in industrial / cold storage applications</li>
+      <li>New walk-in installation or rough-in plumbing (we work with several authorized walk-in installers in SoCal, happy to refer)</li>
+      <li>Roof-mounted condensing unit installation (HVAC contractor with C-20 license)</li>
+      <li>Refrigeration line set installation longer than ~25 feet (specialty trade)</li>
+    </ul>
+
+    <p>This is professional standard. Premium restaurants and hospitality operators value contractors who refer specialty work to specialists rather than fake competence. EPA 608 plus CSLB #1138898 doesn't make us an ammonia contractor.</p>
+  </div>
+</section>
+
+<!-- 06 PRICING -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">06 · Pricing</p>
+    <h2 class="section-title">What commercial refrigeration repair actually costs.</h2>
+
+    <table class="price-table">
+      <thead>
+        <tr><th>Service</th><th>What to expect</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Diagnostic visit</td><td>$120 commercial-tier, waived with repair</td></tr>
+        <tr><td>Emergency / after-hours dispatch</td><td>Same $120, no premium</td></tr>
+        <tr><td>Condenser fan motor (reach-in)</td><td>$280 to $500</td></tr>
+        <tr><td>Evaporator fan motor</td><td>$260 to $450</td></tr>
+        <tr><td>Door gasket replacement (per door)</td><td>$180 to $340</td></tr>
+        <tr><td>Defrost timer replacement</td><td>$200 to $340</td></tr>
+        <tr><td>Defrost board (modern systems)</td><td>$380 to $620</td></tr>
+        <tr><td>Compressor capacitor / start relay</td><td>$200 to $340</td></tr>
+        <tr><td>Walk-in condensing unit fan motor</td><td>$400 to $680</td></tr>
+        <tr><td>Refrigerant leak repair plus recharge</td><td>$600 to $1,400 (depending on charge size)</td></tr>
+        <tr><td>Compressor replacement (reach-in)</td><td>$1,400 to $2,400</td></tr>
+        <tr><td>Walk-in compressor replacement</td><td>$2,400 to $4,200</td></tr>
+        <tr><td>Display case glass heater</td><td>$340 to $620</td></tr>
+        <tr><td>Wine cellar cooling diagnostic</td><td>$120 same as standard commercial</td></tr>
+        <tr><td>Warranty on all repairs</td><td>90 days parts plus labor</td></tr>
+      </tbody>
+    </table>
+
+    <p class="price-note">Refrigerant prices reflect 2026 SoCal market and EPA refrigerant management compliance costs. Leak repair always required before recharge per EPA 608 Section 608 regulations. We cannot legally just "top off" a leaking system.</p>
+  </div>
+</section>
+
+<!-- 07 BRANDS -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">07 · Brands we service</p>
+    <h2 class="section-title">Reach-in and prep table specialists across the SoCal market.</h2>
+
+    <p><strong>True Manufacturing</strong>: Trulaske family-owned (St. Charles, Missouri). T-23, T-49, TG, TPP, TSSU series most common. Independent, not Middleby, not Welbilt. (True Residential is a separate brand owned by Middleby, different company, different parts.)</p>
+
+    <p><strong>Turbo Air</strong>: Korean manufacturer with strong US distribution. M3R, MSR, PRT, MST series. Aggressive pricing, quality has improved significantly post-2018. Common parts on the van.</p>
+
+    <p><strong>Traulsen</strong>: ITW Food Equipment Group brand. G-Series, R-Series, RH-Series. Premium American manufacturer, parts available through ITW network.</p>
+
+    <p><strong>Beverage-Air</strong>: Ali Group brand since ~2005. HR, HF, SP, DP series. Mid-premium, widely deployed in chain restaurants.</p>
+
+    <p><strong>Perlick</strong>: independent Wisconsin family business since 1917. HP, BBR, BC series. Specializes in back-bar and hospitality refrigeration. Premium quality, lifetime construction.</p>
+
+    <p><strong>Hoshizaki</strong>: Japanese manufacturer (commercial refrigeration line, separate from ice machine line). Premium quality reach-ins and prep tables.</p>
+
+    <p><strong>Continental Refrigerator</strong>: Pittsburgh-based, premium American. CPA, CPP, CRA series.</p>
+
+    <p><strong>Delfield</strong>: Welbilt brand. Heritage manufacturer.</p>
+
+    <p><strong>Hussmann</strong>: Panasonic-owned. Display cases and merchandisers, commonly seen in LA grocery and convenience.</p>
+
+    <p><strong>Federal Industries</strong>: Wisconsin-based, deli and bakery cases.</p>
+
+    <p><strong>Victory</strong>: independent commercial refrigeration manufacturer. Reach-ins and prep tables.</p>
+
+    <p><strong>Migali</strong>: California-based commercial refrigeration. Common in mid-tier restaurants.</p>
+
+    <p><strong>Norlake</strong>: heritage walk-in and reach-in manufacturer.</p>
+
+    <p><strong>Avantco / Maxx Cold</strong>: value tier brands, common in food trucks and small operations.</p>
+
+    <p>We carry parts for the top 10 brands listed above on the van for the most common service items. Parts for the rest are 2 to 5 day order through our distributor network.</p>
+  </div>
+</section>
+
+<!-- 08 WHY US -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">08 · Why operators call us back</p>
+    <h2 class="section-title">Nine reasons.</h2>
+
+    <ul class="why-list">
+      <li><strong>24/7 phone answering.</strong> Sunday morning, holiday weekend, 2 AM Friday, phones answered. Dispatch scheduled. Emergency commercial refrigeration failures don't wait.</li>
+      <li><strong>EPA 608 Universal certification.</strong> Covers every refrigerant we encounter. Many residential appliance shops claim "we do commercial too" without 608. That's illegal for sealed system work. See our <a href="/credentials/epa-certified/">EPA 608 page</a>.</li>
+      <li><strong>CSLB #1138898 plus BBB A+.</strong> Verifiable. Required for any contractor working on commercial property in California.</li>
+      <li><strong>Restaurant operations awareness.</strong> We don't dispatch during dinner service unless it's an emergency. We schedule around your operations. Kitchen-trained techs who understand prep line workflow.</li>
+      <li><strong>Parts on the van.</strong> Condenser fan motors (multiple sizes), evaporator fan motors, defrost timers, common compressor capacitors and start components, gaskets for top brands, refrigerant for charge top-offs.</li>
+      <li><strong>No emergency surcharge.</strong> $120 diagnostic is $120 whether it's Tuesday morning or Saturday midnight.</li>
+      <li><strong>Eight branches across SoCal.</strong> West Hollywood, Beverly Hills, Los Angeles main, Pasadena, Thousand Oaks, Irvine, Rancho Cucamonga, Temecula. Same-day in most cases.</li>
+      <li><strong>Honest scope.</strong> We don't do supermarket racks, ammonia, or CO2 industrial. We refer those out to specialty C-38 contractors.</li>
+      <li><strong>Property management coverage.</strong> Multi-unit operations across LA County. We coordinate with property managers, GMs, and corporate facilities for chain operations.</li>
+    </ul>
+
+    <p>Looking for the parent commercial niche? See our <a href="/commercial/">commercial appliance repair overview</a>.</p>
+  </div>
+</section>
+
+<!-- 09 FAQ -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">09 · FAQ</p>
+    <h2 class="section-title">Commercial refrigeration repair, common questions.</h2>
+
     <div class="faq-list">
       {faqs.map((f) => (
         <details class="faq-item">
-          <summary class="faq-q">{f.q}</summary>
-          <p class="faq-a" set:html={f.a} />
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
         </details>
       ))}
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- BOTTOM CTA -->
-  <section class="bottom-cta">
-    <div class="container">
-      <h2>Commercial Refrigeration Down? We Respond Today.</h2>
-      <p>Same-day emergency service for all commercial refrigeration equipment across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. EPA 608 certified. OEM parts. HACCP documentation.</p>
-      <div class="cta-buttons">
-        <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
-        <a href="/contact/" class="btn btn-outline btn-lg">Schedule Service</a>
-      </div>
+<!-- 10 BOTTOM CTA -->
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Commercial Refrigeration Down? Call Us 24/7.</h2>
+    <p>EPA 608 certified. Same-day across LA, OC, Ventura. No emergency surcharge. CSLB #1138898.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
     </div>
-  </section>
+  </div>
+</section>
+
 </Layout>
 
 <style>
-  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-  .btn { display: inline-block; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; text-decoration: none; }
-  .btn-primary { background: #C8102E; color: #fff; }
-  .btn-outline { border: 1.5px solid rgba(0,0,0,0.25); color: #1a1a1a; }
-  .btn-block { display: block; width: 100%; text-align: center; margin-bottom: 10px; }
-  .btn-lg { padding: 16px 34px; font-size: 16px; }
-  .phone-inline { color: #C8102E; font-weight: 700; text-decoration: none; }
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 20px; line-height: 1.2; color: var(--text); letter-spacing: -0.01em; }
+  .lead { font-size: 1.05rem; line-height: 1.7; color: var(--muted); margin: 0 0 24px; font-style: italic; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
 
-  .intro-section { display: grid; grid-template-columns: 1fr 300px; gap: 4rem; padding-top: 4rem; padding-bottom: 4rem; align-items: start; }
-  .intro-content h2 { font-size: 1.6rem; margin-bottom: 1.25rem; line-height: 1.2; }
-  .intro-content p { margin-bottom: 1.25rem; line-height: 1.75; color: #333; }
-  .sticky-cta-box { background: #f5f5f5; border: 1px solid #e2e2e2; border-radius: 0.75rem; padding: 1.75rem; position: sticky; top: 5rem; }
-  .scb-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #C8102E; margin-bottom: 0.25rem; }
-  .scb-phone { font-size: 1.4rem; font-weight: 800; margin-bottom: 1.25rem; }
-  .sticky-cta-box .btn-outline { background: #fff; border-color: #d4d4d4; }
-  .scb-list { list-style: none; padding: 0; margin: 1.25rem 0 0; font-size: 0.82rem; color: #555; }
-  .scb-list li { padding: 0.4rem 0; border-bottom: 1px solid #e2e2e2; padding-left: 1.1rem; position: relative; }
-  .scb-list li::before { content: "✓"; position: absolute; left: 0; color: #C8102E; font-weight: 700; }
-  .scb-list li:last-child { border-bottom: none; }
+  .cat-h3 { font-size: 1.15rem; font-weight: 800; margin: 28px 0 12px; color: var(--text); border-left: 4px solid var(--red); padding-left: 12px; }
 
-  .services-section { background: #f5f5f5; padding: 4rem 0; border-top: 1px solid #e2e2e2; }
-  .services-section h2 { text-align: center; font-size: 1.6rem; margin-bottom: 0.75rem; }
-  .section-sub { text-align: center; color: #6b6b6b; margin: 0 auto 2rem; font-size: 0.95rem; max-width: 65ch; line-height: 1.6; }
-  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .service-card { background: #fff; border: 1px solid #e2e2e2; border-radius: 0.5rem; padding: 1.5rem; display: flex; gap: 1rem; align-items: start; text-decoration: none; color: #1a1a1a; transition: border-color .2s, transform .2s; }
-  .service-card--linked:hover { border-color: #C8102E; transform: translateY(-2px); }
-  .svc-icon { font-size: 1.75rem; flex-shrink: 0; line-height: 1; }
-  .svc-body h3 { font-size: 1rem; font-weight: 700; margin: 0 0 0.5rem; color: #1a1a1a; }
-  .svc-body p { font-size: 0.85rem; color: #555; line-height: 1.55; margin: 0 0 0.6rem; }
-  .svc-cta { font-size: 0.8rem; font-weight: 700; color: #C8102E; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 12px; }
+  .num-list strong { color: var(--text); }
 
-  .featured-section { padding: 4rem 24px; }
-  .featured-section h2 { font-size: 1.6rem; margin-bottom: 0.75rem; text-align: center; }
-  .featured-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .featured-card { background: #fafafa; border: 1px solid #e2e2e2; border-radius: 0.75rem; padding: 1.5rem; text-decoration: none; color: #1a1a1a; display: flex; flex-direction: column; gap: 0.45rem; transition: border-color .2s, transform .2s; }
-  .featured-card:hover { border-color: #C8102E; transform: translateY(-2px); }
-  .fc-name { font-size: 1.05rem; font-weight: 800; color: #C8102E; }
-  .fc-desc { font-size: 0.85rem; color: #555; line-height: 1.55; flex: 1; }
-  .fc-cta { font-size: 0.82rem; font-weight: 700; color: #C8102E; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 6px; }
 
-  .brands-section { background: #f5f5f5; border-top: 1px solid #e2e2e2; padding: 4rem 0; }
-  .brands-section h2 { font-size: 1.6rem; margin-bottom: 0.75rem; text-align: center; }
-  .brands-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-top: 2rem; }
-  .brand-card { background: #fff; border: 1px solid #e2e2e2; border-radius: 0.5rem; padding: 1.25rem; }
-  .brand-header { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
-  .brand-name { font-weight: 700; font-size: 0.95rem; }
-  .brand-cat { font-size: 0.72rem; color: #C8102E; background: rgba(200,16,46,0.08); padding: 0.2rem 0.5rem; border-radius: 0.25rem; white-space: nowrap; }
-  .brand-notes { font-size: 0.83rem; color: #555; line-height: 1.6; margin: 0; }
+  .story { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px 26px; margin-bottom: 14px; }
+  .story h3 { font-size: 1rem; font-weight: 800; margin: 0 0 10px; color: var(--text); line-height: 1.35; }
+  .story p { font-size: 0.95rem; margin: 0; line-height: 1.7; }
 
-  .industries-section { padding: 4rem 24px; }
-  .industries-section h2 { font-size: 1.6rem; margin-bottom: 2rem; text-align: center; }
-  .industries-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
-  .ind-card { background: #fafafa; border: 1px solid #e2e2e2; border-radius: 0.5rem; padding: 1.5rem; }
-  .ind-card h3 { font-size: 0.98rem; margin: 0 0 0.6rem; color: #C8102E; font-weight: 700; }
-  .ind-card p { font-size: 0.88rem; color: #444; line-height: 1.65; margin: 0; }
+  .price-table { width: 100%; border-collapse: collapse; margin: 24px 0 16px; font-size: 0.95rem; background: #fff; }
+  .price-table th { text-align: left; background: var(--black); color: #fff; padding: 12px 16px; font-weight: 700; font-size: 0.85rem; }
+  .price-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+  .price-table tr:nth-child(even) td { background: #fafafa; }
+  .price-table tr:last-child td { font-weight: 700; }
+  .price-note { font-size: 0.92rem; color: var(--muted); margin-top: 16px; padding: 14px 18px; background: #fff; border-left: 3px solid var(--red); border-radius: 4px; }
 
-  .faq-section { padding: 4rem 24px; }
-  .faq-section h2 { font-size: 1.6rem; margin-bottom: 2rem; text-align: center; }
-  .faq-list { display: flex; flex-direction: column; gap: 0.75rem; }
-  .faq-item { border: 1px solid #e2e2e2; border-radius: 0.5rem; background: #fafafa; }
-  .faq-q { padding: 1.25rem 1.5rem; font-weight: 600; cursor: pointer; list-style: none; font-size: 0.98rem; }
-  .faq-q::-webkit-details-marker { display: none; }
-  .faq-a { padding: 0 1.5rem 1.25rem; font-size: 0.92rem; line-height: 1.7; color: #444; margin: 0; }
-  .faq-a a { color: #C8102E; font-weight: 700; text-decoration: none; }
+  .why-list { margin: 18px 0; padding-left: 22px; }
+  .why-list li { margin-bottom: 14px; line-height: 1.7; font-size: 0.98rem; }
+  .why-list strong { color: var(--text); }
 
-  .bottom-cta { background: #0a0a0a; padding: 4rem 24px; text-align: center; color: #fff; }
-  .bottom-cta h2 { font-size: 1.75rem; margin: 0 0 0.75rem; color: #fff; }
-  .bottom-cta p { color: rgba(255,255,255,0.75); margin: 0 auto 2rem; max-width: 65ch; }
-  .bottom-cta .btn-outline { color: #fff; border-color: rgba(255,255,255,0.35); }
-  .cta-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px 22px; margin-bottom: 10px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 0.98rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.93rem; color: var(--text); line-height: 1.7; margin: 12px 0 0; }
 
-  @media (max-width: 1024px) {
-    .intro-section { grid-template-columns: 1fr; }
-    .sticky-cta-box { position: static; }
-    .services-grid, .featured-grid, .brands-grid, .industries-grid { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 768px) {
-    .services-grid, .featured-grid, .brands-grid, .industries-grid { grid-template-columns: 1fr; }
-  }
+  .bottom-cta { background: var(--red); padding: 64px 24px; text-align: center; color: #fff; }
+  .bottom-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 14px; color: #fff; }
+  .bottom-cta p { color: rgba(255,255,255,0.92); margin: 0 0 26px; font-size: 1.05rem; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: #fff; color: var(--red); padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.5); font-weight: 600; text-decoration: none; }
 </style>
