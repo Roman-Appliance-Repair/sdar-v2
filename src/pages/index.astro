@@ -1,49 +1,357 @@
 ---
-// src/pages/index.astro — Homepage
-//
-// Sprint 2026-04-26: Full luxury homepage rebuild.
-// Section components in src/components/homepage/ are scaffolds (Step 3) — real
-// content fills in during Steps 4–6. CountyMap is already implemented (Step 2).
+// src/pages/index.astro — Homepage v2.1
+// 5-niche architecture restructure (2026-05-02). Layout provides global Navbar + Footer.
+// HomepageSchema preserved 1:1 (Organization + WebSite + WebPage + 8 LocalBusiness + FAQPage).
 
 import Layout from '../layouts/Layout.astro';
 import HomepageSchema from '../components/homepage/HomepageSchema.astro';
-import Hero from '../components/homepage/Hero.astro';
-import Services from '../components/homepage/Services.astro';
-import ServiceArea from '../components/homepage/ServiceArea.astro';
-import Credentials from '../components/homepage/Credentials.astro';
-import Reviews from '../components/homepage/Reviews.astro';
-import Pricing from '../components/homepage/Pricing.astro';
-import FAQ from '../components/homepage/FAQ.astro';
-import SectionDivider from '../components/homepage/SectionDivider.astro';
-// HomepageFooter is intentionally NOT imported here — Layout.astro provides the
-// standard <Footer />. Step 6 decides whether to swap in HomepageFooter.
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
 
 const title = 'Same Day Appliance Repair — Los Angeles & Southern California';
-const description =
-  'Same-day appliance repair across 5 SoCal counties. Headquartered in West Hollywood. Licensed C-20, BBB A+, EPA 608. 90-day warranty on parts and labor.';
+const description = 'Same-day appliance repair across 5 SoCal counties. Residential, commercial kitchen, cold storage, ice machines & outdoor — all under one roof. Licensed C-20, BBB A+, EPA 608.';
+
+// Hero compact branch line — Roman's 5 specific branches
+const HERO_BRANCHES = [
+  { label: 'LA',       phone: '(424) 325-0520', href: 'tel:+14243250520' },
+  { label: 'WeHo',     phone: '(323) 870-4790', href: 'tel:+13238704790' },
+  { label: 'Pasadena', phone: '(626) 376-4458', href: 'tel:+16263764458' },
+  { label: 'T.Oaks',   phone: '(424) 208-0228', href: 'tel:+14242080228' },
+  { label: 'Irvine',   phone: '(213) 401-9019', href: 'tel:+12134019019' },
+];
+
+// 5 niches
+const NICHES = [
+  { title: 'Home Appliances',     desc: 'Fridge, washer, oven, dryer — all residential brands',          href: '/services/',                       dot: '#185FA5' },
+  { title: 'Restaurant Kitchen',  desc: 'Ovens, fryers, dishwashers, mixers — $120 diagnostic',          href: '/commercial/',                     dot: '#0F6E56' },
+  { title: 'Cold Storage',        desc: 'Walk-in coolers, reach-in, display cases — EPA 608',            href: '/commercial/refrigeration/',       dot: '#534AB7' },
+  { title: 'Ice Machines',        desc: 'Hoshizaki, Scotsman, Manitowoc — bars & hotels',                href: '/commercial/ice-machines/',        dot: '#993C1D' },
+  { title: 'Outdoor Living',      desc: 'Grills, fireplaces, patio heaters — Lynx, DCS, Fire Magic',     href: '/outdoor/',                        dot: '#854F0B' },
+];
+
+// Popular services
+const POPULAR = [
+  { title: 'Refrigerator Repair',     badge: 'Residential', brands: 'LG, Samsung, Sub-Zero, Viking',    href: '/services/refrigerator-repair/' },
+  { title: 'Walk-In Cooler Repair',   badge: 'Commercial',  brands: 'True, Norlake, Beverage-Air',      href: '/commercial/refrigeration/walk-in-cooler-repair/' },
+  { title: 'Patio Heater Repair',     badge: 'Outdoor',     brands: 'Bromic, Infratech, Fire Sense',    href: '/outdoor/patio-heater-repair/' },
+  { title: 'Commercial Oven Repair',  badge: 'Commercial',  brands: 'Vulcan, Garland, Rational',        href: '/commercial/oven-repair/' },
+  { title: 'Ice Machine Repair',      badge: 'Commercial',  brands: 'Hoshizaki, Scotsman, Manitowoc',   href: '/commercial/ice-machines/' },
+  { title: 'Gas Fireplace Repair',    badge: 'Outdoor',     brands: 'Heat & Glo, Heatilator, Majestic', href: '/outdoor/fireplace-repair/' },
+];
+
+const BADGE_STYLES: Record<string, { bg: string; fg: string }> = {
+  'Residential': { bg: '#E6F1FB', fg: '#0C447C' },
+  'Commercial':  { bg: '#E1F5EE', fg: '#085041' },
+  'Outdoor':     { bg: '#FAEEDA', fg: '#633806' },
+};
+
+// Service areas — by county
+const COUNTY_CITIES = [
+  { county: 'Los Angeles County',    href: '/los-angeles-county/',    cities: ['Los Angeles','West Hollywood','Beverly Hills','Santa Monica','Pasadena','Glendale','Burbank','Malibu'] },
+  { county: 'Orange County',         href: '/orange-county/',         cities: ['Newport Beach','Irvine','Anaheim','Huntington Beach'] },
+  { county: 'Ventura County',        href: '/ventura-county/',        cities: ['Thousand Oaks','Westlake Village','Camarillo'] },
+  { county: 'Riverside County',      href: '/riverside-county/',      cities: ['Temecula','Corona','Riverside'] },
+  { county: 'San Bernardino County', href: '/san-bernardino-county/', cities: ['Rancho Cucamonga','Ontario'] },
+];
+
+// Branches bar — all 8 from BRANCHES SSOT
+function countyTitle(slug: string): string {
+  return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') + ' County';
+}
+const BRANCH_DISPLAY = BRANCHES.map(b => ({
+  name: b.name,
+  county: countyTitle(b.primaryCounty).toUpperCase(),
+  phone: b.phone,
+  isPlaceholder: isPlaceholderPhone(b.phone),
+  href: `tel:+1${b.phone.replace(/\D/g, '')}`,
+}));
 ---
 
 <Layout title={title} description={description}>
   <HomepageSchema slot="head-scripts" />
-  <div class="home-stage">
-    <Hero />
-    <SectionDivider />
-    <ServiceArea />
-    <SectionDivider />
-    <Services />
-    <SectionDivider />
-    <Pricing />
-    <SectionDivider />
-    <Credentials />
-    <SectionDivider />
-    <Reviews />
-    <SectionDivider />
-    <FAQ />
-    <SectionDivider />
+
+  <!-- ===== BLOCK 2: HERO ===== -->
+  <section class="hp-hero">
+    <div class="hp-hero-inner">
+      <div class="hp-hero-text">
+        <p class="hp-eyebrow">Los Angeles · Orange County · Ventura · Riverside · San Bernardino</p>
+        <h1>Expert Appliance Repair For Every Need in SoCal</h1>
+        <p class="hp-subline">Residential, commercial kitchen, cold storage, ice machines &amp; outdoor — all under one roof.</p>
+        <div class="hp-cta-row">
+          <a href={phoneHref} class="hp-btn hp-btn-red">☎ Call Now</a>
+          <a href="/contact/" class="hp-btn hp-btn-outline">Book Online</a>
+        </div>
+        <div class="hp-branch-line">
+          {HERO_BRANCHES.map((b, i) => (
+            <>
+              <span class="hp-bl-city">{b.label}</span>
+              <a href={b.href} class="hp-bl-phone">{b.phone}</a>
+              {i < HERO_BRANCHES.length - 1 && <span class="hp-bl-sep">·</span>}
+            </>
+          ))}
+        </div>
+      </div>
+      <div class="hp-hero-img">
+        <div class="hp-hero-img-placeholder">Technician at work</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOCK 3: TRUST BAR ===== -->
+  <div class="hp-trust">
+    <div class="hp-trust-inner">
+      <span>Same Day Service</span>
+      <span class="hp-trust-sep">·</span>
+      <span>OEM Parts</span>
+      <span class="hp-trust-sep">·</span>
+      <span>90-Day Warranty</span>
+      <span class="hp-trust-sep">·</span>
+      <span>Licensed &amp; Insured</span>
+      <span class="hp-trust-sep">·</span>
+      <span>BBB A+</span>
+      <span class="hp-trust-sep">·</span>
+      <span>EPA 608 Certified</span>
+      <span class="hp-trust-sep">·</span>
+      <span>CSLB #1138898</span>
+    </div>
   </div>
+
+  <!-- ===== BLOCK 4: BRANCHES BAR ===== -->
+  <section class="hp-branches">
+    <div class="hp-branches-inner">
+      <p class="hp-branches-label">8 Branches Across Southern California</p>
+      <div class="hp-branches-grid">
+        {BRANCH_DISPLAY.map(b => (
+          <div class="hp-branch-card">
+            <div class="hp-branch-name">{b.name}</div>
+            <div class="hp-branch-county">{b.county}</div>
+            {b.isPlaceholder ? (
+              <div class="hp-branch-coming">Coming soon</div>
+            ) : (
+              <a href={b.href} class="hp-branch-phone">{b.phone}</a>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOCK 5: 5 NICHES ===== -->
+  <section class="hp-niches">
+    <div class="hp-niches-inner">
+      <p class="hp-section-label">What can we help with?</p>
+      <h2 class="hp-section-title">5 Service Directions — One Call</h2>
+      <p class="hp-section-sub">Pick your category and we'll match the right technician</p>
+      <div class="hp-niches-grid">
+        {NICHES.map(n => (
+          <a href={n.href} class="hp-niche-card">
+            <span class="hp-niche-dot" style={`background:${n.dot}`}></span>
+            <h3>{n.title}</h3>
+            <p>{n.desc}</p>
+            <span class="hp-niche-arrow">View →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOCK 6: POPULAR SERVICES ===== -->
+  <section class="hp-popular">
+    <div class="hp-popular-inner">
+      <h2 class="hp-section-title">Most Requested Repairs</h2>
+      <div class="hp-popular-grid">
+        {POPULAR.map(p => {
+          const bs = BADGE_STYLES[p.badge];
+          return (
+            <a href={p.href} class="hp-pop-card">
+              <span class="hp-pop-badge" style={`background:${bs.bg};color:${bs.fg}`}>{p.badge}</span>
+              <h3>{p.title}</h3>
+              <p>{p.brands}</p>
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOCK 7: WHY US ===== -->
+  <section class="hp-why">
+    <div class="hp-why-inner">
+      <h2 class="hp-section-title">Numbers That Matter</h2>
+      <div class="hp-why-grid">
+        <div class="hp-why-card"><div class="hp-why-num">85%</div><div class="hp-why-label">Fixed first visit</div></div>
+        <div class="hp-why-card"><div class="hp-why-num">8</div><div class="hp-why-label">SoCal branches</div></div>
+        <div class="hp-why-card"><div class="hp-why-num">90-day</div><div class="hp-why-label">Parts warranty</div></div>
+        <div class="hp-why-card"><div class="hp-why-num">24/7</div><div class="hp-why-label">Phones answered</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOCK 8: FOR BUSINESS ===== -->
+  <section class="hp-business">
+    <div class="hp-business-inner">
+      <h2 class="hp-section-title hp-title-light">We Work With</h2>
+      <p class="hp-section-sub hp-sub-light">Priority dispatch · Commercial invoice · COI available</p>
+      <div class="hp-biz-grid">
+        <a href="/for-business/restaurants/" class="hp-biz-card">
+          <h3>Restaurants &amp; Bars</h3>
+          <p>Same-day kitchen equipment service. $120 commercial diagnostic. COI on request.</p>
+        </a>
+        <a href="/for-business/hotels/" class="hp-biz-card">
+          <h3>Hotels &amp; Airbnb</h3>
+          <p>Multi-unit dispatch. Discreet service. Hotel laundry, in-room appliances, kitchen.</p>
+        </a>
+        <a href="/for-business/property-management/" class="hp-biz-card">
+          <h3>Property Management</h3>
+          <p>Multi-property contracts. Tenant scheduling. Centralized billing across portfolio.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOCK 9: SERVICE AREAS ===== -->
+  <section class="hp-areas">
+    <div class="hp-areas-inner">
+      <h2 class="hp-section-title">87 Cities Across Southern California</h2>
+      <div class="hp-chip-rows">
+        {COUNTY_CITIES.map(c => (
+          <div class="hp-chip-row">
+            <a href={c.href} class="hp-chip hp-chip-county">{c.county} →</a>
+            {c.cities.map(city => (
+              <a href={`/${city.toLowerCase().replace(/\s+/g,'-')}/`} class="hp-chip">{city}</a>
+            ))}
+          </div>
+        ))}
+        <p class="hp-areas-more"><a href="/areas/">→ + 67 more cities</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== BLOCK 10: BOTTOM CTA ===== -->
+  <section class="hp-bottom-cta">
+    <div class="hp-bottom-cta-inner">
+      <h2>Need a Repair Today?</h2>
+      <p>Same day dispatch across all 5 counties · Phones answered 24/7</p>
+      <div class="hp-cta-row">
+        <a href={phoneHref} class="hp-btn hp-btn-white">☎ Call {phone}</a>
+        <a href="/contact/" class="hp-btn hp-btn-outline-white">Book Online</a>
+      </div>
+    </div>
+  </section>
 </Layout>
 
 <style>
-  /* Homepage runs on a black stage so SectionDivider gold lines and any inter-section gaps sit on black, not the site-default white body. */
-  .home-stage { background: var(--black); }
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; }
+
+  /* shared */
+  .hp-section-label { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin: 0 0 12px; }
+  .hp-section-title { font-size: clamp(1.7rem, 3.2vw, 2.4rem); font-weight: 800; line-height: 1.2; margin: 0 0 16px; color: var(--black); letter-spacing: -0.01em; }
+  .hp-section-sub { font-size: 1.05rem; line-height: 1.6; color: #555; margin: 0 0 32px; max-width: 640px; }
+  .hp-title-light { color: #fff; }
+  .hp-sub-light { color: rgba(255,255,255,0.72); }
+  .hp-cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hp-btn { display: inline-block; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 700; text-decoration: none; }
+  .hp-btn-red { background: var(--red); color: #fff; }
+  .hp-btn-outline { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.4); }
+  .hp-btn-white { background: #fff; color: var(--red); }
+  .hp-btn-outline-white { background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.6); }
+
+  /* hero */
+  .hp-hero { background: #0a0a0a; color: #fff; padding: 80px 24px 64px; }
+  .hp-hero-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; align-items: center; }
+  .hp-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); margin: 0 0 14px; }
+  .hp-hero-text h1 { font-size: clamp(32px, 4.4vw, 52px); font-weight: 800; line-height: 1.1; margin: 0 0 18px; letter-spacing: -0.02em; color: #fff; }
+  .hp-subline { font-size: 18px; color: rgba(255,255,255,0.85); line-height: 1.65; max-width: 640px; margin: 0 0 28px; }
+  .hp-branch-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 8px; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+  .hp-bl-city { color: #666; font-weight: 600; }
+  .hp-bl-phone { color: #aaa; font-weight: 500; text-decoration: none; }
+  .hp-bl-phone:hover { color: var(--red); }
+  .hp-bl-sep { color: #333; padding: 0 4px; }
+  .hp-hero-img { aspect-ratio: 4/3; background: #1a1a1a; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+  .hp-hero-img-placeholder { color: rgba(255,255,255,0.2); font-size: 13px; }
+  @media (max-width: 900px) { .hp-hero-inner { grid-template-columns: 1fr; } .hp-hero-img { display: none; } }
+
+  /* trust bar */
+  .hp-trust { background: var(--red); padding: 14px 24px; }
+  .hp-trust-inner { max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; color: #fff; font-size: 13px; font-weight: 600; }
+  .hp-trust-sep { color: rgba(255,255,255,0.4); }
+
+  /* branches bar */
+  .hp-branches { background: #111; padding: 56px 24px; }
+  .hp-branches-inner { max-width: 1200px; margin: 0 auto; }
+  .hp-branches-label { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #444; margin: 0 0 24px; text-align: center; }
+  .hp-branches-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .hp-branch-card { background: #1a1a1a; border: 1px solid #222; border-radius: 8px; padding: 18px 16px; text-align: center; }
+  .hp-branch-name { color: #aaa; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
+  .hp-branch-county { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #444; margin-bottom: 10px; }
+  .hp-branch-phone { color: var(--red); font-weight: 700; font-size: 14px; text-decoration: none; }
+  .hp-branch-phone:hover { color: #ff1f47; }
+  .hp-branch-coming { color: #333; font-size: 12px; font-style: italic; }
+  @media (max-width: 900px) { .hp-branches-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* niches */
+  .hp-niches { background: #fff; padding: 80px 24px; }
+  .hp-niches-inner { max-width: 1200px; margin: 0 auto; }
+  .hp-niches-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-top: 20px; }
+  .hp-niche-card { display: block; background: #fff; border: 0.5px solid #d9d9d9; border-radius: 8px; padding: 24px 22px; text-decoration: none; color: var(--black); transition: border-color .2s, transform .2s, box-shadow .2s; }
+  .hp-niche-card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+  .hp-niche-dot { display: block; width: 24px; height: 24px; border-radius: 50%; margin-bottom: 14px; }
+  .hp-niche-card h3 { font-size: 17px; font-weight: 800; margin: 0 0 8px; color: var(--black); }
+  .hp-niche-card p { font-size: 13px; line-height: 1.55; color: #555; margin: 0 0 12px; }
+  .hp-niche-arrow { font-size: 13px; font-weight: 700; color: var(--red); }
+  @media (max-width: 1024px) { .hp-niches-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .hp-niches-grid { grid-template-columns: 1fr; } }
+
+  /* popular */
+  .hp-popular { background: var(--gray); padding: 80px 24px; }
+  .hp-popular-inner { max-width: 1200px; margin: 0 auto; }
+  .hp-popular-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 8px; }
+  .hp-pop-card { display: block; background: #fff; border: 1px solid #e2e2e2; border-radius: 8px; padding: 22px 22px; text-decoration: none; color: var(--black); transition: border-color .2s, transform .2s; }
+  .hp-pop-card:hover { border-color: var(--red); transform: translateY(-2px); }
+  .hp-pop-badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; margin-bottom: 12px; }
+  .hp-pop-card h3 { font-size: 16px; font-weight: 800; margin: 0 0 6px; color: var(--black); }
+  .hp-pop-card p { font-size: 13px; color: #666; margin: 0; line-height: 1.55; }
+  @media (max-width: 768px) { .hp-popular-grid { grid-template-columns: 1fr; } }
+
+  /* why */
+  .hp-why { background: #fff; padding: 80px 24px; text-align: center; }
+  .hp-why-inner { max-width: 1100px; margin: 0 auto; }
+  .hp-why-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; margin-top: 28px; }
+  .hp-why-card { background: var(--gray); border-radius: 10px; padding: 28px 18px; }
+  .hp-why-num { font-size: 2.6rem; font-weight: 800; color: var(--red); line-height: 1; margin-bottom: 10px; letter-spacing: -0.02em; }
+  .hp-why-label { font-size: 13px; font-weight: 600; color: #444; }
+  @media (max-width: 768px) { .hp-why-grid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* business */
+  .hp-business { background: #0a0a0a; padding: 80px 24px; color: #fff; }
+  .hp-business-inner { max-width: 1100px; margin: 0 auto; text-align: center; }
+  .hp-business .hp-section-sub { margin-left: auto; margin-right: auto; }
+  .hp-biz-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 28px; }
+  .hp-biz-card { display: block; background: #1a1a1a; border: 1px solid #2a2a2a; border-radius: 10px; padding: 24px 22px; text-decoration: none; color: #fff; text-align: left; transition: border-color .2s; }
+  .hp-biz-card:hover { border-color: var(--red); }
+  .hp-biz-card h3 { font-size: 17px; font-weight: 800; margin: 0 0 8px; color: #fff; }
+  .hp-biz-card p { font-size: 13px; color: rgba(255,255,255,0.65); margin: 0; line-height: 1.6; }
+  @media (max-width: 768px) { .hp-biz-grid { grid-template-columns: 1fr; } }
+
+  /* areas */
+  .hp-areas { background: var(--gray); padding: 80px 24px; }
+  .hp-areas-inner { max-width: 1100px; margin: 0 auto; }
+  .hp-chip-rows { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
+  .hp-chip-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .hp-chip { display: inline-block; padding: 6px 14px; background: #fff; border: 1px solid #d9d9d9; border-radius: 16px; font-size: 13px; font-weight: 500; color: #555; text-decoration: none; transition: border-color .15s, color .15s; }
+  .hp-chip:hover { border-color: #888; color: var(--black); }
+  .hp-chip-county { background: #fff; border-color: var(--red); color: var(--red); font-weight: 700; }
+  .hp-chip-county:hover { background: var(--red); color: #fff; }
+  .hp-areas-more { font-size: 14px; margin: 12px 0 0; }
+  .hp-areas-more a { color: var(--red); font-weight: 700; text-decoration: none; }
+
+  /* bottom cta */
+  .hp-bottom-cta { background: var(--red); padding: 72px 24px; text-align: center; color: #fff; }
+  .hp-bottom-cta-inner { max-width: 800px; margin: 0 auto; }
+  .hp-bottom-cta h2 { font-size: clamp(1.8rem, 3.4vw, 2.5rem); font-weight: 800; margin: 0 0 14px; color: #fff; }
+  .hp-bottom-cta p { font-size: 17px; color: rgba(255,255,255,0.92); margin: 0 0 28px; }
+  .hp-bottom-cta .hp-cta-row { justify-content: center; }
 </style>
