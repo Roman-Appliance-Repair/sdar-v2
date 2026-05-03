@@ -96,7 +96,7 @@ Write as if a lead technician is talking to a customer who just called with a pr
 
 ### Examples
 
-✓ "Nine times out of ten on a Lynx with no spark, it's the AAA battery in the igniter module. $40 part, 5 minutes. Don't let anyone sell you a new ignition system."
+✓ "Nine times out of ten on a Lynx Professional E-series with no spark, it's the 9V battery in the battery tray (OEM 80489). $5 part, 5 minutes. Don't let anyone sell you a new ignition system."
 
 ✗ "Our experienced technicians are highly trained to diagnose Lynx grill ignition issues with precision and care."
 
@@ -209,7 +209,7 @@ Common mistakes. Get these wrong and the page reads as fake.
 
 - **Lynx Grills** — independent (Compton, CA). Not to be confused with Lynch.
 - **Fire Magic** — RH Peterson Co. brand (City of Industry, CA). Made in USA.
-- **Twin Eagles** — independent premium (Camarillo, CA).
+- **Twin Eagles** — now part of Dometic Group (Camarillo, CA production). Brand schema parentOrganization should reference Dometic.
 - **DCS (Dynamic Cooking Systems)** — Fisher & Paykel since 2004 → Haier group since 2012.
 - **Kalamazoo Outdoor Gourmet** — ultra-premium, Kalamazoo MI. Hybrid grills $15K+.
 - **Alfresco** — BBQG Inc. brand. Not Alfresco Heating (different company).
