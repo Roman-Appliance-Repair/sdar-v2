@@ -27,7 +27,7 @@ export const HOMEPAGE_FAQ: FAQItem[] = [
   {
     question: 'Are you licensed and insured?',
     answer:
-      "Yes. We're licensed by the California Bureau of Household Goods and Services (BHGS #A49573), fully insured, and BBB Accredited with an A+ rating. Our technicians carry EPA 608 certification for refrigerant work.",
+      "Yes. We're licensed by the California Bureau of Household Goods and Services (BHGS #A49573), fully insured, and BBB Accredited with an A+ rating. Our technicians carry EPA 608 Universal certification (#1346255700410) for refrigerant work.",
   },
   {
     question: 'Which appliance brands do you service?',

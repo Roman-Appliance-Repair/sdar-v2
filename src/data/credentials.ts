@@ -48,7 +48,7 @@ export const CREDENTIALS: Credential[] = [
   {
     id: 'epa-certified',
     title: 'EPA Certified',
-    description: 'EPA 608 certified for safe refrigerant handling.',
+    description: 'EPA 608 Universal certified (#1346255700410) for safe refrigerant handling.',
     preferredSlug: 'epa-608-certified',
     iconSvg: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <circle cx="32" cy="32" r="28" stroke="#D4AF37" stroke-width="2"/>
