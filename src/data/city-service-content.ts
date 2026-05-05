@@ -105,6 +105,54 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     serviceContext: "Temecula branch covers Temecula, Murrieta, Menifee, Lake Elsinore, Hemet, Moreno Valley, Corona, Riverside.",
     branchSlug: 'temecula',
   },
+  // ====================================================================
+  // Wave 24b — Top 5 non-hub priority cities (15,516 imp/mo GSC top + others)
+  // ====================================================================
+  'burbank': {
+    tier: 'GENERAL',
+    neighborhoods: ['Toluca Lake (Burbank-adjacent)', 'Magnolia Park', 'Rancho Equestrian District', 'Burbank Hills', 'Media District'],
+    climateNote: "Mediterranean San Fernando Valley climate; runs 5-10°F warmer than westside LA in summer. Refrigerator condenser stress moderate. Less marine layer than coastal LA.",
+    waterNote: "Burbank Water and Power; moderately hard water similar to LADWP (12-18 grains per gallon). Scaling on dishwashers and washers at year 3-5 without descaling PM.",
+    homeStock: "Mix: 1920s-1940s craftsman + Spanish revival in older neighborhoods (Magnolia Park, Toluca Lake-adjacent), 1970s-2000s tract single-family in Burbank Hills, condos near Media District. Brand mix correlates to neighborhood.",
+    serviceContext: "Dispatched from our Los Angeles branch (Wilshire HQ). Burbank's Hollywood-adjacent industry plus residential mix produces high service-call volume — 15,516 imp/mo GSC top priority for our SoCal coverage.",
+    branchSlug: 'los-angeles',
+  },
+  'glendale': {
+    tier: 'GENERAL',
+    neighborhoods: ['Adams Hill', 'Rossmoyne', 'Verdugo Woodlands', 'Glendale Galleria area', 'Brand Park area', 'Northwest Glendale'],
+    climateNote: "Foothill Mediterranean climate; warmer summers than westside LA, cool winter mornings, occasional Santa Ana wind events. Refrigerator condenser stress moderate.",
+    waterNote: "Glendale Water and Power; moderately hard water (12-18 grains per gallon). Scaling on dishwashers, washers, ice makers year 3-5 typical without PM.",
+    homeStock: "Significant Spanish revival + Mediterranean inventory in Rossmoyne and Adams Hill; mid-century in Northwest Glendale; 1970s-2000s tracts in Verdugo Woodlands. Strong Armenian-American demographic with premium-mid appliance preferences.",
+    serviceContext: "Dispatched from our Pasadena branch. Glendale's $85K+ median household income drives premium-mid brand mix; we see Bosch, KitchenAid, GE Profile alongside Whirlpool standard tier.",
+    branchSlug: 'pasadena',
+  },
+  'santa-monica': {
+    tier: 'PREMIUM',
+    neighborhoods: ['North of Montana', 'Sunset Park', 'Ocean Park', 'Wilshire Montana', 'Mid-City Santa Monica', 'Pier-area condos'],
+    climateNote: "Coastal climate, persistent marine layer, salt-air exposure. Refrigerator condenser coil cleaning critical year 2-3 — coastal salt air corrodes coil fins faster than inland. Lower summer temperature than basin LA.",
+    waterNote: "Santa Monica city water; moderately hard. Hard-water descaling on dishwashers and washers year 3-5 standard.",
+    homeStock: "Pre-war Spanish + craftsman in North of Montana and Wilshire Montana; mid-century in Sunset Park; condos near pier and downtown. Premium tier (Sub-Zero, Wolf, Miele) prevalent in North of Montana estates.",
+    serviceContext: "Dispatched from our Los Angeles branch. Santa Monica coastal salt-air angle: refrigerator coil cleaning is high-leverage maintenance for beach-area homes; we see condenser fan motor wear at year 6-8 vs year 8-10 inland.",
+    branchSlug: 'los-angeles',
+  },
+  'long-beach': {
+    tier: 'GENERAL',
+    neighborhoods: ['Belmont Shore', 'Naples Island', 'Bixby Knolls', 'California Heights', 'Downtown Long Beach', 'East Side Long Beach'],
+    climateNote: "Coastal South Bay climate, ocean-moderated summers, mild winters. Marine layer common spring + summer. Salt-air corrosion factor on refrigerator coils similar to Santa Monica but less pronounced inland of the harbor.",
+    waterNote: "Long Beach Water Department; moderately hard water. Scaling patterns comparable to LADWP areas.",
+    homeStock: "Spanish + craftsman in Belmont Shore, Bixby Knolls, California Heights; mid-century + 1970s tracts in East Side; condos in Downtown. Mid-tier brand mix predominant; premium pockets in Naples Island canal homes.",
+    serviceContext: "Dispatched from our Los Angeles branch. Long Beach is our southernmost LA County coverage from the Wilshire HQ; same-day service across the city from Belmont Shore to Bixby Knolls.",
+    branchSlug: 'los-angeles',
+  },
+  'anaheim': {
+    tier: 'PREMIUM-OC',
+    neighborhoods: ['Anaheim Hills', 'Platinum Triangle', 'Colony Historic District', 'West Anaheim', 'Disney area', 'East Anaheim'],
+    climateNote: "Inland Orange County climate; warm dry summers (90-95°F July-Sept), mild winters. Refrigerator condenser stress moderate, less than IE inland but more than coastal OC.",
+    waterNote: "Anaheim Public Utilities; moderately hard water. Scaling on dishwashers and washers year 3-5 standard.",
+    homeStock: "Anaheim Hills has 1980s-2000s premium master-planned tracts (Sub-Zero, Wolf in custom estate pockets). Colony Historic District has 1920s-1940s Spanish + craftsman. Western and central Anaheim mix mid-century + 1960s-70s tracts. Mid-tier brand mix predominant.",
+    serviceContext: "Dispatched from our Irvine branch. Anaheim's family-suburban demographic plus Disney-area service-economy households produce high service-call volume; we cover the full city from Anaheim Hills to West Anaheim same-day.",
+    branchSlug: 'irvine',
+  },
 };
 
 export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
