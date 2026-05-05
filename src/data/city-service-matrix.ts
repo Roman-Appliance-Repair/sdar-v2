@@ -70,6 +70,8 @@ export const CITY_SERVICE_MATRIX: CityServiceCombo[] = [
   ...NON_HUB_PRIORITY_CITIES.flatMap(city => TIER1_SERVICES.map(service => ({ city, service }))),
   // Wave 25b — 5 non-hub priority × 5 Tier 2 services = 25 combos
   ...NON_HUB_PRIORITY_CITIES.flatMap(city => TIER2_SERVICES.map(service => ({ city, service }))),
+  // Wave 26a — 5 non-hub priority × 5 Tier 3 services = 25 combos
+  ...NON_HUB_PRIORITY_CITIES.flatMap(city => TIER3_SERVICES.map(service => ({ city, service }))),
 ];
 
 export const TOTAL_CITY_SERVICE_COMBOS = CITY_SERVICE_MATRIX.length;
