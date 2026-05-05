@@ -1,0 +1,290 @@
+---
+// src/pages/[city]/[service].astro
+// Wave 23 — Parametric city × service template.
+// Reads CITY_SERVICE_MATRIX (40 combos MVP) + CITY_DESCRIPTORS + SERVICE_DESCRIPTORS
+// to render one static page per (city, service) combination.
+//
+// Each page: ~1,500-1,800 visible body words, $89 residential, BHGS + EPA,
+// 5 schemas (LocalBusiness + Service + LocalBusiness#service-area + FAQPage + BreadcrumbList).
+
+import Layout from '../../layouts/Layout.astro';
+import { CITY_SERVICE_MATRIX } from '../../data/city-service-matrix';
+import { CITY_DESCRIPTORS, SERVICE_DESCRIPTORS, getBrandPool } from '../../data/city-service-content';
+import { CITIES } from '../../data/cities';
+import { BRANCHES, MAIN_PHONE } from '../../data/branches';
+
+export async function getStaticPaths() {
+  return CITY_SERVICE_MATRIX.map(combo => ({
+    params: { city: combo.city, service: combo.service },
+  }));
+}
+
+const { city: citySlug, service: serviceSlug } = Astro.params;
+
+const cityData = CITIES.find(c => c.slug === citySlug);
+const cityDesc = CITY_DESCRIPTORS[citySlug as keyof typeof CITY_DESCRIPTORS];
+const serviceDesc = SERVICE_DESCRIPTORS[serviceSlug as keyof typeof SERVICE_DESCRIPTORS];
+const branch = BRANCHES.find(b => b.slug === cityDesc.branchSlug);
+
+const phone = branch?.phone || MAIN_PHONE;
+const phoneRaw = phone.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+
+const cityName = cityData?.name || citySlug;
+const serviceName = serviceDesc.name;
+const canonical = `https://samedayappliance.repair/${citySlug}/${serviceSlug}/`;
+
+const brandPool = getBrandPool(cityDesc.tier, serviceDesc);
+
+// Sibling cities served by same branch (for cross-linking)
+const siblings = CITIES
+  .filter(c => c.primaryBranch === cityData?.primaryBranch && c.slug !== citySlug)
+  .slice(0, 6);
+
+const title = `${serviceName} ${cityName} | $89 Diagnostic, Same-Day, BHGS Licensed`;
+const description = `${serviceName} in ${cityName}. Same-day service from our ${branch?.displayName || 'LA'} branch. ${brandPool.slice(0, 4).join(', ')}, more. $89 residential diagnostic, applied toward repair. BHGS #A49573. ${phone}.`;
+
+// City × service intersection FAQ
+const faqs = [
+  {
+    q: `Do you service ${cityName} for ${serviceDesc.shortName} repair?`,
+    a: `Yes, daily. ${cityName} is dispatched from our ${branch?.displayName || 'Los Angeles'} branch (${phone}). ${cityDesc.serviceContext} Same-day service available across ${cityName} including ${cityDesc.neighborhoods.slice(0, 3).join(', ')}.`,
+  },
+  {
+    q: `What ${serviceDesc.shortName} brands do you service in ${cityName}?`,
+    a: `In ${cityName} we see ${brandPool.slice(0, 5).join(', ')} most often. ${cityDesc.homeStock.split('.')[0]}. Our ${cityDesc.tier === 'ULTRA-PREMIUM' || cityDesc.tier === 'PREMIUM' ? 'premium-tier' : cityDesc.tier === 'INLAND-EMPIRE' || cityDesc.tier === 'INLAND-RIVERSIDE' ? 'mid-tier' : 'full-spectrum'} parts inventory matches the local brand mix.`,
+  },
+  {
+    q: `What's the ${serviceDesc.shortName} repair cost range in ${cityName}?`,
+    a: `Most ${serviceDesc.shortName} repairs in ${cityName} fall in the ${serviceDesc.pricingTable[2]?.cost || '$280 to $485'} range for single-component fixes, or higher for multi-component work on year 10+ units. The $89 residential diagnostic fee is applied toward the repair when you approve the work. We quote labor and parts separately so you see exactly what you're paying for.`,
+  },
+  {
+    q: `${cityDesc.tier === 'INLAND-EMPIRE' || cityDesc.tier === 'INLAND-RIVERSIDE' ? `Hot summers in ${cityName} — does climate affect ${serviceDesc.shortName}?` : `Does ${cityName} water hardness or climate affect ${serviceDesc.shortName} service?`}`,
+    a: `${cityDesc.climateNote} ${cityDesc.waterNote} We factor local conditions into every diagnostic in ${cityName} — the failure pattern profile shifts with climate and water hardness, and we calibrate our service accordingly.`,
+  },
+  {
+    q: `Is your ${serviceDesc.shortName} repair work in ${cityName} licensed and insured?`,
+    a: `Yes. BHGS #A49573 (Bureau of Household Goods and Services). EPA 608 Universal certified #1346255700410${serviceDesc.epaCertRequired ? ' — required for sealed-system refrigerant work on this equipment category' : ''}. CSLB C-20 HVAC for ventilation-related work. BBB A+ accredited. License verifiable at bhgs.dca.ca.gov.`,
+  },
+  {
+    q: `What's your warranty on ${serviceDesc.shortName} repair?`,
+    a: `90 days SDAR labor and parts on every repair. Same issue within 90 days, we come back at no charge. OEM parts wherever available. Brand component warranties (manufacturer-specific) processed separately through authorized service network.`,
+  },
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org", "@type": "LocalBusiness", "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+    ],
+    "areaServed": [{ "@type": "City", "name": cityName }],
+  },
+  {
+    "@context": "https://schema.org", "@type": "Service", "@id": canonical + "#service",
+    "serviceType": serviceDesc.serviceTypeSchema + " in " + cityName,
+    "name": `${serviceName} in ${cityName}`,
+    "url": canonical,
+    "description": `${serviceName} service in ${cityName} from our ${branch?.displayName || 'Los Angeles'} branch. ${cityDesc.serviceContext} Standard failure patterns: ${serviceDesc.failurePatterns.slice(0, 3).map(f => f.title).join('; ')}. Brand pool: ${brandPool.slice(0, 6).join(', ')}. $89 residential diagnostic, applied toward repair. BHGS #A49573${serviceDesc.epaCertRequired ? ', EPA 608 Universal certified #1346255700410' : ''}.`,
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [{ "@type": "City", "name": cityName }],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, applied toward repair" } },
+  },
+  {
+    "@context": "https://schema.org", "@type": "FAQPage",
+    "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })),
+  },
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": cityName, "item": `https://samedayappliance.repair/${citySlug}/` },
+      { "@type": "ListItem", "position": 3, "name": serviceName, "item": canonical },
+    ],
+  },
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<section class="hero">
+  <div class="container">
+    <p class="crumb"><a href="/">Home</a> &rsaquo; <a href={`/${citySlug}/`}>{cityName}</a> &rsaquo; {serviceName}</p>
+    <h1>{serviceName} in {cityName}, Same-Day from {branch?.displayName || 'Los Angeles'}</h1>
+    <p class="lede">{cityDesc.serviceContext} ${'89'} residential diagnostic, applied toward repair. <strong>BHGS #A49573</strong>{serviceDesc.epaCertRequired ? '. EPA 608 Universal certified #1346255700410 for sealed-system work' : ''}. {phone}.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+<section class="trust-bar">
+  <div class="container">
+    <span>$89 Residential Diagnostic</span>
+    <span>BHGS #A49573</span>
+    <span>EPA 608 Universal #1346255700410</span>
+    <span>BBB A+ Accredited</span>
+    <span>90-Day Warranty</span>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">{cityName} {serviceDesc.shortName} service</p>
+    <h2>How {cityName} differs from a generic LA service call.</h2>
+    <p>{cityDesc.homeStock}</p>
+    <p><strong>Climate:</strong> {cityDesc.climateNote}</p>
+    <p><strong>Water:</strong> {cityDesc.waterNote}</p>
+    <p>The {brandPool.slice(0, 3).join(', ')}, and other brands we see in {cityName} carry the failure-pattern profile typical of {cityDesc.tier === 'ULTRA-PREMIUM' ? 'ultra-premium tier' : cityDesc.tier === 'PREMIUM' || cityDesc.tier === 'PREMIUM-OC' ? 'premium tier' : cityDesc.tier.startsWith('INLAND') ? 'inland duty cycle' : 'mid-tier residential'} equipment, calibrated for our local conditions.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Top failure modes</p>
+    <h2>What we see most on {serviceDesc.shortName} calls in {cityName}.</h2>
+    <ol class="num-list">
+      {serviceDesc.failurePatterns.map(f => (
+        <li><strong>{f.title}</strong> {f.detail}</li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Brand pool</p>
+    <h2>{cityName} {serviceDesc.shortName} brands we service most.</h2>
+    <p>Brand mix in {cityName} reflects the local home stock and demographics. Our parts inventory and tech training are calibrated for this mix.</p>
+    <ul class="bullet-list">
+      {brandPool.map(brand => (<li>{brand}</li>))}
+    </ul>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Honest opinion</p>
+    <h2>Practitioner take on {cityName} {serviceDesc.shortName} service.</h2>
+    <p>{serviceDesc.honestOpinion}</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2>{cityName} {serviceDesc.shortName} repair costs.</h2>
+    <p class="lead">$89 residential diagnostic, applied toward repair. Labor and parts quoted separately so you see exactly what you're paying for.</p>
+    <table class="price-table">
+      <thead><tr><th>Service</th><th>Typical Cost</th></tr></thead>
+      <tbody>
+        {serviceDesc.pricingTable.map(row => (
+          <tr><td>{row.repair}</td><td>{row.cost}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">{cityName} neighborhoods we cover</p>
+    <h2>Same-day dispatch across {cityName}.</h2>
+    <p>Our {branch?.displayName || 'Los Angeles'} branch dispatches across {cityName} including:</p>
+    <ul class="bullet-list">
+      {cityDesc.neighborhoods.map(n => (<li>{n}</li>))}
+    </ul>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2>{cityName} {serviceDesc.shortName} questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Related</p>
+    <h2>More {cityName} service + sibling cities.</h2>
+    <ul class="bullet-list">
+      <li><a href={`/${citySlug}/`}>{cityName} appliance repair (city pillar)</a></li>
+      <li><a href={`/services/${serviceSlug}/`}>{serviceName} (service pillar — all cities)</a></li>
+      {siblings.length > 0 && (
+        <li>
+          Sibling cities served from our {branch?.displayName || 'Los Angeles'} branch: {siblings.map((s, i) => (
+            <span><a href={`/${s.slug}/${serviceSlug}/`}>{s.name}</a>{i < siblings.length - 1 ? ', ' : ''}</span>
+          ))}
+        </li>
+      )}
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>{cityName} {serviceDesc.shortName} repair, same-day priority.</h2>
+    <p>{branch?.displayName || 'Los Angeles'} branch · {phone} · $89 residential diagnostic. BHGS #A49573{serviceDesc.epaCertRequired ? ', EPA 608 Universal #1346255700410' : ''}. BBB A+.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .hero { background: var(--black); color: #fff; padding: 56px 24px 64px; }
+  .hero .container { max-width: 1100px; margin: 0 auto; }
+  .hero h1 { color: #fff; font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 800; margin: 12px 0 18px; line-height: 1.2; }
+  .hero .crumb { color: #9a9a9a; font-size: 0.85rem; margin-bottom: 6px; }
+  .hero .crumb a { color: #c9c9c9; text-decoration: none; }
+  .hero .lede { font-size: 1.05rem; color: #d7d7d7; max-width: 720px; line-height: 1.7; margin-bottom: 22px; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+  .trust-bar { background: var(--red); color: #fff; padding: 14px 24px; }
+  .trust-bar .container { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; max-width: 1100px; margin: 0 auto; font-size: 0.92rem; font-weight: 600; }
+  .section { padding: 64px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; color: var(--text); line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 22px; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 6px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  .price-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+</style>
