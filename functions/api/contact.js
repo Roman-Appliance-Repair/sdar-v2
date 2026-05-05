@@ -8,13 +8,41 @@
  *   type: 'pdf'         → 📄 PDF Request        → Telegram + Resend email WITH PDF attachment
  *   name: 'AI Diagnostics' (no other type) → 🤖 AI Diagnostics log only → Telegram
  *
+ * Source markers for shared lgdryer + SDAR Telegram chat:
+ *   payload.brand_site === 'samedayappliance.repair' → 🏠 SDAR prefix + branch routing
+ *   otherwise → default lgdryer-style message
+ *
  * Env vars:
  *   TELEGRAM_BOT_TOKEN
  *   TELEGRAM_CHAT_ID
  *   RESEND_API_KEY
  *   RESEND_FROM          (optional, default 'noreply@samedayappliance.repair')
- *   RESEND_TO            (optional, default 'abysov@gmail.com')
+ *   RESEND_TO            (optional, default 'info@samedayappliance.repair')
  */
+
+// SDAR branch routing — city slug → dispatcher phone
+const SDAR_BRANCH_PHONES = {
+  'pasadena': '(626) 376-4458',
+  'beverly-hills': '(424) 248-1199',
+  'thousand-oaks': '(424) 208-0228',
+  'irvine': '(213) 401-9019',
+  'rancho-cucamonga': '(909) 457-1030',
+  'temecula': '(951) 577-3877',
+  'west-hollywood': '(323) 870-4790',
+  'los-angeles': '(424) 325-0520'
+};
+
+function isSdar(p) {
+  return p && p.brand_site === 'samedayappliance.repair';
+}
+
+function sdarBranch(p) {
+  const slug = (p.city || 'los-angeles').toLowerCase();
+  return {
+    slug,
+    phone: SDAR_BRANCH_PHONES[slug] || SDAR_BRANCH_PHONES['los-angeles']
+  };
+}
 
 export async function onRequestPost(context) {
   const { request, env } = context;
@@ -93,16 +121,26 @@ function buildTelegramText(p) {
   }
 
   if (p.type === 'booking') {
+    const sdar = isSdar(p);
+    const branch = sdar ? sdarBranch(p) : null;
     return [
-      '📅 <b>NEW BOOKING REQUEST</b>',
+      sdar
+        ? '🏠 <b>SDAR BOOKING REQUEST</b>\n🌐 samedayappliance.repair'
+        : '📅 <b>NEW BOOKING REQUEST</b>',
       '',
+      branch ? `<b>Branch:</b> ${escape(branch.slug)} → ${escape(branch.phone)}` : '',
       `<b>Phone:</b> ${escape(p.phone || '—')}`,
+      p.name ? `<b>Name:</b> ${escape(p.name)}` : '',
+      p.email ? `<b>Email:</b> ${escape(p.email)}` : '',
       `<b>Address:</b> ${escape(p.address || '—')}`,
-      `<b>Time window:</b> ${escape(p.time || '—')}`,
+      p.zip ? `<b>Zip:</b> ${escape(p.zip)}` : '',
       `<b>Equipment:</b> ${escape(p.equipment || '—')}`,
       p.brand ? `<b>Brand:</b> ${escape(p.brand)}` : '',
       p.model ? `<b>Model:</b> ${escape(p.model)}` : '',
+      p.date ? `<b>Preferred date:</b> ${escape(p.date)}` : '',
+      `<b>Time window:</b> ${escape(p.time || '—')}`,
       '',
+      p.description ? `<b>Issue:</b>\n${escape(truncate(p.description, 600))}` : '',
       p.diagnosis ? `<b>AI said:</b>\n${escape(truncate(p.diagnosis, 500))}` : '',
     ].filter(Boolean).join('\n');
   }
@@ -137,7 +175,9 @@ async function sendTelegram(env, text, payload) {
 
 async function sendEmail(env, p) {
   const from = env.RESEND_FROM || 'Same Day Appliance Repair <noreply@samedayappliance.repair>';
-  const internalTo = env.RESEND_TO || 'abysov@gmail.com';
+  // SDAR bookings default to info@samedayappliance.repair; all others to Roman's ops inbox
+  const defaultTo = isSdar(p) ? 'info@samedayappliance.repair' : 'abysov@gmail.com';
+  const internalTo = env.RESEND_TO || defaultTo;
 
   // If PDF request — send the PDF TO the user, internal copy to ops
   if (p.type === 'pdf' && p.email && p.pdfBase64) {
@@ -163,9 +203,13 @@ async function sendEmail(env, p) {
   }
 
   // Other types: internal ops copy
+  const sdar = isSdar(p);
+  const branch = sdar ? sdarBranch(p) : null;
+  const sdarPrefix = sdar ? '🏠 SDAR ' : '';
+  const branchTag = branch ? ` [${branch.slug}]` : '';
   const subjectMap = {
-    callback: `📞 New Call Back request — ${p.phone || 'no phone'}`,
-    booking: `📅 New Booking request — ${p.phone || 'no phone'}`,
+    callback: `${sdarPrefix}📞 Call Back — ${p.phone || 'no phone'}${branchTag}`,
+    booking: `${sdarPrefix}📅 Booking — ${p.phone || 'no phone'}${branchTag}`,
   };
   const subject = subjectMap[p.type] || `📬 Form submission`;
 
@@ -229,10 +273,18 @@ function buildPdfUserEmail(p) {
 
 function buildInternalCopy(p) {
   const lines = [];
+  if (isSdar(p)) {
+    const b = sdarBranch(p);
+    lines.push(`<strong>Source:</strong> 🏠 SDAR — samedayappliance.repair`);
+    lines.push(`<strong>Branch:</strong> ${escapeHtml(b.slug)} → ${escapeHtml(b.phone)}`);
+  }
   if (p.type) lines.push(`<strong>Type:</strong> ${escapeHtml(p.type)}`);
+  if (p.name) lines.push(`<strong>Name:</strong> ${escapeHtml(p.name)}`);
   if (p.phone) lines.push(`<strong>Phone:</strong> ${escapeHtml(p.phone)}`);
   if (p.email) lines.push(`<strong>Email:</strong> ${escapeHtml(p.email)}`);
   if (p.address) lines.push(`<strong>Address:</strong> ${escapeHtml(p.address)}`);
+  if (p.zip) lines.push(`<strong>Zip:</strong> ${escapeHtml(p.zip)}`);
+  if (p.date) lines.push(`<strong>Preferred date:</strong> ${escapeHtml(p.date)}`);
   if (p.time) lines.push(`<strong>Time:</strong> ${escapeHtml(p.time)}`);
   if (p.equipment) lines.push(`<strong>Equipment:</strong> ${escapeHtml(p.equipment)}`);
   if (p.brand) lines.push(`<strong>Brand:</strong> ${escapeHtml(p.brand)}`);
