@@ -157,10 +157,12 @@ export default defineConfig({
     // ====================================================================
     // Wave 16 — Fagor washing machine activated 2026-05-04
     // 17 imp/mo legacy. Temp redirect to washer-repair pillar pending
-    // Cluster 10 dedicated commercial laundry brand pages (Fagor brand
-    // page will become canonical when C10 writer ships).
+    // Cluster 10 Commercial Laundry brand pages deployed Wave 20.
+    // Fagor washing-machine redirect resolved: now points to dedicated Fagor
+    // Industrial brand page (Onnera Group, distinct corporate entity from
+    // residential Fagor Electrodomésticos consumer brand).
     // ====================================================================
-    '/fagor-washing-machine-repair/': '/commercial/washer-repair/',
+    '/fagor-washing-machine-repair/': '/commercial/washer-repair/brands/fagor-industrial/',
 
     // NOTE: Deferred items (NOT added this commit):
     // - /beko-dishwasher-repair/ + /smeg-dishwasher-repair/ → residential track
