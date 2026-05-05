@@ -33,8 +33,19 @@ const TIER1_SERVICES = [
   'oven-repair',
 ];
 
+// Wave 24a — Tier 2 services (8 hubs × 5 = 40 new combos)
+const TIER2_SERVICES = [
+  'stove-repair',
+  'cooktop-repair',
+  'range-hood-repair',
+  'microwave-repair',
+  'wall-oven-repair',
+];
+
+const ALL_SERVICES = [...TIER1_SERVICES, ...TIER2_SERVICES];
+
 export const CITY_SERVICE_MATRIX: CityServiceCombo[] = HUBS.flatMap(city =>
-  TIER1_SERVICES.map(service => ({ city, service }))
+  ALL_SERVICES.map(service => ({ city, service }))
 );
 
 export const TOTAL_CITY_SERVICE_COMBOS = CITY_SERVICE_MATRIX.length;
