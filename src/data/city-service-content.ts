@@ -153,6 +153,16 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     serviceContext: "Dispatched from our Irvine branch. Anaheim's family-suburban demographic plus Disney-area service-economy households produce high service-call volume; we cover the full city from Anaheim Hills to West Anaheim same-day.",
     branchSlug: 'irvine',
   },
+  // Wave 27b — final non-hub addition (200/200 master plan target)
+  'hollywood': {
+    tier: 'PREMIUM',
+    neighborhoods: ['Hollywood Hills above-Sunset', 'Outpost Estates', 'Whitley Heights', 'Hollywood proper', 'Franklin Village', 'Beachwood Canyon', 'Larchmont Village (Hollywood-adjacent)'],
+    climateNote: "Mediterranean basin climate. Hollywood Hills above-Sunset sits at elevation, less marine layer, warmer summer afternoons stress refrigerator condensers more than the basin floor. Hollywood proper runs basin-typical with marine layer May-June.",
+    waterNote: "LADWP serves Hollywood with moderately hard water (12-18 grains per gallon). Hard-water descaling on dishwashers and washers year 3-5 standard; ice maker filter service annual.",
+    homeStock: "Two-tier mix. Hollywood Hills above-Sunset is ultra-premium territory: Outpost Estates, Whitley Heights, Beachwood Canyon — Sub-Zero, Wolf, Miele, Thermador, La Cornue installations standard in custom kitchens, often integrated with Sub-Zero Designer columns and matched Wolf rangetops. Hollywood proper is mid-premium entertainment-industry mix: Bosch, KitchenAid, GE Profile, Samsung premium are common alongside the tier-mixed condo and apartment inventory.",
+    serviceContext: "Dispatched from our West Hollywood branch (323) 870-4790. Hollywood is distinct from West Hollywood — different city boundaries, different incorporation, common confusion among new residents. We service both with the same WeHo branch infrastructure; same-day priority dispatch across the Hollywood Hills above-Sunset estate corridor and the Hollywood proper apartment-and-condo density.",
+    branchSlug: 'west-hollywood',
+  },
 };
 
 export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {

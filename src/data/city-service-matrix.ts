@@ -63,6 +63,13 @@ const NON_HUB_PRIORITY_CITIES = [
   'anaheim',
 ];
 
+// Wave 27b — final non-hub addition to reach 200/200 master plan target.
+// Hollywood (entertainment industry + Hollywood Hills premium tier mix);
+// distinct from west-hollywood. Tier 1 only (5 services) to land at exactly 200.
+const NON_HUB_TIER1_ONLY_CITIES = [
+  'hollywood',
+];
+
 export const CITY_SERVICE_MATRIX: CityServiceCombo[] = [
   // 8 hubs × 15 services (Tier 1 + Tier 2 + Tier 3) = 120 combos
   ...HUBS.flatMap(city => ALL_SERVICES.map(service => ({ city, service }))),
@@ -72,6 +79,8 @@ export const CITY_SERVICE_MATRIX: CityServiceCombo[] = [
   ...NON_HUB_PRIORITY_CITIES.flatMap(city => TIER2_SERVICES.map(service => ({ city, service }))),
   // Wave 26a — 5 non-hub priority × 5 Tier 3 services = 25 combos
   ...NON_HUB_PRIORITY_CITIES.flatMap(city => TIER3_SERVICES.map(service => ({ city, service }))),
+  // Wave 27b — Hollywood × 5 Tier 1 services = 5 combos (200/200 target)
+  ...NON_HUB_TIER1_ONLY_CITIES.flatMap(city => TIER1_SERVICES.map(service => ({ city, service }))),
 ];
 
 export const TOTAL_CITY_SERVICE_COMBOS = CITY_SERVICE_MATRIX.length;
