@@ -154,9 +154,15 @@ export default defineConfig({
     '/brands/wolf-outdoor-grill-repair/': '/outdoor/brands/wolf/',
     '/brands/traeger-grill-repair/': '/outdoor/smoker-repair/brands/traeger/',
 
+    // ====================================================================
+    // Wave 16 — Fagor washing machine activated 2026-05-04
+    // 17 imp/mo legacy. Temp redirect to washer-repair pillar pending
+    // Cluster 10 dedicated commercial laundry brand pages (Fagor brand
+    // page will become canonical when C10 writer ships).
+    // ====================================================================
+    '/fagor-washing-machine-repair/': '/commercial/washer-repair/',
+
     // NOTE: Deferred items (NOT added this commit):
-    // - /fagor-washing-machine-repair/ → target TBD
-    //   (C10 Commercial Laundry deferral per C05 Decision 15; activate with C10 writer)
     // - /beko-dishwasher-repair/ + /smeg-dishwasher-repair/ → residential track
     //   (T1/T2 residential analyst owns these at cutover)
     // - C10 Commercial Laundry (13 items) + C11 Commercial Exhaust Hoods redirects
