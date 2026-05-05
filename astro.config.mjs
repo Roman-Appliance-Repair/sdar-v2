@@ -126,14 +126,30 @@ export default defineConfig({
     // on "fisher paykel oven repair los angeles" — preserve ranking at sdar-v2 launch.
     '/fisher-paykel-oven-repair/': '/brands/fisher-paykel-oven-repair/',
     // C17 BBQ Grill — F&P outdoor grill is sold as DCS (single product line under
-    // F&P umbrella; "Fisher & Paykel BBQ" is not a separate product). Redirect any
-    // legacy/intuitive query routing for f&p outdoor → existing DCS combo.
-    '/brands/fisher-paykel-bbq-grill-repair/': '/brands/dcs-grill-repair/',
+    // F&P umbrella; "Fisher & Paykel BBQ" is not a separate product). Updated
+    // 2026-05-04 to bypass the /brands/dcs-grill-repair/ → /outdoor/brands/dcs/
+    // Wave 6c chain — direct to canonical target.
+    '/brands/fisher-paykel-bbq-grill-repair/': '/outdoor/brands/dcs/',
     // Cluster 08 Residential Microwave — service-hub rename (11th project-wide;
     // ~4,000+ imp aggregate — LARGEST residential-track single-URL equity item.
     // 0 brand-level 301s for C08 per Gap #80 exhaustive probe 2026-04-21: 0% brand-URL
     // hit rate on 15 URLs; low-ticket-price-appliance economic pattern.)
     '/services/microwave-repair-los-angeles/': '/services/microwave-repair/',
+
+    // ====================================================================
+    // Wave 6c — Outdoor brand tree consolidation (8 grill brands)
+    // Legacy /brands/{brand}-grill-repair/ → canonical /outdoor/brands/{brand}/
+    // Source files deleted; Astro emits redirect HTML at legacy slot.
+    // Traeger redirect deferred until Wave 6a smoker pillar lands.
+    // ====================================================================
+    '/brands/alfresco-grill-repair/': '/outdoor/brands/alfresco/',
+    '/brands/dcs-grill-repair/': '/outdoor/brands/dcs/',
+    '/brands/fire-magic-grill-repair/': '/outdoor/brands/fire-magic/',
+    '/brands/hestan-outdoor-grill-repair/': '/outdoor/brands/hestan/',
+    '/brands/kalamazoo-grill-repair/': '/outdoor/brands/kalamazoo/',
+    '/brands/lynx-grill-repair/': '/outdoor/brands/lynx/',
+    '/brands/twin-eagles-grill-repair/': '/outdoor/brands/twin-eagles/',
+    '/brands/wolf-outdoor-grill-repair/': '/outdoor/brands/wolf/',
 
     // NOTE: Deferred items (NOT added this commit):
     // - /fagor-washing-machine-repair/ → target TBD
