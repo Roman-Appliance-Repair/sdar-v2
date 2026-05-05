@@ -42,7 +42,16 @@ const TIER2_SERVICES = [
   'wall-oven-repair',
 ];
 
-const ALL_SERVICES = [...TIER1_SERVICES, ...TIER2_SERVICES];
+// Wave 25a — Tier 3 services (8 hubs × 5 = 40 new combos)
+const TIER3_SERVICES = [
+  'freezer-repair',
+  'ice-maker-repair',
+  'wine-cooler-repair',
+  'garbage-disposal-repair',
+  'range-repair',
+];
+
+const ALL_SERVICES = [...TIER1_SERVICES, ...TIER2_SERVICES, ...TIER3_SERVICES];
 
 // Wave 24b — Top 5 non-hub priority cities × Tier 1 services (25 combos).
 // Burbank prioritized due to 15,516 imp/mo GSC top priority.
@@ -55,10 +64,12 @@ const NON_HUB_PRIORITY_CITIES = [
 ];
 
 export const CITY_SERVICE_MATRIX: CityServiceCombo[] = [
-  // 8 hubs × 10 services (Tier 1 + Tier 2) = 80 combos
+  // 8 hubs × 15 services (Tier 1 + Tier 2 + Tier 3) = 120 combos
   ...HUBS.flatMap(city => ALL_SERVICES.map(service => ({ city, service }))),
   // 5 non-hub priority × 5 Tier 1 services = 25 combos
   ...NON_HUB_PRIORITY_CITIES.flatMap(city => TIER1_SERVICES.map(service => ({ city, service }))),
+  // Wave 25b — 5 non-hub priority × 5 Tier 2 services = 25 combos
+  ...NON_HUB_PRIORITY_CITIES.flatMap(city => TIER2_SERVICES.map(service => ({ city, service }))),
 ];
 
 export const TOTAL_CITY_SERVICE_COMBOS = CITY_SERVICE_MATRIX.length;
