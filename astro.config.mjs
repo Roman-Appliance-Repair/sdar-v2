@@ -137,10 +137,12 @@ export default defineConfig({
     '/services/microwave-repair-los-angeles/': '/services/microwave-repair/',
 
     // ====================================================================
-    // Wave 6c — Outdoor brand tree consolidation (8 grill brands)
+    // Wave 6c — Outdoor brand tree consolidation (9 brands: 8 grill + 1 smoker)
     // Legacy /brands/{brand}-grill-repair/ → canonical /outdoor/brands/{brand}/
     // Source files deleted; Astro emits redirect HTML at legacy slot.
-    // Traeger redirect deferred until Wave 6a smoker pillar lands.
+    // Traeger activated 2026-05-04 after Wave 6a smoker pillar landed;
+    // canonical lives at /outdoor/smoker-repair/brands/traeger/ (not /outdoor/brands/)
+    // because Traeger is a pellet smoker, not a grill.
     // ====================================================================
     '/brands/alfresco-grill-repair/': '/outdoor/brands/alfresco/',
     '/brands/dcs-grill-repair/': '/outdoor/brands/dcs/',
@@ -150,6 +152,7 @@ export default defineConfig({
     '/brands/lynx-grill-repair/': '/outdoor/brands/lynx/',
     '/brands/twin-eagles-grill-repair/': '/outdoor/brands/twin-eagles/',
     '/brands/wolf-outdoor-grill-repair/': '/outdoor/brands/wolf/',
+    '/brands/traeger-grill-repair/': '/outdoor/smoker-repair/brands/traeger/',
 
     // NOTE: Deferred items (NOT added this commit):
     // - /fagor-washing-machine-repair/ → target TBD
