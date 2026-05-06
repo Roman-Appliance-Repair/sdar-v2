@@ -1,400 +1,171 @@
-# CLAUDE.md — SDAR Quality Bar
-**Auto-loaded by Claude Code on every session start.**
-**Last updated:** 2026-04-30
-**Project:** Same Day Appliance Repair (samedayappliance.repair)
+# SDAR — Same Day Appliance Repair
 
-> Этот файл — закон проекта. CLAUDE.md > Roadmap > Methodology > Background docs.
-> Если документы конфликтуют — этот файл выигрывает.
+> **Точка входа в любой новый чат или сессию Claude Code.**
+> Прочти этот файл первым. Он компактный — детали подгружай через @-ссылки внизу под конкретную задачу.
 
----
-
-## 1. WHO WE ARE
-
-**Legal:** HVAC 777 LLC dba Same Day Appliance Repair
-**License:** **BHGS #A49573** (Bureau of Household Goods and Services — appliance repair license)
-**EPA 608 Universal Certification:** **#1346255700410** (refrigerant work, residential and commercial)
-**BBB:** A+ Accredited
-**Domain:** samedayappliance.repair (DNS cutover pending)
-**Owner:** Roman Abysov
-**NAP:** 6230 Wilshire Blvd Ste A PMB 2267, Los Angeles CA 90048
-**Hours:** Mon–Sat 8:00 AM–8:00 PM. Sunday closed. **Phones answered 24/7.**
-
-### Credentials — DO NOT CHANGE
-
-The license number above is authoritative. **Do not use:**
-- ❌ `CSLB #1138898` — this is an HVAC contractor license number, NOT used on this site. If you see it in legacy code or older prompts, replace with `BHGS #A49573`.
-- ❌ Any other EPA certification number besides `#1346255700410`.
-
-If a prompt or doc instructs you to use CSLB #1138898 or any other license number for SDAR's primary credentials, that prompt is wrong — follow this file. CLAUDE.md > prompts > legacy code.
+**Последняя синхронизация:** 2026-05-06 (после tier audit)
 
 ---
 
-## 2. THE EIGHT BRANCHES
-
-**Source of truth:** `src/data/branches.ts` — never trust other docs for phones.
-
-| Branch | County | Phone |
-|---|---|---|
-| Los Angeles (Main) | LA County | (424) 325-0520 |
-| West Hollywood | LA County | (323) 870-4790 |
-| Beverly Hills | LA County | (424) 248-1199 |
-| Pasadena | LA County | (626) 376-4458 |
-| Thousand Oaks | Ventura County | (424) 208-0228 |
-| Irvine | Orange County | (213) 401-9019 |
-| Rancho Cucamonga | San Bernardino County | (909) 457-1030 |
-| Temecula | Riverside County | (951) 577-3877 |
-
-When writing pages, pull phones via `MAIN_PHONE` import or `branches.ts` SSOT — never hardcode.
-
----
-
-## 3. PRICING — NEVER MIX
-
-| Tier | Diagnostic | Waived with Repair |
-|---|---|---|
-| Residential | $89 | Yes |
-| Commercial | $120 | Yes |
-| Outdoor (Lynx, Kalamazoo, Fire Magic, etc.) | $120 quote-based | Yes |
-
-**Rules:**
-- Residential page → $89. Always. Never mix.
-- Commercial page → $120. Always. Never mix.
-- Outdoor pages → $120, but premium brands (Kalamazoo, Hestan, Wolf outdoor) often quote-based for parts-heavy jobs.
-- After-hours surcharge: not standard policy yet — don't claim it.
-- Warranty: 90-day parts and labor on every repair, no exceptions.
-
----
-
-## 4. BANNED PHRASES
-
-Never use. These are AI-generated marketing tells.
-
-**Generic AI fillers:**
-- "In conclusion", "Furthermore", "Moreover", "Additionally", "In summary", "It's worth noting"
-- "Comprehensive solutions", "tailored services", "cutting-edge technology", "state-of-the-art"
-- "When it comes to [X]…", "Whether you're a [X] or…", "Look no further than…"
-- "Did you know that…", "In today's fast-paced world…"
-- "Our team of dedicated professionals…"
-- "We pride ourselves on…", "Trust us to…"
-- "Your one-stop shop for…"
-- "Specialists in…", "Specializing in…" (when self-describing)
-
-**Em-dashes** — use sparingly. Never as a tic. If you find more than 2 per page, rewrite.
-
-**Service-industry tells:**
-- "Top-notch service"
-- "Unbeatable prices"
-- "Customer satisfaction is our priority"
-- "We go above and beyond"
-- "Quality you can trust"
-- "Fast, friendly, reliable" (the holy trinity of meaningless)
-
-**False urgency:**
-- "Don't wait — call now!" (use plain "Call us")
-- "Limited time offer"
-- "Act fast"
-
----
-
-## 5. VOICE — PRACTITIONER, NOT MARKETER
-
-Write as if a lead technician is talking to a customer who just called with a problem. Not as a marketer writing brochure copy.
-
-**First person plural always:** "our techs", "we", "our guys". Never "I". Never corporate-abstract third person ("Same Day Appliance Repair offers…").
-
-### Examples
-
-✓ "Nine times out of ten on a Lynx Professional E-series with no spark, it's the 9V battery in the battery tray (OEM 80489). $5 part, 5 minutes. Don't let anyone sell you a new ignition system."
-
-✗ "Our experienced technicians are highly trained to diagnose Lynx grill ignition issues with precision and care."
-
----
-
-✓ "If your Sub-Zero is 18 years old and the compressor just went, that's a $3,500 repair on a unit worth $4,000 used. We'll tell you straight — replace, don't repair."
-
-✗ "Our certified Sub-Zero specialists provide expert diagnosis and offer comprehensive repair solutions."
-
----
-
-✓ "Patio heater won't light: 80% of the time it's the thermocouple. The flame proves the gas is flowing. The thermocouple is what tells the valve to stay open. $35 part, 20 minutes."
-
-✗ "Patio heater not igniting? Our skilled team can troubleshoot and resolve a wide range of issues to get your outdoor space comfortable again."
-
----
-
-### Required on every service/product/landing page
-
-- ≥3 specific equipment models with **full part numbers** (not just brands)
-- ≥2 price ranges in concrete dollars (not "affordable")
-- ≥2 time estimates in concrete minutes/hours
-- ≥3 region-specific or audience-specific references (Beverly Hills, Malibu, restaurant on Sunset, etc.)
-- ≥1 honest opinion that contradicts the industry default (replace-vs-repair, brand X is overrated, etc.)
-- ≥1 composite real-world example with numbers (city, model, age, problem, cost)
-- License number in body AND footer
-- Contact CTA (phone + book online)
-- ≥3 internal links to other SDAR pages
-- FAQ section: 5–7 questions with FAQPage Schema
-- Schema.org JSON-LD: appropriate type minimum (Service, LocalBusiness, FAQPage)
-- Honest scope positioning where relevant (see Part 7)
-
-### Paragraph rhythm
-
-- Mix paragraph lengths: 1-sentence punches next to 4–5 sentence explanations
-- Avoid symmetry — not every section has the same paragraph count
-- Lists: sometimes 4 items, sometimes 7. Never always 3, never always 5 (AI tell)
-- Numbers specific: $247 not "around $250"; "63%" not "more than half"
-
----
-
-## 6. HONEST OPINIONS — THE DIFFERENTIATOR
-
-The biggest reason our pages will rank top-3 against DR 0–22 competitors. Generic AI content doesn't produce these. Real practitioner content does.
-
-Templates:
-
-- **Replace vs repair honesty:** "If your [unit] is [N]+ years old and the [major component] just failed, that's a replace conversation, not a repair conversation. Don't let anyone tell you otherwise."
-
-- **Brand callout:** "[Brand X] is going to win on [specific dimension]. It's not going to win on [other dimension]. We see this in the field every week."
-
-- **Industry default contradiction:** "The internet will tell you [common claim]. Our techs have replaced [specific part] on [N] of these in the last year. The real cause is usually [actual root cause]."
-
-- **Pricing transparency:** "[Common repair] runs $[X]–$[Y] including the part. If anyone quotes you $[3X+], get a second opinion."
-
-These opinions are unique to real practitioners. Generic AI doesn't produce them. This is what makes content rank in 2026.
-
----
-
-## 7. HONEST SCOPE POSITIONING
-
-On every service/product page, where applicable:
-
-1. **Specify what we actually do** (matched to license, expertise, brand catalog)
-2. **Specify what we don't do** with explicit redirect to specialist trade
-3. **Frame as professional standard, not weakness** — "we know our boundaries"
-
-### SDAR scope examples
-
-**Commercial Refrigeration:**
-- ✓ "We do reach-in coolers, walk-in coolers and freezers, prep tables, display cases, and wine cellars. EPA 608 certified for refrigerant work."
-- ✓ "We don't do supermarket multiplexed rack systems with remote condensers — those need a specialty refrigeration contractor with C-38 license. We refer those out."
-- ✓ "We don't do ammonia or CO2 industrial refrigeration. Different trade entirely."
-
-**Outdoor:**
-- ✓ "We service Lynx, Fire Magic, Twin Eagles, DCS, Alfresco, Kalamazoo, Viking outdoor, Wolf outdoor, Hestan, Napoleon."
-- ✓ "We don't do wood-burning fireplace masonry. SCAQMD restrictions on wood burning in SoCal mean most of these are being converted to gas anyway — we do the gas conversion."
-- ✓ "We don't do new outdoor kitchen construction. We service what's already installed. For new builds, we work with several outdoor kitchen contractors and can refer."
-
-**Ice Machines:**
-- ✓ "We service Hoshizaki, Scotsman, Manitowoc, Ice-O-Matic, Follett, Kold-Draft. Cube, flake, nugget, and dispenser models."
-- ✓ "We don't do water filtration installation as a standalone service — but every ice machine repair includes a water-quality check, and we'll tell you if your filtration is the actual problem."
-
----
-
-## 8. BRAND FACTUAL TRAPS
-
-Common mistakes. Get these wrong and the page reads as fake.
-
-### Residential
-
-- **True Manufacturing** ≠ **True Residential**. True Manufacturing is commercial (Trulaske family, independent). True Residential is Middleby-owned, premium home brand.
-- **Wolf** does NOT make residential refrigerators or dishwashers. Sub-Zero (same parent company) does refrigerators. Cove (also same parent) does dishwashers.
-- **Sub-Zero** is not in dishwashers.
-- **Bosch** DOES make freestanding ranges for the US market — gas, dual-fuel, slide-in induction. (Old docs may say otherwise — they're wrong.)
-- **GE Appliances** (Monogram/Profile/Café) — Haier-owned since 2016.
-- **KitchenAid and JennAir** do NOT sell washers/dryers in the US market. Don't write washer pages for these brands.
-- **Fulgor Milano** US distribution = Fulgor USA LLC + Maple Distributing. Not "Fulgor Americas".
-
-### Commercial Refrigeration
-
-- **Perlick** — independent Wisconsin family business since 1917. Not Ali Group.
-- **AHT Cooling Systems** — Daikin-owned since 2017. Not Ali Group.
-- **Beverage-Air** — Ali Group since ~2005.
-- **Hussmann** — Panasonic-owned.
-- **Traulsen** — ITW Food Equipment.
-- **Delfield** — Welbilt.
-
-### Outdoor
-
-- **Lynx Grills** — independent (Compton, CA). Not to be confused with Lynch.
-- **Fire Magic** — RH Peterson Co. brand (City of Industry, CA). Made in USA.
-- **Twin Eagles** — now part of Dometic Group (Camarillo, CA production). Brand schema parentOrganization should reference Dometic.
-- **DCS (Dynamic Cooking Systems)** — Fisher & Paykel since 2004 → Haier group since 2012.
-- **Kalamazoo Outdoor Gourmet** — ultra-premium, Kalamazoo MI. Hybrid grills $15K+.
-- **Alfresco** — BBQG Inc. brand. Not Alfresco Heating (different company).
-- **Viking outdoor** — Middleby brand, separate product line from Viking residential.
-- **Wood-burning fireplaces** — SCAQMD Rule 445 restricts new wood-burning installations in most of SoCal. Most retrofits are gas conversion.
-
----
-
-## 9. WHAT WE DON'T SHOW IN VISIBLE UI
-
-- **AggregateRating (4.6/37 Google reviews)** — only in JSON-LD schema. Never in hero, trust bar, FAQ, or any visible block.
-- **Phone in top notification bar** — replaced by "Request Callback" button (planned). Phone stays in Hero block.
-- **Phone in main menu (right side)** — phone already in Hero, don't duplicate.
-- **HVAC content** — moved to ventahvac.com. Footer-only mention.
-
----
-
-## 10. TYPICAL SECTION ORDER FOR SERVICE PAGES
-
-This is the proven sequence. Customize per page but don't reinvent.
-
-```
-Hero (black bg)
-  → Trust Bar (red bg)
-  → Branches Bar (dark bg, 8 phones)  [homepage only]
-  → Intro / Field Observations (white)
-  → Common Problems We See (gray)
-  → Brands We Service (white)
-  → Real Repair Stories (gray) — composite examples
-  → Honest Scope (white) — what we do, what we don't
-  → Pricing Transparency (gray)
-  → Why Customers Call Back (white)
-  → FAQ (gray)
-  → Bottom CTA (red)
-  → Footer (handled by Layout)
-```
-
----
-
-## 11. INTERNAL LINKING RULES
-
-Every new service/product page MUST link to:
-
-1. **Hub page above it** (e.g., `/outdoor/grill-repair/` links to `/outdoor/`)
-2. **Sibling pages** (2–4 related services in the same hub)
-3. **Brand pages** (3–5 brands serviced for that category)
-4. **At least one city or county page** (LA County, Beverly Hills, etc.)
-5. **Price list page** (if applicable)
-
-Anchor text must be natural sentence-flow, not stuffed keywords.
-✓ "We see this most often on Lynx and Fire Magic units in Beverly Hills"
-✗ "best Lynx grill repair Beverly Hills" as anchor
-
----
-
-## 12. SCHEMA REQUIREMENTS
-
-Every service page needs:
-
-1. **LocalBusiness** (with NAP, AggregateRating, openingHours)
-2. **Service** (with serviceType, areaServed, provider, offers with priceRange)
-3. **FAQPage** (5–7 questions matching the FAQ section)
-4. **BreadcrumbList**
-
-Brand pages additionally:
-
-5. **Brand** schema with logo and parent organization
-
-City pages additionally:
-
-6. **GeoCoordinates** with lat/long
-
-Get these from `src/data/schema-helpers.ts` if exists, or follow patterns in existing live pages.
-
----
-
-## 13. CLUSTER DISCIPLINE
-
-We close one cluster fully before starting the next. No spreading domain authority across half-finished clusters.
-
-**Order within a cluster:**
-1. Pillar / hub page first (1500–4000 words, link magnet, E-E-A-T anchor)
-2. Sub-service pages (1500–2200 words each)
-3. Brand pages (1200–1800 words each)
-4. City × service combo pages (1000–1500 words each)
-5. Blog/long-tail pages last
-
----
-
-## 14. WORD COUNT TARGETS
-
-| Page type | Target |
+## 1. Бизнес — быстрый контекст
+
+- **Домен:** samedayappliance.repair
+- **Юр. лицо:** HVAC 777 LLC dba Same Day Appliance Repair (никогда не упоминать в видимом UI; только в `legalName` JSON-LD на 4 страницах: book, contact, privacy-policy, terms)
+- **Зоны:** 5 каунти SoCal — LA, Orange, Ventura, San Bernardino, Riverside
+- **Часы:** Пн–Сб 8:00–20:00, Вс закрыто. Звонки принимаются 24/7
+- **Цены:** $89 residential / $120 commercial (waived с repair). НИКОГДА не смешивать на одной странице
+- **NAP (физический пин):** 6230 Wilshire Blvd Ste A PMB 2267, Los Angeles CA 90048 — только для West Hollywood schema
+- **Aggregate Rating:** 4.6 / 37 reviews — ТОЛЬКО в JSON-LD, никогда в видимом UI
+- **Технари в текстах:** Mikhail V., Artur S., David K.
+
+### Лицензии (где упоминать)
+| Лицензия | Применение |
 |---|---|
-| Hub / pillar | 1,800–4,000 |
-| Service sub-page | 1,500–2,200 |
-| Brand page | 1,200–1,800 |
-| City × service combo | 1,000–1,500 |
-| Price list page | 800–1,200 |
-| Blog post | 1,200–2,000 |
-
-Don't pad. If the topic doesn't justify the word count, write less. Don't write more.
+| BHGS #A49573 | Везде (главная appliance license) |
+| EPA 608 Universal #1346255700410 | Везде |
+| CSLB C-20 HVAC | Только HVAC pages |
+| CSLB C-38 Refrigeration | Только walk-in / ice machines / commercial refrigeration |
 
 ---
 
-## 15. RESEARCH STANDARDS
+## 2. Стек и инфраструктура
 
-Always web_search for:
-- Current part prices (frequent fluctuation)
-- Equipment specifications and model numbers
-- SCAQMD rule changes (wood burning, refrigerant)
-- EPA refrigerant transitions (R-22 → R-410A → R-454B)
-- Brand ownership changes (acquisitions happen)
-
-Avoid relying on:
-- Competitor blog posts (often outdated)
-- Aggregator sites (Angi, HomeAdvisor)
-- Manufacturer marketing copy (always positive, not honest)
-
-Cite official sources where it matters: EPA, SCAQMD, manufacturer service manuals, AHRI.
+- **Site framework:** Astro SSG → Cloudflare Pages
+- **Preview:** sdar-v2.pages.dev
+- **Production:** samedayappliance.repair (DNS cutover выполнен 2026-05-06)
+- **Repo:** github.com/Roman-Appliance-Repair/sdar-v2 (ветка `main`)
+- **Local:** `C:\Users\Roman\WebstormProjects\sdar-v2\`
+- **Wiki repo (методология, handoffs, cluster plans):** github.com/Roman-Appliance-Repair/sdar-v2-wiki (ветка `master`, private)
+- **Wiki local:** `C:\Users\Roman\projects\sdar-v2-wiki\sdar-v2-wiki\`
 
 ---
 
-## 16. PARENT-READ-BEFORE-CHILD
+## 3. Состояние сайта (по аудиту 2026-05-06)
 
-Before writing any sub-page for an existing parent (e.g., `/outdoor/grill-repair/` after `/outdoor/` is live):
+- **1009 source pages** (1581 HTML в dist с учётом 572 redirect emissions)
+- **89 cities**, **416 brand pages**, **31 service** (15 commercial-flagged), **5 county hubs**, **908 city × service** combos, **49 sub-services** (failure modes), **50 outdoor**, **157 commercial**
+- **0 ошибок билда** · **0 P1 violations** в SEO sample · build time ~45s
+- **830 .astro файлов** в `src/pages/`, из них **25 stubs** (<200 body words)
+- **43 компонента** в `src/components/`, из них **7 orphan** (кандидаты на удаление)
+- Полная аналитическая инфраструктура запущена 2026-05-06: GTM + GA4 + GSC + Bing + IndexNow + Clarity + Cloudflare Web Analytics
 
-1. Read parent fully via project files or web_fetch
-2. Note dispatch policy, pricing, warranty language, voice patterns
-3. Match parent OR explicitly plan reconciliation — don't silently diverge
-4. If conflict found, STOP and report — don't pick one silently
-
-This rule prevents inconsistencies that cost 30+ minutes to fix post-deploy.
-
----
-
-## 17. COMPETITIVE CONTEXT
-
-We are entering a SERP space dominated by competitors with DR 0–26. Our DR is 48. With proper content quality applied via this CLAUDE.md, top-3 rankings are achievable in 2–8 weeks per page in low-KD categories.
-
-Main LA-area competitors:
-- larefrigeration.com (DR 22)
-- expertcommercialappliancerepair.com (DR 0)
-- lafixit.com (DR 26)
-- progrill.com (DR 19, BBQ-only)
-- Mr. Appliance (DR 66, generic franchise)
-- nextechna.com (DR 54, HVAC-adjacent)
-
-None match our breadth × depth × authority combination. The opening exists. Quality content closes it.
+@docs/current-status.md
 
 ---
 
-## 18. WORKFLOW DISCIPLINE
+## 4. Источники истины — приоритет сверху вниз
 
-- **Never fetch** `samedayappliance.repair` or `sdar-v2.pages.dev` during competitor research — these are our own sites
-- **After git push:** verify with `git log origin/main -1` (not just local commit)
-- **Cloudflare HTTP 200 fallback** makes homepage unreliable for existence checks — cross-reference page title + git ls-tree
-- **Hub Chip Sync:** writer commits deploying new combo pages must include tag `[HUB-SYNC-TRIGGER: {section}]`
-- **Session continuity:** before terminal shutdown, write pause file to `wiki/handoff/terminal-TX-pause-YYYY-MM-DD-evening.md`
+1. **`src/data/*.ts`** в sdar-v2 — техническая правда (branches, cities, services, content)
+2. **`wiki/page-plans/METHODOLOGY.md`** v1.3.1 — методология кластерной работы
+3. **Notion writing standard** — `343788eea1d581f9b8f5d4cadd7a54e2`
+4. **Notion tracker** — `343788eea1d58113aab9fafd42075964` (обновляется после каждой страницы)
+5. Этот **CLAUDE.md** + `docs/`
+6. **Project Knowledge** в claude.ai — зеркало этого файла
+
+При конфликте: верхний пункт побеждает. Не доверять старым `.docx`/`.md` без даты — данные могут быть устаревшими (старые лицензии CSLB #1138898, "WordPress legacy", 76 cities — всё это устарело).
+
+### Data layer — что где
+
+| Файл `src/data/` | Содержит |
+|---|---|
+| `branches.ts` | 8 филиалов: slug, name, phone, address, county, cities[] |
+| `cities.ts` | 89 городов: flat slug→branch→county lookup (без tier) |
+| `city-service-content.ts` | `CITY_DESCRIPTORS` — tier города (8 значений), brand pool, climate notes |
+| `services.ts` | 31 услуга: slug, name, commercial flag, **service tier** (tier1/2/3 — приоритет контента) |
+| `city-service-matrix.ts` | Какие city × service комбинации генерятся (hubs × 15, non-hub × 5) |
+| `counties.ts` + `county-boundaries.ts` | 5 county hubs + Leaflet polygon data |
+| `pricing.ts` + `repair-estimates.ts` | Pricing tiers (residential/commercial) |
+| `business-hours.ts` | Часы работы |
+| `credentials.ts` | Лицензии и сертификации |
+| `faq.ts` | FAQ контент |
+| `homepage-services.ts` | Что на главной |
+| `testimonials.ts` | Отзывы |
+
+### Две независимых tier-системы — не путать!
+- **`CityDescriptor.tier`** в `city-service-content.ts` → социально-экономический + гео-кластер: `ULTRA-PREMIUM | PREMIUM | GENERAL | PREMIUM-OC | MID-TIER-NE | MID-TIER-VENTURA | INLAND-EMPIRE | INLAND-RIVERSIDE`. Управляет brand pool на city × service страницах.
+- **`Service.tier`** в `services.ts` → приоритет контента: `tier1 | tier2 | tier3`. Управляет какие city × service страницы генерятся (hubs × 15 vs non-hub × 5).
 
 ---
 
-## 19. WHEN UNSURE
+## 5. Правила всегда применяемые
 
-If anything in a content batch contradicts this file — **stop, report to chat, ask**. Don't silently guess.
+@docs/voice-and-style.md
+@docs/factual-accuracy.md
+@docs/seo-policies.md
 
-Common cases where you should stop:
-- Page topic doesn't fit the 5-niche architecture
-- Pricing doesn't match $89/$120 split
-- Brand factual trap (Wolf refrigerator, KitchenAid washer, etc.)
-- Existing parent uses different framing than this file
-- Competitor name appears that you can't verify
-- Refrigerant or regulatory claim that needs current verification
-
-Better to ask once than fix 30 pages later.
+Кратко (без подгрузки):
+- Голос: «our techs», «we», «our guys» — никогда «I», никогда корпоративно
+- Видимый UI: никаких `aggregateRating`, `4.6 / 37 reviews`, `HVAC 777 LLC`, `streetAddress` (кроме West Hollywood)
+- Цены: $89 ИЛИ $120 на одной странице, не оба
+- Wood-burning fireplaces исключены (SCAQMD restrictions) — only gas
+- Wolf не делает residential refrigerators / dishwashers; Sub-Zero не делает dishwashers; KitchenAid и JennAir не продают washers/dryers в США
 
 ---
 
-**End of CLAUDE.md.**
-This file lives in the repo root and is auto-loaded by Claude Code at the start of every session.
-Quarterly re-verification required: brand ownership, refrigerant rules, SCAQMD, branch phones.
+## 6. Под задачу — подгружай нужное
+
+| Задача | Что подгружать |
+|---|---|
+| Писать city / brand / service страницу | @docs/methodology.md + @docs/voice-and-style.md |
+| Cluster work (residential/commercial) | @docs/methodology.md + wiki: `page-plans/cluster-XX/index.md` |
+| Дизайн, UI, новый шаблон | @docs/design-system.md |
+| Фото, AI-генерация, photo pipeline | @docs/photo-pipeline.md |
+| GA4/GTM/GSC/Clarity настройки и отладка | @docs/analytics-stack.md |
+| GMB решения, новые локации | @docs/gmb-strategy.md |
+| Schema, JSON-LD, NAP audit | @docs/seo-policies.md |
+| Терминалы T1–T6 оркестрация | @docs/terminal-orchestration.md |
+| Resume after pause / понять «как мы сюда пришли» | session-log/*.md (последние 3-5 записей) |
+
+Wiki не подгружается через `@-syntax` (отдельный репо) — путь: `C:\Users\Roman\projects\sdar-v2-wiki\sdar-v2-wiki\`. Главное там: `wiki/page-plans/METHODOLOGY.md` (v1.3.1).
+
+---
+
+## 7. Коммуникация с Roman
+
+- Roman не программист — без жаргона (revert/refactor/hybrid/batch — объяснять простыми словами)
+- Решения: одна чёткая рекомендация, не опросники с вариантами
+- Не использовать `ask_user_input_v0` polls
+- Russian для оркестрации, English для кода и коммитов
+- Не предлагать «паузу» или «остановиться» — Roman сам решает
+- Не регенерировать промпты после подтверждения «запустил» — acknowledge и ждать output
+- Roman ценит результат и качество, не процесс
+
+---
+
+## 8. Обновление knowledge base — обязанность каждого терминала
+
+**Важно: knowledge base ОБНОВЛЯЕТСЯ автоматически после работы, не только Roman'ом.**
+
+| Файл | Когда обновлять | Кто |
+|---|---|---|
+| **`session-log/<today>.md`** | После каждого `git push` или важного решения. Append-only | Терминал, сразу |
+| **`docs/current-status.md`** | После закрытия задачи / completion стадии | Терминал, в том же commit |
+| **`docs/factual-accuracy.md`** | При изменении бизнес-фактов (лицензии, цены, NAP, brand ownership) | Терминал по согласованию с Roman |
+| **`docs/methodology.md`** + другие domain docs | При изменении правил или процесса | Orchestrator chat обсуждает с Roman, потом T1 commit |
+| **`CLAUDE.md` (этот)** | Только при изменении структуры разделов или ссылок | Редкие изменения, после обсуждения |
+| **`memory_user_edits`** | При новых business facts которые нужны кросс-проектно | Orchestrator |
+
+**Стандартный pattern для commit message:**
+- `status: <что изменилось>` — для current-status.md
+- `log: <дата> <короткое описание>` — для session-log
+- `docs(<area>): <изменение>` — для doc files
+- `claude-md: <раздел>` — для CLAUDE.md
+
+**Не смешивать** обновление status/log с feature commits — отдельные коммиты, чтобы git blame был полезен.
+
+### Auto-pattern для writer terminals
+
+После `git push origin main` нового контента — автоматически:
+```bash
+# 1. Append session log entry
+echo "..." >> docs/../session-log/$(date +%Y-%m-%d).md
+git add session-log/
+git commit -m "log: $(date +%Y-%m-%d) <описание>"
+
+# 2. Update current-status if applicable
+# (e.g. moved item from "Что в работе" to "Что закрыто")
+
+git push origin main
+```
+
+См. `session-log/README.md` для формата записей.
