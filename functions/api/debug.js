@@ -22,6 +22,7 @@ export async function onRequestGet(context) {
     },
     anthropic_test: await testAnthropic(env),
     telegram_test: await testTelegram(env),
+    resend_test: await testResend(env),
   };
 
   return new Response(JSON.stringify(report, null, 2), {
@@ -61,6 +62,37 @@ async function testAnthropic(env) {
       status: res.status,
       ok: res.ok,
       body_preview: text.slice(0, 300),
+    };
+  } catch (err) {
+    return `❌ Exception: ${err.message}`;
+  }
+}
+
+async function testResend(env) {
+  if (!env.RESEND_API_KEY) return '❌ RESEND_API_KEY not set';
+  const fromEmail = env.RESEND_FROM || 'noreply@samedayappliance.repair';
+  const toEmail = env.RESEND_TO || 'info@samedayappliance.repair';
+  try {
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: toEmail,
+        subject: '🔧 SDAR Debug Test',
+        text: 'This is a test email from /api/debug. If you see this, Resend integration works.',
+      }),
+    });
+    const body = await res.text();
+    return {
+      status: res.status,
+      ok: res.ok,
+      from: fromEmail,
+      to: toEmail,
+      body_preview: body.slice(0, 400),
     };
   } catch (err) {
     return `❌ Exception: ${err.message}`;
