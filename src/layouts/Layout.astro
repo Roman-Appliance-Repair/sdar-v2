@@ -80,9 +80,39 @@ const ogImage = new URL(image, siteUrl).toString();
 
     <!-- Page-specific head content (JSON-LD schema, etc.) -->
     <slot name="head-scripts" />
+
+    <!-- Google Tag Manager — zero-impact lazy load -->
+    <script>
+      (function() {
+        var loaded = false;
+        function loadGTM() {
+          if (loaded) return;
+          loaded = true;
+          window.dataLayer = window.dataLayer || [];
+          window.dataLayer.push({'gtm.start': Date.now(), event: 'gtm.js'});
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-M43LT47K';
+          document.head.appendChild(s);
+        }
+        var events = ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'];
+        function trigger() {
+          events.forEach(function(e) { window.removeEventListener(e, trigger); });
+          ('requestIdleCallback' in window) ? requestIdleCallback(loadGTM, {timeout: 2000}) : setTimeout(loadGTM, 200);
+        }
+        events.forEach(function(e) { window.addEventListener(e, trigger, {once: true, passive: true}); });
+        setTimeout(trigger, 4000);
+      })();
+    </script>
+    <!-- End Google Tag Manager -->
   </head>
 
   <body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-M43LT47K"
+      height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+
     <!-- ================== Trust Bar ================== -->
     <TrustBar />
 
