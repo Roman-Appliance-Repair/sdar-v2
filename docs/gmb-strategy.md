@@ -96,10 +96,14 @@ GMB в самом дорогом городе каунти → выше сред
 
 **Главный физический пин (West Hollywood) ≠ остальные branches.**
 
-- **West Hollywood:** physical address 6230 Wilshire Blvd Ste A PMB 2267 (только этот в schema streetAddress)
-- **Other branches:** virtual office / PMB / service area only — НЕ показывать streetAddress в site schema (см. @docs/seo-policies.md §1)
+- **West Hollywood:** physical address `8746 Rangely Ave Ste, West Hollywood, CA 90048` (только этот в schema streetAddress на сайте — 6 pin pages, см. @docs/seo-policies.md §1)
+- **Other branches:** virtual office / PMB / service area only — НЕ показывать streetAddress в site schema
 
 GMB profile может иметь свой address (для Google), но visible на сайте = только West Hollywood.
+
+**BBB note:** на bbb.org HVAC 777 LLC имеет 3 профиля (LA Wilshire / WeHo Rangely / Pasadena Columbia). Это нормально для multi-location LLC, не требует sync с сайтом — для site/schema используем только GMB-verified WeHo address. BBB рейтинг = A (не A+); в visible UI и schema пишем только «BBB Accredited Business» без буквы.
+
+**6230 Wilshire Blvd Ste A PMB 2267** — mailing-only PMB юр. лица. Используется для BBB LA profile + бумажной корреспонденции, нигде на сайте/в schema не светим.
 
 ---
 

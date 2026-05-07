@@ -33,16 +33,25 @@
 
 ## 3. Лицензии — где упоминать
 
-| Лицензия | Применение | Никогда |
+**FINAL policy (2026-05-07):** все 4 credentials рендерятся site-wide — schema (`hasCredential` array) на каждой LocalBusiness + visible footer. Это нужно для NAP/credential match с LSA и для trust restoration.
+
+| Credential | Применение | Никогда |
 |---|---|---|
-| **BHGS Registration #A49573** | Везде (главная appliance license) | — |
+| **BHGS #A49573** | Везде (все 1009 страниц, schema + visible footer) | — |
 | **EPA 608 Universal #1346255700410** | Везде | — |
+| **CSLB C-20 HVAC** | Везде (зарегистрирована и заявлена в LSA, нужна для NAP match) | Не подписывать как BHGS — это разные регуляторы |
+| **BBB Accredited Business** | Везде (БЕЗ буквы рейтинга — на BBB реально A, не A+) | "BBB A+" — false claim, никогда |
 
-❌ **CSLB C-20 HVAC** — НЕ используется на этом сайте (это appliance repair, не HVAC).
-❌ **CSLB C-38 Refrigeration** — НЕ используется (BHGS покрывает refrigeration scope).
-❌ **Старая лицензия CSLB #1138898** — устарела, нигде не использовать.
+**BBB rating note:** на bbb.org реальный grade = **A** (не A+). Писать "A+" в visible UI или schema = false-advertising claim. Только "BBB Accredited Business" без буквы. Сам grade Google и так не подтянет в SERP — accreditation status сам по себе trust signal.
 
-Терминология: BHGS выдает **registration** (не license). Везде в visible UI — «BHGS Registration #A49573» или короткая форма «BHGS #A49573». Не «BHGS Licensed», не «CSLB License #A49573», не «CA BHGS #A49573» — все унифицировано в Wave 35 NAP sweep (2026-05-06).
+**HVAC 777 LLC имеет 3 BBB профиля** (LA Wilshire / WeHo Rangely / Pasadena Columbia) — это нормально для multi-location LLC и не требует sync с сайтом. На сайте отражаем только GMB-verified WeHo physical pin.
+
+Терминология BHGS: BHGS выдает **registration** (не license). Везде в visible UI — «BHGS #A49573» или «BHGS Registration #A49573». Не «BHGS Licensed», не «CSLB License #A49573», не «CA BHGS #A49573».
+
+**Изменения 2026-05-07** (vs Wave 35 NAP sweep 2026-05-06):
+- CSLB C-20 возвращён site-wide (был удалён в Wave 35 как «не нужен HVAC site»). Возвращён, потому что зарегистрирован у CSLB и заявлен в Google LSA — на сайте должен совпадать.
+- BBB Accredited Business добавлен как 4-й credential.
+- CSLB C-38 окончательно удалён из policy (не используется).
 
 ## 4. Юридическое лицо
 
@@ -53,19 +62,36 @@
 
 ## 5. NAP — physical pin
 
-- **Единственный публичный адрес:** **8746 Rangely Ave, West Hollywood, CA 90048**
+- **Единственный публичный адрес сайта:** **8746 Rangely Ave Ste, West Hollywood, CA 90048**
 - Это `address` поле у WeHo branch в `branches.ts` (type: `physical_pin`)
-- Рендерится только в JSON-LD на WeHo pillar (`/west-hollywood/`) + Hollywood pillar (мapит на WeHo branch) + homepage primary LocalBusiness schema + contact page
-- **Все остальные branches** = `service_area` type, без public streetAddress
-- **6230 Wilshire / PMB 2267** (старый адрес почтового ящика) — удалён из всего sdar-v2 в Wave 35 NAP sweep (2026-05-06). Был в footer + 87 JSON-LD блоков как мусорный legacy. Не возвращать.
+- **GMB-verified** — этот адрес показывается в Google Maps для WeHo profile.
+
+**Pin pages (6 страниц рендерят streetAddress в schema):**
+1. `/` — homepage primary LocalBusiness
+2. `/west-hollywood/` — WeHo city pillar
+3. `/contact/` — WeHo entry в location array
+4. `/book/` — booking schema
+5. `/privacy-policy/` — legal page schema
+6. `/terms/` — legal page schema
+
+Все остальные ~1003 страницы (city pages, brand pages, services, commercial, outdoor) — без `streetAddress` в schema. Все non-WeHo branches = `service_area` type.
+
+**6230 Wilshire / PMB 2267** — mailing address юр. лица (PMB), нигде на сайте не светим. BBB профиль HVAC 777 LLC в LA указывает 6230 Wilshire — это normal для multi-location LLC, на сайте/в schema отражаем только WeHo physical pin (8746 Rangely).
+
+**HVAC 777 LLC имеет 3 BBB профиля** (LA Wilshire / WeHo Rangely / Pasadena Columbia) — multi-location LLC, sync с сайтом не нужен. Сайт показывает только GMB-verified WeHo address.
 
 ## 6. Aggregate Rating
 
-- **4.6 / 37 reviews** — взято из реального GMB West Hollywood profile
-- **Только в JSON-LD** на 4 legal pages + West Hollywood pillar
-- **Никогда не показывать** в visible UI: ни «★ 4.6», ни «37 Google reviews», ни звёзды в hero
-- **Не фабриковать** — не повышать до 4.9, не округлять до 5.0
-- **При обновлении:** вручную из GMB, не выдумывать промежуточные значения
+**FINAL policy (2026-05-07): AggregateRating НЕ используется НИГДЕ — ни в JSON-LD, ни в visible UI.**
+
+- Google и так берёт rating напрямую из GMB и показывает в SERP / Maps. Дублировать в schema не нужно.
+- Schema `aggregateRating` brittle: создаёт mismatch risk (на GMB сейчас 4.7/36, в schema было 4.6/37 — расхождение → потенциальный structured-data warning + trust signal degradation).
+- Никаких «★ 4.6», «37 Google reviews», звёзд в hero, чисел в footer.
+- Если когда-нибудь захочется review schema, делать только через `Review` schema на отдельных testimonial pages с реальными verifiable отзывами — не через `aggregateRating` поверх GMB.
+
+**Текущий GMB (для информации, нигде не пишем):** 4.7 / 36 reviews на WeHo profile. Site/schema этих чисел не содержат.
+
+**Изменение 2026-05-07** (vs Wave 35): aggregateRating убран отовсюду. До этого был в JSON-LD на 4 legal pages + West Hollywood pillar + LA SAB pillar (через `branches.ts.aggregateRating`). Теперь — нигде.
 
 ## 7. Wood-burning fireplaces — исключены
 

@@ -6,33 +6,54 @@
 
 ## 1. NAP / Rating Policy (SSOT)
 
-**Закон (обновлено Wave 35 NAP sweep, 2026-05-06):**
-1. **AggregateRating 4.6/37** → ТОЛЬКО в JSON-LD на WeHo pillar + LA SAB pillar (через `branches.ts.aggregateRating`). НИКОГДА в visible UI.
-2. **streetAddress 8746 Rangely Ave, West Hollywood, CA 90048** → ТОЛЬКО в schema на:
-   - West Hollywood city pillar (`/west-hollywood/`)
-   - Hollywood pillar (`/hollywood/` — мapит на WeHo branch per `cities.ts.primaryBranch`)
-   - Homepage primary LocalBusiness schema
-   - `/contact/` page
-3. **6230 Wilshire / PMB 2267** (старый адрес) — удалён ВЕЗДЕ, не возвращать. Footer + 87 JSON-LD блоков очищены 2026-05-06.
-4. **HVAC 777 LLC** → ТОЛЬКО в footer copyright line + `legalName` JSON-LD field на legal pages. НИКОГДА в visible body на content pages.
-5. **CSLB C-20** — больше не упоминается нигде (это appliance repair site, не HVAC).
-6. **License labeling** — везде «BHGS Registration #A49573» (не «BHGS Licensed», не «CSLB License», не «CA BHGS»).
+**Закон (FINAL, 2026-05-07):**
 
-**Все остальные страницы:**
-- В schema используют `areaServed` без `streetAddress`
-- Не имеют `aggregateRating`
-- Не упоминают legalName в visible body
+1. **AggregateRating НЕ используется нигде** — ни в JSON-LD, ни в visible UI. Google берёт rating напрямую из GMB. Schema rating brittle и создаёт mismatch risk. Никаких «★ 4.6», «37 reviews», звёзд, чисел.
 
-**Verification:** В каждом релизе делать sample audit на 5-10 случайных страниц:
+2. **streetAddress `8746 Rangely Ave Ste, West Hollywood, CA 90048`** → в schema только на 6 pin pages:
+   - `/` (homepage primary LocalBusiness)
+   - `/west-hollywood/` (WeHo city pillar)
+   - `/contact/` (WeHo entry в location array)
+   - `/book/`
+   - `/privacy-policy/`
+   - `/terms/`
+
+3. **`legalName: "HVAC 777 LLC"`** → во всех LocalBusiness schema на всех 1009 страницах (не только pin pages, не только legal). В visible UI — только в footer copyright line `© 2026 HVAC 777 LLC dba Same Day Appliance Repair`.
+
+4. **`hasCredential` array (4 entries) site-wide** — на каждом LocalBusiness schema:
+   - BHGS Registration #A49573
+   - EPA 608 Universal #1346255700410
+   - CSLB C-20 HVAC
+   - BBB Accredited Business (БЕЗ буквы рейтинга — на BBB реально A, не A+)
+
+5. **`location` array (все 8 филиалов)** → на гео-нейтральных страницах: `/`, `/contact/`, `/book/`, и ~700 страниц без city anchor (services hubs, brand pages, commercial, outdoor, sub-services, price list, credentials). Все 8 — `LocalBusiness` entries с branch phone + service_area.
+
+6. **City pages (87) + city × service combos (908)** → single LocalBusiness своего primary branch, БЕЗ location array (не дублируем все 8 веток на каждой city page — geographic specificity побеждает).
+
+7. **`6230 Wilshire / PMB 2267`** — mailing-only PMB юр. лица. Нигде на сайте/в schema не рендерится.
+
+8. **License labeling** — везде «BHGS #A49573» или «BHGS Registration #A49573». Не «BHGS Licensed», не «CSLB License #A49573», не «CA BHGS». CSLB C-20 не подписывать как BHGS — это разные регуляторы (CSLB issues C-20, BHGS issues registration).
+
+9. **«BBB A+»** — никогда. Реальный grade на bbb.org = A. False-advertising risk. Только «BBB Accredited Business» без буквы.
+
+**Verification (post-deploy на любую dist page):**
 ```bash
-grep -ic "aggregateRating\|4\.6.*reviews\|37 reviews" <page>  # = 0
-grep -c "HVAC 777" <page>  # = 0 в body content (footer copyright OK)
-grep -c "6230 Wilshire\|PMB 2267" <page>  # = 0 site-wide
-grep -c "CSLB C-20" <page>  # = 0 site-wide
-grep -c "BHGS Licensed\|CA BHGS\|License #A49573" <page>  # = 0 site-wide
+grep -c "aggregateRating" <page>          # = 0
+grep -c "BBB A+" <page>                   # = 0
+grep -c "6230 Wilshire" <page>            # = 0
+grep -c "BHGS Licensed\|CA BHGS"  <page>  # = 0
 ```
 
-Текущий статус (2026-05-06): **0 P1 violations** site-wide post-Wave 35 NAP sweep.
+**Изменения 2026-05-07** (vs Wave 35 NAP sweep 2026-05-06):
+- aggregateRating убран отовсюду (был в JSON-LD на 5 страницах).
+- BBB Accredited Business добавлен как 4-й credential (был "BBB A+" в некоторых старых местах — false claim).
+- CSLB C-20 возвращён site-wide (был удалён в Wave 35; нужен для NAP/LSA match).
+- legalName policy расширен на все 1009 страниц (был на legal pages only).
+- location array (все 8 branches) policy сформулирован для гео-нейтральных страниц.
+- streetAddress pin pages =  6 (homepage + WeHo + contact + book + privacy + terms; больше не Hollywood pillar).
+- streetAddress canonical form: «8746 Rangely Ave Ste, West Hollywood, CA 90048» (был "8746 Rangely Ave"; уточнено "Ste").
+
+Текущий статус (2026-05-07): **policy переписана, code/schema sync — отдельный P0 commit** (см. current-status.md).
 
 ---
 
@@ -87,15 +108,17 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 
 ## 3. LocalBusiness schema — обязательные поля
 
+**Базовый шаблон (все 1009 страниц):**
+
 ```json
 {
   "@context": "https://schema.org",
   "@type": "HomeAndConstructionBusiness",
-  "name": "Same Day Appliance Repair — [City]",
+  "name": "[см. таблицу ниже — буквальный name из branches.ts]",
   "legalName": "HVAC 777 LLC",
   "telephone": "[branch phone, никогда head office]",
   "email": "[branch email]",
-  "url": "https://samedayappliance.repair/[city]/",
+  "url": "https://samedayappliance.repair/[path]/",
   "areaServed": [{ "@type": "City", "name": "..." }],
   "openingHoursSpecification": [
     {
@@ -103,31 +126,62 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
       "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
       "opens": "08:00",
       "closes": "20:00"
+    },
+    {
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": "Sunday",
+      "opens": "00:00",
+      "closes": "00:00"
     }
   ],
-  "priceRange": "$$"
+  "priceRange": "$$",
+  "hasCredential": [
+    { "@type": "EducationalOccupationalCredential", "credentialCategory": "license",
+      "name": "BHGS Registration", "identifier": "A49573" },
+    { "@type": "EducationalOccupationalCredential", "credentialCategory": "certification",
+      "name": "EPA 608 Universal", "identifier": "1346255700410" },
+    { "@type": "EducationalOccupationalCredential", "credentialCategory": "license",
+      "name": "CSLB C-20 HVAC" },
+    { "@type": "EducationalOccupationalCredential", "credentialCategory": "membership",
+      "name": "BBB Accredited Business" }
+  ]
 }
 ```
 
-**Только West Hollywood pillar добавляет:**
+**`legalName: "HVAC 777 LLC"` рендерится во ВСЕХ schema** (не только legal/pin pages). Закон обновлён 2026-05-07.
+
+**`hasCredential` (4 entries) рендерится во ВСЕХ schema** site-wide. BBB — БЕЗ буквы рейтинга (на BBB реально A, не A+).
+
+### Name field — буквально из таблицы (8 строк зафиксированы)
+
+`name` берётся из `branches.ts` per-branch и не модифицируется. WeHo и LA = `Same Day Appliance Repair, CA Location` (без города в имени, потому что они корпоративные хабы); остальные 6 веток = `Same Day Appliance Repair [City], CA Location` с городом.
+
+### Pin pages добавляют `address` (6 страниц):
+
+`/`, `/west-hollywood/`, `/contact/`, `/book/`, `/privacy-policy/`, `/terms/`
+
 ```json
 "address": {
   "@type": "PostalAddress",
-  "streetAddress": "6230 Wilshire Blvd Ste A PMB 2267",
-  "addressLocality": "Los Angeles",
+  "streetAddress": "8746 Rangely Ave Ste",
+  "addressLocality": "West Hollywood",
   "addressRegion": "CA",
   "postalCode": "90048",
   "addressCountry": "US"
-},
-"aggregateRating": {
-  "@type": "AggregateRating",
-  "ratingValue": "4.6",
-  "reviewCount": "37",
-  "bestRating": "5"
 }
 ```
 
-**Brand pages (без physical pin):** `aggregateRating` УБРАН (Wave 29 cleanup).
+### Гео-нейтральные страницы добавляют `location` (все 8 филиалов)
+
+`/`, `/contact/`, `/book/`, services hubs, brand pages, commercial, outdoor, sub-services, price list, credentials → `location` array со всеми 8 branches как `LocalBusiness` entries (branch phone + service_area + opening hours).
+
+### City pages (87) + city × service combos (908) — single branch
+
+Без `location` array. Single LocalBusiness своего `primaryBranch` (per `cities.ts`). Geographic specificity побеждает on-page (Beverly Hills page = Beverly Hills branch, не все 8).
+
+### `aggregateRating` — НЕ ИСПОЛЬЗУЕТСЯ
+
+Удалён отовсюду 2026-05-07. Никаких `aggregateRating` blocks ни на pin pages, ни на brand pages, ни где-либо ещё. Google читает rating из GMB.
 
 ---
 

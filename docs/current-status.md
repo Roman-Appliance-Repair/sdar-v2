@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-05-06
+**Последняя синхронизация:** 2026-05-07
 
 ---
 
@@ -43,6 +43,7 @@
 
 | Долг | Масштаб | Приоритет |
 |---|---|---|
+| P0 schema sync для LSA trust restoration | критично, в работе | P0 |
 | 25 stub страниц (<200 body words) | 25 файлов | P2 — отдельный writer batch |
 | 6 orphan компонентов в `src/components/` | AiDiagnostic, Diagnostics, Credentials, BrandHubPlaceholder, BrandDetailPlaceholder, SectionDivider | P3 — после grep verification (HomepageFooter удалён 2026-05-06 в Wave 35) |
 | ~~Page titles >60 chars~~ | ~~Wave 39 series complete~~ | ✅ Закрыто 2026-05-06 — 667 → 20 (16 authored blog + 4 entity-render artifacts; 0 SEO-actionable content) |
@@ -55,6 +56,7 @@
 
 ## Что закрыто недавно
 
+- **2026-05-07:** Schema policy переписана (memory + docs/): aggregateRating убран отовсюду, BBB переименован в "BBB Accredited" (без A+), CSLB C-20 добавлен site-wide, streetAddress перенесён 6230 Wilshire → 8746 Rangely
 - **2026-05-06: Wave 39 Phase 2D — Final title sweep (city pillars + parametric template + misc). Wave 39 series CLOSED.** City pillar template `Appliance Repair {City} CA — Same Day Service` (89 cities resolved from cities.ts). County hub template `Appliance Repair {County} County CA — Same Day`. **Single-line parametric template fix** for `[city]/[service].astro`: `${serviceName} ${cityName} | $89 Diagnostic, Same-Day, BHGS Licensed` → `${serviceName} ${cityName} — Same Day` — affects all 908 city × service combo pages in one edit. Misc per-file rewrites for legal/utility (homepage, contact, book, privacy, terms), hub indexes (services, outdoor, brands, commercial/exhaust-hood-repair), 6 credentials/, 6 price-list/, 5 for-business/. **60 files changed + 56 preserved custom (≤60 already) + parametric fix affects ~908 combos.** Build 1026 PASS. **Final whole-dist distribution: ≤50=708 (69%), 51-60=298 (29%), 61-70=12 (1.2%), >70=8 (0.8%) of 1026 non-redirect pages.** 20 still >60: 16 authored blog post titles (editorial intent) + 4 HTML-entity-render artifacts (`&` → `&amp;`; source ≤60, Google decodes for SERPs). **0 SEO-actionable content above 60.** Wave 39 cumulative: 667 → 20 (99.7% closed by length, 100% closed for SEO purposes). Backup: `backup/title-phase2d-2026-05-06`.
 - **2026-05-06: Wave 39 Phase 2C — Title rewrite for services + outdoor pages.** Template-driven sweep across 127 .astro files (77 services + 50 outdoor). Classifier dispatches 8 page types: service_hub (27) + service_subservice failmode (49) + outdoor_hub (6) + outdoor_subservice (11) + outdoor_brand_pillar (8) + outdoor_brand_sub (13) + outdoor_city (9) + outdoor_misc maintenance (2) + main_hub-skipped (2). Templates: service hub = `{Service} Repair Los Angeles — Same Day`, service sub = `{Service} {Problem} Repair LA — Same Day`, outdoor hub = `{Equipment} Repair Los Angeles — Same Day`, outdoor city = `{Equipment} Repair {City} — Same Day` (no LA — city geo), outdoor brand pillar = `{Brand} Outdoor Grill Repair Los Angeles — Same Day`. Fallback (>60): drop "Los Angeles" → "LA". Curated dictionaries: 28 SERVICE + 50 PROBLEM + 12 OUTDOOR_EQUIPMENT + 24 OUTDOOR_BRAND + 89 CITY entries. **118 swept, 7 preserved (custom ≤60), 2 skipped (main hubs).** Build 1026 PASS. Dist length distribution: services/ 96+14+2+1, outdoor/ 36+13+0+1. **0 real content pages >60** — 4 over-60 are out of scope (2 main hubs intentionally + 2 Astro redirect HTMLs with noindex). Backup: `backup/title-phase2c-2026-05-06`.
 - **2026-05-06: Wave 39 Phase 2B — Title rewrite for commercial pages.** Template-driven sweep across all 157 `src/pages/commercial/*.astro`. Classifier разбивает на 6 типов: service_hub (22) / brand (42) / sub_service_variant (25, например combi-oven, glass-washer) / sub_service_failmode (54, например not-heating, leaking-water) / sub_service_vertical (4, OPL/Industrial/Coin/Stack) / refrigeration_sub (8, walk-in-cooler etc.) / service_hub_special (1, soft-serve). Templates: hub = `Commercial {Equipment} Repair Los Angeles — Same Day`, brand = `{Brand} {Equipment} Repair Los Angeles — Same Day`, failmode = `Commercial {Equipment} {Problem} LA — Same Day`, variant = `Commercial {Variant} Repair Los Angeles — Same Day`. Fallback (>60): drop "Los Angeles" → "LA"; для failmodes ещё drop "Commercial" prefix. Curated dictionaries: 50 equipment, 42 brand, 80 sub-service entries. **154 swept, 2 preserved (custom ≤60), 1 skipped (commercial/index main hub).** Build 1026 PASS. Dist length distribution: ≤50=69, 51-60=87, 61-70=1, >70=0. The 1 over-60 is `exhaust-hood-repair` — preserved custom title with `&` → `&amp;` HTML-entity inflation. Backup: `backup/title-phase2b-2026-05-06`.
