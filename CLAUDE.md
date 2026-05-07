@@ -3,28 +3,32 @@
 > **Точка входа в любой новый чат или сессию Claude Code.**
 > Прочти этот файл первым. Он компактный — детали подгружай через @-ссылки внизу под конкретную задачу.
 
-**Последняя синхронизация:** 2026-05-06 (после tier audit)
+**Последняя синхронизация:** 2026-05-07 (после P0 schema sync для LSA trust restoration)
 
 ---
 
 ## 1. Бизнес — быстрый контекст
 
 - **Домен:** samedayappliance.repair
-- **Юр. лицо:** HVAC 777 LLC dba Same Day Appliance Repair (никогда не упоминать в видимом UI; только в `legalName` JSON-LD на 4 страницах: book, contact, privacy-policy, terms)
+- **Юр. лицо:** HVAC 777 LLC dba Same Day Appliance Repair (в visible UI только в footer copyright line; в JSON-LD `legalName` во всех LocalBusiness schemas site-wide через `src/data/credentials-schema.ts` → `mergeCredentials()` helper)
 - **Зоны:** 5 каунти SoCal — LA, Orange, Ventura, San Bernardino, Riverside
 - **Часы:** Пн–Сб 8:00–20:00, Вс закрыто. Звонки принимаются 24/7
 - **Цены:** $89 residential / $120 commercial (waived с repair). НИКОГДА не смешивать на одной странице
-- **NAP (физический пин):** 6230 Wilshire Blvd Ste A PMB 2267, Los Angeles CA 90048 — только для West Hollywood schema
-- **Aggregate Rating:** 4.6 / 37 reviews — ТОЛЬКО в JSON-LD, никогда в видимом UI
+- **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, эмитится в schema на 4 pin pages: `/`, `/west-hollywood/`, `/contact/` (в WeHo entry), `/book/`
+- **Aggregate Rating:** не используется нигде (ни в JSON-LD, ни в visible UI). Google берёт rating напрямую из GMB. См. @docs/factual-accuracy.md §6
 - **Технари в текстах:** Mikhail V., Artur S., David K.
 
-### Лицензии (где упоминать)
-| Лицензия | Применение |
+### Лицензии (4 credentials site-wide — FINAL 2026-05-07)
+| Credential | Применение |
 |---|---|
-| BHGS #A49573 | Везде (главная appliance license) |
-| EPA 608 Universal #1346255700410 | Везде |
-| CSLB C-20 HVAC | Только HVAC pages |
-| CSLB C-38 Refrigeration | Только walk-in / ice machines / commercial refrigeration |
+| BHGS Registration #A49573 | Site-wide (schema + visible footer) — главная appliance registration |
+| EPA 608 Universal #1346255700410 | Site-wide — federal refrigerant cert |
+| CSLB C-20 HVAC | Site-wide — нужен для NAP/LSA match |
+| BBB Accredited Business | Site-wide — БЕЗ буквы рейтинга (real BBB grade = A, не A+; «BBB A+» — false claim) |
+
+SSOT: `src/data/credentials-schema.ts` экспортирует `CANONICAL_CREDENTIALS` array (4 entries c `recognizedBy`) + `LEGAL_NAME` + `mergeCredentials(schema)` helper. Применяется в HomepageSchema + 89 city pillars + contact + book + credentials/licensed (Phase 2b-1, commit `39042c7`). Phase 2b-2 deferred — 580 schemaJsons sub-pages через AST-aware modifier.
+
+CSLB C-38 (Refrigeration) более не используется (отменено в FINAL 2026-05-07 policy). CSLB #1138898 — retired, нигде не упоминать.
 
 ---
 
@@ -95,7 +99,9 @@
 
 Кратко (без подгрузки):
 - Голос: «our techs», «we», «our guys» — никогда «I», никогда корпоративно
-- Видимый UI: никаких `aggregateRating`, `4.6 / 37 reviews`, `HVAC 777 LLC`, `streetAddress` (кроме West Hollywood)
+- Видимый UI: никаких `aggregateRating`, `4.6 / 37 reviews`, `BBB A+`, `HVAC 777 LLC` (кроме footer copyright), `streetAddress` (кроме WeHo pin pages)
+- BBB: только «BBB Accredited» / «BBB Accredited Business», никогда «BBB A+» (false claim — real grade = A)
+- Cred labeling: «BHGS #A49573», «EPA 608 Universal», «CSLB C-20 HVAC». Никогда: «BHGS Licensed», «CSLB License #A49573», «CA BHGS», «CSLB #1138898» (retired)
 - Цены: $89 ИЛИ $120 на одной странице, не оба
 - Wood-burning fireplaces исключены (SCAQMD restrictions) — only gas
 - Wolf не делает residential refrigerators / dishwashers; Sub-Zero не делает dishwashers; KitchenAid и JennAir не продают washers/dryers в США

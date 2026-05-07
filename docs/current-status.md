@@ -43,8 +43,13 @@
 
 | Долг | Масштаб | Приоритет |
 |---|---|---|
-| P0 schema sync для LSA trust restoration | критично, в работе | P0 |
-| 25 stub страниц (<200 body words) | 25 файлов | P2 — отдельный writer batch |
+| ~~P0 schema sync для LSA trust restoration~~ | ~~all LSA-critical surfaces~~ | ✅ Закрыто 2026-05-07 — commits d6768ea + f9af9a6 + 39042c7 + docs |
+| **Phase 2b-2 schemaJsons sub-pages** | 580 deep brand/service/commercial pages | P2 — credentials через AST-aware modifier; primary LB reachable через Service.provider @id graph ref, не блокирует LSA |
+| 5 county hubs schema coverage | LA/Orange/Ventura/SB/Riverside county.astro | P3 — different pattern, не покрылись Phase 2b-1 sweep'ом |
+| privacy-policy + terms LocalBusiness schema | отсутствует целиком | P3 — pin identity ограничена 4 страницами вместо 6, добавление с нуля |
+| contact.astro geo coords mismatch | 34.0619,-118.3692 (Wilshire LA) ≠ WeHo Rangely (34.0894,-118.3895) | P2 — affects maps.google integration; not LSA blocker |
+| Wave 35 artifacts на ~10 commercial HVAC pages | `<strong></strong>` empty + "  scope" double-space + "Our mailing address is , Los Angeles" в privacy-policy:75 | P3 — cosmetic, не emit'ится в schema |
+| 25 stub страниц (<200 body words) | 25 файлов | P2 — отдельный writer batch (минус Wave 42 закрытые 13) |
 | 6 orphan компонентов в `src/components/` | AiDiagnostic, Diagnostics, Credentials, BrandHubPlaceholder, BrandDetailPlaceholder, SectionDivider | P3 — после grep verification (HomepageFooter удалён 2026-05-06 в Wave 35) |
 | ~~Page titles >60 chars~~ | ~~Wave 39 series complete~~ | ✅ Закрыто 2026-05-06 — 667 → 20 (16 authored blog + 4 entity-render artifacts; 0 SEO-actionable content) |
 | Schema inconsistency: LocalBusiness vs HomeAndConstructionBusiness | Часть city pillars одно, часть другое | P3 — Wave 30 W3, открыто |
@@ -56,7 +61,13 @@
 
 ## Что закрыто недавно
 
-- **2026-05-07:** Schema policy переписана (memory + docs/): aggregateRating убран отовсюду, BBB переименован в "BBB Accredited" (без A+), CSLB C-20 добавлен site-wide, streetAddress перенесён 6230 Wilshire → 8746 Rangely
+- **2026-05-07:** P0 schema sync для LSA trust restoration — series CLOSED. Schema policy переписана (memory + docs/) и applied в 4 commits:
+  - **Commit 1 (`d6768ea`)** — stale phrases + ghost elements removed (7 files): Layout default meta description «Licensed C-20» снят, HomepageSchema WebPage description чистый, contact.astro 3 fixes (description + ghost `credentialCategory:""` + ghost `<li><strong></strong>`), book.astro pin identity (streetAddress 8746 Rangely + WeHo phone), branches.ts 3 dormant aggregateRating entries удалены, server functions `contact.js` + `diagnose.js` — stale CSLB #1138898 заменён на актуальные credentials.
+  - **Commit 2a (`f9af9a6`)** — chrome BBB rename A+ → Accredited (10 files): Footer, TrustBar, Hero, BlogLayout, AiDiagnostic, index.astro meta+body, contact cred-list. Pin pages completion: contact root LocalBusiness streetAddress + locality fix. branches.ts hours canonicalization Mon-Sat 08:00-20:00 (8 entries). privacy-policy + terms double-space ghosts.
+  - **Commit 2a-bis + 2b-1 (`39042c7`)** — 372 files: page-level BBB sweep (313 files, 579 replacements via 9-pattern map) + canonical credentials shared module (NEW `src/data/credentials-schema.ts` with `CANONICAL_CREDENTIALS` 4-array + `LEGAL_NAME` + `mergeCredentials()` helper) + Phase 2b-1 application к ~91 LSA-critical файлам (HomepageSchema buildLocalBusiness, 89 city pillars wrapped via brace-balanced sweep, contact + book + credentials/licensed singular→canonical 4-array).
+  - **Commit 3 (this)** — docs alignment: CLAUDE.md §1 + current-status.md updated. factual-accuracy.md + seo-policies.md + gmb-strategy.md уже были FINAL state earlier today.
+  - Backup branch: `backup/p0-schema-fix-2026-05-07` (covers all 4 commits).
+  - Verified live: 0× «BBB A+» / «Licensed C-20» / «1138898» / «aggregateRating» в любом dist file. CSLB C-20 + HVAC 777 LLC + BBB Accredited Business present во всех LSA-critical pages.
 - **2026-05-06: Wave 39 Phase 2D — Final title sweep (city pillars + parametric template + misc). Wave 39 series CLOSED.** City pillar template `Appliance Repair {City} CA — Same Day Service` (89 cities resolved from cities.ts). County hub template `Appliance Repair {County} County CA — Same Day`. **Single-line parametric template fix** for `[city]/[service].astro`: `${serviceName} ${cityName} | $89 Diagnostic, Same-Day, BHGS Licensed` → `${serviceName} ${cityName} — Same Day` — affects all 908 city × service combo pages in one edit. Misc per-file rewrites for legal/utility (homepage, contact, book, privacy, terms), hub indexes (services, outdoor, brands, commercial/exhaust-hood-repair), 6 credentials/, 6 price-list/, 5 for-business/. **60 files changed + 56 preserved custom (≤60 already) + parametric fix affects ~908 combos.** Build 1026 PASS. **Final whole-dist distribution: ≤50=708 (69%), 51-60=298 (29%), 61-70=12 (1.2%), >70=8 (0.8%) of 1026 non-redirect pages.** 20 still >60: 16 authored blog post titles (editorial intent) + 4 HTML-entity-render artifacts (`&` → `&amp;`; source ≤60, Google decodes for SERPs). **0 SEO-actionable content above 60.** Wave 39 cumulative: 667 → 20 (99.7% closed by length, 100% closed for SEO purposes). Backup: `backup/title-phase2d-2026-05-06`.
 - **2026-05-06: Wave 39 Phase 2C — Title rewrite for services + outdoor pages.** Template-driven sweep across 127 .astro files (77 services + 50 outdoor). Classifier dispatches 8 page types: service_hub (27) + service_subservice failmode (49) + outdoor_hub (6) + outdoor_subservice (11) + outdoor_brand_pillar (8) + outdoor_brand_sub (13) + outdoor_city (9) + outdoor_misc maintenance (2) + main_hub-skipped (2). Templates: service hub = `{Service} Repair Los Angeles — Same Day`, service sub = `{Service} {Problem} Repair LA — Same Day`, outdoor hub = `{Equipment} Repair Los Angeles — Same Day`, outdoor city = `{Equipment} Repair {City} — Same Day` (no LA — city geo), outdoor brand pillar = `{Brand} Outdoor Grill Repair Los Angeles — Same Day`. Fallback (>60): drop "Los Angeles" → "LA". Curated dictionaries: 28 SERVICE + 50 PROBLEM + 12 OUTDOOR_EQUIPMENT + 24 OUTDOOR_BRAND + 89 CITY entries. **118 swept, 7 preserved (custom ≤60), 2 skipped (main hubs).** Build 1026 PASS. Dist length distribution: services/ 96+14+2+1, outdoor/ 36+13+0+1. **0 real content pages >60** — 4 over-60 are out of scope (2 main hubs intentionally + 2 Astro redirect HTMLs with noindex). Backup: `backup/title-phase2c-2026-05-06`.
 - **2026-05-06: Wave 39 Phase 2B — Title rewrite for commercial pages.** Template-driven sweep across all 157 `src/pages/commercial/*.astro`. Classifier разбивает на 6 типов: service_hub (22) / brand (42) / sub_service_variant (25, например combi-oven, glass-washer) / sub_service_failmode (54, например not-heating, leaking-water) / sub_service_vertical (4, OPL/Industrial/Coin/Stack) / refrigeration_sub (8, walk-in-cooler etc.) / service_hub_special (1, soft-serve). Templates: hub = `Commercial {Equipment} Repair Los Angeles — Same Day`, brand = `{Brand} {Equipment} Repair Los Angeles — Same Day`, failmode = `Commercial {Equipment} {Problem} LA — Same Day`, variant = `Commercial {Variant} Repair Los Angeles — Same Day`. Fallback (>60): drop "Los Angeles" → "LA"; для failmodes ещё drop "Commercial" prefix. Curated dictionaries: 50 equipment, 42 brand, 80 sub-service entries. **154 swept, 2 preserved (custom ≤60), 1 skipped (commercial/index main hub).** Build 1026 PASS. Dist length distribution: ≤50=69, 51-60=87, 61-70=1, >70=0. The 1 over-60 is `exhaust-hood-repair` — preserved custom title with `&` → `&amp;` HTML-entity inflation. Backup: `backup/title-phase2b-2026-05-06`.
@@ -79,11 +90,13 @@
 
 ## На горизонте (большие задачи, не текущий sprint)
 
+- **LSA recovery monitoring** — 24-72h после 2026-05-07 P0 schema sync. Если звонки не возвращаются к baseline — investigate возможные дополнительные mismatches. Roman делает GSC Request Indexing off-machine для критических URL.
+- **Phase 2b-2 schemaJsons credentials** — 580 deep sub-pages (commercial brand combos, service hubs, brand pillar sub-pages). Требует AST-aware JSON-LD modifier (text sweep небезопасен — Wave 35 lesson). Не блокирует LSA (primary LB reachable через Service.provider @id graph ref).
 - **Cluster 6 Residential** — Phase A compliance sweep (em-dash + EPA + BHGS), Phase B sub-services под pillars (failure modes), Range-repair новый pillar
 - **Photo wave (W1-W7)** — 219 фото в первых 4 волнах
 - **GMB expansion** — Glendale, Long Beach (приоритет 1), Chino Hills, Temecula (волна 3)
 - **Voice search optimization** — FAQPage + Speakable schema, NAP consistency audit
-- **Stub cleanup batch** — 25 stubs одной writer-сессией
+- **Stub cleanup batch** — 25 stubs одной writer-сессией (минус Wave 42 closed 13)
 
 ## Метрики (baseline 2026-05-06)
 
