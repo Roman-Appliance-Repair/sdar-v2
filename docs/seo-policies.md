@@ -234,6 +234,26 @@ Curated dictionaries: 28 SERVICE_DISPLAY entries (Refrigerator, Wall Oven, Wine 
 
 **Phase 2C sweep results:** 118 files swept, 7 preserved as custom (≤60 + ≠ template), 2 skipped (services/index.astro + outdoor/index.astro main hubs). 159/163 (97.5%) services + outdoor pages now ≤60 chars. The 4 above-60 are out-of-scope: 2 main hubs (intentionally skipped) + 2 Astro redirect HTMLs (`Redirecting to:` transit pages with noindex). **0 real content pages above 60.**
 
+### City pillar + parametric template (Wave 39 Phase 2D, 2026-05-06)
+
+Финальная фаза Wave 39:
+
+| Тип | Path | Template |
+|---|---|---|
+| **City pillar** | `pages/{city}.astro` | `Appliance Repair {City} CA — Same Day Service` |
+| **County hub** | `pages/{county}-county.astro` | `Appliance Repair {County} County CA — Same Day` |
+| **City × service combo** | `pages/[city]/[service].astro` (parametric, 200+ pages) | `${serviceName} ${cityName} — Same Day` |
+
+`{City}` resolved from `src/data/cities.ts` (89 entries). City × service template is a single-line fix in the parametric source — affects ALL combo pages site-wide, not file-per-file.
+
+Misc per-file rewrites for legal/utility/hub pages (homepage, contact, book, privacy, terms, services-hub, outdoor-hub, brands-hub, exhaust-hood-hub, 6 credentials/, 6 price-list/, 5 for-business/).
+
+**Phase 2D sweep results:** 60 files changed (city pillars + county hubs + misc) + 200+ city × service combos via parametric template fix + 56 preserved custom. **Final whole-dist distribution:** ≤50=708 (69%), 51-60=298 (29%), 61-70=12 (1.2%), >70=8 (0.8%) — out of 1026 non-redirect HTML pages.
+
+**20 still >60:** 16 blog post titles (authored editorial content, length intentional) + 4 HTML-entity-inflation artifacts (`&` → `&amp;` in kolpak-walk-in-repair, hoshizaki, fisher-paykel-refrigerator-repair, exhaust-hood-repair — source ≤60, Google decodes entities). **0 actual problematic content titles.**
+
+**Wave 39 series total:** 667 over-60 → 20 (4 dist-entity + 16 authored blog) = **99.7% closed by length, 100% closed for SEO-actionable content.**
+
 **Phase 1 sweep results (commit предыдущий):** 151 файл — strip только из `<title>` / `title:` / `const title = ...` контекстов; body / hero / schema / meta description НЕ трогали.
 
 **Phase 2 candidates:** 667 файлов с titles > 60 chars (после template-literal expansion). См. `audit-output/wave-39-phase2-candidates.txt`. Распределение:
