@@ -177,6 +177,23 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 
 **Допустимо:** Brand в начале title, если страница ИМЕННО о бренде или это homepage (например, `Same Day Appliance Repair | Los Angeles & Southern California` — homepage, brand НЕ tail а start). Brand в середине title с geo-qualifier (`Appliance Repair Blog | Same Day Appliance Repair Los Angeles`) — авторская формулировка, кандидат для Phase 2 manual rewrite.
 
+### Brand title templates (Wave 39 Phase 2A, 2026-05-06)
+
+Применяется ко всем `src/pages/brands/*.astro` (416 страниц).
+
+| Тип | Primary template | Fallback (>60 chars) |
+|---|---|---|
+| **Brand pillar** (`/brands/{slug}/`) | `{Brand} Appliance Repair Los Angeles — Same Day` | `{Brand} Appliance Repair LA — Same Day` |
+| **Brand × category** (`/brands/{slug}-{cat}-repair/`) | `{Brand} {Category} Repair Los Angeles — Same Day` | `{Brand} {Category} Repair LA — Same Day` |
+
+`{Brand}` = display name из `audit-output/brand-display-map.json` (167 entries, derived from existing pillar titles + manual overrides for irregular casing — Sub-Zero, JennAir, GE, KitchenAid, BlueStar, ZLINE, Fisher & Paykel, etc.).
+
+`{Category}` = display name из category dictionary в `scripts/wave-39-phase2a-sweep.py` (Refrigerator, Wall Oven, Wine Cooler, BBQ Grill, etc.).
+
+**Skip rule (preserve custom titles):** если existing title `<= 60 chars` И `!= new template title`, sweep пропускает файл. Sweep НЕ ломает hand-written titles, только переписывает overflow + template-matching.
+
+**Phase 2A sweep results:** 344 files swept, 23 preserved as custom. 412/416 (99%) brand pages now ≤60 chars. 4 above-60 are HTML-entity-encoding artifacts (`&` → `&amp;` inflates dist render — Google decodes entities so functionally still ≤60) or out-of-scope (`brands/index.html` hub).
+
 **Phase 1 sweep results (commit предыдущий):** 151 файл — strip только из `<title>` / `title:` / `const title = ...` контекстов; body / hero / schema / meta description НЕ трогали.
 
 **Phase 2 candidates:** 667 файлов с titles > 60 chars (после template-literal expansion). См. `audit-output/wave-39-phase2-candidates.txt`. Распределение:
