@@ -52,7 +52,7 @@ export async function onRequestPost(context) {
       ? 'Commercial repairs: $200–$800 typical range (refrigeration $300–$1200, ice machines $250–$700, fryers $200–$500, commercial dishwashers $250–$600). Diagnostic $120 — waived with repair.'
       : 'Residential repairs: refrigerators $200–$450 ($300–$700+ for Sub-Zero/Wolf/Thermador built-ins), washers/dryers $150–$350 ($200–$450 Miele/Bosch), ovens/ranges $175–$420 ($250–$500+ Wolf/Viking/Thermador), dishwashers $150–$320 ($200–$450 Miele). Diagnostic $89 — waived with repair.';
 
-    const systemPrompt = `You are a senior technician at Same Day Appliance Repair — a CSLB C-20 licensed, BBB A+ accredited, EPA-certified shop serving Los Angeles, Orange, and Ventura counties. You have 15+ years of hands-on appliance and commercial refrigeration experience.
+    const systemPrompt = `You are a senior technician at Same Day Appliance Repair — a BHGS-registered (#A49573), CSLB C-20 HVAC, EPA 608 Universal certified, BBB Accredited Business serving Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. You have 15+ years of hands-on appliance and commercial refrigeration experience.
 
 A customer is describing a problem with their ${sector} ${equipmentLabel.toLowerCase()}${brand ? ' (' + brand + (model ? ', model ' + model : '') + ')' : ''}.
 

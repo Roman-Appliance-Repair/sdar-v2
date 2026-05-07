@@ -256,7 +256,7 @@ function buildPdfUserEmail(p) {
         <span style="color:#1a1a1a;">${diag}</span>
       </div>
       <p style="font-size:14px;line-height:1.6;">
-        When you want a real C-20 technician to confirm and fix it, call us —
+        When you want a BHGS-licensed technician to confirm and fix it, call us —
         the <strong>$89 diagnostic is waived</strong> when you approve the repair.
       </p>
       <p style="text-align:center;margin:28px 0 12px;">
@@ -264,7 +264,7 @@ function buildPdfUserEmail(p) {
       </p>
       <p style="font-size:12px;color:#6b6b6b;text-align:center;margin-top:24px;line-height:1.6;">
         West Hollywood · Los Angeles · Thousand Oaks · Pasadena · Irvine<br>
-        CSLB C-20 #1138898 · BBB A+ · EPA 608 Certified · Fully Insured
+        BHGS #A49573 · EPA 608 Universal #1346255700410 · CSLB C-20 HVAC · BBB Accredited Business
       </p>
     </div>
   </div>
