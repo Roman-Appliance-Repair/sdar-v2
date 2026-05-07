@@ -196,35 +196,26 @@ export default defineConfig({
     '/brand-roper-appliance-repair/': '/services/washer-repair/',
     '/brand-speed-queen-appliance-repair/': '/brands/speed-queen-washer-dryer-repair/',
 
-    // === Wave 32 :: B_brands_no_category | /brands/{brand}/ category-less URLs (28) ===
-    '/brands/amana/': '/brands/amana-refrigerator-repair/',
+    // === Wave 32 :: B_brands_no_category | /brands/{brand}/ category-less URLs ===
+    // Wave 40b removed: sub-zero, thermador, miele, viking (intra-brand 301s).
+    // Wave 40c removed: amana, bosch, dacor, frigidaire, ge, haier, jennair,
+    //   kitchenaid, lg, maytag, samsung, whirlpool (same intra-brand pattern,
+    //   2044-5928 word pillars wrongly hidden). Pillars + category pages now
+    //   coexist; cross-link via internal href, never via 301.
+    // Surviving rules below are off-brand routings (we don't pillar these brands)
+    // or deprecated-URL cleanup — intentional, do not remove.
     '/brands/asko/': '/brands/asko-dishwasher-repair/',
     '/brands/blomberg/': '/services/refrigerator-repair/',
-    '/brands/bosch/': '/brands/bosch-dishwasher-repair/',
     '/brands/commercial-and-household/': '/brands/',
-    '/brands/dacor/': '/brands/dacor-oven-repair/',
     '/brands/electrolux/': '/brands/electrolux-refrigerator-repair/',
     '/brands/fisher-paykel/': '/brands/fisher-paykel-refrigerator-repair/',
-    '/brands/frigidaire/': '/brands/frigidaire-refrigerator-repair/',
     '/brands/gaggenau/': '/brands/gaggenau-oven-repair/',
     '/brands/ge-monogram/': '/brands/ge-monogram-refrigerator-repair/',
-    '/brands/ge/': '/brands/ge-refrigerator-repair/',
-    '/brands/haier/': '/brands/haier-refrigerator-repair/',
     '/brands/hotpoint/': '/services/refrigerator-repair/',
-    '/brands/jennair/': '/brands/jennair-refrigerator-repair/',
     '/brands/kenmore/': '/brands/kenmore/',
-    '/brands/kitchenaid/': '/brands/kitchenaid-refrigerator-repair/',
-    '/brands/lg/': '/brands/lg-refrigerator-repair/',
     '/brands/magic-chef/': '/services/refrigerator-repair/',
-    '/brands/maytag/': '/brands/maytag-washer-repair/',
     '/brands/roper/': '/services/washer-repair/',
-    '/brands/samsung/': '/brands/samsung-refrigerator-repair/',
     '/brands/speed-queen/': '/brands/speed-queen-washer-dryer-repair/',
-    '/brands/whirlpool/': '/brands/whirlpool-refrigerator-repair/',
-    // Wave 40b removed 4 brand pillar redirects (sub-zero, thermador, miele,
-    // viking). Each had a 2650-3273 word .astro pillar wrongly hidden behind
-    // a 301 to its category-suffixed variant. Pillars + category pages now
-    // coexist; cross-link via internal href.
 
     // === Wave 32 :: C_brands_repair_suffix | /brands/{brand}-repair/ legacy variants (7) ===
     '/brands/electrolux-repair/': '/brands/electrolux-refrigerator-repair/',
