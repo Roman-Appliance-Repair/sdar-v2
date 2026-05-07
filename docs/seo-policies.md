@@ -194,6 +194,25 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 
 **Phase 2A sweep results:** 344 files swept, 23 preserved as custom. 412/416 (99%) brand pages now ≤60 chars. 4 above-60 are HTML-entity-encoding artifacts (`&` → `&amp;` inflates dist render — Google decodes entities so functionally still ≤60) or out-of-scope (`brands/index.html` hub).
 
+### Commercial title templates (Wave 39 Phase 2B, 2026-05-06)
+
+Применяется ко всем `src/pages/commercial/*.astro` (157 страниц). Page type определяется по структуре пути.
+
+| Тип страницы | Path pattern | Template |
+|---|---|---|
+| **Service hub** | `commercial/{equipment}-repair.astro` или `commercial/{equipment}/index.astro` | `Commercial {Equipment} Repair Los Angeles — Same Day` |
+| **Brand page** | `commercial/{equipment}-repair/brands/{brand}.astro` | `{Brand} {Equipment} Repair Los Angeles — Same Day` |
+| **Sub-service variant** (equipment subtype) | `commercial/{equipment}-repair/{variant}-repair.astro` | `Commercial {Variant} Repair Los Angeles — Same Day` |
+| **Sub-service failmode** (problem) | `commercial/{equipment}-repair/{problem}.astro` | `Commercial {Equipment} {Problem} LA — Same Day` |
+| **Sub-service vertical** (industry wrap) | `commercial/{equipment}-repair/{vertical}-laundry-repair.astro` | `{Vertical} Repair Los Angeles — Same Day` |
+| **Refrigeration sub** | `commercial/refrigeration/{equipment}-repair.astro` | `Commercial {Equipment} Repair Los Angeles — Same Day` |
+
+Fallback (>60): replace `Los Angeles` → `LA`. For failmodes ещё доп-fallback: drop `Commercial` prefix → drop equipment if needed.
+
+`{Equipment}` / `{Brand}` / `{Variant}` / `{Problem}` derived from curated dictionaries в `scripts/wave-39-phase2b-audit.py` (50 equipment, 42 brand, 80 sub-service entries).
+
+**Phase 2B sweep results:** 154 files swept, 2 preserved as custom (≤60 + ≠ template), 1 skipped (commercial/index.astro main hub). 156/157 (99.4%) commercial pages now ≤60 chars. The 1 above-60 is `exhaust-hood-repair` — `&` → `&amp;` HTML-entity inflation (source 57 chars, dist 61 with entity).
+
 **Phase 1 sweep results (commit предыдущий):** 151 файл — strip только из `<title>` / `title:` / `const title = ...` контекстов; body / hero / schema / meta description НЕ трогали.
 
 **Phase 2 candidates:** 667 файлов с titles > 60 chars (после template-literal expansion). См. `audit-output/wave-39-phase2-candidates.txt`. Распределение:
