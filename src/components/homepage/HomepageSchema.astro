@@ -27,6 +27,7 @@ import {
   type Branch
 } from '../../data/branches';
 import { HOMEPAGE_FAQ } from '../../data/faq';
+import { CANONICAL_CREDENTIALS, LEGAL_NAME } from '../../data/credentials-schema';
 
 interface Props {}
 
@@ -68,6 +69,7 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
     '@type': ['LocalBusiness', 'HomeAndConstructionBusiness'],
     '@id': branchId(branch.slug),
     name: branch.gbpName,
+    legalName: LEGAL_NAME,
     url: `${SITE_URL}/branches/${branch.slug}/`,
     telephone: phoneE164(branch.phone),
     email: branch.email,
@@ -87,6 +89,13 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
     })),
     parentOrganization: { '@id': ORG_ID }
   };
+
+  // hasCredential lives on the primary (physical_pin) branch only — other 7
+  // service_area branches reach the same credentials via parentOrganization
+  // @id graph link to the Organization node (which also carries them).
+  if (branch.type === 'physical_pin') {
+    base.hasCredential = [...CANONICAL_CREDENTIALS];
+  }
 
   // physical_pin: full address + root geo
   if (branch.type === 'physical_pin' && branch.address) {
@@ -139,6 +148,7 @@ const graph: Array<Record<string, unknown>> = [
     '@id': ORG_ID,
     name: 'Same Day Appliance Repair',
     alternateName: 'SDAR',
+    legalName: LEGAL_NAME,
     url: SITE_URL,
     logo: {
       '@type': 'ImageObject',
@@ -157,7 +167,8 @@ const graph: Array<Record<string, unknown>> = [
       contactType: 'customer service',
       areaServed: 'US-CA',
       availableLanguage: ['en']
-    }]
+    }],
+    hasCredential: [...CANONICAL_CREDENTIALS]
   },
 
   // 2. WebSite
