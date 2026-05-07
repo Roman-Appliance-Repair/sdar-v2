@@ -207,6 +207,9 @@ Phase 2 — manual rewrite, не sweep. Фокус: brand pages (largest cluster
 - `/services/[service]/[failure-mode]/` — sub-service (failure modes: not-draining, not-heating, error-codes)
 - `/brands/[brand]-[category]-repair/` — brand × category (e.g. `lg-washer-repair`)
 
+**Brand pillar vs brand × category — раздельные SEO targets, не редиректы.**
+`/brands/{slug}/` = широкий brand pillar (covers full brand surface — all categories, history, models, lineup). `/brands/{slug}-{category}-repair/` = targeted combo (one category, deeper). Cross-link через internal href в обе стороны, **никогда** через 301. Если pillar redirected на одну из своих category-suffixed страниц, broad-brand search intent теряется навсегда (Google не видит pillar в индексе). Wave 40b восстановил 4 неправильно скрытых pillars (sub-zero, thermador, miele, viking) + добавил cross-link block на каждый.
+
 **НЕ создавать:**
 - `/services/[category]/brands/[brand]/` — дубликат `/brands/[brand]-[category]-repair/`
 - `/areas/[city]/` (deprecated, used to exist on legacy)

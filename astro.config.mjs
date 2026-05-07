@@ -217,14 +217,14 @@ export default defineConfig({
     '/brands/lg/': '/brands/lg-refrigerator-repair/',
     '/brands/magic-chef/': '/services/refrigerator-repair/',
     '/brands/maytag/': '/brands/maytag-washer-repair/',
-    '/brands/miele/': '/brands/miele-refrigerator-repair/',
     '/brands/roper/': '/services/washer-repair/',
     '/brands/samsung/': '/brands/samsung-refrigerator-repair/',
     '/brands/speed-queen/': '/brands/speed-queen-washer-dryer-repair/',
-    '/brands/sub-zero/': '/brands/sub-zero-refrigerator-repair/',
-    '/brands/thermador/': '/brands/thermador-refrigerator-repair/',
-    '/brands/viking/': '/brands/viking-range-repair/',
     '/brands/whirlpool/': '/brands/whirlpool-refrigerator-repair/',
+    // Wave 40b removed 4 brand pillar redirects (sub-zero, thermador, miele,
+    // viking). Each had a 2650-3273 word .astro pillar wrongly hidden behind
+    // a 301 to its category-suffixed variant. Pillars + category pages now
+    // coexist; cross-link via internal href.
 
     // === Wave 32 :: C_brands_repair_suffix | /brands/{brand}-repair/ legacy variants (7) ===
     '/brands/electrolux-repair/': '/brands/electrolux-refrigerator-repair/',
@@ -353,7 +353,9 @@ export default defineConfig({
     '/calabasas/refrigerator-repair/': '/calabasas/',
     '/calabasas/washer-repair/': '/calabasas/',
     '/calabasas/wine-cellar-repair/': '/calabasas/',
-    '/commercial/dryer-repair/': '/commercial/',
+    // Wave 40b removed /commercial/dryer-repair/ redirect — the .astro source
+    // is a 5378-word content page. The redirect was over-aggressive Wave 32
+    // catch-all. Page now lives at its natural URL.
     '/costa-mesa/cooktop-repair/': '/costa-mesa/',
     '/costa-mesa/dishwasher-repair/': '/costa-mesa/',
     '/costa-mesa/dryer-repair/': '/costa-mesa/',
