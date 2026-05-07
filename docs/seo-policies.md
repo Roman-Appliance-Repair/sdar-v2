@@ -167,11 +167,28 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 | `<title>` | 50-60 chars | **60 chars** (Google SERP truncation) |
 | `<meta description>` | 150-160 chars | **160 chars** |
 
-**Известные нарушения** (Wave 36 sweep candidate):
-- `san-gabriel.astro` — title 96 chars
-- `services/washer-repair.astro` — title 86 chars
-
 **Rule:** Title должен содержать city + CA + ключевой запрос. Description — city + 2-3 района + телефон.
+
+### Title — что НЕ кладём (Wave 39 Phase 1, 2026-05-06)
+
+1. **Телефон в `<title>`** — никогда. Ни литералом `(424) 325-0520`, ни через template literal `${branch.phone}` / `${displayPhone}`. Телефон живёт в Hero / TrustBar / NAP — не в SERP-сниппете. Отнимает 14+ символов от полезного контента.
+2. **Brand-tail `" | Same Day Appliance Repair"`** в конце title — никогда. Google и так знает имя сайта (отображает домен под snippet). Brand-tail просто съедает 30 символов хвоста title.
+3. **Orphan separators** (`|`, `·`, `—`) на конце после strip — обязательно убирать.
+
+**Допустимо:** Brand в начале title, если страница ИМЕННО о бренде или это homepage (например, `Same Day Appliance Repair | Los Angeles & Southern California` — homepage, brand НЕ tail а start). Brand в середине title с geo-qualifier (`Appliance Repair Blog | Same Day Appliance Repair Los Angeles`) — авторская формулировка, кандидат для Phase 2 manual rewrite.
+
+**Phase 1 sweep results (commit предыдущий):** 151 файл — strip только из `<title>` / `title:` / `const title = ...` контекстов; body / hero / schema / meta description НЕ трогали.
+
+**Phase 2 candidates:** 667 файлов с titles > 60 chars (после template-literal expansion). См. `audit-output/wave-39-phase2-candidates.txt`. Распределение:
+- brands/: 338
+- commercial/: 154
+- services/: 71
+- outdoor/: 48
+- credentials/, price-list/, for-business/: 17
+- city pillars: 39
+- blog: 1
+
+Phase 2 — manual rewrite, не sweep. Фокус: brand pages (largest cluster) → commercial → services → outdoor.
 
 ---
 
