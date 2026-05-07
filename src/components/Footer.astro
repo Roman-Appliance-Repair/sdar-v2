@@ -1,8 +1,9 @@
 ---
 /**
- * Footer — NAP, branches, quick links, counties, legal.
- * Branches read from branches.ts SSOT (T13). Pending phones rendered as "Opening soon".
- * Hours from BUSINESS_HOURS.display SSOT (T13).
+ * Footer — NAP via BRANCHES SSOT, no hardcoded address.
+ * NAP/SSOT 2026-05-06: legal mailing address (PMB) removed from footer.
+ * Only WeHo physical_pin renders a public street address (on its own pillar).
+ * Branches list, hours, credentials all derive from data layer.
  */
 
 import { BRANCHES } from '../data/branches';
@@ -15,24 +16,24 @@ function slugToLabel(slug: string) {
   ).join(' ');
 }
 
-// Dynamically pull county hubs from root pages
 const countySlugs = Object.keys(import.meta.glob('../pages/*.astro'))
   .map(slugFromPath)
   .filter((s) => s.endsWith('-county'))
   .sort();
 const counties = countySlugs.map((slug) => ({
   label: slugToLabel(slug),
-  href: `/${slug}/`,
+  href: `/${slug}/`
 }));
 
 const currentYear = new Date().getFullYear();
 
-const activeBranches = BRANCHES
-  .filter((b) => b.phoneStatus === 'active')
-  .map((b) => ({ city: b.name, phone: b.phone, tel: `+1${b.phone.replace(/\D/g, '')}` }));
-const pendingBranches = BRANCHES
-  .filter((b) => b.phoneStatus === 'pending')
-  .map((b) => ({ city: b.name }));
+const branchListings = BRANCHES.map((b) => ({
+  name: b.name,
+  phone: b.phone,
+  tel: `+1${b.phone.replace(/\D/g, '')}`,
+  email: b.email,
+  serviceAreas: b.displayAreas.slice(0, 4).join(' · ')
+}));
 
 const servicesLinks = [
   { label: 'Refrigerator Repair', href: '/services/refrigerator-repair/' },
@@ -40,7 +41,7 @@ const servicesLinks = [
   { label: 'Dryer Repair', href: '/services/dryer-repair/' },
   { label: 'Oven Repair', href: '/services/oven-repair/' },
   { label: 'Dishwasher Repair', href: '/services/dishwasher-repair/' },
-  { label: 'All Services →', href: '/services/' },
+  { label: 'All Services →', href: '/services/' }
 ];
 
 const companyLinks = [
@@ -49,19 +50,18 @@ const companyLinks = [
   { label: 'Price List', href: '/price-list/' },
   { label: 'Service Areas', href: '/areas/' },
   { label: 'Commercial', href: '/commercial/' },
-  { label: 'Brands', href: '/brands/' },
+  { label: 'Brands', href: '/brands/' }
 ];
 
 const legalLinks = [
   { label: 'Privacy Policy', href: '/privacy-policy/' },
   { label: 'Terms of Service', href: '/terms/' },
-  { label: 'Sitemap', href: '/sitemap-index.xml' },
+  { label: 'Sitemap', href: '/sitemap-index.xml' }
 ];
 ---
 
 <footer class="footer">
   <div class="container">
-    <!-- Top grid -->
     <div class="footer-top">
       <div class="footer-brand">
         <div class="footer-logo">
@@ -69,31 +69,20 @@ const legalLinks = [
           <span class="footer-logo-sub">Appliance Repair</span>
         </div>
         <p class="footer-tagline">
-          Licensed C-20 appliance & HVAC repair across Los Angeles, Orange, and Ventura counties.
-          Same-day service. $89 diagnostic waived with repair.
+          Same-day appliance repair across LA, Orange, Ventura, San Bernardino, and Riverside counties.
+          $89 residential / $120 commercial diagnostic, waived with repair.
         </p>
-        <address class="footer-address">
-          <strong>HVAC 777 LLC</strong><br />
-          DBA Same Day Appliance Repair<br />
-          6230 Wilshire Blvd Ste A PMB 2267<br />
-          Los Angeles, CA 90048<br />
-          <a href="tel:+14243250520" class="address-phone">(424) 325-0520</a>
-        </address>
       </div>
 
-      <div class="footer-col">
+      <div class="footer-col footer-branches">
         <h4>Branches</h4>
         <ul>
-          {activeBranches.map((b) => (
-            <li>
-              <span class="branch-city">{b.city}</span>
+          {branchListings.map((b) => (
+            <li class="branch-listing">
+              <span class="branch-city">{b.name}</span>
               <a href={`tel:${b.tel}`} class="branch-phone">{b.phone}</a>
-            </li>
-          ))}
-          {pendingBranches.map((b) => (
-            <li>
-              <span class="branch-city">{b.city}</span>
-              <span class="branch-pending">Opening soon</span>
+              <a href={`mailto:${b.email}`} class="branch-email">{b.email}</a>
+              <span class="branch-areas">{b.serviceAreas}</span>
             </li>
           ))}
         </ul>
@@ -128,16 +117,7 @@ const legalLinks = [
       </div>
     </div>
 
-    <!-- Credentials strip -->
     <div class="footer-credentials">
-      <div class="cred-item">
-        <strong>CSLB C-20</strong>
-        <span>License #A49573</span>
-      </div>
-      <div class="cred-item">
-        <strong>BBB A+</strong>
-        <span>Accredited Business</span>
-      </div>
       <div class="cred-item">
         <strong>BHGS</strong>
         <span>Registration #A49573</span>
@@ -147,17 +127,19 @@ const legalLinks = [
         <span>#1346255700410</span>
       </div>
       <div class="cred-item">
+        <strong>BBB A+</strong>
+        <span>Accredited Business</span>
+      </div>
+      <div class="cred-item">
         <strong>Insured</strong>
         <span>$1M General Liability</span>
       </div>
     </div>
 
-    <!-- Hours -->
     <div class="footer-hours">
       <strong>Hours:</strong> {BUSINESS_HOURS.display}
     </div>
 
-    <!-- Bottom -->
     <div class="footer-bottom">
       <p class="copyright">
         © {currentYear} HVAC 777 LLC dba Same Day Appliance Repair. All rights reserved.
@@ -181,7 +163,6 @@ const legalLinks = [
     padding: 72px 0 28px;
     border-top: 3px solid var(--red);
   }
-
   .footer h4 {
     font-family: var(--font-body);
     font-size: 11px;
@@ -191,31 +172,26 @@ const legalLinks = [
     color: var(--red);
     margin-bottom: 18px;
   }
-
   .footer a {
     color: rgba(255,255,255,0.75);
     text-decoration: none;
     transition: color 0.15s var(--ease);
   }
   .footer a:hover { color: var(--white); }
-
   .footer ul {
     list-style: none;
     padding: 0;
     margin: 0;
   }
-
-  /* Top grid — 5 columns (brand + 4 cols) */
   .footer-top {
     display: grid;
-    grid-template-columns: 1.8fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1.4fr 1.4fr 1fr 1fr 1fr;
     gap: 40px;
     padding-bottom: 48px;
     border-bottom: 1px solid rgba(255,255,255,0.12);
   }
-
   @media (max-width: 1100px) {
-    .footer-top { grid-template-columns: 1.6fr 1fr 1fr; gap: 36px; }
+    .footer-top { grid-template-columns: 1.4fr 1.4fr 1fr; gap: 36px; }
   }
   @media (max-width: 720px) {
     .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
@@ -223,8 +199,6 @@ const legalLinks = [
   @media (max-width: 480px) {
     .footer-top { grid-template-columns: 1fr; gap: 28px; }
   }
-
-  /* Brand block */
   .footer-logo { line-height: 1; margin-bottom: 16px; }
   .footer-logo-main {
     display: block;
@@ -250,52 +224,46 @@ const legalLinks = [
     margin-bottom: 20px;
     max-width: 380px;
   }
-  .footer-address {
-    font-style: normal;
-    font-size: 13px;
-    line-height: 1.7;
-    color: rgba(255,255,255,0.65);
+  .footer-branches li.branch-listing {
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
-  .footer-address strong { color: var(--white); font-weight: 600; }
-  .address-phone {
-    display: inline-block;
-    margin-top: 8px;
-    font-family: var(--font-display);
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--white) !important;
+  .footer-branches li.branch-listing:last-child {
+    border-bottom: none;
   }
-  .address-phone:hover { color: var(--red) !important; }
-
-  /* Column lists */
-  .footer-col li { margin-bottom: 10px; font-size: 14px; }
-  .footer-col a { font-size: 14px; }
-
   .branch-city {
     display: block;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: rgba(255,255,255,0.5);
-    margin-bottom: 2px;
+    margin-bottom: 4px;
   }
   .branch-phone {
+    display: block;
     font-family: var(--font-display);
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--white) !important;
+    margin-bottom: 2px;
   }
   .branch-phone:hover { color: var(--red) !important; }
-  .branch-pending {
-    display: inline-block;
+  .branch-email {
+    display: block;
     font-size: 12px;
-    font-weight: 500;
-    font-style: italic;
-    color: rgba(255,255,255,0.45);
-    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.55) !important;
+    margin-bottom: 4px;
   }
-
-  /* Credentials strip */
+  .branch-email:hover { color: var(--white) !important; }
+  .branch-areas {
+    display: block;
+    font-size: 11px;
+    color: rgba(255,255,255,0.4);
+    line-height: 1.4;
+  }
+  .footer-col li { margin-bottom: 10px; font-size: 14px; }
+  .footer-col a { font-size: 14px; }
   .footer-credentials {
     display: flex;
     flex-wrap: wrap;
@@ -319,8 +287,6 @@ const legalLinks = [
     font-size: 12px;
     color: rgba(255,255,255,0.6);
   }
-
-  /* Hours */
   .footer-hours {
     padding: 24px 0;
     font-size: 14px;
@@ -328,9 +294,6 @@ const legalLinks = [
     border-bottom: 1px solid rgba(255,255,255,0.12);
   }
   .footer-hours strong { color: var(--white); margin-right: 6px; }
-  .footer-hours .sep { margin: 0 12px; color: rgba(255,255,255,0.3); }
-
-  /* Bottom */
   .footer-bottom {
     display: flex;
     justify-content: space-between;
@@ -352,7 +315,6 @@ const legalLinks = [
   }
   .footer-legal li { font-size: 13px; }
   .footer-legal .sep { color: rgba(255,255,255,0.3); }
-
   @media (max-width: 640px) {
     .footer-bottom { flex-direction: column; align-items: flex-start; }
   }

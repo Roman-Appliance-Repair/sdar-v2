@@ -44,17 +44,18 @@
 | Долг | Масштаб | Приоритет |
 |---|---|---|
 | 25 stub страниц (<200 body words) | 25 файлов | P2 — отдельный writer batch |
-| 7 orphan компонентов в `src/components/` | AiDiagnostic, Diagnostics, Credentials, BrandHubPlaceholder, BrandDetailPlaceholder, HomepageFooter, SectionDivider | P3 — после grep verification |
+| 6 orphan компонентов в `src/components/` | AiDiagnostic, Diagnostics, Credentials, BrandHubPlaceholder, BrandDetailPlaceholder, SectionDivider | P3 — после grep verification (HomepageFooter удалён 2026-05-06 в Wave 35) |
 | 2 page titles >60 chars | san-gabriel.astro (96), services/washer-repair.astro (86) | P3 — Wave 36 sweep |
 | Schema inconsistency: LocalBusiness vs HomeAndConstructionBusiness | Часть city pillars одно, часть другое | P3 — Wave 30 W3, открыто |
 | san-clemente.astro = 167 body words | 1 файл | P2 — стейл от T7-dump |
 | 87 city pages нуждаются в фото (5 слотов каждая) | ~435 photo slots | P2 — Photo Pipeline wave |
-| Rancho Cucamonga + Temecula real DID phones | 2 placeholder в branches.ts | P2 — после открытия GMB |
+| ~~Rancho Cucamonga + Temecula real DID phones~~ | ~~2 placeholder в branches.ts~~ | ✅ Закрыто 2026-05-06 — реальные DID активны: RC (909) 457-1030, Temecula (951) 577-3877 |
 | `audit-output/` directory | untracked, нужно в .gitignore | P3 |
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
 
+- **2026-05-06: NAP sweep (Wave 35)** — old PMB address (6230 Wilshire / PMB 2267) удалён из footer + 87 JSON-LD блоков. CSLB C-20 удалён со всех 41 страницы (это appliance site, не HVAC). BHGS Registration labeling унифицирован: «BHGS Licensed» (168 файлов) + «CA BHGS» (87 файлов) + «License #A49573» (13 файлов) → «BHGS #A49573» / «BHGS Registration #A49573». Footer переписан на BRANCHES SSOT (no hardcoded NAP). `LEGAL_ADDRESS` const → `LEGAL_ENTITY` (только название без адреса). `internalAddress` удалены из LA + BH branches. Single public address site-wide = 8746 Rangely Ave (WeHo physical_pin only). Orphan HomepageFooter.astro удалён.
 - **2026-05-06:** CLAUDE.md + 10 docs/*.md структура задеплоена в sdar-v2 root
 - **2026-05-06:** Total site audit (1009 pages, 0 P1, 25 stubs identified, tier system documented)
 - **2026-05-06:** Analytics stack full deployment (GTM `GTM-M43LT47K` + GA4 `G-PST1TR9G88` + Clarity `wn15edpjlc` + IndexNow + Cloudflare WA)

@@ -118,12 +118,12 @@ export const BRANCHES: Branch[] = [
       state: 'CA',
       zip: '90048',
       lat: 34.0894,
-      lng: -118.3895,
+      lng: -118.3895
     },
     geo: {
       cityCenterLat: 34.0900,
       cityCenterLng: -118.3617,
-      serviceRadius: 10,
+      serviceRadius: 10
     },
     hours: { days: 'Mon-Sun', open: '08:00', close: '20:00' },
     primaryCounty: 'los-angeles',
@@ -132,9 +132,9 @@ export const BRANCHES: Branch[] = [
       'hollywood',
       'mid-wilshire',
       'fairfax',
-      'hancock-park',
+      'hancock-park'
     ],
-    displayAreas: ['West Hollywood', 'Hollywood', 'Hancock Park', 'Mid-Wilshire'],
+    displayAreas: ['West Hollywood', 'Hollywood', 'Hancock Park', 'Mid-Wilshire']
   },
 
   // ─────────────────────────────────────────────────
@@ -153,23 +153,17 @@ export const BRANCHES: Branch[] = [
     phone: '(424) 248-1199',
     phoneStatus: 'active',
     email: 'beverlyhills@samedayappliance.repair',
-    internalAddress: {
-      street: '12142 W Sunset Blvd',
-      city: 'Los Angeles',
-      state: 'CA',
-      zip: '90077',
-    },
     geo: {
       cityCenterLat: 34.0736,
       cityCenterLng: -118.4004,
-      serviceRadius: 8,
+      serviceRadius: 8
     },
     hours: { days: 'Mon-Sun', open: '08:00', close: '20:00' },
     primaryCounty: 'los-angeles',
     citiesServed: [
-      'beverly-hills',
+      'beverly-hills'
     ],
-    displayAreas: ['Beverly Hills', 'Beverly Glen', 'Trousdale Estates'],
+    displayAreas: ['Beverly Hills', 'Beverly Glen', 'Trousdale Estates']
   },
 
   // ─────────────────────────────────────────────────
@@ -188,16 +182,10 @@ export const BRANCHES: Branch[] = [
     phoneStatus: 'active',
     email: 'info@samedayappliance.repair',
     // address: undefined — SAB rule, NO public address
-    internalAddress: {
-      street: '11352 Elderwood Street',
-      city: 'Los Angeles',
-      state: 'CA',
-      zip: '90049',
-    },
     geo: {
       cityCenterLat: 34.0522,
       cityCenterLng: -118.2437,
-      serviceRadius: 25,
+      serviceRadius: 25
     },
     hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
     primaryCounty: 'los-angeles',
@@ -236,9 +224,9 @@ export const BRANCHES: Branch[] = [
       'toluca-lake',
       'torrance',
       'woodland-hills',
-      'koreatown',
+      'koreatown'
     ],
-    displayAreas: ['Brentwood', 'Santa Monica', 'Westwood', 'Malibu'],
+    displayAreas: ['Brentwood', 'Santa Monica', 'Westwood', 'Malibu']
   },
 
   // ─────────────────────────────────────────────────
@@ -258,12 +246,12 @@ export const BRANCHES: Branch[] = [
       street: '1205 Columbia Pl',
       city: 'Pasadena',
       state: 'CA',
-      zip: '91105',
+      zip: '91105'
     },
     geo: {
       cityCenterLat: 34.1478,
       cityCenterLng: -118.1445,
-      serviceRadius: 20,
+      serviceRadius: 20
     },
     hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
     primaryCounty: 'los-angeles',
@@ -283,9 +271,9 @@ export const BRANCHES: Branch[] = [
       'silver-lake',
       'atwater-village',
       'altadena',
-      'temple-city',
+      'temple-city'
     ],
-    displayAreas: ['Pasadena', 'Arcadia', 'South Pasadena', 'San Marino'],
+    displayAreas: ['Pasadena', 'Arcadia', 'South Pasadena', 'San Marino']
   },
 
   // ─────────────────────────────────────────────────
@@ -307,12 +295,12 @@ export const BRANCHES: Branch[] = [
       street: '1669 Tiburon Ct',
       city: 'Thousand Oaks',
       state: 'CA',
-      zip: '91362',
+      zip: '91362'
     },
     geo: {
       cityCenterLat: 34.1706,
       cityCenterLng: -118.8376,
-      serviceRadius: 25,
+      serviceRadius: 25
     },
     hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
     primaryCounty: 'ventura',
@@ -327,9 +315,9 @@ export const BRANCHES: Branch[] = [
       'ojai',
       'oxnard',
       'simi-valley',
-      'ventura',
+      'ventura'
     ],
-    displayAreas: ['Thousand Oaks', 'Westlake Village', 'Newbury Park'],
+    displayAreas: ['Thousand Oaks', 'Westlake Village', 'Newbury Park']
   },
 
   // ─────────────────────────────────────────────────
@@ -349,12 +337,12 @@ export const BRANCHES: Branch[] = [
       street: '53 Bellwind',
       city: 'Irvine',
       state: 'CA',
-      zip: '92603',
+      zip: '92603'
     },
     geo: {
       cityCenterLat: 33.6846,
       cityCenterLng: -117.8265,
-      serviceRadius: 25,
+      serviceRadius: 25
     },
     hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
     primaryCounty: 'orange',
@@ -373,9 +361,9 @@ export const BRANCHES: Branch[] = [
       'santa-ana',
       'tustin',
       'villa-park',
-      'yorba-linda',
+      'yorba-linda'
     ],
-    displayAreas: ['Irvine', 'Newport Beach', 'Costa Mesa', 'Tustin'],
+    displayAreas: ['Irvine', 'Newport Beach', 'Costa Mesa', 'Tustin']
   },
 
   // ─────────────────────────────────────────────────
@@ -398,7 +386,7 @@ export const BRANCHES: Branch[] = [
     geo: {
       cityCenterLat: 34.1064,
       cityCenterLng: -117.5931,
-      serviceRadius: 25,
+      serviceRadius: 25
     },
     hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
     primaryCounty: 'san-bernardino',
@@ -410,9 +398,9 @@ export const BRANCHES: Branch[] = [
       'ontario',
       'redlands',
       'san-bernardino',
-      'upland',
+      'upland'
     ],
-    displayAreas: ['Rancho Cucamonga', 'Upland', 'Ontario', 'Fontana'],
+    displayAreas: ['Rancho Cucamonga', 'Upland', 'Ontario', 'Fontana']
   },
 
   // ─────────────────────────────────────────────────
@@ -434,7 +422,7 @@ export const BRANCHES: Branch[] = [
     geo: {
       cityCenterLat: 33.4936,
       cityCenterLng: -117.1484,
-      serviceRadius: 30,
+      serviceRadius: 30
     },
     hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
     primaryCounty: 'riverside',
@@ -446,10 +434,10 @@ export const BRANCHES: Branch[] = [
       'menifee',
       'moreno-valley',
       'murrieta',
-      'riverside',
+      'riverside'
     ],
-    displayAreas: ['Temecula', 'Murrieta', 'Menifee'],
-  },
+    displayAreas: ['Temecula', 'Murrieta', 'Menifee']
+  }
 ];
 
 // ─────────────────────────────────────────────────
@@ -464,14 +452,12 @@ export const MAIN_PHONE = '(424) 325-0520';
  *  surface that needs a phone tel: link without re-deriving the format inline. */
 export const MAIN_PHONE_TEL = '+1' + MAIN_PHONE.replace(/\D/g, '');
 
-/** Legal entity address — for footer legal line and Organization schema */
-export const LEGAL_ADDRESS = {
-  entity: 'HVAC 777 LLC',
-  street: '6230 Wilshire Blvd Ste A PMB 2267',
-  city: 'Los Angeles',
-  state: 'CA' as const,
-  zip: '90048',
-};
+/** Legal entity name — used in copyright line only.
+ *  NAP/SSOT 2026-05-06: legal-entity STREET ADDRESS is no longer rendered
+ *  anywhere on the site (it was the PMB mailing address, not a service
+ *  address — caused NAP confusion). The only public street address is
+ *  WeHo's `address` field below (8746 Rangely Ave). */
+export const LEGAL_ENTITY = 'HVAC 777 LLC';
 
 /** The single physical pin — for primary LocalBusiness schema */
 export const HEADQUARTERS = BRANCHES.find(b => b.type === 'physical_pin')!;
@@ -509,7 +495,7 @@ export const CITIES_WITHOUT_PAGES = new Set<string>([
   'century-city', 'cheviot-hills', 'beverly-glen',
   'playa-del-rey', 'venice', 'mar-vista',
   // Pasadena
-  'sierra-madre', 'altadena',
+  'sierra-madre', 'altadena'
 ]);
 
 /** Returns citiesServed for a branch, but ONLY those with .astro pages on disk.

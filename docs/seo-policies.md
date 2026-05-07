@@ -6,26 +6,33 @@
 
 ## 1. NAP / Rating Policy (SSOT)
 
-**Закон:**
-1. **AggregateRating 4.6/37** → ТОЛЬКО в JSON-LD, НИКОГДА в visible UI
-2. **streetAddress 6230 Wilshire Blvd...** → ТОЛЬКО в schema на:
-   - West Hollywood city pillar
-   - 4 legal pages: book, contact, privacy-policy, terms
-3. **HVAC 777 LLC** → ТОЛЬКО в `legalName` JSON-LD field, НИКОГДА в visible body
+**Закон (обновлено Wave 35 NAP sweep, 2026-05-06):**
+1. **AggregateRating 4.6/37** → ТОЛЬКО в JSON-LD на WeHo pillar + LA SAB pillar (через `branches.ts.aggregateRating`). НИКОГДА в visible UI.
+2. **streetAddress 8746 Rangely Ave, West Hollywood, CA 90048** → ТОЛЬКО в schema на:
+   - West Hollywood city pillar (`/west-hollywood/`)
+   - Hollywood pillar (`/hollywood/` — мapит на WeHo branch per `cities.ts.primaryBranch`)
+   - Homepage primary LocalBusiness schema
+   - `/contact/` page
+3. **6230 Wilshire / PMB 2267** (старый адрес) — удалён ВЕЗДЕ, не возвращать. Footer + 87 JSON-LD блоков очищены 2026-05-06.
+4. **HVAC 777 LLC** → ТОЛЬКО в footer copyright line + `legalName` JSON-LD field на legal pages. НИКОГДА в visible body на content pages.
+5. **CSLB C-20** — больше не упоминается нигде (это appliance repair site, не HVAC).
+6. **License labeling** — везде «BHGS Registration #A49573» (не «BHGS Licensed», не «CSLB License», не «CA BHGS»).
 
 **Все остальные страницы:**
 - В schema используют `areaServed` без `streetAddress`
 - Не имеют `aggregateRating`
-- Не упоминают legalName
+- Не упоминают legalName в visible body
 
 **Verification:** В каждом релизе делать sample audit на 5-10 случайных страниц:
 ```bash
-# Visible body не должен содержать:
 grep -ic "aggregateRating\|4\.6.*reviews\|37 reviews" <page>  # = 0
-grep -c "HVAC 777" <page>  # = 0 в body, > 0 в head/script OK
+grep -c "HVAC 777" <page>  # = 0 в body content (footer copyright OK)
+grep -c "6230 Wilshire\|PMB 2267" <page>  # = 0 site-wide
+grep -c "CSLB C-20" <page>  # = 0 site-wide
+grep -c "BHGS Licensed\|CA BHGS\|License #A49573" <page>  # = 0 site-wide
 ```
 
-Текущий статус (2026-05-06): **0 P1 violations** в SEO sample.
+Текущий статус (2026-05-06): **0 P1 violations** site-wide post-Wave 35 NAP sweep.
 
 ---
 

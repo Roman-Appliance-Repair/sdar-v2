@@ -35,26 +35,29 @@
 
 | Лицензия | Применение | Никогда |
 |---|---|---|
-| **BHGS #A49573** | Везде (главная appliance license) | — |
+| **BHGS Registration #A49573** | Везде (главная appliance license) | — |
 | **EPA 608 Universal #1346255700410** | Везде | — |
-| **CSLB C-20 HVAC** | Только HVAC pages (heating/cooling/ventilation) | На appliance-only страницах |
-| **CSLB C-38 Refrigeration** | Только walk-in coolers/freezers, ice machines, commercial refrigeration | На gas equipment, cooking, residential |
 
-❌ **Старая лицензия CSLB #1138898** — устарела, нигде не использовать. Если встретишь в старых docs — это от пред-2025 периода.
+❌ **CSLB C-20 HVAC** — НЕ используется на этом сайте (это appliance repair, не HVAC).
+❌ **CSLB C-38 Refrigeration** — НЕ используется (BHGS покрывает refrigeration scope).
+❌ **Старая лицензия CSLB #1138898** — устарела, нигде не использовать.
+
+Терминология: BHGS выдает **registration** (не license). Везде в visible UI — «BHGS Registration #A49573» или короткая форма «BHGS #A49573». Не «BHGS Licensed», не «CSLB License #A49573», не «CA BHGS #A49573» — все унифицировано в Wave 35 NAP sweep (2026-05-06).
 
 ## 4. Юридическое лицо
 
 - **Юр. название:** HVAC 777 LLC dba Same Day Appliance Repair
-- **В schema (`legalName` field):** HVAC 777 LLC — только в JSON-LD
-- **В видимом UI:** **никогда** не упоминать «HVAC 777 LLC»
-- **Исключения** где можно упомянуть legalName в JSON-LD: book, contact, privacy-policy, terms (4 страницы)
+- **В schema (`legalName` field):** HVAC 777 LLC — в JSON-LD на legal/contact страницах
+- **В visible UI:** упоминается ТОЛЬКО в footer copyright line `© 2026 HVAC 777 LLC dba Same Day Appliance Repair`
+- **Адрес юр. лица (PMB на Wilshire) больше нигде не рендерится** — только legal entity name остался для copyright
 
 ## 5. NAP — physical pin
 
-- **Адрес:** 6230 Wilshire Blvd Ste A PMB 2267, Los Angeles CA 90048
-- **Этот адрес** = только в schema **West Hollywood pillar** + 4 legal pages
-- **Все остальные страницы** — areaServed без streetAddress
-- **Legacy schema** (старый сайт) использовал `streetAddress` везде — это исправлено в Wave 29-31, не возвращать
+- **Единственный публичный адрес:** **8746 Rangely Ave, West Hollywood, CA 90048**
+- Это `address` поле у WeHo branch в `branches.ts` (type: `physical_pin`)
+- Рендерится только в JSON-LD на WeHo pillar (`/west-hollywood/`) + Hollywood pillar (мapит на WeHo branch) + homepage primary LocalBusiness schema + contact page
+- **Все остальные branches** = `service_area` type, без public streetAddress
+- **6230 Wilshire / PMB 2267** (старый адрес почтового ящика) — удалён из всего sdar-v2 в Wave 35 NAP sweep (2026-05-06). Был в footer + 87 JSON-LD блоков как мусорный legacy. Не возвращать.
 
 ## 6. Aggregate Rating
 
@@ -103,15 +106,15 @@ SCAQMD (South Coast Air Quality Management District) restrictions:
 
 ## 11. Branch phones (8 филиалов)
 
-| Branch | Phone | Status |
-|---|---|---|
-| West Hollywood | (323) 870-4790 | Live |
-| Beverly Hills | (323) 870-4790 | Использует West Hollywood phone |
-| Los Angeles | (424) 325-0520 | Live |
-| Pasadena | (626) 376-4458 | Live |
-| Thousand Oaks | (424) 208-0228 | Live |
-| Irvine | (213) 401-9019 | Live |
-| Rancho Cucamonga | placeholder | Real DID pending |
-| Temecula | placeholder | Real DID pending |
+| Branch | Phone | Email | Status |
+|---|---|---|---|
+| West Hollywood | (323) 870-4790 | support@samedayappliance.repair | Live (physical_pin, GBP verified) |
+| Beverly Hills | (424) 248-1199 | beverlyhills@samedayappliance.repair | Live (service_area, GBP unverified) |
+| Los Angeles | (424) 325-0520 | info@samedayappliance.repair | Live (service_area, GBP verified SAB) |
+| Pasadena | (626) 376-4458 | pasadena@samedayappliance.repair | Live |
+| Thousand Oaks | (424) 208-0228 | thousandoaks@samedayappliance.repair | Live (GBP verified SAB) |
+| Irvine | (213) 401-9019 | irvine@samedayappliance.repair | Live |
+| Rancho Cucamonga | (909) 457-1030 | ranchocucamonga@samedayappliance.repair | Live (real DID, GBP pending) |
+| Temecula | (951) 577-3877 | temecula@samedayappliance.repair | Live (real DID, GBP pending) |
 
 **Источник правды:** `src/data/branches.ts` — не дублировать здесь при изменениях.
