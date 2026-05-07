@@ -213,6 +213,27 @@ Fallback (>60): replace `Los Angeles` → `LA`. For failmodes ещё доп-fall
 
 **Phase 2B sweep results:** 154 files swept, 2 preserved as custom (≤60 + ≠ template), 1 skipped (commercial/index.astro main hub). 156/157 (99.4%) commercial pages now ≤60 chars. The 1 above-60 is `exhaust-hood-repair` — `&` → `&amp;` HTML-entity inflation (source 57 chars, dist 61 with entity).
 
+### Service + outdoor title templates (Wave 39 Phase 2C, 2026-05-06)
+
+Применяется ко всем `src/pages/services/*.astro` (77) + `src/pages/outdoor/*.astro` (50) = 127 страниц.
+
+| Тип | Path pattern | Template |
+|---|---|---|
+| **Service hub** | `services/{slug}-repair.astro` | `{Service} Repair Los Angeles — Same Day` |
+| **Service sub-service** (failure) | `services/{slug}-repair/{problem}.astro` | `{Service} {Problem} Repair LA — Same Day` |
+| **Outdoor hub** | `outdoor/{slug}-repair.astro` (no city suffix) | `{Equipment} Repair Los Angeles — Same Day` |
+| **Outdoor city-targeted** | `outdoor/{slug}-repair-{city}.astro` | `{Equipment} Repair {City} — Same Day` |
+| **Outdoor brand pillar** | `outdoor/brands/{brand}.astro` | `{Brand} Outdoor Grill Repair Los Angeles — Same Day` |
+| **Outdoor brand sub** | `outdoor/{equip}-repair/brands/{brand}.astro` | `{Brand} {Equipment} Repair Los Angeles — Same Day` |
+| **Outdoor sub-service** | `outdoor/{equip}-repair/{problem}.astro` | `{Equipment} {Problem} Repair LA — Same Day` |
+| **Outdoor maintenance** | `outdoor/{slug}-maintenance.astro` | `{Equipment} Maintenance Los Angeles — Same Day` |
+
+Fallback (>60): drop `Los Angeles` → `LA`; для sub-services также drop `Repair` keyword. Для city-targeted: `LA` НЕ добавляется — city уже даёт гео.
+
+Curated dictionaries: 28 SERVICE_DISPLAY entries (Refrigerator, Wall Oven, Wine Cooler, Dryer Vent, Trash Compactor, etc.), 50 PROBLEM_DISPLAY entries (Not Heating, Burner Not Igniting, Surface Cracked, Wood-to-Gas Conversion, etc.), 12 OUTDOOR_EQUIPMENT entries (Outdoor Grill, BBQ Grill, Outdoor Kitchen, Patio Heater, Smoker, Outdoor Refrigerator, etc.), 24 OUTDOOR_BRAND entries (Lynx, Fire Magic, Twin Eagles, DCS, Kalamazoo, Sunpak, Big Green Egg, Traeger, etc.), 89 CITY_DISPLAY entries (all SoCal cities).
+
+**Phase 2C sweep results:** 118 files swept, 7 preserved as custom (≤60 + ≠ template), 2 skipped (services/index.astro + outdoor/index.astro main hubs). 159/163 (97.5%) services + outdoor pages now ≤60 chars. The 4 above-60 are out-of-scope: 2 main hubs (intentionally skipped) + 2 Astro redirect HTMLs (`Redirecting to:` transit pages with noindex). **0 real content pages above 60.**
+
 **Phase 1 sweep results (commit предыдущий):** 151 файл — strip только из `<title>` / `title:` / `const title = ...` контекстов; body / hero / schema / meta description НЕ трогали.
 
 **Phase 2 candidates:** 667 файлов с titles > 60 chars (после template-literal expansion). См. `audit-output/wave-39-phase2-candidates.txt`. Распределение:
