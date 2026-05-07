@@ -76,11 +76,28 @@ SCAQMD (South Coast Air Quality Management District) restrictions:
 
 ## 8. Часы работы
 
-- **Mon-Sat:** 8:00 AM – 8:00 PM
-- **Sunday:** Closed
-- **Phone:** 24/7 answered (но это про call answering, не про дежурство)
-- **Schema OpeningHoursSpecification:** должен отражать Mon-Sat 08:00-20:00 + Sunday closed
-- ❌ Старые часы «Mon-Fri 7am-9pm, Sun 9-17» — устарели, не использовать
+**Canonical visible string (использовать везде на сайте):**
+`Mon–Sat 8am–8pm · Sun closed · Phone answered 24/7`
+
+Никаких других вариантов: ни "8am-7pm", ни "Sun 9am-5pm", ни "Hours: 8 AM to 8 PM",
+ни таблиц с днями. Один канон. Импортируется из `BUSINESS_HOURS.display`
+в `src/data/business-hours.ts`.
+
+**Schema OpeningHoursSpecification (везде):**
+- Mon-Sat 08:00-20:00 (single block с массивом dayOfWeek)
+- Sunday `00:00-00:00` (Google's "closed" pattern)
+- Импортировать из `OPENING_HOURS_SCHEMA` в `src/data/business-hours.ts`
+
+**FAQ answer rules:**
+Sunday questions отвечаем «closed for in-person, but phones 24/7». Не утверждать
+что мы открыты по воскресеньям.
+
+❌ Старые форматы НЕ использовать:
+- Mon-Fri 07:00-21:00 + Sat 08:00-19:00 + Sun 09:00-17:00 (3-block split)
+- Mon-Sun 00:00-23:59 (always-open claim)
+- "8am-7pm и Sunday 9am-5pm"
+
+Унифицировано в Wave 36 hours sweep (2026-05-06).
 
 ## 9. Цены
 

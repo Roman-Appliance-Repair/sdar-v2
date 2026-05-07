@@ -28,12 +28,19 @@ export const BUSINESS_HOURS = {
   phoneAnswered24x7: true
 } as const;
 
-/** openingHoursSpecification block for LocalBusiness JSON-LD. */
+/** openingHoursSpecification block for LocalBusiness JSON-LD.
+ *  Sunday closed is encoded as opens=closes=00:00 per Google's documented pattern. */
 export const OPENING_HOURS_SCHEMA = [
   {
     '@type': 'OpeningHoursSpecification',
     dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     opens: '08:00',
     closes: '20:00'
+  },
+  {
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: 'Sunday',
+    opens: '00:00',
+    closes: '00:00'
   }
 ];

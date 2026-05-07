@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { BRANCHES, type Branch } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
 // Filter out branches with placeholder 555 phones (RC + Temecula are 'pending'
 // until Roman buys real DIDs). Don't publish 555-fake numbers.
@@ -8,13 +9,6 @@ const activeBranches = BRANCHES.filter(b => b.phoneStatus === 'active');
 const phoneRawFor = (b: Branch) => '+1' + b.phone.replace(/\D/g, '');
 const slugToTitle = (slug: string) =>
   slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
-const isoDays = (days: string): string => {
-  const map: Record<string, string> = {
-    'Mon-Sun': 'Mo-Su', 'Mon-Sat': 'Mo-Sa', 'Mon-Fri': 'Mo-Fr',
-    'Sun-Sat': 'Su-Sa', 'Tue-Sun': 'Tu-Su'
-  };
-  return map[days] ?? days;
-};
 const sharedEmail = 'support@samedayappliance.repair';
 
 const title = 'Contact Us — 5 Branches Across LA, OC & Ventura | Same Day Appliance Repair';
@@ -80,7 +74,7 @@ const localBusinessSchema = {
       '@type': 'LocalBusiness',
       name: b.gbpName,
       telephone: b.phone,
-      openingHours: `${isoDays(b.hours.days)} ${b.hours.open}-${b.hours.close}`,
+      openingHoursSpecification: OPENING_HOURS_SCHEMA,
       areaServed: b.citiesServed.slice(0, 8).map((slug) => ({
         '@type': 'City',
         name: slugToTitle(slug)

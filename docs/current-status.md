@@ -55,6 +55,7 @@
 
 ## Что закрыто недавно
 
+- **2026-05-06: Wave 36 hours sweep** — visible UI + schema OpeningHoursSpecification унифицированы по всему сайту до canonical SSOT (`Mon–Sat 8am–8pm · Sun closed · Phone answered 24/7`). 39 visible-UI files + 278 schema files + 2 FAQ-answer fixes (north-hollywood, tarzana — Sunday-availability claims contradicting SSOT). `OPENING_HOURS_SCHEMA` теперь включает Sunday closed (00:00-00:00) per Google's pattern. /contact/ переписан на `OPENING_HOURS_SCHEMA` import (был динамический string-form openingHours per-branch, который генерировал Mon-Sun 7am-9pm для 6 веток). Verification: 1009/1009 dist pages canonical visible, 0 stale patterns. Backup: `backup/hours-sweep-2026-05-06`.
 - **2026-05-06: NAP sweep (Wave 35)** — old PMB address (6230 Wilshire / PMB 2267) удалён из footer + 87 JSON-LD блоков. CSLB C-20 удалён со всех 41 страницы (это appliance site, не HVAC). BHGS Registration labeling унифицирован: «BHGS Licensed» (168 файлов) + «CA BHGS» (87 файлов) + «License #A49573» (13 файлов) → «BHGS #A49573» / «BHGS Registration #A49573». Footer переписан на BRANCHES SSOT (no hardcoded NAP). `LEGAL_ADDRESS` const → `LEGAL_ENTITY` (только название без адреса). `internalAddress` удалены из LA + BH branches. Single public address site-wide = 8746 Rangely Ave (WeHo physical_pin only). Orphan HomepageFooter.astro удалён.
 - **2026-05-06:** CLAUDE.md + 10 docs/*.md структура задеплоена в sdar-v2 root
 - **2026-05-06:** Total site audit (1009 pages, 0 P1, 25 stubs identified, tier system documented)

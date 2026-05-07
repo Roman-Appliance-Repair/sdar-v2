@@ -52,6 +52,39 @@ grep -c "BHGS Licensed\|CA BHGS\|License #A49573" <page>  # = 0 site-wide
 
 ---
 
+## Hours canonical SSOT (Wave 36, 2026-05-06)
+
+**SSOT location:** `src/data/business-hours.ts`
+
+**Visible UI string** (use everywhere via `BUSINESS_HOURS.display`):
+```
+Mon–Sat 8am–8pm · Sun closed · Phone answered 24/7
+```
+
+**Schema JSON-LD** (use everywhere via `OPENING_HOURS_SCHEMA` import — array of two objects):
+```json
+[
+  { "@type": "OpeningHoursSpecification",
+    "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+    "opens": "08:00", "closes": "20:00" },
+  { "@type": "OpeningHoursSpecification",
+    "dayOfWeek": "Sunday",
+    "opens": "00:00", "closes": "00:00" }
+]
+```
+
+Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" pattern.
+
+**Verification (post Wave 36):**
+- All 1009 dist pages contain canonical visible string ✓
+- 0 stale `8am–7pm`, `Sun 9am–5pm` patterns in dist ✓
+- 0 stale schema patterns (`opens=07:00`, Sunday `09:00-17:00`, Saturday `08:00-19:00`) ✓
+- `/contact/` consumes `OPENING_HOURS_SCHEMA` directly per branch in its location array ✓
+
+**Pages that hand-roll their own openingHoursSpecification literals were swept in Wave 36 (~278 files). Do not roll new ones — import the SSOT.**
+
+---
+
 ## 3. LocalBusiness schema — обязательные поля
 
 ```json
