@@ -51,7 +51,7 @@ export const RESIDENTIAL_SERVICES: HomepageService[] = [
   { id: 'washer',               name: 'Washer Repair',           desc: 'Same day service · Front-load & top-load · LG, Samsung, Whirlpool, Maytag, Bosch. Bearing, pump, valve, control board.', photoCaption: 'Photo · LG Front-Load Washer', category: 'residential' },
   { id: 'wine-cellar-cooling',  name: 'Wine Cellar Cooling',     desc: 'Same day service · Ducted, ductless, self-contained · CellarPro, WhisperKOOL, Wine Guardian. Compressor, condenser, refrigerant.', photoCaption: 'Photo · CellarPro Split Cooling Unit', category: 'residential' },
   { id: 'wine-cellar',          name: 'Wine Cellar Repair',      desc: 'Same day service · Built-in cellars · Temperature + humidity control, condensation, glass-door seal, LED lighting.', photoCaption: 'Photo · Custom-Built Wine Cellar', category: 'residential' },
-  { id: 'wine-cooler',          name: 'Wine Cooler Repair',      desc: 'Same day service · Sub-Zero, Miele, Liebherr, Thermador · Compressor, thermostat, evaporator fan, dual-zone controls.', photoCaption: 'Photo · Sub-Zero Dual-Zone Wine Cooler', category: 'residential' },
+  { id: 'wine-cooler',          name: 'Wine Cooler Repair',      desc: 'Same day service · Sub-Zero, Miele, Liebherr, Thermador · Compressor, thermostat, evaporator fan, dual-zone controls.', photoCaption: 'Photo · Sub-Zero Dual-Zone Wine Cooler', category: 'residential' }
 ];
 
 export const COMMERCIAL_SERVICES: HomepageService[] = [
@@ -72,5 +72,5 @@ export const COMMERCIAL_SERVICES: HomepageService[] = [
   { id: 'comm-stove',           name: 'Stove Repair',            desc: 'Commercial certified · Vulcan, Garland, Wolf commercial · 6-burner, 8-burner, salamander. Gas valve, pilot, oven safety.', photoCaption: 'Photo · Vulcan Commercial Range', category: 'commercial' },
   { id: 'walk-in-cooler',       name: 'Walk-In Cooler',          desc: 'Commercial certified · 24/7 emergency · True, Kolpak, Nor-Lake, Master-Bilt. Compressor, evaporator, defrost timer, door seal.', photoCaption: 'Photo · True Walk-In Cooler Box', category: 'commercial' },
   { id: 'walk-in-freezer',      name: 'Walk-In Freezer',         desc: 'Commercial certified · Refrigeration system, defrost cycle, controller, pressure switch · Kolpak, Master-Bilt, Nor-Lake.', photoCaption: 'Photo · Master-Bilt Walk-In Freezer', category: 'commercial' },
-  { id: 'comm-washer',          name: 'Washer Repair',           desc: 'Commercial certified · Speed Queen, Dexter, Wascomat, Continental Girbau · Bearing, motor, drain valve, control board.', photoCaption: 'Photo · Dexter Commercial Washer', category: 'commercial' },
+  { id: 'comm-washer',          name: 'Washer Repair',           desc: 'Commercial certified · Speed Queen, Dexter, Wascomat, Continental Girbau · Bearing, motor, drain valve, control board.', photoCaption: 'Photo · Dexter Commercial Washer', category: 'commercial' }
 ];

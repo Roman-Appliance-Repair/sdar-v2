@@ -22,10 +22,10 @@ export const BUSINESS_HOURS = {
     thursday: { opens: '08:00', closes: '20:00' },
     friday: { opens: '08:00', closes: '20:00' },
     saturday: { opens: '08:00', closes: '20:00' },
-    sunday: 'closed' as const,
+    sunday: 'closed' as const
   },
   /** True — phone calls answered 24/7 even when in-person service hours are closed. */
-  phoneAnswered24x7: true,
+  phoneAnswered24x7: true
 } as const;
 
 /** openingHoursSpecification block for LocalBusiness JSON-LD. */
@@ -34,6 +34,6 @@ export const OPENING_HOURS_SCHEMA = [
     '@type': 'OpeningHoursSpecification',
     dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     opens: '08:00',
-    closes: '20:00',
-  },
+    closes: '20:00'
+  }
 ];

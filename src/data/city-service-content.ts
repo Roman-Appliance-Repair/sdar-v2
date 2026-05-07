@@ -40,7 +40,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "LADWP serves WeHo with moderate to hard water (12-18 grains per gallon TDS). Scaling on dishwashers and washers shows up at year 3-5 without descaling PM.",
     homeStock: "Mid-century apartments, condos, and 1920s-50s Spanish + craftsman bungalows. Premium built-in refrigerators (Sub-Zero, Miele) common in Sunset Strip estates and Norma Triangle.",
     serviceContext: "Premium service expectations. Same-day priority dispatch on the WeHo route from the West Hollywood branch.",
-    branchSlug: 'west-hollywood',
+    branchSlug: 'west-hollywood'
   },
   'beverly-hills': {
     tier: 'ULTRA-PREMIUM',
@@ -49,7 +49,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Beverly Hills operates its own water utility with relatively soft water (5-10 grains per gallon). Less scaling on dishwashers and washers than LADWP-served neighbors.",
     homeStock: "Pre-war estates, 1960s-80s rebuilds, contemporary trophy properties. Built-in Sub-Zero, Wolf, Miele, Gaggenau, La Cornue installations standard. Service expectations the highest in LA.",
     serviceContext: "Ultra-premium service expectations. Beverly Hills branch dispatches white-glove protocol on every visit — booties on flooring, drop cloths, no-trace work.",
-    branchSlug: 'beverly-hills',
+    branchSlug: 'beverly-hills'
   },
   'los-angeles': {
     tier: 'GENERAL',
@@ -58,7 +58,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "LADWP serves most of LA with moderately hard water (12-18 grains per gallon). Scaling on water-heated appliances year 3-5 without descaling PM.",
     homeStock: "Full spectrum: pre-war estates in Hancock Park, mid-century in Silver Lake and Los Feliz, condos and apartments downtown, single-family across the basin. Brand mix correlates to neighborhood.",
     serviceContext: "Same-day dispatch from Wilshire Blvd HQ. We service all 87 neighborhoods + cities across LA County.",
-    branchSlug: 'los-angeles',
+    branchSlug: 'los-angeles'
   },
   'pasadena': {
     tier: 'MID-TIER-NE',
@@ -67,7 +67,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Foothill Municipal Water District plus Pasadena Water and Power; moderately hard water. Scaling on dishwashers and washers similar to LADWP areas.",
     homeStock: "Significant Craftsman + bungalow + Spanish revival inventory; 1910s-1940s construction common with original built-in cabinetry and updated appliances. Sub-Zero retrofits in older built-ins are routine.",
     serviceContext: "Pasadena branch covers Pasadena, Glendale, Alhambra, Arcadia, San Marino, Monrovia, San Gabriel, South Pasadena, Highland Park, Eagle Rock, La Cañada, Atwater Village, Silver Lake, Los Feliz, Temple City.",
-    branchSlug: 'pasadena',
+    branchSlug: 'pasadena'
   },
   'thousand-oaks': {
     tier: 'MID-TIER-VENTURA',
@@ -76,7 +76,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Calleguas Municipal Water District; moderately hard water similar to LADWP. Scaling patterns on dishwashers and washers comparable.",
     homeStock: "Suburban single-family with 1970s-2000s construction predominant. Mid-tier brands (KitchenAid, Whirlpool, GE, Maytag) common. Premium pockets in North Ranch and Lynn Ranch.",
     serviceContext: "Thousand Oaks branch covers Conejo Valley, Newbury Park, Westlake Village, Oak Park, Moorpark, Camarillo, Oxnard, Ventura, Simi Valley, Ojai.",
-    branchSlug: 'thousand-oaks',
+    branchSlug: 'thousand-oaks'
   },
   'irvine': {
     tier: 'PREMIUM-OC',
@@ -85,7 +85,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Irvine Ranch Water District; moderately hard water. Hard-water scaling at year 3-5 standard pattern.",
     homeStock: "Newer-construction master-planned communities (1980s-present). Premium tier in newer estate sub-divisions; Samsung, LG, KitchenAid, Whirlpool common, Sub-Zero / Wolf in higher-end Turtle Rock and Quail Hill estates.",
     serviceContext: "Irvine branch covers Irvine, Newport Beach, Newport Coast, Costa Mesa, Tustin, Anaheim, Anaheim Hills, Yorba Linda, Fullerton, Mission Viejo, Laguna Beach, Laguna Niguel, Dana Point, San Clemente, Huntington Beach, Villa Park.",
-    branchSlug: 'irvine',
+    branchSlug: 'irvine'
   },
   'rancho-cucamonga': {
     tier: 'INLAND-EMPIRE',
@@ -94,7 +94,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Cucamonga Valley Water District; harder water than LADWP. Scaling on dishwashers, washers, ice makers shows up faster — year 2-4 typical.",
     homeStock: "Suburban single-family, 1990s-2010s construction predominant. Mid-tier brands (Whirlpool, GE, Samsung, LG) standard. Premium tier in newer Etiwanda and north Alta Loma.",
     serviceContext: "Rancho Cucamonga branch covers Rancho Cucamonga, Ontario, Upland, Fontana, Chino Hills, Loma Linda, Redlands, San Bernardino.",
-    branchSlug: 'rancho-cucamonga',
+    branchSlug: 'rancho-cucamonga'
   },
   'temecula': {
     tier: 'INLAND-RIVERSIDE',
@@ -103,7 +103,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Eastern Municipal Water District + Rancho California Water District; harder water than LADWP. Scaling on dishwashers and washers year 2-4 typical.",
     homeStock: "Suburban single-family, 1990s-2010s construction. Wine Country has custom estates with premium built-in appliances. Mid-tier brands standard in valley tracts.",
     serviceContext: "Temecula branch covers Temecula, Murrieta, Menifee, Lake Elsinore, Hemet, Moreno Valley, Corona, Riverside.",
-    branchSlug: 'temecula',
+    branchSlug: 'temecula'
   },
   // ====================================================================
   // Wave 24b — Top 5 non-hub priority cities (15,516 imp/mo GSC top + others)
@@ -115,7 +115,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Burbank Water and Power; moderately hard water similar to LADWP (12-18 grains per gallon). Scaling on dishwashers and washers at year 3-5 without descaling PM.",
     homeStock: "Mix: 1920s-1940s craftsman + Spanish revival in older neighborhoods (Magnolia Park, Toluca Lake-adjacent), 1970s-2000s tract single-family in Burbank Hills, condos near Media District. Brand mix correlates to neighborhood.",
     serviceContext: "Dispatched from our Los Angeles branch (Wilshire HQ). Burbank's Hollywood-adjacent industry plus residential mix produces high service-call volume — 15,516 imp/mo GSC top priority for our SoCal coverage.",
-    branchSlug: 'los-angeles',
+    branchSlug: 'los-angeles'
   },
   'glendale': {
     tier: 'GENERAL',
@@ -124,7 +124,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Glendale Water and Power; moderately hard water (12-18 grains per gallon). Scaling on dishwashers, washers, ice makers year 3-5 typical without PM.",
     homeStock: "Significant Spanish revival + Mediterranean inventory in Rossmoyne and Adams Hill; mid-century in Northwest Glendale; 1970s-2000s tracts in Verdugo Woodlands. Strong Armenian-American demographic with premium-mid appliance preferences.",
     serviceContext: "Dispatched from our Pasadena branch. Glendale's $85K+ median household income drives premium-mid brand mix; we see Bosch, KitchenAid, GE Profile alongside Whirlpool standard tier.",
-    branchSlug: 'pasadena',
+    branchSlug: 'pasadena'
   },
   'santa-monica': {
     tier: 'PREMIUM',
@@ -133,7 +133,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Santa Monica city water; moderately hard. Hard-water descaling on dishwashers and washers year 3-5 standard.",
     homeStock: "Pre-war Spanish + craftsman in North of Montana and Wilshire Montana; mid-century in Sunset Park; condos near pier and downtown. Premium tier (Sub-Zero, Wolf, Miele) prevalent in North of Montana estates.",
     serviceContext: "Dispatched from our Los Angeles branch. Santa Monica coastal salt-air angle: refrigerator coil cleaning is high-leverage maintenance for beach-area homes; we see condenser fan motor wear at year 6-8 vs year 8-10 inland.",
-    branchSlug: 'los-angeles',
+    branchSlug: 'los-angeles'
   },
   'long-beach': {
     tier: 'GENERAL',
@@ -142,7 +142,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Long Beach Water Department; moderately hard water. Scaling patterns comparable to LADWP areas.",
     homeStock: "Spanish + craftsman in Belmont Shore, Bixby Knolls, California Heights; mid-century + 1970s tracts in East Side; condos in Downtown. Mid-tier brand mix predominant; premium pockets in Naples Island canal homes.",
     serviceContext: "Dispatched from our Los Angeles branch. Long Beach is our southernmost LA County coverage from the Wilshire HQ; same-day service across the city from Belmont Shore to Bixby Knolls.",
-    branchSlug: 'los-angeles',
+    branchSlug: 'los-angeles'
   },
   'anaheim': {
     tier: 'PREMIUM-OC',
@@ -151,7 +151,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "Anaheim Public Utilities; moderately hard water. Scaling on dishwashers and washers year 3-5 standard.",
     homeStock: "Anaheim Hills has 1980s-2000s premium master-planned tracts (Sub-Zero, Wolf in custom estate pockets). Colony Historic District has 1920s-1940s Spanish + craftsman. Western and central Anaheim mix mid-century + 1960s-70s tracts. Mid-tier brand mix predominant.",
     serviceContext: "Dispatched from our Irvine branch. Anaheim's family-suburban demographic plus Disney-area service-economy households produce high service-call volume; we cover the full city from Anaheim Hills to West Anaheim same-day.",
-    branchSlug: 'irvine',
+    branchSlug: 'irvine'
   },
   // Wave 27b — final non-hub addition (200/200 master plan target)
   'hollywood': {
@@ -161,8 +161,8 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     waterNote: "LADWP serves Hollywood with moderately hard water (12-18 grains per gallon). Hard-water descaling on dishwashers and washers year 3-5 standard; ice maker filter service annual.",
     homeStock: "Two-tier mix. Hollywood Hills above-Sunset is ultra-premium territory: Outpost Estates, Whitley Heights, Beachwood Canyon — Sub-Zero, Wolf, Miele, Thermador, La Cornue installations standard in custom kitchens, often integrated with Sub-Zero Designer columns and matched Wolf rangetops. Hollywood proper is mid-premium entertainment-industry mix: Bosch, KitchenAid, GE Profile, Samsung premium are common alongside the tier-mixed condo and apartment inventory.",
     serviceContext: "Dispatched from our West Hollywood branch (323) 870-4790. Hollywood is distinct from West Hollywood — different city boundaries, different incorporation, common confusion among new residents. We service both with the same WeHo branch infrastructure; same-day priority dispatch across the Hollywood Hills above-Sunset estate corridor and the Hollywood proper apartment-and-condo density.",
-    branchSlug: 'west-hollywood',
-  },
+    branchSlug: 'west-hollywood'
+  }
 };
 
 export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
@@ -177,7 +177,7 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Evaporator fan motor (year 6-10).', detail: '$280-440. Symptom: fresh-food side won\'t cool properly even though freezer is fine.' },
       { title: 'Door gasket compression (year 5-8).', detail: '$180-280 gasket replacement. Heat infiltration causes longer compressor cycles.' },
       { title: 'Ice maker assembly (year 6-9).', detail: '$285-485. Dispenser solenoid year 7-10 ($180-280).' },
-      { title: 'Water inlet valve / supply line.', detail: 'Most common ice and water dispenser failure. $245-385.' },
+      { title: 'Water inlet valve / supply line.', detail: 'Most common ice and water dispenser failure. $245-385.' }
     ],
     brandPoolUltraPremium: ['Sub-Zero', 'Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Viking'],
     brandPoolPremium: ['Sub-Zero', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking'],
@@ -194,10 +194,10 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { repair: 'Sealed-system refrigerant work (EPA 608)', cost: '$585 to $985' },
       { repair: 'Compressor replacement (mid-tier)', cost: '$580 to $1,200' },
       { repair: 'Compressor replacement (built-in Sub-Zero / Wolf)', cost: '$1,200 to $2,400' },
-      { repair: 'Warranty', cost: '90 days parts and labor' },
+      { repair: 'Warranty', cost: '90 days parts and labor' }
     ],
     epaCertRequired: true,
-    serviceTypeSchema: 'Residential Refrigerator Repair',
+    serviceTypeSchema: 'Residential Refrigerator Repair'
   },
   'dryer-repair': {
     name: 'Dryer Repair',
@@ -210,7 +210,7 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Thermal fuse (one-shot safety).', detail: '$120-220 replacement. Trips when dryer overheats — usually caused by vent restriction.' },
       { title: 'Drive belt wear (year 7-10).', detail: '$180-280 replacement. Drum stops turning while motor still runs.' },
       { title: 'Door switch (year 6-9).', detail: '$120-220. Dryer won\'t start, control board reads door open even when closed.' },
-      { title: 'Lint screen / cabinet airflow.', detail: 'Annual deep cleaning service prevents fire risk and extends component life.' },
+      { title: 'Lint screen / cabinet airflow.', detail: 'Annual deep cleaning service prevents fire risk and extends component life.' }
     ],
     brandPoolUltraPremium: ['Miele', 'Asko', 'LG SteamFresh', 'Whirlpool', 'KitchenAid'],
     brandPoolPremium: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'KitchenAid', 'Bosch', 'Miele'],
@@ -227,10 +227,10 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { repair: 'Heating element (electric)', cost: '$280 to $440' },
       { repair: 'Drum bearing / roller service', cost: '$280 to $485' },
       { repair: 'Annual maintenance PM', cost: '$140 to $220' },
-      { repair: 'Warranty', cost: '90 days parts and labor' },
+      { repair: 'Warranty', cost: '90 days parts and labor' }
     ],
     epaCertRequired: false,
-    serviceTypeSchema: 'Residential Dryer Repair',
+    serviceTypeSchema: 'Residential Dryer Repair'
   },
   'washer-repair': {
     name: 'Washer Repair',
@@ -243,7 +243,7 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Inlet valve / fill solenoid (year 6-9).', detail: '$245-385. Symptom: washer won\'t fill, or fills slowly, or fills with wrong-temperature water.' },
       { title: 'Control board (year 8-12).', detail: '$385-680 replacement. Error codes flashing, no response to controls, intermittent operation.' },
       { title: 'Drain hose blockage / kink.', detail: '$120-180 service. Can mimic drain pump failure symptoms; we test the cheap diagnosis first.' },
-      { title: 'Detergent dispenser / overdose.', detail: 'Excessive sudsing leak. $80-160 dispenser cleaning + customer education.' },
+      { title: 'Detergent dispenser / overdose.', detail: 'Excessive sudsing leak. $80-160 dispenser cleaning + customer education.' }
     ],
     brandPoolUltraPremium: ['Miele', 'Asko', 'LG WashTower', 'Whirlpool', 'KitchenAid'],
     brandPoolPremium: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'Bosch', 'Miele', 'Speed Queen'],
@@ -260,10 +260,10 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { repair: 'Shock absorber service (front-load)', cost: '$340 to $580' },
       { repair: 'Control board replacement', cost: '$385 to $680' },
       { repair: 'Annual maintenance PM', cost: '$140 to $220' },
-      { repair: 'Warranty', cost: '90 days parts and labor' },
+      { repair: 'Warranty', cost: '90 days parts and labor' }
     ],
     epaCertRequired: false,
-    serviceTypeSchema: 'Residential Washer Repair',
+    serviceTypeSchema: 'Residential Washer Repair'
   },
   'dishwasher-repair': {
     name: 'Dishwasher Repair',
@@ -276,7 +276,7 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Door spring / hinge (year 6-9).', detail: '$180-280. Door slams shut or won\'t stay open at any angle.' },
       { title: 'Detergent dispenser (year 7-10).', detail: '$180-280. Pod or powder won\'t release, dishes come out dirty.' },
       { title: 'Door latch / interlock (year 6-9).', detail: '$180-280. Dishwasher won\'t start because control reads door open.' },
-      { title: 'Hard-water scaling (LADWP / Pasadena / IE areas).', detail: '$120-220 descaling service. Scale buildup damages heating element and wash arm spray jets.' },
+      { title: 'Hard-water scaling (LADWP / Pasadena / IE areas).', detail: '$120-220 descaling service. Scale buildup damages heating element and wash arm spray jets.' }
     ],
     brandPoolUltraPremium: ['Miele', 'Bosch', 'Asko', 'KitchenAid', 'Thermador', 'Cove (Sub-Zero family)'],
     brandPoolPremium: ['Bosch', 'Miele', 'KitchenAid', 'Thermador', 'LG', 'Samsung'],
@@ -292,10 +292,10 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { repair: 'Drain pump replacement', cost: '$280 to $440' },
       { repair: 'Heating element replacement', cost: '$280 to $440' },
       { repair: 'Annual maintenance PM (descaling + spray-arm clean)', cost: '$140 to $220' },
-      { repair: 'Warranty', cost: '90 days parts and labor' },
+      { repair: 'Warranty', cost: '90 days parts and labor' }
     ],
     epaCertRequired: false,
-    serviceTypeSchema: 'Residential Dishwasher Repair',
+    serviceTypeSchema: 'Residential Dishwasher Repair'
   },
   'oven-repair': {
     name: 'Oven Repair',
@@ -308,7 +308,7 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Convection fan motor (year 6-9).', detail: '$385-625 replacement. Convection-equipped models lose airflow circulation.' },
       { title: 'Control board (year 8-12).', detail: '$485-820. Error codes, intermittent operation, mode buttons unresponsive.' },
       { title: 'Door hinge sag (year 6-9).', detail: '$120-220 service. Door doesn\'t close fully, heat loss, latch issues.' },
-      { title: 'Self-clean lock mechanism (year 7-10).', detail: '$180-280 replacement. Oven stuck locked after self-clean cycle, or won\'t enter self-clean.' },
+      { title: 'Self-clean lock mechanism (year 7-10).', detail: '$180-280 replacement. Oven stuck locked after self-clean cycle, or won\'t enter self-clean.' }
     ],
     brandPoolUltraPremium: ['Wolf', 'Miele', 'Sub-Zero (Cove dishwasher partner)', 'Thermador', 'Gaggenau', 'La Cornue', 'Viking'],
     brandPoolPremium: ['Wolf', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking'],
@@ -325,11 +325,11 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { repair: 'Convection fan motor', cost: '$385 to $625' },
       { repair: 'Control board replacement', cost: '$485 to $820' },
       { repair: 'Annual calibration PM', cost: '$140 to $220' },
-      { repair: 'Warranty', cost: '90 days parts and labor' },
+      { repair: 'Warranty', cost: '90 days parts and labor' }
     ],
     epaCertRequired: false,
-    serviceTypeSchema: 'Residential Oven Repair',
-  },
+    serviceTypeSchema: 'Residential Oven Repair'
+  }
 };
 
 // ====================================================================
@@ -347,7 +347,7 @@ SERVICE_DESCRIPTORS['stove-repair'] = {
     { title: 'Oven thermostat drift (year 5-8).', detail: 'Stove range section integrated with oven below; oven temp drifts off setpoint, stove top still works. $260-440 thermostat replacement.' },
     { title: 'Bake igniter (gas range oven, year 5-8).', detail: '$260-440 replacement. Glows orange but does not fully ignite.' },
     { title: 'Control board (year 8-12).', detail: 'Touch controls unresponsive, error codes flashing. $385-680 replacement.' },
-    { title: 'Self-clean lock mechanism (year 7-10).', detail: 'Stuck locked or won\'t enter self-clean. $180-280.' },
+    { title: 'Self-clean lock mechanism (year 7-10).', detail: 'Stuck locked or won\'t enter self-clean. $180-280.' }
   ],
   brandPoolUltraPremium: ['Wolf', 'La Cornue', 'Viking', 'Thermador', 'Miele', 'Lacanche', 'BlueStar'],
   brandPoolPremium: ['Wolf', 'Thermador', 'Viking', 'KitchenAid', 'Bosch', 'BlueStar'],
@@ -365,10 +365,10 @@ SERVICE_DESCRIPTORS['stove-repair'] = {
     { repair: 'Glass-ceramic radiant element (smoothtop)', cost: '$340 to $540' },
     { repair: 'Control board replacement', cost: '$385 to $680' },
     { repair: 'Annual calibration PM', cost: '$140 to $220' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: false,
-  serviceTypeSchema: 'Residential Stove Repair',
+  serviceTypeSchema: 'Residential Stove Repair'
 };
 
 SERVICE_DESCRIPTORS['cooktop-repair'] = {
@@ -382,7 +382,7 @@ SERVICE_DESCRIPTORS['cooktop-repair'] = {
     { title: 'Touch control board (induction + smoothtop, year 7-10).', detail: 'Controls unresponsive, error codes. $480-820 replacement.' },
     { title: 'Power module (induction, year 8-11).', detail: '$580-880 replacement.' },
     { title: 'Burner cap / port carbon clog (gas).', detail: '$120-200 cleaning service often resolves without parts.' },
-    { title: 'Cooktop downdraft motor (Jenn-Air, Wolf downdraft).', detail: '$485-820 motor replacement.' },
+    { title: 'Cooktop downdraft motor (Jenn-Air, Wolf downdraft).', detail: '$485-820 motor replacement.' }
   ],
   brandPoolUltraPremium: ['Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Viking', 'BlueStar'],
   brandPoolPremium: ['Wolf', 'Bosch', 'Thermador', 'KitchenAid', 'Jenn-Air', 'Miele'],
@@ -399,10 +399,10 @@ SERVICE_DESCRIPTORS['cooktop-repair'] = {
     { repair: 'Glass-ceramic surface replacement', cost: '$580 to $980' },
     { repair: 'Induction power module', cost: '$580 to $880' },
     { repair: 'Downdraft motor (Jenn-Air, Wolf)', cost: '$485 to $820' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: false,
-  serviceTypeSchema: 'Residential Cooktop Repair',
+  serviceTypeSchema: 'Residential Cooktop Repair'
 };
 
 SERVICE_DESCRIPTORS['range-hood-repair'] = {
@@ -416,7 +416,7 @@ SERVICE_DESCRIPTORS['range-hood-repair'] = {
     { title: 'Make-up air integration issues (newer construction).', detail: 'Hood over 400 CFM requires make-up air per CA Title 24. Diagnostic + plumber/HVAC referral.' },
     { title: 'Ductless conversion (older homes, no exterior vent).', detail: 'Charcoal filter conversion service. $180-380.' },
     { title: 'Damper / backdraft mechanism (year 6-9).', detail: '$220-380. Backdraft prevents outdoor air intrusion.' },
-    { title: 'Control board (year 8-11).', detail: '$385-580 replacement.' },
+    { title: 'Control board (year 8-11).', detail: '$385-580 replacement.' }
   ],
   brandPoolUltraPremium: ['Wolf', 'Vent-A-Hood', 'Miele', 'Best', 'Faber', 'Zephyr Power'],
   brandPoolPremium: ['Wolf', 'Vent-A-Hood', 'Best', 'Zephyr', 'Bosch', 'Faber'],
@@ -433,10 +433,10 @@ SERVICE_DESCRIPTORS['range-hood-repair'] = {
     { repair: 'Control board replacement', cost: '$385 to $580' },
     { repair: 'Fan motor replacement', cost: '$385 to $625' },
     { repair: 'Annual maintenance PM', cost: '$140 to $220' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: false,
-  serviceTypeSchema: 'Residential Range Hood Repair',
+  serviceTypeSchema: 'Residential Range Hood Repair'
 };
 
 SERVICE_DESCRIPTORS['microwave-repair'] = {
@@ -450,7 +450,7 @@ SERVICE_DESCRIPTORS['microwave-repair'] = {
     { title: 'Control board / touchpad (year 7-10).', detail: 'Buttons unresponsive, displays error or random behavior. $280-540 replacement.' },
     { title: 'Drawer microwave mechanism (Sharp, Wolf, year 6-9).', detail: 'Drawer won\'t open or close smoothly. $385-680 service.' },
     { title: 'Trim kit issues (built-in, year 5+).', detail: 'Loose or visibly damaged trim kit. $180-340 service.' },
-    { title: 'Vent / exhaust fan (over-the-range models).', detail: 'Hood functionality fails. $220-380 service.' },
+    { title: 'Vent / exhaust fan (over-the-range models).', detail: 'Hood functionality fails. $220-380 service.' }
   ],
   brandPoolUltraPremium: ['Wolf', 'Sharp drawer', 'Miele', 'Thermador', 'Gaggenau'],
   brandPoolPremium: ['Wolf', 'Sharp drawer', 'KitchenAid', 'Bosch', 'Miele', 'Panasonic'],
@@ -468,10 +468,10 @@ SERVICE_DESCRIPTORS['microwave-repair'] = {
     { repair: 'Control board / touchpad', cost: '$280 to $540' },
     { repair: 'Magnetron (built-in)', cost: '$385 to $580' },
     { repair: 'Drawer microwave mechanism (Sharp, Wolf)', cost: '$385 to $680' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: false,
-  serviceTypeSchema: 'Residential Microwave Repair',
+  serviceTypeSchema: 'Residential Microwave Repair'
 };
 
 SERVICE_DESCRIPTORS['wall-oven-repair'] = {
@@ -485,7 +485,7 @@ SERVICE_DESCRIPTORS['wall-oven-repair'] = {
     { title: 'Door gasket compression (year 5-8).', detail: '$220-340 replacement. Heat loss makes oven run longer to maintain temp.' },
     { title: 'Control board (year 8-12).', detail: '$580-980. Premium tier electronic controls more expensive.' },
     { title: 'Self-clean lock mechanism (year 7-10).', detail: '$220-380 replacement. Common Wolf, Miele, Thermador failure pattern.' },
-    { title: 'Door hinge sag (year 6-9).', detail: '$180-280 service. Heavy wall-oven door hinges wear faster than free-standing.' },
+    { title: 'Door hinge sag (year 6-9).', detail: '$180-280 service. Heavy wall-oven door hinges wear faster than free-standing.' }
   ],
   brandPoolUltraPremium: ['Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Sub-Zero (Cove)', 'La Cornue', 'Viking'],
   brandPoolPremium: ['Wolf', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking', 'Jenn-Air'],
@@ -503,10 +503,10 @@ SERVICE_DESCRIPTORS['wall-oven-repair'] = {
     { repair: 'Convection fan motor', cost: '$385 to $625' },
     { repair: 'Control board (premium tier)', cost: '$580 to $980' },
     { repair: 'Annual calibration PM', cost: '$160 to $240' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: false,
-  serviceTypeSchema: 'Residential Wall Oven Repair',
+  serviceTypeSchema: 'Residential Wall Oven Repair'
 };
 
 // ====================================================================
@@ -524,7 +524,7 @@ SERVICE_DESCRIPTORS['freezer-repair'] = {
     { title: 'Door gasket compression (year 5-8).', detail: '$180-280. Heat infiltration, longer compressor cycles.' },
     { title: 'Thermostat / control board (year 8-12).', detail: '$280-540 thermostat, $480-820 board on premium tier.' },
     { title: 'Door alarm / temp alarm sensor (year 7-10).', detail: '$180-280 sensor replacement on premium chest freezers and Sub-Zero columns.' },
-    { title: 'Drain line frozen / clogged.', detail: '$120-220 service. Common on French door freezer drawers.' },
+    { title: 'Drain line frozen / clogged.', detail: '$120-220 service. Common on French door freezer drawers.' }
   ],
   brandPoolUltraPremium: ['Sub-Zero', 'Miele', 'Liebherr', 'Thermador', 'Viking'],
   brandPoolPremium: ['Sub-Zero', 'Miele', 'Liebherr', 'KitchenAid', 'Bosch', 'Frigidaire Professional'],
@@ -542,10 +542,10 @@ SERVICE_DESCRIPTORS['freezer-repair'] = {
     { repair: 'Sealed-system refrigerant work (EPA 608)', cost: '$585 to $985' },
     { repair: 'Compressor (mid-tier standalone)', cost: '$580 to $1,200' },
     { repair: 'Compressor (built-in Sub-Zero column)', cost: '$1,200 to $2,400' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: true,
-  serviceTypeSchema: 'Residential Freezer Repair',
+  serviceTypeSchema: 'Residential Freezer Repair'
 };
 
 SERVICE_DESCRIPTORS['ice-maker-repair'] = {
@@ -559,7 +559,7 @@ SERVICE_DESCRIPTORS['ice-maker-repair'] = {
     { title: 'Standalone undercounter (Sub-Zero, Scotsman, U-Line) compressor.', detail: 'EPA 608 Universal work. $785-1,485 compressor replacement.' },
     { title: 'Door / drawer ice maker dispenser solenoid (year 7-10).', detail: '$180-280. Dispenser arm doesn\'t engage, ice doesn\'t drop.' },
     { title: 'Auger motor (Scotsman / standalone, year 8-11).', detail: '$385-580 replacement.' },
-    { title: 'Ice jam clearing.', detail: '$120-180 service. Bin overfill, dispenser chute jam.' },
+    { title: 'Ice jam clearing.', detail: '$120-180 service. Bin overfill, dispenser chute jam.' }
   ],
   brandPoolUltraPremium: ['Sub-Zero', 'Scotsman', 'U-Line', 'Marvel', 'Viking', 'Miele'],
   brandPoolPremium: ['Sub-Zero', 'U-Line', 'Marvel', 'Scotsman', 'KitchenAid', 'GE Monogram'],
@@ -577,10 +577,10 @@ SERVICE_DESCRIPTORS['ice-maker-repair'] = {
     { repair: 'Auger motor (Scotsman / standalone)', cost: '$385 to $580' },
     { repair: 'Compressor (standalone undercounter, EPA 608)', cost: '$785 to $1,485' },
     { repair: 'Annual descaling PM', cost: '$120 to $220' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: true,
-  serviceTypeSchema: 'Residential Ice Maker Repair',
+  serviceTypeSchema: 'Residential Ice Maker Repair'
 };
 
 SERVICE_DESCRIPTORS['wine-cooler-repair'] = {
@@ -594,7 +594,7 @@ SERVICE_DESCRIPTORS['wine-cooler-repair'] = {
     { title: 'Evaporator fan motor (year 6-10).', detail: '$280-440. Internal air circulation fails, temperature stratification develops.' },
     { title: 'Temp control board (year 8-12).', detail: '$485-820 on premium dual-zone (Sub-Zero, U-Line). Touch controls unresponsive.' },
     { title: 'Glass door / hinge wear (year 8-12).', detail: '$220-380. Heavy-duty hinges support tempered-glass doors; weight stresses hardware.' },
-    { title: 'LED interior lighting (year 5-8).', detail: '$120-220 LED panel replacement on premium tier.' },
+    { title: 'LED interior lighting (year 5-8).', detail: '$120-220 LED panel replacement on premium tier.' }
   ],
   brandPoolUltraPremium: ['Sub-Zero', 'U-Line', 'Marvel', 'Miele', 'Liebherr', 'Thermador', 'True Residential'],
   brandPoolPremium: ['Sub-Zero', 'U-Line', 'Marvel', 'KitchenAid', 'GE Monogram', 'Bosch'],
@@ -612,10 +612,10 @@ SERVICE_DESCRIPTORS['wine-cooler-repair'] = {
     { repair: 'Sealed-system refrigerant work (EPA 608)', cost: '$585 to $985' },
     { repair: 'Compressor (standalone mid-tier)', cost: '$580 to $1,200' },
     { repair: 'Compressor (Sub-Zero / U-Line / Marvel built-in)', cost: '$1,200 to $2,400' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: true,
-  serviceTypeSchema: 'Residential Wine Cooler Repair',
+  serviceTypeSchema: 'Residential Wine Cooler Repair'
 };
 
 SERVICE_DESCRIPTORS['garbage-disposal-repair'] = {
@@ -629,7 +629,7 @@ SERVICE_DESCRIPTORS['garbage-disposal-repair'] = {
     { title: 'Switch failure (year 7-10).', detail: '$120-220. Wall switch or air-switch sensor stops engaging disposal.' },
     { title: 'Continuous-feed vs batch-feed differences.', detail: 'Continuous-feed (most common) uses wall switch; batch-feed (some KitchenAid) uses lid sensor. Different failure patterns.' },
     { title: 'Discharge tube corrosion (year 8-12).', detail: '$120-220 replacement. Mounting flange seal compromised.' },
-    { title: 'Hard-water scaling on internal grinding components.', detail: 'Year 4-6 LA hard water typical onset. Reduces grinding efficiency. Limited internal cleaning options; usually leads to unit replacement at year 8+.' },
+    { title: 'Hard-water scaling on internal grinding components.', detail: 'Year 4-6 LA hard water typical onset. Reduces grinding efficiency. Limited internal cleaning options; usually leads to unit replacement at year 8+.' }
   ],
   brandPoolUltraPremium: ['InSinkErator Evolution', 'Waste King Legend', 'Moen Host'],
   brandPoolPremium: ['InSinkErator Evolution', 'KitchenAid', 'Waste King', 'Moen'],
@@ -645,10 +645,10 @@ SERVICE_DESCRIPTORS['garbage-disposal-repair'] = {
     { repair: 'Drain line plumbing service', cost: '$180 to $280' },
     { repair: 'Disposal unit replacement (mid-tier)', cost: '$280 to $440' },
     { repair: 'Disposal unit replacement (premium InSinkErator Evolution)', cost: '$440 to $680' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: false,
-  serviceTypeSchema: 'Residential Garbage Disposal Repair',
+  serviceTypeSchema: 'Residential Garbage Disposal Repair'
 };
 
 SERVICE_DESCRIPTORS['range-repair'] = {
@@ -664,7 +664,7 @@ SERVICE_DESCRIPTORS['range-repair'] = {
     { title: 'Convection fan motor (year 6-9).', detail: '$385-625 on convection-equipped models.' },
     { title: 'Dual-fuel range — distinct service.', detail: 'Combines gas range top + electric oven; diagnostic spans both gas and electric subsystems. $280-540 typical.' },
     { title: 'Self-clean lock mechanism (year 7-10).', detail: '$180-280 replacement.' },
-    { title: 'Control board (year 8-12).', detail: '$485-820. Touch controls unresponsive, error codes flashing.' },
+    { title: 'Control board (year 8-12).', detail: '$485-820. Touch controls unresponsive, error codes flashing.' }
   ],
   brandPoolUltraPremium: ['Wolf', 'La Cornue', 'Bertazzoni', 'Viking', 'Thermador', 'Miele', 'BlueStar', 'Lacanche'],
   brandPoolPremium: ['Wolf', 'Thermador', 'Bertazzoni', 'Viking', 'KitchenAid', 'GE Cafe', 'BlueStar'],
@@ -683,10 +683,10 @@ SERVICE_DESCRIPTORS['range-repair'] = {
     { repair: 'Convection fan motor', cost: '$385 to $625' },
     { repair: 'Control board replacement', cost: '$485 to $820' },
     { repair: 'Annual calibration PM', cost: '$140 to $220' },
-    { repair: 'Warranty', cost: '90 days parts and labor' },
+    { repair: 'Warranty', cost: '90 days parts and labor' }
   ],
   epaCertRequired: false,
-  serviceTypeSchema: 'Residential Range Repair',
+  serviceTypeSchema: 'Residential Range Repair'
 };
 
 // Helper to get the brand pool for a city × service combo based on city tier

@@ -68,8 +68,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'uneven-heat-hot-and-cold-spots',    label: 'Uneven Heat / Hot and Cold Spots', priceRange: r(180, 330) },
       { id: 'weak-flame-low-heat-output',        label: 'Weak Flame / Low Heat Output', priceRange: r(180, 330) },
       { id: 'excessive-flare-ups',               label: 'Excessive Flare-Ups',          priceRange: r(120, 250) },
-      { id: 'pellet-grill-not-heating',          label: 'Pellet Grill Not Heating',     priceRange: r(230, 400) },
-    ],
+      { id: 'pellet-grill-not-heating',          label: 'Pellet Grill Not Heating',     priceRange: r(230, 400) }
+    ]
   },
 
   'built-in-fridge': {
@@ -84,8 +84,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'error-codes-on-display',            label: 'Error Codes on Display',          priceRange: r(200, 290) },
       { id: 'ice-maker-not-producing',           label: 'Ice Maker Not Producing',         priceRange: r(200, 290) },
       { id: 'compressor-noise-vibration',        label: 'Compressor Noise / Vibration',    priceRange: r(280, 400) },
-      { id: 'door-seal-gasket-failure',          label: 'Door Seal / Gasket Failure',      priceRange: r(200, 290) },
-    ],
+      { id: 'door-seal-gasket-failure',          label: 'Door Seal / Gasket Failure',      priceRange: r(200, 290) }
+    ]
   },
 
   'cooktop': {
@@ -99,8 +99,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'constant-clicking-gas',             label: 'Constant Clicking (Gas)',         priceRange: r(120, 210) },
       { id: 'electric-burner-not-heating',       label: 'Electric Burner Not Heating',     priceRange: r(200, 320) },
       { id: 'cracked-glass-cooktop',             label: 'Cracked Glass Cooktop',           priceRange: r(200, 320) },
-      { id: 'control-panel-touch-panel-dead',    label: 'Control Panel / Touch Panel Dead', priceRange: r(200, 320) },
-    ],
+      { id: 'control-panel-touch-panel-dead',    label: 'Control Panel / Touch Panel Dead', priceRange: r(200, 320) }
+    ]
   },
 
   'dishwasher': {
@@ -114,8 +114,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'wont-start-door-wont-latch',        label: "Won't Start / Door Won't Latch",  priceRange: r(120, 190) },
       { id: 'dishes-come-out-dirty',             label: 'Dishes Come Out Dirty',           priceRange: r(150, 240) },
       { id: 'dishwasher-leaking',                label: 'Dishwasher Leaking',              priceRange: r(150, 240) },
-      { id: 'error-codes',                       label: 'Error Codes',                     priceRange: r(180, 280) },
-    ],
+      { id: 'error-codes',                       label: 'Error Codes',                     priceRange: r(180, 280) }
+    ]
   },
 
   'dryer': {
@@ -129,8 +129,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'no-heat-gas',                       label: 'No Heat (Gas)',                   priceRange: r(190, 300) },
       { id: 'wont-start',                        label: "Won't Start",                     priceRange: r(120, 200) },
       { id: 'drum-not-turning',                  label: 'Drum Not Turning',                priceRange: r(160, 260) },
-      { id: 'squealing-or-grinding-noise',       label: 'Squealing or Grinding Noise',     priceRange: r(160, 260) },
-    ],
+      { id: 'squealing-or-grinding-noise',       label: 'Squealing or Grinding Noise',     priceRange: r(160, 260) }
+    ]
   },
 
   'dryer-vent': {
@@ -144,8 +144,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'dryer-running-hot',                 label: 'Dryer Running Hot',               priceRange: r(270, 450) },
       { id: 'visible-damage-to-transition-duct', label: 'Visible Damage to Transition Duct', priceRange: r(150, 290) },
       { id: 'visible-lint-at-back-of-dryer',     label: 'Visible Lint at Back of Dryer',   priceRange: r(150, 290) },
-      { id: 'booster-fan-failure',               label: 'Booster Fan Failure',             priceRange: r(270, 450) },
-    ],
+      { id: 'booster-fan-failure',               label: 'Booster Fan Failure',             priceRange: r(270, 450) }
+    ]
   },
 
   'fireplace': {
@@ -159,8 +159,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'remote-control-not-working',        label: 'Remote Control Not Working',      priceRange: r(120, 240) },
       { id: 'blower-fan-not-working-or-noisy',   label: 'Blower Fan Not Working or Noisy', priceRange: r(170, 320) },
       { id: 'no-flame-at-all-wont-light',        label: "No Flame at All / Won't Light",   priceRange: r(220, 380) },
-      { id: 'electric-fireplace-not-heating',    label: 'Electric Fireplace Not Heating',  priceRange: r(220, 380) },
-    ],
+      { id: 'electric-fireplace-not-heating',    label: 'Electric Fireplace Not Heating',  priceRange: r(220, 380) }
+    ]
   },
 
   'freezer': {
@@ -174,8 +174,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'excessive-frost-ice-buildup',       label: 'Excessive Frost / Ice Buildup',   priceRange: r(170, 300) },
       { id: 'defrost-system-failure',            label: 'Defrost System Failure',          priceRange: r(170, 300) },
       { id: 'evaporator-fan-failure',            label: 'Evaporator Fan Failure',          priceRange: r(130, 230) },
-      { id: 'compressor-issues',                 label: 'Compressor Issues',               priceRange: r(220, 350) },
-    ],
+      { id: 'compressor-issues',                 label: 'Compressor Issues',               priceRange: r(220, 350) }
+    ]
   },
 
   'disposal': {
@@ -189,8 +189,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'leaking-under-the-sink',            label: 'Leaking Under the Sink',          priceRange: r(150, 240) },
       { id: 'not-turning-on-at-all',             label: 'Not Turning On at All',           priceRange: r(180, 280) },
       { id: 'slow-grinding-or-weak-performance', label: 'Slow Grinding or Weak Performance', priceRange: r(150, 240) },
-      { id: 'loud-grinding-or-rattling-noise',   label: 'Loud Grinding or Rattling Noise', priceRange: r(150, 240) },
-    ],
+      { id: 'loud-grinding-or-rattling-noise',   label: 'Loud Grinding or Rattling Noise', priceRange: r(150, 240) }
+    ]
   },
 
   'ice-maker': {
@@ -204,8 +204,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'produces-little-ice-slow-production',    label: 'Produces Little Ice / Slow Production', priceRange: r(150, 240) },
       { id: 'cloudy-small-or-misshapen-ice',          label: 'Cloudy, Small, or Misshapen Ice',     priceRange: r(120, 190) },
       { id: 'ice-maker-leaking',                      label: 'Ice Maker Leaking',                   priceRange: r(120, 190) },
-      { id: 'ice-maker-frozen-iced-over',             label: 'Ice Maker Frozen / Iced Over',        priceRange: r(150, 240) },
-    ],
+      { id: 'ice-maker-frozen-iced-over',             label: 'Ice Maker Frozen / Iced Over',        priceRange: r(150, 240) }
+    ]
   },
 
   'induction': {
@@ -219,8 +219,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'cooktop-shuts-off-during-cooking',       label: 'Cooktop Shuts Off During Cooking',    priceRange: r(230, 360) },
       { id: 'f-code-on-display',                      label: 'F-Code on Display',                   priceRange: r(180, 290) },
       { id: 'control-board-failure',                  label: 'Control Board Failure',               priceRange: r(280, 420) },
-      { id: 'touch-controls-unresponsive',            label: 'Touch Controls Unresponsive',         priceRange: r(180, 290) },
-    ],
+      { id: 'touch-controls-unresponsive',            label: 'Touch Controls Unresponsive',         priceRange: r(180, 290) }
+    ]
   },
 
   'laundry': {
@@ -235,8 +235,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'washer-not-draining',     label: 'Washer Not Draining',  priceRange: r(140, 250) },
       { id: 'dryer-not-heating',       label: 'Dryer Not Heating',    priceRange: r(240, 380) },
       { id: 'dryer-takes-too-long',    label: 'Dryer Takes Too Long', priceRange: r(190, 320) },
-      { id: 'washer-leaking',          label: 'Washer Leaking',       priceRange: r(190, 320) },
-    ],
+      { id: 'washer-leaking',          label: 'Washer Leaking',       priceRange: r(190, 320) }
+    ]
   },
 
   'microwave': {
@@ -250,8 +250,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'sparking-or-arcing-inside',   label: 'Sparking or Arcing Inside',  priceRange: r(130, 210) },
       { id: 'wont-turn-on',                label: "Won't Turn On",              priceRange: r(160, 250) },
       { id: 'door-wont-open-or-latch',     label: "Door Won't Open or Latch",   priceRange: r(100, 170) },
-      { id: 'turntable-not-spinning',      label: 'Turntable Not Spinning',     priceRange: r(100, 170) },
-    ],
+      { id: 'turntable-not-spinning',      label: 'Turntable Not Spinning',     priceRange: r(100, 170) }
+    ]
   },
 
   'oven': {
@@ -265,8 +265,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'temperature-inaccurate',      label: 'Temperature Inaccurate',     priceRange: r(150, 240) },
       { id: 'bakes-unevenly-hot-spots',    label: 'Bakes Unevenly / Hot Spots', priceRange: r(190, 300) },
       { id: 'broiler-not-working',         label: 'Broiler Not Working',        priceRange: r(150, 240) },
-      { id: 'control-board-error-codes',   label: 'Control Board / Error Codes', priceRange: r(230, 350) },
-    ],
+      { id: 'control-board-error-codes',   label: 'Control Board / Error Codes', priceRange: r(230, 350) }
+    ]
   },
 
   'pizza-oven': {
@@ -281,8 +281,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'wont-light-no-ignition',      label: "Won't Light / No Ignition",  priceRange: r(150, 240) },
       { id: 'uneven-deck-temperature',     label: 'Uneven Deck Temperature',    priceRange: r(190, 300) },
       { id: 'burner-assembly-failure',     label: 'Burner Assembly Failure',    priceRange: r(230, 350) },
-      { id: 'control-board-failure',       label: 'Control Board Failure',      priceRange: r(230, 350) },
-    ],
+      { id: 'control-board-failure',       label: 'Control Board Failure',      priceRange: r(230, 350) }
+    ]
   },
 
   'range-hood': {
@@ -296,8 +296,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'loud-rattling-or-vibration', label: 'Loud Rattling or Vibration',   priceRange: r(140, 240) },
       { id: 'grinding-or-squealing-noise', label: 'Grinding or Squealing Noise', priceRange: r(140, 240) },
       { id: 'lights-not-working',         label: 'Lights Not Working',           priceRange: r(100, 180) },
-      { id: 'hood-completely-dead',       label: 'Hood Completely Dead',         priceRange: r(170, 280) },
-    ],
+      { id: 'hood-completely-dead',       label: 'Hood Completely Dead',         priceRange: r(170, 280) }
+    ]
   },
 
   'refrigerator': {
@@ -311,8 +311,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'ice-maker-not-working',    label: 'Ice Maker Not Working',    priceRange: r(200, 340) },
       { id: 'noisy-refrigerator',       label: 'Noisy Refrigerator',       priceRange: r(200, 340) },
       { id: 'water-leaking-or-pooling', label: 'Water Leaking or Pooling', priceRange: r(150, 260) },
-      { id: 'compressor-failure',       label: 'Compressor Failure',       priceRange: r(250, 400) },
-    ],
+      { id: 'compressor-failure',       label: 'Compressor Failure',       priceRange: r(250, 400) }
+    ]
   },
 
   'stackable': {
@@ -326,8 +326,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'washer-not-draining',  label: 'Washer Not Draining', priceRange: r(130, 220) },
       { id: 'door-latch-failure',   label: 'Door Latch Failure',  priceRange: r(130, 220) },
       { id: 'dryer-not-heating',    label: 'Dryer Not Heating',   priceRange: r(210, 320) },
-      { id: 'washer-leaking',       label: 'Washer Leaking',      priceRange: r(170, 270) },
-    ],
+      { id: 'washer-leaking',       label: 'Washer Leaking',      priceRange: r(170, 270) }
+    ]
   },
 
   'stove': {
@@ -341,8 +341,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'all-gas-burners-dead-at-once',       label: 'All Gas Burners Dead at Once',        priceRange: r(260, 420) },
       { id: 'one-electric-burner-not-heating',    label: 'One Electric Burner Not Heating',     priceRange: r(150, 270) },
       { id: 'range-not-heating-to-temperature',   label: 'Range Not Heating to Temperature',    priceRange: r(260, 420) },
-      { id: 'control-knobs-display-not-responding', label: 'Control Knobs / Display Not Responding', priceRange: r(260, 420) },
-    ],
+      { id: 'control-knobs-display-not-responding', label: 'Control Knobs / Display Not Responding', priceRange: r(260, 420) }
+    ]
   },
 
   'trash-compactor': {
@@ -356,8 +356,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'ram-stuck-mid-cycle',            label: 'Ram Stuck Mid-Cycle',           priceRange: r(140, 210) },
       { id: 'loud-grinding-or-crunching',     label: 'Loud Grinding or Crunching',    priceRange: r(140, 210) },
       { id: 'runs-but-doesnt-compact-well',   label: "Runs But Doesn't Compact Well", priceRange: r(140, 210) },
-      { id: 'drawer-wont-open-latch-issues',  label: "Drawer Won't Open / Latch Issues", priceRange: r(120, 170) },
-    ],
+      { id: 'drawer-wont-open-latch-issues',  label: "Drawer Won't Open / Latch Issues", priceRange: r(120, 170) }
+    ]
   },
 
   'wall-oven': {
@@ -371,8 +371,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'temperature-inaccurate',    label: 'Temperature Inaccurate',     priceRange: r(150, 250) },
       { id: 'bakes-unevenly',            label: 'Bakes Unevenly',             priceRange: r(200, 320) },
       { id: 'self-clean-door-locked',    label: 'Self-Clean Door Locked',     priceRange: r(150, 250) },
-      { id: 'control-board-error-codes', label: 'Control Board / Error Codes', priceRange: r(240, 380) },
-    ],
+      { id: 'control-board-error-codes', label: 'Control Board / Error Codes', priceRange: r(240, 380) }
+    ]
   },
 
   'washer': {
@@ -386,8 +386,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'wont-spin-or-agitate',    label: "Won't Spin or Agitate",   priceRange: r(170, 300) },
       { id: 'water-leaking',           label: 'Water Leaking',           priceRange: r(170, 300) },
       { id: 'door-lock-latch-failure', label: 'Door Lock / Latch Failure', priceRange: r(130, 230) },
-      { id: 'control-board-issues',    label: 'Control Board Issues',    priceRange: r(220, 350) },
-    ],
+      { id: 'control-board-issues',    label: 'Control Board Issues',    priceRange: r(220, 350) }
+    ]
   },
 
   'wine-cellar-cooling': {
@@ -402,8 +402,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'temperature-drift',        label: 'Temperature Drift',         priceRange: r(200, 400) },
       { id: 'refrigerant-charge-issue', label: 'Refrigerant Charge Issue',  priceRange: r(380, 650) },
       { id: 'condenser-fouling',        label: 'Condenser Fouling',         priceRange: r(200, 400) },
-      { id: 'compressor-not-running',   label: 'Compressor Not Running',    priceRange: r(380, 650) },
-    ],
+      { id: 'compressor-not-running',   label: 'Compressor Not Running',    priceRange: r(380, 650) }
+    ]
   },
 
   'wine-cellar': {
@@ -418,8 +418,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'humidity-dropping-below-50',  label: 'Humidity Dropping Below 50%', priceRange: r(330, 550) },
       { id: 'humidity-climbing-above-75',  label: 'Humidity Climbing Above 75%', priceRange: r(330, 550) },
       { id: 'compressor-short-cycling',    label: 'Compressor Short-Cycling',    priceRange: r(410, 650) },
-      { id: 'evaporator-fan-failure',      label: 'Evaporator Fan Failure',      priceRange: r(250, 430) },
-    ],
+      { id: 'evaporator-fan-failure',      label: 'Evaporator Fan Failure',      priceRange: r(250, 430) }
+    ]
   },
 
   'wine-cooler': {
@@ -433,8 +433,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'not-cooling-thermoelectric-units', label: 'Not Cooling (Thermoelectric Units)', priceRange: r(200, 320) },
       { id: 'uneven-cooling-between-zones',     label: 'Uneven Cooling Between Zones',      priceRange: r(160, 270) },
       { id: 'temperature-fluctuation',          label: 'Temperature Fluctuation',           priceRange: r(160, 270) },
-      { id: 'door-seal-deterioration',          label: 'Door Seal Deterioration',           priceRange: r(120, 210) },
-    ],
+      { id: 'door-seal-deterioration',          label: 'Door Seal Deterioration',           priceRange: r(120, 210) }
+    ]
   },
 
   // ──────────────── COMMERCIAL (18) ────────────────
@@ -450,8 +450,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'temperature-inconsistent-or-drifting', label: 'Temperature Inconsistent or Drifting', priceRange: r(220, 410) },
       { id: 'ice-forming-inside-the-unit',         label: 'Ice Forming Inside the Unit',         priceRange: r(220, 410) },
       { id: 'noisy-operation',                     label: 'Noisy Operation',                     priceRange: r(220, 410) },
-      { id: 'kegerator-not-holding-temperature',   label: 'Kegerator Not Holding Temperature',   priceRange: r(290, 500) },
-    ],
+      { id: 'kegerator-not-holding-temperature',   label: 'Kegerator Not Holding Temperature',   priceRange: r(290, 500) }
+    ]
   },
 
   'comm-dishwasher': {
@@ -465,8 +465,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'not-reaching-sanitizing-temperature', label: 'Not Reaching Sanitizing Temperature', priceRange: r(310, 500) },
       { id: 'not-draining',                        label: 'Not Draining',                        priceRange: r(180, 320) },
       { id: 'leaking',                             label: 'Leaking',                             priceRange: r(240, 420) },
-      { id: 'chemical-dispenser-failure',          label: 'Chemical Dispenser Failure',          priceRange: r(180, 320) },
-    ],
+      { id: 'chemical-dispenser-failure',          label: 'Chemical Dispenser Failure',          priceRange: r(180, 320) }
+    ]
   },
 
   'comm-dryer': {
@@ -480,8 +480,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'slow-drying-takes-multiple-cycles',  label: 'Slow Drying / Takes Multiple Cycles',   priceRange: r(210, 380) },
       { id: 'overheating-burning-smell',          label: 'Overheating / Burning Smell',           priceRange: r(150, 290) },
       { id: 'drum-not-turning',                   label: 'Drum Not Turning',                      priceRange: r(210, 380) },
-      { id: 'wont-start',                         label: "Won't Start",                           priceRange: r(150, 290) },
-    ],
+      { id: 'wont-start',                         label: "Won't Start",                           priceRange: r(150, 290) }
+    ]
   },
 
   'exhaust-hood': {
@@ -496,8 +496,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'weak-airflow-reduced-capture',     label: 'Weak Airflow / Reduced Capture',     priceRange: r(250, 530) },
       { id: 'excessive-noise-vibration',        label: 'Excessive Noise / Vibration',        priceRange: r(250, 530) },
       { id: 'hood-running-constantly-wont-turn-off', label: "Hood Running Constantly / Won't Turn Off", priceRange: r(150, 380) },
-      { id: 'grease-dripping-leaking',          label: 'Grease Dripping / Leaking',          priceRange: r(150, 380) },
-    ],
+      { id: 'grease-dripping-leaking',          label: 'Grease Dripping / Leaking',          priceRange: r(150, 380) }
+    ]
   },
 
   'comm-freezer': {
@@ -511,8 +511,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'compressor-running-constantly',     label: 'Compressor Running Constantly',       priceRange: r(330, 550) },
       { id: 'ice-buildup-on-evaporator',         label: 'Ice Buildup on Evaporator',           priceRange: r(250, 460) },
       { id: 'door-gasket-failure',               label: 'Door Gasket Failure',                 priceRange: r(180, 350) },
-      { id: 'not-starting-dead-unit',            label: 'Not Starting / Dead Unit',            priceRange: r(330, 550) },
-    ],
+      { id: 'not-starting-dead-unit',            label: 'Not Starting / Dead Unit',            priceRange: r(330, 550) }
+    ]
   },
 
   'fryer': {
@@ -526,8 +526,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'temperature-not-holding-cycling-off-early',    label: 'Temperature Not Holding / Cycling Off Early', priceRange: r(220, 410) },
       { id: 'pilot-light-wont-stay-lit',                    label: "Pilot Light Won't Stay Lit",                 priceRange: r(150, 310) },
       { id: 'drain-valve-not-working',                      label: 'Drain Valve Not Working',                    priceRange: r(150, 310) },
-      { id: 'recovery-time-too-slow',                       label: 'Recovery Time Too Slow',                     priceRange: r(220, 410) },
-    ],
+      { id: 'recovery-time-too-slow',                       label: 'Recovery Time Too Slow',                     priceRange: r(220, 410) }
+    ]
   },
 
   'ice-machine': {
@@ -541,8 +541,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'slow-ice-production-low-output',  label: 'Slow Ice Production / Low Output', priceRange: r(240, 420) },
       { id: 'harvest-cycle-failure',           label: 'Harvest Cycle Failure',           priceRange: r(240, 420) },
       { id: 'dirty-cloudy-or-off-tasting-ice', label: 'Dirty, Cloudy, or Off-Tasting Ice', priceRange: r(180, 320) },
-      { id: 'machine-overheating-shutting-down', label: 'Machine Overheating / Shutting Down', priceRange: r(310, 500) },
-    ],
+      { id: 'machine-overheating-shutting-down', label: 'Machine Overheating / Shutting Down', priceRange: r(310, 500) }
+    ]
   },
 
   'comm-laundry': {
@@ -557,8 +557,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'washer-not-draining',         label: 'Washer Not Draining',         priceRange: r(180, 320) },
       { id: 'dryer-not-heating',           label: 'Dryer Not Heating',           priceRange: r(310, 500) },
       { id: 'machine-wont-start',          label: "Machine Won't Start",         priceRange: r(180, 320) },
-      { id: 'excessive-vibration-or-noise', label: 'Excessive Vibration or Noise', priceRange: r(240, 420) },
-    ],
+      { id: 'excessive-vibration-or-noise', label: 'Excessive Vibration or Noise', priceRange: r(240, 420) }
+    ]
   },
 
   'comm-oven': {
@@ -572,8 +572,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'uneven-cooking-hot-spots',                  label: 'Uneven Cooking / Hot Spots',                  priceRange: r(250, 460) },
       { id: 'pilot-light-wont-stay-lit',                 label: "Pilot Light Won't Stay Lit",                  priceRange: r(180, 350) },
       { id: 'temperature-fluctuation-inconsistent-heat', label: 'Temperature Fluctuation / Inconsistent Heat', priceRange: r(250, 460) },
-      { id: 'control-board-fault',                       label: 'Control Board Fault',                         priceRange: r(330, 550) },
-    ],
+      { id: 'control-board-fault',                       label: 'Control Board Fault',                         priceRange: r(330, 550) }
+    ]
   },
 
   'pizza-oven-comm': {
@@ -588,8 +588,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'wont-light-no-ignition',     label: "Won't Light / No Ignition",  priceRange: r(350, 530) },
       { id: 'uneven-deck-temperature',    label: 'Uneven Deck Temperature',    priceRange: r(430, 650) },
       { id: 'conveyor-belt-stopped-moving', label: 'Conveyor Belt Stopped Moving', priceRange: r(430, 650) },
-      { id: 'control-board-failure',      label: 'Control Board Failure',      priceRange: r(510, 750) },
-    ],
+      { id: 'control-board-failure',      label: 'Control Board Failure',      priceRange: r(510, 750) }
+    ]
   },
 
   'refrigeration-hub': {
@@ -604,8 +604,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'not-holding-temperature',       label: 'Not Holding Temperature',       priceRange: r(510, 900) },
       { id: 'excessive-frost-ice-buildup',   label: 'Excessive Frost / Ice Buildup', priceRange: r(380, 740) },
       { id: 'compressor-running-constantly', label: 'Compressor Running Constantly', priceRange: r(510, 900) },
-      { id: 'unusual-noise',                 label: 'Unusual Noise',                 priceRange: r(380, 740) },
-    ],
+      { id: 'unusual-noise',                 label: 'Unusual Noise',                 priceRange: r(380, 740) }
+    ]
   },
 
   'comm-fridge': {
@@ -619,8 +619,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'temperature-fluctuation',           label: 'Temperature Fluctuation',          priceRange: r(250, 460) },
       { id: 'frost-ice-buildup-on-evaporator',   label: 'Frost / Ice Buildup on Evaporator', priceRange: r(250, 460) },
       { id: 'evaporator-condenser-fan-failure',  label: 'Evaporator & Condenser Fan Failure', priceRange: r(180, 350) },
-      { id: 'compressor-failure',                label: 'Compressor Failure',               priceRange: r(330, 550) },
-    ],
+      { id: 'compressor-failure',                label: 'Compressor Failure',               priceRange: r(330, 550) }
+    ]
   },
 
   'showcase-fridge': {
@@ -634,8 +634,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'temperature-not-holding',      label: 'Temperature Not Holding',         priceRange: r(310, 550) },
       { id: 'lighting-failure-flickering',  label: 'Lighting Failure / Flickering',   priceRange: r(150, 330) },
       { id: 'door-gasket-failure',          label: 'Door Gasket Failure',             priceRange: r(150, 330) },
-      { id: 'uneven-temperatures-hot-spots', label: 'Uneven Temperatures / Hot Spots', priceRange: r(230, 450) },
-    ],
+      { id: 'uneven-temperatures-hot-spots', label: 'Uneven Temperatures / Hot Spots', priceRange: r(230, 450) }
+    ]
   },
 
   'slushie': {
@@ -649,8 +649,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'product-not-cold-enough-too-liquid',  label: 'Product Not Cold Enough / Too Liquid', priceRange: r(290, 500) },
       { id: 'wont-dispense-slow-flow',             label: "Won't Dispense / Slow Flow",           priceRange: r(150, 310) },
       { id: 'machine-not-running',                 label: 'Machine Not Running',                  priceRange: r(290, 500) },
-      { id: 'leaking-product-dripping',            label: 'Leaking / Product Dripping',           priceRange: r(220, 410) },
-    ],
+      { id: 'leaking-product-dripping',            label: 'Leaking / Product Dripping',           priceRange: r(220, 410) }
+    ]
   },
 
   'comm-stove': {
@@ -664,8 +664,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'weak-or-yellow-flame',              label: 'Weak or Yellow Flame',               priceRange: r(220, 410) },
       { id: 'pilot-light-wont-stay-lit',         label: "Pilot Light Won't Stay Lit",         priceRange: r(150, 310) },
       { id: 'burner-ignites-then-goes-out',      label: 'Burner Ignites Then Goes Out',       priceRange: r(220, 410) },
-      { id: 'uneven-heat-one-section-not-working', label: 'Uneven Heat / One Section Not Working', priceRange: r(290, 500) },
-    ],
+      { id: 'uneven-heat-one-section-not-working', label: 'Uneven Heat / One Section Not Working', priceRange: r(290, 500) }
+    ]
   },
 
   'walk-in-cooler': {
@@ -679,8 +679,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'excessive-ice-frost-buildup',   label: 'Excessive Ice / Frost Buildup',   priceRange: r(280, 500) },
       { id: 'compressor-running-constantly', label: 'Compressor Running Constantly',   priceRange: r(360, 600) },
       { id: 'water-on-the-floor-inside',     label: 'Water on the Floor Inside',       priceRange: r(200, 380) },
-      { id: 'door-wont-seal-frozen-shut',    label: "Door Won't Seal / Frozen Shut",   priceRange: r(200, 380) },
-    ],
+      { id: 'door-wont-seal-frozen-shut',    label: "Door Won't Seal / Frozen Shut",   priceRange: r(200, 380) }
+    ]
   },
 
   'walk-in-freezer': {
@@ -694,8 +694,8 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'floor-ice-buildup',                           label: 'Floor Ice Buildup',                            priceRange: r(340, 590) },
       { id: 'evaporator-coils-completely-frozen-over',     label: 'Evaporator Coils Completely Frozen Over',      priceRange: r(340, 590) },
       { id: 'door-wont-open-frozen-shut',                  label: "Door Won't Open / Frozen Shut",                priceRange: r(250, 450) },
-      { id: 'compressor-running-constantly',               label: 'Compressor Running Constantly',                priceRange: r(430, 700) },
-    ],
+      { id: 'compressor-running-constantly',               label: 'Compressor Running Constantly',                priceRange: r(430, 700) }
+    ]
   },
 
   'comm-washer': {
@@ -709,9 +709,9 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'not-spinning-weak-spin',      label: 'Not Spinning / Weak Spin',     priceRange: r(240, 420) },
       { id: 'water-leaking',               label: 'Water Leaking',                priceRange: r(240, 420) },
       { id: 'wont-start-dead-machine',     label: "Won't Start / Dead Machine",   priceRange: r(310, 500) },
-      { id: 'excessive-noise-vibration',   label: 'Excessive Noise / Vibration',  priceRange: r(240, 420) },
-    ],
-  },
+      { id: 'excessive-noise-vibration',   label: 'Excessive Noise / Vibration',  priceRange: r(240, 420) }
+    ]
+  }
 };
 
 /** Unit ids per category, alphabetical by display label. */
@@ -741,7 +741,7 @@ export const UNITS_BY_CATEGORY: Record<ServiceType, string[]> = {
     'washer',
     'wine-cellar-cooling',
     'wine-cellar',
-    'wine-cooler',
+    'wine-cooler'
   ],
   commercial: [
     'bar-fridge',
@@ -761,6 +761,6 @@ export const UNITS_BY_CATEGORY: Record<ServiceType, string[]> = {
     'comm-stove',
     'walk-in-cooler',
     'walk-in-freezer',
-    'comm-washer',
-  ],
+    'comm-washer'
+  ]
 };

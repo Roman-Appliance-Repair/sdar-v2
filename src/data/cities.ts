@@ -40,7 +40,7 @@ export const COUNTIES: Record<CountySlug, { name: string; hubUrl: string }> = {
   'orange':         { name: 'Orange County',          hubUrl: '/orange-county/' },
   'ventura':        { name: 'Ventura County',         hubUrl: '/ventura-county/' },
   'san-bernardino': { name: 'San Bernardino County',  hubUrl: '/san-bernardino-county/' },
-  'riverside':      { name: 'Riverside County',       hubUrl: '/riverside-county/' },
+  'riverside':      { name: 'Riverside County',       hubUrl: '/riverside-county/' }
 };
 
 export const CITIES: City[] = [
@@ -130,7 +130,7 @@ export const CITIES: City[] = [
   { slug: 'westlake-village',     name: 'Westlake Village',     county: 'ventura',        primaryBranch: 'thousand-oaks' },
   { slug: 'westwood',             name: 'Westwood',             county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'woodland-hills',       name: 'Woodland Hills',       county: 'los-angeles',    primaryBranch: 'los-angeles' },
-  { slug: 'yorba-linda',          name: 'Yorba Linda',          county: 'orange',         primaryBranch: 'irvine' },
+  { slug: 'yorba-linda',          name: 'Yorba Linda',          county: 'orange',         primaryBranch: 'irvine' }
 ];
 
 export function getCityBySlug(slug: string): City | undefined {

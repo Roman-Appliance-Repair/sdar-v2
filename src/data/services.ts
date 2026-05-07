@@ -42,8 +42,8 @@ export const services: Service[] = [
       'Refrigerator making noise',
       'Ice maker not working',
       'Refrigerator compressor failure',
-      'Door seal not sealing',
-    ],
+      'Door seal not sealing'
+    ]
   },
   {
     slug: 'washer-repair',
@@ -61,8 +61,8 @@ export const services: Service[] = [
       'Washer leaking water',
       'Washer making loud noise',
       'Washer door not opening',
-      'Washer not starting',
-    ],
+      'Washer not starting'
+    ]
   },
   {
     slug: 'dryer-repair',
@@ -80,8 +80,8 @@ export const services: Service[] = [
       'Dryer taking too long to dry',
       'Dryer making noise',
       'Dryer stops mid-cycle',
-      'Gas dryer not igniting',
-    ],
+      'Gas dryer not igniting'
+    ]
   },
   {
     slug: 'oven-repair',
@@ -99,8 +99,8 @@ export const services: Service[] = [
       'Oven igniter not working',
       'Oven door not closing',
       'Oven not self-cleaning',
-      'Control panel not responding',
-    ],
+      'Control panel not responding'
+    ]
   },
   {
     slug: 'dishwasher-repair',
@@ -118,8 +118,8 @@ export const services: Service[] = [
       'Dishwasher leaking',
       'Dishwasher not starting',
       'Dishwasher making noise',
-      'Dishwasher leaving residue',
-    ],
+      'Dishwasher leaving residue'
+    ]
   },
 
   // --- Tier 2 ---
@@ -138,8 +138,8 @@ export const services: Service[] = [
       'Freezer frost buildup',
       'Freezer making noise',
       'Freezer door seal broken',
-      'Freezer temperature fluctuating',
-    ],
+      'Freezer temperature fluctuating'
+    ]
   },
   {
     slug: 'stove-repair',
@@ -156,8 +156,8 @@ export const services: Service[] = [
       'Igniter clicking continuously',
       'Gas burner not lighting',
       'Electric coil not heating',
-      'Control knob broken',
-    ],
+      'Control knob broken'
+    ]
   },
   {
     slug: 'wine-cooler-repair',
@@ -174,8 +174,8 @@ export const services: Service[] = [
       'Wine cooler temperature too warm',
       'Wine cooler compressor not working',
       'Wine cooler making noise',
-      'Wine cooler door seal broken',
-    ],
+      'Wine cooler door seal broken'
+    ]
   },
   {
     slug: 'cooktop-repair',
@@ -192,8 +192,8 @@ export const services: Service[] = [
       'Cooktop sparking',
       'Cooktop not heating evenly',
       'Glass cooktop cracked',
-      'Control panel not responding',
-    ],
+      'Control panel not responding'
+    ]
   },
   {
     slug: 'microwave-repair',
@@ -210,8 +210,8 @@ export const services: Service[] = [
       'Microwave sparking inside',
       'Turntable not spinning',
       'Microwave display not working',
-      'Microwave door not closing',
-    ],
+      'Microwave door not closing'
+    ]
   },
 
   // --- Tier 3 ---
@@ -229,8 +229,8 @@ export const services: Service[] = [
       'Range hood fan not working',
       'Range hood lights not working',
       'Range hood making noise',
-      'Range hood motor failure',
-    ],
+      'Range hood motor failure'
+    ]
   },
   {
     slug: 'fireplace-repair',
@@ -246,8 +246,8 @@ export const services: Service[] = [
       'Gas fireplace not igniting',
       'Pilot light keeps going out',
       'Fireplace thermostat not working',
-      'Fireplace remote not responding',
-    ],
+      'Fireplace remote not responding'
+    ]
   },
   {
     slug: 'bbq-grill-repair',
@@ -263,8 +263,8 @@ export const services: Service[] = [
       'BBQ igniter not working',
       'Burner not lighting',
       'Uneven heat distribution',
-      'Gas leak suspected',
-    ],
+      'Gas leak suspected'
+    ]
   },
   {
     slug: 'wine-cellar-repair',
@@ -280,8 +280,8 @@ export const services: Service[] = [
       'Wine cellar not cooling',
       'Humidity control not working',
       'Cooling unit making noise',
-      'Temperature fluctuating',
-    ],
+      'Temperature fluctuating'
+    ]
   },
   {
     slug: 'induction-cooktop-repair',
@@ -297,8 +297,8 @@ export const services: Service[] = [
       'Induction cooktop not detecting cookware',
       'Induction zone not heating',
       'Error code on display',
-      'Control panel not responding',
-    ],
+      'Control panel not responding'
+    ]
   },
 
   // =========================================================================
@@ -321,8 +321,8 @@ export const services: Service[] = [
       'Temperature not holding',
       'Compressor failure',
       'Door gasket broken',
-      'Evaporator fan not working',
-    ],
+      'Evaporator fan not working'
+    ]
   },
   {
     slug: 'walk-in-cooler-repair',
@@ -340,8 +340,8 @@ export const services: Service[] = [
       'Compressor not working',
       'Evaporator coil iced over',
       'Door not sealing',
-      'Walk-in cooler leaking',
-    ],
+      'Walk-in cooler leaking'
+    ]
   },
   {
     slug: 'walk-in-freezer-repair',
@@ -358,8 +358,8 @@ export const services: Service[] = [
       'Temperature fluctuating',
       'Frost buildup on coils',
       'Compressor failure',
-      'Door heater not working',
-    ],
+      'Door heater not working'
+    ]
   },
   {
     slug: 'ice-machine-repair',
@@ -376,8 +376,8 @@ export const services: Service[] = [
       'Ice machine making too little ice',
       'Ice machine leaking water',
       'Ice machine making cloudy ice',
-      'Ice machine not harvesting',
-    ],
+      'Ice machine not harvesting'
+    ]
   },
 
   // --- Tier 2 ---
@@ -395,8 +395,8 @@ export const services: Service[] = [
       'Commercial freezer not freezing',
       'Temperature too warm',
       'Frost buildup',
-      'Compressor not working',
-    ],
+      'Compressor not working'
+    ]
   },
   {
     slug: 'oven-repair',
@@ -413,8 +413,8 @@ export const services: Service[] = [
       'Temperature inaccurate',
       'Igniter not working',
       'Convection fan not working',
-      'Control board failure',
-    ],
+      'Control board failure'
+    ]
   },
   {
     slug: 'dishwasher-repair',
@@ -431,8 +431,8 @@ export const services: Service[] = [
       'Not reaching sanitize temperature',
       'Not draining',
       'Low water pressure',
-      'Door latch broken',
-    ],
+      'Door latch broken'
+    ]
   },
   {
     slug: 'laundry-repair',
@@ -448,8 +448,8 @@ export const services: Service[] = [
       'Commercial washer not spinning',
       'Commercial dryer not heating',
       'Coin mechanism not working',
-      'Control board failure',
-    ],
+      'Control board failure'
+    ]
   },
 
   // --- Tier 3 ---
@@ -467,8 +467,8 @@ export const services: Service[] = [
       'Commercial washer not spinning',
       'Not draining',
       'Leaking',
-      'Not starting',
-    ],
+      'Not starting'
+    ]
   },
   {
     slug: 'dryer-repair',
@@ -484,8 +484,8 @@ export const services: Service[] = [
       'Commercial dryer not heating',
       'Not spinning',
       'Taking too long',
-      'Making noise',
-    ],
+      'Making noise'
+    ]
   },
   {
     slug: 'stove-repair',
@@ -501,8 +501,8 @@ export const services: Service[] = [
       'Burner not lighting',
       'Pilot light out',
       'Gas valve failure',
-      'Burner flame too low',
-    ],
+      'Burner flame too low'
+    ]
   },
   {
     slug: 'slushie-machine-repair',
@@ -518,8 +518,8 @@ export const services: Service[] = [
       'Slushie machine not freezing',
       'Auger not turning',
       'Machine leaking',
-      'Product too watery',
-    ],
+      'Product too watery'
+    ]
   },
   {
     slug: 'showcase-refrigerator-repair',
@@ -535,8 +535,8 @@ export const services: Service[] = [
       'Showcase fridge not cooling',
       'Glass door fogging up',
       'Lighting not working',
-      'Door heater failure',
-    ],
+      'Door heater failure'
+    ]
   },
   {
     slug: 'bar-refrigerator-repair',
@@ -552,8 +552,8 @@ export const services: Service[] = [
       'Bar fridge not cooling',
       'Kegerator not maintaining temperature',
       'CO2 system issues',
-      'Door gasket broken',
-    ],
+      'Door gasket broken'
+    ]
   },
   {
     slug: 'fryer-repair',
@@ -569,9 +569,9 @@ export const services: Service[] = [
       'Fryer not heating to temperature',
       'Thermostat not working',
       'Gas valve failure',
-      'Heating element burned out',
-    ],
-  },
+      'Heating element burned out'
+    ]
+  }
 ];
 
 // ---------------------------------------------------------------------------

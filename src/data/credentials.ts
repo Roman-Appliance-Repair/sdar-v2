@@ -33,7 +33,7 @@ export const CREDENTIALS: Credential[] = [
   <path d="M32 16L38 22L32 28L26 22L32 16Z" fill="#D4AF37"/>
   <rect x="22" y="30" width="20" height="16" rx="2" stroke="#D4AF37" stroke-width="2"/>
   <path d="M27 38L30 41L37 34" stroke="#C8102E" stroke-width="2" stroke-linecap="round"/>
-</svg>`,
+</svg>`
   },
   {
     id: 'bbb-accredited',
@@ -43,7 +43,7 @@ export const CREDENTIALS: Credential[] = [
     iconSvg: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect x="12" y="16" width="40" height="32" rx="4" stroke="#D4AF37" stroke-width="2"/>
   <text x="32" y="38" text-anchor="middle" font-family="Cinzel" font-size="20" font-weight="700" fill="#D4AF37">A+</text>
-</svg>`,
+</svg>`
   },
   {
     id: 'epa-certified',
@@ -54,7 +54,7 @@ export const CREDENTIALS: Credential[] = [
   <circle cx="32" cy="32" r="28" stroke="#D4AF37" stroke-width="2"/>
   <text x="32" y="36" text-anchor="middle" font-family="Montserrat" font-size="14" font-weight="700" fill="#D4AF37">EPA</text>
   <text x="32" y="50" text-anchor="middle" font-family="Montserrat" font-size="10" fill="#888888">608</text>
-</svg>`,
+</svg>`
   },
   {
     id: 'insured',
@@ -64,7 +64,7 @@ export const CREDENTIALS: Credential[] = [
     iconSvg: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M32 12L44 18V32C44 42 32 52 32 52C32 52 20 42 20 32V18L32 12Z" stroke="#D4AF37" stroke-width="2" fill="none"/>
   <path d="M27 32L30 35L37 28" stroke="#C8102E" stroke-width="2" stroke-linecap="round"/>
-</svg>`,
+</svg>`
   },
   {
     id: 'licensed',
@@ -75,7 +75,7 @@ export const CREDENTIALS: Credential[] = [
   <rect x="16" y="20" width="32" height="24" rx="2" stroke="#D4AF37" stroke-width="2"/>
   <circle cx="32" cy="28" r="4" stroke="#D4AF37" stroke-width="2"/>
   <text x="32" y="42" text-anchor="middle" font-family="Montserrat" font-size="8" fill="#888888">BHGS</text>
-</svg>`,
+</svg>`
   },
   {
     id: 'oem-parts',
@@ -85,7 +85,7 @@ export const CREDENTIALS: Credential[] = [
     iconSvg: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect x="20" y="16" width="24" height="32" rx="2" stroke="#D4AF37" stroke-width="2"/>
   <path d="M26 24H38M26 32H38M26 40H34" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
-</svg>`,
+</svg>`
   },
   {
     id: 'osha-certified',
@@ -95,7 +95,7 @@ export const CREDENTIALS: Credential[] = [
     iconSvg: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <path d="M32 14L42 20L42 34L32 40L22 34L22 20L32 14Z" stroke="#D4AF37" stroke-width="2" fill="none"/>
   <text x="32" y="32" text-anchor="middle" font-family="Montserrat" font-size="10" font-weight="700" fill="#D4AF37">OSHA</text>
-</svg>`,
+</svg>`
   },
   {
     id: 'same-day-service',
@@ -105,6 +105,6 @@ export const CREDENTIALS: Credential[] = [
     iconSvg: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <circle cx="32" cy="32" r="20" stroke="#D4AF37" stroke-width="2"/>
   <path d="M32 20V32L40 36" stroke="#C8102E" stroke-width="2" stroke-linecap="round"/>
-</svg>`,
-  },
+</svg>`
+  }
 ];

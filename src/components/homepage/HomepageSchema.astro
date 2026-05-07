@@ -24,7 +24,7 @@ import {
   BRANCHES,
   MAIN_PHONE,
   milesToMeters,
-  type Branch,
+  type Branch
 } from '../../data/branches';
 import { HOMEPAGE_FAQ } from '../../data/faq';
 
@@ -77,17 +77,17 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
       '@type': 'OpeningHoursSpecification',
       dayOfWeek: hoursDaysToArray(branch.hours.days),
       opens: branch.hours.open,
-      closes: branch.hours.close,
+      closes: branch.hours.close
     }],
     areaServed: branch.citiesServed.map(citySlug => ({
       '@type': 'City',
       name: slugToTitle(citySlug),
       containedInPlace: {
         '@type': 'AdministrativeArea',
-        name: countyTitle(branch.primaryCounty),
-      },
+        name: countyTitle(branch.primaryCounty)
+      }
     })),
-    parentOrganization: { '@id': ORG_ID },
+    parentOrganization: { '@id': ORG_ID }
   };
 
   // physical_pin: full address + root geo
@@ -98,13 +98,13 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
       addressLocality: branch.address.city,
       addressRegion: branch.address.state,
       postalCode: branch.address.zip,
-      addressCountry: 'US',
+      addressCountry: 'US'
     };
     if (typeof branch.address.lat === 'number' && typeof branch.address.lng === 'number') {
       base.geo = {
         '@type': 'GeoCoordinates',
         latitude: branch.address.lat,
-        longitude: branch.address.lng,
+        longitude: branch.address.lng
       };
     }
   }
@@ -116,9 +116,9 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
       geoMidpoint: {
         '@type': 'GeoCoordinates',
         latitude: branch.geo.cityCenterLat,
-        longitude: branch.geo.cityCenterLng,
+        longitude: branch.geo.cityCenterLng
       },
-      geoRadius: milesToMeters(branch.geo.serviceRadius).toString(),
+      geoRadius: milesToMeters(branch.geo.serviceRadius).toString()
     };
   }
 
@@ -146,20 +146,20 @@ const graph: Array<Record<string, unknown>> = [
       '@type': 'ImageObject',
       url: `${SITE_URL}/logo.png`,
       width: 512,
-      height: 512,
+      height: 512
     },
     sameAs: [
       'https://share.google/MZH7ZdnIWHiAp8Zm3',
       'https://share.google/dBFQdBNMTF9W7og21',
-      'https://share.google/DXrnBNy1purtECJTu',
+      'https://share.google/DXrnBNy1purtECJTu'
     ],
     contactPoint: [{
       '@type': 'ContactPoint',
       telephone: phoneE164(MAIN_PHONE),
       contactType: 'customer service',
       areaServed: 'US-CA',
-      availableLanguage: ['en'],
-    }],
+      availableLanguage: ['en']
+    }]
   },
 
   // 2. WebSite
@@ -169,7 +169,7 @@ const graph: Array<Record<string, unknown>> = [
     url: SITE_URL,
     name: 'Same Day Appliance Repair',
     publisher: { '@id': ORG_ID },
-    inLanguage: 'en-US',
+    inLanguage: 'en-US'
   },
 
   // 3. WebPage
@@ -185,8 +185,8 @@ const graph: Array<Record<string, unknown>> = [
     about: { '@id': ORG_ID },
     primaryImageOfPage: {
       '@type': 'ImageObject',
-      url: `${SITE_URL}/og-homepage.jpg`,
-    },
+      url: `${SITE_URL}/og-homepage.jpg`
+    }
   },
 
   // 4-11. LocalBusiness × 8 (1 physical_pin + 7 service_area)
@@ -205,15 +205,15 @@ const graph: Array<Record<string, unknown>> = [
       name: item.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: item.answer,
-      },
-    })),
-  },
+        text: item.answer
+      }
+    }))
+  }
 ];
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@graph': graph,
+  '@graph': graph
 };
 ---
 

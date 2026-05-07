@@ -26,7 +26,7 @@ export const PRICING_TIERS: PricingTier[] = [
     diagnosticFee: 89,
     waivedNote: 'Waived with repair',
     examples:
-      'Refrigerator compressor: $450–$850 · Washer pump: $250–$400 · Wolf RTD probe: $180–$280 · Bosch drain hose: $140–$220 · Sub-Zero coil cleaning: $180–$280 · Range igniter: $150–$240 · Dishwasher control board: $280–$440',
+      'Refrigerator compressor: $450–$850 · Washer pump: $250–$400 · Wolf RTD probe: $180–$280 · Bosch drain hose: $140–$220 · Sub-Zero coil cleaning: $180–$280 · Range igniter: $150–$240 · Dishwasher control board: $280–$440'
   },
   {
     id: 'commercial',
@@ -34,15 +34,15 @@ export const PRICING_TIERS: PricingTier[] = [
     diagnosticFee: 120,
     waivedNote: 'Waived with repair',
     examples:
-      'Walk-in cooler compressor: $1,200–$2,500 · Ice machine pump: $400–$700 · Hobart dishwasher heater: $480–$780 · Pizza oven conveyor: $360–$580 · Commercial fryer thermostat: $240–$420 · Vulcan range gas valve: $320–$520',
-  },
+      'Walk-in cooler compressor: $1,200–$2,500 · Ice machine pump: $400–$700 · Hobart dishwasher heater: $480–$780 · Pizza oven conveyor: $360–$580 · Commercial fryer thermostat: $240–$420 · Vulcan range gas valve: $320–$520'
+  }
 ];
 
 export const PRICING_BULLETS: string[] = [
   'All repairs include OEM parts — no aftermarket or refurbished components',
   '90-day warranty on parts and labor — same issue returns, we come back free',
   'Upfront written quote before work begins — no surprise charges',
-  'No distance surcharge within branch territory — what we quote is what you pay',
+  'No distance surcharge within branch territory — what we quote is what you pay'
 ];
 
 export const PRICING_FOOTNOTE =
