@@ -124,7 +124,7 @@ export const BRANCHES: Branch[] = [
       cityCenterLng: -118.3617,
       serviceRadius: 10
     },
-    hours: { days: 'Mon-Sun', open: '08:00', close: '20:00' },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'los-angeles',
     citiesServed: [
       'west-hollywood',
@@ -157,7 +157,7 @@ export const BRANCHES: Branch[] = [
       cityCenterLng: -118.4004,
       serviceRadius: 8
     },
-    hours: { days: 'Mon-Sun', open: '08:00', close: '20:00' },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'los-angeles',
     citiesServed: [
       'beverly-hills'
@@ -185,7 +185,7 @@ export const BRANCHES: Branch[] = [
       cityCenterLng: -118.2437,
       serviceRadius: 25
     },
-    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'los-angeles',
     citiesServed: [
       'los-angeles',
@@ -251,7 +251,7 @@ export const BRANCHES: Branch[] = [
       cityCenterLng: -118.1445,
       serviceRadius: 20
     },
-    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'los-angeles',
     citiesServed: [
       'pasadena',
@@ -299,7 +299,7 @@ export const BRANCHES: Branch[] = [
       cityCenterLng: -118.8376,
       serviceRadius: 25
     },
-    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'ventura',
     citiesServed: [
       'thousand-oaks',
@@ -341,7 +341,7 @@ export const BRANCHES: Branch[] = [
       cityCenterLng: -117.8265,
       serviceRadius: 25
     },
-    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'orange',
     citiesServed: [
       'irvine',
@@ -385,7 +385,7 @@ export const BRANCHES: Branch[] = [
       cityCenterLng: -117.5931,
       serviceRadius: 25
     },
-    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'san-bernardino',
     citiesServed: [
       'rancho-cucamonga',
@@ -421,7 +421,7 @@ export const BRANCHES: Branch[] = [
       cityCenterLng: -117.1484,
       serviceRadius: 30
     },
-    hours: { days: 'Mon-Sun', open: '07:00', close: '21:00' },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'riverside',
     citiesServed: [
       'temecula',
