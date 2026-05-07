@@ -442,7 +442,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'bar-fridge': {
     id: 'bar-fridge',
     label: 'Bar Refrigerator',
-    href: '/commercial/bar-refrigerator-repair/',
+    href: '/commercial/refrigeration/undercounter-refrigerator-repair/',
     category: 'commercial',
     pageRange: r(150, 500),
     issues: [
@@ -472,7 +472,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'comm-dryer': {
     id: 'comm-dryer',
     label: 'Dryer Repair',
-    href: '/commercial/dryer-repair/',
+    href: '/commercial/',
     category: 'commercial',
     pageRange: r(150, 450),
     issues: [
@@ -503,7 +503,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'comm-freezer': {
     id: 'comm-freezer',
     label: 'Freezer Repair',
-    href: '/commercial/freezer-repair/',
+    href: '/commercial/refrigeration/reach-in-freezer-repair/',
     category: 'commercial',
     pageRange: r(180, 550),
     issues: [
@@ -533,7 +533,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'ice-machine': {
     id: 'ice-machine',
     label: 'Ice Machine Repair',
-    href: '/commercial/ice-machine-repair/',
+    href: '/commercial/ice-machines/',
     category: 'commercial',
     pageRange: r(180, 500),
     issues: [
@@ -595,7 +595,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'refrigeration-hub': {
     id: 'refrigeration-hub',
     label: 'Refrigeration Hub',
-    href: '/commercial/refrigeration-hub/',
+    href: '/commercial/refrigeration/',
     category: 'commercial',
     pageRange: r(250, 900),
     sparse: true,
@@ -626,7 +626,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'showcase-fridge': {
     id: 'showcase-fridge',
     label: 'Showcase Refrigerator',
-    href: '/commercial/showcase-refrigerator-repair/',
+    href: '/commercial/refrigeration/display-case-repair/',
     category: 'commercial',
     pageRange: r(150, 550),
     issues: [
@@ -641,7 +641,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'slushie': {
     id: 'slushie',
     label: 'Slushie Machine',
-    href: '/commercial/slushie-machine-repair/',
+    href: '/commercial/ice-machines/soft-serve/',
     category: 'commercial',
     pageRange: r(150, 500),
     issues: [
@@ -671,7 +671,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'walk-in-cooler': {
     id: 'walk-in-cooler',
     label: 'Walk-In Cooler',
-    href: '/commercial/walk-in-cooler-repair/',
+    href: '/commercial/refrigeration/walk-in-cooler-repair/',
     category: 'commercial',
     pageRange: r(200, 600),
     issues: [
@@ -686,7 +686,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'walk-in-freezer': {
     id: 'walk-in-freezer',
     label: 'Walk-In Freezer',
-    href: '/commercial/walk-in-freezer-repair/',
+    href: '/commercial/refrigeration/walk-in-freezer-repair/',
     category: 'commercial',
     pageRange: r(250, 700),
     issues: [

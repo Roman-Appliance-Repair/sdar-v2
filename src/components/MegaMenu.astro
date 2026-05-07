@@ -35,10 +35,22 @@ function toLinks(glob: Record<string, unknown>, hrefPrefix: string) {
     }));
 }
 
-const services    = toLinks(import.meta.glob('../pages/services/*.astro'),    '/services/');
-const commercial  = toLinks(import.meta.glob('../pages/commercial/*.astro'),  '/commercial/');
-const credentials = toLinks(import.meta.glob('../pages/credentials/*.astro'), '/credentials/');
-const forBusiness = toLinks(import.meta.glob('../pages/for-business/*.astro'),'/for-business/');
+// URLs that must be excluded from auto-glob menus because they 301-redirect
+// elsewhere (Wave 32 redirect map). Source .astro file still exists but page
+// is unreachable at this URL — listing it in nav would generate stale links.
+// Wave 40 link-discipline.
+const REDIRECTED_URLS_EXCLUDE_FROM_NAV = new Set([
+  '/commercial/dryer-repair/',
+]);
+
+const services    = toLinks(import.meta.glob('../pages/services/*.astro'),    '/services/')
+  .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
+const commercial  = toLinks(import.meta.glob('../pages/commercial/*.astro'),  '/commercial/')
+  .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
+const credentials = toLinks(import.meta.glob('../pages/credentials/*.astro'), '/credentials/')
+  .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
+const forBusiness = toLinks(import.meta.glob('../pages/for-business/*.astro'),'/for-business/')
+  .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
 // Slugs intentionally excluded from megamenu nav — pages stay live and are
 // reached via internal links from their parent price-list page.
 // Door spring is a sub-variant of /price-list/dishwasher-repair-cost/, not a peer.

@@ -36,9 +36,19 @@ const canonical = `https://samedayappliance.repair/${citySlug}/${serviceSlug}/`;
 
 const brandPool = getBrandPool(cityDesc.tier, serviceDesc);
 
-// Sibling cities served by same branch (for cross-linking)
+// Sibling cities served by same branch (for cross-linking).
+// Only include siblings whose (city, current-service) combo actually exists in
+// CITY_SERVICE_MATRIX — otherwise the link points to a redirected URL (Wave 32
+// catch-all sent missing combos to the city pillar). Wave 40 link-discipline.
+const existingComboCities = new Set(
+  CITY_SERVICE_MATRIX
+    .filter(c => c.service === serviceSlug)
+    .map(c => c.city)
+);
 const siblings = CITIES
-  .filter(c => c.primaryBranch === cityData?.primaryBranch && c.slug !== citySlug)
+  .filter(c => c.primaryBranch === cityData?.primaryBranch
+            && c.slug !== citySlug
+            && existingComboCities.has(c.slug))
   .slice(0, 6);
 
 const title = `${serviceName} ${cityName} | $89 Diagnostic, Same-Day, BHGS Licensed`;
