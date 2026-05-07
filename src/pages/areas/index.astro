@@ -1,67 +1,55 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import CountyMap from '../../components/CountyMap.astro';
+import BranchNAP from '../../components/BranchNAP.astro';
+import { BRANCHES } from '../../data/branches';
+import { CITIES, COUNTIES, type CountySlug } from '../../data/cities';
+
+// County order (rendering top-down)
+const COUNTY_ORDER: CountySlug[] = [
+  'los-angeles',
+  'orange',
+  'ventura',
+  'san-bernardino',
+  'riverside'
+];
+
+// Build county → branch → cities hierarchy from data layer.
+// Each city is uniquely owned by ONE branch (primaryBranch field), so no
+// dedup is needed. Empty-cities branches still render с BranchNAP block.
+const branchesByCounty = COUNTY_ORDER.map((countySlug) => {
+  const county = COUNTIES[countySlug];
+  const branches = BRANCHES.filter((b) => b.primaryCounty === countySlug);
+  const branchSections = branches.map((branch) => {
+    const cities = CITIES
+      .filter((c) => c.primaryBranch === branch.slug)
+      .sort((a, b) => a.name.localeCompare(b.name));
+    return { branch, cities };
+  });
+  const totalCities = branchSections.reduce((sum, s) => sum + s.cities.length, 0);
+  return {
+    countySlug,
+    countyName: county.name,
+    countyHref: county.hubUrl,
+    branchSections,
+    totalCities,
+    branchCount: branches.length
+  };
+});
+
+// Summary cards (top-level "Five counties" block) — derived counts from same data.
+const counties = branchesByCounty.map((c) => ({
+  href: c.countyHref,
+  name: c.countyName,
+  cities: c.totalCities,
+  branches: c.branchCount
+}));
+
+const totalCities = counties.reduce((sum, c) => sum + c.cities, 0);
+const totalBranches = BRANCHES.length;
 
 const title = 'Service Areas';
-const description = 'Same-day appliance repair across LA, OC, Ventura, SB, Riverside. 65+ cities served from 8 branch locations. BHGS #A49573, EPA 608. $89 / $120 dx.';
-
-const counties = [
-  { slug: 'los-angeles-county',     name: 'Los Angeles County',    cities: 26, branches: 3 },
-  { slug: 'orange-county',          name: 'Orange County',         cities: 14, branches: 1 },
-  { slug: 'riverside-county',       name: 'Riverside County',      cities:  8, branches: 1 },
-  { slug: 'san-bernardino-county',  name: 'San Bernardino County', cities:  8, branches: 1 },
-  { slug: 'ventura-county',         name: 'Ventura County',        cities:  9, branches: 1 }
-];
-
-const cityGroups = [
-  {
-    name: 'Los Angeles County',
-    href: '/los-angeles-county/',
-    cities: [
-      'Los Angeles', 'West Hollywood', 'Beverly Hills', 'Santa Monica', 'Pasadena', 'Glendale', 'Burbank',
-      'Brentwood', 'Silver Lake', 'Culver City', 'Manhattan Beach', 'Studio City', 'Sherman Oaks',
-      'Encino', 'Woodland Hills', 'Marina del Rey', 'Redondo Beach', 'Long Beach', 'Koreatown',
-      'Highland Park', 'Atwater Village', 'Eagle Rock', 'Malibu', 'Pacific Palisades', 'Calabasas', 'Los Feliz'
-    ]
-  },
-  {
-    name: 'Orange County',
-    href: '/orange-county/',
-    cities: [
-      'Newport Beach', 'Laguna Beach', 'Irvine', 'Huntington Beach', 'Costa Mesa', 'Anaheim',
-      'Mission Viejo', 'Dana Point', 'Laguna Niguel', 'Yorba Linda', 'Fullerton', 'Tustin',
-      'San Clemente', 'Villa Park'
-    ]
-  },
-  {
-    name: 'Ventura County',
-    href: '/ventura-county/',
-    cities: [
-      'Thousand Oaks', 'Westlake Village', 'Agoura Hills', 'Camarillo', 'Simi Valley',
-      'Moorpark', 'Ventura', 'Newbury Park', 'Oak Park'
-    ]
-  },
-  {
-    name: 'San Bernardino County',
-    href: '/san-bernardino-county/',
-    cities: [
-      'Rancho Cucamonga', 'Chino Hills', 'Upland', 'Ontario', 'Redlands', 'Loma Linda',
-      'Fontana', 'San Bernardino'
-    ]
-  },
-  {
-    name: 'Riverside County',
-    href: '/riverside-county/',
-    cities: [
-      'Temecula', 'Murrieta', 'Corona', 'Menifee', 'Lake Elsinore', 'Riverside',
-      'Moreno Valley', 'Hemet'
-    ]
-  }
-];
-
-function citySlug(name: string) {
-  return name.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-}
+const description = `Same-day appliance repair across LA, OC, Ventura, SB, Riverside. ${totalCities} cities served from ${totalBranches} branch locations. BHGS #A49573, EPA 608, CSLB C-20. $89 / $120 dx.`;
 
 const residentialServices = [
   { label: 'Refrigerator Repair', href: '/services/refrigerator-repair/' },
@@ -93,13 +81,13 @@ const commercialServices = [
     <div class="container">
       <p class="eyebrow">Service Areas · Southern California</p>
       <h1>Appliance Repair Across Southern California</h1>
-      <p class="subtitle">103 cities across 5 counties. 8 branch locations. Same day available. Residential and commercial.</p>
+      <p class="subtitle">{totalCities} cities across 5 counties. {totalBranches} branch locations. Same day available. Residential and commercial.</p>
     </div>
   </section>
 
   <section class="map-section">
     <div class="container">
-      <p class="sl">Our 8 Branches</p>
+      <p class="sl">Our {totalBranches} Branches</p>
       <h2 class="map-h2">Click any branch pin to view its territory</h2>
     </div>
   </section>
@@ -111,7 +99,7 @@ const commercialServices = [
       <h2>Five counties across Southern California</h2>
       <div class="county-grid">
         {counties.map((c) => (
-          <a href={`/${c.slug}/`} class="county-card">
+          <a href={c.href} class="county-card">
             <h3>{c.name}</h3>
             <p class="county-meta">{c.cities} cities · {c.branches} {c.branches === 1 ? 'branch' : 'branches'}</p>
             <span class="card-cta">View county →</span>
@@ -148,16 +136,36 @@ const commercialServices = [
 
   <section class="section">
     <div class="container">
-      <p class="sl">All Service Cities</p>
-      <h2>65 cities, organized by county</h2>
-      {cityGroups.map((group) => (
-        <div class="city-group">
-          <a href={group.href} class="county-heading">{group.name} →</a>
-          <div class="city-grid">
-            {group.cities.map((city) => (
-              <a href={`/${citySlug(city)}/`} class="city-link">{city}</a>
-            ))}
-          </div>
+      <p class="sl">All Service Cities by Branch</p>
+      <h2>{totalCities} cities, organized by county and branch</h2>
+      <p class="section-intro">
+        Each city below links to its dedicated service page. Branches grouped by county show
+        the territory each location dispatches from — for fastest response, call the branch
+        nearest you.
+      </p>
+
+      {branchesByCounty.map((county) => (
+        <div class="county-block">
+          <a href={county.countyHref} class="county-heading">
+            {county.countyName} <span class="county-count">— {county.branchCount} {county.branchCount === 1 ? 'branch' : 'branches'} · {county.totalCities} {county.totalCities === 1 ? 'city' : 'cities'}</span>
+            <span class="county-arrow">→</span>
+          </a>
+
+          {county.branchSections.map(({ branch, cities }) => (
+            <section class="county-branch">
+              <div class="branch-nap-wrap">
+                <BranchNAP branch={branch} showHeading={true} showEmail={true} showCities={false} />
+              </div>
+
+              {cities.length > 0 && (
+                <div class="branch-cities-grid">
+                  {cities.map((city) => (
+                    <a href={`/${city.slug}/`} class="city-link">{city.name}</a>
+                  ))}
+                </div>
+              )}
+            </section>
+          ))}
         </div>
       ))}
     </div>
@@ -179,7 +187,8 @@ const commercialServices = [
   .map-h2 { font-size: clamp(20px, 2.6vw, 28px); font-weight: 700; line-height: 1.2; margin: 0 0 28px; color: var(--text); }
 
   .section { padding: 64px 24px; }
-  .section h2 { font-size: clamp(22px, 3vw, 32px); font-weight: 700; line-height: 1.2; margin: 0 0 28px; color: var(--text); }
+  .section h2 { font-size: clamp(22px, 3vw, 32px); font-weight: 700; line-height: 1.2; margin: 0 0 16px; color: var(--text); }
+  .section-intro { font-size: 15px; line-height: 1.65; color: var(--muted); max-width: 720px; margin: 0 0 32px; }
 
   .county-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
   .county-card { display: flex; flex-direction: column; gap: 6px; padding: 24px 22px; background: #0a0a0a; border-radius: 8px; color: #fff; text-decoration: none; transition: transform .2s, background .2s; }
@@ -198,19 +207,81 @@ const commercialServices = [
   .svc-col a { font-size: 14.5px; color: var(--text); text-decoration: none; transition: color .15s, padding-left .15s; display: block; }
   .svc-col a:hover { color: var(--red); padding-left: 4px; }
 
-  .city-group { margin-top: 32px; }
-  .city-group:first-of-type { margin-top: 12px; }
-  .county-heading { display: inline-block; font-size: 14px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--red); padding-bottom: 10px; margin-bottom: 14px; border-bottom: 2px solid rgba(200, 16, 46, .25); text-decoration: none; transition: color .15s; }
-  .county-heading:hover { color: #ff1f47; }
-  .city-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px 18px; }
-  .city-link { padding: 6px 0; font-size: 14px; color: var(--text); text-decoration: none; border-bottom: 1px solid transparent; transition: color .15s, border-bottom-color .15s; }
-  .city-link:hover { color: var(--red); border-bottom-color: var(--red); }
+  /* ─── County → branch → cities hierarchy ─── */
+  .county-block { margin-top: 48px; }
+  .county-block:first-of-type { margin-top: 24px; }
 
-  @media (max-width: 1024px) {
-    .city-grid { grid-template-columns: repeat(3, 1fr); }
+  .county-heading {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    padding-bottom: 12px;
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--red);
+    transition: color .15s;
+  }
+  .county-heading:hover { color: var(--red); }
+  .county-count {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: .02em;
+  }
+  .county-arrow {
+    font-size: 14px;
+    color: var(--red);
+    margin-left: 4px;
+  }
+
+  .county-branch {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .county-branch:last-child { border-bottom: none; }
+
+  .branch-nap-wrap {
+    background: var(--gray);
+    border-radius: 8px;
+    padding: 20px 22px;
+  }
+
+  .branch-cities-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 4px 18px;
+    align-content: start;
+  }
+  .city-link {
+    padding: 6px 0;
+    font-size: 14.5px;
+    color: var(--text);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: color .15s, border-bottom-color .15s;
+  }
+  .city-link:hover {
+    color: var(--red);
+    border-bottom-color: var(--red);
+  }
+
+  @media (max-width: 768px) {
+    .county-branch {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .branch-nap-wrap {
+      padding: 18px 20px;
+    }
   }
   @media (max-width: 640px) {
     .services-cols { grid-template-columns: 1fr; }
-    .city-grid { grid-template-columns: repeat(2, 1fr); }
+    .branch-cities-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
