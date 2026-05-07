@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import { BRANCHES, type Branch } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import BranchNAP from '../components/BranchNAP.astro';
 
 import { mergeCredentials } from '../data/credentials-schema';
 // Filter out branches with placeholder 555 phones (RC + Temecula are 'pending'
@@ -134,7 +135,7 @@ const breadcrumbSchema = {
 
   <section class="branches" id="branches">
     <div class="container">
-      <h2>Five branches across Southern California</h2>
+      <h2>Eight branches across Southern California</h2>
       <p class="section-intro">
         Each branch has its own dispatch, its own parts inventory, and its own service area.
         Call the branch closest to you for the fastest arrival window.
@@ -144,7 +145,6 @@ const breadcrumbSchema = {
         {activeBranches.map((b) => (
           <article class="branch-card">
             <header class="branch-head">
-              <h3>{b.name}</h3>
               {b.gbpStatus.startsWith('verified') ? (
                 <span class="badge">GMB verified</span>
               ) : (
@@ -152,29 +152,11 @@ const breadcrumbSchema = {
               )}
             </header>
 
-            <a href={`tel:${phoneRawFor(b)}`} class="branch-phone">{b.phone}</a>
-            <a href={`mailto:${sharedEmail}`} class="branch-email">{sharedEmail}</a>
-
-            {b.type === 'physical_pin' && b.address ? (
-              <address>
-                {b.address.street}<br />
-                {b.address.city}, {b.address.state} {b.address.zip}
-              </address>
-            ) : (
-              <address class="sab">
-                <strong>{b.name}, CA</strong><br />
-                <em>Service area — by appointment</em>
-              </address>
-            )}
+            <BranchNAP branch={b} showHeading={true} showEmail={true} showCities={true} />
 
             <dl class="branch-hours">
               <dt>{b.hours.days}</dt><dd>{b.hours.open} – {b.hours.close}</dd>
             </dl>
-
-            <div class="branch-zones">
-              <h4>Service area</h4>
-              <p>{b.citiesServed.slice(0, 8).map(slugToTitle).join(' · ')}</p>
-            </div>
           </article>
         ))}
       </div>

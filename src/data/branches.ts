@@ -44,16 +44,22 @@ export interface BranchAddress {
 export interface Branch {
   /** URL slug for /branches/[slug] */
   slug: string;
-  /** Display name in UI */
+  /** Short city name — used for legacy short-label displays (Footer city tag, etc.). */
   name: string;
   /** Full descriptive name for schema and titles */
   fullName: string;
-  /** EXACT name as registered in Google Business Profile listing.
-   *  Used as the `name` field in LocalBusiness JSON-LD schema.
-   *  CRITICAL for NAP consistency — must match GBP word-for-word.
-   *  For service_area locations without verified GBP yet, use the pattern
-   *  'Same Day Appliance Repair {City}' which is reserved for future registration. */
+  /** EXACT name as registered in Google Business Profile listing, with ", CA Location"
+   *  suffix per Roman's canonical GMB table (2026-05-07).
+   *  Used as the `name` field in LocalBusiness JSON-LD schema AND as the canonical
+   *  legal label in BranchNAP `<h3>` rendering. CRITICAL for NAP consistency —
+   *  must match GBP word-for-word. */
   gbpName: string;
+  /** City label rendered in BranchNAP "Our [City] Location" heading.
+   *  Always Title Case (e.g. 'West Hollywood'). */
+  displayCity: string;
+  /** True for all 7 service-area branches; false only for WeHo (physical_pin).
+   *  Redundant with `type === 'service_area'` but explicit для component reads. */
+  isServiceArea: boolean;
   /** Determines public address visibility. CRITICAL FIELD. */
   type: LocationType;
   /** GBP verification status */
@@ -103,7 +109,9 @@ export const BRANCHES: Branch[] = [
     slug: 'west-hollywood',
     name: 'West Hollywood',
     fullName: 'Same Day Appliance Repair — West Hollywood',
-    gbpName: 'Same Day Appliance Repair',
+    gbpName: 'Same Day Appliance Repair, CA Location',
+    displayCity: 'West Hollywood',
+    isServiceArea: false,
     type: 'physical_pin',
     gbpStatus: 'verified_pin',
     gbpUrl: 'https://share.google/MZH7ZdnIWHiAp8Zm3',
@@ -133,7 +141,7 @@ export const BRANCHES: Branch[] = [
       'fairfax',
       'hancock-park'
     ],
-    displayAreas: ['West Hollywood', 'Hollywood', 'Hancock Park', 'Mid-Wilshire']
+    displayAreas: ['West Hollywood', 'Hollywood', 'Hancock Park', 'Mid-Wilshire', 'Fairfax']
   },
 
   // ─────────────────────────────────────────────────
@@ -146,7 +154,9 @@ export const BRANCHES: Branch[] = [
     slug: 'beverly-hills',
     name: 'Beverly Hills',
     fullName: 'Same Day Appliance Repair — Beverly Hills',
-    gbpName: 'Same Day Appliance Repair Beverly Hills',
+    gbpName: 'Same Day Appliance Repair Beverly Hills, CA Location',
+    displayCity: 'Beverly Hills',
+    isServiceArea: true,
     type: 'service_area',
     gbpStatus: 'unverified',
     phone: '(424) 248-1199',
@@ -172,7 +182,9 @@ export const BRANCHES: Branch[] = [
     slug: 'los-angeles',
     name: 'Los Angeles',
     fullName: 'Same Day Appliance Repair — Los Angeles',
-    gbpName: 'Same Day Appliance Repair',
+    gbpName: 'Same Day Appliance Repair, CA Location',
+    displayCity: 'Los Angeles',
+    isServiceArea: true,
     type: 'service_area',
     gbpStatus: 'verified_sab',
     gbpUrl: 'https://share.google/dBFQdBNMTF9W7og21',
@@ -224,7 +236,7 @@ export const BRANCHES: Branch[] = [
       'woodland-hills',
       'koreatown'
     ],
-    displayAreas: ['Brentwood', 'Santa Monica', 'Westwood', 'Malibu']
+    displayAreas: ['Brentwood', 'Bel Air', 'Pacific Palisades', 'Santa Monica', 'Westwood', 'Century City', 'Culver City', 'Westside', 'Long Beach']
   },
 
   // ─────────────────────────────────────────────────
@@ -234,7 +246,9 @@ export const BRANCHES: Branch[] = [
     slug: 'pasadena',
     name: 'Pasadena',
     fullName: 'Same Day Appliance Repair — Pasadena',
-    gbpName: 'Same Day Appliance Repair Pasadena',
+    gbpName: 'Same Day Appliance Repair Pasadena, CA Location',
+    displayCity: 'Pasadena',
+    isServiceArea: true,
     type: 'service_area',
     gbpStatus: 'unverified',
     phone: '(626) 376-4458',
@@ -271,7 +285,7 @@ export const BRANCHES: Branch[] = [
       'altadena',
       'temple-city'
     ],
-    displayAreas: ['Pasadena', 'Arcadia', 'South Pasadena', 'San Marino']
+    displayAreas: ['Pasadena', 'Arcadia', 'South Pasadena', 'San Marino', 'Glendale', 'Burbank']
   },
 
   // ─────────────────────────────────────────────────
@@ -281,7 +295,9 @@ export const BRANCHES: Branch[] = [
     slug: 'thousand-oaks',
     name: 'Thousand Oaks',
     fullName: 'Same Day Appliance Repair — Thousand Oaks',
-    gbpName: 'Same Day Appliance Repair Thousand Oaks',
+    gbpName: 'Same Day Appliance Repair Thousand Oaks, CA Location',
+    displayCity: 'Thousand Oaks',
+    isServiceArea: true,
     type: 'service_area',
     gbpStatus: 'verified_sab',
     gbpUrl: 'https://share.google/DXrnBNy1purtECJTu',
@@ -314,7 +330,7 @@ export const BRANCHES: Branch[] = [
       'simi-valley',
       'ventura'
     ],
-    displayAreas: ['Thousand Oaks', 'Westlake Village', 'Newbury Park']
+    displayAreas: ['Thousand Oaks', 'Westlake Village', 'Newbury Park', 'Conejo Valley', 'Ventura']
   },
 
   // ─────────────────────────────────────────────────
@@ -324,7 +340,9 @@ export const BRANCHES: Branch[] = [
     slug: 'irvine',
     name: 'Irvine',
     fullName: 'Same Day Appliance Repair — Irvine',
-    gbpName: 'Same Day Appliance Repair Irvine',
+    gbpName: 'Same Day Appliance Repair Irvine, CA Location',
+    displayCity: 'Irvine',
+    isServiceArea: true,
     type: 'service_area',
     gbpStatus: 'unverified',
     phone: '(213) 401-9019',
@@ -360,7 +378,7 @@ export const BRANCHES: Branch[] = [
       'villa-park',
       'yorba-linda'
     ],
-    displayAreas: ['Irvine', 'Newport Beach', 'Costa Mesa', 'Tustin']
+    displayAreas: ['Irvine', 'Newport Beach', 'Costa Mesa', 'Tustin', 'Orange County']
   },
 
   // ─────────────────────────────────────────────────
@@ -373,7 +391,9 @@ export const BRANCHES: Branch[] = [
     slug: 'rancho-cucamonga',
     name: 'Rancho Cucamonga',
     fullName: 'Same Day Appliance Repair — Rancho Cucamonga',
-    gbpName: 'Same Day Appliance Repair Rancho Cucamonga',
+    gbpName: 'Same Day Appliance Repair Rancho Cucamonga, CA Location',
+    displayCity: 'Rancho Cucamonga',
+    isServiceArea: true,
     type: 'service_area',
     gbpStatus: 'pending',
     phone: '(909) 457-1030',
@@ -410,7 +430,9 @@ export const BRANCHES: Branch[] = [
     slug: 'temecula',
     name: 'Temecula',
     fullName: 'Same Day Appliance Repair — Temecula',
-    gbpName: 'Same Day Appliance Repair Temecula',
+    gbpName: 'Same Day Appliance Repair Temecula, CA Location',
+    displayCity: 'Temecula',
+    isServiceArea: true,
     type: 'service_area',
     gbpStatus: 'pending',
     phone: '(951) 577-3877',

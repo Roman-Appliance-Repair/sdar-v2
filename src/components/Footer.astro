@@ -8,6 +8,7 @@
 
 import { BRANCHES } from '../data/branches';
 import { BUSINESS_HOURS } from '../data/business-hours';
+import BranchNAP from './BranchNAP.astro';
 
 function slugFromPath(p: string) { return (p.split('/').pop() ?? '').replace(/\.astro$/, ''); }
 function slugToLabel(slug: string) {
@@ -26,14 +27,6 @@ const counties = countySlugs.map((slug) => ({
 }));
 
 const currentYear = new Date().getFullYear();
-
-const branchListings = BRANCHES.map((b) => ({
-  name: b.name,
-  phone: b.phone,
-  tel: `+1${b.phone.replace(/\D/g, '')}`,
-  email: b.email,
-  serviceAreas: b.displayAreas.slice(0, 4).join(' · ')
-}));
 
 const servicesLinks = [
   { label: 'Refrigerator Repair', href: '/services/refrigerator-repair/' },
@@ -78,12 +71,9 @@ const legalLinks = [
       <div class="footer-col footer-branches">
         <h4>Branches</h4>
         <ul>
-          {branchListings.map((b) => (
+          {BRANCHES.map((b) => (
             <li class="branch-listing">
-              <span class="branch-city">{b.name}</span>
-              <a href={`tel:${b.tel}`} class="branch-phone">{b.phone}</a>
-              <a href={`mailto:${b.email}`} class="branch-email">{b.email}</a>
-              <span class="branch-areas">{b.serviceAreas}</span>
+              <BranchNAP branch={b} showHeading={true} showEmail={true} showCities={true} />
             </li>
           ))}
         </ul>
