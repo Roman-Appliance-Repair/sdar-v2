@@ -245,7 +245,7 @@ Per `CLAUDE.md` §1 + `wiki/decisions/nap-rating-policy-ssot.md`:
 - EPA 608 Universal certified (#1346255700410) — refrigerant work
 - BBB A+ accredited
 - CSLB C-38 Refrigeration only on commercial/refrigeration/ pages (correct scope)
-- **Never use:** CSLB #1138898 (legacy HVAC contractor number — replaced sitewide)
+- **CSLB C-20 HVAC #1138898** — active license. Used in `src/components/Footer.astro` (visible credentials bar) and `hasCredential` schema across all 1009 pages. (Earlier docs incorrectly described this as legacy/retired; corrected 2026-05-08.)
 
 **Diagnostic pricing tiers (per `CLAUDE.md` §3):**
 | Tier | Diagnostic | Waived |
