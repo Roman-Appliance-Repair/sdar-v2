@@ -109,7 +109,7 @@ export const BRANCHES: Branch[] = [
     slug: 'west-hollywood',
     name: 'West Hollywood',
     fullName: 'Same Day Appliance Repair — West Hollywood',
-    gbpName: 'Same Day Appliance Repair, CA Location',
+    gbpName: 'Same Day Appliance Repair',
     displayCity: 'West Hollywood',
     isServiceArea: false,
     type: 'physical_pin',
@@ -154,7 +154,7 @@ export const BRANCHES: Branch[] = [
     slug: 'beverly-hills',
     name: 'Beverly Hills',
     fullName: 'Same Day Appliance Repair — Beverly Hills',
-    gbpName: 'Same Day Appliance Repair Beverly Hills, CA Location',
+    gbpName: 'Same Day Appliance Repair Beverly Hills',
     displayCity: 'Beverly Hills',
     isServiceArea: true,
     type: 'service_area',
@@ -162,6 +162,12 @@ export const BRANCHES: Branch[] = [
     phone: '(424) 248-1199',
     phoneStatus: 'active',
     email: 'beverlyhills@samedayappliance.repair',
+    internalAddress: {
+      street: '9465 Wilshire Blvd Ste 300',
+      city: 'Beverly Hills',
+      state: 'CA',
+      zip: '90212'
+    },
     geo: {
       cityCenterLat: 34.0736,
       cityCenterLng: -118.4004,
@@ -182,7 +188,7 @@ export const BRANCHES: Branch[] = [
     slug: 'los-angeles',
     name: 'Los Angeles',
     fullName: 'Same Day Appliance Repair — Los Angeles',
-    gbpName: 'Same Day Appliance Repair, CA Location',
+    gbpName: 'Same Day Appliance Repair Los Angeles',
     displayCity: 'Los Angeles',
     isServiceArea: true,
     type: 'service_area',
@@ -192,6 +198,12 @@ export const BRANCHES: Branch[] = [
     phoneStatus: 'active',
     email: 'info@samedayappliance.repair',
     // address: undefined — SAB rule, NO public address
+    internalAddress: {
+      street: '11352 Elderwood St',
+      city: 'Los Angeles',
+      state: 'CA',
+      zip: '90049'
+    },
     geo: {
       cityCenterLat: 34.0522,
       cityCenterLng: -118.2437,
@@ -246,7 +258,7 @@ export const BRANCHES: Branch[] = [
     slug: 'pasadena',
     name: 'Pasadena',
     fullName: 'Same Day Appliance Repair — Pasadena',
-    gbpName: 'Same Day Appliance Repair Pasadena, CA Location',
+    gbpName: 'Same Day Appliance Repair Pasadena',
     displayCity: 'Pasadena',
     isServiceArea: true,
     type: 'service_area',
@@ -295,7 +307,7 @@ export const BRANCHES: Branch[] = [
     slug: 'thousand-oaks',
     name: 'Thousand Oaks',
     fullName: 'Same Day Appliance Repair — Thousand Oaks',
-    gbpName: 'Same Day Appliance Repair Thousand Oaks, CA Location',
+    gbpName: 'Same Day Appliance Repair Thousand Oaks',
     displayCity: 'Thousand Oaks',
     isServiceArea: true,
     type: 'service_area',
@@ -340,7 +352,7 @@ export const BRANCHES: Branch[] = [
     slug: 'irvine',
     name: 'Irvine',
     fullName: 'Same Day Appliance Repair — Irvine',
-    gbpName: 'Same Day Appliance Repair Irvine, CA Location',
+    gbpName: 'Same Day Appliance Repair Irvine',
     displayCity: 'Irvine',
     isServiceArea: true,
     type: 'service_area',
@@ -391,7 +403,7 @@ export const BRANCHES: Branch[] = [
     slug: 'rancho-cucamonga',
     name: 'Rancho Cucamonga',
     fullName: 'Same Day Appliance Repair — Rancho Cucamonga',
-    gbpName: 'Same Day Appliance Repair Rancho Cucamonga, CA Location',
+    gbpName: 'Same Day Appliance Repair Rancho Cucamonga',
     displayCity: 'Rancho Cucamonga',
     isServiceArea: true,
     type: 'service_area',
@@ -399,7 +411,12 @@ export const BRANCHES: Branch[] = [
     phone: '(909) 457-1030',
     phoneStatus: 'active',
     email: 'ranchocucamonga@samedayappliance.repair',
-    // No internalAddress — true service territory
+    internalAddress: {
+      street: '9220 Haven Ave',
+      city: 'Rancho Cucamonga',
+      state: 'CA',
+      zip: '91730'
+    },
     geo: {
       cityCenterLat: 34.1064,
       cityCenterLng: -117.5931,
@@ -421,41 +438,55 @@ export const BRANCHES: Branch[] = [
   },
 
   // ─────────────────────────────────────────────────
-  // 7. TEMECULA — Service Territory
-  // Phone is a temporary placeholder (555 pattern); active on city pages
-  // until Roman swaps in the real DID. T13-FIX flipped pending → active so
-  // Riverside county cities show this number rather than fall back to MAIN_PHONE.
+  // 7. RIVERSIDE — Service Territory (Riverside County)
+  // Renamed from Temecula 2026-05-08 (Phase 1 schema-nap-fix-phase1):
+  //   The (951) 577-3877 DID is registered to Riverside, not Temecula —
+  //   branch identity now matches the registered service territory.
+  //   Riverside city is a more central anchor for the Riverside County
+  //   coverage that includes Corona, Moreno Valley, Norco, Eastvale,
+  //   Temecula, Murrieta, Menifee, Lake Elsinore, Hemet.
+  //   citiesServed retains all served slugs to preserve branch lookups
+  //   for existing city pages; displayAreas narrowed to the new branch's
+  //   primary anchor cities.
   // ─────────────────────────────────────────────────
   {
-    slug: 'temecula',
-    name: 'Temecula',
-    fullName: 'Same Day Appliance Repair — Temecula',
-    gbpName: 'Same Day Appliance Repair Temecula, CA Location',
-    displayCity: 'Temecula',
+    slug: 'riverside',
+    name: 'Riverside',
+    fullName: 'Same Day Appliance Repair — Riverside',
+    gbpName: 'Same Day Appliance Repair Riverside',
+    displayCity: 'Riverside',
     isServiceArea: true,
     type: 'service_area',
     gbpStatus: 'pending',
     phone: '(951) 577-3877',
     phoneStatus: 'active',
-    email: 'temecula@samedayappliance.repair',
+    email: 'riverside@samedayappliance.repair',
+    internalAddress: {
+      street: '3610 Central Ave Ste 400',
+      city: 'Riverside',
+      state: 'CA',
+      zip: '92506'
+    },
     geo: {
-      cityCenterLat: 33.4936,
-      cityCenterLng: -117.1484,
+      cityCenterLat: 33.9486,
+      cityCenterLng: -117.3942,
       serviceRadius: 30
     },
     hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'riverside',
     citiesServed: [
-      'temecula',
+      'riverside',
       'corona',
-      'hemet',
-      'lake-elsinore',
-      'menifee',
       'moreno-valley',
+      'norco',
+      'eastvale',
+      'temecula',
       'murrieta',
-      'riverside'
+      'menifee',
+      'lake-elsinore',
+      'hemet'
     ],
-    displayAreas: ['Temecula', 'Murrieta', 'Menifee']
+    displayAreas: ['Riverside', 'Corona', 'Moreno Valley', 'Norco', 'Eastvale']
   }
 ];
 
@@ -514,7 +545,9 @@ export const CITIES_WITHOUT_PAGES = new Set<string>([
   'century-city', 'cheviot-hills', 'beverly-glen',
   'playa-del-rey', 'venice', 'mar-vista',
   // Pasadena
-  'sierra-madre', 'altadena'
+  'sierra-madre', 'altadena',
+  // Riverside (new entries 2026-05-08; pages not yet authored)
+  'norco', 'eastvale'
 ]);
 
 /** Returns citiesServed for a branch, but ONLY those with .astro pages on disk.

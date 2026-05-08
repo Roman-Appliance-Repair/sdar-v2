@@ -79,5 +79,5 @@ export const BRANCH_PIN_POSITIONS: Record<string, { x: number; y: number }> = {
   'thousand-oaks': { x: 143.02, y: 450.99 },
   'irvine': { x: 323.81, y: 551.03 },
   'rancho-cucamonga': { x: 362.97, y: 460.49 },
-  'temecula': { x: 445.4, y: 588.36 }
+  'riverside': { x: 445.4, y: 588.36 }
 };

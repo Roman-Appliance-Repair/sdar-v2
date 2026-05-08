@@ -28,6 +28,7 @@ import {
 } from '../../data/branches';
 import { HOMEPAGE_FAQ } from '../../data/faq';
 import { CANONICAL_CREDENTIALS, LEGAL_NAME } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 interface Props {}
 
@@ -70,15 +71,12 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
     '@id': branchId(branch.slug),
     name: branch.gbpName,
     legalName: LEGAL_NAME,
-    url: `${SITE_URL}/branches/${branch.slug}/`,
+    url: `${SITE_URL}/`,
     telephone: phoneE164(branch.phone),
     email: branch.email,
     image: `${SITE_URL}/images/branches/${branch.slug}.jpg`,
     priceRange: '$$',
-    openingHoursSpecification: [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
-      ],
+    openingHoursSpecification: OPENING_HOURS_SCHEMA,
     areaServed: branch.citiesServed.map(citySlug => ({
       '@type': 'City',
       name: slugToTitle(citySlug),
@@ -87,17 +85,15 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
         name: countyTitle(branch.primaryCounty)
       }
     })),
-    parentOrganization: { '@id': ORG_ID }
+    parentOrganization: { '@id': ORG_ID },
+    // Site-wide canonical credentials (BHGS / EPA 608 / CSLB C-20 / BBB).
+    // Emitted on every LocalBusiness for NAP/credential consistency across
+    // graph entries — matches docs/seo-policies.md §1 (FINAL 2026-05-07)
+    // and the Organization node in this same @graph.
+    hasCredential: [...CANONICAL_CREDENTIALS]
   };
 
-  // hasCredential lives on the primary (physical_pin) branch only — other 7
-  // service_area branches reach the same credentials via parentOrganization
-  // @id graph link to the Organization node (which also carries them).
-  if (branch.type === 'physical_pin') {
-    base.hasCredential = [...CANONICAL_CREDENTIALS];
-  }
-
-  // physical_pin: full address + root geo
+  // physical_pin: full PostalAddress (with streetAddress) + root geo
   if (branch.type === 'physical_pin' && branch.address) {
     base.address = {
       '@type': 'PostalAddress',
@@ -116,8 +112,23 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
     }
   }
 
-  // service_area: GeoCircle only — NEVER address, NEVER root geo
+  // service_area: emit PostalAddress with locality/region/postalCode but
+  // NEVER streetAddress — required by Google SAB guidelines and enforced
+  // by branches.ts header (line 5-9). Falls back to displayCity when
+  // internalAddress is absent (LA/BH/RC have no zip on record yet).
+  // Also emit GeoCircle as serviceArea — never root geo.
   if (branch.type === 'service_area') {
+    const sabAddress: Record<string, unknown> = {
+      '@type': 'PostalAddress',
+      addressLocality: branch.internalAddress?.city ?? branch.displayCity,
+      addressRegion: 'CA',
+      addressCountry: 'US'
+    };
+    if (branch.internalAddress?.zip) {
+      sabAddress.postalCode = branch.internalAddress.zip;
+    }
+    base.address = sabAddress;
+
     base.serviceArea = {
       '@type': 'GeoCircle',
       geoMidpoint: {
