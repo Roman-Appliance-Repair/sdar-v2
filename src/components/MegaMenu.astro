@@ -6,7 +6,8 @@
  */
 
 import { counties as countyData, toSlug } from '../data/counties.ts';
-import { MAIN_PHONE } from '../data/branches.ts';
+import { MAIN_PHONE, BRANCHES } from '../data/branches.ts';
+import { CITIES, COUNTIES } from '../data/cities.ts';
 
 const ACRONYMS = new Set([
   'bbb', 'oem', 'epa', 'osha', 'bbq', 'cslb', 'hvac', 'ac', 'la', 'ca', 'cma', 'ge', 'lg', 'sks', 'zline'
@@ -65,7 +66,8 @@ const existingSlugs = new Set(
     .filter((slug) => slug !== 'index' && !slug.endsWith('-county'))
 );
 
-// Enrich counties.ts data with per-city existence flag
+// Enrich counties.ts data with per-city existence flag (legacy — retained
+// only in case other code references `enrichedCounties` shape).
 const enrichedCounties = countyData.map((county) => ({
   name: county.name,
   slug: county.slug,
@@ -74,6 +76,37 @@ const enrichedCounties = countyData.map((county) => ({
     return { name, slug, exists: existingSlugs.has(slug) };
   })
 }));
+
+// Areas panel v4 — county → branch → cities (matches /areas/ page reorg).
+// Uses CITIES from cities.ts (canonical city pillars only — guarantees no
+// 404 links). Branch list filtered by primaryCounty; cities filtered by
+// primaryBranch on each city. Aligns megamenu source-of-truth with /areas/.
+const COUNTY_ORDER = [
+  'los-angeles',
+  'orange',
+  'ventura',
+  'san-bernardino',
+  'riverside'
+] as const;
+
+const countiesWithBranches = COUNTY_ORDER.map((countySlug) => {
+  const county = COUNTIES[countySlug];
+  const branches = BRANCHES
+    .filter((b) => b.primaryCounty === countySlug)
+    .map((b) => ({
+      slug: b.slug,
+      displayCity: b.displayCity,
+      phone: b.phone,
+      cities: CITIES
+        .filter((c) => c.primaryBranch === b.slug)
+        .map((c) => ({ slug: c.slug, name: c.name }))
+    }));
+  return {
+    name: county.name,
+    hubUrl: county.hubUrl,
+    branches
+  };
+});
 
 // Price list — strip "Cost" suffix for cleaner labels and split res/com.
 // All glob'd items exist (built from actual .astro files), so exists: true.
@@ -96,13 +129,14 @@ const mainPhoneTel = `+1${MAIN_PHONE.replace(/\D/g, '')}`;
 
 type Link = { label: string; href: string };
 type Column = { title?: string; links?: Link[]; html?: string };
-type CityCell = { name: string; slug: string; exists: boolean };
-type CountyGroup = { name: string; slug: string; cities: CityCell[] };
+type AreasCity = { slug: string; name: string };
+type AreasBranch = { slug: string; displayCity: string; phone: string; cities: AreasCity[] };
+type AreasCounty = { name: string; hubUrl: string; branches: AreasBranch[] };
 type PriceCell = { label: string; href: string; exists: boolean };
 type Panel =
   | { kind: 'flow'; links: Link[] }
   | { kind: 'grouped'; columns: Column[]; align?: 'center' }
-  | { kind: 'areas'; counties: CountyGroup[] }
+  | { kind: 'areas'; counties: AreasCounty[] }
   | { kind: 'pricelist'; residential: PriceCell[]; commercial: PriceCell[]; html: string };
 
 const menu: Array<{ label: string; href: string; panel: Panel }> = [
@@ -148,7 +182,7 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
   {
     label: 'Areas',
     href: '/areas/',
-    panel: { kind: 'areas', counties: enrichedCounties }
+    panel: { kind: 'areas', counties: countiesWithBranches }
   },
   {
     label: 'About',
@@ -221,17 +255,26 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
           ) : item.panel.kind === 'areas' ? (
             <div class="mega-panel-inner panel-areas">
               {item.panel.counties.map((county) => (
-                <div class="areas-county">
-                  <a href={`/${county.slug}/`} class="county-heading">{county.name}</a>
-                  <div class="city-grid">
-                    {county.cities.map((city) => (
-                      city.exists ? (
-                        <a href={`/${city.slug}/`} class="city-link">{city.name}</a>
-                      ) : (
-                        <span class="city-link missing" title="Page not yet created">{city.name}</span>
-                      )
-                    ))}
+                <div class="county-section">
+                  <div class="county-header">
+                    <span class="county-name">{county.name}</span>
+                    <a href={county.hubUrl} class="county-hub-link">View all {county.name} →</a>
                   </div>
+                  {county.branches.map((branch) => (
+                    <div class="branch-block">
+                      <div class="branch-header">
+                        <a href={`/${branch.slug}/`} class="branch-name">{branch.displayCity} Branch</a>
+                        <a href={`tel:+1${branch.phone.replace(/\D/g, '')}`} class="branch-phone">{branch.phone}</a>
+                      </div>
+                      {branch.cities.length > 0 && (
+                        <div class="branch-cities">
+                          {branch.cities.map((city) => (
+                            <a href={`/${city.slug}/`} class="city-link">{city.name}</a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -554,61 +597,101 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     opacity: 0.8;
   }
 
-  /* ===================== Areas layout (counties + city grid) ===================== */
+  /* ===================== Areas layout v4 (county → branch → cities) ===================== */
   .panel-areas {
     max-width: 1200px;
     max-height: none;
     overflow: visible;
-    padding: 24px 40px;
+    padding: 18px 22px;
   }
-  .areas-county { margin-bottom: 14px; }
-  .areas-county:last-child { margin-bottom: 0; }
 
-  .county-heading {
-    display: block;
+  .county-section { margin-bottom: 14px; }
+  .county-section:last-child { margin-bottom: 0; }
+
+  .county-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 4px;
+    margin-bottom: 6px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .county-name {
+    font-family: var(--font-body);
+    color: var(--red);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .county-hub-link {
     font-family: var(--font-body);
     font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
     color: var(--red);
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid rgba(200, 16, 46, 0.2);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+  }
+  .county-hub-link:hover { color: #ff4458; text-decoration: underline; }
+
+  .branch-block { margin-bottom: 8px; }
+  .branch-block:last-child { margin-bottom: 0; }
+
+  .branch-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 4px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .branch-name {
+    font-family: var(--font-body);
+    font-size: 12px;
+    font-weight: 500;
+    color: #ffffff;
     text-decoration: none;
     transition: color 0.2s ease;
   }
-  .county-heading:hover { color: #ff4458; }
-
-  .city-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 2px 20px;
+  .branch-name:hover { color: var(--red); }
+  .branch-phone {
+    font-family: var(--font-body);
+    font-size: 12px;
+    color: var(--red);
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
   }
+  .branch-phone:hover { text-decoration: underline; }
 
+  .branch-cities {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 3px 10px;
+  }
   .city-link {
     display: block;
     font-family: var(--font-body);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 400;
-    padding: 3px 0;
+    color: rgba(255, 255, 255, 0.6);
+    padding: 2px 0;
     line-height: 1.4;
     text-decoration: none;
     transition: color 0.2s ease, padding-left 0.2s ease;
   }
+  .city-link:hover { color: #ffffff; padding-left: 3px; }
 
-  a.city-link:not(.missing) { color: rgba(255, 255, 255, 0.85); }
-  a.city-link:not(.missing):hover { color: #ffffff; padding-left: 4px; }
-
-  .city-link.missing {
-    color: #ff4458;
-    cursor: not-allowed;
-    opacity: 0.75;
+  /* Tablet */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .branch-cities { grid-template-columns: repeat(4, 1fr); }
   }
-  .city-link.missing::after {
-    content: " ⚠";
-    font-size: 11px;
-    opacity: 0.8;
+  /* Mobile */
+  @media (max-width: 768px) {
+    .branch-cities { grid-template-columns: repeat(2, 1fr); }
+    .county-header, .branch-header { flex-direction: column; align-items: flex-start; gap: 4px; }
   }
 
   /* ===================== Mobile (≤1024px): accordion ===================== */
