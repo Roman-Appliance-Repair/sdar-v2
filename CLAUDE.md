@@ -28,7 +28,7 @@
 
 SSOT: `src/data/credentials-schema.ts` экспортирует `CANONICAL_CREDENTIALS` array (4 entries c `recognizedBy`) + `LEGAL_NAME` + `mergeCredentials(schema)` helper. Применяется в HomepageSchema + 89 city pillars + contact + book + credentials/licensed (Phase 2b-1, commit `39042c7`). Phase 2b-2 deferred — 580 schemaJsons sub-pages через AST-aware modifier.
 
-CSLB C-38 (Refrigeration) более не используется (отменено в FINAL 2026-05-07 policy). CSLB #1138898 — retired, нигде не упоминать.
+CSLB C-38 (Refrigeration) более не используется (отменено в FINAL 2026-05-07 policy). CSLB C-20 HVAC #1138898 — **active** (per Roman 2026-05-07), используется в `src/components/Footer.astro` + `hasCredential` schema на 1009 страницах.
 
 ---
 
@@ -66,7 +66,7 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 5. Этот **CLAUDE.md** + `docs/`
 6. **Project Knowledge** в claude.ai — зеркало этого файла
 
-При конфликте: верхний пункт побеждает. Не доверять старым `.docx`/`.md` без даты — данные могут быть устаревшими (старые лицензии CSLB #1138898, "WordPress legacy", 76 cities — всё это устарело).
+При конфликте: верхний пункт побеждает. Не доверять старым `.docx`/`.md` без даты — данные могут быть устаревшими ("WordPress legacy", 76 cities — это устаревшая информация).
 
 ### Data layer — что где
 
@@ -101,7 +101,7 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 - Голос: «our techs», «we», «our guys» — никогда «I», никогда корпоративно
 - Видимый UI: никаких `aggregateRating`, `4.6 / 37 reviews`, `BBB A+`, `HVAC 777 LLC` (кроме footer copyright), `streetAddress` (кроме WeHo pin pages)
 - BBB: только «BBB Accredited» / «BBB Accredited Business», никогда «BBB A+» (false claim — real grade = A)
-- Cred labeling: «BHGS #A49573», «EPA 608 Universal», «CSLB C-20 HVAC». Никогда: «BHGS Licensed», «CSLB License #A49573», «CA BHGS», «CSLB #1138898» (retired)
+- Cred labeling: «BHGS #A49573», «EPA 608 Universal», «CSLB C-20 HVAC #1138898». Никогда: «BHGS Licensed», «CSLB License #A49573», «CA BHGS»
 - Цены: $89 ИЛИ $120 на одной странице, не оба
 - Wood-burning fireplaces исключены (SCAQMD restrictions) — only gas
 - Wolf не делает residential refrigerators / dishwashers; Sub-Zero не делает dishwashers; KitchenAid и JennAir не продают washers/dryers в США
