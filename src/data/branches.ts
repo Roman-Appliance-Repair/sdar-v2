@@ -99,6 +99,12 @@ export interface Branch {
    *  overlap with adjacent branches (e.g. WeHo doesn't display Beverly Hills
    *  since BH has its own branch). */
   displayAreas: string[];
+  /** Branch-level sameAs URLs for LocalBusiness JSON-LD (per-branch entity
+   *  cross-link signals). Verified GBPs use the maps.google place_id form
+   *  (canonical). Branch-specific socials go here; org-wide socials (FB, YT)
+   *  live on the Organization @graph node. WeHo additionally carries FB at
+   *  branch level since the FB profile is anchored to the WeHo physical pin. */
+  sameAs?: string[];
 }
 
 export const BRANCHES: Branch[] = [
@@ -141,7 +147,12 @@ export const BRANCHES: Branch[] = [
       'fairfax',
       'hancock-park'
     ],
-    displayAreas: ['West Hollywood', 'Hollywood', 'Hancock Park', 'Mid-Wilshire', 'Fairfax']
+    displayAreas: ['West Hollywood', 'Hollywood', 'Hancock Park', 'Mid-Wilshire', 'Fairfax'],
+    sameAs: [
+      'https://www.google.com/maps/place/?q=place_id:0x80c2bf2c71272bf7:0xe64cb214ae1a8e7b',
+      'https://www.facebook.com/profile.php?id=61577069941613',
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   },
 
   // ─────────────────────────────────────────────────
@@ -178,7 +189,10 @@ export const BRANCHES: Branch[] = [
     citiesServed: [
       'beverly-hills'
     ],
-    displayAreas: ['Beverly Hills', 'Beverly Glen', 'Trousdale Estates']
+    displayAreas: ['Beverly Hills', 'Beverly Glen', 'Trousdale Estates'],
+    sameAs: [
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   },
 
   // ─────────────────────────────────────────────────
@@ -248,7 +262,11 @@ export const BRANCHES: Branch[] = [
       'woodland-hills',
       'koreatown'
     ],
-    displayAreas: ['Brentwood', 'Bel Air', 'Pacific Palisades', 'Santa Monica', 'Westwood', 'Century City', 'Culver City', 'Westside', 'Long Beach']
+    displayAreas: ['Brentwood', 'Bel Air', 'Pacific Palisades', 'Santa Monica', 'Westwood', 'Century City', 'Culver City', 'Westside', 'Long Beach'],
+    sameAs: [
+      'https://www.google.com/maps/place/?q=place_id:0x6818dad7e2e70159:0x1127e79bbdbbfb24',
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   },
 
   // ─────────────────────────────────────────────────
@@ -297,7 +315,10 @@ export const BRANCHES: Branch[] = [
       'altadena',
       'temple-city'
     ],
-    displayAreas: ['Pasadena', 'Arcadia', 'South Pasadena', 'San Marino', 'Glendale', 'Burbank']
+    displayAreas: ['Pasadena', 'Arcadia', 'South Pasadena', 'San Marino', 'Glendale', 'Burbank'],
+    sameAs: [
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   },
 
   // ─────────────────────────────────────────────────
@@ -342,7 +363,11 @@ export const BRANCHES: Branch[] = [
       'simi-valley',
       'ventura'
     ],
-    displayAreas: ['Thousand Oaks', 'Westlake Village', 'Newbury Park', 'Conejo Valley', 'Ventura']
+    displayAreas: ['Thousand Oaks', 'Westlake Village', 'Newbury Park', 'Conejo Valley', 'Ventura'],
+    sameAs: [
+      'https://www.google.com/maps/place/?q=place_id:0x6af10f7fed7e00a9:0x947bbaeffac04b15',
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   },
 
   // ─────────────────────────────────────────────────
@@ -390,7 +415,10 @@ export const BRANCHES: Branch[] = [
       'villa-park',
       'yorba-linda'
     ],
-    displayAreas: ['Irvine', 'Newport Beach', 'Costa Mesa', 'Tustin', 'Orange County']
+    displayAreas: ['Irvine', 'Newport Beach', 'Costa Mesa', 'Tustin', 'Orange County'],
+    sameAs: [
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   },
 
   // ─────────────────────────────────────────────────
@@ -434,7 +462,10 @@ export const BRANCHES: Branch[] = [
       'san-bernardino',
       'upland'
     ],
-    displayAreas: ['Rancho Cucamonga', 'Upland', 'Ontario', 'Fontana']
+    displayAreas: ['Rancho Cucamonga', 'Upland', 'Ontario', 'Fontana'],
+    sameAs: [
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   },
 
   // ─────────────────────────────────────────────────
@@ -486,7 +517,10 @@ export const BRANCHES: Branch[] = [
       'lake-elsinore',
       'hemet'
     ],
-    displayAreas: ['Riverside', 'Corona', 'Moreno Valley', 'Norco', 'Eastvale']
+    displayAreas: ['Riverside', 'Corona', 'Moreno Valley', 'Norco', 'Eastvale'],
+    sameAs: [
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   }
 ];
 

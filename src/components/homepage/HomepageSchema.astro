@@ -145,6 +145,15 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
     base.hasMap = branch.gbpUrl;
   }
 
+  // sameAs — branch-level cross-link signals (verified GBP place_id maps URL,
+  // and YouTube channel; WeHo additionally carries Facebook profile since the
+  // FB account is anchored to the WeHo physical pin). Source: branch.sameAs in
+  // src/data/branches.ts. Emitted only when at least one URL is configured —
+  // empty/undefined arrays are skipped (defensive: avoids `"sameAs": []`).
+  if (Array.isArray(branch.sameAs) && branch.sameAs.length > 0) {
+    base.sameAs = [...branch.sameAs];
+  }
+
   // aggregateRating intentionally omitted per NAP/Rating SSOT Rule 3
   // (wiki/decisions/nap-rating-policy-ssot.md) — body and schema ratings
   // are removed everywhere until GMB API integration.
@@ -167,10 +176,14 @@ const graph: Array<Record<string, unknown>> = [
       width: 512,
       height: 512
     },
+    // Organization-level sameAs — org-wide social profiles (FB + YT). The
+    // verified GBP listings live at the per-branch LocalBusiness level via
+    // branch.sameAs (place_id maps URLs), not duplicated here. Older
+    // share.google/* shortened links replaced with the canonical maps
+    // place_id form on the branch entries.
     sameAs: [
-      'https://share.google/MZH7ZdnIWHiAp8Zm3',
-      'https://share.google/dBFQdBNMTF9W7og21',
-      'https://share.google/DXrnBNy1purtECJTu'
+      'https://www.facebook.com/profile.php?id=61577069941613',
+      'https://www.youtube.com/@SameDayAppliance.Repair'
     ],
     contactPoint: [{
       '@type': 'ContactPoint',
