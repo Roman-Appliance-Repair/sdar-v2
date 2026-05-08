@@ -82,10 +82,26 @@ const commercialBrandFiles = [
   ...Object.keys(import.meta.glob('./bunn-slushie-machine-repair.astro', { eager: false }))
 ].map(p => p.split('/').pop().replace('.astro', ''));
 
-const commercialCategoryFiles = Object.keys(
-  import.meta.glob('../commercial/*.astro', { eager: false })
-).map(p => p.split('/').pop().replace('.astro', ''))
- .filter(p => p !== 'index' && p !== 'refrigeration-hub');
+// Recursive glob — includes subdirectories (refrigeration/, ice-machines/, etc.).
+// For index.astro files, slug = parent directory name (so /commercial/ice-machines/
+// is reachable via slug 'ice-machines'). For named .astro files, slug = filename.
+const commercialCategoryFiles = (() => {
+  const all = Object.keys(import.meta.glob('../commercial/**/*.astro', { eager: false }));
+  const slugs = new Set<string>();
+  for (const p of all) {
+    const parts = p.split('/');
+    const filename = parts[parts.length - 1].replace('.astro', '');
+    if (filename === 'index') {
+      const dirName = parts[parts.length - 2];
+      if (dirName !== 'commercial' && dirName !== 'refrigeration-hub') {
+        slugs.add(dirName);
+      }
+    } else {
+      slugs.add(filename);
+    }
+  }
+  return Array.from(slugs);
+})();
 
 const has = (slug, list) => list.includes(slug);
 
@@ -676,10 +692,10 @@ const commercialSections = [
       {
         subhead: 'Equipment categories',
         items: [
-          { slug: 'refrigerator-repair',          href: '/commercial/refrigerator-repair/',          label: 'Commercial Refrigerator', source: 'category' },
-          { slug: 'freezer-repair',               href: '/commercial/refrigeration/reach-in-freezer-repair/',               label: 'Commercial Freezer',      source: 'category' },
-          { slug: 'bar-refrigerator-repair',      href: '/commercial/refrigeration/undercounter-refrigerator-repair/',      label: 'Bar Refrigerator',        source: 'category' },
-          { slug: 'showcase-refrigerator-repair', href: '/commercial/refrigeration/display-case-repair/', label: 'Showcase Display',        source: 'category' }
+          { slug: 'refrigerator-repair',                  href: '/commercial/refrigerator-repair/',                                  label: 'Commercial Refrigerator', source: 'category' },
+          { slug: 'reach-in-freezer-repair',              href: '/commercial/refrigeration/reach-in-freezer-repair/',                label: 'Commercial Freezer',      source: 'category' },
+          { slug: 'undercounter-refrigerator-repair',     href: '/commercial/refrigeration/undercounter-refrigerator-repair/',       label: 'Bar Refrigerator',        source: 'category' },
+          { slug: 'display-case-repair',                  href: '/commercial/refrigeration/display-case-repair/',                    label: 'Showcase Display',        source: 'category' }
         ]
       },
       {
@@ -704,7 +720,7 @@ const commercialSections = [
     count: '6/6',
     blocks: [
       { subhead: 'Equipment categories', items: [
-        { slug: 'ice-machine-repair', href: '/commercial/ice-machines/', label: 'Ice Machine', source: 'category' }
+        { slug: 'ice-machines', href: '/commercial/ice-machines/', label: 'Ice Machine', source: 'category' }
       ]},
       { subhead: 'Brand-specific', items: [
         { slug: 'hoshizaki-ice-machine-repair', href: '/brands/hoshizaki-ice-machine-repair/', label: 'Hoshizaki',  source: 'brand' },
@@ -723,7 +739,7 @@ const commercialSections = [
     count: '1/5',
     blocks: [
       { subhead: 'Equipment categories', items: [
-        { slug: 'slushie-machine-repair', href: '/commercial/ice-machines/soft-serve/', label: 'Slushie Machine', source: 'category' }
+        { slug: 'soft-serve', href: '/commercial/ice-machines/soft-serve/', label: 'Slushie Machine', source: 'category' }
       ]},
       { subhead: 'Brand-specific', items: [
         { slug: 'bunn-slushie-machine-repair', href: '/brands/bunn-slushie-machine-repair/', label: 'Bunn', source: 'brand' }
