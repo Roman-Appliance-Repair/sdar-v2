@@ -14,6 +14,11 @@ export interface CityServiceCombo {
 }
 
 // 8 hubs × 5 services. MVP launch matrix.
+// Note: 'temecula' here is the city slug used as a HUB anchor for the
+// Riverside-county service combos (city pages like /temecula/dishwasher-repair/).
+// The branch was renamed temecula→riverside (2026-05-08), but Temecula remains
+// a real served city and is the hub anchor for this matrix until/unless the
+// matrix is rebuilt around 'riverside' city as the hub.
 const HUBS = [
   'west-hollywood',
   'beverly-hills',

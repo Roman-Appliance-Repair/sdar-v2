@@ -102,8 +102,8 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     climateNote: "Hot inland summers (95-105°F July-Sept), mild winters. Wine Country slightly cooler at higher elevation than valley floor. Refrigerator condenser stress similar to Rancho Cucamonga.",
     waterNote: "Eastern Municipal Water District + Rancho California Water District; harder water than LADWP. Scaling on dishwashers and washers year 2-4 typical.",
     homeStock: "Suburban single-family, 1990s-2010s construction. Wine Country has custom estates with premium built-in appliances. Mid-tier brands standard in valley tracts.",
-    serviceContext: "Temecula branch covers Temecula, Murrieta, Menifee, Lake Elsinore, Hemet, Moreno Valley, Corona, Riverside.",
-    branchSlug: 'temecula'
+    serviceContext: "Riverside branch covers Riverside, Corona, Moreno Valley, Norco, Eastvale, Temecula, Murrieta, Menifee, Lake Elsinore, Hemet.",
+    branchSlug: 'riverside'
   },
   // ====================================================================
   // Wave 24b — Top 5 non-hub priority cities (15,516 imp/mo GSC top + others)
