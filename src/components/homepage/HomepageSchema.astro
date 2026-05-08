@@ -29,6 +29,7 @@ import {
 import { HOMEPAGE_FAQ } from '../../data/faq';
 import { CANONICAL_CREDENTIALS, LEGAL_NAME } from '../../data/credentials-schema';
 import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
+import { buildServiceCatalogSchema, SERVICE_CATALOG_REF } from '../../lib/build-service-catalog';
 
 interface Props {}
 
@@ -154,6 +155,11 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
     base.sameAs = [...branch.sameAs];
   }
 
+  // hasOfferCatalog — @id reference to the canonical OfferCatalog graph node
+  // defined elsewhere in this @graph. All 8 LocalBusiness point at the same
+  // catalog (#service-catalog) rather than embedding 48 services 8 times.
+  base.hasOfferCatalog = SERVICE_CATALOG_REF;
+
   // aggregateRating intentionally omitted per NAP/Rating SSOT Rule 3
   // (wiki/decisions/nap-rating-policy-ssot.md) — body and schema ratings
   // are removed everywhere until GMB API integration.
@@ -192,7 +198,11 @@ const graph: Array<Record<string, unknown>> = [
       areaServed: 'US-CA',
       availableLanguage: ['en']
     }],
-    hasCredential: [...CANONICAL_CREDENTIALS]
+    hasCredential: [...CANONICAL_CREDENTIALS],
+    // hasOfferCatalog — @id ref to the canonical OfferCatalog node below.
+    // Same anchor that all 8 LocalBusiness point at (single SSOT, no payload
+    // duplication across entities in this graph).
+    hasOfferCatalog: SERVICE_CATALOG_REF
   },
 
   // 2. WebSite
@@ -224,6 +234,13 @@ const graph: Array<Record<string, unknown>> = [
 
   // 4-11. LocalBusiness × 8 (1 physical_pin + 7 service_area)
   ...BRANCHES.map(buildLocalBusiness),
+
+  // 12. OfferCatalog — canonical service catalog (6 sub-catalogs / 48 services).
+  // Defined HERE on the homepage @graph; all other pages (LocalBusiness on
+  // city pillars, contact location array, etc.) reference this via
+  // `{ "@id": "https://samedayappliance.repair/#service-catalog" }`. SSOT
+  // lives in src/data/service-catalog.ts; renderer in src/lib/build-service-catalog.ts.
+  buildServiceCatalogSchema(),
 
   // 12. FAQPage — 10 Q/A pairs from src/data/faq.ts
   // (Same content as the visible accordion in FAQ.astro for NAP-style consistency
