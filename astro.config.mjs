@@ -212,7 +212,6 @@ export default defineConfig({
     '/brands/gaggenau/': '/brands/gaggenau-oven-repair/',
     '/brands/ge-monogram/': '/brands/ge-monogram-refrigerator-repair/',
     '/brands/hotpoint/': '/services/refrigerator-repair/',
-    '/brands/kenmore/': '/brands/kenmore/',
     '/brands/magic-chef/': '/services/refrigerator-repair/',
     '/brands/roper/': '/services/washer-repair/',
     '/brands/speed-queen/': '/brands/speed-queen-washer-dryer-repair/',
