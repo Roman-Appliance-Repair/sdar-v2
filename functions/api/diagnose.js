@@ -35,11 +35,14 @@ export async function onRequestPost(context) {
   try {
     const payload = await request.json();
 
-    // Validate inputs
-    const description = typeof payload.description === 'string' ? payload.description.slice(0, 1000).trim() : '';
-    if (!description || description.length < 10) {
-      return json({ error: 'Description required (min 10 chars).' }, 400, corsHeaders);
-    }
+    // Build a description from whatever the client sends. If the explicit
+    // `description` field is missing/empty, fall back to `detail`, then to a
+    // synthesized "<symptom> on <appliance> <brand>" line. No min-length gate.
+    const description = String(
+      payload.description ||
+      payload.detail ||
+      `${payload.symptom || ''} on ${payload.appliance || ''} ${payload.brand || ''}`
+    ).trim().slice(0, 1000);
 
     const sector = payload.sector === 'commercial' ? 'commercial' : 'residential';
     const equipmentLabel = sanitize(payload.equipmentLabel || payload.equipment || 'appliance');
