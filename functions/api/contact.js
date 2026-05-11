@@ -79,17 +79,24 @@ export async function onRequestPost(context) {
 // =====================================================================
 
 function buildTelegramText(p) {
-  // AI diagnostic log (no lead yet)
+  // AI diagnostic log (no lead yet — dispatcher follow-up task)
   if (p.name === '🤖 AI Diagnostics' && !p.type) {
+    const requestedAt = new Date().toLocaleString('ru-RU', { timeZone: 'America/Los_Angeles' });
     return [
-      '🤖 <b>AI Diagnostics used</b>',
-      '',
-      `<b>Sector:</b> ${escape(p.sector || '—')}`,
-      `<b>Equipment:</b> ${escape(p.equipmentLabel || p.equipment || '—')}`,
-      p.brand ? `<b>Brand:</b> ${escape(p.brand)}` : '',
-      p.model ? `<b>Model:</b> ${escape(p.model)}` : '',
-      '',
-      `<b>Issue:</b> ${escape(truncate(p.description || '—', 400))}`,
+      '🌐 SDAR AI DIAGNOSTIC | samedayappliance.repair/ai-diagnostic/',
+      '─────────────────────',
+      '📞 Задача диспетчеру: позвонить клиенту и продать визит техника',
+      '─────────────────────',
+      `👤 Клиент: ${escape(p.customerName || '—')}`,
+      `📱 Телефон: ${escape(p.phone || '—')}`,
+      `📧 Email: ${escape(p.email || '—')}`,
+      `🕐 Время запроса: ${escape(requestedAt)}`,
+      '─────────────────────',
+      `🔧 Техника: ${escape(p.appliance || '—')} · ${escape(p.brand || '—')}${p.model ? ' · ' + escape(p.model) : ''}`,
+      `❗ Проблема: ${escape(p.symptom || '—')}`,
+      p.detail ? `📝 Детали: ${escape(truncate(p.detail, 300))}` : null,
+      '─────────────────────',
+      `🤖 AI диагноз: ${escape(truncate(p.result || '—', 400))}`,
     ].filter(Boolean).join('\n');
   }
 
@@ -106,17 +113,22 @@ function buildTelegramText(p) {
   }
 
   if (p.type === 'callback') {
+    const callbackDeadline = new Date(Date.now() + 10 * 60 * 1000).toLocaleString('ru-RU', { timeZone: 'America/Los_Angeles' });
+    const aiDiagnosisText = p.result || p.diagnosis || '';
     return [
-      '📞 <b>CALL BACK REQUEST</b>',
-      '',
-      `<b>Phone:</b> ${escape(p.phone || '—')}`,
-      `<b>Equipment:</b> ${escape(p.equipment || '—')}`,
-      p.brand ? `<b>Brand:</b> ${escape(p.brand)}` : '',
-      p.model ? `<b>Model:</b> ${escape(p.model)}` : '',
-      '',
-      p.diagnosis ? `<b>AI said:</b>\n${escape(truncate(p.diagnosis, 500))}` : '',
-      '',
-      '⏱ Call within 10 minutes.',
+      '📞 SDAR CALL BACK REQUEST',
+      '─────────────────────',
+      '⏰ ПЕРЕЗВОНИТЬ ДО: ' + escape(callbackDeadline) + ' (иначе скидка 5%)',
+      '─────────────────────',
+      '👤 Клиент: ' + escape(p.name || '—'),
+      '📱 Телефон: ' + escape(p.phone || '—'),
+      p.email ? '📧 Email: ' + escape(p.email) : null,
+      '─────────────────────',
+      p.appliance
+        ? `🔧 Техника: ${escape(p.appliance)}${p.brand ? ' · ' + escape(p.brand) : ''}${p.model ? ' · ' + escape(p.model) : ''}`
+        : (p.equipment ? `🔧 Техника: ${escape(p.equipment)}` : null),
+      p.symptom ? `❗ Проблема: ${escape(p.symptom)}` : null,
+      aiDiagnosisText ? `🤖 AI диагноз: ${escape(truncate(aiDiagnosisText, 400))}` : null,
     ].filter(Boolean).join('\n');
   }
 

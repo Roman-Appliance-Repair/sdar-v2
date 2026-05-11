@@ -2,16 +2,36 @@ import { useState } from 'react';
 
 const APPLIANCES = [
   'Refrigerator',
+  'Freezer',
   'Washer',
   'Dryer',
   'Dishwasher',
   'Oven / Range',
   'Cooktop',
   'Microwave',
-  'Wine Cooler',
-  'Ice Maker',
+  'Range Hood',
+  'Wine Cooler / Cellar',
+  'Ice Machine',
+  'Outdoor Refrigerator',
+  'Walk-in Cooler/Freezer',
   'Other',
 ];
+
+const SERVICE_URLS = {
+  'Refrigerator': 'https://samedayappliance.repair/services/refrigerator-repair/',
+  'Freezer': 'https://samedayappliance.repair/services/refrigerator-repair/',
+  'Dishwasher': 'https://samedayappliance.repair/services/dishwasher-repair/',
+  'Washer': 'https://samedayappliance.repair/services/washer-repair/',
+  'Dryer': 'https://samedayappliance.repair/services/dryer-repair/',
+  'Oven / Range': 'https://samedayappliance.repair/services/oven-repair/',
+  'Cooktop': 'https://samedayappliance.repair/services/cooktop-repair/',
+  'Microwave': 'https://samedayappliance.repair/services/microwave-repair/',
+  'Wine Cooler / Cellar': 'https://samedayappliance.repair/services/wine-cellar-cooling-repair/',
+  'Ice Machine': 'https://samedayappliance.repair/commercial/ice-machines/',
+  'Outdoor Refrigerator': 'https://samedayappliance.repair/outdoor/outdoor-refrigerator-repair/',
+  'Range Hood': 'https://samedayappliance.repair/services/range-hood-repair/',
+  'Walk-in Cooler/Freezer': 'https://samedayappliance.repair/commercial/refrigeration/',
+};
 
 const BRANDS = [
   'Sub-Zero',
@@ -47,6 +67,7 @@ const initialForm = {
   age: '',
   detail: '',
   name: '',
+  phone: '',
   email: '',
 };
 
@@ -56,17 +77,25 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState('');
   const [error, setError] = useState('');
+  const [callbackRequested, setCallbackRequested] = useState(false);
 
   const phoneTel = '+1' + phone.replace(/\D/g, '');
 
   const update = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
   const pick = (key, value) => setForm((f) => ({ ...f, [key]: value }));
 
+  const phoneDigits = (s) => String(s || '').replace(/\D/g, '');
+
   const canAdvance = () => {
     if (step === 1) return !!form.appliance;
     if (step === 2) return !!form.brand;
     if (step === 3) return form.symptom.trim().length >= 10;
-    if (step === 4) return !!form.name.trim() && /\S+@\S+\.\S+/.test(form.email);
+    if (step === 4)
+      return (
+        !!form.name.trim() &&
+        phoneDigits(form.phone).length >= 10 &&
+        /\S+@\S+\.\S+/.test(form.email)
+      );
     return true;
   };
 
@@ -77,6 +106,9 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
     setLoading(true);
     setError('');
     try {
+      const serviceUrl =
+        SERVICE_URLS[form.appliance] || 'https://samedayappliance.repair/services/';
+
       const res = await fetch('/api/diagnose', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -87,6 +119,7 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
           symptom: form.symptom,
           age: form.age,
           detail: form.detail,
+          serviceUrl,
           // diagnose.js expects these keys for its system prompt:
           equipment: form.appliance,
           equipmentLabel: form.appliance,
@@ -99,13 +132,17 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
       const text = data.result || 'Call ' + phone + ' for a free phone diagnosis.';
       setResult(text);
 
-      // Fire-and-forget Telegram log via existing /api/contact route
+      // Fire-and-forget Telegram dispatcher log via existing /api/contact route.
+      // `name: '🤖 AI Diagnostics'` is the routing trigger inside contact.js;
+      // the real customer name goes in `customerName` so it renders correctly.
       fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: '🤖 AI Diagnostics',
+          customerName: form.name,
           email: form.email,
+          phone: form.phone,
           appliance: form.appliance,
           brand: form.brand,
           model: form.model,
@@ -127,11 +164,37 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
     }
   };
 
+  const handleCallback = async () => {
+    try {
+      await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'callback',
+          name: form.name,
+          phone: form.phone,
+          email: form.email,
+          appliance: form.appliance,
+          brand: form.brand,
+          model: form.model,
+          symptom: form.symptom,
+          result: result,
+          source: 'ai-diagnostic',
+          brand_site: 'samedayappliance.repair',
+        }),
+      });
+    } catch {
+      /* fire-and-forget — fall through to confirmation either way */
+    }
+    setCallbackRequested(true);
+  };
+
   const reset = () => {
     setStep(1);
     setForm(initialForm);
     setResult('');
     setError('');
+    setCallbackRequested(false);
   };
 
   if (result) {
@@ -141,17 +204,35 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
         <h2 style={styles.h2}>Here's what's likely going on</h2>
         <div style={styles.resultBox}>{result}</div>
 
-        <div style={styles.ctaRow}>
-          <a href={`tel:${phoneTel}`} style={styles.ctaPrimary}>
-            Call {phone}
+        <div style={styles.ctaStack}>
+          <a href="/book/" style={styles.ctaPrimary}>
+            Забронировать онлайн →
           </a>
-          <a href="/book/" style={styles.ctaSecondary}>
-            Book online →
-          </a>
+
+          {callbackRequested ? (
+            <p style={styles.callbackOk}>
+              ✓ Заявка принята — ждите звонка в течение 10 минут
+            </p>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCallback}
+              style={styles.ctaOutline}
+            >
+              <span style={styles.ctaOutlineMain}>
+                Запросить обратный звонок — перезвоним за 10 минут
+              </span>
+              <span style={styles.ctaOutlineSub}>
+                Если позже — скидка 5% на стоимость работ
+              </span>
+            </button>
+          )}
         </div>
 
         <p style={styles.smallNote}>
           Diagnostic fee waived when you approve the repair. BHGS #A49573 · CSLB C-20 HVAC · EPA 608 Universal · BBB Accredited Business.
+          <br />
+          Or call <a href={`tel:${phoneTel}`} style={styles.inlineCall}>{phone}</a> directly.
         </p>
 
         <button type="button" onClick={reset} style={styles.resetBtn}>
@@ -287,6 +368,18 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
               onChange={update('name')}
               placeholder="First name is fine"
               style={styles.input}
+            />
+          </label>
+          <label style={styles.label}>
+            Phone number
+            <input
+              type="tel"
+              value={form.phone}
+              onChange={update('phone')}
+              placeholder="(323) 000-0000"
+              autoComplete="tel"
+              style={styles.input}
+              required
             />
           </label>
           <label style={styles.label}>
@@ -502,35 +595,67 @@ const styles = {
     whiteSpace: 'pre-wrap',
     margin: '0 0 24px 0',
   },
-  ctaRow: {
+  ctaStack: {
     display: 'flex',
+    flexDirection: 'column',
     gap: 12,
-    flexWrap: 'wrap',
     marginBottom: 16,
   },
   ctaPrimary: {
     display: 'inline-flex',
     alignItems: 'center',
-    padding: '14px 24px',
+    justifyContent: 'center',
+    padding: '16px 24px',
     background: '#C8102E',
     color: '#fff',
     fontWeight: 700,
-    fontSize: 15,
+    fontSize: 16,
     textDecoration: 'none',
     borderRadius: 6,
     letterSpacing: '0.02em',
   },
-  ctaSecondary: {
-    display: 'inline-flex',
+  ctaOutline: {
+    display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
-    padding: '14px 24px',
+    justifyContent: 'center',
+    gap: 4,
+    padding: '14px 22px',
     background: '#fff',
     color: '#1a1a1a',
-    fontWeight: 600,
-    fontSize: 15,
-    textDecoration: 'none',
-    border: '1px solid #d6d6d6',
+    border: '1.5px solid #C8102E',
     borderRadius: 6,
+    fontFamily: 'inherit',
+    cursor: 'pointer',
+    width: '100%',
+    textAlign: 'center',
+  },
+  ctaOutlineMain: {
+    fontWeight: 600,
+    fontSize: 14,
+    lineHeight: 1.3,
+    color: '#C8102E',
+  },
+  ctaOutlineSub: {
+    fontSize: 12,
+    color: '#6b6b6b',
+    lineHeight: 1.4,
+  },
+  callbackOk: {
+    margin: 0,
+    padding: '14px 18px',
+    background: '#eaf7ed',
+    border: '1px solid #b9e0c2',
+    borderRadius: 6,
+    color: '#1f7a3a',
+    fontSize: 14,
+    fontWeight: 600,
+    textAlign: 'center',
+  },
+  inlineCall: {
+    color: '#C8102E',
+    textDecoration: 'none',
+    fontWeight: 600,
   },
   smallNote: {
     fontSize: 12,

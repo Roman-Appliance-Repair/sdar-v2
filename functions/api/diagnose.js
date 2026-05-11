@@ -46,31 +46,25 @@ export async function onRequestPost(context) {
     const category = sanitize(payload.category || '');
     const brand = sanitize(payload.brand || '');
     const model = sanitize(payload.model || '');
+    const serviceUrl = String(payload.serviceUrl || 'https://samedayappliance.repair/services/').slice(0, 200);
 
     // Pricing context based on sector
     const priceContext = sector === 'commercial'
       ? 'Commercial repairs: $200–$800 typical range (refrigeration $300–$1200, ice machines $250–$700, fryers $200–$500, commercial dishwashers $250–$600). Diagnostic $120 — waived with repair.'
       : 'Residential repairs: refrigerators $200–$450 ($300–$700+ for Sub-Zero/Wolf/Thermador built-ins), washers/dryers $150–$350 ($200–$450 Miele/Bosch), ovens/ranges $175–$420 ($250–$500+ Wolf/Viking/Thermador), dishwashers $150–$320 ($200–$450 Miele). Diagnostic $89 — waived with repair.';
 
-    const systemPrompt = `You are a senior technician at Same Day Appliance Repair — a BHGS-registered (#A49573), CSLB C-20 HVAC, EPA 608 Universal certified, BBB Accredited Business serving Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. You have 15+ years of hands-on appliance and commercial refrigeration experience.
+    const systemPrompt = `You are a senior appliance repair technician at Same Day Appliance Repair, Los Angeles.
+BHGS #A49573, CSLB C-20, EPA 608 Universal certified.
 
-A customer is describing a problem with their ${sector} ${equipmentLabel.toLowerCase()}${brand ? ' (' + brand + (model ? ', model ' + model : '') + ')' : ''}.
+The client described a problem with their appliance. Give a diagnostic response in the same language the client used.
 
-Write a preliminary diagnosis in 4–6 sentences that sounds like a real tech thinking out loud, not corporate copy. Cover:
+Structure your response as follows:
+1. List 3-4 most likely causes, ordered from most probable to least probable. For each cause give 1-2 sentences of explanation with specific technical detail (component names, failure patterns, model-specific notes if brand/model provided).
+2. Mention the estimated repair cost range. Always add this exact disclaimer after the number: "Это базовая стоимость работ — цифра приблизительная и не включает стоимость запчастей, материалов и расходников. Точная стоимость определяется только после визита техника на месте."
+3. End with one sentence mentioning the relevant service page: ${serviceUrl}
+4. Final line: call to action to book same-day visit or request callback. Mention $89 diagnostic fee is waived if repair is approved.
 
-1. Most likely cause — be specific about the part or failure mode (not vague "could be a few things").
-2. Whether this is typically a DIY fix or needs a pro (most aren't DIY; mention why briefly).
-3. A realistic repair cost range for ${brand || 'this type of unit'}. ${priceContext}
-4. Whether same-day service is realistic for this issue.
-5. Close with a direct line: call (323) 870-4790 to get a C-20 tech out today. The $${sector === 'commercial' ? '120' : '89'} diagnostic is waived when they approve the repair.
-
-Do NOT:
-- Use phrases like "we understand the urgency", "certified technicians", "peace of mind", "hassle-free", "look no further".
-- Make claims about specific lifespans or warranties.
-- Recommend buying a new appliance unless repair clearly doesn't pencil out (over 50% of replacement cost).
-- Start with "Based on your description" or similar filler.
-
-Start with a direct observation about what's probably happening. Sound like a tech who's seen this a hundred times.`;
+Be direct, technical, honest. Never say "I recommend" — say "our technicians". Max 200 words.`;
 
     const userContent = `Customer's description: ${description}`;
 
