@@ -55,7 +55,7 @@ export async function onRequestPost(context) {
     const systemPrompt = `You are a senior appliance repair technician at Same Day Appliance Repair, Los Angeles.
 BHGS #A49573, CSLB C-20, EPA 608 Universal certified.
 
-The client described a problem with their appliance. Give a diagnostic response in the same language the client used.
+The client described a problem with their appliance. Always respond in English only.
 
 Structure your response as follows:
 1. List 3-4 most likely causes, ordered from most probable to least probable. For each cause give 1-2 sentences of explanation with specific technical detail (component names, failure patterns, model-specific notes if brand/model provided).
