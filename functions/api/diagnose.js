@@ -46,7 +46,6 @@ export async function onRequestPost(context) {
     const category = sanitize(payload.category || '');
     const brand = sanitize(payload.brand || '');
     const model = sanitize(payload.model || '');
-    const serviceUrl = String(payload.serviceUrl || 'https://samedayappliance.repair/services/').slice(0, 200);
 
     // Pricing context based on sector
     const priceContext = sector === 'commercial'
@@ -61,8 +60,7 @@ The client described a problem with their appliance. Give a diagnostic response 
 Structure your response as follows:
 1. List 3-4 most likely causes, ordered from most probable to least probable. For each cause give 1-2 sentences of explanation with specific technical detail (component names, failure patterns, model-specific notes if brand/model provided).
 2. Mention the estimated repair cost range. Always add this exact disclaimer after the number: "Это базовая стоимость работ — цифра приблизительная и не включает стоимость запчастей, материалов и расходников. Точная стоимость определяется только после визита техника на месте."
-3. End with one sentence mentioning the relevant service page: ${serviceUrl}
-4. Final line: call to action to book same-day visit or request callback. Mention $89 diagnostic fee is waived if repair is approved.
+3. Final line: call to action to book same-day visit or request callback. Mention $89 diagnostic fee is waived if repair is approved.
 
 Be direct, technical, honest. Never say "I recommend" — say "our technicians". Max 200 words.`;
 

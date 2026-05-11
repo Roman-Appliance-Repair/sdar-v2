@@ -33,22 +33,21 @@ const SERVICE_URLS = {
   'Walk-in Cooler/Freezer': 'https://samedayappliance.repair/commercial/refrigeration/',
 };
 
-const BRANDS = [
-  'Sub-Zero',
-  'Wolf',
-  'Thermador',
-  'Viking',
-  'Miele',
-  'Bosch',
-  'KitchenAid',
-  'GE',
-  'LG',
-  'Samsung',
-  'Whirlpool',
-  'Maytag',
-  'Frigidaire',
-  'Other',
-];
+const BRANDS_BY_APPLIANCE = {
+  'Refrigerator':           ['Sub-Zero','Thermador','Viking','Miele','Liebherr','True Residential','GE Monogram','JennAir','KitchenAid','Bosch','Dacor','Fisher & Paykel','LG','Samsung','GE','Whirlpool','Maytag','Frigidaire','Haier','Other'],
+  'Freezer':                ['Sub-Zero','Thermador','True Residential','GE Monogram','LG','Samsung','GE','Whirlpool','Frigidaire','Other'],
+  'Dishwasher':             ['Miele','Thermador','JennAir','Cove','Gaggenau','KitchenAid','Bosch','Dacor','Fisher & Paykel','Asko','LG','Samsung','GE','Whirlpool','Maytag','Frigidaire','Other'],
+  'Washer':                 ['Miele','Asko','Bosch','Speed Queen','Electrolux','Fisher & Paykel','LG','Samsung','GE','Whirlpool','Maytag','Haier','Frigidaire','Other'],
+  'Dryer':                  ['Miele','Asko','Bosch','Speed Queen','Electrolux','Fisher & Paykel','LG','Samsung','GE','Whirlpool','Maytag','Frigidaire','Other'],
+  'Oven / Range':           ['Wolf','Thermador','Viking','JennAir','Miele','Gaggenau','KitchenAid','Bosch','Bertazzoni','Dacor','BlueStar','Hestan','LG','Samsung','GE','Whirlpool','Maytag','Frigidaire','Other'],
+  'Cooktop':                ['Wolf','Thermador','Viking','JennAir','KitchenAid','Bosch','GE','Whirlpool','Other'],
+  'Microwave':              ['Wolf','Thermador','Miele','JennAir','KitchenAid','Dacor','LG','Samsung','GE','Whirlpool','Maytag','Sharp','Panasonic','Other'],
+  'Wine Cooler / Cellar':   ['Sub-Zero','Viking','Liebherr','Miele','Gaggenau','True Residential','Thermador','U-Line','WhisperKool','CellarPro','Breezaire','Other'],
+  'Ice Machine':            ['Sub-Zero','Viking','Thermador','GE Monogram','GE Profile','LG','Samsung','GE','Whirlpool','Maytag','Miele','Frigidaire','Other'],
+  'Outdoor Refrigerator':   ['Sub-Zero','Viking','U-Line','Perlick','Hestan','Other'],
+  'Range Hood':             ['Wolf','Thermador','Viking','Miele','JennAir','GE Monogram','BlueStar','Hestan','Fisher & Paykel','Bosch','KitchenAid','Zephyr','GE Profile','LG','Samsung','Whirlpool','Broan','GE','Frigidaire','Maytag','Other'],
+  'Walk-in Cooler/Freezer': ['True Refrigeration','Hoshizaki','Traulsen','Beverage-Air','Delfield','Nor-Lake','Other'],
+};
 
 const AGE_OPTIONS = [
   'Less than 1 year',
@@ -204,6 +203,25 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
         <h2 style={styles.h2}>Here's what's likely going on</h2>
         <div style={styles.resultBox}>{result}</div>
 
+        {SERVICE_URLS[form.appliance] && (
+          <a
+            href={SERVICE_URLS[form.appliance]}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-block',
+              marginTop: '1rem',
+              marginBottom: '1.25rem',
+              color: '#C8102E',
+              fontWeight: 500,
+              fontSize: '14px',
+              textDecoration: 'underline',
+            }}
+          >
+            Подробнее об этой услуге →
+          </a>
+        )}
+
         <div style={styles.ctaStack}>
           <a href="/book/" style={styles.ctaPrimary}>
             Забронировать онлайн →
@@ -265,7 +283,13 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
               <button
                 key={a}
                 type="button"
-                onClick={() => pick('appliance', a)}
+                onClick={() =>
+                  setForm((f) => ({
+                    ...f,
+                    appliance: a,
+                    brand: (BRANDS_BY_APPLIANCE[a] || []).includes(f.brand) ? f.brand : '',
+                  }))
+                }
                 style={{
                   ...styles.choice,
                   ...(form.appliance === a ? styles.choiceActive : {}),
@@ -282,7 +306,7 @@ export default function AIDiagnostic({ phone = '(323) 870-4790' }) {
         <>
           <h2 style={styles.h2}>Which brand?</h2>
           <div style={styles.grid}>
-            {BRANDS.map((b) => (
+            {(BRANDS_BY_APPLIANCE[form.appliance] || ['Other']).map((b) => (
               <button
                 key={b}
                 type="button"

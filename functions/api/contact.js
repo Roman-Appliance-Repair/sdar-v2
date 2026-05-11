@@ -96,7 +96,7 @@ function buildTelegramText(p) {
       `❗ Проблема: ${escape(p.symptom || '—')}`,
       p.detail ? `📝 Детали: ${escape(truncate(p.detail, 300))}` : null,
       '─────────────────────',
-      `🤖 AI диагноз: ${escape(truncate(p.result || '—', 400))}`,
+      `🤖 AI диагноз: ${escape(p.result || '—')}`,
     ].filter(Boolean).join('\n');
   }
 
