@@ -1,6 +1,103 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { execSync } from 'node:child_process';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const PAGES_DIR = path.join(__dirname, 'src', 'pages');
+
+// Git lastmod map: POSIX-relative path → ISO commit date.
+// Built lazily on first sitemap serialize call. One git log invocation.
+// On Cloudflare Pages with shallow clone, may be partial — fs.statSync
+// fallback covers missing entries; today's date is final fallback.
+let _gitMtimeMap = null;
+function getGitMtimeMap() {
+  if (_gitMtimeMap) return _gitMtimeMap;
+  _gitMtimeMap = new Map();
+  try {
+    const out = execSync('git log --name-only --pretty=format:__SDAR_DATE__%cI', {
+      encoding: 'utf8',
+      maxBuffer: 200 * 1024 * 1024,
+      cwd: __dirname,
+    });
+    let currentDate = null;
+    for (const line of out.split('\n')) {
+      if (line.startsWith('__SDAR_DATE__')) {
+        currentDate = line.slice('__SDAR_DATE__'.length);
+      } else if (line && currentDate && !_gitMtimeMap.has(line)) {
+        _gitMtimeMap.set(line, currentDate);
+      }
+    }
+    console.log(`[sitemap] git lastmod map: ${_gitMtimeMap.size} files`);
+  } catch (e) {
+    console.warn('[sitemap] git lastmod unavailable, using fs.statSync fallback');
+  }
+  return _gitMtimeMap;
+}
+
+function findFileForUrl(urlPath) {
+  const trimmed = urlPath.replace(/^\/+|\/+$/g, '');
+  if (trimmed === '') return path.join(PAGES_DIR, 'index.astro');
+
+  const direct = path.join(PAGES_DIR, trimmed + '.astro');
+  if (fs.existsSync(direct)) return direct;
+
+  const indexed = path.join(PAGES_DIR, trimmed, 'index.astro');
+  if (fs.existsSync(indexed)) return indexed;
+
+  // Walk parametric routes
+  const segments = trimmed.split('/');
+  for (let i = segments.length; i >= 1; i--) {
+    const fixedParts = segments.slice(0, i - 1);
+    const dirPath = fixedParts.length ? path.join(PAGES_DIR, ...fixedParts) : PAGES_DIR;
+    if (!fs.existsSync(dirPath)) continue;
+
+    let entries;
+    try { entries = fs.readdirSync(dirPath, { withFileTypes: true }); } catch { continue; }
+
+    if (i === segments.length) {
+      const paramFile = entries.find(e => e.isFile() && /^\[.+\]\.astro$/.test(e.name));
+      if (paramFile) return path.join(dirPath, paramFile.name);
+    }
+
+    const paramDir = entries.find(e => e.isDirectory() && /^\[.+\]$/.test(e.name));
+    if (paramDir) {
+      const remaining = segments.slice(i);
+      const subDirPath = path.join(dirPath, paramDir.name);
+      const c1 = path.join(subDirPath, remaining.join('/') + '.astro');
+      if (fs.existsSync(c1)) return c1;
+      const c2 = path.join(subDirPath, ...remaining, 'index.astro');
+      if (fs.existsSync(c2)) return c2;
+      if (remaining.length === 1) {
+        try {
+          const subEntries = fs.readdirSync(subDirPath, { withFileTypes: true });
+          const subParam = subEntries.find(e => e.isFile() && /^\[.+\]\.astro$/.test(e.name));
+          if (subParam) return path.join(subDirPath, subParam.name);
+        } catch {}
+      }
+    }
+  }
+  return null;
+}
+
+function getLastmodForUrl(itemUrl) {
+  try {
+    const urlPath = new URL(itemUrl).pathname;
+    const filePath = findFileForUrl(urlPath);
+    if (!filePath) return new Date().toISOString();
+
+    const relPath = path.relative(__dirname, filePath).replace(/\\/g, '/');
+    const gitDate = getGitMtimeMap().get(relPath);
+    if (gitDate) return gitDate;
+
+    return fs.statSync(filePath).mtime.toISOString();
+  } catch {
+    return new Date().toISOString();
+  }
+}
 
 // https://astro.build/config
 export default defineConfig({
@@ -14,7 +111,12 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'hover',
   },
-  integrations: [sitemap()],
+  integrations: [sitemap({
+    serialize(item) {
+      item.lastmod = getLastmodForUrl(item.url);
+      return item;
+    },
+  })],
   redirects: {
     // ====================================================================
     // Pre-existing redirects (preserved from original config)
