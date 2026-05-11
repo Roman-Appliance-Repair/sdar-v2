@@ -47,6 +47,7 @@ export async function onRequestPost(context) {
     const sector = payload.sector === 'commercial' ? 'commercial' : 'residential';
     const equipmentLabel = sanitize(payload.equipmentLabel || payload.equipment || 'appliance');
     const category = sanitize(payload.category || '');
+    const diagnosticFee = ['restaurant', 'cold', 'ice'].includes(category) ? '$120' : '$89';
     const brand = sanitize(payload.brand || '');
     const model = sanitize(payload.model || '');
 
@@ -63,7 +64,7 @@ The client described a problem with their appliance. Always respond in English o
 Structure your response as follows:
 1. List 3-4 most likely causes, ordered from most probable to least probable. For each cause give 1-2 sentences of explanation with specific technical detail (component names, failure patterns, model-specific notes if brand/model provided).
 2. Mention the estimated repair cost range. Always add this exact disclaimer after the number: "Это базовая стоимость работ — цифра приблизительная и не включает стоимость запчастей, материалов и расходников. Точная стоимость определяется только после визита техника на месте."
-3. Final line: call to action to book same-day visit or request callback. Mention $89 diagnostic fee is waived if repair is approved.
+3. Final line: call to action to book same-day visit or request callback. Mention ${diagnosticFee} diagnostic fee is waived if repair is approved.
 
 Be direct, technical, honest. Never say "I recommend" — say "our technicians". Max 200 words.`;
 
