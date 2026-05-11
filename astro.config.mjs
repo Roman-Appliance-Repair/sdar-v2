@@ -10,13 +10,30 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PAGES_DIR = path.join(__dirname, 'src', 'pages');
 
 // Git lastmod map: POSIX-relative path → ISO commit date.
-// Built lazily on first sitemap serialize call. One git log invocation.
-// On Cloudflare Pages with shallow clone, may be partial — fs.statSync
-// fallback covers missing entries; today's date is final fallback.
+// Source priority:
+//   1. scripts/git-mtime-map.json — pre-built snapshot committed to repo;
+//      always present on Cloudflare Pages (shallow clone) builds.
+//   2. live `git log` invocation — used locally when JSON is missing/empty.
+// fs.statSync mtime and today's date are tertiary fallbacks per-URL.
 let _gitMtimeMap = null;
 function getGitMtimeMap() {
   if (_gitMtimeMap) return _gitMtimeMap;
   _gitMtimeMap = new Map();
+
+  const jsonPath = path.join(__dirname, 'scripts', 'git-mtime-map.json');
+  try {
+    if (fs.existsSync(jsonPath)) {
+      const obj = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+      for (const [k, v] of Object.entries(obj)) _gitMtimeMap.set(k, v);
+      if (_gitMtimeMap.size > 0) {
+        console.log(`[sitemap] git lastmod map: ${_gitMtimeMap.size} files (from scripts/git-mtime-map.json)`);
+        return _gitMtimeMap;
+      }
+    }
+  } catch (e) {
+    console.warn('[sitemap] failed to read git-mtime-map.json:', e.message);
+  }
+
   try {
     const out = execSync('git log --name-only --pretty=format:__SDAR_DATE__%cI', {
       encoding: 'utf8',
@@ -31,7 +48,7 @@ function getGitMtimeMap() {
         _gitMtimeMap.set(line, currentDate);
       }
     }
-    console.log(`[sitemap] git lastmod map: ${_gitMtimeMap.size} files`);
+    console.log(`[sitemap] git lastmod map: ${_gitMtimeMap.size} files (from live git log)`);
   } catch (e) {
     console.warn('[sitemap] git lastmod unavailable, using fs.statSync fallback');
   }
