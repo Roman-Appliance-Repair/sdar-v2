@@ -70,12 +70,6 @@ const breadcrumbSchema = {
   ]
 };
 
-const applianceOptions = [
-  'Refrigerator', 'Freezer', 'Wine Cooler / Cellar', 'Ice Maker',
-  'Dishwasher', 'Oven / Wall Oven', 'Range / Stove', 'Cooktop',
-  'Microwave', 'Range Hood', 'Washer', 'Dryer', 'Stackable Washer-Dryer',
-  'Garbage Disposal', 'Trash Compactor', 'BBQ Grill', 'Pizza Oven', 'Other'
-];
 ---
 
 <Layout title={title} description={description} canonical={canonical}>
@@ -196,12 +190,23 @@ const applianceOptions = [
           </select>
         </label>
 
+        <label class="full">
+          <span>Service category *</span>
+          <select id="f-category" name="category" required>
+            <option value="">— Select category —</option>
+            <option value="home">Home Appliances</option>
+            <option value="restaurant">Restaurant Kitchen</option>
+            <option value="cold">Cold Storage</option>
+            <option value="ice">Ice Machines</option>
+            <option value="outdoor">Outdoor Living</option>
+          </select>
+        </label>
+
         <div class="form-row">
           <label>
             <span>Appliance *</span>
             <select id="f-appliance" name="appliance" required>
-              <option value="">— Select —</option>
-              {applianceOptions.map((o) => <option value={o}>{o}</option>)}
+              <option value="">— Select category first —</option>
             </select>
           </label>
           <label>
@@ -223,11 +228,19 @@ const applianceOptions = [
           <label>
             <span>Preferred time</span>
             <select id="f-time" name="window">
-              <option value="asap">ASAP — same day if possible</option>
-              <option value="today-pm">Today, afternoon</option>
-              <option value="tomorrow-am">Tomorrow, morning</option>
-              <option value="tomorrow-pm">Tomorrow, afternoon</option>
-              <option value="flex">Flexible — tell me what's open</option>
+              <option value="">— Select time —</option>
+              <option value="ASAP">ASAP — same day if possible</option>
+              <option value="8:00-10:00 AM">8:00–10:00 AM</option>
+              <option value="9:00-11:00 AM">9:00–11:00 AM</option>
+              <option value="10:00 AM-12:00 PM">10:00 AM–12:00 PM</option>
+              <option value="11:00 AM-1:00 PM">11:00 AM–1:00 PM</option>
+              <option value="12:00-2:00 PM">12:00–2:00 PM</option>
+              <option value="1:00-3:00 PM">1:00–3:00 PM</option>
+              <option value="2:00-4:00 PM">2:00–4:00 PM</option>
+              <option value="3:00-5:00 PM">3:00–5:00 PM</option>
+              <option value="4:00-6:00 PM">4:00–6:00 PM</option>
+              <option value="5:00-7:00 PM">5:00–7:00 PM</option>
+              <option value="6:00-8:00 PM">6:00–8:00 PM</option>
             </select>
           </label>
         </div>
@@ -322,6 +335,34 @@ const applianceOptions = [
         return el ? (el.value || '').trim() : '';
       }
 
+      // Category → appliances mapping for the dependent dropdown.
+      var APPLIANCES_BY_CAT = {
+        home: ['Refrigerator','Freezer','Dishwasher','Washer','Dryer','Oven / Range','Cooktop','Microwave','Wine Cooler / Cellar','Range Hood','Wall Oven','Garbage Disposal','Trash Compactor','Stackable Washer-Dryer','Other'],
+        restaurant: ['Commercial Oven','Commercial Range','Commercial Fryer','Commercial Dishwasher','Commercial Refrigerator','Commercial Freezer','Commercial Steamer','Commercial Mixer','Other'],
+        cold: ['Walk-in Cooler','Walk-in Freezer','Reach-in Refrigerator','Reach-in Freezer','Display Case','Prep Table','Undercounter Refrigerator','Other'],
+        ice: ['Ice Machine (Cuber)','Ice Machine (Flaker)','Ice Machine (Nugget)','Ice Dispenser','Ice Storage Bin','Other'],
+        outdoor: ['Gas Grill','Pellet Grill','Patio Heater','Gas Fireplace','Outdoor Refrigerator','Outdoor Ice Maker','Pizza Oven','BBQ Grill','Other']
+      };
+
+      var catSel = document.getElementById('f-category');
+      var appSel = document.getElementById('f-appliance');
+      if (catSel && appSel) {
+        catSel.addEventListener('change', function () {
+          var list = APPLIANCES_BY_CAT[catSel.value] || [];
+          appSel.innerHTML = '';
+          var placeholder = document.createElement('option');
+          placeholder.value = '';
+          placeholder.textContent = list.length ? '— Select appliance —' : '— Select category first —';
+          appSel.appendChild(placeholder);
+          for (var i = 0; i < list.length; i++) {
+            var opt = document.createElement('option');
+            opt.value = list[i];
+            opt.textContent = list[i];
+            appSel.appendChild(opt);
+          }
+        });
+      }
+
       btn.addEventListener('click', async function () {
         var name = val('f-name');
         var phone = val('f-phone');
@@ -329,6 +370,7 @@ const applianceOptions = [
         var zip = val('f-zip');
         var address = val('f-address');
         var city = val('f-city');
+        var category = val('f-category');
         var appliance = val('f-appliance');
         var brand = val('f-brand');
         var issue = val('f-issue');
@@ -343,6 +385,7 @@ const applianceOptions = [
         }
         if (!address) { alert('Please enter your service address.'); return; }
         if (!city) { alert('Please select your service area.'); return; }
+        if (!category) { alert('Please select the service category.'); return; }
         if (!appliance) { alert('Please select the appliance type.'); return; }
         if (!issue) { alert('Please describe the issue briefly.'); return; }
 
@@ -363,7 +406,9 @@ const applianceOptions = [
               zip: zip,
               address: address,
               city: city,
+              category: category,
               equipment: appliance,
+              appliance: appliance,
               brand: brand,
               description: issue,
               date: date,
