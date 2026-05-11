@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import react from '@astrojs/react';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -128,12 +129,15 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'hover',
   },
-  integrations: [sitemap({
-    serialize(item) {
-      item.lastmod = getLastmodForUrl(item.url);
-      return item;
-    },
-  })],
+  integrations: [
+    react(),
+    sitemap({
+      serialize(item) {
+        item.lastmod = getLastmodForUrl(item.url);
+        return item;
+      },
+    }),
+  ],
   redirects: {
     // ====================================================================
     // Pre-existing redirects (preserved from original config)
