@@ -330,7 +330,6 @@ export default defineConfig({
     '/brands/blomberg/': '/services/refrigerator-repair/',
     '/brands/commercial-and-household/': '/brands/',
     '/brands/fisher-paykel/': '/brands/fisher-paykel-refrigerator-repair/',
-    '/brands/ge-monogram/': '/brands/ge-monogram-refrigerator-repair/',
     '/brands/hotpoint/': '/services/refrigerator-repair/',
     '/brands/magic-chef/': '/services/refrigerator-repair/',
     '/brands/roper/': '/services/washer-repair/',
