@@ -179,8 +179,8 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Ice maker assembly (year 6-9).', detail: '$285-485. Dispenser solenoid year 7-10 ($180-280).' },
       { title: 'Water inlet valve / supply line.', detail: 'Most common ice and water dispenser failure. $245-385.' }
     ],
-    brandPoolUltraPremium: ['Sub-Zero', 'Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Viking'],
-    brandPoolPremium: ['Sub-Zero', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking'],
+    brandPoolUltraPremium: ['Sub-Zero', 'Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Viking', 'Liebherr', 'Marvel'],
+    brandPoolPremium: ['Sub-Zero', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking', 'Fisher & Paykel', 'U-Line'],
     brandPoolGeneral: ['Whirlpool', 'GE', 'LG', 'Samsung', 'KitchenAid', 'Frigidaire', 'Bosch', 'Sub-Zero'],
     brandPoolInland: ['Whirlpool', 'GE', 'Samsung', 'LG', 'Frigidaire', 'KitchenAid', 'Maytag'],
     honestOpinion: "If your refrigerator is year 12+ and the compressor just failed on a mid-tier brand (Whirlpool, GE, Samsung, LG), the math usually says replace, not repair. Compressor + labor at $880-1,400 on a $1,400-2,200 unit at end of design life is borderline. Premium built-in (Sub-Zero, Wolf) at year 12+ usually still justifies repair because chassis is built for 18-25 year service.",
@@ -213,7 +213,7 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Lint screen / cabinet airflow.', detail: 'Annual deep cleaning service prevents fire risk and extends component life.' }
     ],
     brandPoolUltraPremium: ['Miele', 'Asko', 'LG SteamFresh', 'Whirlpool', 'KitchenAid'],
-    brandPoolPremium: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'KitchenAid', 'Bosch', 'Miele'],
+    brandPoolPremium: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'KitchenAid', 'Bosch', 'Miele', 'Speed Queen', 'Asko', 'Fisher & Paykel'],
     brandPoolGeneral: ['Whirlpool', 'Maytag', 'GE', 'LG', 'Samsung', 'Frigidaire', 'Kenmore'],
     brandPoolInland: ['Whirlpool', 'Maytag', 'GE', 'Samsung', 'LG', 'Frigidaire'],
     honestOpinion: "Annual vent cleaning is the single highest-leverage maintenance on dryers. Lint accumulation in the vent is the leading cause of premature thermal fuse trips, heating element burnout, and dryer fires. We charge $140-220 for vent cleaning service; you save money on parts replacement plus reduce fire risk. Some shops won't recommend this because it's lower margin than parts work.",
@@ -246,7 +246,7 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Detergent dispenser / overdose.', detail: 'Excessive sudsing leak. $80-160 dispenser cleaning + customer education.' }
     ],
     brandPoolUltraPremium: ['Miele', 'Asko', 'LG WashTower', 'Whirlpool', 'KitchenAid'],
-    brandPoolPremium: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'Bosch', 'Miele', 'Speed Queen'],
+    brandPoolPremium: ['LG', 'Samsung', 'Whirlpool', 'Maytag', 'Bosch', 'Miele', 'Speed Queen', 'Asko', 'Fisher & Paykel'],
     brandPoolGeneral: ['Whirlpool', 'Maytag', 'GE', 'LG', 'Samsung', 'Speed Queen', 'Frigidaire'],
     brandPoolInland: ['Whirlpool', 'Maytag', 'GE', 'Samsung', 'LG', 'Speed Queen', 'Frigidaire'],
     honestOpinion: "Front-load washer shock absorbers are the most-overlooked maintenance item. Year 6-9 typical wear; symptom is severe vibration during spin. Replacement runs $340-580. Skipping shock absorber service stresses the drum bearings and tub seal, leading to $880-1,400 multi-component repair instead of $400 single-component. Most operations replace shocks reactively after secondary damage; we identify shock wear at routine service before damage compounds.",
@@ -278,8 +278,8 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Door latch / interlock (year 6-9).', detail: '$180-280. Dishwasher won\'t start because control reads door open.' },
       { title: 'Hard-water scaling (LADWP / Pasadena / IE areas).', detail: '$120-220 descaling service. Scale buildup damages heating element and wash arm spray jets.' }
     ],
-    brandPoolUltraPremium: ['Miele', 'Bosch', 'Asko', 'KitchenAid', 'Thermador', 'Cove (Sub-Zero family)'],
-    brandPoolPremium: ['Bosch', 'Miele', 'KitchenAid', 'Thermador', 'LG', 'Samsung'],
+    brandPoolUltraPremium: ['Miele', 'Bosch', 'Asko', 'KitchenAid', 'Thermador', 'Cove (Sub-Zero family)', 'Gaggenau'],
+    brandPoolPremium: ['Bosch', 'Miele', 'KitchenAid', 'Thermador', 'LG', 'Samsung', 'Asko', 'Fisher & Paykel'],
     brandPoolGeneral: ['Whirlpool', 'KitchenAid', 'Bosch', 'GE', 'LG', 'Samsung', 'Frigidaire', 'Maytag'],
     brandPoolInland: ['Whirlpool', 'KitchenAid', 'GE', 'Bosch', 'LG', 'Samsung', 'Frigidaire'],
     honestOpinion: "About 30 percent of dishwasher service calls in LA hard-water areas (San Fernando Valley, Pasadena, Inland Empire) resolve at descaling service ($120-220), not parts replacement. Some shops will quote a $385 inlet valve or $280 wash arm assembly on a unit that just needs descaling. We test descaling first because that's the actual issue 30 percent of the time. Annual descaling PM extends heating element life from year 7-10 to year 10-15 in hard-water areas.",
@@ -310,8 +310,8 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Door hinge sag (year 6-9).', detail: '$120-220 service. Door doesn\'t close fully, heat loss, latch issues.' },
       { title: 'Self-clean lock mechanism (year 7-10).', detail: '$180-280 replacement. Oven stuck locked after self-clean cycle, or won\'t enter self-clean.' }
     ],
-    brandPoolUltraPremium: ['Wolf', 'Miele', 'Sub-Zero (Cove dishwasher partner)', 'Thermador', 'Gaggenau', 'La Cornue', 'Viking'],
-    brandPoolPremium: ['Wolf', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking'],
+    brandPoolUltraPremium: ['Wolf', 'Miele', 'Sub-Zero (Cove dishwasher partner)', 'Thermador', 'Gaggenau', 'La Cornue', 'Viking', 'BlueStar', 'Bertazzoni', 'Hestan', 'ILVE'],
+    brandPoolPremium: ['Wolf', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking', 'BlueStar', 'Bertazzoni'],
     brandPoolGeneral: ['Whirlpool', 'GE', 'KitchenAid', 'LG', 'Samsung', 'Frigidaire', 'Maytag', 'Wolf (premium pockets)'],
     brandPoolInland: ['Whirlpool', 'GE', 'KitchenAid', 'Samsung', 'LG', 'Frigidaire', 'Maytag'],
     honestOpinion: "Most oven calls resolve at the igniter (gas) or bake element (electric) plus a thermostat check. About 65 percent of LA oven service in our experience falls in the $280-440 single-component range. Multi-component failure on year 12+ ovens is the borderline replace-vs-repair call; mid-tier ovens at year 12+ with multiple aging components ($800-1,200 cumulative repair on a $1,200-2,400 retail unit) usually lean replace. Premium tier (Wolf, Miele, Thermador) at year 12+ usually still justifies repair.",
@@ -349,8 +349,8 @@ SERVICE_DESCRIPTORS['stove-repair'] = {
     { title: 'Control board (year 8-12).', detail: 'Touch controls unresponsive, error codes flashing. $385-680 replacement.' },
     { title: 'Self-clean lock mechanism (year 7-10).', detail: 'Stuck locked or won\'t enter self-clean. $180-280.' }
   ],
-  brandPoolUltraPremium: ['Wolf', 'La Cornue', 'Viking', 'Thermador', 'Miele', 'Lacanche', 'BlueStar'],
-  brandPoolPremium: ['Wolf', 'Thermador', 'Viking', 'KitchenAid', 'Bosch', 'BlueStar'],
+  brandPoolUltraPremium: ['Wolf', 'La Cornue', 'Viking', 'Thermador', 'Miele', 'Lacanche', 'BlueStar', 'Bertazzoni', 'Hestan', 'ILVE'],
+  brandPoolPremium: ['Wolf', 'Thermador', 'Viking', 'KitchenAid', 'Bosch', 'BlueStar', 'Bertazzoni'],
   brandPoolGeneral: ['Whirlpool', 'GE', 'KitchenAid', 'LG', 'Samsung', 'Frigidaire', 'Maytag', 'Wolf'],
   brandPoolInland: ['Whirlpool', 'GE', 'KitchenAid', 'Samsung', 'LG', 'Frigidaire', 'Maytag'],
   honestOpinion: "Most stove calls resolve at the surface burner igniter or oven thermostat — about 65 percent of LA stove service in our experience falls in the $220-440 single-component range. Premium tier (Wolf, Thermador, Viking, La Cornue) at year 12+ usually still justifies repair because chassis is built for 18-25 year service. Mid-tier free-standing ranges at year 12+ with multiple aging components typically lean replace.",
@@ -384,8 +384,8 @@ SERVICE_DESCRIPTORS['cooktop-repair'] = {
     { title: 'Burner cap / port carbon clog (gas).', detail: '$120-200 cleaning service often resolves without parts.' },
     { title: 'Cooktop downdraft motor (Jenn-Air, Wolf downdraft).', detail: '$485-820 motor replacement.' }
   ],
-  brandPoolUltraPremium: ['Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Viking', 'BlueStar'],
-  brandPoolPremium: ['Wolf', 'Bosch', 'Thermador', 'KitchenAid', 'Jenn-Air', 'Miele'],
+  brandPoolUltraPremium: ['Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Viking', 'BlueStar', 'Bertazzoni', 'Hestan', 'ILVE'],
+  brandPoolPremium: ['Wolf', 'Bosch', 'Thermador', 'KitchenAid', 'Jenn-Air', 'Miele', 'BlueStar', 'Bertazzoni'],
   brandPoolGeneral: ['Whirlpool', 'GE', 'KitchenAid', 'Bosch', 'Frigidaire', 'Samsung', 'LG', 'Wolf'],
   brandPoolInland: ['Whirlpool', 'GE', 'KitchenAid', 'Samsung', 'LG', 'Frigidaire'],
   honestOpinion: "About 25 percent of induction cooktop \"won't heat\" calls resolve at vessel verification — operator using non-induction-compatible cookware. Five-second magnet test before quoting parts. For glass-ceramic surface cracks, replacement is the only option (safety hazard); $580-980 surface replacement on premium models often pencils as repair vs $2,400-4,800 full cooktop replacement on year 8+ units.",
@@ -487,8 +487,8 @@ SERVICE_DESCRIPTORS['wall-oven-repair'] = {
     { title: 'Self-clean lock mechanism (year 7-10).', detail: '$220-380 replacement. Common Wolf, Miele, Thermador failure pattern.' },
     { title: 'Door hinge sag (year 6-9).', detail: '$180-280 service. Heavy wall-oven door hinges wear faster than free-standing.' }
   ],
-  brandPoolUltraPremium: ['Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Sub-Zero (Cove)', 'La Cornue', 'Viking'],
-  brandPoolPremium: ['Wolf', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking', 'Jenn-Air'],
+  brandPoolUltraPremium: ['Wolf', 'Miele', 'Thermador', 'Gaggenau', 'Sub-Zero (Cove)', 'La Cornue', 'Viking', 'BlueStar', 'Bertazzoni', 'Hestan', 'ILVE'],
+  brandPoolPremium: ['Wolf', 'Miele', 'Thermador', 'KitchenAid', 'Bosch', 'Viking', 'Jenn-Air', 'BlueStar', 'Bertazzoni'],
   brandPoolGeneral: ['Whirlpool', 'KitchenAid', 'GE', 'Wolf', 'Bosch', 'LG', 'Samsung', 'Frigidaire'],
   brandPoolInland: ['Whirlpool', 'KitchenAid', 'GE', 'LG', 'Samsung', 'Frigidaire'],
   honestOpinion: "Wall ovens are premium-tier appliances; replacement requires cabinet modification + electrical/gas disconnect work that doubles the install cost. Repair-vs-replace math is different from free-standing: a $580-980 control board on a $4,500-8,000 Wolf or Thermador wall oven at year 10 is a sound investment vs a $6,000+ replacement-plus-installation cost. Most wall-oven service in LA is repair, not replace, through year 18-22 on premium tier.",
@@ -526,8 +526,8 @@ SERVICE_DESCRIPTORS['freezer-repair'] = {
     { title: 'Door alarm / temp alarm sensor (year 7-10).', detail: '$180-280 sensor replacement on premium chest freezers and Sub-Zero columns.' },
     { title: 'Drain line frozen / clogged.', detail: '$120-220 service. Common on French door freezer drawers.' }
   ],
-  brandPoolUltraPremium: ['Sub-Zero', 'Miele', 'Liebherr', 'Thermador', 'Viking'],
-  brandPoolPremium: ['Sub-Zero', 'Miele', 'Liebherr', 'KitchenAid', 'Bosch', 'Frigidaire Professional'],
+  brandPoolUltraPremium: ['Sub-Zero', 'Miele', 'Liebherr', 'Thermador', 'Viking', 'Marvel'],
+  brandPoolPremium: ['Sub-Zero', 'Miele', 'Liebherr', 'KitchenAid', 'Bosch', 'Frigidaire Professional', 'Fisher & Paykel', 'U-Line'],
   brandPoolGeneral: ['Whirlpool', 'GE', 'Frigidaire', 'LG', 'Samsung', 'Maytag', 'Sub-Zero', 'KitchenAid'],
   brandPoolInland: ['Whirlpool', 'GE', 'Frigidaire', 'Samsung', 'LG', 'Maytag'],
   honestOpinion: "Year 12+ standalone chest or upright freezer with compressor failure on mid-tier (Whirlpool, GE, Frigidaire) is usually replace, not repair. $880-1,400 compressor on a $400-800 chest freezer at end of design life doesn't pencil. Built-in Sub-Zero columns at year 12+ usually justify repair because chassis is built for 18-25 year service and the install cost makes replacement prohibitive.",
@@ -666,7 +666,7 @@ SERVICE_DESCRIPTORS['range-repair'] = {
     { title: 'Self-clean lock mechanism (year 7-10).', detail: '$180-280 replacement.' },
     { title: 'Control board (year 8-12).', detail: '$485-820. Touch controls unresponsive, error codes flashing.' }
   ],
-  brandPoolUltraPremium: ['Wolf', 'La Cornue', 'Bertazzoni', 'Viking', 'Thermador', 'Miele', 'BlueStar', 'Lacanche'],
+  brandPoolUltraPremium: ['Wolf', 'La Cornue', 'Bertazzoni', 'Viking', 'Thermador', 'Miele', 'BlueStar', 'Lacanche', 'Hestan', 'ILVE'],
   brandPoolPremium: ['Wolf', 'Thermador', 'Bertazzoni', 'Viking', 'KitchenAid', 'GE Cafe', 'BlueStar'],
   brandPoolGeneral: ['Whirlpool', 'GE', 'KitchenAid', 'LG', 'Samsung', 'Frigidaire', 'Maytag', 'Wolf'],
   brandPoolInland: ['Whirlpool', 'GE', 'KitchenAid', 'Samsung', 'LG', 'Frigidaire', 'Maytag'],
