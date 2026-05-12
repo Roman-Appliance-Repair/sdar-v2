@@ -329,11 +329,9 @@ export default defineConfig({
     // or deprecated-URL cleanup — intentional, do not remove.
     '/brands/blomberg/': '/services/refrigerator-repair/',
     '/brands/commercial-and-household/': '/brands/',
-    '/brands/fisher-paykel/': '/brands/fisher-paykel-refrigerator-repair/',
     '/brands/hotpoint/': '/services/refrigerator-repair/',
     '/brands/magic-chef/': '/services/refrigerator-repair/',
     '/brands/roper/': '/services/washer-repair/',
-    '/brands/speed-queen/': '/brands/speed-queen-washer-dryer-repair/',
 
     // === Wave 32 :: C_brands_repair_suffix | /brands/{brand}-repair/ legacy variants (7) ===
     '/brands/electrolux-repair/': '/brands/electrolux-refrigerator-repair/',
