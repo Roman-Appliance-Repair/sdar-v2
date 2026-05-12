@@ -327,7 +327,6 @@ export default defineConfig({
     //   coexist; cross-link via internal href, never via 301.
     // Surviving rules below are off-brand routings (we don't pillar these brands)
     // or deprecated-URL cleanup — intentional, do not remove.
-    '/brands/asko/': '/brands/asko-dishwasher-repair/',
     '/brands/blomberg/': '/services/refrigerator-repair/',
     '/brands/commercial-and-household/': '/brands/',
     '/brands/fisher-paykel/': '/brands/fisher-paykel-refrigerator-repair/',
