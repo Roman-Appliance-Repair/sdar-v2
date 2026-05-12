@@ -330,7 +330,6 @@ export default defineConfig({
     '/brands/asko/': '/brands/asko-dishwasher-repair/',
     '/brands/blomberg/': '/services/refrigerator-repair/',
     '/brands/commercial-and-household/': '/brands/',
-    '/brands/electrolux/': '/brands/electrolux-refrigerator-repair/',
     '/brands/fisher-paykel/': '/brands/fisher-paykel-refrigerator-repair/',
     '/brands/gaggenau/': '/brands/gaggenau-oven-repair/',
     '/brands/ge-monogram/': '/brands/ge-monogram-refrigerator-repair/',
