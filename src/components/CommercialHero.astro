@@ -23,6 +23,9 @@ export interface Props {
   requestLabel?: string;
   heroImageTitle?: string;
   heroImageLocation?: string;
+  imageSrc?: string;
+  imageAlt?: string;
+  glassOverlay?: boolean;
   trustBarItems?: string[];
   /** When true, render the 8-branch list inside the hero content column.
    *  Default true for the new neutral-hub posture. */
@@ -39,6 +42,9 @@ const {
   requestLabel = 'Request Service',
   heroImageTitle = title,
   heroImageLocation = 'Southern California',
+  imageSrc,
+  imageAlt,
+  glassOverlay = false,
   trustBarItems = [
     '🏅 BHGS #A49573',
     '⚡ 24/7 Emergency Service',
@@ -50,7 +56,20 @@ const {
 } = Astro.props;
 ---
 
-<section class="hero">
+<section class={`hero ${glassOverlay ? 'commercial-hero--glass' : ''}`}>
+  {glassOverlay && imageSrc && (
+    <div class="hero-bg-image">
+      <img
+        src={imageSrc}
+        alt={imageAlt || heroImageTitle}
+        width="1600"
+        height="800"
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+    </div>
+  )}
   <div class="hero-inner">
     <div class="hero-content">
       <p class="hero-eyebrow">{eyebrow}</p>
@@ -66,12 +85,26 @@ const {
         </div>
       )}
     </div>
-    <div class="hero-img-wrap">
-      <div class="hero-img-placeholder">
-        <p>{heroImageTitle}</p>
-        <p>{heroImageLocation}</p>
+    {!glassOverlay && (
+      <div class="hero-img-wrap">
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={imageAlt || heroImageTitle}
+            width="1600"
+            height="800"
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+          />
+        ) : (
+          <div class="hero-img-placeholder">
+            <p>{heroImageTitle}</p>
+            <p>{heroImageLocation}</p>
+          </div>
+        )}
       </div>
-    </div>
+    )}
   </div>
 </section>
 
@@ -160,11 +193,17 @@ const {
     border-radius: 12px;
     overflow: hidden;
     background: #1a1a1a;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 2 / 1;
     display: flex;
     align-items: center;
     justify-content: center;
     align-self: start;
+  }
+  .hero-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
   }
   .hero-img-placeholder {
     color: rgba(255, 255, 255, .2);
@@ -205,6 +244,56 @@ const {
     }
     .hero-img-wrap {
       display: none;
+    }
+  }
+
+  /* Glass overlay variant — full-bleed bg + frosted content card */
+  .commercial-hero--glass {
+    position: relative;
+    overflow: hidden;
+  }
+  .commercial-hero--glass .hero-bg-image {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .commercial-hero--glass .hero-bg-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: right center;
+    display: block;
+  }
+  .commercial-hero--glass .hero-bg-image::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg,
+      rgba(10, 10, 10, 0.65) 0%,
+      rgba(10, 10, 10, 0.35) 50%,
+      rgba(10, 10, 10, 0.15) 100%);
+    pointer-events: none;
+  }
+  .commercial-hero--glass .hero-inner {
+    position: relative;
+    z-index: 1;
+  }
+  .commercial-hero--glass .hero-content {
+    background: rgba(20, 20, 20, 0.55);
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 48px 40px;
+    max-width: 620px;
+  }
+  @media (max-width: 768px) {
+    .commercial-hero--glass .hero-bg-image img {
+      object-position: 70% center;
+    }
+    .commercial-hero--glass .hero-content {
+      padding: 32px 24px;
+      background: rgba(20, 20, 20, 0.70);
     }
   }
 </style>
