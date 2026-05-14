@@ -332,6 +332,10 @@ export default defineConfig({
     '/brands/hotpoint/': '/services/refrigerator-repair/',
     '/brands/magic-chef/': '/services/refrigerator-repair/',
     '/brands/roper/': '/services/washer-repair/',
+    // Wave 43 Batch 1 — slug-asymmetry fix: pillar renamed to match
+    // combo prefix (ge-cafe-*-repair, ge-profile-*-repair).
+    '/brands/cafe/': '/brands/ge-cafe/',
+    '/brands/profile/': '/brands/ge-profile/',
 
     // === Wave 32 :: C_brands_repair_suffix | /brands/{brand}-repair/ legacy variants (7) ===
     '/brands/electrolux-repair/': '/brands/electrolux-refrigerator-repair/',

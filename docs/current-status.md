@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-05-07
+**Последняя синхронизация:** 2026-05-14
 
 ---
 
@@ -60,6 +60,8 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-05-14:** Wave 43 brand pillars — audit + Batch 1 fixes. Audit (`audit-output/wave-43-brand-pillar-audit.md`) подтвердил все 17 pillars уже существуют на main: 14 FULL (1800-2823 wd), 3 PARTIAL (ilve 1633, hestan 1596, signature-kitchen-suite 1619 — niche brands, acceptable scope). Batch 1 fix: (a) cafe.astro → ge-cafe.astro + profile.astro → ge-profile.astro slug-rename matching combo prefix (ge-cafe-*-repair, ge-profile-*-repair) — все 13 combos уже linkали на новый URL (pre-rename = 404, post-rename = works); (b) 301 redirects добавлены в astro.config.mjs + public/_redirects; (c) Liebherr + Marvel orphan-adjacent linking sweep — было 1-3 in-links each, стало 13/11 (city pillars: bel-air, beverly-hills, brentwood, pacific-palisades, manhattan-beach, newport-beach; service hubs: refrigerator-repair, wine-cooler-repair, outdoor-refrigerator-repair; Liebherr sibling combos: liebherr-built-in-refrigerator-repair, liebherr-wine-cooler-repair); (d) liebherr-built-in + liebherr-wine-cooler combos breadcrumb fix (указывали на liebherr-refrigerator-repair вместо pillar) + FAQ stale text удалён. MegaMenu skip (no brand-level entries в текущей nav structure — structural change, deferred).
 
 - **2026-05-07:** P0 schema sync для LSA trust restoration — series CLOSED. Schema policy переписана (memory + docs/) и applied в 4 commits:
   - **Commit 1 (`d6768ea`)** — stale phrases + ghost elements removed (7 files): Layout default meta description «Licensed C-20» снят, HomepageSchema WebPage description чистый, contact.astro 3 fixes (description + ghost `credentialCategory:""` + ghost `<li><strong></strong>`), book.astro pin identity (streetAddress 8746 Rangely + WeHo phone), branches.ts 3 dormant aggregateRating entries удалены, server functions `contact.js` + `diagnose.js` — stale CSLB #1138898 заменён на актуальные credentials.
