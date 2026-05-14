@@ -201,8 +201,8 @@ export const BRANCHES: Branch[] = [
   {
     slug: 'los-angeles',
     name: 'Los Angeles',
-    fullName: 'Same Day Appliance Repair — Los Angeles',
-    gbpName: 'Same Day Appliance Repair Los Angeles',
+    fullName: 'Same Day Appliance Repair',
+    gbpName: 'Same Day Appliance Repair',
     displayCity: 'Los Angeles',
     isServiceArea: true,
     type: 'service_area',
