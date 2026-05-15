@@ -56,7 +56,7 @@
 | san-clemente.astro = 167 body words | 1 файл | P2 — стейл от T7-dump |
 | 87 city pages нуждаются в фото (5 слотов каждая) | ~435 photo slots | P2 — Photo Pipeline wave |
 | ~~Rancho Cucamonga + Temecula real DID phones~~ | ~~2 placeholder в branches.ts~~ | ✅ Закрыто 2026-05-06 — реальные DID активны: RC (909) 457-1030, Temecula (951) 577-3877 |
-| `audit-output/` directory | untracked, нужно в .gitignore | P3 |
+| ~~`audit-output/` directory~~ | ~~untracked, нужно в .gitignore~~ | ✅ Закрыто 2026-05-14 — commit `f2fd8e9` добавил `audit-results/` в .gitignore (`audit-output/` уже был там) |
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
