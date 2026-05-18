@@ -129,6 +129,11 @@ export default defineConfig({
     prefetchAll: true,
     defaultStrategy: 'hover',
   },
+  vite: {
+    define: {
+      'import.meta.env.PUBLIC_TURNSTILE_SITE_KEY': JSON.stringify(process.env.TURNSTILE_SITE_KEY || ''),
+    },
+  },
   integrations: [
     react(),
     sitemap({
