@@ -3,11 +3,23 @@
  * CommercialHero.astro
  * Unified hero block for /commercial/* pages.
  *
+ * Two render modes (mirroring ServiceHero post-3c93996):
+ *   MODE A — Full-bleed background photo + frosted-glass overlay card.
+ *            Triggered by `slug` prop when /public/images/commercial/{slug}/
+ *            hero.webp + hero.jpg both exist on disk at build time, or when
+ *            explicit `imageSrc` is passed.
+ *   MODE B — Legacy split layout with placeholder (graceful fallback).
+ *            Used when no photo is available so pages without deployed
+ *            photos still render cleanly.
+ *
  * Default posture: NEUTRAL multi-county, B2B-tweaked. $120 diagnostic, 24/7,
  * COI, NSF — and the same 8-branch list available via showBranches=true.
  * NAP-compliant per branch-types-and-public-nap-rules.md.
  */
 
+import '../styles/v2-tokens.css';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import BranchesBlock from './BranchesBlock.astro';
 import { MAIN_PHONE } from '../data/branches';
 
@@ -25,11 +37,15 @@ export interface Props {
   heroImageLocation?: string;
   imageSrc?: string;
   imageAlt?: string;
+  /** DEPRECATED — kept for backward compat. New code uses `slug`
+   *  to auto-derive photo paths; existsSync auto-toggles MODE A/B. */
   glassOverlay?: boolean;
   trustBarItems?: string[];
   /** When true, render the 8-branch list inside the hero content column.
    *  Default true for the new neutral-hub posture. */
   showBranches?: boolean;
+  /** Auto-derive photo path from slug; checked against disk at build time. */
+  slug?: string;
 }
 
 const {
@@ -44,7 +60,6 @@ const {
   heroImageLocation = 'Southern California',
   imageSrc,
   imageAlt,
-  glassOverlay = false,
   trustBarItems = [
     '🏅 BHGS #A49573',
     '⚡ 24/7 Emergency Service',
@@ -52,61 +67,85 @@ const {
     '✅ NSF-Certified Repairs',
     '💬 $120 Diagnostic — Waived With Repair'
   ],
-  showBranches = true
+  showBranches = true,
+  slug
 } = Astro.props;
+
+const slugWebpPath = slug ? path.join('public', 'images', 'commercial', slug, 'hero.webp') : null;
+const slugJpgPath = slug ? path.join('public', 'images', 'commercial', slug, 'hero.jpg') : null;
+const slugPhotoExists = !!(slugWebpPath && slugJpgPath && existsSync(slugWebpPath) && existsSync(slugJpgPath));
+
+const photoWebp = slugPhotoExists ? `/images/commercial/${slug}/hero.webp` : null;
+const photoJpg = imageSrc ?? (slugPhotoExists ? `/images/commercial/${slug}/hero.jpg` : null);
+const photoAlt = imageAlt ?? `${heroImageTitle || title || 'Commercial appliance repair'} ${heroImageLocation || ''}`.trim();
+const photoMode = !!photoJpg;
 ---
 
-<section class={`hero ${glassOverlay ? 'commercial-hero--glass' : ''}`}>
-  {glassOverlay && imageSrc && (
-    <div class="hero-bg-image">
-      <img
-        src={imageSrc}
-        alt={imageAlt || heroImageTitle}
-        width="1600"
-        height="800"
-        loading="eager"
-        fetchpriority="high"
-        decoding="async"
-      />
+{photoMode ? (
+  <section class="hero-photo">
+    <div class="hero-photo__bg">
+      <picture>
+        {photoWebp && <source srcset={photoWebp} type="image/webp" />}
+        <source srcset={photoJpg} type="image/jpeg" />
+        <img
+          src={photoJpg}
+          alt={photoAlt}
+          width="1920"
+          height="900"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </picture>
+      <div class="hero-photo__overlay"></div>
     </div>
-  )}
-  <div class="hero-inner">
-    <div class="hero-content">
-      <p class="hero-eyebrow">{eyebrow}</p>
-      <h1>{title}</h1>
-      <p class="hero-sub">{subtitle}</p>
-      <div class="hero-ctas">
-        <a href={phoneHref} class="btn-primary">☎ {phone}</a>
-        <a href={requestUrl} class="btn-outline">{requestLabel}</a>
-      </div>
-      {showBranches && (
-        <div class="hero-branches-wrap">
-          <BranchesBlock title="Our Branches" layout="grid" showCount={true} />
+    <div class="v2-container hero-photo__inner">
+      <div class="v2-glass hero-photo__panel">
+        <p class="hero-photo__eyebrow">{eyebrow}</p>
+        <h1 class="hero-photo__h1">{title}</h1>
+        <p class="hero-photo__sub">{subtitle}</p>
+        <div class="hero-photo__ctas">
+          <a href={phoneHref} class="v2-btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.29h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+            </svg>
+            Call {phone}
+          </a>
+          <a href={requestUrl} class="v2-btn-secondary">{requestLabel}</a>
         </div>
-      )}
-    </div>
-    {!glassOverlay && (
-      <div class="hero-img-wrap">
-        {imageSrc ? (
-          <img
-            src={imageSrc}
-            alt={imageAlt || heroImageTitle}
-            width="1600"
-            height="800"
-            loading="eager"
-            fetchpriority="high"
-            decoding="async"
-          />
-        ) : (
-          <div class="hero-img-placeholder">
-            <p>{heroImageTitle}</p>
-            <p>{heroImageLocation}</p>
+        {showBranches && (
+          <div class="hero-photo__branches">
+            <BranchesBlock title="Our Branches" layout="grid" showCount={true} />
           </div>
         )}
       </div>
-    )}
-  </div>
-</section>
+    </div>
+  </section>
+) : (
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <p class="hero-eyebrow">{eyebrow}</p>
+        <h1>{title}</h1>
+        <p class="hero-sub">{subtitle}</p>
+        <div class="hero-ctas">
+          <a href={phoneHref} class="btn-primary">☎ {phone}</a>
+          <a href={requestUrl} class="btn-outline">{requestLabel}</a>
+        </div>
+        {showBranches && (
+          <div class="hero-branches-wrap">
+            <BranchesBlock title="Our Branches" layout="grid" showCount={true} />
+          </div>
+        )}
+      </div>
+      <div class="hero-img-wrap">
+        <div class="hero-img-placeholder">
+          <p>{heroImageTitle}</p>
+          <p>{heroImageLocation}</p>
+        </div>
+      </div>
+    </div>
+  </section>
+)}
 
 <div class="trust-bar">
   <div class="trust-bar-inner">
@@ -122,6 +161,100 @@ const {
 </div>
 
 <style>
+  /* ========================================================================
+   * MODE A — Background photo + frosted-glass overlay
+   * Mirrors v2 city HeroSection and residential ServiceHero MODE A:
+   * min-height 580, gradient overlay, .v2-glass panel max-width 620,
+   * Playfair display H1.
+   * ====================================================================== */
+  .hero-photo {
+    position: relative;
+    min-height: 580px;
+    background: var(--v2-black);
+    color: var(--v2-white);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+  .hero-photo__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .hero-photo__bg picture,
+  .hero-photo__bg img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-photo__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.35) 100%);
+    z-index: 1;
+  }
+  .hero-photo__inner {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    padding-top: 80px;
+    padding-bottom: 80px;
+  }
+  .hero-photo__panel {
+    max-width: 620px;
+    padding: 40px 36px;
+    color: var(--v2-white);
+  }
+  .hero-photo__eyebrow {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--v2-red);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 18px;
+  }
+  .hero-photo__h1 {
+    font-family: var(--v2-font-display);
+    font-size: clamp(32px, 4.4vw, 46px);
+    font-weight: 700;
+    line-height: 1.12;
+    margin: 0 0 18px;
+    color: var(--v2-white);
+    letter-spacing: -0.01em;
+  }
+  .hero-photo__sub {
+    font-size: 17px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.85);
+    margin: 0 0 26px;
+  }
+  .hero-photo__ctas {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .hero-photo__branches {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  @media (max-width: 768px) {
+    .hero-photo { min-height: 520px; }
+    .hero-photo__inner { padding-top: 56px; padding-bottom: 56px; }
+    .hero-photo__panel { padding: 28px 22px; max-width: 100%; }
+    .hero-photo__h1 { font-size: clamp(26px, 7vw, 34px); }
+    .hero-photo__ctas { flex-direction: column; }
+    .hero-photo__ctas .v2-btn-primary,
+    .hero-photo__ctas .v2-btn-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  /* ========================================================================
+   * MODE B — Legacy split layout fallback (when no photo)
+   * ====================================================================== */
   .hero {
     background: #0a0a0a;
     color: #fff;
@@ -188,7 +321,6 @@ const {
     padding-top: 24px;
     border-top: 1px solid rgba(255, 255, 255, .08);
   }
-
   .hero-img-wrap {
     border-radius: 12px;
     overflow: hidden;
@@ -199,12 +331,6 @@ const {
     justify-content: center;
     align-self: start;
   }
-  .hero-img-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
   .hero-img-placeholder {
     color: rgba(255, 255, 255, .2);
     font-size: 13px;
@@ -213,7 +339,18 @@ const {
   .hero-img-placeholder p {
     margin: 0;
   }
+  @media (max-width: 768px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+    }
+    .hero-img-wrap {
+      display: none;
+    }
+  }
 
+  /* ========================================================================
+   * Trust bar — preserved in both modes
+   * ====================================================================== */
   .trust-bar {
     background: #C8102E;
     color: #fff;
@@ -236,64 +373,5 @@ const {
   }
   .trust-icon {
     font-size: 16px;
-  }
-
-  @media (max-width: 768px) {
-    .hero-inner {
-      grid-template-columns: 1fr;
-    }
-    .hero-img-wrap {
-      display: none;
-    }
-  }
-
-  /* Glass overlay variant — full-bleed bg + frosted content card */
-  .commercial-hero--glass {
-    position: relative;
-    overflow: hidden;
-  }
-  .commercial-hero--glass .hero-bg-image {
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-  }
-  .commercial-hero--glass .hero-bg-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: right center;
-    display: block;
-  }
-  .commercial-hero--glass .hero-bg-image::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg,
-      rgba(10, 10, 10, 0.65) 0%,
-      rgba(10, 10, 10, 0.35) 50%,
-      rgba(10, 10, 10, 0.15) 100%);
-    pointer-events: none;
-  }
-  .commercial-hero--glass .hero-inner {
-    position: relative;
-    z-index: 1;
-  }
-  .commercial-hero--glass .hero-content {
-    background: rgba(20, 20, 20, 0.55);
-    backdrop-filter: blur(16px) saturate(140%);
-    -webkit-backdrop-filter: blur(16px) saturate(140%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 48px 40px;
-    max-width: 620px;
-  }
-  @media (max-width: 768px) {
-    .commercial-hero--glass .hero-bg-image img {
-      object-position: 70% center;
-    }
-    .commercial-hero--glass .hero-content {
-      padding: 32px 24px;
-      background: rgba(20, 20, 20, 0.70);
-    }
   }
 </style>
