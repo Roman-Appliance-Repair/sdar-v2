@@ -34,9 +34,14 @@ const rawPhone = branch.phone;
 const phone = rawPhone;
 const phoneTel = `+1${phone.replace(/\D/g, '')}`;
 
-// Photo fallback chain
+// Photo fallback chain: WebP primary, JPG fallback for clients that fail
+// to decode WebP (incl. Cloudflare edge nodes occasionally returning
+// text/html instead of image/webp on cached 404 misses).
 const photoSrc = heroPhoto
   ?? `/images/cities/${citySlug}/hero.webp`;
+const photoJpgSrc = heroPhoto
+  ? heroPhoto.replace(/\.webp$/, '.jpg')
+  : `/images/cities/${citySlug}/hero.jpg`;
 const photoAlt = `Appliance repair technician in ${city.name}, CA kitchen`;
 
 const eyebrow = `${city.name}, CA · ${zips.join(' · ')}`;
@@ -46,14 +51,14 @@ const eyebrow = `${city.name}, CA · ${zips.join(' · ')}`;
   <div class="v2-hero__bg">
     <picture>
       <source srcset={photoSrc} type="image/webp" />
+      <source srcset={photoJpgSrc} type="image/jpeg" />
       <img
-        src={photoSrc}
+        src={photoJpgSrc}
         alt={photoAlt}
         width="1920"
         height="900"
         loading="eager"
         fetchpriority="high"
-        onerror="this.style.display='none'"
       />
     </picture>
     <div class="v2-hero__overlay"></div>
