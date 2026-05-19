@@ -27,6 +27,10 @@ export interface Props {
   /** When true, render the 8-branch list inside the hero content column.
    *  Default true for the new neutral-hub posture. */
   showBranches?: boolean;
+  image?: string;
+  imageWebp?: string;
+  imageWebpMobile?: string;
+  imageAlt?: string;
 }
 
 const {
@@ -45,7 +49,11 @@ const {
     '🔩 OEM Parts on Truck',
     '💬 $89 Diagnostic — Waived With Repair'
   ],
-  showBranches = true
+  showBranches = true,
+  image,
+  imageWebp,
+  imageWebpMobile,
+  imageAlt
 } = Astro.props;
 ---
 
@@ -66,10 +74,31 @@ const {
       )}
     </div>
     <div class="hero-img-wrap">
-      <div class="hero-img-placeholder">
-        <p>{heroImageTitle}</p>
-        <p>{heroImageLocation}</p>
-      </div>
+      {image && imageWebp ? (
+        <picture class="hero-img">
+          {imageWebpMobile && (
+            <source
+              type="image/webp"
+              media="(max-width: 768px)"
+              srcset={imageWebpMobile}
+            />
+          )}
+          <source type="image/webp" srcset={imageWebp} />
+          <img
+            src={image}
+            alt={imageAlt || `${heroImageTitle || 'Appliance repair'} ${heroImageLocation || ''}`.trim()}
+            width="1600"
+            height="900"
+            loading="eager"
+            fetchpriority="high"
+          />
+        </picture>
+      ) : (
+        <div class="hero-img-placeholder">
+          <p>{heroImageTitle}</p>
+          <p>{heroImageLocation}</p>
+        </div>
+      )}
     </div>
   </div>
 </section>
@@ -172,6 +201,18 @@ const {
   }
   .hero-img-placeholder p {
     margin: 0;
+  }
+  .hero-img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .hero-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: inherit;
   }
 
   .trust-bar {
