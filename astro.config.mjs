@@ -123,6 +123,7 @@ export default defineConfig({
   trailingSlash: 'always',
   build: {
     format: 'directory',
+    inlineStylesheets: 'always',
   },
   compressHTML: true,
   prefetch: {
