@@ -42,6 +42,10 @@ export interface Props {
   showBranches?: boolean;
   /** Auto-derive photo path from slug; checked against disk at build time. */
   slug?: string;
+  /** Photo directory bucket. Default 'services' (residential). Use 'outdoor'
+   *  for outdoor-section pages so photos resolve under
+   *  public/images/outdoor/{slug}/. */
+  section?: 'services' | 'commercial' | 'outdoor';
   /** Explicit overrides (rarely needed once slug auto-derive is in place). */
   image?: string;
   imageWebp?: string;
@@ -67,18 +71,19 @@ const {
   ],
   showBranches = true,
   slug,
+  section = 'services',
   image,
   imageWebp,
   imageWebpMobile,
   imageAlt
 } = Astro.props;
 
-const slugWebpPath = slug ? path.join('public', 'images', 'services', slug, 'hero.webp') : null;
-const slugJpgPath = slug ? path.join('public', 'images', 'services', slug, 'hero.jpg') : null;
+const slugWebpPath = slug ? path.join('public', 'images', section, slug, 'hero.webp') : null;
+const slugJpgPath = slug ? path.join('public', 'images', section, slug, 'hero.jpg') : null;
 const slugPhotoExists = !!(slugWebpPath && slugJpgPath && existsSync(slugWebpPath) && existsSync(slugJpgPath));
 
-const photoWebp = imageWebp ?? (slugPhotoExists ? `/images/services/${slug}/hero.webp` : null);
-const photoJpg = image ?? (slugPhotoExists ? `/images/services/${slug}/hero.jpg` : null);
+const photoWebp = imageWebp ?? (slugPhotoExists ? `/images/${section}/${slug}/hero.webp` : null);
+const photoJpg = image ?? (slugPhotoExists ? `/images/${section}/${slug}/hero.jpg` : null);
 const photoMobileWebp = imageWebpMobile ?? null;
 const photoAlt = imageAlt ?? `${heroImageTitle || title || 'Appliance repair'} ${heroImageLocation || ''}`.trim();
 const photoMode = !!(photoWebp && photoJpg);
