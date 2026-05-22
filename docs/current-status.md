@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-05-14
+**Последняя синхронизация:** 2026-05-22
 
 ---
 
@@ -44,9 +44,9 @@
 | Долг | Масштаб | Приоритет |
 |---|---|---|
 | ~~P0 schema sync для LSA trust restoration~~ | ~~all LSA-critical surfaces~~ | ✅ Закрыто 2026-05-07 — commits d6768ea + f9af9a6 + 39042c7 + docs |
-| **Phase 2b-2 schemaJsons sub-pages** | 580 deep brand/service/commercial pages | P2 — credentials через AST-aware modifier; primary LB reachable через Service.provider @id graph ref, не блокирует LSA |
-| 5 county hubs schema coverage | LA/Orange/Ventura/SB/Riverside county.astro | P3 — different pattern, не покрылись Phase 2b-1 sweep'ом |
-| privacy-policy + terms LocalBusiness schema | отсутствует целиком | P3 — pin identity ограничена 4 страницами вместо 6, добавление с нуля |
+| ~~Phase 2b-2 schemaJsons sub-pages~~ | ~~392 deep brand/service/commercial pages~~ | ✅ Закрыто 2026-05-22 — Wave 47 commit `7d767f6`. 1052/1054 (99.8%) full schema compliance achieved |
+| ~~5 county hubs schema coverage~~ | ~~LA/Orange/Ventura/SB/Riverside county.astro~~ | ✅ Закрыто 2026-05-22 — Wave 47 (5 pages, full creds+hours) |
+| ~~privacy-policy + terms LocalBusiness schema~~ | ~~отсутствует целиком~~ | ✅ Закрыто 2026-05-22 — Wave 47 добавил pin LB schema (8746 Rangely Ave Ste, legalName, 4 creds, hours) на обе страницы. Residual: pre-existing "HVAC 777 LLC" copy в WebPage description — separate decision needed |
 | contact.astro geo coords mismatch | 34.0619,-118.3692 (Wilshire LA) ≠ WeHo Rangely (34.0894,-118.3895) | P2 — affects maps.google integration; not LSA blocker |
 | Wave 35 artifacts на ~10 commercial HVAC pages | `<strong></strong>` empty + "  scope" double-space + "Our mailing address is , Los Angeles" в privacy-policy:75 | P3 — cosmetic, не emit'ится в schema |
 | 25 stub страниц (<200 body words) | 25 файлов | P2 — отдельный writer batch (минус Wave 42 закрытые 13) |
@@ -60,6 +60,10 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-05-22:** Wave 47 — Full schema compliance sweep (commit `7d767f6`). Closes Phase 2b-2 backlog: 374 files modified (372 .astro source + 1 BlogLayout + 1 new sweep script). Brings site from 62.8% → 99.8% (1052/1054) full schema compliance per audit `briefings/2026-05-22-schema-total-audit.md`. Sweep injects `legalName: "HVAC 777 LLC"` + canonical `hasCredential[4]` (BHGS #A49573, EPA 608 Universal, CSLB C-20 HVAC, BBB Accredited Business) + `openingHoursSpecification` (Mon-Sat 08:00-20:00 + Sunday closed) into existing LocalBusiness + Service.provider objects via 9 distinct patterns: (A) brand_pillar `Service.provider` (32), (B) service_hub inline `JSON.stringify` (27), (C) standalone `LocalBusiness@id` (~239: service_subservice + commercial_failmode + commercial_subtype + outdoor + county_hub + misc), (D) raw inline `<script type="ld+json">` (25: commercial_hub + indexes), (E) BlogLayout shared edit (1 file → 21 blog posts), (F) price_list `telephone: MAIN_PHONE` only (36 — wave46OrgSchema wrapper already provides creds), (G) `/book/` Sunday closed companion, (H) credentials/* template-literal LB (10), (I) privacy/terms/credentials-index full pin schema with `streetAddress: '8746 Rangely Ave Ste'` (3), (J) generic-no-LB fallback for hub/landing pages (5: brands/index, blog/index, ai-diagnostic, areas/index, for-business/index). Brace-balanced regex parser with quote/escape awareness, idempotent `has_field()` checks before injection. Net-zero word count on visible body. Build: 1054 pages, 0 errors, 43.17s. Re-audit: 1052/1054 PASS, residual 2 pages (privacy + terms) carry pre-existing "HVAC 777 LLC" in WebPage description copy — legitimate legal-entity reference. Sample 10/10 random verify PASS. Aggregate injections: 329 legalName + 327 hasCredential + 66 hours + 36 telephone + 36 MAIN_PHONE imports + 5 const+emit pin/generic schemas + 1 const+emit BlogLayout. Forbidden-pattern check: 0 aggregateRating, 0 #1138898 in JSON-LD, 0 streetAddress outside pin pages. Backup: `backup/wave-47-2026-05-22`. IndexNow: 109 modified URLs submitted.
+
+- **2026-05-22:** Schema total audit — 1054 URL site-wide compliance scan (`briefings/2026-05-22-schema-total-audit.md` in wiki @ `c8dde28`). 62.8% baseline, 392 gap URLs identified, 0 forbidden-pattern violations site-wide. Audit scripts: `scripts/audit-schema-2026-05-22/01-08*.py` + `reaudit_dist.py`. Drove Wave 47 scope.
 
 - **2026-05-14:** Wave 43 Batch 3 — Hestan pillar full rewrite (Option C fact-rebuild). Audit caught fabricated SKU naming throughout pillar (GROR/HOTR/GMWR/HVBI series don't exist in current Hestan catalog) + factual errors про founding history ("Napa Valley founded 1986, residential launched 2015" → verified: Anaheim CA Hestan Commercial Corporation founded 2013 by Stanley Cheng / Meyer Corp parent; outdoor residential launched 2016, indoor residential launched 2018; Napa Valley = Hestan Vineyards sister business). Full rewrite: verified SKUs (KRD/KRG freestanding ranges, KRT/KRTI rangetops, KDO wall ovens with TwinVection, GABR/GMBR/GSBR built-in grills, GRFR/GRSR/GRSL/GRWG outdoor refrigerators), new "Why Hestan service works different in LA" section (~270 wd, 35-mile Anaheim parts pipeline USP), 3 new Recent Repair cards (KRT365 Beverly Hills CircuFlame, KDO30 Brentwood TwinVection rear-fan, GRFR24 Hidden Hills evaporator fan), 7 FAQs rewritten Q1-Q6 (Q7 unchanged), JSON-LD schema description updated, "hand-built" marketing claim replaced with "manufactured" 6× site-wide on pillar. Honest pattern framing per voice-and-style §3.6 — dropped "year 3-5 cohort"/"year 4-6 cohort" specific multi-year wear claims (residential indoor lineup is 8 years max in field, multi-decade curves unclaimable). Removed "cheaper than Wolf" claim (contradicted upper-luxury pricing). Removed commercial-division mention from Q1. Build 1053 PASS. Dist verify: 0× GROR/HOTR/GMWR/HVBI, 50× KRT, 34× KRD, 37× KDO, 23× Anaheim, 0× hand-built, 0× year-range patterns, 0× commercial division. Wave 43 statement: 17 of 17 pillars at 1800+ target. **Wave 43 CLOSED.**
 
