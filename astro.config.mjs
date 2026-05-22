@@ -829,6 +829,10 @@ export default defineConfig({
     '/price-list/dryer-vent-installation-cost/': '/price-list/dryer-vent-repair-cost/',
     '/price-list/lg-dryer-repair-cost/': '/price-list/dryer-repair-cost/',
 
+    // === Zombie price-list URLs (slug-rename without 301; were returning homepage HTML — index dilution) ===
+    '/price-list/commercial-walk-in-cooler-repair-cost/': '/price-list/walk-in-cooler-repair-cost/',
+    '/price-list/commercial-dryer-repair-cost/': '/price-list/dryer-repair-cost/',
+
     // === Wave 32 :: P_misc | /reviews-page/, /schedule/, /directories/ (3) ===
     '/directories/': '/',
     '/reviews-page/': '/',
