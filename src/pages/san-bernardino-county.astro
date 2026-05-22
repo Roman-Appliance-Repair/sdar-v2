@@ -3,41 +3,70 @@
 // /san-bernardino-county/
 import Layout from '../layouts/Layout.astro';
 import CountyMap from '../components/CountyMap.astro';
+import { BRANCHES, type Branch } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
 
 const title = "Appliance Repair San Bernardino County CA | Same Day";
 const description = "Appliance repair across San Bernardino County — Rancho Cucamonga, Chino Hills, Upland, Ontario and more. $89 diagnostic. (909) 457-1030.";
+
+const activeBranches = BRANCHES.filter((b) => b.phoneStatus === 'active');
+const slugToTitle = (s: string) => s.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+const sharedEmail = 'support@samedayappliance.repair';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': 'https://samedayappliance.repair/san-bernardino-county/#business',
+  name: 'Same Day Appliance Repair — San Bernardino County',
+  telephone: '(909) 457-1030',
+  url: 'https://samedayappliance.repair/san-bernardino-county/',
+  areaServed: { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  location: activeBranches.map((b: Branch) => {
+    const entry: Record<string, unknown> = {
+      '@type': 'LocalBusiness',
+      name: b.gbpName,
+      telephone: b.phone,
+      openingHoursSpecification: OPENING_HOURS_SCHEMA,
+      areaServed: b.citiesServed.slice(0, 8).map((slug) => ({ '@type': 'City', name: slugToTitle(slug) })),
+      hasOfferCatalog: { '@id': 'https://samedayappliance.repair/#service-catalog' }
+    };
+    if (b.type === 'physical_pin' && b.address) {
+      entry.address = {
+        '@type': 'PostalAddress',
+        streetAddress: b.address.street,
+        addressLocality: b.address.city,
+        addressRegion: b.address.state,
+        postalCode: b.address.zip,
+        addressCountry: 'US'
+      };
+      entry.email = sharedEmail;
+    }
+    if (Array.isArray(b.sameAs) && b.sameAs.length > 0) {
+      entry.sameAs = [...b.sameAs];
+    }
+    return entry;
+  })
+});
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: 'Do you offer same day appliance repair across San Bernardino County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. We cover 8 cities across San Bernardino County. Call (909) 457-1030 for availability.' } },
+    { '@type': 'Question', name: 'What is the diagnostic fee for appliance repair in San Bernardino County?', acceptedAnswer: { '@type': 'Answer', text: '$89 for residential — applied to the repair. $120 for commercial. Quote before we start.' } },
+    { '@type': 'Question', name: 'Which cities do you cover in San Bernardino County?', acceptedAnswer: { '@type': 'Answer', text: 'Rancho Cucamonga, Chino Hills, Upland, Ontario, Redlands, Loma Linda, Fontana, San Bernardino.' } }
+  ]
+};
 ---
 
 <Layout title={title} description={description}>
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "HomeAndConstructionBusiness",
-    "name": "Same Day Appliance Repair — San Bernardino County",
-    "telephone": "(909) 457-1030",
-    "url": "https://samedayappliance.repair/san-bernardino-county/",
-        "areaServed": { "@type": "AdministrativeArea", "name": "San Bernardino County" },
-    "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
-      ],
-    "priceRange": "$$",
-    "legalName": "HVAC 777 LLC",
-    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ]
-  }
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      { "@type": "Question", "name": "Do you offer same day appliance repair across San Bernardino County?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. We cover 8 cities across San Bernardino County. Call (909) 457-1030 for availability." } },
-      { "@type": "Question", "name": "What is the diagnostic fee for appliance repair in San Bernardino County?", "acceptedAnswer": { "@type": "Answer", "text": "$89 for residential — applied to the repair. $120 for commercial. Quote before we start." } },
-      { "@type": "Question", "name": "Which cities do you cover in San Bernardino County?", "acceptedAnswer": { "@type": "Answer", "text": "Rancho Cucamonga, Chino Hills, Upland, Ontario, Redlands, Loma Linda, Fontana, San Bernardino." } }
-    ]
-  }
-  </script>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
 
   <style>
     :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }

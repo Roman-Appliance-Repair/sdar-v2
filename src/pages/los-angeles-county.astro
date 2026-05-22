@@ -3,45 +3,74 @@
 // /los-angeles-county/
 import Layout from '../layouts/Layout.astro';
 import CountyMap from '../components/CountyMap.astro';
+import { BRANCHES, type Branch } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
 
 const title = "Appliance Repair Los Angeles County CA | Same Day Service";
 const description = "Appliance repair across Los Angeles County — Beverly Hills, Pasadena, Santa Monica, Glendale, Burbank and 20+ cities. $89 diagnostic, same day. (424) 325-0520.";
+
+const activeBranches = BRANCHES.filter((b) => b.phoneStatus === 'active');
+const slugToTitle = (s: string) => s.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+const sharedEmail = 'support@samedayappliance.repair';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': 'https://samedayappliance.repair/los-angeles-county/#business',
+  name: 'Same Day Appliance Repair — Los Angeles County',
+  telephone: '(424) 325-0520',
+  url: 'https://samedayappliance.repair/los-angeles-county/',
+  areaServed: { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  location: activeBranches.map((b: Branch) => {
+    const entry: Record<string, unknown> = {
+      '@type': 'LocalBusiness',
+      name: b.gbpName,
+      telephone: b.phone,
+      openingHoursSpecification: OPENING_HOURS_SCHEMA,
+      areaServed: b.citiesServed.slice(0, 8).map((slug) => ({ '@type': 'City', name: slugToTitle(slug) })),
+      hasOfferCatalog: { '@id': 'https://samedayappliance.repair/#service-catalog' }
+    };
+    if (b.type === 'physical_pin' && b.address) {
+      entry.address = {
+        '@type': 'PostalAddress',
+        streetAddress: b.address.street,
+        addressLocality: b.address.city,
+        addressRegion: b.address.state,
+        postalCode: b.address.zip,
+        addressCountry: 'US'
+      };
+      entry.email = sharedEmail;
+    }
+    if (Array.isArray(b.sameAs) && b.sameAs.length > 0) {
+      entry.sameAs = [...b.sameAs];
+    }
+    return entry;
+  })
+});
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: 'Do you offer same day appliance repair across Los Angeles County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. We cover 26 cities across LA County from our Los Angeles and West Hollywood branches. Same day appliance repair in Los Angeles County is our core service — call (424) 325-0520 for availability in your city.' } },
+    { '@type': 'Question', name: 'What is the diagnostic fee for appliance repair in Los Angeles County?', acceptedAnswer: { '@type': 'Answer', text: "$89 for residential appliances — and that fee is applied to the repair the moment you approve the work. For commercial appliances it's $120. Quote before we start, transparent invoice." } },
+    { '@type': 'Question', name: 'Do you repair luxury appliances like Sub-Zero and Wolf in LA County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Sub-Zero, Wolf, Thermador, Miele, Viking, Gaggenau, JennAir — we service the full range of luxury appliances common in Beverly Hills, Brentwood, Pacific Palisades, and the Westside. Our technicians carry OEM parts for these brands on the truck.' } },
+    { '@type': 'Question', name: 'Which cities in Los Angeles County do you service?', acceptedAnswer: { '@type': 'Answer', text: 'We cover 26 cities: Los Angeles, West Hollywood, Beverly Hills, Santa Monica, Pasadena, Glendale, Burbank, Brentwood, Silver Lake, Culver City, Manhattan Beach, Studio City, Sherman Oaks, Encino, Woodland Hills, Marina del Rey, Redondo Beach, Long Beach, Koreatown, Highland Park, Atwater Village, Eagle Rock, Malibu, Pacific Palisades, Calabasas, and Los Feliz.' } },
+    { '@type': 'Question', name: 'Do you offer commercial appliance repair in Los Angeles County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Commercial kitchen equipment, walk-in coolers, commercial laundry — $120 commercial diagnostic, same day available, COI provided. We work with restaurants, hotels, property managers, and multi-unit buildings across LA County.' } },
+    { '@type': 'Question', name: 'What appliance brands do you repair in Los Angeles County?', acceptedAnswer: { '@type': 'Answer', text: 'All major brands: Samsung, LG, GE, Whirlpool, Frigidaire, Maytag, KitchenAid, Bosch, Electrolux, and all luxury brands including Sub-Zero, Wolf, Thermador, Miele, Viking, Gaggenau, JennAir, Fisher & Paykel, and Dacor.' } },
+    { '@type': 'Question', name: 'How do coastal and inland climate conditions affect appliances in LA County?', acceptedAnswer: { '@type': 'Answer', text: 'Coastal cities like Santa Monica and Malibu have salt air that accelerates coil corrosion and gasket wear — maintenance intervals should be 4–6 months, not 12. Inland areas like the San Fernando Valley have dry dusty conditions that clog condenser coils faster. We factor in where you live when diagnosing and advising on maintenance.' } }
+  ]
+};
 ---
 
 <Layout title={title} description={description}>
-<script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "HomeAndConstructionBusiness",
-    "name": "Same Day Appliance Repair — Los Angeles County",
-    "telephone": "(424) 325-0520",
-    "url": "https://samedayappliance.repair/los-angeles-county/",
-        "areaServed": { "@type": "AdministrativeArea", "name": "Los Angeles County" },
-    "openingHoursSpecification": [
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
-        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
-      ],
-    "priceRange": "$$",
-    "legalName": "HVAC 777 LLC",
-    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ]
-  }
-  </script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      { "@type": "Question", "name": "Do you offer same day appliance repair across Los Angeles County?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. We cover 26 cities across LA County from our Los Angeles and West Hollywood branches. Same day appliance repair in Los Angeles County is our core service — call (424) 325-0520 for availability in your city." } },
-      { "@type": "Question", "name": "What is the diagnostic fee for appliance repair in Los Angeles County?", "acceptedAnswer": { "@type": "Answer", "text": "$89 for residential appliances — and that fee is applied to the repair the moment you approve the work. For commercial appliances it's $120. Quote before we start, transparent invoice." } },
-      { "@type": "Question", "name": "Do you repair luxury appliances like Sub-Zero and Wolf in LA County?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Sub-Zero, Wolf, Thermador, Miele, Viking, Gaggenau, JennAir — we service the full range of luxury appliances common in Beverly Hills, Brentwood, Pacific Palisades, and the Westside. Our technicians carry OEM parts for these brands on the truck." } },
-      { "@type": "Question", "name": "Which cities in Los Angeles County do you service?", "acceptedAnswer": { "@type": "Answer", "text": "We cover 26 cities: Los Angeles, West Hollywood, Beverly Hills, Santa Monica, Pasadena, Glendale, Burbank, Brentwood, Silver Lake, Culver City, Manhattan Beach, Studio City, Sherman Oaks, Encino, Woodland Hills, Marina del Rey, Redondo Beach, Long Beach, Koreatown, Highland Park, Atwater Village, Eagle Rock, Malibu, Pacific Palisades, Calabasas, and Los Feliz." } },
-      { "@type": "Question", "name": "Do you offer commercial appliance repair in Los Angeles County?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Commercial kitchen equipment, walk-in coolers, commercial laundry — $120 commercial diagnostic, same day available, COI provided. We work with restaurants, hotels, property managers, and multi-unit buildings across LA County." } },
-      { "@type": "Question", "name": "What appliance brands do you repair in Los Angeles County?", "acceptedAnswer": { "@type": "Answer", "text": "All major brands: Samsung, LG, GE, Whirlpool, Frigidaire, Maytag, KitchenAid, Bosch, Electrolux, and all luxury brands including Sub-Zero, Wolf, Thermador, Miele, Viking, Gaggenau, JennAir, Fisher & Paykel, and Dacor." } },
-      { "@type": "Question", "name": "How do coastal and inland climate conditions affect appliances in LA County?", "acceptedAnswer": { "@type": "Answer", "text": "Coastal cities like Santa Monica and Malibu have salt air that accelerates coil corrosion and gasket wear — maintenance intervals should be 4–6 months, not 12. Inland areas like the San Fernando Valley have dry dusty conditions that clog condenser coils faster. We factor in where you live when diagnosing and advising on maintenance." } }
-    ]
-  }
-  </script>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
 
   <style>
     :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
