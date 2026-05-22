@@ -2,6 +2,8 @@
 import Layout from '../../layouts/Layout.astro';
 import BrandBranchesGrid from '../../components/BrandBranchesGrid.astro';
 import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../data/branches';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 const title = "Viking Range Repair Los Angeles — Same Day";
 const description = "Viking range repair across SoCal. Spark module VKPA020047, F02 RTD, surface igniter, bake element service., post-warranty specialists. $89 dx waived.";
@@ -94,9 +96,30 @@ const schemaJsons = [
     ]
   }
 ];
+
+// Wave 46 (2026-05-21): canonical org schema — HVAC 777 LLC + 4 credentials + hours.
+// Closes Wave 35 / Phase 2b-1 gap for brand-combo and price-list pages.
+// SSOT: src/data/credentials-schema.ts + src/data/business-hours.ts.
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': 'https://samedayappliance.repair/brands/viking-range-repair/#org',
+  name: 'Same Day Appliance Repair',
+  url: 'https://samedayappliance.repair/brands/viking-range-repair/',
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ]
+});
 ---
 <Layout title={title} description={description}>
   <Fragment slot="head-scripts">
+  <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />
     {schemaJsons.map((schema) => (
       <script type="application/ld+json" set:html={JSON.stringify(schema)} />
     ))}

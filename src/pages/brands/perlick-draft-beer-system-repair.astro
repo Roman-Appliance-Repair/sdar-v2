@@ -7,6 +7,8 @@
 import Layout from '../../layouts/Layout.astro';
 import BrandBranchesGrid from '../../components/BrandBranchesGrid.astro';
 import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../data/branches';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 const title = "Perlick Draft Beer System Repair | Southern California";
 const description = "Same-day Perlick glycol draft beer system repair across SoCal. Power packs, trunk lines, font coolers. Craft bar + brewery specialists.";
@@ -103,10 +105,31 @@ const schemaJsons = [
     ]
   }
 ];
+
+// Wave 46 (2026-05-21): canonical org schema — HVAC 777 LLC + 4 credentials + hours.
+// Closes Wave 35 / Phase 2b-1 gap for brand-combo and price-list pages.
+// SSOT: src/data/credentials-schema.ts + src/data/business-hours.ts.
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': canonical + '#org',
+  name: 'Same Day Appliance Repair',
+  url: canonical,
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ]
+});
 ---
 
 <Layout title={title} description={description} canonical={canonical}>
   <Fragment slot="head-scripts">
+  <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />
     {schemaJsons.map((schema) => (
       <script type="application/ld+json" set:html={JSON.stringify(schema)} />
     ))}

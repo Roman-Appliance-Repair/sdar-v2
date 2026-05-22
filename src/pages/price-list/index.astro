@@ -2,12 +2,38 @@
 // Price List Hub | Same Day Appliance Repair Los Angeles
 // /price-list/
 import Layout from '../../layouts/Layout.astro';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 const title = "Appliance Repair Cost Los Angeles 2026 — Pricing";
 const description = "Appliance repair cost in Los Angeles — labor rates for 38 appliance types. Parts quoted separately. $89 residential / $120 commercial.";
+
+// Wave 46 (2026-05-21): canonical org schema — HVAC 777 LLC + 4 credentials + hours.
+// Closes Wave 35 / Phase 2b-1 gap for brand-combo and price-list pages.
+// SSOT: src/data/credentials-schema.ts + src/data/business-hours.ts.
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': 'https://samedayappliance.repair/price-list/#org',
+  name: 'Same Day Appliance Repair',
+  url: 'https://samedayappliance.repair/price-list/',
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ]
+});
 ---
 
 <Layout title={title} description={description}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />
+  </Fragment>
+
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",

@@ -8,6 +8,8 @@
 
 import Layout from '../../layouts/Layout.astro';
 import { MAIN_PHONE } from '../../data/branches';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 const phone = MAIN_PHONE;
 const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
@@ -57,14 +59,6 @@ const schemaJsons = [
     "url": canonical,
     "telephone": phone,
     "priceRange": "$$",
-    "address": {
-      "@type": "PostalAddress",
-      
-      "addressLocality": "Los Angeles",
-      "addressRegion": "CA",
-      "postalCode": "90048",
-      "addressCountry": "US"
-    },
     "openingHoursSpecification": [
         { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
         { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
@@ -125,11 +119,32 @@ const schemaJsons = [
     ]
   }
 ];
+
+// Wave 46 (2026-05-21): canonical org schema — HVAC 777 LLC + 4 credentials + hours.
+// Closes Wave 35 / Phase 2b-1 gap for brand-combo and price-list pages.
+// SSOT: src/data/credentials-schema.ts + src/data/business-hours.ts.
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': canonical + '#org',
+  name: 'Same Day Appliance Repair',
+  url: canonical,
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ]
+});
 ---
 
 <Layout title={title} description={description}>
 
 <Fragment slot="head-scripts">
+  <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />
   {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
 </Fragment>
 

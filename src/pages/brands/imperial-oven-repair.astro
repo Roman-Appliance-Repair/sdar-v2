@@ -3,6 +3,8 @@
 import Layout from '../../layouts/Layout.astro';
 import BrandBranchesGrid from '../../components/BrandBranchesGrid.astro';
 import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../data/branches';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 const title = "Imperial Oven Repair Los Angeles — Same Day";
 const description = "Imperial ICV convection, ICB conveyor, IR-G ranges repair Southern California. Value-tier independent. $120 diagnostic. (424) 325-0520.";
@@ -34,9 +36,33 @@ const schema = { "@context": "https://schema.org", "@graph": [
   { "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a.replace(/<[^>]+>/g, '') } })) },
   { "@type": "BreadcrumbList", "itemListElement": [ { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" }, { "@type": "ListItem", "position": 2, "name": "Brands", "item": "https://samedayappliance.repair/brands/" }, { "@type": "ListItem", "position": 3, "name": "Imperial Oven Repair", "item": canonical } ] }
 ] };
+
+// Wave 46 (2026-05-21): canonical org schema — HVAC 777 LLC + 4 credentials + hours.
+// Closes Wave 35 / Phase 2b-1 gap for brand-combo and price-list pages.
+// SSOT: src/data/credentials-schema.ts + src/data/business-hours.ts.
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': canonical + '#org',
+  name: 'Same Day Appliance Repair',
+  url: canonical,
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ]
+});
 ---
 
 <Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />
+  </Fragment>
+
   <script type="application/ld+json" set:html={JSON.stringify(schema)} />
   <div class="call-banner"><div class="wrap"><span>Imperial oven down? Same-day commercial service:</span><a href={`tel:${MAIN_PHONE_TEL}`} class="phone-lg">{MAIN_PHONE}</a></div></div>
   <section class="hero"><div class="wrap"><div class="crumb"><a href="/">Home</a> › <a href="/brands/">Brands</a> › Imperial Oven Repair</div><h1>Imperial Commercial Oven Repair</h1><p class="lede">Imperial ICV convection ovens, ICB conveyor pizza ovens, IR-G gas range-ovens, IFS fryer family, our techs service the full Imperial Commercial Cooking Equipment lineup across LA, Orange County, Ventura, San Bernardino, and Riverside. Corona California independent family manufacturer; 1–3 day parts to LA; value-tier honest pricing; $120 diagnostic waived.</p><div class="hero-cta"><a href={`tel:${MAIN_PHONE_TEL}`} class="btn btn-primary">Call {MAIN_PHONE}</a><a href="#book" class="btn btn-ghost">Request a Visit</a></div><ul class="hero-facts"><li><b>Imperial Commercial Cooking, Corona CA since 1957</b>, independent family-owned; NOT Ali/Middleby/ITW/Welbilt</li><li><b>Corona California parts advantage</b>, 60 miles from LA; 1–3 business day parts supply</li><li><b>Value-tier positioning</b>, 15–25% below equivalent Vulcan/Blodgett repair pricing</li><li><b>LA value-tier pizza + mid-range restaurant cluster</b>, ICB conveyor + ICV convection</li></ul></div></section>

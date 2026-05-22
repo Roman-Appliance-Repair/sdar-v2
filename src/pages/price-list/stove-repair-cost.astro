@@ -2,6 +2,8 @@
 // Stove Repair Cost Los Angeles | Same Day Appliance Repair
 // /price-list/stove-repair-cost/
 import Layout from '../../layouts/Layout.astro';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 const title = "Stove Repair Cost Los Angeles 2026 | Labor Rates";
 const description = "Stove repair cost — gas and electric, all brands. Labor rates from $150. Burner ignition, heating elements, control boards. $89 dx.";
@@ -17,10 +19,31 @@ const schemaJson = `{
       { "@type": "Question", "name": "What warranty do you provide on stove repair in Los Angeles?", "acceptedAnswer": { "@type": "Answer", "text": "90 days on parts and labor. Same issue within 90 days and we come back at no charge. OEM parts wherever available." } }
     ]
   }`;
+
+// Wave 46 (2026-05-21): canonical org schema — HVAC 777 LLC + 4 credentials + hours.
+// Closes Wave 35 / Phase 2b-1 gap for brand-combo and price-list pages.
+// SSOT: src/data/credentials-schema.ts + src/data/business-hours.ts.
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': 'https://samedayappliance.repair/price-list/stove-repair-cost/#org',
+  name: 'Same Day Appliance Repair',
+  url: 'https://samedayappliance.repair/price-list/stove-repair-cost/',
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ]
+});
 ---
 
 <Layout title={title} description={description}>
   <Fragment slot="head-scripts">
+  <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />
     <script type="application/ld+json" set:html={schemaJson}></script>
   </Fragment>
 

@@ -2,6 +2,8 @@
 // Range Hood Repair Cost Los Angeles | Same Day Appliance Repair
 // /price-list/range-hood-repair-cost/
 import Layout from '../../layouts/Layout.astro';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 const title = "Range Hood Repair Cost Los Angeles 2026 | Labor Rates";
 const description = "Range hood repair cost — ducted and ductless, all brands. Labor rates from $100. Fan, lighting, controls, and vent cleaning. $89 dx.";
@@ -39,10 +41,31 @@ const schemaJsons = [
     ]
   }
 ];
+
+// Wave 46 (2026-05-21): canonical org schema — HVAC 777 LLC + 4 credentials + hours.
+// Closes Wave 35 / Phase 2b-1 gap for brand-combo and price-list pages.
+// SSOT: src/data/credentials-schema.ts + src/data/business-hours.ts.
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': canonical + '#org',
+  name: 'Same Day Appliance Repair',
+  url: canonical,
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ]
+});
 ---
 
 <Layout title={title} description={description} canonical={canonical}>
-  <Fragment slot="head-scripts">{schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}</Fragment>
+  <Fragment slot="head-scripts">
+  <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />{schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}</Fragment>
 
 <style>
     :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }

@@ -2,12 +2,38 @@
 // Commercial Fryer Repair Cost in Los Angeles | Same Day Appliance Repair
 // /price-list/commercial-fryer-repair-cost/
 import Layout from '../../layouts/Layout.astro';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 
 const title = "Commercial Fryer Repair Cost Los Angeles 2026";
 const description = "Commercial fryer repair cost — gas and electric, all brands. Labor from $240. Thermostat, igniter, heating element, high-limit. $120 dx.";
+
+// Wave 46 (2026-05-21): canonical org schema — HVAC 777 LLC + 4 credentials + hours.
+// Closes Wave 35 / Phase 2b-1 gap for brand-combo and price-list pages.
+// SSOT: src/data/credentials-schema.ts + src/data/business-hours.ts.
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': 'https://samedayappliance.repair/price-list/commercial-fryer-repair-cost/#org',
+  name: 'Same Day Appliance Repair',
+  url: 'https://samedayappliance.repair/price-list/commercial-fryer-repair-cost/',
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ]
+});
 ---
 
 <Layout title={title} description={description}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />
+  </Fragment>
+
 <style>
     :root{--red:#C8102E;--black:#0a0a0a;--gray:#f5f5f5;--border:#e2e2e2;--text:#1a1a1a;--muted:#6b6b6b;}
     *{box-sizing:border-box;margin:0;padding:0;}
