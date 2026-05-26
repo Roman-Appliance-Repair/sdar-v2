@@ -13,6 +13,7 @@ import { CITY_DESCRIPTORS, SERVICE_DESCRIPTORS, getBrandPool } from '../../data/
 import { CITIES } from '../../data/cities';
 import { BRANCHES, MAIN_PHONE } from '../../data/branches';
 import { mergeCredentials } from '../../data/credentials-schema';
+import { getBrandPillarSlug } from '../../data/brand-pillar-map';
 
 export async function getStaticPaths() {
   return CITY_SERVICE_MATRIX.map(combo => ({
@@ -177,7 +178,14 @@ const schemaJsons = [
     <h2>{cityName} {serviceDesc.shortName} brands we service most.</h2>
     <p>Brand mix in {cityName} reflects the local home stock and demographics. Our parts inventory and tech training are calibrated for this mix.</p>
     <ul class="bullet-list">
-      {brandPool.map(brand => (<li>{brand}</li>))}
+      {brandPool.map(brand => {
+        const slug = getBrandPillarSlug(brand);
+        return slug ? (
+          <li><a href={`/brands/${slug}/`}>{brand}</a></li>
+        ) : (
+          <li>{brand}</li>
+        );
+      })}
     </ul>
   </div>
 </section>
