@@ -155,7 +155,6 @@ export default defineConfig({
     // pillar deployment.
     // ====================================================================
     '/brands/hobart/':    '/brands/hobart-dishwasher-repair/',
-    '/brands/scotsman/':  '/brands/scotsman-ice-machine-repair/',
     '/brands/jackson/':   '/brands/jackson-dishwasher-repair/',
     '/brands/garland/':   '/brands/garland-range-repair/',
     '/brands/rational/':  '/brands/rational-combi-oven-repair/',
