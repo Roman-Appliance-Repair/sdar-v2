@@ -164,6 +164,15 @@ export default defineConfig({
     '/brands/lang/':      '/brands/lang-oven-repair/',
 
     // ====================================================================
+    // Wave 59-Hobart-prep (2026-05-26) — phantom URL fix until proper combo
+    // or permanent decision. Sibling /commercial/{equipment}/brands/hobart/
+    // exist for mixer-repair, slicer-repair, food-processor-repair; this one
+    // (dishwasher-repair) was missing alone and returned homepage SPA-fallback
+    // HTTP 200 (duplicate-content risk, same root cause as Wave 58).
+    // ====================================================================
+    '/commercial/dishwasher-repair/brands/hobart/': '/brands/hobart-dishwasher-repair/',
+
+    // ====================================================================
     // Pre-existing redirects (preserved from original config)
     // ====================================================================
     '/brand-thermador-appliance-repair/': '/brands/thermador/',
