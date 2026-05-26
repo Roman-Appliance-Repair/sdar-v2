@@ -135,9 +135,61 @@ type AreasCounty = { name: string; hubUrl: string; branches: AreasBranch[] };
 type PriceCell = { label: string; href: string; exists: boolean };
 type Panel =
   | { kind: 'flow'; links: Link[] }
-  | { kind: 'grouped'; columns: Column[]; align?: 'center' }
+  | { kind: 'grouped'; columns: Column[]; align?: 'center'; cols?: 3 | 4 }
   | { kind: 'areas'; counties: AreasCounty[] }
   | { kind: 'pricelist'; residential: PriceCell[]; commercial: PriceCell[]; html: string };
+
+// Brand pillar mega-menu (Wave 55, 2026-05-26). Hand-curated grouping —
+// auto-glob would mix 416 brand combo pages with 35 pillars. We want only
+// pillar pages here (one entry per real brand pillar), grouped by audience
+// tier so the nav both teaches scope and distributes link equity from all
+// 1054 pages to the top 32 brand pillars.
+// Note: lynx + perlick excluded — pillars not yet created (Wave 53b backlog).
+const brandResidentialPremium: Link[] = [
+  { label: 'Sub-Zero',                 href: '/brands/sub-zero/' },
+  { label: 'Wolf',                     href: '/brands/wolf/' },
+  { label: 'Viking',                   href: '/brands/viking/' },
+  { label: 'Thermador',                href: '/brands/thermador/' },
+  { label: 'Miele',                    href: '/brands/miele/' },
+  { label: 'Bosch',                    href: '/brands/bosch/' },
+  { label: 'KitchenAid',               href: '/brands/kitchenaid/' },
+  { label: 'Dacor',                    href: '/brands/dacor/' },
+  { label: 'Fisher & Paykel',          href: '/brands/fisher-paykel/' },
+  { label: 'Cove',                     href: '/brands/cove/' },
+  { label: 'ILVE',                     href: '/brands/ilve/' },
+  { label: 'Signature Kitchen Suite',  href: '/brands/signature-kitchen-suite/' }
+];
+
+const brandResidentialMass: Link[] = [
+  { label: 'LG',         href: '/brands/lg/' },
+  { label: 'Samsung',    href: '/brands/samsung/' },
+  { label: 'GE',         href: '/brands/ge/' },
+  { label: 'Whirlpool',  href: '/brands/whirlpool/' },
+  { label: 'Maytag',     href: '/brands/maytag/' },
+  { label: 'Frigidaire', href: '/brands/frigidaire/' },
+  { label: 'Amana',      href: '/brands/amana/' },
+  { label: 'JennAir',    href: '/brands/jennair/' }
+];
+
+const brandSpecialtyWine: Link[] = [
+  { label: 'U-Line',       href: '/brands/u-line/' },
+  { label: 'Marvel',       href: '/brands/marvel/' },
+  { label: 'Liebherr',     href: '/brands/liebherr/' },
+  { label: 'WhisperKool',  href: '/brands/whisperkool/' },
+  { label: 'CellarPro',    href: '/brands/cellarpro/' },
+  { label: 'EuroCave',     href: '/brands/eurocave/' },
+  { label: 'Vinotemp',     href: '/brands/vinotemp/' }
+];
+
+const brandCommercialOutdoor: Link[] = [
+  { label: 'Hestan (Outdoor)',    href: '/brands/hestan/' },
+  { label: 'Hoshizaki',           href: '/brands/hoshizaki/' },
+  { label: 'Manitowoc',           href: '/brands/manitowoc/' },
+  { label: 'Vulcan',              href: '/brands/vulcan/' },
+  { label: 'Beverage-Air',        href: '/brands/beverage-air/' },
+  { label: 'True Manufacturing',  href: '/brands/true/' },
+  { label: 'Traulsen',            href: '/brands/traulsen/' }
+];
 
 const menu: Array<{ label: string; href: string; panel: Panel }> = [
   {
@@ -155,12 +207,12 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     href: '/brands/',
     panel: {
       kind: 'grouped',
-      align: 'center',
+      cols: 4,
       columns: [
-        {
-          title: 'Brand Pages',
-          html: 'Dedicated pages for Sub-Zero, Wolf, Viking, Thermador and more — coming soon. <br/>Browse all <a href="/services/">appliance services</a> in the meantime.'
-        }
+        { title: 'Residential Premium',     links: brandResidentialPremium },
+        { title: 'Residential Mass Market', links: brandResidentialMass },
+        { title: 'Specialty & Wine',        links: brandSpecialtyWine },
+        { title: 'Commercial & Outdoor',    links: brandCommercialOutdoor }
       ]
     }
   },
@@ -279,7 +331,7 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
               ))}
             </div>
           ) : (
-            <div class={`mega-panel-inner mega-panel-grid ${item.panel.align === 'center' ? 'is-center' : ''}`}>
+            <div class={`mega-panel-inner mega-panel-grid ${item.panel.align === 'center' ? 'is-center' : ''} ${item.panel.cols === 4 ? 'is-cols-4' : ''}`}>
               {item.panel.columns.map((col) => (
                 <div class="panel-col">
                   {col.title && <h4>{col.title}</h4>}
@@ -478,6 +530,10 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     grid-template-columns: minmax(0, 560px);
     justify-content: center;
     text-align: center;
+  }
+  .mega-panel-grid.is-cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px 40px;
   }
 
   .panel-col h4 {
