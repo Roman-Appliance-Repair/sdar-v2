@@ -155,7 +155,6 @@ export default defineConfig({
     // pillar deployment.
     // ====================================================================
     '/brands/hobart/':    '/brands/hobart-dishwasher-repair/',
-    '/brands/jackson/':   '/brands/jackson-dishwasher-repair/',
     '/brands/garland/':   '/brands/garland-range-repair/',
     '/brands/rational/':  '/brands/rational-combi-oven-repair/',
     '/brands/frymaster/': '/brands/frymaster-fryer-repair/',
