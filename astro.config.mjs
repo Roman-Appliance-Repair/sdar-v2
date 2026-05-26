@@ -146,6 +146,26 @@ export default defineConfig({
   ],
   redirects: {
     // ====================================================================
+    // TEMPORARY (Wave 58 / 2026-05-26): /brands/{commercial-brand}/ → most-trafficked
+    // combo. Fixes Cloudflare SPA-fallback fake-200 serving homepage HTML for these
+    // 10 URLs (duplicate-content signal to Google).
+    // REMOVE THESE 10 RULES when broad pillar pages are deployed at /brands/{slug}/
+    // (Wave 59+ — Hobart, Scotsman, Jackson, Garland, Rational, Frymaster, Pitco,
+    // Champion, Imperial, Lang pillars planned). DO NOT remove without confirming
+    // pillar deployment.
+    // ====================================================================
+    '/brands/hobart/':    '/brands/hobart-dishwasher-repair/',
+    '/brands/scotsman/':  '/brands/scotsman-ice-machine-repair/',
+    '/brands/jackson/':   '/brands/jackson-dishwasher-repair/',
+    '/brands/garland/':   '/brands/garland-range-repair/',
+    '/brands/rational/':  '/brands/rational-combi-oven-repair/',
+    '/brands/frymaster/': '/brands/frymaster-fryer-repair/',
+    '/brands/pitco/':     '/brands/pitco-fryer-repair/',
+    '/brands/champion/':  '/brands/champion-dishwasher-repair/',
+    '/brands/imperial/':  '/brands/imperial-range-repair/',
+    '/brands/lang/':      '/brands/lang-oven-repair/',
+
+    // ====================================================================
     // Pre-existing redirects (preserved from original config)
     // ====================================================================
     '/brand-thermador-appliance-repair/': '/brands/thermador/',
