@@ -2,6 +2,8 @@
 /** v2 LuxurySpecialists — eyebrow + H2 + paragraphs + brand pills + 4-stat scoreboard.
  *  Photo slot 3 (luxury appliance close-up) embedded inside. */
 
+import { getBrandPillarSlug } from '../../../data/brand-pillar-map';
+
 export interface Props {
   cityName: string;
   eyebrow?: string;
@@ -50,7 +52,14 @@ const photoAlt = `Sub-Zero / Wolf / Thermador appliance repair ${cityName}`;
           </svg>
         </div>
         <div class="v2-luxury__brands">
-          {brands.map((b) => (<div class="v2-luxury__brand">{b}</div>))}
+          {brands.map((b) => {
+            const slug = getBrandPillarSlug(b);
+            return slug ? (
+              <a href={`/brands/${slug}/`} class="v2-luxury__brand">{b}</a>
+            ) : (
+              <div class="v2-luxury__brand">{b}</div>
+            );
+          })}
         </div>
       </div>
       <aside class="v2-luxury__stats">
@@ -110,6 +119,13 @@ const photoAlt = `Sub-Zero / Wolf / Thermador appliance repair ${cityName}`;
     font-weight: 500;
     font-family: var(--v2-font-body);
     color: rgba(255,255,255,0.9);
+  }
+  a.v2-luxury__brand {
+    text-decoration: none;
+    color: inherit;
+  }
+  a.v2-luxury__brand:hover {
+    text-decoration: underline;
   }
   .v2-luxury__stats {
     display: grid;
