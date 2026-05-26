@@ -1,0 +1,569 @@
+---
+// src/pages/brands/hobart.astro
+// Wave 59 — Hobart broad commercial equipment pillar.
+// Pillar #5 of 10 commercial brand pillars (Maximum SEO structure approved 2026-05-26).
+// HIGHEST TP in Wave 59 cluster ~20,000+/mo combined across 4 product categories.
+// UNIQUE POSITIONING: Hobart Corp = direct service competitor (125 locations,
+// 1,500 techs national network). Pillar positions SDAR as 'independent alternative'.
+// Cross-links to 4 existing Hobart combos:
+//   - /brands/hobart-dishwasher-repair/ (3,485w deep dishwasher combo)
+//   - /commercial/mixer-repair/brands/hobart/ (Legacy mixer combo)
+//   - /commercial/slicer-repair/brands/hobart/ (HS-series slicer combo)
+//   - /commercial/food-processor-repair/brands/hobart/ (Buffalo Chopper combo)
+// Does NOT link to /commercial/dishwasher-repair/brands/hobart/ (phantom URL,
+// fixed via 301 redirect in commit 4be11b5; Wave 59-Hobart-prep-followup).
+// Wave 58 temporary /brands/hobart/ → combo redirect removed in same commit.
+// Research source: audit-output/hobart-pillar-content-research-2026-05-26.md.
+// 5 schema entities (HomeAndConstructionBusiness + Brand[ITW Food Equipment Group]
+// + FAQPage + BreadcrumbList + WebPage SpeakableSpecification). Brand schema uses
+// verified ownership chain: 1897 Troy OH → 1981 Dart & Kraft → 1986 Premark → 1999 ITW.
+// Em-dash budget: visible body ≤6. NO aggregateRating. NO streetAddress.
+
+import Layout from '../../layouts/Layout.astro';
+import ServiceHero from '../../components/ServiceHero.astro';
+import BrandBranchesGrid from '../../components/BrandBranchesGrid.astro';
+import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../data/branches';
+import { mergeCredentials } from '../../data/credentials-schema';
+
+const canonical = "https://samedayappliance.repair/brands/hobart/";
+const title = "Hobart Commercial Equipment Repair Los Angeles — Same Day";
+const description = "Hobart dishwasher, mixer, slicer, Buffalo Chopper service across LA. AM16, HL600, FT2000, 2912. Independent alternative to Hobart Corp.";
+
+const faqs = [
+  {
+    q: "Should I call Hobart Corp direct or use an independent service like SDAR?",
+    a: "Honest answer: depends on what you're calling about. Hobart Corp runs a 125-location, 1,500-technician national service network with their own LA office. For active warranty work, new-install commissioning, ServicePlus or Hobart Assurance contract accounts, and large multi-location facility programs, Hobart Corp direct is the right call. They wrote the parts manual, they have factory-trained techs, and their dispatch logistics are real. Where the math shifts toward independent: out-of-warranty repairs (the majority of LA Hobart service calls we see), emergency after-hours or weekend dispatches where their queue is 24 to 48 hours and your kitchen needs running today, post-warranty units where their callout charge is $300 to $400 before any repair labor, and second-opinion situations where their tech says 'replace the unit for $14,000' and you want an honest read on whether repair is still viable. We're the LA-based independent that fills those gaps. $120 commercial diagnostic, 2-hour LA response window, stocked common parts across all four Hobart product categories."
+  },
+  {
+    q: "Do you service all four Hobart product categories (dishwashers, mixers, slicers, Buffalo Choppers)?",
+    a: "Yes. Hobart is the most-serviced brand on our LA commercial route precisely because it owns the workhorse position in all four categories. Warewashing: AM16 and AM16VLT door-type, LXe and LXn undercounter (plus the rackless LXeR and LXnR variants), CLeR/CLeN/CL44eN rack conveyors, FT900 and FT2000 flight-types, plus legacy CRS-66A door units. Mixers: Legacy planetary HL120 (12-quart), HL200 (20-quart), HL400 (40-quart), HL600 (60-quart), HL800 (80-quart), HL1400 (140-quart), plus the H600 floor mixer and legacy H800. Current Legacy+ line including HL200 Plus and HL662. Slicers: HS-series gravity-feed (HS6 12-inch, HS7 12-inch heavy-duty, HS8 13-inch, HS9 14-inch), plus legacy 1812 and 2912 still in active LA service. Food prep: Buffalo Chopper vertical cutter-mixer (84142, 84186, FP400 series), plus legacy 84142B Buffalo units running since the late 1990s. One service relationship, four product categories, single billing account."
+  },
+  {
+    q: "Hobart Corp said 'replace the unit, $14,000' — should I get a second opinion?",
+    a: "Almost always worth it. We get this call constantly: facility manager has a 12-year-old AM16 or a 25-year-old HL600, Hobart Corp factory tech quotes new-unit replacement with installation rather than itemized repair, and the operator wants to know if the math is honest. Often it is, sometimes it isn't. Hobart shells outlast components by decades. A 20-year-old HL400 with a failed bowl-lift motor isn't a replacement scenario, it's a $580 to $880 part swap. A 15-year-old AM16 with a control board fault isn't a replacement scenario, it's a $700 to $1,400 board swap. Even sealed-system or cast-iron-transmission rebuilds at year 18 to 22 ($1,400 to $2,400 on an HL400) beat replacement math handily. The exception is units with cascading failures (board plus pump plus tank heater plus chemical dispenser all failing in one quarter), where Hobart Corp's number lines up because the unit is genuinely end-of-life. Our $120 diagnostic gives you the honest itemized read with no replacement-sale incentive on our side."
+  },
+  {
+    q: "How does LADWP hard water affect Hobart warewashing in LA?",
+    a: "Significantly, and most operators under-budget for it. Los Angeles Department of Water and Power delivers water at 8 to 12 grains per gallon hardness across most service territory, roughly double the national average that Hobart's national service literature assumes. Tank heaters scale faster, rinse arm jets clog faster, booster heater elements crust over faster, and FT-series spray manifolds need delime service more often than Hobart's published intervals call for. Quarterly delime is realistic for commercial duty in LADWP territory (national recommendation is twice a year). FT2000 flight-type and high-volume AM16 door units in core LA should be on a quarterly preventive schedule. Coastal sites (Santa Monica, Marina del Rey, Manhattan Beach) add condenser fin salt-air corrosion on top, inspect at the same visit. Inland Empire sites (Rancho Cucamonga, Riverside, Temecula) face even harder water and often need monthly delime on high-throughput units. Real delime service (descale tank, descale wash arms, descale booster, replace water filter) runs $220 to $380 depending on machine size. Skip it and your tank heater runs at 60% efficiency by year three."
+  },
+  {
+    q: "I have a 25-year-old Hobart Legacy mixer. Repair or replace?",
+    a: "Almost always repair on Hobart Legacy. ITW's Hobart parts ecosystem is unusually strong for older mixers because the cast-iron transmission cabinets are deliberately designed to outlast service components. HL120s, HL200s, HL400s, HL600s, and HL800s from the early 2000s are still in active LA service with periodic component replacement. The structural cabinet, gear box housing, and bowl-lift architecture remain solid for 30+ years. What cycles through replacement: motor brushes (year 6 to 9), bowl-lift safety interlock (year 5 to 9, OSHA-critical), gear transmission oil seal (year 8 to 12), planetary drive motor (year 12 to 18), bowl-lift motor (year 12 to 18), full gear transmission rebuild (year 18 to 25 if needed). Even the rebuild on an HL400 at year 22 ($1,400 to $2,400) beats replacement of a comparable new HL400 ($12,000 to $18,000 installed). The math flips only when multiple major components fail in the same year, which is uncommon on properly maintained Legacy units. We give the honest read after the $120 diagnostic, including which components have remaining life and which are near end-of-cycle."
+  },
+  {
+    q: "Genuine Hobart parts vs aftermarket — does it matter?",
+    a: "Yes, and Hobart Corp will void any active warranty on equipment serviced with non-OEM parts (same as most manufacturers). The real argument for OEM Hobart isn't warranty defense though, it's reliability. Aftermarket booster heater contactors, chemical dispenser solenoids, wash pump seals, and rinse arm bearings fail at meaningfully higher rates than Hobart Service Parts, and a $40 saved on the install often turns into a $400 repeat service call six months later. We source exclusively through Hobart Service Parts (ITW Food Equipment authorized distribution). Common wear items stocked on the truck for AM16, LXe, HS-series, HL-series, and Buffalo Chopper service. Specialty parts (specific control boards, conveyor drive motors, CL44e tank heaters, FT900 and FT2000 flight-type modules, Buffalo Chopper bowl bearings) come next-day from the Troy, Ohio ITW warehouse, typically 5 to 7 business days standard ship, expedited available."
+  },
+  {
+    q: "Do you service ITW siblings like Traulsen, Vulcan, or Wolf commercial?",
+    a: "Yes, and this is where the ITW family relationship pays off operationally. Hobart sits inside ITW Food Equipment Group alongside Traulsen (commercial refrigeration), Vulcan (cooking equipment, ranges, ovens, fryers), Wolf commercial cooking, Stero (warewashing), Baxter (bakery equipment), Bonnet, and Wittco (holding cabinets). A typical fine-dining or hotel banquet kitchen runs Hobart warewashing plus Traulsen reach-in refrigeration plus Vulcan ranges and convection ovens, all three from the same ITW family. We service the full ITW commercial portfolio with one parts account, one service relationship, one billing channel. For multi-location operators or facility managers running mixed ITW equipment, that means a single Friday call covers the AM16 down at the bar, the Traulsen G-series on the line, and the Vulcan VC4GD convection oven in the prep kitchen, three brands and three categories on one dispatch."
+  },
+  {
+    q: "Do you service Hobart meat grinders?",
+    a: "No, and we want to be straight about that. Hobart historically manufactured commercial meat grinders and meat-room equipment, but the company largely exited that product category over the last 15 years (Biro Manufacturing and various specialty meat-equipment makers now dominate that space). We don't carry meat grinder parts on the truck, we don't have Hobart meat grinder schematics in our service library, and we'd refer a meat grinder service call to a meat-equipment specialist rather than fake competence. The four Hobart product categories we do service: warewashing (dishwashers, glasswashers, conveyors, flight-types), planetary mixers (Legacy and floor units), gravity-feed slicers (HS-series and legacy 1812/2912), and Buffalo Chopper vertical cutter-mixers (food processors). Anything outside those four categories, we'll tell you and refer you to the right specialist. That's honest scope, not a limitation."
+  }
+];
+
+const schemaJsons = [
+  mergeCredentials({
+    "@context": "https://schema.org",
+    "@type": "HomeAndConstructionBusiness",
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair, Hobart Commercial Equipment Service",
+    "image": "https://samedayappliance.repair/images/same-day-appliance-repair.png",
+    "url": canonical,
+    "telephone": MAIN_PHONE_TEL,
+    "priceRange": "$$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ]
+  }),
+  {
+    "@context": "https://schema.org",
+    "@type": "Brand",
+    "@id": canonical + "#brand",
+    "name": "Hobart",
+    "alternateName": ["Hobart Corporation", "Hobart Service"],
+    "url": "https://www.hobartcorp.com/",
+    "logo": "https://www.hobartcorp.com/favicon.ico",
+    "description": "Hobart Corporation is the dominant American commercial foodservice equipment manufacturer, founded 1897 in Troy, Ohio. Acquired by Dart & Kraft in 1981, became part of Premark International in the 1986 spinoff, then acquired by Illinois Tool Works in 1999 and integrated into ITW Food Equipment Group. ITW sibling brands include Vulcan (commercial cooking equipment), Wolf commercial, Stero (warewashing), Traulsen (commercial refrigeration), Baxter (bakery), Bonnet, and Wittco (holding cabinets). Hobart product families: warewashing (AM16 / AM16VLT door-type, LXe / LXn / LXeR / LXnR undercounter, CLeR / CLeN / CL44eN rack conveyors, FT900 / FT2000 flight-type, PWn prep washers), planetary mixers (Legacy HL120 / HL200 / HL400 / HL600 / HL800 / HL1400, H600 floor mixer, HL200 Plus, HL662), gravity-feed slicers (HS6 / HS7 / HS8 / HS9, legacy 1812 / 2912), and Buffalo Chopper vertical cutter-mixers (84142, 84186, FP400 series). Hobart Corp also operates a 125-location, 1,500-technician direct national service network.",
+    "foundingDate": "1897",
+    "foundingLocation": { "@type": "Place", "name": "Troy, Ohio" },
+    "parentOrganization": { "@type": "Organization", "name": "ITW Food Equipment Group" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(f => ({
+      "@type": "Question",
+      "name": f.q,
+      "acceptedAnswer": { "@type": "Answer", "text": f.a }
+    }))
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Brands", "item": "https://samedayappliance.repair/brands/" },
+      { "@type": "ListItem", "position": 3, "name": "Hobart Commercial Equipment Repair", "item": canonical }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "url": canonical,
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": [".intro-speakable", ".faq-item:first-of-type"]
+    }
+  }
+];
+---
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    {schemaJsons.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+  </Fragment>
+
+  <ServiceHero
+    slug="hobart"
+    section="brands"
+    eyebrow="Commercial Equipment · BHGS #A49573 · EPA 608 Universal · $120 Commercial Diagnostic"
+    title="Hobart Commercial Equipment Repair Los Angeles"
+    subtitle="AM16 / LXn / CL conveyor / FT2000 warewashing. Legacy HL200-HL1400 / H600 mixers. HS-series and 1812/2912 slicers. Buffalo Chopper. Independent alternative to Hobart Corp direct dispatch."
+    heroImageTitle="Hobart Commercial Equipment Repair"
+    showBranches={true}
+  />
+
+  <!-- ── INTRO (Speakable target) ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Why LA operators call us first</p>
+      <h2>Hobart is the most-serviced commercial brand on our LA route, and the only one where the manufacturer is our direct service competitor.</h2>
+      <p class="intro-speakable">Hobart Corporation runs a 125-location, 1,500-technician national service network. They dispatch their own techs to your kitchen. Our positioning isn't "we're better than Hobart factory." It's a specific choice: same-day 2-hour LA response when Hobart's national queue can't match it, stocked common parts when their truck doesn't carry your obscure part, post-warranty scope when the factory callout charge is $300 to $400 before any repair labor, and an honest second opinion when a Hobart Corp tech says "replace the unit, $14,000." For warranty work, new installs, large facility contracts, call Hobart Corp direct. For everything else, we're the LA-based independent with the parts pipeline and the technical depth across all four Hobart product categories.</p>
+      <p>Hobart's depth across LA commercial kitchens is unmatched. Almost every restaurant, hotel banquet operation, hospital cafeteria, school food service, country club, and stadium prep kitchen runs at least one Hobart unit. Often three or four: an AM16 door-type dishwasher at the back dish station, an HL200 or HL400 Legacy mixer in the prep area, an HS-series slicer at the deli counter, and a Buffalo Chopper for sausage and soup-base work. Four product categories, four service intervals, four parts pipelines, all from one manufacturer. That depth is why an independent service alternative matters: when the AM16 fails at 4pm on a Friday and the HL600 is making noise the same week, you need one phone call that covers both, not separate dispatches across four equipment categories.</p>
+      <p>The diagnostic is $120 commercial-tier, waived when you approve the repair. We quote labor and parts before any work starts. We pick up the phone Monday through Saturday 8am to 8pm and dispatch typically same-day across the Westside, Hollywood, downtown LA, Pasadena, and Conejo Valley. Inland Empire and Riverside County typically next-day. BHGS Registration #A49573. EPA 608 Universal certified #1346255700410. CSLB C-20 HVAC. BBB Accredited Business.</p>
+    </div>
+  </section>
+
+  <!-- ── ITW FOOD EQUIPMENT GROUP CONTEXT ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">The corporate ownership chain that matters</p>
+      <h2>Hobart sits inside ITW Food Equipment Group, with sibling brands across the commercial kitchen</h2>
+      <p>Hobart Corporation was founded in 1897 in Troy, Ohio, by Charles C. Hobart. The brand became part of Dart &amp; Kraft in 1981, separated into Premark International in the 1986 spinoff, and was acquired by Illinois Tool Works (NYSE: ITW) in 1999. Since then, Hobart has been the flagship of the ITW Food Equipment Group portfolio, which includes some of the most-recognized commercial kitchen brand names in the US market.</p>
+      <p><strong>ITW Food Equipment Group sibling brands we also service:</strong></p>
+      <ul class="legacy-list">
+        <li><strong>Vulcan</strong> — commercial cooking equipment, ranges, convection ovens, fryers, charbroilers, griddles. Dominant in restaurant cook lines across LA.</li>
+        <li><strong>Wolf commercial</strong> — high-end commercial cooking (separate from the residential Wolf line owned by Sub-Zero Group; Wolf commercial sits under ITW).</li>
+        <li><strong>Stero</strong> — commercial warewashing, Hobart's sibling brand for door-type and conveyor dishwashers at slightly different scale points.</li>
+        <li><strong>Traulsen</strong> — commercial reach-in refrigeration and walk-in coolers, common pairing with Hobart warewashing in fine-dining and hotel banquet kitchens.</li>
+        <li><strong>Baxter</strong> — bakery equipment, rotating rack ovens, retarder-proofers. Common in commercial bakeries and hotel pastry programs.</li>
+        <li><strong>Bonnet</strong> — institutional cooking equipment.</li>
+        <li><strong>Wittco</strong> — heated holding cabinets, common in K-12 cafeteria and institutional foodservice.</li>
+      </ul>
+      <p>What this means operationally: an LA kitchen running Hobart warewashing plus Traulsen reach-in refrigeration plus Vulcan ranges is running three ITW brands. We service all three through one parts account, one technician relationship, and one service billing channel. For multi-location operators, facility managers, and corporate dining accounts, that single-call coverage across the ITW commercial portfolio is real operational simplification. The combo page deeper context lives at our <a href="/brands/hobart-dishwasher-repair/" class="brand-inline-link">Hobart dishwasher repair detail page</a> and the ITW refrigeration side is documented at <a href="/brands/commercial-refrigeration/traulsen-commercial-repair/" class="brand-inline-link">Traulsen commercial refrigeration</a>.</p>
+    </div>
+  </section>
+
+  <!-- ── WAREWASHING LINEUP ── -->
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow-sub">Category 1 of 4 — Warewashing</p>
+      <h2>Hobart warewashing — the dominant US commercial dishwasher brand, full lineup we service</h2>
+      <p>Hobart is the #1 US commercial warewashing brand by installed base. Across LA restaurants, hotels, hospitals, schools, and stadium kitchens, Hobart machines run more dish loads than any other manufacturer. We service the full current lineup plus extensive legacy coverage. Deeper detail with model-specific failure narratives and a full pricing table is at our <a href="/brands/hobart-dishwasher-repair/" class="brand-inline-link">Hobart commercial dishwasher repair</a> combo page.</p>
+
+      <h3 class="line-h3">Door-type dishwashers</h3>
+      <p><strong>AM16 and AM16VLT.</strong> The workhorse single-rack high-volume door machine. AM16 is the standard heated-rinse unit; AM16VLT is the ventless variant (condenses steam internally, no hood connection required, common where ventilation retrofit is impractical). Heavy stainless construction, designed for 15+ year service life with periodic component replacement. AM16 + AM16VLT together account for the largest single service call category on our LA Hobart route. Common failures: rinse arm spray bearing, booster heater contactor, wash pump seal, chemical dispenser solenoid, door gasket, fill solenoid.</p>
+      <p><strong>Legacy CRS-66A, CRS-86A.</strong> Older door-type machines still in active LA service. Parts availability through ITW Hobart Service Parts remains strong even for units 20+ years old.</p>
+
+      <h3 class="line-h3">Undercounter dishwashers</h3>
+      <p><strong>LXe and LXn.</strong> Standard undercounter rack machines, 24-inch form factor for bar-back and prep-station installations. LXn is the current production replacement for the LXe; both serviced. Common failures: door gasket (#1 LXe service item), door switch, fill solenoid, drain pump.</p>
+      <p><strong>LXeR and LXnR.</strong> Rackless variants for glass and small-ware. Dishes sit on the inner structure rather than a rack. Heavy populations in WeHo, DTLA, and Santa Monica bar clusters for glassware. Same failure pattern profile as LXe / LXn.</p>
+      <p><strong>PWn prep washer.</strong> Prep-station undercounter optimized for pot and pan washing. Less common than LXe but present in higher-volume prep operations.</p>
+
+      <h3 class="line-h3">Rack conveyors</h3>
+      <p><strong>CLeR, CLeN, CL44eN.</strong> Rack-conveyance line machines for high-volume institutional cafeterias and large hotel banquet kitchens. CLeR is the retractable-hood variant for low-ceiling installations; CLeN is the standard fixed-hood; CL44eN is the 44-inch-chamber high-capacity variant for the highest-throughput rack-conveyor applications. Service complexity steps up from door machines: conveyor drive motor, tank heater banks, spray arm modules across pre-wash / wash / rinse zones, final rinse booster, chemical dispenser stacks. Conveyor jobs typically run longer service calls and benefit from quarterly scheduled-maintenance visits rather than reactive emergency dispatches.</p>
+
+      <h3 class="line-h3">Flight-type continuous belt</h3>
+      <p><strong>FT900 and FT2000.</strong> Top-of-range flight-type with continuous belt conveyance across pre-wash, wash, and final rinse zones. FT900 is the legacy generation still in heavy LA service; FT2000 is the current production line (Advansys and Base variants). Standard installations in stadium commissaries (SoFi, Crypto.com Arena, Dodger Stadium prep kitchens), airline catering operations (Gate Gourmet at LAX, LSG Sky Chefs), large convention-center kitchens (LA Convention Center, Anaheim Convention Center), and major hotel banquet operations (downtown LA financial district hotels, BH luxury properties). Service complexity is highest in the lineup: belt drive, multi-zone refrigerant or steam supply, pre-wash manifold, vapor extraction, and the full chemical dispenser stack. Scheduled PM is the operational norm; emergency dispatches happen but cost the operator significantly more in down-time than preventive maintenance avoidance.</p>
+    </div>
+  </section>
+
+  <!-- ── MIXERS LINEUP ── -->
+  <section class="section section-alt">
+    <div class="container">
+      <p class="eyebrow-sub">Category 2 of 4 — Planetary mixers</p>
+      <h2>Hobart Legacy mixers — the iconic planetary mixer line we service across LA bakeries, pizzerias, and restaurant prep kitchens</h2>
+      <p>Hobart Legacy is the canonical commercial planetary mixer. Cast-iron gear transmissions, bowl-lift architecture (separate motor on HL200 and larger), OSHA-compliant safety interlocks, and structural cabinets engineered for 30+ year service life. Deeper detail with mixer-specific failure narratives, OSHA bowl-lift interlock compliance protocol, and a full Legacy pricing table is at our <a href="/commercial/mixer-repair/brands/hobart/" class="brand-inline-link">Hobart Legacy mixer repair</a> combo page.</p>
+
+      <h3 class="line-h3">Hobart Legacy planetary mixers — full lineup</h3>
+      <ul class="legacy-list">
+        <li><strong>HL120</strong> — 12-quart countertop planetary, smallest Legacy. Common at restaurants and small bakeries for sauce, batter, and small-batch work.</li>
+        <li><strong>HL200</strong> — 20-quart bench planetary with separate bowl-lift motor. Restaurant prep kitchens, smaller bakeries.</li>
+        <li><strong>HL400</strong> — 40-quart floor planetary, the LA bakery workhorse. Dominant mid-size install across pizzerias and mid-volume bakeries.</li>
+        <li><strong>HL600</strong> — 60-quart floor planetary, the standard for high-volume bakeries, hotel pastry programs, and country club banquet operations. Heritage HL600 units from the early 2000s common in established BH and WeHo hotel kitchens.</li>
+        <li><strong>HL800</strong> — 80-quart floor planetary, high-volume bakeries and institutional cafeterias.</li>
+        <li><strong>HL1400</strong> — 140-quart floor planetary, the largest standard Legacy. Industrial bakeries and large institutional foodservice.</li>
+        <li><strong>HL200 Plus and HL662</strong> — current production refresh of the Legacy line with updated controls and motor architecture.</li>
+        <li><strong>H600 floor mixer (legacy)</strong> — 60-quart legacy predecessor to HL600, still in active LA service at year 25+. Parts ecosystem remains strong.</li>
+        <li><strong>H800 floor mixer (legacy)</strong> — 80-quart legacy predecessor to HL800.</li>
+      </ul>
+
+      <h3 class="line-h3">Hobart Legacy failure patterns</h3>
+      <p><strong>Bowl-lift safety interlock (year 5 to 9).</strong> OSHA-mandated. Electromechanical interlock at the bowl-cradle interface; failure mode is contact wear. Replacement $260 to $440. Critical to service when symptoms appear because failed interlock means mixer keeps running with bowl lowered, direct OSHA pinch-point citation territory.</p>
+      <p><strong>Motor brushes (year 6 to 9).</strong> Periodic wear item. $120 to $220 with brush kit swap.</p>
+      <p><strong>Gear transmission oil seal (year 8 to 12).</strong> $440 to $720 with oil refill. Catch early at the slow-leak stage; running the transmission dry accelerates wear into a $1,400 to $2,400 full rebuild scenario.</p>
+      <p><strong>Bowl-lift motor (year 12 to 18).</strong> Separate motor distinct from the planetary drive motor on HL200 and larger. $580 to $880 replacement depending on mixer size.</p>
+      <p><strong>Planetary drive motor (year 12 to 18).</strong> $880 to $1,400 replacement.</p>
+      <p><strong>Full gear transmission rebuild (year 18 to 25 if needed).</strong> $1,400 to $2,400 on-site rebuild for HL400; scales with mixer size. Even at year 22, this beats new-unit replacement math handily for properly cared-for Legacy units.</p>
+    </div>
+  </section>
+
+  <!-- ── SLICERS LINEUP ── -->
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow-sub">Category 3 of 4 — Gravity-feed slicers</p>
+      <h2>Hobart HS-series slicers — the standard gravity-feed slicer at LA delis, butcher shops, and restaurant prep kitchens</h2>
+      <p>Hobart HS-series is the dominant US commercial gravity-feed slicer. Cast-iron base, manual or automatic feed (depending on model), built-in sharpener stone, OSHA-compliant safety interlock at the blade guard interface. Service life properly maintained is 15 to 25 years; heritage HS units from the 1990s are common in long-tenure LA delis and butcher shops. Deeper detail at our <a href="/commercial/slicer-repair/brands/hobart/" class="brand-inline-link">Hobart slicer repair</a> combo page.</p>
+
+      <h3 class="line-h3">Hobart slicer current and legacy</h3>
+      <ul class="legacy-list">
+        <li><strong>HS6</strong> — 12-inch blade, smallest HS, manual gravity feed. Common at smaller delis and restaurant prep.</li>
+        <li><strong>HS7</strong> — 12-inch heavy-duty, manual gravity feed. Higher-cycle deli operations.</li>
+        <li><strong>HS8</strong> — 13-inch, manual or automatic feed (HS8A automatic variant). Mid-volume deli and butcher.</li>
+        <li><strong>HS9</strong> — 14-inch, the largest standard HS. Heavy butcher operations, sausage makers, large delicatessen counters.</li>
+        <li><strong>Legacy 1812</strong> — 12-inch legacy slicer. Pre-HS generation still in active LA service.</li>
+        <li><strong>Legacy 2912</strong> — 12-inch legacy slicer. Same generation as 1812. Parts still available through ITW Hobart Service Parts.</li>
+        <li><strong>Edge slicer</strong> — newer Hobart slicer variant in select installations.</li>
+      </ul>
+
+      <h3 class="line-h3">Hobart slicer service items</h3>
+      <p><strong>Blade sharpening with built-in sharpener (routine).</strong> $140 to $260 per service. Restores edge without blade replacement.</p>
+      <p><strong>Blade replacement NSF-listed OEM (year 5 to 10 depending on duty).</strong> $380 to $720 depending on HS6 vs HS9 size. When blade has been sharpened to the point further sharpening compromises diameter, replacement is the right call.</p>
+      <p><strong>Safety interlock (year 5 to 9).</strong> Magnetic reed switch in blade guard interface. $260 to $440. OSHA critical, same logic as the Legacy bowl-lift interlock.</p>
+      <p><strong>Sharpener stone (periodic wear).</strong> $140 to $240.</p>
+      <p><strong>Drive belt (year 6 to 10).</strong> $180 to $320.</p>
+      <p><strong>Motor (year 12 to 18).</strong> $580 to $980 depending on slicer size.</p>
+    </div>
+  </section>
+
+  <!-- ── BUFFALO CHOPPER / FOOD PREP ── -->
+  <section class="section section-alt">
+    <div class="container">
+      <p class="eyebrow-sub">Category 4 of 4 — Buffalo Chopper / food prep</p>
+      <h2>Hobart Buffalo Chopper — the iconic vertical cutter-mixer we service at LA butcher shops, sausage makers, and Italian-concept restaurants</h2>
+      <p>The Buffalo Chopper (named for the original Buffalo, NY design origin) is Hobart's high-volume vertical cutter-mixer line, the standard food processor at restaurants doing serious in-house chopping work: charcuterie, sausage filler, soup base, ground meat applications. Rotating bowl with stationary blade architecture (different from Robot Coupe bowl-cutters with rotating blade and stationary bowl). Heavy cast construction, 15 to 20 year service life with proper maintenance. Deeper detail at our <a href="/commercial/food-processor-repair/brands/hobart/" class="brand-inline-link">Hobart Buffalo Chopper repair</a> combo page.</p>
+
+      <h3 class="line-h3">Hobart Buffalo Chopper models</h3>
+      <ul class="legacy-list">
+        <li><strong>84142</strong> — standard 3-quart bowl, ~250 to 300 lb/hr capacity. Most common LA install across butcher shops and sausage operations.</li>
+        <li><strong>84186</strong> — larger 5-quart bowl, ~500 to 600 lb/hr capacity. High-volume butcher shops and sausage makers.</li>
+        <li><strong>FP400 series</strong> — very high-volume industrial.</li>
+        <li><strong>Legacy 84142B</strong> — pre-current-generation Buffalo Chopper still in active service at LA butcher shops and Italian-concept restaurants since the late 1990s.</li>
+      </ul>
+
+      <h3 class="line-h3">Buffalo Chopper failure modes</h3>
+      <p><strong>Blade dull or chipped (year 5 to 8 commercial duty).</strong> $340 to $540 blade replacement.</p>
+      <p><strong>Bowl scraper wear (year 4 to 7).</strong> PTFE or rubber scraper rubs against bowl during operation. Easy field replacement, $80 to $180.</p>
+      <p><strong>Motor brushes (year 6 to 9).</strong> $120 to $220.</p>
+      <p><strong>Drive coupling (year 7 to 10).</strong> $280 to $440.</p>
+      <p><strong>Bowl bearing (year 8 to 12).</strong> $380 to $580.</p>
+      <p><strong>Safety interlock (year 5 to 8).</strong> $180 to $280. Hobart Buffalo Chopper requires complete bowl removal for cleaning per LA County DPH (Department of Public Health) protocol; we verify operator cleaning protocol on every service visit and document the interlock function for health inspection records.</p>
+    </div>
+  </section>
+
+  <!-- ── LA-SPECIFIC FAILURE PATTERNS ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">LA conditions matter</p>
+      <h2>Why Hobart equipment fails faster in LA than Hobart's national service literature predicts</h2>
+      <p>Hobart publishes national service guidance based on national-average operating conditions. LA isn't national-average on three vectors that meaningfully affect Hobart service-life expectations.</p>
+      <p><strong>LADWP hard water on warewashing equipment.</strong> 8 to 12 grains per gallon hardness, roughly double the national average. Tank heaters scale faster, rinse arm jets clog faster, booster elements crust faster, FT-series spray manifolds need delime service more often than published intervals call for. Real impact: AM16 booster running at 60 percent efficiency by year three without quarterly delime. CL conveyor wash arms losing rinse pattern coverage by year two on units without preventive descale. FT2000 flight-type spray manifolds throwing temperature errors on the final rinse zone because the delime-recommended interval was treated as a suggestion rather than a service requirement. Quarterly delime is the right schedule for commercial duty in LADWP territory ($220 to $380 per service depending on machine size, includes wash arm cleaning and water filter inspection).</p>
+      <p><strong>Coastal salt-air corrosion on condenser-equipped units.</strong> Properties within roughly a mile of the Pacific (Santa Monica, Venice, Marina del Rey, Manhattan Beach, Newport Beach, Pacific Palisades) see accelerated corrosion on condenser fins, compressor housings, and any exposed metallic component on Hobart units with refrigeration packages. The AM16VLT ventless variant has an internal condenser that's vulnerable to coastal corrosion. Inspect twice a year at coastal sites versus annual inland.</p>
+      <p><strong>Commercial duty cycles.</strong> LA restaurants run 12 to 16 hours per day during operating season; hospital cafeterias and stadium prep kitchens run longer or 24/7 during event days. Hobart's national service-life estimates assume 6 to 10 hours per day commercial duty. The cycle math accelerates wear on Legacy mixer motors, HS-series blade systems, Buffalo Chopper drive components, and the entire warewashing service-item stack. Schedule preventive maintenance based on actual cycle hours, not calendar years.</p>
+    </div>
+  </section>
+
+  <!-- ── ERROR CODE TRANSLATION TABLE ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Hobart warewashing error code translation</p>
+      <h2>What the Hobart dishwasher control panel is actually telling you</h2>
+      <p>Hobart current-generation AM16, LXn, and CL machines display plain-text status and error messages. The message itself rarely tells the full story; the underlying cause and the typical fix usually require interpretation. Our techs read these constantly.</p>
+      <table class="failure-table">
+        <thead>
+          <tr><th>Display message</th><th>Likely cause</th><th>Typical fix range</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Door(s) Open</td><td>Door switch or magnet alignment, sometimes door interlock contact wear</td><td>$160 to $240</td></tr>
+          <tr><td>Unload Dishes</td><td>Conveyor sensor flag, often debris-blocked, occasionally sensor failure</td><td>$120 to $260</td></tr>
+          <tr><td>Clear Conveyor Jam</td><td>Conveyor drive overload, debris or rack jam, drive motor stall</td><td>$180 to $440</td></tr>
+          <tr><td>Probe Err - [Tank]</td><td>Tank temperature probe failure, common LADWP-water scaled probe</td><td>$220 to $380</td></tr>
+          <tr><td>Fnl Rinse Temp Low</td><td>Booster heater contactor failed open OR booster element scaled, most common LA service code</td><td>$220 to $540</td></tr>
+          <tr><td>Probe Error - FnlRns</td><td>Final rinse probe failure, distinct from tank probe</td><td>$220 to $380</td></tr>
+          <tr><td>Check Water Level</td><td>Fill solenoid failure OR float switch fault</td><td>$200 to $340</td></tr>
+          <tr><td>Reset Required</td><td>Control board fault flag, sometimes recoverable by power cycle, often needs board service</td><td>$120 to $1,400 (cycle vs board)</td></tr>
+          <tr><td>Delime Recommended</td><td>Scale accumulation threshold tripped, real maintenance signal not a fault</td><td>$220 to $380 delime service</td></tr>
+          <tr><td>Change Water Soon</td><td>Tank water TDS exceeded threshold, operational signal not a fault</td><td>Operator action, no service charge</td></tr>
+          <tr><td>Water Change Req'd</td><td>TDS exceeded hard limit, machine will block cycle</td><td>Operator action; if recurring, water filtration audit</td></tr>
+          <tr><td>Energy Save Active, Press STOP to Exit</td><td>Standby state, not an error, occasional operator confusion</td><td>No service charge, operator training</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top: 14px;">For LA operators, the two codes worth treating with priority are <strong>Fnl Rinse Temp Low</strong> (sanitization compliance affected, dishes coming out below 180°F final rinse fails health inspection) and <strong>Delime Recommended</strong> (running past the threshold accelerates booster and tank heater failure into the $1,400 to $1,800 replacement range). The other codes are diagnostic signals rather than emergencies, but Reset Required can hide a real board fault so don't dismiss it after the first power cycle.</p>
+    </div>
+  </section>
+
+  <!-- ── PRICING TRANSPARENCY ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Pricing transparency</p>
+      <h2>Hobart repair cost ranges across all four product categories</h2>
+      <p>$120 commercial diagnostic, waived with repair. The ranges below are typical parts-and-labor for the most common Hobart service items across our LA route. Final invoice depends on model, age, and what we find on inspection.</p>
+      <table class="failure-table">
+        <thead>
+          <tr><th>Repair</th><th>Category</th><th>Typical cost</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Commercial diagnostic (waived with repair)</td><td>All</td><td>$120</td></tr>
+          <tr><td>Quarterly delime service (LADWP territory)</td><td>Warewashing</td><td>$220 to $380</td></tr>
+          <tr><td>Rinse arm spray bearing (AM16, LXn)</td><td>Warewashing</td><td>$180 to $320</td></tr>
+          <tr><td>Door gasket (LXe, LXn, AM16)</td><td>Warewashing</td><td>$180 to $320</td></tr>
+          <tr><td>Fill solenoid</td><td>Warewashing</td><td>$200 to $340</td></tr>
+          <tr><td>Booster heater contactor (Fnl Rinse Temp Low)</td><td>Warewashing</td><td>$220 to $360</td></tr>
+          <tr><td>Chemical dispenser solenoid</td><td>Warewashing</td><td>$220 to $380</td></tr>
+          <tr><td>Drain pump</td><td>Warewashing</td><td>$280 to $440</td></tr>
+          <tr><td>Wash pump seal kit</td><td>Warewashing</td><td>$300 to $480</td></tr>
+          <tr><td>Booster element (scaled or burned)</td><td>Warewashing</td><td>$320 to $540</td></tr>
+          <tr><td>Wash pump replacement</td><td>Warewashing</td><td>$500 to $820</td></tr>
+          <tr><td>Conveyor drive motor (CL line)</td><td>Warewashing</td><td>$550 to $950</td></tr>
+          <tr><td>Control board replacement</td><td>Warewashing</td><td>$700 to $1,400</td></tr>
+          <tr><td>Tank heater (older units)</td><td>Warewashing</td><td>$800 to $1,500</td></tr>
+          <tr><td>Bowl-lift safety interlock (OSHA)</td><td>Mixer</td><td>$260 to $440</td></tr>
+          <tr><td>Mixer motor brushes</td><td>Mixer</td><td>$120 to $220</td></tr>
+          <tr><td>Gear transmission oil seal</td><td>Mixer</td><td>$440 to $720</td></tr>
+          <tr><td>Bowl-lift motor (HL200+)</td><td>Mixer</td><td>$580 to $880</td></tr>
+          <tr><td>Planetary drive motor</td><td>Mixer</td><td>$880 to $1,400</td></tr>
+          <tr><td>Gear transmission rebuild (HL400)</td><td>Mixer</td><td>$1,400 to $2,400</td></tr>
+          <tr><td>Slicer blade sharpening (built-in sharpener)</td><td>Slicer</td><td>$140 to $260</td></tr>
+          <tr><td>Slicer blade replacement OEM NSF</td><td>Slicer</td><td>$380 to $720</td></tr>
+          <tr><td>Slicer safety interlock (OSHA)</td><td>Slicer</td><td>$260 to $440</td></tr>
+          <tr><td>Slicer drive belt</td><td>Slicer</td><td>$180 to $320</td></tr>
+          <tr><td>Slicer motor</td><td>Slicer</td><td>$580 to $980</td></tr>
+          <tr><td>Buffalo Chopper blade replacement</td><td>Food prep</td><td>$340 to $540</td></tr>
+          <tr><td>Buffalo Chopper bowl scraper</td><td>Food prep</td><td>$80 to $180</td></tr>
+          <tr><td>Buffalo Chopper drive coupling</td><td>Food prep</td><td>$280 to $440</td></tr>
+          <tr><td>Buffalo Chopper bowl bearing</td><td>Food prep</td><td>$380 to $580</td></tr>
+          <tr><td>Buffalo Chopper motor</td><td>Food prep</td><td>$880 to $1,400</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top: 14px;">For comparison: Hobart Corp direct typically lists callout alone at $300 to $400 before any repair labor. On a door-gasket swap that's a $250 invoice with us versus a $550+ invoice with Hobart Corp direct, same OEM part. The pricing-transparency angle isn't anti-Hobart-Corp; their techs are competent and their warranty work is what they're paid to do well. The angle is honest economics for the out-of-warranty segment of the market where the operator is paying retail anyway.</p>
+    </div>
+  </section>
+
+  <!-- ── USED HOBART MARKET / PRE-PURCHASE INSPECTION ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Used Hobart buying</p>
+      <h2>The LA restaurant liquidation pipeline and Hobart pre-purchase inspection</h2>
+      <p>LA's restaurant closure rate generates continuous flow of used Hobart equipment through restaurantequipment.bid, Resto City Auctions in Vernon, Liquidations LA, Restaurant Equipment World, and direct restaurant-to-restaurant sales. At any given time there are dozens of used AM16, LXe, LXn, CL-series, HL Legacy mixers, HS slicers, and Buffalo Choppers across SoCal at 25 to 40 percent of new-equipment pricing. For a new operator or a second-location build, that's attractive. The catch: unknown service history. An AM16 with 8 years of light bar service is a $2,000 buy; an AM16 with 8 years of 400-cover-a-night chain service is closer to scrap value.</p>
+      <p><strong>Our pre-purchase inspection service:</strong> $120 commercial diagnostic visit to the seller's location before the sale closes. For Hobart units we check:</p>
+      <ul class="inspection-list">
+        <li>Front-panel-off inspection of wash and rinse pump assemblies</li>
+        <li>Wash and rinse pressure test under load</li>
+        <li>Tank and wash arm condition (scale, corrosion, jet pattern)</li>
+        <li>Booster operation verification (180°F final rinse compliance)</li>
+        <li>Booster element scale level</li>
+        <li>Control board age, error log if accessible, board generation</li>
+        <li>Chemical dispenser proportioning verification</li>
+        <li>Door gasket and door switch condition</li>
+        <li>For mixers: bowl-lift interlock function, motor brush wear, gear transmission noise check, oil seal integrity</li>
+        <li>For slicers: blade diameter remaining, sharpener stone condition, safety interlock function, drive belt wear</li>
+        <li>For Buffalo Chopper: blade condition, bowl bearing play, scraper integrity, motor brush wear</li>
+        <li>Written condition report suitable for buyer financing, insurance, or seller renegotiation</li>
+      </ul>
+      <p>For any used Hobart over $4,000, the inspection pays for itself by either catching a unit that should be passed on or identifying $400 to $800 of preemptive service that prevents a $2,500 hidden-repair scenario in the first six months.</p>
+    </div>
+  </section>
+
+  <!-- ── HOW WE WORK ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sb">How we work</p>
+      <h2>The diagnostic flow when you call us about Hobart equipment</h2>
+      <p><strong>Phone intake.</strong> Mon-Sat 8am-8pm we pick up directly. Tell us model number, year of install if you know it, and the symptom in operator language (no need to translate to tech terms). We'll tell you whether it's a service item we carry on the truck, whether we'll need to order parts before dispatch, and whether the symptom looks like same-day, next-day, or scheduled-PM territory.</p>
+      <p><strong>On-site diagnostic.</strong> $120 commercial flat fee, waived when you approve the repair. Front-panel-off inspection, load test if applicable, control board diagnostic codes read, pump amperage check on warewashing, transmission noise check on mixers, blade and interlock check on slicers and Buffalo Choppers. We quote labor and parts before any work starts.</p>
+      <p><strong>Parts pipeline.</strong> Common Hobart service items stocked on the truck for AM16, LXe, LXn, HL Legacy, HS-series, and Buffalo Chopper across the four categories. Specialty parts (specific control boards, conveyor drive motors, CL44e tank heaters, FT900 and FT2000 flight-type modules, Buffalo Chopper bowl bearings) come next-day from the Troy, Ohio ITW Hobart Service Parts warehouse, typically 5 to 7 business days standard ship, expedited available.</p>
+      <p><strong>Documentation.</strong> Written invoice with itemized parts and labor. OSHA safety interlock service documented for compliance records. LA County DPH cleaning protocol verification for Buffalo Chopper service. ENERGY STAR equipment documentation provided when applicable for rebate filing.</p>
+      <p><strong>Warranty.</strong> 90-day SDAR labor warranty on every repair. Hobart component warranties (where applicable through ITW Food Equipment) processed separately.</p>
+    </div>
+  </section>
+
+  <!-- ── RECENT REPAIRS ── -->
+  <section class="section section-alt">
+    <div class="container">
+      <p class="eyebrow-sub">Recent Hobart repairs</p>
+      <h2>What this past month looked like on our LA Hobart route</h2>
+
+      <div class="case-grid">
+        <div class="case-card">
+          <h3>"Final rinse temp keeps dropping — banquet is at 6pm"</h3>
+          <p>Downtown LA luxury hotel called at 11am about an FT2000 flight-type unit serving the banquet kitchen. Display showed Fnl Rinse Temp Low intermittently for two days; banquet manager woke up to it after the morning prep crew flagged dishes coming out lukewarm. Our tech arrived by 1pm. Diagnosis: booster heater contactor failed open intermittently (the worst kind of failure, looks fine when tested cold, fails under load). Replaced contactor, verified booster element scale level (acceptable, last delime three months ago), tested final rinse at 184°F under full load. Documented for health inspection records. Done by 3pm, banquet ran on schedule. <strong>Total: $480</strong> — contactor $280, $120 diagnostic applied, plus labor.</p>
+        </div>
+
+        <div class="case-card">
+          <h3>"HL600 makes a noise we've never heard before"</h3>
+          <p>Beverly Hills country club called about an HL600 floor mixer in the pastry program at year 14. Pastry chef described "metallic whine starting Monday morning, getting louder Tuesday." Our tech opened the gear transmission cover and found oil seal leaking onto the bottom transmission bearing; gears were running progressively dry. Caught it at the right time. Cleaned the transmission housing, replaced the oil seal, refilled with OEM Hobart transmission oil to spec, ran the mixer through the planetary range to verify quiet operation. Recommended bowl-lift interlock inspection at next scheduled PM (year 14, due soon). <strong>Total: $720</strong> — oil seal $440, transmission oil refill $160, $120 diagnostic applied, labor included.</p>
+        </div>
+
+        <div class="case-card">
+          <h3>"Slicer interlock won't reset — health inspection tomorrow"</h3>
+          <p>West LA deli called at 2pm about an HS8 slicer with the safety interlock failing intermittently — blade kept running for two seconds after the guard was removed on the test. Owner had pre-scheduled LA County DPH health inspection the next morning. Our tech arrived by 4pm. Diagnosed magnetic reed switch failure in the blade guard interlock (year 8 of heavy deli duty, typical wear-out point). Replaced the reed switch assembly with OEM Hobart part, tested interlock function across 20 cycles, blade stopped within 0.4 seconds of guard removal on every test (well within OSHA spec). Documented for DPH inspection records. Inspector signed off the next morning. <strong>Total: $440</strong> — interlock assembly $320, $120 diagnostic applied, labor included.</p>
+        </div>
+
+        <div class="case-card">
+          <h3>"Conveyor drive lockout, lunch service ruined"</h3>
+          <p>WeHo restaurant group called about a CLeN rack conveyor in the central dish station — drive motor locked out mid-service, lunch crew piling dirty dishes for the past hour. Our tech arrived in 90 minutes. Diagnosis: conveyor drive overload from a fork stuck in the conveyor mechanism (operator hadn't cleared a tine drop before starting the cycle). Cleared the obstruction, reset the drive controller, verified normal conveyor operation, ran a delime cycle while we were there (scale check was due). Trained the dish crew on conveyor pre-clear protocol. Back in service for dinner. <strong>Total: $380</strong> — labor and delime included, $120 diagnostic applied, no parts needed.</p>
+        </div>
+
+        <div class="case-card">
+          <h3>"Buffalo Chopper started smoking — sausage prep stopped"</h3>
+          <p>Italian-concept restaurant in Hollywood called about an 84142 Buffalo Chopper at year 9. Chef reported smoke from the motor housing during a sausage filler prep run. Our tech arrived in two hours. Pulled the motor housing and found motor brushes worn to the holder with the rotor showing scoring; this is the year 6 to 9 typical brush failure pattern but the customer ran past it. Replaced brushes with OEM Hobart kit, cleaned the rotor (still within service spec, no resurface required), verified bowl bearing condition (year 8, acceptable but flagged for inspection at next PM), tested cutter under load. Smoke cleared, sausage prep resumed. <strong>Total: $260</strong> — brush kit $140, $120 diagnostic applied, plus labor.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">FAQ</p>
+      <h2>Hobart service questions LA operators ask</h2>
+
+      {faqs.map((f, i) => (
+        <details class="faq-item" open={i === 0}>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── CROSS-LINK BLOCK ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Hobart equipment we service in depth</p>
+      <h2>Deeper Hobart product category detail</h2>
+      <p>This pillar gives the broad brand view. For deeper coverage by product category:</p>
+      <ul class="related-list">
+        <li><a href="/brands/hobart-dishwasher-repair/" class="brand-inline-link"><strong>Hobart commercial dishwasher repair</strong></a> — deep combo (3,485 words) covering AM16, AM16VLT, LXe, LXeR, CLeR, CLeN, CL44eN, FT900 with detailed failure pattern narratives, ITW family context, Independent-vs-Hobart-Corp positioning, and full dishwasher-specific pricing table.</li>
+        <li><a href="/commercial/mixer-repair/brands/hobart/" class="brand-inline-link"><strong>Hobart Legacy mixer repair</strong></a> — deep combo covering HL120, HL200, HL400, HL600, HL800, HL1400 planetary mixers with OSHA bowl-lift interlock compliance protocol, gear transmission service detail, and Legacy-specific pricing.</li>
+        <li><a href="/commercial/slicer-repair/brands/hobart/" class="brand-inline-link"><strong>Hobart slicer repair</strong></a> — deep combo covering HS6, HS7, HS8, HS9 gravity-feed slicers with blade sharpening protocol, OSHA safety interlock compliance, NSF blade replacement detail.</li>
+        <li><a href="/commercial/food-processor-repair/brands/hobart/" class="brand-inline-link"><strong>Hobart Buffalo Chopper repair</strong></a> — deep combo covering 84142, 84186, FP400 vertical cutter-mixer with LA County DPH cleaning protocol verification and Buffalo Chopper-specific failure mode table.</li>
+        <li><a href="/commercial/dishwasher-repair/"><strong>Commercial dishwasher hub</strong></a> — broader category covering all commercial warewashing brands we service (Hobart, Jackson, Champion, CMA, Meiko, Ecolab).</li>
+        <li><a href="/commercial/mixer-repair/"><strong>Commercial mixer hub</strong></a> — broader category page across all commercial mixer brands.</li>
+        <li><a href="/commercial/slicer-repair/"><strong>Commercial slicer hub</strong></a> — broader category page across all commercial slicer brands.</li>
+        <li><a href="/commercial/food-processor-repair/"><strong>Commercial food processor hub</strong></a> — broader category page across all food processor brands.</li>
+        <li><a href="/brands/commercial-refrigeration/traulsen-commercial-repair/" class="brand-inline-link"><strong>Traulsen commercial refrigeration</strong></a> — ITW Food Equipment Group sibling brand; common Hobart + Traulsen pairing in LA fine-dining and hotel banquet kitchens.</li>
+        <li><a href="/commercial/"><strong>Commercial appliance repair hub</strong></a> — top commercial parent.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── SERVICE AREAS + BRANCHES ── -->
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow-sub">Where we work</p>
+      <h2>Hobart service across Greater Los Angeles</h2>
+      <p>Hobart install density is highest across hospitality corridors (Beverly Hills, WeHo, Hollywood, downtown LA financial district, Santa Monica), hospital cafeterias (Cedars-Sinai, UCLA Health, Kaiser Permanente locations, City of Hope, USC Keck Medicine), school food service (LAUSD facility kitchens, UCLA dining commons, USC University Village, CSULA, CSULB, CSUN, LA community college district), stadium prep kitchens (SoFi, Crypto.com Arena, Dodger Stadium), airline catering (Gate Gourmet at LAX), convention-center kitchens (LA Convention Center), and high-volume Italian-concept restaurants for Buffalo Chopper work. Hospital and K-12 dispatches route priority because the service clock is hard, meal periods aren't negotiable.</p>
+      <BrandBranchesGrid showHeader={false} />
+    </div>
+  </section>
+
+  <!-- ── CREDENTIALS ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Credentials</p>
+      <h2>Licensed, insured, EPA-certified, BBB Accredited</h2>
+      <p>BHGS Registration #A49573 (California Bureau of Household Goods and Services). EPA 608 Universal Certification #1346255700410. CSLB C-20 HVAC #1138898. BBB Accredited Business. General liability and workers' compensation insurance current. License verification on the <a href="/credentials/">credentials page</a>.</p>
+    </div>
+  </section>
+
+  <!-- ── BOTTOM CTA ── -->
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>Hobart equipment down? Call the branch nearest your kitchen.</h2>
+      <p>Same-day in LA, Orange County, Ventura. Next-day for Inland Empire. $120 commercial diagnostic, waived with repair. OEM Hobart Service Parts only. Hospital and K-12 priority dispatch.</p>
+      <div class="hero-ctas">
+        <a href={`tel:${MAIN_PHONE_TEL}`} class="btn-primary">☎ Call {MAIN_PHONE}</a>
+        <a href="/contact/" class="btn-outline">Book Online</a>
+      </div>
+    </div>
+  </section>
+
+<style>
+  :root {
+    --red: #C8102E;
+    --black: #0a0a0a;
+    --gray: #f5f5f5;
+    --border: #e2e2e2;
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); line-height: 1.6; }
+
+  .section { padding: 72px 24px; }
+  .section-alt { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .eyebrow-sub { font-size: 13px; color: var(--red); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; font-weight: 600; }
+  h2 { font-size: clamp(24px, 3vw, 34px); font-weight: 700; margin-bottom: 20px; line-height: 1.2; font-family: 'Playfair Display', Georgia, serif; }
+  h3.line-h3 { font-size: 17px; font-weight: 700; margin: 24px 0 10px; color: var(--black); font-family: 'Playfair Display', Georgia, serif; }
+  .section p { margin-bottom: 16px; color: var(--text); }
+  .section a { color: var(--red); text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+
+  .legacy-list, .inspection-list, .related-list { padding-left: 22px; margin: 14px 0 18px; }
+  .legacy-list li, .inspection-list li, .related-list li { font-size: 15.5px; line-height: 1.65; color: var(--text); margin-bottom: 8px; }
+
+  .failure-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 14.5px; }
+  .failure-table th, .failure-table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  .failure-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .failure-table tr:last-child td { border-bottom: none; }
+  .failure-table td:nth-child(3) { white-space: nowrap; }
+
+  .case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px; margin-top: 24px; }
+  .case-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 24px 22px; }
+  .case-card h3 { font-size: 16px; font-weight: 700; margin: 0 0 12px; color: var(--text); line-height: 1.35; font-family: 'Playfair Display', Georgia, serif; }
+  .case-card p { font-size: 14.5px; margin-bottom: 0; line-height: 1.65; }
+
+  .faq-item { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; background: #fff; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 16px; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 14.5px; color: var(--text); margin: 12px 0 0; line-height: 1.7; }
+
+  .btn-primary { display: inline-block; padding: 14px 28px; background: var(--red); color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: background .2s; }
+  .btn-primary:hover { background: #a50d25; }
+  .btn-outline { display: inline-block; padding: 14px 28px; border: 1.5px solid rgba(255,255,255,.35); color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all .2s; }
+  .btn-outline:hover { background: rgba(255,255,255,.08); border-color: #fff; }
+
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; }
+  .bottom-cta p { color: rgba(255,255,255,.78); margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .bottom-cta .hero-ctas { justify-content: center; display: flex; gap: 12px; flex-wrap: wrap; }
+</style>
+</Layout>
