@@ -135,7 +135,7 @@ type AreasCounty = { name: string; hubUrl: string; branches: AreasBranch[] };
 type PriceCell = { label: string; href: string; exists: boolean };
 type Panel =
   | { kind: 'flow'; links: Link[] }
-  | { kind: 'grouped'; columns: Column[]; align?: 'center'; cols?: 3 | 4 }
+  | { kind: 'grouped'; columns: Column[]; align?: 'center'; cols?: 3 | 4 | 5 }
   | { kind: 'areas'; counties: AreasCounty[] }
   | { kind: 'pricelist'; residential: PriceCell[]; commercial: PriceCell[]; html: string };
 
@@ -181,14 +181,25 @@ const brandSpecialtyWine: Link[] = [
   { label: 'Vinotemp',     href: '/brands/vinotemp/' }
 ];
 
-const brandCommercialOutdoor: Link[] = [
-  { label: 'Hestan (Outdoor)',    href: '/brands/hestan/' },
+const brandCommercial: Link[] = [
   { label: 'Hoshizaki',           href: '/brands/hoshizaki/' },
   { label: 'Manitowoc',           href: '/brands/manitowoc/' },
   { label: 'Vulcan',              href: '/brands/vulcan/' },
   { label: 'Beverage-Air',        href: '/brands/beverage-air/' },
   { label: 'True Manufacturing',  href: '/brands/true/' },
   { label: 'Traulsen',            href: '/brands/traulsen/' }
+];
+
+// Outdoor brand pillars live at /outdoor/brands/{slug}/ (not /brands/{slug}/).
+// T1 audit 2026-05-26 confirmed all 7 exist with strong content (3,500-4,100w).
+const brandOutdoor: Link[] = [
+  { label: 'Lynx',         href: '/outdoor/brands/lynx/' },
+  { label: 'Alfresco',     href: '/outdoor/brands/alfresco/' },
+  { label: 'DCS',          href: '/outdoor/brands/dcs/' },
+  { label: 'Twin Eagles',  href: '/outdoor/brands/twin-eagles/' },
+  { label: 'Fire Magic',   href: '/outdoor/brands/fire-magic/' },
+  { label: 'Hestan',       href: '/outdoor/brands/hestan/' },
+  { label: 'Kalamazoo',    href: '/outdoor/brands/kalamazoo/' }
 ];
 
 const menu: Array<{ label: string; href: string; panel: Panel }> = [
@@ -207,12 +218,13 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     href: '/brands/',
     panel: {
       kind: 'grouped',
-      cols: 4,
+      cols: 5,
       columns: [
         { title: 'Residential Premium',     links: brandResidentialPremium },
         { title: 'Residential Mass Market', links: brandResidentialMass },
         { title: 'Specialty & Wine',        links: brandSpecialtyWine },
-        { title: 'Commercial & Outdoor',    links: brandCommercialOutdoor }
+        { title: 'Commercial',              links: brandCommercial },
+        { title: 'Outdoor & Grills',        links: brandOutdoor }
       ]
     }
   },
@@ -331,7 +343,7 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
               ))}
             </div>
           ) : (
-            <div class={`mega-panel-inner mega-panel-grid ${item.panel.align === 'center' ? 'is-center' : ''} ${item.panel.cols === 4 ? 'is-cols-4' : ''}`}>
+            <div class={`mega-panel-inner mega-panel-grid ${item.panel.align === 'center' ? 'is-center' : ''} ${item.panel.cols === 4 ? 'is-cols-4' : ''} ${item.panel.cols === 5 ? 'is-cols-5' : ''}`}>
               {item.panel.columns.map((col) => (
                 <div class="panel-col">
                   {col.title && <h4>{col.title}</h4>}
@@ -534,6 +546,10 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
   .mega-panel-grid.is-cols-4 {
     grid-template-columns: repeat(4, 1fr);
     gap: 32px 40px;
+  }
+  .mega-panel-grid.is-cols-5 {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px 28px;
   }
 
   .panel-col h4 {
