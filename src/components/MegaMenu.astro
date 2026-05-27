@@ -37,12 +37,13 @@ function toLinks(glob: Record<string, unknown>, hrefPrefix: string) {
 }
 
 // URLs that must be excluded from auto-glob menus because they 301-redirect
-// elsewhere (Wave 32 redirect map). Source .astro file still exists but page
-// is unreachable at this URL — listing it in nav would generate stale links.
-// Wave 40 link-discipline.
-const REDIRECTED_URLS_EXCLUDE_FROM_NAV = new Set([
-  '/commercial/dryer-repair/',
-]);
+// elsewhere. Source .astro file still exists but page is unreachable at this
+// URL — listing it in nav would generate stale links. Wave 40 link-discipline.
+// Wave 61b Sprint 1 (2026-05-27): /commercial/dryer-repair/ removed from this
+// Set — Wave 40b restored that page as a full content surface (6595 words,
+// 316 outbound) but stale exclusion was never lifted, leaving it orphaned
+// with 0 inbound. Set is currently empty but kept as architectural hook.
+const REDIRECTED_URLS_EXCLUDE_FROM_NAV = new Set<string>([]);
 
 const services    = toLinks(import.meta.glob('../pages/services/*.astro'),    '/services/')
   .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
@@ -157,7 +158,8 @@ const brandResidentialPremium: Link[] = [
   { label: 'Fisher & Paykel',          href: '/brands/fisher-paykel/' },
   { label: 'Cove',                     href: '/brands/cove/' },
   { label: 'ILVE',                     href: '/brands/ilve/' },
-  { label: 'Signature Kitchen Suite',  href: '/brands/signature-kitchen-suite/' }
+  { label: 'Signature Kitchen Suite',  href: '/brands/signature-kitchen-suite/' },
+  { label: 'Smeg',                     href: '/brands/smeg/' }
 ];
 
 const brandResidentialMass: Link[] = [
@@ -168,17 +170,21 @@ const brandResidentialMass: Link[] = [
   { label: 'Maytag',     href: '/brands/maytag/' },
   { label: 'Frigidaire', href: '/brands/frigidaire/' },
   { label: 'Amana',      href: '/brands/amana/' },
-  { label: 'JennAir',    href: '/brands/jennair/' }
+  { label: 'JennAir',    href: '/brands/jennair/' },
+  { label: 'Sharp',      href: '/brands/sharp/' }
 ];
 
 const brandSpecialtyWine: Link[] = [
-  { label: 'U-Line',       href: '/brands/u-line/' },
-  { label: 'Marvel',       href: '/brands/marvel/' },
-  { label: 'Liebherr',     href: '/brands/liebherr/' },
-  { label: 'WhisperKool',  href: '/brands/whisperkool/' },
-  { label: 'CellarPro',    href: '/brands/cellarpro/' },
-  { label: 'EuroCave',     href: '/brands/eurocave/' },
-  { label: 'Vinotemp',     href: '/brands/vinotemp/' }
+  { label: 'U-Line',                    href: '/brands/u-line/' },
+  { label: 'Marvel',                    href: '/brands/marvel/' },
+  { label: 'Liebherr',                  href: '/brands/liebherr/' },
+  { label: 'WhisperKool',               href: '/brands/whisperkool/' },
+  { label: 'CellarPro',                 href: '/brands/cellarpro/' },
+  { label: 'EuroCave',                  href: '/brands/eurocave/' },
+  { label: 'Vinotemp',                  href: '/brands/vinotemp/' },
+  { label: 'Danby Wine Cooler',         href: '/brands/danby-wine-cooler/' },
+  { label: 'Summit Wine Cooler',        href: '/brands/summit-wine-cooler/' },
+  { label: 'Wine Enthusiast Wine Cooler', href: '/brands/wine-enthusiast-wine-cooler/' }
 ];
 
 // Wave 59 mega-nav expansion (2026-05-26) — Commercial column split into two
@@ -195,7 +201,9 @@ const brandCommercialRefrigerationIce: Link[] = [
   { label: 'Manitowoc',           href: '/brands/manitowoc/' },
   { label: 'Beverage-Air',        href: '/brands/beverage-air/' },
   { label: 'True Manufacturing',  href: '/brands/true/' },
-  { label: 'Traulsen',            href: '/brands/traulsen/' }
+  { label: 'Traulsen',            href: '/brands/traulsen/' },
+  { label: 'Delfield',            href: '/brands/delfield/' },
+  { label: 'Perlick Commercial',  href: '/brands/perlick-commercial/' }
 ];
 
 const brandCommercialCookingFryers: Link[] = [
@@ -211,7 +219,9 @@ const brandCommercialCookingFryers: Link[] = [
   { label: 'Vulcan',              href: '/brands/vulcan/' },
   // Fryers
   { label: 'Frymaster',           href: '/brands/frymaster/' },
-  { label: 'Pitco',               href: '/brands/pitco/' }
+  { label: 'Pitco',               href: '/brands/pitco/' },
+  // Ventilation / Hoods
+  { label: 'CaptiveAire',         href: '/brands/captiveaire/' }
 ];
 
 // Outdoor brand pillars live at /outdoor/brands/{slug}/ (not /brands/{slug}/).
