@@ -154,7 +154,6 @@ export default defineConfig({
     // Champion, Imperial, Lang pillars planned). DO NOT remove without confirming
     // pillar deployment.
     // ====================================================================
-    '/brands/garland/':   '/brands/garland-range-repair/',
     '/brands/frymaster/': '/brands/frymaster-fryer-repair/',
     '/brands/pitco/':     '/brands/pitco-fryer-repair/',
     '/brands/champion/':  '/brands/champion-dishwasher-repair/',
