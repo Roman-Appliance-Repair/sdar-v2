@@ -135,7 +135,7 @@ type AreasCounty = { name: string; hubUrl: string; branches: AreasBranch[] };
 type PriceCell = { label: string; href: string; exists: boolean };
 type Panel =
   | { kind: 'flow'; links: Link[] }
-  | { kind: 'grouped'; columns: Column[]; align?: 'center'; cols?: 3 | 4 | 5 }
+  | { kind: 'grouped'; columns: Column[]; align?: 'center'; cols?: 3 | 4 | 5 | 6 }
   | { kind: 'areas'; counties: AreasCounty[] }
   | { kind: 'pricelist'; residential: PriceCell[]; commercial: PriceCell[]; html: string };
 
@@ -181,13 +181,37 @@ const brandSpecialtyWine: Link[] = [
   { label: 'Vinotemp',     href: '/brands/vinotemp/' }
 ];
 
-const brandCommercial: Link[] = [
+// Wave 59 mega-nav expansion (2026-05-26) — Commercial column split into two
+// sub-grouped columns to accommodate 10 new Wave 59 broad pillars (Scotsman,
+// Hobart, Jackson, Champion, Rational, Garland, Imperial, Lang, Frymaster,
+// Pitco) plus existing commercial pillars. Vulcan moved from old Commercial
+// column to Cooking & Fryers (Vulcan ITW covers ranges + ovens + fryers).
+// Total commercial pillars in nav: 6 → 16. Total mega nav brand pillars:
+// 41 → 50. Hand-curated pattern preserved (Wave 55b decision).
+
+const brandCommercialRefrigerationIce: Link[] = [
+  { label: 'Scotsman',            href: '/brands/scotsman/' },
   { label: 'Hoshizaki',           href: '/brands/hoshizaki/' },
   { label: 'Manitowoc',           href: '/brands/manitowoc/' },
-  { label: 'Vulcan',              href: '/brands/vulcan/' },
   { label: 'Beverage-Air',        href: '/brands/beverage-air/' },
   { label: 'True Manufacturing',  href: '/brands/true/' },
   { label: 'Traulsen',            href: '/brands/traulsen/' }
+];
+
+const brandCommercialCookingFryers: Link[] = [
+  // Warewashing
+  { label: 'Champion',            href: '/brands/champion/' },
+  { label: 'Hobart',              href: '/brands/hobart/' },
+  { label: 'Jackson',             href: '/brands/jackson/' },
+  // Ranges / Ovens / Combi
+  { label: 'Garland',             href: '/brands/garland/' },
+  { label: 'Imperial',            href: '/brands/imperial/' },
+  { label: 'Lang',                href: '/brands/lang/' },
+  { label: 'Rational',            href: '/brands/rational/' },
+  { label: 'Vulcan',              href: '/brands/vulcan/' },
+  // Fryers
+  { label: 'Frymaster',           href: '/brands/frymaster/' },
+  { label: 'Pitco',               href: '/brands/pitco/' }
 ];
 
 // Outdoor brand pillars live at /outdoor/brands/{slug}/ (not /brands/{slug}/).
@@ -218,13 +242,14 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
     href: '/brands/',
     panel: {
       kind: 'grouped',
-      cols: 5,
+      cols: 6,
       columns: [
-        { title: 'Residential Premium',     links: brandResidentialPremium },
-        { title: 'Residential Mass Market', links: brandResidentialMass },
-        { title: 'Specialty & Wine',        links: brandSpecialtyWine },
-        { title: 'Commercial',              links: brandCommercial },
-        { title: 'Outdoor & Grills',        links: brandOutdoor }
+        { title: 'Residential Premium',              links: brandResidentialPremium },
+        { title: 'Residential Mass Market',          links: brandResidentialMass },
+        { title: 'Specialty & Wine',                 links: brandSpecialtyWine },
+        { title: 'Commercial — Refrigeration & Ice', links: brandCommercialRefrigerationIce },
+        { title: 'Commercial — Cooking & Fryers',    links: brandCommercialCookingFryers },
+        { title: 'Outdoor & Grills',                 links: brandOutdoor }
       ]
     }
   },
@@ -343,7 +368,7 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
               ))}
             </div>
           ) : (
-            <div class={`mega-panel-inner mega-panel-grid ${item.panel.align === 'center' ? 'is-center' : ''} ${item.panel.cols === 4 ? 'is-cols-4' : ''} ${item.panel.cols === 5 ? 'is-cols-5' : ''}`}>
+            <div class={`mega-panel-inner mega-panel-grid ${item.panel.align === 'center' ? 'is-center' : ''} ${item.panel.cols === 4 ? 'is-cols-4' : ''} ${item.panel.cols === 5 ? 'is-cols-5' : ''} ${item.panel.cols === 6 ? 'is-cols-6' : ''}`}>
               {item.panel.columns.map((col) => (
                 <div class="panel-col">
                   {col.title && <h4>{col.title}</h4>}
@@ -550,6 +575,10 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
   .mega-panel-grid.is-cols-5 {
     grid-template-columns: repeat(5, 1fr);
     gap: 24px 28px;
+  }
+  .mega-panel-grid.is-cols-6 {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 20px 22px;
   }
 
   .panel-col h4 {
