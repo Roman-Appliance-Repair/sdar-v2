@@ -154,7 +154,6 @@ export default defineConfig({
     // Champion, Imperial, Lang pillars planned). DO NOT remove without confirming
     // pillar deployment.
     // ====================================================================
-    '/brands/pitco/':     '/brands/pitco-fryer-repair/',
     '/brands/lang/':      '/brands/lang-oven-repair/',
 
     // ====================================================================
