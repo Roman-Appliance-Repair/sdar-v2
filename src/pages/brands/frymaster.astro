@@ -1,0 +1,494 @@
+---
+// src/pages/brands/frymaster.astro
+// Wave 59 — Frymaster broad commercial fryer pillar.
+// Pillar #7 of 10 commercial brand pillars (Maximum SEO structure approved 2026-05-26).
+// TP target ~1,500-1,800/mo combined: frymaster fryer 700/0/1,300 (parent topic),
+// frymaster parts 400/0/200, frymaster gas fryer 30/0/1,300 (parent topic),
+// + electric/commercial/pasta-cooker/filter long-tail. KD 0 across all head keywords.
+// UNIQUE POSITIONING: McDonald's exclusive OEM supplier 50+ years (LOV/FilterQuick
+// spec). 200+ LA County McDonald's locations all run Frymaster.
+// HONEST SCOPE: we're NOT in McDonald's corporate dispatch network — we're the
+// independent alternative for emergency response + out-of-corporate-window service.
+// Cross-links to /brands/frymaster-fryer-repair/ (3,891w combo, deep generation
+// comparison and full pricing table) + /brands/pitco-fryer-repair/ (Ali Group
+// sibling fryer brand) + /commercial/fryer-repair/ parent hub.
+// Wave 58 temporary /brands/frymaster/ → combo redirect removed in same commit.
+// 5 schema entities (HomeAndConstructionBusiness + Brand[Ali Group via Welbilt 2022]
+// + FAQPage + BreadcrumbList + WebPage SpeakableSpecification).
+// Em-dash budget: visible body ≤6. NO aggregateRating. NO streetAddress.
+
+import Layout from '../../layouts/Layout.astro';
+import ServiceHero from '../../components/ServiceHero.astro';
+import BrandBranchesGrid from '../../components/BrandBranchesGrid.astro';
+import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../data/branches';
+import { mergeCredentials } from '../../data/credentials-schema';
+
+const canonical = "https://samedayappliance.repair/brands/frymaster/";
+const title = "Frymaster Fryer Repair Los Angeles — Same Day";
+const description = "Frymaster LOV, FilterQuick, Footprint Pro, MJ45, H17 service across LA. McDonald's franchises, KFC, casual dining. $120 commercial diagnostic.";
+
+const faqs = [
+  {
+    q: "Are you the McDonald's corporate Frymaster service network?",
+    a: "No, and we want to be straight about that upfront. Frymaster is McDonald's OEM commercial fryer spec for 50+ years, and McDonald's runs its own corporate service program coordinated with authorized Frymaster service providers. We're not in that authorized corporate network. Where we fit is the independent alternative: emergency response when the corporate dispatch window is 12 to 24 hours and your franchise can't wait that long, out-of-corporate-program work where the franchise operator is paying retail anyway, post-warranty service where corporate hand-off has happened, and second-opinion situations where a corporate-dispatched tech says 'replace the unit' and the franchise operator wants honest itemized read on whether repair is still viable. LA County has 200+ McDonald's locations, and the corporate program covers most of them most of the time. We exist for the cases where it doesn't. $120 commercial diagnostic, same-day LA dispatch typical, OEM Frymaster parts only."
+  },
+  {
+    q: "Do you service all Frymaster product families?",
+    a: "Yes — gas atmospheric, electric, built-in filtration, pasta cookers, and the specialty configurations. Gas atmospheric: H17 and H22 McDonald's legacy gas open-pot, MJ45 and MJ40 open-pot, MJ Series multi-vat, GF and GFE gas tubed restaurant fryers, J-series legacy. Electric: FPEL pasta-friendly, FPHE high-efficiency, HD60 series, EF and EFE open-pot electric. Built-in filtration: Footprint Pro (FPP series) integrated filter station, FilterQuick (FQE electric and FQG gas) the current McDonald's spec, BIELA14 built-in filter cabinet. Pasta cookers: FPP-LO low-oil pasta units. Specialty: battered and breaded fryer configurations (KFC and Popeyes chicken spec), 4-section vat assemblies, RE Series restaurant tier. Plus legacy units 15 to 20 years old still in active LA service with parts available through Ali Group Frymaster Service Parts distribution. Note: Frymaster makes commercial fryers and pasta cookers; we don't service Frymaster-branded equipment outside those categories because there isn't any (Frymaster is fryer-focused by design)."
+  },
+  {
+    q: "What's LOV and why does it matter for service?",
+    a: "LOV stands for Low Oil Volume, Frymaster's proprietary technology that reduces oil capacity per vat by roughly 40 percent compared to traditional fryer designs. The operational impact is real: less oil means faster heat recovery between drop cycles, lower oil cost per pound of product fried, and reduced oil disposal expense. The service impact is also real: LOV vats have tighter tolerances, more sensitive temperature management, and integration with FilterQuick auto-filtration that demands service tech familiarity with the LOV-specific service profile. We've serviced LOV units across LA McDonald's franchises and the QSR chains that have adopted the technology. Common LOV-specific service items include oil quality sensor calibration, FilterQuick pump performance verification, manifold seal integrity, and temperature probe drift correction. None of it is mystery work, but it does require knowing the LOV architecture rather than assuming it's a standard open-pot fryer."
+  },
+  {
+    q: "My FilterQuick keeps tripping mid-cycle — what's wrong?",
+    a: "Most common cause: filter paper spec mismatch or paper installation fault. FilterQuick uses Frymaster-spec filter paper with specific permeability characteristics; aftermarket paper that looks similar but doesn't meet spec will trip the cycle on flow restriction sensing. Second most common: pump suction debris or manifold seal degradation. Third: pump motor failure (year 5 to 8 typical wear-out, more frequent in heavy-duty QSR applications). We diagnose with full FilterQuick walk-through: filter paper inspection and spec verification, manifold seal check, pump amperage test under load, suction debris removal, and oil return valve function. Most FilterQuick trip-mid-cycle calls resolve at the paper or seal level ($200 to $380 service); pump motor replacement is the higher-end scenario ($400 to $680). Don't ignore intermittent trips; the failure pattern usually escalates and a trip mid-cycle with hot oil involves real cleanup labor on top of the repair itself."
+  },
+  {
+    q: "How does the Ali Group acquisition affect Frymaster parts and service?",
+    a: "Frymaster has been part of Ali Group since July 2022, when Ali Group completed its acquisition of Welbilt Inc. (Frymaster's parent through earlier consolidation waves). That puts Frymaster in the same Ali Group commercial foodservice family as Pitco (the other major commercial fryer brand), Garland and US Range commercial ranges, Manitowoc ice machines, Beverage-Air refrigeration, Champion and CMA commercial dishwashers, Convotherm combi ovens, Kolpak and Master-Bilt walk-in coolers, and Delfield refrigeration. For LA operators running multi-Ali kitchens — and many do, especially in hotel banquet operations, hotel chain builds, and dealer-spec turnkey installations — that means single-call service across the full sibling list. We carry parts catalogs and technician relationships across the Ali Group portfolio. Parts pipeline for Frymaster runs through Ali Group's authorized distribution; LA orders typically ship 3 to 5 business days standard, expedited available."
+  },
+  {
+    q: "OEM Frymaster parts vs aftermarket — does it matter?",
+    a: "Yes, materially. Frymaster's FilterQuick filter paper, LOV oil quality sensors, gas valves, thermocouples, and FQ pump components have aftermarket equivalents that look identical but fail at noticeably higher rates and often void Ali Group warranty coverage on out-of-warranty units. The specific case that matters most is FilterQuick filter paper: Frymaster-spec paper has specific permeability characteristics matched to the pump and manifold design; aftermarket paper trips cycles, causes pump wear, and creates the intermittent fault pattern that gets misdiagnosed as a pump problem. We source exclusively through Ali Group Frymaster Service Parts distribution. Common wear items stocked on the truck (thermocouples, gas valve components, FilterQuick filter paper, door gaskets, ignitor assemblies); specialty items (FQ pumps, LOV sensors, main control boards, BIELA14 modules) ship 3 to 5 business days from the Ali Group warehouse, expedited 1 to 2 day available."
+  },
+  {
+    q: "Frymaster vs Pitco — which fryer is better for my operation?",
+    a: "Both are Ali Group sibling brands as of July 2022, so the corporate competition framing is historical at this point. Operationally the differences come down to product philosophy and chain spec. Frymaster owns the McDonald's OEM relationship and the LOV technology, plus FilterQuick auto-filtration. Pitco emphasizes the Solstice Supreme platform and FilterMate auto-filtration (different mechanism, similar outcome). Both lines run reliably when maintained, both fail predictably when maintenance is skipped. For chain operators, the choice is usually dictated by corporate spec or dealer package rather than individual preference. For independent operators, it usually comes down to whichever the equipment dealer carried in the original kitchen build. We service both lines with equivalent parts infrastructure and technician depth. See our <a href=\"/brands/pitco-fryer-repair/\">Pitco fryer repair page</a> for the Solstice Supreme and FilterMate detail."
+  }
+];
+
+const schemaJsons = [
+  mergeCredentials({
+    "@context": "https://schema.org",
+    "@type": "HomeAndConstructionBusiness",
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair, Frymaster Commercial Fryer Service",
+    "image": "https://samedayappliance.repair/images/same-day-appliance-repair.png",
+    "url": canonical,
+    "telephone": MAIN_PHONE_TEL,
+    "priceRange": "$$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ]
+  }),
+  {
+    "@context": "https://schema.org",
+    "@type": "Brand",
+    "@id": canonical + "#brand",
+    "name": "Frymaster",
+    "url": "https://www.frymaster.com/",
+    "logo": "https://www.frymaster.com/favicon.ico",
+    "description": "Frymaster is a commercial deep fryer manufacturer headquartered in Shreveport, Louisiana, with manufacturing operations there since the mid-20th century. McDonald's exclusive OEM commercial fryer spec for 50+ years, spanning multiple product generations (H17 and H22 legacy gas, current FilterQuick FQE electric and FQG gas, LOV Low Oil Volume technology). Acquired by Welbilt Inc.; Welbilt was acquired by Ali Group in July 2022. Now part of Ali Group's commercial foodservice portfolio alongside Pitco fryers, Garland and US Range cooking equipment, Manitowoc ice machines, Beverage-Air refrigeration, Champion and CMA commercial dishwashers, Convotherm combi ovens, Kolpak and Master-Bilt walk-ins, Delfield refrigeration. Product families: gas atmospheric (H17 / H22 / MJ45 / MJ40 / MJ Series / GF / GFE), electric (FPEL / FPHE / EF / EFE / HD60), built-in filtration (Footprint Pro FPP, FilterQuick FQE / FQG, BIELA14), pasta cookers (FPP-LO), specialty (battered and breaded, RE Series restaurant). 200+ Frymaster installations across LA County McDonald's franchises.",
+    "foundingLocation": { "@type": "Place", "name": "Shreveport, Louisiana" },
+    "parentOrganization": { "@type": "Organization", "name": "Ali Group" }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(f => ({
+      "@type": "Question",
+      "name": f.q,
+      "acceptedAnswer": { "@type": "Answer", "text": f.a.replace(/<[^>]+>/g, '') }
+    }))
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Brands", "item": "https://samedayappliance.repair/brands/" },
+      { "@type": "ListItem", "position": 3, "name": "Frymaster Fryer Repair", "item": canonical }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "url": canonical,
+    "speakable": {
+      "@type": "SpeakableSpecification",
+      "cssSelector": [".intro-speakable", ".faq-item:first-of-type"]
+    }
+  }
+];
+---
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    {schemaJsons.map((schema) => (
+      <script type="application/ld+json" set:html={JSON.stringify(schema)} />
+    ))}
+  </Fragment>
+
+  <ServiceHero
+    slug="frymaster"
+    section="brands"
+    eyebrow="Commercial Fryers · BHGS #A49573 · EPA 608 Universal · $120 Commercial Diagnostic"
+    title="Frymaster Commercial Fryer Repair Los Angeles"
+    subtitle="H17 / FilterQuick / MJ45 / Footprint Pro / LOV / BIELA14 service across LA, OC, Ventura, San Bernardino, Riverside. McDonald's OEM for 50+ years; 200+ LA County franchises. Ali Group family. Independent alternative to corporate dispatch."
+    heroImageTitle="Frymaster Commercial Fryer Repair"
+    showBranches={true}
+  />
+
+  <!-- ── INTRO (Speakable target) ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Why LA fryer operators call us</p>
+      <h2>Frymaster is McDonald's exclusive OEM fryer, which means LA has Frymaster density that no other fryer brand matches.</h2>
+      <p class="intro-speakable">Every McDonald's location in Los Angeles County runs Frymaster, and there are over 200 of them. That single fact establishes Frymaster as the dominant commercial fryer brand in LA, by significant margin over Pitco (the #2 brand, now an Ali Group sibling) and everything else. Beyond McDonald's, Frymaster spec extends across LA's KFC and Popeyes locations (chicken-vat configurations), the Burger King and Wienerschnitzel franchise networks (open-pot gas), and the casual dining chains that pattern after QSR fryer architecture. Our techs service the full Frymaster lineup, gas atmospheric and electric, with and without built-in filtration, including the LOV (Low Oil Volume) technology and FilterQuick auto-filtration that define the current Frymaster generation.</p>
+      <p>Honest scope upfront: Frymaster maintains an authorized service provider network that handles McDonald's corporate program work and warranty service. We're not in that authorized network. Our role is the independent alternative for emergency dispatch when the corporate window is 12 to 24 hours, out-of-corporate-program work where the franchise operator pays retail anyway, post-warranty service where corporate hand-off has happened, and second-opinion situations on replace-the-unit recommendations from corporate-dispatched techs. For most LA McDonald's franchises the corporate program covers routine service; we exist for the gaps. $120 commercial diagnostic, waived when you approve the repair. Same-day LA dispatch typical Monday through Saturday.</p>
+      <p>This pillar covers the broader Frymaster brand view across all product families. For deep coverage of the H17 vs FilterQuick generation comparison, McDonald's franchise service framing, and Frymaster-specific pricing detail, our <a href="/brands/frymaster-fryer-repair/" class="brand-inline-link">Frymaster commercial fryer repair</a> combo page (3,891 words) goes deeper on those angles. This page extends with full lineup coverage, LA install map, Ali Group family operations, and the broader brand context.</p>
+    </div>
+  </section>
+
+  <!-- ── ALI GROUP OWNERSHIP CONTEXT ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Ownership chain</p>
+      <h2>Frymaster, Shreveport Louisiana, Ali Group family since July 2022</h2>
+      <p>Quick clarification on geography that confuses some SERP content: <strong>Frymaster is headquartered in Shreveport, Louisiana, not Los Angeles, California.</strong> The "LA" in some search results refers to the Louisiana state abbreviation, not the LA metro area. Our techs service Frymaster equipment across LA County and the broader SoCal region; the manufacturer itself is in Louisiana.</p>
+      <p>The current ownership chain: Frymaster → Welbilt Inc. → Ali Group (July 2022 acquisition). The Welbilt corporate identity ended with the Ali transaction, and SERP content from before mid-2022 that describes Frymaster as a Welbilt brand or as an independent fryer maker is dated by roughly three years now. The factually accurate current framing: Frymaster is an Ali Group commercial foodservice brand. Shreveport manufacturing continues operationally intact under the new parent.</p>
+      <p><strong>Frymaster founding context.</strong> Frymaster has manufactured commercial fryers from Shreveport since the mid-20th century, with the brand becoming the McDonald's exclusive OEM fryer over a 50+ year supplier relationship that spans multiple product generations. The H17 gas open-pot fryer was the McDonald's standard for decades; the current generation FilterQuick (FQE electric and FQG gas) with integrated LOV (Low Oil Volume) technology is the contemporary McDonald's spec. That McDonald's relationship is the single most important fact for understanding Frymaster's LA install density and the operational service context.</p>
+      <p>What being Ali Group means practically: Frymaster sits inside the same corporate parent as a long list of LA-relevant commercial brands. Operators running multi-Ali kitchens can consolidate service across the family.</p>
+    </div>
+  </section>
+
+  <!-- ── GAS ATMOSPHERIC LINEUP ── -->
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow-sub">Category 1 — Gas atmospheric fryers</p>
+      <h2>Frymaster gas atmospheric lineup, current and legacy</h2>
+      <p>Gas atmospheric fryers (open-pot architecture, atmospheric burner under the vat) are Frymaster's heritage product line and remain the dominant configuration across the LA McDonald's install base plus QSR and casual dining segments.</p>
+
+      <h3 class="line-h3">McDonald's legacy gas open-pot</h3>
+      <p><strong>H17 and H22.</strong> The McDonald's standard gas fryer for decades. Thermocouple, gas valve, burner ignitor, manual filtration (or external filter cart). Reliable, straightforward to service, parts chain still strong through Ali Group Frymaster Service Parts. H17 units 15 to 20 years old are common in older LA McDonald's locations that haven't undergone full Frymaster generation refresh. Common failure modes: thermocouple drift, gas valve wear, ignitor degradation, pilot light cleanup, gas regulator calibration.</p>
+
+      <h3 class="line-h3">MJ Series multi-vat gas</h3>
+      <p><strong>MJ45 and MJ40.</strong> Open-pot gas fryers in single and multi-vat configurations. MJ45 is the 45-pound vat capacity; MJ40 is the 40-pound. Common in casual dining chains, QSR operations outside the McDonald's spec, and independent restaurants doing fried food at meaningful volume. Standard service items: thermocouple, gas valve, burner ignitor, oil temperature probe, manifold seals.</p>
+      <p><strong>MJ Series multi-vat.</strong> Multi-vat assemblies for high-volume operations, 2-vat, 3-vat, and 4-vat configurations. Standard QSR and high-volume casual dining install.</p>
+
+      <h3 class="line-h3">Restaurant-tier gas tubed</h3>
+      <p><strong>GF and GFE Series.</strong> Gas tubed restaurant fryers, higher-tier configurations than the open-pot QSR units. Tubed burner architecture gives more even heat distribution but adds service complexity at the tube and manifold level. Restaurant-tier installations including chain restaurants and higher-end casual dining.</p>
+      <p><strong>J-series legacy.</strong> Older gas fryer line still in service at long-tenure LA restaurants. Parts available through Ali Group Frymaster Service Parts distribution; service profile similar to H17.</p>
+    </div>
+  </section>
+
+  <!-- ── ELECTRIC LINEUP ── -->
+  <section class="section section-alt">
+    <div class="container">
+      <p class="eyebrow-sub">Category 2 — Electric fryers</p>
+      <h2>Frymaster electric lineup for kitchens without gas service or with venting constraints</h2>
+      <p>Electric fryers replace the gas burner with electric heating elements immersed in the oil bath. Higher upfront equipment cost than gas, but installation flexibility (no gas plumbing required, simpler venting) plus precise temperature control make electric the right call for some LA kitchen builds, particularly retrofits in older buildings and operations in jurisdictions or building configurations where gas service is constrained.</p>
+
+      <h3 class="line-h3">FPEL Series electric pasta-friendly</h3>
+      <p>Electric platform optimized for crossover pasta and fryer applications. The "pasta-friendly" framing refers to the gentler temperature profile that works for both fried product and pasta cooking applications. Restaurant-tier install.</p>
+
+      <h3 class="line-h3">FPHE Series electric high-efficiency</h3>
+      <p>Electric platform with enhanced heat recovery and energy efficiency profile. Common in operations where utility cost optimization matters and the kitchen build supports electric.</p>
+
+      <h3 class="line-h3">HD60 Series</h3>
+      <p>Heavy-duty electric fryer for high-volume operations.</p>
+
+      <h3 class="line-h3">EF and EFE Series electric open-pot</h3>
+      <p>Open-pot electric configurations. EF is the standard line; EFE adds enhanced electronic controls. Common in restaurants with gas constraints.</p>
+
+      <h3 class="line-h3">Electric service profile</h3>
+      <p>Common electric Frymaster failure patterns differ from gas: heating element burnout (replaces the gas valve and ignitor failure modes of gas units), high-limit thermostat (replaces gas valve safety chain), contactor wear (cycling under load), element-housing seal integrity. Electric units carry the same FilterQuick or Footprint Pro integration as gas units in the current Frymaster generation.</p>
+    </div>
+  </section>
+
+  <!-- ── BUILT-IN FILTRATION ── -->
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow-sub">Category 3 — Built-in filtration platforms</p>
+      <h2>Footprint Pro, FilterQuick, and BIELA14 — Frymaster's filtration architectures</h2>
+      <p>Built-in filtration is Frymaster's competitive moat against simpler open-pot competitors. The integrated filter station, paired with LOV technology in the current generation, extends oil life, reduces oil waste and disposal cost, and meaningfully impacts product quality. The trade-off is service complexity: the filter station adds pump motors, manifold seals, filter paper spec management, and oil return valve mechanics on top of the base fryer service profile.</p>
+
+      <h3 class="line-h3">Footprint Pro (FPP Series)</h3>
+      <p>Frymaster's integrated filter station platform. Filter assembly mounts below the vat in a defined footprint, accessible for paper replacement and routine maintenance. Pump, manifold, paper, and return valve assembly designed as an integrated module. Common in QSR and chain casual dining where chain spec specifies built-in filtration. Service items: filter paper (Frymaster spec only), pump motor, manifold seals, oil return valve diaphragm.</p>
+
+      <h3 class="line-h3">FilterQuick (FQE electric + FQG gas)</h3>
+      <p>The current Frymaster filtration generation, McDonald's standard spec, integrated with FQE electric and FQG gas current-generation fryers. Architecture: oil filtered through a manifold-routed path with Frymaster-spec filter paper, pumped back to the vat through an oil return valve. Different mechanism from Pitco FilterMate (which uses a different pump and paper architecture); both work, both fail in their own ways when maintained poorly. Common FilterQuick service items: filter paper spec mismatch (most common trip cause), pump motor (year 5 to 8 wear-out), manifold seal degradation, oil return valve diaphragm, oil quality sensor calibration.</p>
+
+      <h3 class="line-h3">BIELA14 built-in filter cabinet</h3>
+      <p>Built-in filter cabinet configuration that integrates filtration into a dedicated cabinet alongside the fryer vat structure. Used in higher-end chain builds and specific franchise spec packages. Service profile combines fryer-side items with filter-cabinet-specific service: filter cabinet pump, cabinet seal integrity, oil routing between cabinet and vat.</p>
+
+      <h3 class="line-h3">Filtration service approach</h3>
+      <p>The single most common filtration service mistake we clean up after other techs is filter paper spec error. Aftermarket paper that looks similar but doesn't meet Frymaster permeability spec will trip FilterQuick cycles, accelerate pump wear, and create the intermittent fault pattern that gets misdiagnosed as pump failure. We use Frymaster Service Parts paper exclusively and verify paper spec at every filter service. Pump amperage check under load identifies actual pump wear vs paper-induced false triggers. Manifold seal inspection at every annual service catches degradation before it becomes an oil-leak situation.</p>
+    </div>
+  </section>
+
+  <!-- ── LOV TECHNOLOGY ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">LOV technology and the McDonald's relationship</p>
+      <h2>Low Oil Volume — Frymaster's competitive moat and the McDonald's exclusivity</h2>
+      <p>LOV (Low Oil Volume) is Frymaster's proprietary technology that reduces oil capacity per vat by roughly 40 percent versus traditional fryer designs. The architectural changes that make LOV work include redesigned vat geometry, optimized heating element placement for tighter heat distribution, integrated oil quality sensing, and tight coupling with FilterQuick auto-filtration.</p>
+      <p><strong>Why this matters operationally:</strong> less oil means faster heat recovery between drop cycles (productivity), lower oil cost per pound of product fried (margin), reduced oil disposal expense and frequency (operations), and tighter temperature control during drop cycles (product quality). For an operator dropping product every 30 to 90 seconds during a peak service window, the cumulative effect of LOV across a day adds up to real numbers on the P&L.</p>
+      <p><strong>Why this matters for service:</strong> LOV vats run with tighter tolerances and more sensitive temperature management than traditional open-pot fryers. The oil quality sensor needs calibration drift correction, the FilterQuick integration needs the manifold and pump performance to actually be in spec (not just functional), and temperature probe drift correction matters more on LOV because the smaller oil volume amplifies the impact of probe error. None of this is exotic, but it does require service technician familiarity with the LOV architecture rather than treating the unit as a standard open-pot fryer with a different label.</p>
+      <p><strong>McDonald's exclusivity context:</strong> LOV was developed in close collaboration with McDonald's during the development cycle and shipped as McDonald's-exclusive spec for the initial deployment phase. The technology has since proliferated through the broader Frymaster lineup and other QSR chains have adopted LOV-equipped configurations, but the McDonald's relationship remains the defining context for the product. Every LA McDonald's location runs LOV-equipped FilterQuick fryers; if you're operating a McDonald's franchise in LA, you have LOV.</p>
+    </div>
+  </section>
+
+  <!-- ── PASTA + SPECIALTY ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Category 4 — Pasta cookers and specialty configurations</p>
+      <h2>Frymaster pasta cookers and specialty fryer variants</h2>
+      <p><strong>FPP-LO pasta cookers.</strong> Low-oil pasta cooker platform that shares architecture with the FilterQuick/LOV fryer line but optimized for pasta cooking temperature profiles and product handling. Common in chain pasta operations and casual dining concepts where pasta is a meaningful menu item.</p>
+      <p><strong>Battered and breaded fryer configurations.</strong> Specialty Frymaster builds for chicken-vat applications, including the configurations used by KFC, Popeyes, and chicken-focused independent operators. Vat architecture optimized for breaded product (mesh screens, particle handling, oil quality management for breading-intensive frying). Common LA installs across the chicken-chain franchise networks.</p>
+      <p><strong>4-section vat assemblies.</strong> Multi-vat configurations for high-volume operations. Standard QSR and stadium concession spec.</p>
+      <p><strong>RE Series restaurant tier.</strong> Restaurant-focused Frymaster line for non-QSR restaurant operations.</p>
+    </div>
+  </section>
+
+  <!-- ── LA INSTALL MAP ── -->
+  <section class="section section-alt">
+    <div class="container">
+      <p class="eyebrow-sub">LA Frymaster install map</p>
+      <h2>Where Frymaster equipment lives across the LA commercial kitchen landscape</h2>
+      <p>Frymaster's LA install density follows the QSR and casual dining footprint, with McDonald's as the dominant single channel.</p>
+      <ul class="legacy-list">
+        <li><strong>McDonald's franchises (200+ LA County locations).</strong> Every LA McDonald's runs Frymaster, the largest single-brand fryer fleet in the metro area. Mix of H17 legacy units in older franchises and FilterQuick (FQE/FQG) current generation in newer builds. Corporate program covers routine service; we handle emergency and out-of-program dispatches.</li>
+        <li><strong>KFC and Popeyes (chicken-chain franchises).</strong> Frymaster spec for the breaded-chicken vat applications. Specialty configurations optimized for breaded product. Heavy presence across LA County and OC.</li>
+        <li><strong>Burger King franchises.</strong> Frymaster gas open-pot spec common across the LA BK network.</li>
+        <li><strong>Wienerschnitzel and other QSR.</strong> Open-pot gas fryers across the QSR landscape outside the McDonald's spec.</li>
+        <li><strong>Chick-fil-A locations (some).</strong> Frymaster present in select Chick-fil-A configurations; Pitco also common in this chain.</li>
+        <li><strong>Casual dining chains and sports bars.</strong> MJ Series and GF/GFE Series across mid-volume operations. Footprint Pro filtration common in chain casual dining where chain spec dictates built-in filter.</li>
+        <li><strong>Independent restaurants.</strong> Mexican and Latin fish-and-chips concepts, fried chicken independents, comfort food restaurants. Mix of MJ and GF/GFE series.</li>
+        <li><strong>Hotel banquet kitchens.</strong> Lower frequency than QSR but present in larger hotel operations. Pitco more common at the premium hotel tier; Frymaster present where chain build dictated.</li>
+        <li><strong>Catering kitchens and event operators.</strong> Portable Frymaster configurations for off-site catering, plus the standard kitchen install for in-house operations.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── ALI GROUP 5-CLUSTER SINGLE-CALL ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Ali Group sibling-call advantage</p>
+      <h2>One service account, Frymaster + Pitco + Garland + Manitowoc + Beverage-Air + more</h2>
+      <p>The Ali Group acquisition of Welbilt put Frymaster into the same parent foodservice portfolio as a long list of LA-relevant commercial brands. For operators running multi-Ali kitchens, that opens up a single-call operational pattern that wasn't available pre-2022.</p>
+      <p>Our Ali Group sibling coverage spans:</p>
+      <ul class="legacy-list">
+        <li><strong><a href="/brands/pitco-fryer-repair/" class="brand-inline-link">Pitco fryers</a></strong> — Ali Group commercial fryer sibling, Solstice Supreme platform with FilterMate auto-filtration. Different mechanism from FilterQuick but same Ali parts pipeline.</li>
+        <li><strong><a href="/brands/garland/" class="brand-inline-link">Garland and US Range commercial cooking</a></strong> — Ali Group cooking equipment siblings, ranges and convection ovens, GS and GD charbroilers, griddles, salamanders.</li>
+        <li><strong>Manitowoc ice machines</strong> — Ali Group ice machine sibling, the #1 US installed base in commercial ice. Common pairing with Frymaster in QSR and chain casual dining.</li>
+        <li><strong>Beverage-Air refrigeration</strong> — Ali Group back-bar and reach-in refrigeration sibling.</li>
+        <li><strong><a href="/brands/champion-dishwasher-repair/" class="brand-inline-link">Champion and CMA commercial dishwashers</a></strong> — Ali Group warewashing siblings.</li>
+        <li><strong>Convotherm combi ovens</strong> — Ali Group combi sibling.</li>
+        <li><strong>Kolpak / Master-Bilt / Nor-Lake walk-ins</strong> — Ali Group walk-in cooler family.</li>
+        <li><strong>Delfield refrigeration</strong> — Ali Group commercial refrigeration sibling.</li>
+        <li><strong><a href="/brands/scotsman/" class="brand-inline-link">Scotsman ice machines</a></strong> — Ali Group ice sibling alongside Manitowoc and Ice-O-Matic and Kold-Draft (post-Welbilt acquisition combined Ali ice family).</li>
+      </ul>
+      <p>For multi-Ali LA kitchens (extremely common in hotel banquet operations, hotel chain builds, dealer-spec turnkey installations, and QSR/casual dining standardized on the Ali equipment package), single SDAR account covers the full sibling list. One Friday afternoon call can dispatch service across the Frymaster fryer line, the Beverage-Air bar refrigeration, and the Champion dishwasher in the back dish station, three brands and three categories on one service relationship.</p>
+    </div>
+  </section>
+
+  <!-- ── FAILURE PATTERNS ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Failure patterns by series</p>
+      <h2>What fails on Frymaster equipment across the LA route</h2>
+      <p><strong>H17 and H22 (legacy McDonald's gas).</strong> Thermocouple drift (year 4 to 8), gas valve wear (year 8 to 12), burner ignitor degradation (year 6 to 10), pilot orifice carbon buildup (annual cleanup), gas regulator calibration drift (year 5 to 8). Parts ecosystem strong; service straightforward.</p>
+      <p><strong>MJ45 / MJ40 / MJ Series (open-pot gas).</strong> Same core failure pattern as H17 family. Thermocouple, gas valve, ignitor, oil temperature probe, manifold seal integrity, door hinge wear on multi-vat units.</p>
+      <p><strong>GF / GFE (gas tubed restaurant).</strong> Adds tube and manifold-specific service items on top of the open-pot pattern. Burner tube cleanup, manifold seal at the tube junction.</p>
+      <p><strong>FPEL / FPHE / EF / EFE (electric).</strong> Heating element burnout (year 5 to 10 in heavy QSR duty, longer in lower-volume restaurant), high-limit thermostat fault, contactor wear (cycling under load), element-housing seal integrity at the vat penetration.</p>
+      <p><strong>Footprint Pro (FPP) and FilterQuick (FQE/FQG).</strong> Filter paper spec verification (most common service item, often misdiagnosed), pump motor wear (year 5 to 8 in heavy QSR duty), manifold seal degradation, oil return valve diaphragm, oil quality sensor calibration drift on LOV-equipped units. FilterQuick trip-mid-cycle is usually paper or seal, not pump (we verify before recommending pump replacement).</p>
+      <p><strong>BIELA14 built-in filter cabinet.</strong> Combines fryer-side items with filter cabinet pump, cabinet seal integrity, oil routing valves between cabinet and vat. Higher service complexity than FilterQuick proper.</p>
+      <p><strong>LOV-specific items.</strong> Oil quality sensor calibration (drift over time), temperature probe drift correction (amplified impact due to low oil volume), FilterQuick performance verification (LOV integration tighter than standard fryer pairing).</p>
+    </div>
+  </section>
+
+  <!-- ── PRICING ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Pricing transparency</p>
+      <h2>Frymaster repair cost ranges across the lineup</h2>
+      <p>$120 commercial diagnostic, waived when you approve the repair. The ranges below are typical parts-and-labor for the most common Frymaster service items across our LA route. Final invoice depends on model, age, and what we find on inspection.</p>
+      <table class="failure-table">
+        <thead>
+          <tr><th>Repair</th><th>Family</th><th>Typical cost</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Commercial diagnostic (waived with repair)</td><td>All</td><td>$120</td></tr>
+          <tr><td>Thermocouple replacement</td><td>Gas</td><td>$180 to $320</td></tr>
+          <tr><td>Oil temperature probe</td><td>All</td><td>$200 to $340</td></tr>
+          <tr><td>Burner ignitor assembly</td><td>Gas</td><td>$220 to $380</td></tr>
+          <tr><td>Gas regulator calibration</td><td>Gas</td><td>$220 to $380</td></tr>
+          <tr><td>Door gasket / hinge service</td><td>All</td><td>$180 to $320</td></tr>
+          <tr><td>Gas valve replacement</td><td>Gas</td><td>$300 to $520</td></tr>
+          <tr><td>FilterQuick filter paper + manifold service</td><td>FQ filtration</td><td>$200 to $380</td></tr>
+          <tr><td>FilterQuick pump motor</td><td>FQ filtration</td><td>$400 to $680</td></tr>
+          <tr><td>Footprint Pro pump service</td><td>FPP filtration</td><td>$380 to $640</td></tr>
+          <tr><td>Oil return valve replacement</td><td>Filtration</td><td>$320 to $500</td></tr>
+          <tr><td>Heating element replacement (electric)</td><td>Electric</td><td>$320 to $580</td></tr>
+          <tr><td>High-limit thermostat (electric)</td><td>Electric</td><td>$240 to $400</td></tr>
+          <tr><td>Contactor (electric)</td><td>Electric</td><td>$220 to $360</td></tr>
+          <tr><td>LOV oil quality sensor calibration</td><td>LOV</td><td>$220 to $360</td></tr>
+          <tr><td>H17 burner refurbish</td><td>Legacy gas</td><td>$480 to $820</td></tr>
+          <tr><td>BIELA14 built-in filter service</td><td>BIELA14</td><td>$500 to $900</td></tr>
+          <tr><td>Wash pump rebuild</td><td>All filtration</td><td>$500 to $780</td></tr>
+          <tr><td>Main control board (FilterQuick / FQE/FQG)</td><td>Filtration</td><td>$750 to $1,400</td></tr>
+        </tbody>
+      </table>
+      <p style="margin-top: 14px;">Most Frymaster service calls land $380 to $850 parts-and-labor. FilterQuick-specific jobs and BIELA14 built-in filter service run higher due to system complexity. Annual preventive maintenance bundle (filter paper service, manifold inspection, pump amperage check, thermocouple verification, gas valve calibration) typically $480 to $720 depending on vat count.</p>
+    </div>
+  </section>
+
+  <!-- ── RECENT REPAIRS ── -->
+  <section class="section section-alt">
+    <div class="container">
+      <p class="eyebrow-sub">Recent Frymaster repairs</p>
+      <h2>What this past month looked like on our LA Frymaster route</h2>
+
+      <div class="case-grid">
+        <div class="case-card">
+          <h3>"FilterQuick trips every other cycle since Tuesday"</h3>
+          <p>South LA McDonald's franchise called Wednesday morning about an FQG (FilterQuick gas) unit tripping the filter cycle intermittently. Franchise operator had submitted a corporate dispatch ticket Monday but the authorized network window was 18 to 24 hours and the operator needed a fix before Friday lunch peak. Our tech arrived 2 hours after the call. Diagnosis: filter paper spec mismatch (aftermarket paper installed by the supply delivery driver, not Frymaster Service Parts spec). Replaced with correct Frymaster paper, verified pump amperage in spec under load, ran 5 verification cycles clean. Documented for franchise records. <strong>Total: $240</strong> — paper change $120, $120 diagnostic applied, labor included.</p>
+        </div>
+
+        <div class="case-card">
+          <h3>"Burger King chicken vat won't reach temp"</h3>
+          <p>Hollywood Burger King franchise called about an MJ Series open-pot gas fryer dedicated to the chicken-vat application. Vat was holding 320°F instead of the target 350°F under load. Our tech arrived in 90 minutes. Diagnosis: gas regulator drift at year 7 of heavy duty (regulator slowly drifted below spec, gas valve compensated for a while until it hit the limit). Calibrated regulator to spec, verified gas valve function, ran 3 consecutive load cycles confirming temperature recovery within spec. Recommended annual regulator verification going forward. <strong>Total: $380</strong> — regulator calibration $280, $120 diagnostic applied, labor included.</p>
+        </div>
+
+        <div class="case-card">
+          <h3>"KFC chicken fryer ignitor won't light"</h3>
+          <p>West LA KFC franchise called Sunday morning about a Frymaster gas fryer dedicated to bone-in chicken that wouldn't ignite at startup. Lunch service was in 3 hours. Our tech arrived in 75 minutes. Diagnosis: ignitor element burnout at year 6 of constant cycling. Replaced with OEM Frymaster ignitor assembly, verified spark and pilot ignition across 5 cold starts, confirmed full-temperature operation. Back in service well before lunch peak. <strong>Total: $440</strong> — ignitor assembly $320, $120 diagnostic applied, labor included.</p>
+        </div>
+
+        <div class="case-card">
+          <h3>"BIELA14 filter cabinet leaking oil onto the floor"</h3>
+          <p>Long Beach chain casual dining location called about a BIELA14 built-in filter cabinet showing oil pooling at the cabinet base. Operator had wiped it twice over two days hoping it was a one-time spill; third time confirmed active leak. Our tech arrived in 2 hours. Diagnosis: oil return valve diaphragm failure at year 9 (year 5 to 8 typical, this unit ran past it). Replaced diaphragm with OEM Frymaster part, verified cabinet seal integrity, cleaned oil routing path, ran 3 filter cycles to confirm no recurrence. Documented oil cleanup completed; recommended preventive replacement schedule for the other 3 vats in the cabinet at next service window. <strong>Total: $820</strong> — diaphragm replacement and cabinet service $700, $120 diagnostic applied, labor included.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FAQ ── -->
+  <section class="section">
+    <div class="container narrow">
+      <p class="eyebrow-sub">FAQ</p>
+      <h2>Frymaster service questions LA operators ask</h2>
+
+      {faqs.map((f, i) => (
+        <details class="faq-item" open={i === 0}>
+          <summary>{f.q}</summary>
+          <p set:html={f.a} />
+        </details>
+      ))}
+    </div>
+  </section>
+
+  <!-- ── CROSS-LINK BLOCK ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Frymaster service detail and Ali Group siblings</p>
+      <h2>Deeper Frymaster and related coverage</h2>
+      <ul class="related-list">
+        <li><a href="/brands/frymaster-fryer-repair/" class="brand-inline-link"><strong>Frymaster commercial fryer repair</strong></a> — deep combo (3,891 words) with detailed H17 vs FilterQuick generation comparison, McDonald's franchise service framing, FilterQuick vs Pitco FilterMate technical detail, and full Frymaster-specific pricing table.</li>
+        <li><a href="/brands/pitco-fryer-repair/" class="brand-inline-link"><strong>Pitco fryer repair</strong></a> — Ali Group sibling fryer brand. Solstice Supreme platform with FilterMate auto-filtration. Different mechanism from FilterQuick, same Ali parts pipeline.</li>
+        <li><a href="/brands/garland/" class="brand-inline-link"><strong>Garland commercial cooking</strong></a> — Ali Group cooking equipment sibling. Heavy-duty ranges, MCO convection, GS/GD charbroilers.</li>
+        <li><a href="/brands/champion-dishwasher-repair/" class="brand-inline-link"><strong>Champion commercial dishwasher</strong></a> — Ali Group warewashing sibling.</li>
+        <li><a href="/brands/scotsman/" class="brand-inline-link"><strong>Scotsman ice machines</strong></a> — Ali Group ice sibling (alongside Manitowoc, Ice-O-Matic, Kold-Draft).</li>
+        <li><a href="/commercial/fryer-repair/"><strong>Commercial fryer repair hub</strong></a> — broader category covering all commercial fryer brands we service (Frymaster, Pitco, Vulcan, Imperial, Henny Penny, others).</li>
+        <li><a href="/commercial/"><strong>Commercial appliance repair hub</strong></a> — top commercial parent.</li>
+        <li><a href="/price-list/commercial-fryer-repair-cost/"><strong>Commercial fryer repair cost guide</strong></a> — cross-brand pricing context.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── SERVICE AREAS + BRANCHES ── -->
+  <section class="section">
+    <div class="container">
+      <p class="eyebrow-sub">Where we work</p>
+      <h2>Frymaster service across Greater Los Angeles</h2>
+      <p>Frymaster install density follows the QSR and chain casual dining footprint. Highest concentration around McDonald's franchise corridors (every neighborhood in LA County), KFC and Popeyes locations, Burger King franchises, and the Chick-fil-A and casual dining chains that overlap into chicken-vat and high-volume fryer territory. Routine service Mon-Sat 8am-8pm; emergency response available on the standard commercial schedule.</p>
+      <BrandBranchesGrid showHeader={false} />
+    </div>
+  </section>
+
+  <!-- ── CREDENTIALS ── -->
+  <section class="section section-alt">
+    <div class="container narrow">
+      <p class="eyebrow-sub">Credentials</p>
+      <h2>Licensed, insured, EPA-certified, BBB Accredited</h2>
+      <p>BHGS Registration #A49573 (California Bureau of Household Goods and Services). EPA 608 Universal Certification #1346255700410. CSLB C-20 HVAC #1138898. BBB Accredited Business. General liability and workers' compensation insurance current. License verification on the <a href="/credentials/">credentials page</a>.</p>
+    </div>
+  </section>
+
+  <!-- ── BOTTOM CTA ── -->
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>Frymaster fryer down? Call the branch nearest your kitchen.</h2>
+      <p>Same-day in LA, Orange County, Ventura. Next-day for Inland Empire. $120 commercial diagnostic, waived with repair. OEM Frymaster Service Parts only. McDonald's franchise emergency dispatch available outside corporate program window.</p>
+      <div class="hero-ctas">
+        <a href={`tel:${MAIN_PHONE_TEL}`} class="btn-primary">☎ Call {MAIN_PHONE}</a>
+        <a href="/contact/" class="btn-outline">Book Online</a>
+      </div>
+    </div>
+  </section>
+
+<style>
+  :root {
+    --red: #C8102E;
+    --black: #0a0a0a;
+    --gray: #f5f5f5;
+    --border: #e2e2e2;
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: var(--text); line-height: 1.6; }
+
+  .section { padding: 72px 24px; }
+  .section-alt { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .eyebrow-sub { font-size: 13px; color: var(--red); text-transform: uppercase; letter-spacing: .12em; margin-bottom: 12px; font-weight: 600; }
+  h2 { font-size: clamp(24px, 3vw, 34px); font-weight: 700; margin-bottom: 20px; line-height: 1.2; font-family: 'Playfair Display', Georgia, serif; }
+  h3.line-h3 { font-size: 17px; font-weight: 700; margin: 24px 0 10px; color: var(--black); font-family: 'Playfair Display', Georgia, serif; }
+  .section p { margin-bottom: 16px; color: var(--text); }
+  .section a { color: var(--red); text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+
+  .legacy-list, .related-list { padding-left: 22px; margin: 14px 0 18px; }
+  .legacy-list li, .related-list li { font-size: 15.5px; line-height: 1.65; color: var(--text); margin-bottom: 8px; }
+
+  .failure-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 14.5px; }
+  .failure-table th, .failure-table td { padding: 11px 14px; text-align: left; border-bottom: 1px solid var(--border); }
+  .failure-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .failure-table tr:last-child td { border-bottom: none; }
+  .failure-table td:nth-child(3) { white-space: nowrap; }
+
+  .case-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 22px; margin-top: 24px; }
+  .case-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 24px 22px; }
+  .case-card h3 { font-size: 16px; font-weight: 700; margin: 0 0 12px; color: var(--text); line-height: 1.35; font-family: 'Playfair Display', Georgia, serif; }
+  .case-card p { font-size: 14.5px; margin-bottom: 0; line-height: 1.65; }
+
+  .faq-item { margin-bottom: 12px; border: 1px solid var(--border); border-radius: 6px; padding: 16px 20px; background: #fff; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 16px; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 14.5px; color: var(--text); margin: 12px 0 0; line-height: 1.7; }
+
+  .btn-primary { display: inline-block; padding: 14px 28px; background: var(--red); color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: background .2s; }
+  .btn-primary:hover { background: #a50d25; }
+  .btn-outline { display: inline-block; padding: 14px 28px; border: 1.5px solid rgba(255,255,255,.35); color: #fff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; transition: all .2s; }
+  .btn-outline:hover { background: rgba(255,255,255,.08); border-color: #fff; }
+
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; }
+  .bottom-cta p { color: rgba(255,255,255,.78); margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .bottom-cta .hero-ctas { justify-content: center; display: flex; gap: 12px; flex-wrap: wrap; }
+</style>
+</Layout>
