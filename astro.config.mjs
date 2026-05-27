@@ -153,8 +153,8 @@ export default defineConfig({
     // (Wave 59+ — Hobart, Scotsman, Jackson, Garland, Rational, Frymaster, Pitco,
     // Champion, Imperial, Lang pillars planned). DO NOT remove without confirming
     // pillar deployment.
+    // ALL 10 Wave 58 temp redirects removed as pillars deployed (Wave 59 complete).
     // ====================================================================
-    '/brands/lang/':      '/brands/lang-oven-repair/',
 
     // ====================================================================
     // Wave 59-Hobart-prep (2026-05-26) — phantom URL fix until proper combo
