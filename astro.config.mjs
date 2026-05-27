@@ -146,6 +146,20 @@ export default defineConfig({
   ],
   redirects: {
     // ====================================================================
+    // Wave 63 Sprint 2D (2026-05-27): outdoor city-flat URLs restructured to
+    // proper L2 hierarchy. Old /outdoor/<category>-<city>/ → /outdoor/<category>/<city>/
+    // ====================================================================
+    '/outdoor/grill-repair-beverly-hills/':           '/outdoor/grill-repair/beverly-hills/',
+    '/outdoor/kitchen-repair-malibu/':                '/outdoor/kitchen-repair/malibu/',
+    '/outdoor/kitchen-repair-newport-beach/':         '/outdoor/kitchen-repair/newport-beach/',
+    '/outdoor/kitchen-repair-thousand-oaks/':         '/outdoor/kitchen-repair/thousand-oaks/',
+    '/outdoor/wine-cellar-repair-bel-air/':           '/outdoor/wine-cellar-repair/bel-air/',
+    '/outdoor/wine-cellar-repair-beverly-hills/':     '/outdoor/wine-cellar-repair/beverly-hills/',
+    '/outdoor/wine-cellar-repair-malibu/':            '/outdoor/wine-cellar-repair/malibu/',
+    '/outdoor/wine-cellar-repair-newport-beach/':     '/outdoor/wine-cellar-repair/newport-beach/',
+    '/outdoor/wine-cellar-repair-pacific-palisades/': '/outdoor/wine-cellar-repair/pacific-palisades/',
+
+    // ====================================================================
     // TEMPORARY (Wave 58 / 2026-05-26): /brands/{commercial-brand}/ → most-trafficked
     // combo. Fixes Cloudflare SPA-fallback fake-200 serving homepage HTML for these
     // 10 URLs (duplicate-content signal to Google).
