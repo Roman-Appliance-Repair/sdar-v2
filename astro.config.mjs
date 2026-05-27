@@ -155,7 +155,6 @@ export default defineConfig({
     // pillar deployment.
     // ====================================================================
     '/brands/pitco/':     '/brands/pitco-fryer-repair/',
-    '/brands/champion/':  '/brands/champion-dishwasher-repair/',
     '/brands/lang/':      '/brands/lang-oven-repair/',
 
     // ====================================================================
