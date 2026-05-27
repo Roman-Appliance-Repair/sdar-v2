@@ -14,6 +14,7 @@ import { CITIES } from '../../data/cities';
 import { BRANCHES, MAIN_PHONE } from '../../data/branches';
 import { mergeCredentials } from '../../data/credentials-schema';
 import { getBrandPillarSlug } from '../../data/brand-pillar-map';
+import { getCommercialCrossLink } from '../../data/commercial-cross-link-map';
 
 export async function getStaticPaths() {
   return CITY_SERVICE_MATRIX.map(combo => ({
@@ -52,6 +53,13 @@ const siblings = CITIES
             && c.slug !== citySlug
             && existingComboCities.has(c.slug))
   .slice(0, 6);
+
+// Wave 61b Sprint 2 Batch D — commercial counterpart cross-link.
+// 13 of 15 residential services map to a commercial hub; microwave +
+// garbage-disposal return null (no commercial scope) and the Related list-item
+// is skipped. Pricing-fork ($120 commercial) noted inline per
+// docs/factual-accuracy.md §9 mixed-scope discipline.
+const commercialHub = getCommercialCrossLink(serviceSlug);
 
 const title = `${serviceName} ${cityName} — Same Day`;
 const description = `Same-day ${serviceName} in ${cityName}. ${brandPool.slice(0, 4).join(', ')}. BHGS #A49573, $89 dx waived with repair.`;
@@ -247,6 +255,11 @@ const schemaJsons = [
           Sibling cities served from our {branch?.displayName || 'Los Angeles'} branch: {siblings.map((s, i) => (
             <span><a href={`/${s.slug}/${serviceSlug}/`}>{s.name}</a>{i < siblings.length - 1 ? ', ' : ''}</span>
           ))}
+        </li>
+      )}
+      {commercialHub && (
+        <li>
+          Commercial scope in {cityName}? See <a href={commercialHub.url}>{commercialHub.linkText}</a> — $120 diagnostic, BHGS #A49573.
         </li>
       )}
     </ul>
