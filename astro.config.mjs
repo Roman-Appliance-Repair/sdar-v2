@@ -156,7 +156,6 @@ export default defineConfig({
     // ====================================================================
     '/brands/pitco/':     '/brands/pitco-fryer-repair/',
     '/brands/champion/':  '/brands/champion-dishwasher-repair/',
-    '/brands/imperial/':  '/brands/imperial-range-repair/',
     '/brands/lang/':      '/brands/lang-oven-repair/',
 
     // ====================================================================
