@@ -1,0 +1,310 @@
+---
+// src/pages/commercial/ice-machines/manitowoc-not-making-ice.astro
+// Wave 70 Phase 2b CANARY — Manitowoc brand-gap pioneer.
+// First brand-failure page (700 vol/mo, AI Overview confirmed, KD 0).
+// Cross-verified factual data from 3 sources:
+//   - not-making-ice.astro (post-hotfix 3f391b4)
+//   - error-codes.astro (batch14 02393df, authoritative for touchscreen alerts)
+//   - brands/manitowoc.astro (model series, AlphaSan/LuminIce/Acu-Thaw)
+// CRITICAL: Indigo NXT = touchscreen NAMED ALERTS (not E1/E2/E3, not LED flash).
+// $120 commercial. BHGS #A49573 + EPA 608 Universal #1346255700410.
+
+import Layout from '../../../layouts/Layout.astro';
+import CommercialHero from '../../../components/CommercialHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/commercial/ice-machines/manitowoc-not-making-ice/";
+
+const title = "Manitowoc Ice Machine Not Making Ice LA — Same Day";
+const description = "Manitowoc ice machine stopped producing? LA same-day diagnostic on Indigo NXT touchscreen alerts + Q-Series + R-Series. EPA 608. BHGS #A49573.";
+
+const faqs = [
+  {
+    q: "Why is my Manitowoc ice machine not making ice?",
+    a: "A Manitowoc ice machine that stopped making ice usually comes down to one of three things: a water-side fault (closed inlet, scaled inlet valve, clogged supply filter), a bin-sensor or harvest-timing failure stopping the cycle, or a refrigerant-side problem (low charge, weak compressor, fouled condenser). Our techs at Same Day Appliance Repair work the diagnostic cheapest-first because about 4 in 5 Manitowoc no-production calls in LA, OC, Ventura, and the IE land on water-side or harvest-side issues before refrigerant work is needed — a $295 service call instead of a $1,200 sealed-system repair. $120 commercial diagnostic, applied toward repair."
+  },
+  {
+    q: "What does 'Long Freeze' mean on my Manitowoc Indigo NXT?",
+    a: "Long Freeze on an Indigo NXT touchscreen means the freeze cycle exceeded its design time. Three usual causes in order of frequency: refrigerant under-charge or condenser fouling (sealed-system side), water inlet partial restriction reducing fill speed, or ambient temperature exceeding the unit's spec (kitchen heat exceeding 90°F+ during summer Service). The alert points at the category; our techs at Same Day Appliance Repair confirm the component by checking head pressure on the manifold gauges, inspecting the condenser fins, and timing the water fill. Indigo NXT also stores fault history in the touchscreen menu, which tells us whether Long Freeze has been intermittent or recurring."
+  },
+  {
+    q: "What does 'No Harvest' mean on my Manitowoc Indigo NXT?",
+    a: "No Harvest on an Indigo NXT means the freeze cycle completed but ice didn't release from the evaporator during the harvest cycle. Three usual causes: the harvest assist mechanism is stuck or worn (most common on year-5+ IY/IB cubers), the hot gas valve (Acu-Thaw) failed to open and warm the evaporator, or the water curtain switch isn't reading the expected open/closed state during the cycle. Our techs at Same Day Appliance Repair inspect the harvest assembly and curtain switch first because those resolve roughly 6 of every 10 'No Harvest' calls — Acu-Thaw hot gas valve replacement runs $340 to $540 if that turns out to be the failure."
+  },
+  {
+    q: "What does 'Curtain Switch' alert mean on my Manitowoc?",
+    a: "Curtain Switch on an Indigo NXT means the water curtain wasn't detected closed or open at the expected time in the freeze/harvest cycle. The curtain is the hinged flap that closes the freeze chamber during ice formation and opens during harvest; the switch reads its position. Causes: the curtain itself is warped or stuck, the switch is misaligned or failed, or there's a wiring fault between switch and control board. Our techs at Same Day Appliance Repair check curtain alignment first because that's free to rule out — switch replacement runs $185 to $285 if the mechanical inspection clears."
+  },
+  {
+    q: "How do I reset my Manitowoc Indigo NXT ice machine?",
+    a: "Indigo NXT resets through the touchscreen menu rather than a physical button: navigate to Service → Reset Faults from the home screen. If the underlying fault is still present, the alert returns within minutes (faster on refrigerant-side faults, slower on intermittent water issues), and the touchscreen Fault History menu preserves the record. On older Q-Series legacy machines without touchscreen, reset is a power-cycle at the breaker. Resetting without diagnosing is fine as a temporary workaround while you wait for our visit; don't ignore an alert that keeps returning. Our techs at Same Day Appliance Repair read the Fault History first because intermittent patterns point to different parts than steady-state alerts."
+  },
+  {
+    q: "What's the difference between Manitowoc Indigo NXT and Q-Series?",
+    a: "Indigo NXT is Manitowoc's current generation (since 2018), replacing the Q-Series legacy line on most new installations. Indigo NXT uses a touchscreen interface with named alerts (Long Freeze, No Harvest, Curtain Switch, Bin Full, High Discharge Temp, Low Water) and the Easy-Read display, plus AlphaSan antimicrobial protection and LuminIce II UV growth inhibitor. Q-Series uses numeric codes similar to Hoshizaki style, simpler display, no AlphaSan or LuminIce II. Q-Series machines are still serviceable through the Welbilt parts network for several more years. Our techs at Same Day Appliance Repair service both — the diagnostic logic is identical, just the display read changes."
+  },
+  {
+    q: "How long does a Manitowoc ice machine repair take?",
+    a: "Time-to-restoration depends on the failure category. Cleaning service: 90 minutes to 2 hours, same-day production restored. Water inlet valve: 60 to 90 minutes on-site, same-day. Harvest sensor or curtain switch: 60 to 90 minutes, same-day. Hot gas valve (Acu-Thaw): 90 to 120 minutes, same-day. Condenser fan motor: 60 to 90 minutes, same-day. Refrigerant leak repair: 3 to 5 hours including leak detection plus evacuation plus recharge, usually same-day for accessible joints, next-day if parts need ordering. Easy-Read board: same-day if a unit on the truck matches; otherwise 1 to 3 day part order. Compressor: full day plus, often next-day completion. Common Indigo NXT parts (inlet valves, harvest sensors, curtain switches, fan motors) are stocked on the van for first-visit completion."
+  },
+  {
+    q: "How much does Manitowoc ice machine repair cost?",
+    a: "Diagnostic visit $120, waived with repair. Typical repair line items: cleaning service $200 to $340; water inlet valve $260 to $420; hot gas valve (Acu-Thaw) $340 to $540; harvest sensor $200 to $340; curtain switch $185 to $285; LuminIce II UV bulb $140 to $240; bin sensor $180 to $280; condenser fan motor $300 to $520; Easy-Read display board $480 to $820; refrigerant leak repair plus recharge $700 to $1,500; compressor replacement $1,400 to $2,200 (IB/ID mid-size and undercounter) or $1,800 to $2,800 (IY large modular). Most no-production calls resolve in the $260 to $540 range when the diagnostic points to water-side or harvest-assembly work."
+  },
+  {
+    q: "How often should a Manitowoc ice machine be cleaned?",
+    a: "Manitowoc and LA County DPH both recommend 2 to 4 cleanings per year on cube machines — closer to 4 (quarterly) in heavy-use restaurants and bars with hard water, closer to 2 (every 6 months) in lighter-use settings with quality filtration. AlphaSan antimicrobial and LuminIce II UV protection slow biological growth but do NOT prevent mineral scale buildup on the vertical evaporator plate. Our techs at Same Day Appliance Repair use Manitowoc Cleen Ice brand-spec cleaner during service and document each cleaning for LA County DPH inspection records. Standard cleaning runs $200 to $340 per service; quarterly contracts reduce per-visit cost."
+  },
+  {
+    q: "Why does my Manitowoc ice machine keep stopping mid-cycle?",
+    a: "Mid-cycle shutdowns on Manitowoc Indigo NXT usually trigger one of two touchscreen alerts: 'High Discharge Temp' (compressor overheating from fouled condenser or restricted airflow — common when kitchen ambient exceeds 90°F during LA summer service) or 'Long Freeze' (cycle timer exceeded design, often refrigerant under-charge). Less commonly, the curtain switch is intermittent and triggers a 'Curtain Switch' alert mid-cycle. Our techs at Same Day Appliance Repair check the condenser fin condition first because that's the most common root cause on chain restaurant installations where the unit is tucked into a tight kitchen alcove — $245 to $385 cleaning, $300 to $520 if a fan motor replacement is also needed."
+  },
+  {
+    q: "Where can I get Manitowoc parts in LA?",
+    a: "Manitowoc parts in LA route through the Welbilt parts network (Wisconsin-based distribution): standard 5 to 7 day ship, expedited 1 to 3 day available for service-critical components. Common Indigo NXT parts (water inlet valves for IY-0454A and IB-0420A, harvest sensors, curtain switches, condenser fan motors for -A air-cooled units, LuminIce II UV bulbs) are stocked on our service trucks for first-visit completion on most LA County hospitality calls. Rarer parts (full Easy-Read display boards, IY-1196A compressors, Q-Series legacy replacements) require Welbilt direct order. Our techs at Same Day Appliance Repair pre-order based on phone-call symptom description to compress restoration time."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org", "@type": "LocalBusiness", "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair", "url": canonical, "telephone": phone, "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+    "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+  },
+  {
+    "@context": "https://schema.org", "@type": "Service", "@id": canonical + "#service",
+    "serviceType": "Manitowoc Ice Machine Production Failure Repair",
+    "name": "Manitowoc Ice Machine Not Making Ice Diagnostic and Repair",
+    "url": canonical,
+    "description": "Manitowoc commercial ice machine production-failure diagnostic across all five SoCal counties. Indigo NXT (current generation since 2018, IY large modular IY-0454A through IY-1196A, IB mid-size IB-0420A through IB-0620A, ID compact undercounter ID-0322A through ID-0522A, IRT remote-condensed) touchscreen named alerts (Long Freeze, No Harvest, Curtain Switch, Bin Full, High Discharge Temp, Low Water) with Easy-Read display and Fault History menu. Q-Series legacy machines with numeric codes still serviced. R-Series nugget (RNS-0385A, RNS-0820A) auger drive amp draw diagnostic. Vertical evaporator architecture, Acu-Thaw hot gas harvest cycle, AlphaSan antimicrobial, LuminIce II UV growth inhibitor service. Manitowoc Cleen Ice brand-spec cleaner. EPA 608 Universal plus R-290 hydrocarbon refrigerant certified for post-2020 green-refrigerant Indigo NXT models. Welbilt parts network access (5-7 day standard, expedited 1-3 day). $120 commercial diagnostic, applied toward repair. BHGS #A49573, EPA 608 Universal #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Commercial diagnostic fee, applied toward repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Commercial", "item": "https://samedayappliance.repair/commercial/" },
+      { "@type": "ListItem", "position": 3, "name": "Ice Machines", "item": "https://samedayappliance.repair/commercial/ice-machines/" },
+      { "@type": "ListItem", "position": 4, "name": "Manitowoc Not Making Ice", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<CommercialHero
+  eyebrow="Manitowoc Service · Not Making Ice · Production Failure Diagnostic"
+  title="Manitowoc Ice Machine Not Making Ice — Same Day LA"
+  subtitle={`Indigo NXT touchscreen alerts, Q-Series legacy, R-Series nugget. Restaurant ice production stopped during service? Five-step diagnostic. ${phone}`}
+  heroImageTitle="Manitowoc Ice Machine Not Producing"
+  showBranches={true}
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Production-failure diagnostic</p>
+    <h2>A Manitowoc that stopped making ice has water-side, harvest-side, or refrigerant-side root cause. Five-step order, cheapest first.</h2>
+
+    <p>A Manitowoc ice machine that stopped making ice usually comes down to one of three things: a water-side fault (closed inlet, scaled inlet valve, clogged supply filter), a bin-sensor or harvest-timing failure stopping the cycle, or a refrigerant-side problem (low charge, weak compressor, fouled condenser). Our techs at Same Day Appliance Repair work the diagnostic cheapest-first because about 4 in 5 Manitowoc no-production calls in LA, OC, Ventura, and the IE land on water-side or harvest-side issues before refrigerant work is needed — a $295 service call instead of a $1,200 sealed-system repair.</p>
+
+    <p>Across LA County, the Manitowoc service calls we run come from a predictable mix of operations: bars on Sunset Strip going dark Friday evening before peak service, Marriott and Hilton and Hyatt banquet ice rooms in DTLA where corporate events depend on ice volume, seafood markets in Santa Monica that need flake-and-cube combinations for product display, and quick-service restaurant kitchens in West Hollywood where the Indigo NXT ID-0322A undercounter is the standard install. The diagnostic pattern is consistent across all of them: the cheapest fixes get tested first because that's where most calls clear.</p>
+
+    <p>$120 commercial diagnostic, waived with repair. BHGS #A49573 + EPA 608 Universal #1346255700410 for sealed-system work. Welbilt parts network access (Wisconsin distribution) with 5 to 7 day standard ship and expedited 1 to 3 day available. Common Manitowoc parts on the truck. Phones answered 24/7.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">Series-aware diagnosis</p>
+    <h2>Three diagnostic approaches across the Manitowoc lineup.</h2>
+
+    <p>Manitowoc has shipped three meaningfully different display and diagnostic systems across its current lineup, and the right read-first approach changes with the series. Our techs at Same Day Appliance Repair identify the series by serial number on the phone before dispatch so the right tools and reference manuals are on the truck.</p>
+
+    <h3 class="series-h3">Indigo NXT (IY, IB, ID) — Touchscreen Fault History menu</h3>
+    <p>Current-generation Manitowoc since 2018 across the size tiers: IY large modular (IY-0454A, IY-0524A, IY-0606A, IY-0696A, IY-0906A, IY-1196A), IB mid-size (IB-0420A, IB-0520A, IB-0620A), ID compact undercounter (ID-0322A, ID-0452A, ID-0522A), plus IRT remote-condensed variants. All use the Easy-Read touchscreen display showing named alerts: Long Freeze, No Harvest, Curtain Switch, Bin Full, High Discharge Temp, Low Water. Diagnostic first step is reading the Fault History menu through the touchscreen — that shows whether the alert is intermittent (water pressure dip, transient ambient spike) or recurring (real component failure). Intermittent vs recurring drives whether we replace a sensor or chase a sealed-system issue.</p>
+
+    <h3 class="series-h3">Q-Series Legacy — Numeric error code + physical LED indicator</h3>
+    <p>Pre-Indigo NXT Manitowoc models still in active service across older LA County restaurant installations. Q-Series uses a numeric error code display similar to Hoshizaki style plus physical LED indicators on the control board for power, freeze cycle active, and harvest cycle active. Diagnostic first step is reading the numeric code against the Q-Series service manual reference (Welbilt documentation), then visually confirming LED state matches the cycle position. Parts available through the Welbilt network for several more years.</p>
+
+    <h3 class="series-h3">R-Series Nugget (RNS-0385A, RNS-0820A) — Auger drive amp draw measurement</h3>
+    <p>Different architecture from cube production: nugget machines run an auger continuously to compress scraped ice into nugget shape. When R-Series nugget production drops or stops, the first diagnostic measurement is auger drive motor amp draw under load with a clamp meter — elevated amps point to mechanical drag (worn auger flighting, scale on the drum interior, failing gear reducer), while low or no amps point to motor windings or control circuit. Touchscreen alert display on newer R-Series mirrors Indigo NXT logic.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Five-step diagnostic order</p>
+    <h2>Cheapest tests first on every Manitowoc no-production call.</h2>
+
+    <p>Across LA County, OC, Ventura, and the IE, our techs run the same diagnostic order on every Manitowoc no-production call — restaurants on Sunset Blvd, hotel banquet ice rooms in DTLA, beachfront bars in Manhattan Beach. We run cheapest tests first not to save time, but because the failure data backs it up: roughly 20% of calls clear at water supply, 15% at bin sensor or harvest-side test, 45% at water inlet valve or harvest assembly replacement, and 20% require sealed-system or compressor work.</p>
+
+    <h3 class="series-h3">1. Water supply check (free, 5 minutes)</h3>
+    <p>Walk to the supply line behind the Manitowoc. Confirm the shut-off valve is fully open. Inspect supply tubing for kinks, crimps, or visible scale buildup. Check the water filter cartridge (Pentair Everpure or 3M Cuno on most Manitowoc installs) for overdue replacement. About 20% of calls clear here with no parts billed.</p>
+
+    <h3 class="series-h3">2. Bin sensor / fullness signal (free to inspect)</h3>
+    <p>On Indigo NXT the touchscreen will show "Bin Full" when the bin-fullness sensor reports full. Empty the bin completely and observe whether production resumes. If yes, sensor is failing — replacement $180 to $280.</p>
+
+    <h3 class="series-h3">3. Water inlet valve diaphragm</h3>
+    <p>Most common single-component failure on Manitowoc no-production calls, year 5 to 8 typical wear window. Symptom: machine cycles normally (audible compressor, condenser fan running) but no ice forms because no water enters the freeze chamber. Replacement runs $260 to $420 — typical 60 to 90 minutes on-site, same-day restoration.</p>
+
+    <h3 class="series-h3">4. Harvest assembly (Acu-Thaw hot gas valve, curtain switch, harvest sensor)</h3>
+    <p>When the touchscreen shows "No Harvest" or "Curtain Switch," the harvest cycle isn't completing. The Acu-Thaw hot gas valve warms the evaporator to release ice during harvest; failure leaves ice frozen to the plate. The curtain switch reads the water curtain position. Acu-Thaw hot gas valve replacement $340 to $540; curtain switch $185 to $285; harvest sensor $200 to $340.</p>
+
+    <h3 class="series-h3">5. Sealed-system (condenser, refrigerant, compressor) — EPA 608 work</h3>
+    <p>Last in the diagnostic order because it's the most expensive. Condenser coil fouled with dust or kitchen grease prevents heat rejection (cleaning $245 to $385). Refrigerant slow leak at evaporator brazed joint or flare connection (EPA 608 leak detection plus brazed repair plus recharge $700 to $1,500). Compressor failure (Indigo NXT IB/ID $1,400 to $2,200; IY large modular $1,800 to $2,800).</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2>Production-failure repair costs with restoration estimates.</h2>
+
+    <p class="lead">$120 commercial diagnostic, waived with repair. Restoration estimates assume common Indigo NXT parts on the service truck. Welbilt expedite available 1 to 3 day on parts not on the truck.</p>
+
+    <table class="price-table">
+      <thead><tr><th>Repair</th><th>Typical Cost</th><th>Time-to-Restoration</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic (waived with repair)</td><td>$120</td><td>30 to 60 min on-site</td></tr>
+        <tr><td>Water supply / filter replacement (no internal parts)</td><td>$120 to $185</td><td>30 to 60 min, same-day</td></tr>
+        <tr><td>Bin sensor replacement</td><td>$180 to $280</td><td>45 to 75 min, same-day</td></tr>
+        <tr><td>Water inlet valve replacement</td><td>$260 to $420</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Curtain switch replacement</td><td>$185 to $285</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Harvest sensor replacement</td><td>$200 to $340</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Acu-Thaw hot gas valve replacement</td><td>$340 to $540</td><td>90 to 120 min, same-day</td></tr>
+        <tr><td>Cleaning service (Manitowoc Cleen Ice)</td><td>$200 to $340</td><td>90 to 120 min, same-day</td></tr>
+        <tr><td>Condenser coil cleaning + scale removal</td><td>$245 to $385</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Condenser fan motor (-A air-cooled)</td><td>$300 to $520</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>LuminIce II UV bulb replacement</td><td>$140 to $240</td><td>30 to 60 min, same-day</td></tr>
+        <tr><td>Easy-Read display board replacement</td><td>$480 to $820</td><td>2 to 3 hours, same-day if on truck; otherwise 1-3 day expedite</td></tr>
+        <tr><td>Refrigerant leak repair + recharge (EPA 608)</td><td>$700 to $1,500</td><td>3 to 5 hours, usually same-day</td></tr>
+        <tr><td>Compressor replacement (IB/ID mid-size + undercounter)</td><td>$1,400 to $2,200</td><td>Full day, often next-day completion</td></tr>
+        <tr><td>Compressor replacement (IY large modular)</td><td>$1,800 to $2,800</td><td>Full day, often next-day completion</td></tr>
+        <tr><td>Auger gear reducer (R-Series nugget)</td><td>$580 to $880</td><td>2 to 3 hours, same-day if on truck</td></tr>
+        <tr><td>Warranty</td><td>90 days parts and labor</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2>Manitowoc production-failure questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p set:html={f.a}></p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">Related</p>
+    <h2>Manitowoc and commercial ice service across the catalog.</h2>
+    <div class="related-grid">
+      <a href="/commercial/ice-machines/" class="related-card">
+        <h3>Commercial Ice Machine Hub</h3>
+        <p>Parent pillar. All commercial ice formats: cube, nugget, flake, dispensers. Full SoCal coverage.</p>
+      </a>
+      <a href="/commercial/ice-machines/not-making-ice/" class="related-card">
+        <h3>Not Making Ice (Brand-Neutral)</h3>
+        <p>Production-failure five-step diagnostic across all brands. Brand-neutral baseline diagnostic.</p>
+      </a>
+      <a href="/commercial/ice-machines/brands/manitowoc/" class="related-card">
+        <h3>Manitowoc Brand Page</h3>
+        <p>Indigo NXT IY/IB/ID lineup, AlphaSan + LuminIce II maintenance, Welbilt parts network.</p>
+      </a>
+      <a href="/commercial/ice-machines/error-codes/" class="related-card">
+        <h3>Error Codes (All Brands)</h3>
+        <p>Indigo NXT touchscreen named alerts, Q-Series numeric codes, plus Hoshizaki, Scotsman, Ice-O-Matic, Follett.</p>
+      </a>
+      <a href="/commercial/ice-machines/water-leaking/" class="related-card">
+        <h3>Ice Machine Water Leaking</h3>
+        <p>Drain pump, water curtain, sump diagnostic across Manitowoc and other commercial brands.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Friday night Manitowoc ice machine down? Same-day priority.</h2>
+    <p>Our techs at Same Day Appliance Repair carry common Indigo NXT inlet valves, harvest sensors, curtain switches, and condenser fan motors on the truck — most LA County hospitality calls resolved before Saturday brunch service. EPA 608 + R-290 certified. BHGS #A49573 + EPA 608 #1346255700410. 24/7 phones, no emergency surcharge.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .series-h3 { font-size: 1.1rem; font-weight: 800; margin: 28px 0 10px; }
+  .lead { font-size: 1.05rem; line-height: 1.7; color: var(--muted); margin: 0 0 24px; font-style: italic; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  .price-table th { background: var(--gray); font-weight: 700; }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; line-height: 1.75; margin: 14px 0 0; }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 22px; }
+  .related-card { display: block; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+  .related-card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .related-card h3 { font-size: 1rem; font-weight: 800; margin: 0 0 8px; }
+  .related-card p { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.6; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
+</content>
+</invoke>
