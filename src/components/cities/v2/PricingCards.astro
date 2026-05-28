@@ -1,6 +1,11 @@
 ---
 /** v2 PricingCards — 6 residential price tiers + footnote.
- *  RESIDENTIAL ONLY. No $120 commercial tier. */
+ *  RESIDENTIAL ONLY. No $120 commercial tier.
+ *  Wave 69 Phase A 2026-05-27: appliance/note/footnote run through
+ *  linkifyBrands so recognized brand names (Sub-Zero, Wolf, Miele, …) link to
+ *  their /brands/{slug}/ pillar on first mention per field. */
+
+import { linkifyBrands } from '../../../lib/linkify-brands';
 
 export interface PriceTier { appliance: string; range: string; note: string; featured?: boolean; }
 
@@ -34,13 +39,13 @@ const finalSub = subhead ?? 'Honest estimates. Written before we start. Diagnost
     <div class="v2-pricing__grid">
       {tiers.map((t) => (
         <div class={`v2-pricing__card ${t.featured ? 'v2-pricing__card--featured' : ''}`}>
-          <div class="v2-pricing__appliance">{t.appliance}</div>
+          <div class="v2-pricing__appliance" set:html={linkifyBrands(t.appliance)}></div>
           <div class="v2-pricing__range">{t.range}</div>
-          <div class="v2-pricing__note">{t.note}</div>
+          <div class="v2-pricing__note" set:html={linkifyBrands(t.note)}></div>
         </div>
       ))}
     </div>
-    {footnote && <p class="v2-pricing__footnote">{footnote}</p>}
+    {footnote && <p class="v2-pricing__footnote" set:html={linkifyBrands(footnote)}></p>}
   </div>
 </section>
 
@@ -77,6 +82,14 @@ const finalSub = subhead ?? 'Honest estimates. Written before we start. Diagnost
   }
   .v2-pricing__appliance { font-size: 13px; color: var(--v2-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 8px; font-weight: 600; }
   .v2-pricing__card--featured .v2-pricing__appliance { color: var(--muted-on-dark); }
+  .v2-pricing__appliance a,
+  .v2-pricing__note a,
+  .v2-pricing__footnote a { color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  .v2-pricing__appliance a:hover,
+  .v2-pricing__note a:hover,
+  .v2-pricing__footnote a:hover { color: var(--v2-red); }
+  .v2-pricing__card--featured .v2-pricing__appliance a:hover,
+  .v2-pricing__card--featured .v2-pricing__note a:hover { color: var(--v2-white); }
   .v2-pricing__range {
     font-family: var(--v2-font-display);
     font-size: 24px; font-weight: 700;

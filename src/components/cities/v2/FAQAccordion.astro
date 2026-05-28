@@ -1,6 +1,12 @@
 ---
 /** v2 FAQAccordion — details/summary + auto-generated FAQPage JSON-LD.
- *  Single source: schema = HTML 1:1 from same `faqs` prop array. */
+ *  Single source: schema = HTML 1:1 from same `faqs` prop array.
+ *  Wave 69 Phase A 2026-05-27: visible answer HTML runs through linkifyBrands
+ *  so the first mention of each known brand links to /brands/{slug}/. The
+ *  FAQPage schema `acceptedAnswer.text` keeps the plain-text version
+ *  (no anchors) — Google reads schema text raw, not the rendered HTML. */
+
+import { linkifyBrands } from '../../../lib/linkify-brands';
 
 export interface FAQ { question: string; answer: string; schemaAnswer?: string; }
 export interface Props {
@@ -34,7 +40,7 @@ const faqSchema = {
             <span>{f.question}</span>
             <span class="v2-faq__chev" aria-hidden="true">+</span>
           </summary>
-          <div class="v2-faq__a" set:html={f.answer}></div>
+          <div class="v2-faq__a" set:html={linkifyBrands(f.answer)}></div>
         </details>
       ))}
     </div>
@@ -85,4 +91,6 @@ const faqSchema = {
     line-height: 1.7;
     color: var(--v2-text);
   }
+  .v2-faq__a a { color: var(--v2-red); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 2px; }
+  .v2-faq__a a:hover { text-decoration-thickness: 2px; }
 </style>
