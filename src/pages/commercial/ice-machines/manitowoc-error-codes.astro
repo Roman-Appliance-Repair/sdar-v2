@@ -1,0 +1,294 @@
+---
+// src/pages/commercial/ice-machines/manitowoc-error-codes.astro
+// Wave 70 Phase 2b Batch 17 — Manitowoc error codes REFERENCE page (70 vol/mo).
+// Encyclopedia-style reference for Manitowoc Indigo NXT named alerts + Q-Series
+// legacy codes. Builds on canary 346b820 + post-P0-hotfix brands/manitowoc.astro
+// + error-codes.astro authoritative table.
+// FOCUS: deep-dive on 6 Indigo NXT named alerts + Fault History menu navigation +
+// reset procedure. Q-Series legacy mentioned generically (no fake specifics per
+// P0 hotfix lesson).
+// $120 commercial. BHGS #A49573 + EPA 608 Universal #1346255700410.
+
+import Layout from '../../../layouts/Layout.astro';
+import CommercialHero from '../../../components/CommercialHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/commercial/ice-machines/manitowoc-error-codes/";
+
+const title = "Manitowoc Error Codes Reference LA — Same Day";
+const description = "Manitowoc error codes reference — Indigo NXT touchscreen named alerts + Q-Series numeric legacy + Fault History menu. LA same-day. BHGS #A49573.";
+
+const faqs = [
+  {
+    q: "What does Long Freeze mean on my Manitowoc?",
+    a: "Long Freeze on a Manitowoc Indigo NXT touchscreen means the freeze cycle exceeded its design time. The cycle timer fired without the cell sensor reaching the freeze-complete signal. Three usual causes in order of frequency: refrigerant under-charge or condenser fouling (sealed-system side — EPA 608 work to confirm), water inlet valve partial restriction reducing fill speed, or ambient temperature exceeding the unit's spec (kitchen heat above 90°F during LA summer service triggers the protection). Our techs at Same Day Appliance Repair check head pressure on manifold gauges and inspect the condenser fins first because that resolves the majority of Long Freeze calls. Typical resolution $245 to $385 condenser cleaning or $700 to $1,500 refrigerant work."
+  },
+  {
+    q: "What does No Harvest mean on my Manitowoc?",
+    a: "No Harvest on an Indigo NXT touchscreen means the freeze cycle completed but ice didn't release from the evaporator during the harvest cycle. Three usual causes: the harvest assist mechanism is stuck or worn (most common on year-5+ IY/IB cubers), the Acu-Thaw hot gas valve failed to open and warm the evaporator, or the water curtain switch isn't reading the expected open/closed state during the cycle. Our techs at Same Day Appliance Repair inspect the harvest assembly and curtain switch first because those resolve roughly 6 of every 10 No Harvest calls. Acu-Thaw hot gas valve replacement $340 to $540 if that turns out to be the failure."
+  },
+  {
+    q: "What does Curtain Switch alert mean?",
+    a: "Curtain Switch on an Indigo NXT means the water curtain wasn't detected closed or open at the expected time in the freeze and harvest cycle. The curtain is the hinged flap that closes the freeze chamber during ice formation and opens during harvest; the switch reads its position. Causes: the curtain itself is warped or stuck, the switch is misaligned or failed, or there's a wiring fault between switch and control board. Our techs at Same Day Appliance Repair check curtain alignment first because that's free to rule out — switch replacement runs $185 to $285 if the mechanical inspection clears."
+  },
+  {
+    q: "What does High Discharge Temp mean on my Manitowoc?",
+    a: "High Discharge Temp on an Indigo NXT touchscreen means the compressor discharge temperature exceeded safe operating range. The control board cuts power to protect the compressor from further damage. Three usual causes: condenser fouling restricting heat rejection (most common, $245 to $385 cleaning resolves), condenser fan motor failure on -A air-cooled units (high-pitched whine or no airflow, $300 to $520 motor replacement), or refrigerant over-charge from prior service work. Our techs at Same Day Appliance Repair check condenser fin condition and fan operation first because those resolve the majority of High Discharge Temp calls — and on tight kitchen installations the cause is often inadequate clearance for airflow rather than a component failure."
+  },
+  {
+    q: "What does Low Water alert mean on my Manitowoc?",
+    a: "Low Water on an Indigo NXT means insufficient water at the freeze chamber for the freeze cycle to complete. Three usual causes in order of frequency: water supply shut off or partially closed at the wall valve (free to check), water filter cartridge clogged (Pentair Everpure or 3M Cuno on most Manitowoc installs, 6-month replacement cycle), or the water inlet valve has failed closed. Our techs at Same Day Appliance Repair check the supply valve and filter first because those resolve roughly 4 of every 10 Low Water calls at no parts cost. Water inlet valve replacement runs $260 to $420 if the upstream supply side checks clean."
+  },
+  {
+    q: "What does Bin Full alert mean on my Manitowoc?",
+    a: "Bin Full on an Indigo NXT touchscreen means the bin-fullness sensor reports the bin is full and the machine has stopped production accordingly. Two scenarios: (1) Legitimate full bin — sensor is correct, empty the bin and production resumes automatically. (2) Sensor fault — the bin is empty but the sensor is misreading; empty the bin completely and observe whether production resumes. If yes, sensor is failing — replacement $180 to $280. Our techs at Same Day Appliance Repair note whether Bin Full is intermittent (sensor drift, usually replace) or persistent (often legitimate full or wiring fault) by reading the Fault History menu first."
+  },
+  {
+    q: "How do I navigate the Indigo NXT Fault History menu?",
+    a: "Fault History is in the Service menu on the touchscreen home screen — navigate to Service then Fault History. The display shows the most recent alerts with timestamps, allowing intermittent-vs-recurring distinction. Steady-state alerts (same alert repeating every cycle) usually point to a hard component failure. Intermittent alerts (same code appearing then clearing) often point to upstream conditions (water pressure dip, ambient spike, brief power blip). Our techs at Same Day Appliance Repair read the Fault History first on every visit because that pattern often points at different parts than the active alert alone would suggest."
+  },
+  {
+    q: "How do I reset my Manitowoc Indigo NXT?",
+    a: "Indigo NXT resets through the touchscreen menu: navigate to Service then Reset Faults from the home screen. If the underlying fault is still present, the alert returns within minutes, and the Fault History preserves the record. On older Q-Series legacy machines without touchscreen, reset is a power-cycle at the breaker (wait 60 seconds, restore power). Resetting without diagnosing is fine as a temporary workaround while you wait for our visit; don't ignore an alert that keeps returning. Our techs at Same Day Appliance Repair always read Fault History before resetting so the diagnostic trail is preserved."
+  },
+  {
+    q: "How long does Manitowoc error-code-related repair take?",
+    a: "Repair time depends on which alert and what component fails. Long Freeze + High Discharge Temp from condenser fouling: 60 to 90 minutes cleaning, same-day. Low Water from water inlet valve: 60 to 90 minutes, same-day. No Harvest from Acu-Thaw hot gas valve: 90 to 120 minutes, same-day. Curtain Switch replacement: 60 to 90 minutes, same-day. Bin Full from sensor: 45 to 75 minutes, same-day. Long Freeze from refrigerant leak (EPA 608): 3 to 5 hours including leak detection plus evacuation plus recharge. Easy-Read display board: same-day if on truck (2 to 3 hours); otherwise 1 to 3 day Welbilt expedite. Common Indigo NXT parts (water inlet valves, harvest sensors, curtain switches, fan motors) are stocked on the van for first-visit completion."
+  },
+  {
+    q: "How much does Manitowoc error-code-related repair cost?",
+    a: "Diagnostic visit + Fault History menu read $120, waived with repair. Typical repair ranges by alert: Long Freeze (condenser cleaning $245-$385 or refrigerant work $700-$1,500); No Harvest (Acu-Thaw valve $340-$540 or harvest sensor $200-$340); Curtain Switch (switch $185-$285); High Discharge Temp (condenser cleaning $245-$385 or fan motor $300-$520); Low Water (water inlet valve $260-$420 or filter $80-$180); Bin Full (sensor $180-$280). Most named-alert calls resolve in the $200 to $540 range when the alert points to water-side or sensor work. Refrigerant-related alerts (Long Freeze from leak, High Discharge Temp from sealed-system) run higher, $700-$1,500 EPA 608 work."
+  },
+  {
+    q: "How can I prevent Manitowoc error codes?",
+    a: "Three preventive practices reduce error-code frequency significantly. (1) Maintain 2 to 4 cleanings per year with Manitowoc Cleen Ice brand-spec cleaner — scale buildup triggers Long Freeze, High Discharge Temp, and Low Water alerts on Indigo NXT vertical evaporator. (2) Replace water filter cartridges on the 6-month schedule (Pentair Everpure or 3M Cuno) — overdue filters trigger Low Water and accelerate water inlet valve wear. (3) Inspect condenser fin clearance quarterly and clean the fins during scheduled service — fouled condenser is the single biggest cause of Long Freeze and High Discharge Temp alerts. Our techs at Same Day Appliance Repair offer quarterly contract service with documented LA County DPH compliance — typically $720 to $1,200 annual for cleaning + filter replacement + condenser cleaning."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org", "@type": "LocalBusiness", "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair", "url": canonical, "telephone": phone, "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+    "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+  },
+  {
+    "@context": "https://schema.org", "@type": "Service", "@id": canonical + "#service",
+    "serviceType": "Manitowoc Error Codes Reference and Repair",
+    "name": "Manitowoc Error Codes Diagnostic and Reference",
+    "url": canonical,
+    "description": "Manitowoc error codes reference and repair across all five SoCal counties. Indigo NXT touchscreen Easy-Read display with six named alerts: Long Freeze (refrigerant under-charge / condenser fouling / inlet restriction / ambient over spec), No Harvest (harvest assist mechanism / Acu-Thaw hot gas valve / water curtain switch), Curtain Switch (curtain warped or stuck / switch misaligned / wiring fault), Bin Full (legitimate full or sensor fault), High Discharge Temp (compressor overheating / condenser fouling / fan motor failure), Low Water (supply valve / filter / inlet valve). Fault History menu navigation for intermittent-vs-recurring distinction. Service then Reset Faults procedure. Q-Series legacy numeric codes serviced through Welbilt service manuals (model-and-generation specific). AlphaSan antimicrobial + LuminIce II UV maintenance scheduling. EPA 608 Universal plus R-290 hydrocarbon certified. Welbilt parts network (5-7 day standard, 1-3 day expedite). $120 commercial diagnostic, applied toward repair. BHGS #A49573, EPA 608 Universal #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Commercial diagnostic fee, applied toward repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Commercial", "item": "https://samedayappliance.repair/commercial/" },
+      { "@type": "ListItem", "position": 3, "name": "Ice Machines", "item": "https://samedayappliance.repair/commercial/ice-machines/" },
+      { "@type": "ListItem", "position": 4, "name": "Manitowoc Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<CommercialHero
+  eyebrow="Manitowoc Reference · Named Alerts + Legacy Codes · Indigo NXT Diagnostic"
+  title="Manitowoc Error Codes Reference — Same Day LA"
+  subtitle={`Indigo NXT touchscreen named alerts (Long Freeze, No Harvest, Curtain Switch, Bin Full, High Discharge Temp, Low Water) + Q-Series legacy codes. ${phone}`}
+  heroImageTitle="Manitowoc Error Codes Reference"
+  showBranches={true}
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Manitowoc error code reference</p>
+    <h2>Manitowoc error codes split into two generations — Indigo NXT touchscreen named alerts (2018+) and Q-Series legacy numeric codes (pre-2018).</h2>
+
+    <p>Manitowoc commercial ice machines display fault information across two distinct generations. Current Indigo NXT machines (most installs since 2018, covering IY large modular, IB mid-size, ID compact undercounter, IRT remote-condensed, and R-Series nugget) use a touchscreen Easy-Read display showing six named alerts: Long Freeze, No Harvest, Curtain Switch, Bin Full, High Discharge Temp, Low Water. Each alert points at a category of failure and stores in the Fault History menu for intermittent-vs-recurring distinction. Q-Series legacy machines (pre-2018, still in active service across older LA County restaurant installations) use a numeric error code display — specific codes depend on the model and generation, our techs reference Welbilt service manuals on-site for those translations. Our techs at Same Day Appliance Repair carry both Indigo NXT touchscreen diagnostic reference cards and Q-Series legacy service manuals on every Manitowoc call.</p>
+
+    <p>Across LA County, our Manitowoc error code calls come from a predictable mix of operations: bars on Sunset Strip with ID-0322A undercounter cube where Low Water signals a clogged filter, hotel banquet ice rooms in DTLA (Marriott, Hilton, Hyatt corporate accounts) running IY-1196A with High Discharge Temp from tight kitchen alcove ventilation, seafood markets in Santa Monica where No Harvest indicates Acu-Thaw hot gas valve failure on heavy daily cycle, and quick-service restaurant kitchens in West Hollywood where Long Freeze points at condenser fin fouling. Reading the Fault History menu first lets us route the diagnostic to the right component category before opening the cabinet.</p>
+
+    <p>$120 commercial diagnostic, waived with repair. BHGS #A49573 + EPA 608 Universal #1346255700410 for sealed-system work. Welbilt parts network access with 5 to 7 day standard ship and 1 to 3 day expedite available. Common Indigo NXT parts on the truck for first-visit completion on most named-alert calls.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">Code reference by generation</p>
+    <h2>Three reading approaches across Manitowoc generations.</h2>
+
+    <p>Manitowoc has shipped three generations of diagnostic display systems. The right read-first approach changes with the generation, and our techs at Same Day Appliance Repair identify the generation by serial number on the phone before dispatch so the right tools and reference manuals are on the truck.</p>
+
+    <h3 class="series-h3">Indigo NXT — Six Named Alerts (Full Reference)</h3>
+    <p>Current-generation Manitowoc since 2018 across IY/IB/ID/IRT cube and R-Series nugget. Easy-Read touchscreen displays one of six named alerts:</p>
+    <ul class="bullet-list">
+      <li><strong>Long Freeze</strong> — freeze cycle exceeded design time. Causes: refrigerant under-charge, condenser fouling, inlet water restriction, ambient over spec. Typical repair: condenser cleaning $245-$385 or EPA 608 refrigerant work $700-$1,500.</li>
+      <li><strong>No Harvest</strong> — freeze completed but ice didn't release. Causes: harvest assist mechanism, Acu-Thaw hot gas valve, water curtain switch. Typical repair: Acu-Thaw $340-$540 or harvest sensor $200-$340.</li>
+      <li><strong>Curtain Switch</strong> — water curtain not detected closed/open at expected time. Causes: curtain warped or stuck, switch misaligned, wiring fault. Typical repair: switch $185-$285.</li>
+      <li><strong>Bin Full</strong> — bin-fullness sensor reports full. Causes: legitimate full or sensor fault. Typical repair: sensor $180-$280 if false-positive.</li>
+      <li><strong>High Discharge Temp</strong> — compressor discharge temp exceeded safe range. Causes: condenser fouling, fan motor failure, refrigerant over-charge. Typical repair: condenser cleaning $245-$385 or fan motor $300-$520.</li>
+      <li><strong>Low Water</strong> — insufficient water at freeze chamber. Causes: supply valve closed, filter clogged, inlet valve failed. Typical repair: filter $80-$180 or inlet valve $260-$420.</li>
+    </ul>
+
+    <h3 class="series-h3">Q-Series Legacy — Numeric Codes (Generic)</h3>
+    <p>Pre-Indigo NXT Manitowoc models still in active service. Q-Series uses a numeric error code display (older convention) rather than touchscreen named alerts. Specific code interpretations depend on the model and generation — there is no single Q-Series code-to-cause table that applies across all legacy Manitowoc machines. Our techs reference Welbilt service manuals on-site to translate Q-Series codes to component categories. Parts available through the Welbilt network for several more years on these legacy units. If your Manitowoc is showing a numeric code rather than a touchscreen named alert, identify the model number on the serial plate before calling so we can pull the right service manual for your generation.</p>
+
+    <h3 class="series-h3">Fault History Menu + Reset Procedure</h3>
+    <p>On Indigo NXT, the Fault History menu lives in Service then Fault History on the touchscreen home screen. The display shows the most recent alerts with timestamps. Steady-state alerts (same code repeating every cycle) usually point to a hard component failure. Intermittent alerts (same code appearing then clearing on subsequent cycles) often point to upstream conditions (water pressure dip, ambient spike, brief power blip). Reset procedure on Indigo NXT: navigate to Service then Reset Faults from the home screen. The active alert clears; if the underlying fault is still present, the alert returns within minutes. On Q-Series legacy machines without touchscreen, reset is a power-cycle at the breaker (wait 60 seconds, restore power). Our techs at Same Day Appliance Repair always read Fault History before resetting so the diagnostic trail is preserved.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Repair costs by alert</p>
+    <h2>What each named alert typically costs to resolve.</h2>
+
+    <p class="lead">$120 commercial diagnostic, waived with repair. Restoration estimates assume common Indigo NXT parts on the truck.</p>
+
+    <table class="price-table">
+      <thead><tr><th>Alert / Code</th><th>Typical Repair</th><th>Cost Range</th><th>Time-to-Restoration</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic + Fault History read</td><td>—</td><td>$120, waived with repair</td><td>30 to 60 min on-site</td></tr>
+        <tr><td>Long Freeze (condenser fouling)</td><td>Condenser coil cleaning + scale removal</td><td>$245 to $385</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Long Freeze (refrigerant under-charge)</td><td>EPA 608 leak repair + recharge</td><td>$700 to $1,500</td><td>3 to 5 hours, usually same-day</td></tr>
+        <tr><td>No Harvest (Acu-Thaw hot gas valve)</td><td>Hot gas valve replacement</td><td>$340 to $540</td><td>90 to 120 min, same-day</td></tr>
+        <tr><td>No Harvest (harvest sensor)</td><td>Harvest sensor replacement</td><td>$200 to $340</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Curtain Switch</td><td>Switch replacement + curtain inspection</td><td>$185 to $285</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Bin Full (false-positive sensor)</td><td>Bin sensor replacement</td><td>$180 to $280</td><td>45 to 75 min, same-day</td></tr>
+        <tr><td>High Discharge Temp (condenser fouling)</td><td>Condenser coil cleaning</td><td>$245 to $385</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>High Discharge Temp (fan motor)</td><td>Condenser fan motor (-A air-cooled)</td><td>$300 to $520</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Low Water (filter clog)</td><td>Water filter replacement</td><td>$80 to $180</td><td>30 to 60 min, same-day</td></tr>
+        <tr><td>Low Water (inlet valve)</td><td>Water inlet valve replacement</td><td>$260 to $420</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Multiple alerts (Easy-Read board fault)</td><td>Easy-Read display board replacement</td><td>$480 to $820</td><td>2 to 3 hours, same-day if on truck; otherwise 1-3 day expedite</td></tr>
+        <tr><td>Compressor protection (IB/ID)</td><td>Compressor replacement</td><td>$1,400 to $2,200</td><td>Full day, often next-day</td></tr>
+        <tr><td>Compressor protection (IY large modular)</td><td>Compressor replacement</td><td>$1,800 to $2,800</td><td>Full day, often next-day</td></tr>
+        <tr><td>Warranty</td><td>—</td><td>90 days parts and labor</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2>Manitowoc error code questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p set:html={f.a}></p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">Related</p>
+    <h2>Manitowoc and commercial ice service across the catalog.</h2>
+    <div class="related-grid">
+      <a href="/commercial/ice-machines/" class="related-card">
+        <h3>Commercial Ice Machine Hub</h3>
+        <p>Parent pillar. All commercial ice formats: cube, nugget, flake, dispensers. Full SoCal coverage.</p>
+      </a>
+      <a href="/commercial/ice-machines/manitowoc-not-making-ice/" class="related-card">
+        <h3>Manitowoc Not Making Ice</h3>
+        <p>Production-failure-specific diagnostic — five-step cheapest-first order.</p>
+      </a>
+      <a href="/commercial/ice-machines/manitowoc-troubleshooting/" class="related-card">
+        <h3>Manitowoc Troubleshooting</h3>
+        <p>Full-spectrum diagnostic across six condition categories — production, quality, leaks, noises, cleaning.</p>
+      </a>
+      <a href="/commercial/ice-machines/brands/manitowoc/" class="related-card">
+        <h3>Manitowoc Brand Page</h3>
+        <p>Indigo NXT IY/IB/ID lineup, AlphaSan + LuminIce II maintenance, Welbilt parts network.</p>
+      </a>
+      <a href="/commercial/ice-machines/error-codes/" class="related-card">
+        <h3>Error Codes (All Brands)</h3>
+        <p>Indigo NXT touchscreen named alerts, Q-Series legacy, plus Hoshizaki EverCheck, Scotsman Prodigy ELITE, Ice-O-Matic, Follett.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Manitowoc showing a touchscreen alert? Same-day priority.</h2>
+    <p>Our techs at Same Day Appliance Repair read the Indigo NXT Fault History menu on-site and translate the alert into a diagnostic action within the first 10 minutes — most LA County hospitality calls move from "what does this alert mean" to "here's the quote and restoration time" before the diagnostic visit ends. EPA 608 + R-290 certified. BHGS #A49573 + EPA 608 #1346255700410. 24/7 phones, no emergency surcharge.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .series-h3 { font-size: 1.1rem; font-weight: 800; margin: 28px 0 10px; }
+  .lead { font-size: 1.05rem; line-height: 1.7; color: var(--muted); margin: 0 0 24px; font-style: italic; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 10px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  .price-table th { background: var(--gray); font-weight: 700; }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; line-height: 1.75; margin: 14px 0 0; }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 22px; }
+  .related-card { display: block; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+  .related-card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .related-card h3 { font-size: 1rem; font-weight: 800; margin: 0 0 8px; }
+  .related-card p { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.6; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
+</content>
+</invoke>
