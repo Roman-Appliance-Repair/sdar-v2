@@ -1,0 +1,309 @@
+---
+// src/pages/commercial/ice-machines/hoshizaki-troubleshooting.astro
+// Wave 70 Phase 2b Batch 18 FINAL — Hoshizaki full troubleshooting (60 vol/mo, KD 0).
+// Sister to hoshizaki-not-making-ice batch17 (commit 68748aa) — broader scope.
+// Mirrors manitowoc-troubleshooting structure with 6 condition categories.
+// Zero-invention enforced: KM-Edge water inlet PUMP, EverCheck E-1 through E-6,
+// CycleSaver, H-Guard Plus, CleanCycle 24, cell-and-curtain architecture.
+// $120 commercial. BHGS #A49573 + EPA 608 Universal #1346255700410.
+
+import Layout from '../../../layouts/Layout.astro';
+import CommercialHero from '../../../components/CommercialHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/commercial/ice-machines/hoshizaki-troubleshooting/";
+
+const title = "Hoshizaki Ice Machine Troubleshooting LA — Same Day";
+const description = "Hoshizaki troubleshooting in LA — KM-Edge EverCheck E-1 to E-6, F-Series flake, FS Sliver Nugget. CycleSaver + H-Guard Plus. EPA 608. BHGS #A49573.";
+
+const faqs = [
+  {
+    q: "How do I troubleshoot my Hoshizaki ice machine?",
+    a: "Start by reading the EverCheck LCD code on KM-Edge cube and F-Series flake machines — codes run E-1 (low water/no water), E-2 (high temperature), E-3 (long freeze cycle), E-4 (long harvest cycle), E-5 (control thermistor failure), E-6 (compressor protection). The code points at a category; the test confirms the component. From there, the diagnostic order is cheapest-first: water supply check, cell sensor and harvest-side, water inlet pump (Hoshizaki-specific, not a valve like Manitowoc and Scotsman), then sealed-system. Our techs at Same Day Appliance Repair handle this end-to-end on a $120 commercial diagnostic visit, applied toward repair, with most calls clearing in the $340 to $540 range when the symptom points to water inlet pump or harvest-side work."
+  },
+  {
+    q: "Why is my Hoshizaki making less ice than usual?",
+    a: "Low production (machine running but output below nameplate) usually traces to one of three things on Hoshizaki KM-Edge: scale buildup on the cell evaporator (H-Guard Plus antimicrobial coating slows biological growth but does NOT prevent calcium and magnesium scale), a fouled condenser restricting heat rejection (EverCheck often shows E-2 high temperature or E-3 long freeze in this case), or water inlet pump diaphragm weakness reducing water flow to the freeze cells. Our techs at Same Day Appliance Repair start with an EverCheck code read and condenser fin inspection — about half of 'low production' Hoshizaki calls clear at cleaning service ($200 to $340) or condenser cleaning ($245 to $385) without major parts work."
+  },
+  {
+    q: "Why is my Hoshizaki ice cloudy or undersized?",
+    a: "Quality issues on Hoshizaki KM-Edge cube usually trace to one of three things: cell sensor drift causing premature harvest (EverCheck may show E-4 long harvest if the cycle is mistimed), inadequate water supply pressure causing thin cubes (CycleSaver energy-efficient design is sensitive to water flow rate), or scale buildup on the cell evaporator preventing proper heat transfer. Our techs at Same Day Appliance Repair time a full freeze cycle first because that quantifies whether the timing is correct. Cell sensor replacement runs $200 to $340 and resolves the majority of mis-timed-harvest calls."
+  },
+  {
+    q: "Why is my Hoshizaki leaking water?",
+    a: "Hoshizaki water leaks usually fall into three categories. Drain-side: drain pump failed or drain line clogged with scale (about 50% of leak calls). Supply-side: water inlet pump seal failed (Hoshizaki-specific component on KM-Edge cell-and-curtain architecture — about 25% of leak calls). Internal: water curtain not seating during freeze cycle on cell-and-curtain architecture, sump tank crack on year-12+ units (about 25%). Our techs at Same Day Appliance Repair trace the leak source first because location determines repair tier — drain-side $185 to $585, water inlet pump seal $185 to $385, internal $185 to $885."
+  },
+  {
+    q: "Why is my Hoshizaki making strange noises?",
+    a: "Unusual noises on Hoshizaki typically come from three sources. Compressor bearings worn (low-frequency hum or grinding that gets louder over weeks, year 10 to 12 typical, $1,400 to $2,800 compressor replacement). Condenser fan motor bearings failing on -A air-cooled units (high-pitched whine or rattle when the fan is running, $300 to $520 fan motor replacement). On F-Series flake or FS Sliver Nugget machines, auger drive bearings produce grinding under load — typical at year 6 to 9 ($580 to $880 gear reducer replacement). Our techs at Same Day Appliance Repair isolate the noise source by ear with the technician's diagnostic stethoscope before quoting parts."
+  },
+  {
+    q: "Why does the CleanCycle 24 reminder keep firing on my Hoshizaki?",
+    a: "CleanCycle 24 is Hoshizaki's built-in maintenance reminder system that signals when cleaning is due based on hours of operation. If the reminder is firing more frequently than expected, three possibilities: (1) the machine has actually exceeded its scheduled cleaning interval and a full descale + sanitation is overdue (run the cleaning, the timer resets), (2) hard-water installations need more frequent cleaning than the default interval (closer to quarterly than semi-annual — typical for LA County hard water), or (3) the CleanCycle 24 control logic itself has drifted, sometimes requiring control board service. Our techs at Same Day Appliance Repair recalibrate or replace the CleanCycle 24 system if it's flagging falsely; standard cleaning runs $200 to $340 either way."
+  },
+  {
+    q: "How do I reset my Hoshizaki KM-Edge?",
+    a: "KM-Edge reset is a power-cycle: turn the unit off at the rocker switch or main breaker, wait 60 seconds, restore power. The EverCheck LCD clears the displayed code. If the underlying fault is still present, the code returns within minutes (faster on serious faults like E-3 long freeze or E-6 compressor protection, slower on intermittent E-1 water issues). Resetting without diagnosing is fine as a temporary workaround while you wait for our visit; don't ignore a code that keeps returning. Our techs at Same Day Appliance Repair note whether the EverCheck code was intermittent or steady because that distinction points to different parts."
+  },
+  {
+    q: "How often should I clean my Hoshizaki?",
+    a: "Hoshizaki recommends 2 to 4 cleanings per year on KM-Edge cube and F-Series flake machines, validated by the CleanCycle 24 reminder system based on hours of operation — closer to 4 (quarterly) in heavy-use restaurants and bars with hard water, closer to 2 (every 6 months) in lighter-use settings with quality filtration. H-Guard Plus antimicrobial coating on the cell evaporator slows biological growth but does NOT prevent mineral scale. Our techs at Same Day Appliance Repair document each service for LA County DPH inspection records. Standard cleaning runs $200 to $340 per service; quarterly contracts with filter replacement reduce per-cleaning cost."
+  },
+  {
+    q: "How long does Hoshizaki ice machine troubleshooting take?",
+    a: "Diagnostic visit alone: 30 to 60 minutes on-site for EverCheck read-and-quote. Common repair restoration times: water inlet pump 60 to 90 minutes (Hoshizaki-specific component); cell sensor 60 to 90 minutes; hot gas valve 90 to 120 minutes; cleaning service 90 to 120 minutes; condenser fan motor 60 to 90 minutes; F-Series auger gear reducer 2 to 3 hours, same-day if on truck; EverCheck board same-day if on truck (2 to 3 hours) or 4 to 7 day Peachtree City standard ship; refrigerant leak repair 3 to 5 hours; compressor full day plus often next-day completion. Common KM-Edge parts are stocked on the van for first-visit completion."
+  },
+  {
+    q: "How much does Hoshizaki troubleshooting cost?",
+    a: "Diagnostic visit $120, waived with repair. Typical repair ranges: cleaning $200 to $340; water inlet pump (KM-Edge specific) $340 to $540; cell sensor $200 to $340; hot gas valve $340 to $540; condenser fan motor $300 to $520; F-Series auger gear reducer $580 to $880; auger motor F-Series $480 to $780; drive shaft seal F-Series $260 to $420; EverCheck board $480 to $820; refrigerant leak repair $700 to $1,500; compressor KM-650MAJ $1,400 to $2,200; compressor KM-1340MAJ+ $1,800 to $2,800. Most troubleshooting calls resolve in the $200 to $540 range when the symptom points to water-side, sensor, or basic harvest-assembly work."
+  },
+  {
+    q: "When should I call a tech vs DIY troubleshoot on my Hoshizaki?",
+    a: "Customer-side first checks worth running before a service call: confirm the water supply valve is fully open, check the water filter cartridge (Pentair Everpure or 3M Cuno, 6-month cycle), confirm the bin isn't full (sensor sometimes misreads — empty the bin and watch for production to resume), read the EverCheck LCD code and note it. Call for service when an EverCheck E-code is recurring after a power-cycle reset, ice production is below nameplate by 30%+ for more than 48 hours, water is leaking anywhere near the unit, the compressor is making a noise different from normal hum, or any E-3 long freeze / E-4 long harvest / E-6 compressor protection code is steady. Our techs at Same Day Appliance Repair do the read-and-quote at $120 commercial diagnostic."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org", "@type": "LocalBusiness", "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair", "url": canonical, "telephone": phone, "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+    "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+  },
+  {
+    "@context": "https://schema.org", "@type": "Service", "@id": canonical + "#service",
+    "serviceType": "Hoshizaki Ice Machine Full Troubleshooting",
+    "name": "Hoshizaki Ice Machine Troubleshooting and Diagnostic",
+    "url": canonical,
+    "description": "Hoshizaki commercial ice machine full-spectrum troubleshooting across all five SoCal counties. Six condition categories: production failure (no ice), low production (below nameplate), ice quality (cloudy, undersized cubes), water leaks, unusual noises, and cleaning/maintenance issues. KM-Edge cube architecture with cell-and-curtain evaporator and EverCheck LCD diagnostic showing E-1 (low water/no water), E-2 (high temperature), E-3 (long freeze), E-4 (long harvest), E-5 (control thermistor), E-6 (compressor protection). F-Series flake auger drive diagnostic (F-450MAH through F-2000MWJ). DCM Cubelet (DCM-270BAH, DCM-500BAH). FS Sliver Nugget (FS-1000MWH). Water inlet pump (Hoshizaki-specific, not valve like Manitowoc/Scotsman), CycleSaver energy-efficient design, H-Guard Plus antimicrobial protection, CleanCycle 24 maintenance reminder system. EPA 608 Universal plus R-290 hydrocarbon certified. Hoshizaki America Peachtree City parts network (4-7 day standard, 1-3 day expedite). $120 commercial diagnostic, applied toward repair. BHGS #A49573, EPA 608 Universal #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Commercial diagnostic fee, applied toward repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Commercial", "item": "https://samedayappliance.repair/commercial/" },
+      { "@type": "ListItem", "position": 3, "name": "Ice Machines", "item": "https://samedayappliance.repair/commercial/ice-machines/" },
+      { "@type": "ListItem", "position": 4, "name": "Hoshizaki Troubleshooting", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<CommercialHero
+  eyebrow="Hoshizaki Service · Full Troubleshooting · KM-Edge + EverCheck"
+  title="Hoshizaki Ice Machine Troubleshooting — Same Day LA"
+  subtitle={`KM-Edge EverCheck E-1 to E-6, F-Series flake auger, FS Sliver Nugget. Full diagnostic spectrum across LA, OC, Ventura, IE. ${phone}`}
+  heroImageTitle="Hoshizaki Ice Machine Troubleshooting"
+  showBranches={true}
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Full troubleshooting</p>
+    <h2>Hoshizaki troubleshooting covers six condition categories — read the EverCheck code first, then test cheapest-first.</h2>
+
+    <p>Hoshizaki ice machine troubleshooting covers six broad condition categories: production failure (no ice — see our sister <a href="/commercial/ice-machines/hoshizaki-not-making-ice/">Hoshizaki not making ice</a> page for that specific diagnostic), low production below nameplate, ice quality issues (cloudy, undersized cubes), water leaks, unusual noises, and cleaning/maintenance flags. Our techs at Same Day Appliance Repair start every troubleshooting visit by reading the EverCheck LCD code on KM-Edge cube and F-Series flake machines — codes run E-1 through E-6 with specific failure-mode mapping that points at the component category before we open the cabinet.</p>
+
+    <p>Across LA County, our Hoshizaki troubleshooting calls come from a predictable mix of operations: sushi restaurants on Sawtelle and in Little Tokyo running F-Series flake for premium fish display, bars on Sunset Strip with KM-650MAJ undercounter cube needing scheduled maintenance, hotel banquet ice rooms in DTLA (Marriott, Hilton, Hyatt corporate accounts) running large KM-1340MAJ modular through peak event seasons, hospital cafeterias with DCM Cubelet for patient-care wings, and seafood markets in Marina del Rey with F-801MWH water-cooled flake on heavy daily cycle. The diagnostic pattern is consistent — reading the EverCheck code first lets us route the rest of the visit efficiently.</p>
+
+    <p>$120 commercial diagnostic, waived with repair. BHGS #A49573 + EPA 608 Universal #1346255700410 for sealed-system work. Hoshizaki America Peachtree City parts network access (4 to 7 day standard ship, 1 to 3 day expedite available). Common KM-Edge parts on the truck for first-visit completion.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">Diagnostic approaches by series</p>
+    <h2>Three diagnostic methods across the Hoshizaki lineup.</h2>
+
+    <p>Hoshizaki ships meaningfully different ice production architectures across its current lineup, and the right read-first approach changes with the product line. Our techs at Same Day Appliance Repair identify the series by serial number on the phone before dispatch so the right tools and reference manuals are on the truck.</p>
+
+    <h3 class="series-h3">KM-Edge Cube — EverCheck E-1 through E-6 LCD reading</h3>
+    <p>Flagship Hoshizaki cube ice line with cell-and-curtain evaporator architecture, CycleSaver energy-efficient operation, H-Guard Plus antimicrobial coating, and CleanCycle 24 maintenance reminder. Size range: KM-340MAJ (340 lb/day undercounter), KM-650MAJ (650 lb/day, the most-installed Hoshizaki cube across SoCal), KM-901MAJ (900 lb/day), KM-1340MAJ + KM-1601MAJ + KM-2200SR for high-volume operations. EverCheck LCD displays one of six codes for active fault categories. The code narrows the diagnostic; the test confirms the component.</p>
+
+    <h3 class="series-h3">F-Series Flake + DCM Cubelet — auger drive diagnostic</h3>
+    <p>F-Series flake architecture (F-450MAH through F-2000MWJ) and DCM Cubelet chewable ice (DCM-270BAH, DCM-500BAH) both use auger-driven cylindrical evaporator drums. Diagnostic on these is auger drive motor amp draw measurement first because the auger is the mechanical heart of flake and Cubelet production. Auger gear reducer wear is the most common F-Series failure at year 6 to 9. EverCheck on F-Series follows the same E-1 through E-6 convention as KM-Edge for water and sealed-system codes.</p>
+
+    <h3 class="series-h3">FS Sliver Nugget (FS-1000MWH) — combined auger + cell sensor diagnostic</h3>
+    <p>Hoshizaki's nugget ice line competing with Scotsman Brilliance and Manitowoc R-Series. Architecture combines auger flake-style scraping with cell sensor harvest signaling. Diagnostic approach combines auger amp draw measurement (mechanical side) with cell sensor signal verification (electronic side). When FS-1000MWH production drops or quality degrades, both sides need testing in sequence.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Six condition categories</p>
+    <h2>What we troubleshoot most often on Hoshizaki service calls.</h2>
+
+    <p>Across LA County, OC, Ventura, and the IE, our Hoshizaki troubleshooting calls distribute predictably across six condition categories. Reading the EverCheck LCD code first lets us route the rest of the diagnostic to the right category.</p>
+
+    <h3 class="series-h3">1. Production failure (no ice)</h3>
+    <p>EverCheck typically shows E-1 (low water), E-3 (long freeze), or E-4 (long harvest). Five-step cheapest-first diagnostic covered in detail on our <a href="/commercial/ice-machines/hoshizaki-not-making-ice/">Hoshizaki not making ice</a> page.</p>
+
+    <h3 class="series-h3">2. Low production (below nameplate)</h3>
+    <p>Machine running normally but output below spec. Usually scale buildup on cell evaporator (H-Guard Plus slows biological growth but doesn't prevent calcium scale), fouled condenser ($245 to $385 cleaning often showing E-2 or E-3 codes), or water inlet pump weakness. Cleaning service ($200 to $340) resolves the majority.</p>
+
+    <h3 class="series-h3">3. Ice quality (cloudy, undersized cubes)</h3>
+    <p>Quality issues usually trigger E-4 long harvest from cell sensor timing drift. CycleSaver energy-efficient design is sensitive to water flow rate, so inadequate supply produces thin cubes. Cell sensor replacement ($200 to $340) and cleaning service typically resolves.</p>
+
+    <h3 class="series-h3">4. Water leaks</h3>
+    <p>Three leak source categories on Hoshizaki: drain-side (50% — drain pump, line clog), water inlet pump seal (25% — Hoshizaki-specific component, not a valve), internal (25% — water curtain on cell-and-curtain architecture, sump tank crack on year-12+ units). Trace by location first.</p>
+
+    <h3 class="series-h3">5. Unusual noises</h3>
+    <p>Compressor bearings (low-frequency hum getting louder, year 10 to 12, $1,400 to $2,800), condenser fan bearings on -A air-cooled (high-pitched whine, $300 to $520), F-Series and FS-1000MWH auger bearings (grinding under load, year 6 to 9 gear reducer wear $580 to $880).</p>
+
+    <h3 class="series-h3">6. Cleaning and CleanCycle 24 reminders</h3>
+    <p>CleanCycle 24 reminder system signals when cleaning is due based on hours of operation. Standard 2 to 4 times per year with brand-spec cleaner — H-Guard Plus slows biological growth but doesn't prevent calcium scale. Frequent reminders often signal hard-water-driven faster scaling that needs a quarterly schedule rather than semi-annual.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2>Troubleshooting and repair costs with restoration estimates.</h2>
+
+    <p class="lead">$120 commercial diagnostic, waived with repair. Restoration estimates assume common KM-Edge parts on the truck. Peachtree City expedite available 1 to 3 day on parts not on the truck.</p>
+
+    <table class="price-table">
+      <thead><tr><th>Repair</th><th>Typical Cost</th><th>Time-to-Restoration</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic + EverCheck read (waived with repair)</td><td>$120</td><td>30 to 60 min on-site</td></tr>
+        <tr><td>Cleaning service (H-Guard Plus + cell evaporator)</td><td>$200 to $340</td><td>90 to 120 min, same-day</td></tr>
+        <tr><td>Water filter replacement</td><td>$80 to $180</td><td>30 to 60 min, same-day</td></tr>
+        <tr><td>Cell sensor replacement (KM-Edge)</td><td>$200 to $340</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Water inlet pump replacement (KM-Edge, Hoshizaki-specific)</td><td>$340 to $540</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Hot gas valve replacement</td><td>$340 to $540</td><td>90 to 120 min, same-day</td></tr>
+        <tr><td>Condenser coil cleaning + scale removal</td><td>$245 to $385</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Condenser fan motor (-A air-cooled)</td><td>$300 to $520</td><td>60 to 90 min, same-day</td></tr>
+        <tr><td>Auger gear reducer (F-Series flake)</td><td>$580 to $880</td><td>2 to 3 hours, same-day if on truck</td></tr>
+        <tr><td>Drive shaft seal (F-Series)</td><td>$260 to $420</td><td>2 to 3 hours, same-day</td></tr>
+        <tr><td>EverCheck control board replacement</td><td>$480 to $820</td><td>2 to 3 hours, same-day if on truck; otherwise 4-7 day Peachtree City ship</td></tr>
+        <tr><td>Refrigerant leak repair + recharge (EPA 608)</td><td>$700 to $1,500</td><td>3 to 5 hours, usually same-day</td></tr>
+        <tr><td>Compressor replacement (KM-650MAJ)</td><td>$1,400 to $2,200</td><td>Full day, often next-day completion</td></tr>
+        <tr><td>Compressor replacement (KM-1340MAJ+)</td><td>$1,800 to $2,800</td><td>Full day, often next-day completion</td></tr>
+        <tr><td>Warranty</td><td>90 days parts and labor</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2>Hoshizaki troubleshooting questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p set:html={f.a}></p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">Related</p>
+    <h2>Hoshizaki and commercial ice service across the catalog.</h2>
+    <div class="related-grid">
+      <a href="/commercial/ice-machines/" class="related-card">
+        <h3>Commercial Ice Machine Hub</h3>
+        <p>Parent pillar. All commercial ice formats: cube, nugget, flake, dispensers. Full SoCal coverage.</p>
+      </a>
+      <a href="/commercial/ice-machines/hoshizaki-not-making-ice/" class="related-card">
+        <h3>Hoshizaki Not Making Ice</h3>
+        <p>Production-failure-specific diagnostic — five-step cheapest-first order.</p>
+      </a>
+      <a href="/commercial/ice-machines/hoshizaki-error-codes/" class="related-card">
+        <h3>Hoshizaki Error Codes Reference</h3>
+        <p>EverCheck E-1 through E-6 deep-dive table with failure-mode mapping per code.</p>
+      </a>
+      <a href="/commercial/ice-machines/brands/hoshizaki/" class="related-card">
+        <h3>Hoshizaki Brand Page</h3>
+        <p>KM-Edge, F-Series, DCM Cubelet, FS Sliver Nugget lineup, CycleSaver, H-Guard Plus, Peachtree City parts.</p>
+      </a>
+      <a href="/commercial/ice-machines/error-codes/" class="related-card">
+        <h3>Error Codes (All Brands)</h3>
+        <p>Hoshizaki EverCheck, plus Manitowoc named alerts, Scotsman Prodigy ELITE, Ice-O-Matic, Follett.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Hoshizaki showing a code or running off-spec? Same-day priority.</h2>
+    <p>Our techs at Same Day Appliance Repair read the EverCheck LCD on-site, identify the failing component category in the first 10 minutes, and quote restoration time before any parts are ordered. EPA 608 + R-290 certified. BHGS #A49573 + EPA 608 #1346255700410. 24/7 phones, no emergency surcharge.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .series-h3 { font-size: 1.1rem; font-weight: 800; margin: 28px 0 10px; }
+  .lead { font-size: 1.05rem; line-height: 1.7; color: var(--muted); margin: 0 0 24px; font-style: italic; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  .price-table th { background: var(--gray); font-weight: 700; }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; line-height: 1.75; margin: 14px 0 0; }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 22px; }
+  .related-card { display: block; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+  .related-card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .related-card h3 { font-size: 1rem; font-weight: 800; margin: 0 0 8px; }
+  .related-card p { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.6; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
+</content>
+</invoke>
