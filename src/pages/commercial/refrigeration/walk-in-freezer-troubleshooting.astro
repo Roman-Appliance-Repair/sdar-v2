@@ -1,0 +1,365 @@
+---
+// src/pages/commercial/refrigeration/walk-in-freezer-troubleshooting.astro
+// Wave 70 Phase 2d Batch 23 — Walk-in freezer troubleshooting sister page.
+// Target: "walk in freezer troubleshooting" 10 vol/mo, AI Overview + sitelinks,
+// CPC $400 (highest CPC in batch). Sister page для walk-in-cooler-not-cooling
+// canary (commit 77df6b8). Different failure profile: -10°F operational target,
+// 0°F federal USDA frozen storage, defrost cycle critical, ice buildup primary
+// failure mode, snap-disc termination thermostat.
+// Cross-verified from:
+//   - walk-in-cooler-not-cooling.astro canary
+//   - walk-in-freezer-repair.astro existing pillar (5,921 wd)
+// $120 commercial diagnostic. BHGS #A49573 + EPA 608 Universal + R-290.
+
+import Layout from '../../../layouts/Layout.astro';
+import CommercialHero from '../../../components/CommercialHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/commercial/refrigeration/walk-in-freezer-troubleshooting/";
+
+const title = "Walk-In Freezer Troubleshooting LA — Same Day Commercial";
+const description = "Walk-in freezer not holding -10°F? LA same-day defrost system, compressor, condenser diagnostic. Master-Bilt, Norlake, Kolpak. EPA 608. $120 dx.";
+
+const faqs = [
+  {
+    q: "Why is my walk-in freezer not freezing?",
+    a: "A commercial walk-in freezer that won't hold -10°F operational or 0°F USDA federal frozen storage threshold usually traces to one of three root causes our techs at Same Day Appliance Repair diagnose first across LA commercial kitchens. (1) Defrost system failure — defrost timer ($280 to $440) not initiating cycle, defrost heater ($380 to $580) open circuit, or snap-disc defrost termination thermostat stuck. About 35 to 40 percent of walk-in freezer troubleshooting calls. (2) Iced-over evaporator coil — secondary effect of defrost failure, the coil becomes a block of ice over 24 to 72 hours and stops transferring heat into the refrigerant. (3) Compressor failure year 7 to 10 typical wear curve — two-stage compressors used on low-temperature walk-in applications wear faster than single-stage refrigerator equivalents. $1,800 to $3,200 walk-in scale single-stage, $2,400 to $3,800 two-stage. We test cheap-first with visual inspection plus snap-disc continuity plus head pressure measurement."
+  },
+  {
+    q: "What temperature should a walk-in freezer maintain?",
+    a: "USDA federal frozen storage standard (7 CFR 250.404) requires frozen TCS (Time/Temperature Control for Safety) food products held at 0°F or below. Most commercial walk-in freezers operationally target -10°F to allow recovery headroom — if a unit holds at exactly 0°F at all times, normal door openings during service push product temperature above the federal threshold faster than the system can recover. California Retail Food Code (CalCode) follows federal USDA frozen storage standard for licensed food service operators. CalCode's 41°F cold-holding threshold applies to refrigerators, not freezers. Our techs at Same Day Appliance Repair check both the operational -10°F setpoint and the 0°F federal floor on every walk-in freezer troubleshooting visit."
+  },
+  {
+    q: "How do I troubleshoot a walk-in freezer not getting cold enough?",
+    a: "Five-step cheap-first diagnostic our techs at Same Day Appliance Repair run on every walk-in freezer troubleshooting call. (1) Probe at product level to verify current product temperature against operator log entry — establishes USDA federal frozen storage compliance window. (2) Visual evaporator coil inspection inside the box — ice formation indicates defrost system failure (timer, heater, or snap-disc termination thermostat). (3) Visual condenser inspection — grease, dust, lint on fins resolves at $200 to $280 cleaning on roughly 20 percent of calls, no parts. (4) Compressor amp draw and head pressure measurement against data plate spec — two-stage compressor verification on low-temp applications, stuck in low-stage equals chronic warm freezer. (5) Door gasket plus door switch verification — warm humid air infiltration overwhelms defrost cycle, light heat load. Most diagnostics complete 25 to 40 minutes on-site."
+  },
+  {
+    q: "Why is my walk-in freezer's evaporator coil iced over?",
+    a: "Three causes our techs at Same Day Appliance Repair see for evaporator coil ice formation on commercial walk-in freezers. (1) Defrost system failure — most common single cause. Standard mechanical defrost timer initiates a heating cycle every 6 to 8 hours; when the timer fails ($280 to $440), the defrost heater open-circuits ($380 to $580), or the snap-disc termination thermostat sticks, frost accumulates until the coil becomes a block of ice. Walk-in freezer scale typically more severe than reach-in because lower operating temperature accelerates frost formation between cycles. (2) Low refrigerant charge — TXV or evaporator inlet drops below dew point, moisture in box air freezes on contact. $700 to $1,500 leak repair plus recharge with EPA 608 documentation. (3) Door gasket leak — warm humid LA kitchen air infiltrates continuously, moisture overwhelms defrost cycle capacity. $180 to $340 gasket replacement plus deep ice clear."
+  },
+  {
+    q: "What's a snap-disc defrost termination thermostat?",
+    a: "A snap-disc termination thermostat is a mechanical bimetal switch that terminates the defrost cycle once the evaporator coil reaches its design temperature (typically 40°F to 55°F for walk-in freezer applications). The snap-disc snaps open when temperature is exceeded, cutting power to the defrost heater. When the snap-disc fails stuck closed, the defrost heater continues running past the design termination point, wastes energy and accelerates coil wear. When the snap-disc fails stuck open, defrost cycle never initiates properly, evaporator coil ices over. Our techs at Same Day Appliance Repair test snap-disc continuity at room temperature and after controlled heating to verify proper switching. $140 to $260 replacement, accessed via evaporator panel."
+  },
+  {
+    q: "How fast can you respond to a walk-in freezer emergency in LA?",
+    a: "Same-day across LA County, Orange County, and Ventura County during business hours. Next-day Riverside County and San Bernardino County. Our techs at Same Day Appliance Repair prioritize commercial walk-in freezer emergencies because of federal USDA frozen storage exposure — restaurants, hotels, ice cream and frozen dessert operators, grocery chains, and ghost kitchens holding $5,000 to $15,000+ of frozen perishable inventory above the 0°F federal threshold. Calls during Friday evening service shifts, Saturday hospitality peak, and HACCP CCP exceedance events get pushed to the front of the queue. We coordinate temperature log documentation appropriate for USDA federal frozen storage compliance and LADPH inspection records at every visit."
+  },
+  {
+    q: "What does compressor replacement cost on a walk-in freezer?",
+    a: "Walk-in freezer compressor replacement varies by scale and compressor configuration. Single-stage walk-in freezer scale (1 HP through 5 HP): $1,800 to $3,200 all-in. Two-stage compressors used on lower-temperature freezer applications (commonly Copeland or Tecumseh — required for -10°F operational target at lower ambient conditions): $2,400 to $3,800. All include EPA 608 Universal refrigerant recovery, system evacuation to deep vacuum, new compressor installation, fresh refrigerant charge (R-404A commercial standard, R-448A or R-449A transitional, R-454A post-2024), pressure test, and federal compliance documentation. On year 12+ units with compressor failure, our techs at Same Day Appliance Repair walk through repair-versus-replace math with the operator — new walk-in freezer condensing unit installed runs $10,000 to $18,000, so compressor replacement at year 12 with otherwise healthy refrigeration components is often the correct economic call."
+  },
+  {
+    q: "Do you carry Master-Bilt, Norlake, Kolpak, Heatcraft, and Bohn walk-in freezer parts?",
+    a: "Common service parts on our trucks for first-visit completion across LA commercial walk-in freezer calls: condenser fan motors, evaporator fan motors, defrost timers (Paragon, Intermatic, Grasslin standard mechanical plus solid-state replacements), defrost heaters (Calrod element style), snap-disc defrost termination thermostats, door switches, door gaskets, and door heaters (low-wattage wire preventing door-frame frost). Heatcraft and Bohn refrigeration systems power most commercial walk-in freezers regardless of panel brand (Master-Bilt, Norlake, Kolpak). Copeland and Tecumseh compressors dominate single-stage and two-stage low-temperature applications. Less common parts — specific TXV models, custom-spec compressor units, custom panel components — order through manufacturer distribution, 3 to 7 day standard."
+  },
+  {
+    q: "What's the difference between walk-in cooler and walk-in freezer troubleshooting?",
+    a: "Same five-step diagnostic logic, different failure frequency distribution. Walk-in cooler holds at 38°F to 41°F (CalCode 41°F threshold) — primary failure is dirty condenser coil (25-30% of calls) followed by iced evaporator from defrost failure (20-25%). Walk-in freezer holds at -10°F operational with 0°F USDA federal floor — primary failure is defrost system (35-40% of calls) because lower operating temperature accelerates frost formation between cycles and increases defrost cycle stress. Walk-in freezers also use two-stage compressors more often than coolers, adding low-stage stuck failure as a freezer-specific mode. Door heaters (low-wattage wire around the door frame) are freezer-specific to prevent frame frost. See sister page <a href=\"/commercial/refrigeration/walk-in-cooler-not-cooling/\">walk-in cooler not cooling</a> for cooler-specific diagnostic."
+  },
+  {
+    q: "Is a not-freezing walk-in freezer a USDA or HACCP violation?",
+    a: "Yes, immediately. USDA federal frozen storage standard (7 CFR 250.404 and related) requires frozen TCS (Time/Temperature Control for Safety) food products held at 0°F or below. California Retail Food Code (CalCode) follows federal USDA frozen storage standard for licensed food service operators. Product held above 0°F enters a critical control point (CCP) exceedance event with documented corrective action requirements under HACCP plans. Product that rises above 41°F enters the temperature danger zone with stricter discard decisions. LADPH inspectors during routine and complaint-driven inspections check current product temperature plus operator temperature logs. Our techs at Same Day Appliance Repair provide temperature documentation appropriate for USDA federal frozen storage compliance plus HACCP records on every commercial walk-in freezer service call."
+  },
+  {
+    q: "Should I repair or replace a 13-year-old walk-in freezer?",
+    a: "Honest math we walk through with operators at the diagnostic visit. A new commercial walk-in freezer condensing unit installed runs $10,000 to $18,000 depending on size and refrigerant. A new full walk-in freezer (panels + cooling system + door + door heater) runs $20,000 to $45,000. Repair economics at year 13: compressor replacement $1,800 to $3,200 single-stage or $2,400 to $3,800 two-stage makes sense if the rest of the system is healthy (evaporator, condenser, controls) and the panels are sound. Replacement makes sense if compressor failure is the third major repair in 18 months, if the refrigerant is R-22 legacy (phased out), or if the panels have visible degradation. Walk-in freezer panel construction quality varies significantly — Master-Bilt and Norlake panels typically last 20 to 30 years with refrigeration component replacement; Kolpak and mid-tier panels 15 to 20 years. Our techs at Same Day Appliance Repair tell you straight which call the math favors."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org", "@type": "LocalBusiness", "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair", "url": canonical, "telephone": phone, "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+    "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+  },
+  {
+    "@context": "https://schema.org", "@type": "Service", "@id": canonical + "#service",
+    "serviceType": "Walk-In Freezer Troubleshooting and Repair",
+    "name": "Commercial Walk-In Freezer Troubleshooting and Repair Service",
+    "url": canonical,
+    "description": "Commercial walk-in freezer troubleshooting and repair across all five SoCal counties. Defrost system failure (timer $280-$440, heater $380-$580, snap-disc termination thermostat $140-$260), iced-over evaporator coil (failed defrost system primary cause), dirty condenser coil cleaning ($200-$280 service, resolves 20% of calls at diagnostic), evaporator fan motor (year 5-9, $320-$520), condenser fan motor ($380-$580), TXV thermostatic expansion valve ($480-$680), refrigerant leak detection and repair plus recharge ($700-$1,500, EPA 608 Universal certified), compressor replacement ($1,800-$3,200 single-stage walk-in scale, $2,400-$3,800 two-stage low-temperature). Master-Bilt walk-in freezers, Norlake walk-in freezers, Kolpak walk-in freezers, Heatcraft and Bohn refrigeration systems, Copeland and Tecumseh compressors. R-404A commercial standard, R-448A / R-449A transitional, R-454A post-2024 refrigerant handling. USDA 7 CFR 250.404 federal frozen storage 0°F threshold compliance documentation. California Retail Food Code (CalCode) HACCP CCP exceedance corrective action coordination. LADPH inspection record support. $120 commercial diagnostic, applied toward repair. Same-day LA / OC / Ventura, next-day Riverside / San Bernardino. BHGS #A49573, EPA 608 Universal certified #1346255700410, CSLB C-20 HVAC, BBB Accredited Business.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": {
+      "@type": "Offer",
+      "priceRange": "$120-$3800",
+      "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Commercial diagnostic fee, applied toward repair" }
+    }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Commercial", "item": "https://samedayappliance.repair/commercial/" },
+      { "@type": "ListItem", "position": 3, "name": "Refrigeration", "item": "https://samedayappliance.repair/commercial/refrigeration/" },
+      { "@type": "ListItem", "position": 4, "name": "Walk-In Freezer Troubleshooting", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<CommercialHero
+  eyebrow="Commercial Refrigeration · Walk-In Freezer Troubleshooting · Defrost & Two-Stage Compressor Diagnostic"
+  title="Walk-In Freezer Troubleshooting — Same Day LA Commercial"
+  subtitle={`Defrost system failure, iced evaporator, two-stage compressor wear, refrigerant leak. Frozen inventory at stake on a Friday service shift? Five-step diagnostic. EPA 608 Universal certified. $120 commercial diagnostic, applied toward repair. ${phone}`}
+  heroImageTitle="Walk-In Freezer Troubleshooting"
+/>
+
+<!-- 01 INTRO — answer-first lead -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 · Walk-in freezer troubleshooting</p>
+    <h2 class="section-title">Three root causes our techs diagnose first across LA commercial.</h2>
+
+    <p>A commercial walk-in freezer that won't hold -10°F operational target or 0°F USDA federal frozen storage floor usually traces to one of three root causes our techs at Same Day Appliance Repair diagnose first across LA County restaurant, hotel, grocery, and frozen dessert operations. (1) Defrost system failure — defrost timer ($280 to $440) not initiating cycle, defrost heater ($380 to $580) open circuit, or snap-disc defrost termination thermostat stuck ($140 to $260). The evaporator coil becomes a block of ice over 24 to 72 hours and stops transferring heat into the refrigerant. About 35 to 40 percent of walk-in freezer troubleshooting calls — higher than walk-in cooler frequency because lower operating temperature accelerates frost formation between defrost cycles. (2) Iced-over evaporator coil — typically secondary effect of defrost system failure. (3) Compressor failure year 7 to 10 typical wear curve — two-stage compressors used on low-temperature walk-in freezer applications (Copeland or Tecumseh) wear faster than single-stage refrigerator equivalents because of higher load. $1,800 to $3,200 single-stage walk-in scale, $2,400 to $3,800 two-stage.</p>
+
+    <p>This page covers commercial walk-in freezer troubleshooting across all five SoCal counties — Sunset Strip restaurants, DTLA hotel banquet kitchens, Beverly Hills hospitality, Long Beach port-adjacent cold-chain logistics, Pasadena specialty grocery, Inland Empire commercial kitchens in Ontario warehouses, LA ice cream and frozen dessert operations. Every hour of walk-in freezer downtime equals real frozen inventory loss exposure and federal USDA frozen storage compliance pressure. Sister page: <a href="/commercial/refrigeration/walk-in-cooler-not-cooling/">walk-in cooler not cooling</a> covers refrigerator-temperature troubleshooting with different failure distribution.</p>
+
+    <p><strong>$120 commercial diagnostic, applied toward repair.</strong> BHGS Registration #A49573 and EPA 608 Universal certified (#1346255700410), plus R-290 propane certification. CSLB C-20 HVAC. BBB Accredited Business. 90-day warranty. Same-day across LA, OC, Ventura. Next-day Riverside and San Bernardino. Sister sub-services: <a href="/commercial/refrigeration/walk-in-cooler-not-cooling/">walk-in cooler not cooling</a>, <a href="/commercial/refrigeration/commercial-freezer-not-freezing/">commercial freezer not freezing (reach-in + walk-in)</a>, <a href="/commercial/refrigeration/walk-in-freezer-repair/">walk-in freezer repair pillar</a>, <a href="/commercial/refrigeration/compressor-issues/">compressor issues</a>. Parent: <a href="/commercial/refrigeration/">commercial refrigeration</a>.</p>
+  </div>
+</section>
+
+<!-- 02 DIAGNOSTIC SEQUENCE -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">02 · Five-step diagnostic on every walk-in freezer troubleshooting call</p>
+    <h2 class="section-title">Cheap-first sequence. Defrost system first, sealed-system last.</h2>
+
+    <ol class="num-list">
+      <li><strong>Box temperature documentation.</strong> Probe at product level (not air space at ceiling) to verify current product temperature against the operator's last log entry. Establishes USDA federal frozen storage compliance window and HACCP CCP exceedance documentation. Both -10°F operational setpoint and 0°F federal floor verified.</li>
+      <li><strong>Visual evaporator coil inspection inside the box.</strong> Ice formation indicates defrost system failure (timer, heater, or snap-disc termination thermostat). Heavy frost coverage indicates door gasket leak or excessive door openings. Photo documentation for the operator's HACCP records.</li>
+      <li><strong>Visual condenser inspection at the condensing unit.</strong> Grease, dust, lint accumulation on fins. If condenser is the diagnosis, cleaning runs $200 to $280 and resolves the call without parts on roughly 20 percent of LA walk-in freezer service visits.</li>
+      <li><strong>Compressor amp draw and head pressure measurement.</strong> Multimeter at compressor terminals against data plate spec, manifold gauges on high and low side. Two-stage compressor verification on low-temperature applications — stuck in low-stage equals chronic warm freezer. Out-of-spec readings narrow to sealed-system versus mechanical compressor wear.</li>
+      <li><strong>Door gasket plus door switch plus door heater verification.</strong> Air infiltration at gasket allows warm humid LA kitchen air into the box, defrost cycle overwhelmed by moisture load. Door switch stuck closed keeps interior light running, heat load on refrigeration system. Door heater wire failure causes door-frame frost buildup that prevents proper seal.</li>
+    </ol>
+
+    <p>Most diagnostics complete in 25 to 40 minutes on-site. Our techs at Same Day Appliance Repair walk operators through the findings with photo documentation before any repair work begins. Sealed-system work requires EPA 608 Universal certification (#1346255700410) plus R-290 certification for newer green-refrigerant models.</p>
+  </div>
+</section>
+
+<!-- 03 TOP CAUSES FREQUENCY -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 · Top causes by frequency</p>
+    <h2 class="section-title">Across LA County walk-in freezer troubleshooting calls.</h2>
+
+    <p>Across LA County commercial walk-in freezer troubleshooting calls our techs at Same Day Appliance Repair run — Sunset Strip restaurants storing frozen protein inventory, DTLA hotel banquet kitchens with frozen dessert prep, Beverly Hills luxury hospitality, Long Beach port-adjacent frozen cold-chain logistics, Pasadena specialty grocery and frozen dessert retail, Inland Empire commercial kitchens in Ontario warehouses, LA ice cream operations — the failure breakdown clusters predictably and differs from walk-in cooler distribution.</p>
+
+    <div class="cause-block">
+      <h3>1. Defrost system failure (35-40% of calls)</h3>
+      <p>Most common single root cause across LA commercial walk-in freezer service — higher frequency than walk-in cooler because lower operating temperature accelerates frost formation between cycles. Standard mechanical defrost timer initiates a heating cycle every 6 to 8 hours; when the timer fails ($280 to $440), the defrost heater open-circuits ($380 to $580), or the snap-disc termination thermostat sticks ($140 to $260), frost accumulates until the coil becomes a block of ice. Our techs clear ice at the visit (60 to 90 minutes manual plus warm-water defrost) and replace failed component same-day from truck stock.</p>
+    </div>
+
+    <div class="cause-block">
+      <h3>2. Iced-over evaporator coil — secondary effect (15-20% of calls)</h3>
+      <p>Typically secondary effect of defrost system failure, but sometimes presents as primary call. Heavy ice accumulation requires manual clear plus identification of root cause (timer, heater, or snap-disc). Combined with category 1, defrost-related failures account for over half of walk-in freezer service calls.</p>
+    </div>
+
+    <div class="cause-block">
+      <h3>3. Compressor failure (12-15% of calls)</h3>
+      <p>Year 7 to 10 typical wear curve. Compressor runs continuously without bringing box to -10°F, or short-cycles, or audible knocking. Two-stage compressors (Copeland or Tecumseh) used on low-temperature walk-in freezer applications wear faster than single-stage refrigerator equivalents because of higher load. Stuck in low-stage equals chronic warm freezer. $1,800 to $3,200 single-stage, $2,400 to $3,800 two-stage, all-in including EPA 608 refrigerant recovery and recharge.</p>
+    </div>
+
+    <div class="cause-block">
+      <h3>4. Refrigerant leak (10-15% of calls)</h3>
+      <p>Suction line or evaporator inlet pinhole, joint failure, vibration fatigue at copper fittings. Symptom: gradual loss of cooling capacity over weeks, frost line shifts on suction line, head pressure low. EPA 608 Universal certified leak detection (electronic sniffer, UV dye where applicable), evacuation to deep vacuum, recharge with correct refrigerant (R-404A commercial standard, R-448A or R-449A transitional, R-454A post-2024). $700 to $1,500 typical all-in.</p>
+    </div>
+
+    <div class="cause-block">
+      <h3>5. Dirty condenser coil (8-12% of calls)</h3>
+      <p>Restaurant kitchen grease, dust, lint accumulate on rooftop or wall-mounted condensing unit fins. Less frequent than on walk-in coolers because walk-in freezer condensers are often roof-mounted away from kitchen exhaust. Resolves at the $120 commercial diagnostic with cleaning on about 20 percent of calls, no parts charge.</p>
+    </div>
+
+    <div class="cause-block">
+      <h3>6. Door gasket, door switch, door heater (5-10% of calls)</h3>
+      <p>Door gasket warm humid LA kitchen air infiltration $180 to $340 replacement plus deep ice clear. Door switch stuck closed keeping interior light as heat load $80 to $160. Door heater wire failure (low-wattage wire preventing door-frame frost) $220 to $380. Combined these resolve the remaining 5 to 10 percent of walk-in freezer troubleshooting calls.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 BRAND-SPECIFIC PATTERNS -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">04 · Walk-in freezer panel and refrigeration brand patterns</p>
+    <h2 class="section-title">Panel brand, refrigeration system brand — different parts pipelines.</h2>
+
+    <ul class="bullet-list">
+      <li><strong>Master-Bilt.</strong> Walk-in freezers, blast chillers, condensing units. Common across LA food service and institutional kitchens. Panel construction typically 20 to 30 year lifespan with refrigeration component replacement. Parts through Master-Bilt direct distribution, 3 to 7 day standard.</li>
+      <li><strong>Norlake.</strong> Walk-in freezers, blast chillers, scientific refrigeration. Common across LA healthcare, school cafeteria, institutional installations. Panel construction quality on par with Master-Bilt.</li>
+      <li><strong>Kolpak.</strong> Walk-in freezer panels and integrated systems. Common across mid-tier LA restaurant chains. 15 to 20 year panel lifespan typical.</li>
+      <li><strong>Heatcraft and Bohn refrigeration systems.</strong> Compressor + evaporator + condenser combinations powering most commercial walk-in freezers regardless of panel brand. Most walk-in freezers in LA commercial use Heatcraft or Bohn refrigeration even when panels are Master-Bilt, Norlake, or Kolpak branded.</li>
+      <li><strong>Copeland and Tecumseh compressors.</strong> Dominant single-stage and two-stage units in low-temperature commercial walk-in freezer applications. Two-stage Copeland Scroll and Tecumseh units required for -10°F operational at lower ambient conditions.</li>
+      <li><strong>Refrigerants.</strong> R-404A commercial standard (most existing installations), R-448A and R-449A transitional (EPA SNAP program transition), R-454A post-2024 newer commercial. R-22 legacy phased out — retrofit pricing significantly higher.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 05 PRICING -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 · Pricing</p>
+    <h2 class="section-title">Walk-in freezer troubleshooting and repair costs.</h2>
+
+    <table class="price-table">
+      <thead>
+        <tr><th>Repair</th><th>Typical Cost</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Diagnostic (commercial)</td><td>$120, waived with repair</td></tr>
+        <tr><td>Snap-disc defrost termination thermostat</td><td>$140 to $260</td></tr>
+        <tr><td>Door switch replacement</td><td>$80 to $160</td></tr>
+        <tr><td>Door gasket replacement</td><td>$180 to $340</td></tr>
+        <tr><td>Condenser coil cleaning (resolves 20% no parts)</td><td>$200 to $280</td></tr>
+        <tr><td>Door heater wire replacement</td><td>$220 to $380</td></tr>
+        <tr><td>Defrost timer (Paragon / Intermatic / Grasslin)</td><td>$280 to $440</td></tr>
+        <tr><td>Evaporator fan motor</td><td>$320 to $520</td></tr>
+        <tr><td>Defrost heater (Calrod element)</td><td>$380 to $580</td></tr>
+        <tr><td>Condenser fan motor</td><td>$380 to $580</td></tr>
+        <tr><td>TXV (thermostatic expansion valve)</td><td>$480 to $680</td></tr>
+        <tr><td>Refrigerant leak repair + recharge (EPA 608)</td><td>$700 to $1,500</td></tr>
+        <tr><td>Compressor replacement (single-stage walk-in scale)</td><td>$1,800 to $3,200</td></tr>
+        <tr><td>Compressor replacement (two-stage low-temp)</td><td>$2,400 to $3,800</td></tr>
+        <tr><td>Warranty</td><td>90 days parts and labor</td></tr>
+      </tbody>
+    </table>
+
+    <p style="margin-top: 22px;">$120 commercial diagnostic universal across walk-in cooler and walk-in freezer service. Sealed-system work requires EPA 608 Universal certification (#1346255700410) plus R-290 propane certification for newer green-refrigerant models, which we hold for R-22 legacy, R-134a, R-404A commercial, R-448A / R-449A transitional, R-290 propane, and R-454A post-2024 commercial refrigerant types.</p>
+  </div>
+</section>
+
+<!-- 06 USDA + HACCP -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">06 · USDA federal frozen storage and HACCP response</p>
+    <h2 class="section-title">$5,000 to $15,000+ frozen inventory at stake on every emergency call.</h2>
+
+    <p>USDA federal frozen storage standard (7 CFR 250.404 and related) requires frozen TCS (Time/Temperature Control for Safety) food products held at 0°F or below. California Retail Food Code (CalCode) follows federal USDA frozen storage standard for licensed food service operators. Product held above 0°F enters a critical control point (CCP) exceedance event with documented corrective action requirements under HACCP plans. Product that rises above 41°F enters the temperature danger zone with stricter discard decisions.</p>
+
+    <p>Our techs at Same Day Appliance Repair coordinate emergency response around the operator's HACCP plan, USDA federal frozen storage compliance, and CalCode timeline on every walk-in freezer troubleshooting visit. Temperature documentation at arrival, repair-vs-relocate decision support, post-repair temperature recovery records, LADPH inspection record support. Service prioritization puts Friday evening service shifts, Saturday hospitality peak, and HACCP CCP exceedance events at the front. Same-day across LA, Orange, and Ventura counties to compress frozen inventory loss exposure.</p>
+  </div>
+</section>
+
+<!-- 07 WHY OPERATORS CALL US -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">07 · Why LA walk-in freezer operators call us</p>
+    <h2 class="section-title">Seven reasons.</h2>
+
+    <ul class="why-list">
+      <li><strong>EPA 608 Universal certified (#1346255700410) plus R-290 propane certification.</strong> Sealed-system work — refrigerant leak detection, evacuation, recharge — is legally restricted to EPA 608 certified technicians. We hold Universal certification for all refrigerant types including R-22 legacy, R-134a, R-404A commercial, R-448A / R-449A transitional, R-290 propane, R-454A post-2024.</li>
+      <li><strong>Walk-in freezer defrost system fluency.</strong> 35-40 percent of walk-in freezer calls trace to defrost system. We diagnose timer vs heater vs snap-disc termination thermostat fast. Truck stock for first-visit completion.</li>
+      <li><strong>Same-day response across LA, OC, Ventura.</strong> Friday service shift, Saturday hospitality peak, HACCP CCP exceedance events, USDA federal frozen storage compliance emergencies get pushed to the front of the dispatch queue.</li>
+      <li><strong>USDA, HACCP, and CalCode documentation support.</strong> Temperature logs, time-stamped photos, corrective action records appropriate for LADPH inspection, federal frozen storage compliance, and operator food safety plans.</li>
+      <li><strong>Two-stage compressor diagnostic discipline.</strong> Walk-in freezer two-stage compressors stuck in low-stage equal chronic warm freezer. We test stage transition on every two-stage diagnostic — different troubleshooting than single-stage refrigerator compressors.</li>
+      <li><strong>BHGS Registration #A49573, CSLB C-20 HVAC, BBB Accredited Business.</strong> See our <a href="/credentials/licensed/">licensing page</a> for full credentials.</li>
+      <li><strong>$120 commercial diagnostic, no after-hours surcharge.</strong> Phones answered 24/7. Same-day LA, OC, Ventura. Next-day Riverside, San Bernardino.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 08 FAQ -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">08 · FAQ</p>
+    <h2 class="section-title">Walk-in freezer troubleshooting, common questions.</h2>
+
+    <div class="faq-list">
+      {faqs.map(f => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- 09 BOTTOM CTA -->
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Walk-in freezer not holding -10°F on a Friday service shift? Call now.</h2>
+    <p>$120 commercial diagnostic, applied toward repair. Same-day LA, OC, Ventura. Next-day Riverside, San Bernardino. EPA 608 Universal plus R-290 certified. USDA federal frozen storage and HACCP documentation support. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 64px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 16px; line-height: 1.2; color: var(--text); letter-spacing: -0.01em; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .cause-block { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--red); border-radius: 8px; padding: 22px 26px; margin-bottom: 16px; }
+  .cause-block h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 10px; color: var(--text); }
+  .cause-block p { font-size: 0.96rem; line-height: 1.7; margin: 0; }
+  .cause-block strong { color: var(--text); }
+  .bullet-list { padding-left: 22px; margin: 14px 0; }
+  .bullet-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .bullet-list strong { color: var(--text); font-weight: 700; }
+  .num-list { padding-left: 22px; margin: 14px 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .num-list strong { color: var(--text); font-weight: 700; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; }
+  .price-table th { background: var(--gray); font-weight: 700; color: var(--text); letter-spacing: 0.02em; }
+  .price-table tr:last-child td { border-bottom: none; }
+  .why-list { padding-left: 22px; margin: 18px 0; }
+  .why-list li { font-size: 1rem; line-height: 1.7; color: var(--text); margin-bottom: 12px; }
+  .why-list strong { color: var(--text); font-weight: 700; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px 22px; margin-bottom: 10px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 0.98rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.93rem; color: var(--text); line-height: 1.7; margin: 12px 0 0; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: clamp(1.5rem, 3vw, 2rem); }
+  .bottom-cta p { color: #aaa; margin: 0 0 28px; font-size: 1.02rem; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
+</content>
+</invoke>
