@@ -39,6 +39,14 @@ const canonical = `https://samedayappliance.repair/${citySlug}/${serviceSlug}/`;
 
 const brandPool = getBrandPool(cityDesc.tier, serviceDesc);
 
+// Wave 71-ext Batch 60 — AI-First answer-first content helpers.
+// Strips "(year 6-10)" parentheticals + trailing period from failure-pattern
+// titles so they read as flowing prose in the answer-first lead + FAQ.
+// Content stays varied per combo: every zone references city + service data.
+const stripMeta = (t: string) => t.replace(/\s*\([^)]*\)/g, '').replace(/\.$/, '').trim();
+const topPatterns = serviceDesc.failurePatterns.slice(0, 3).map(f => stripMeta(f.title));
+const eyebrowLine = `${serviceName} · ${cityName} · Residential Appliance Repair · Same Day`;
+
 // Sibling cities served by same branch (for cross-linking).
 // Only include siblings whose (city, current-service) combo actually exists in
 // CITY_SERVICE_MATRIX — otherwise the link points to a redirected URL (Wave 32
@@ -89,6 +97,14 @@ const faqs = [
   {
     q: `What's your warranty on ${serviceDesc.shortName} repair?`,
     a: `90 days SDAR labor and parts on every repair. Same issue within 90 days, we come back at no charge. OEM parts wherever available. Brand component warranties (manufacturer-specific) processed separately through authorized service network.`
+  },
+  {
+    q: `What's the most common ${serviceDesc.shortName} problem in ${cityName}?`,
+    a: `The ${serviceDesc.shortName} failure our techs at Same Day Appliance Repair see most often in ${cityName} is ${stripMeta(serviceDesc.failurePatterns[0].title).toLowerCase()}. ${serviceDesc.failurePatterns[0].detail} After that, ${stripMeta(serviceDesc.failurePatterns[1].title).toLowerCase()} and ${stripMeta(serviceDesc.failurePatterns[2].title).toLowerCase()} are the next most frequent calls we run in ${cityName}. $89 residential diagnostic, waived with repair.`
+  },
+  {
+    q: `Should I repair or replace my ${serviceDesc.shortName} in ${cityName}?`,
+    a: `${serviceDesc.honestOpinion} Our techs at Same Day Appliance Repair give you the cumulative-repair math against replacement before you commit — in ${cityName}, with its ${brandPool.slice(0, 2).join(' and ')} brand mix, that call comes down to the unit's age and tier. $89 residential diagnostic, waived with repair.`
   }
 ];
 
@@ -138,6 +154,7 @@ const schemaJsons = [
 <section class="hero">
   <div class="container">
     <p class="crumb"><a href="/">Home</a> &rsaquo; <a href={`/${citySlug}/`}>{cityName}</a> &rsaquo; {serviceName}</p>
+    <p class="eyebrow">{eyebrowLine}</p>
     <h1>{serviceName} in {cityName}, Same-Day from {branch?.displayName || 'Los Angeles'}</h1>
     <p class="lede">{cityDesc.serviceContext} ${'89'} residential diagnostic, applied toward repair. <strong>BHGS #A49573</strong>{serviceDesc.epaCertRequired ? '. EPA 608 Universal certified #1346255700410 for sealed-system work' : ''}. {phone}.</p>
     <div class="cta-row">
@@ -161,6 +178,7 @@ const schemaJsons = [
   <div class="container narrow">
     <p class="section-number">{cityName} {serviceDesc.shortName} service</p>
     <h2>How {cityName} differs from a generic LA service call.</h2>
+    <p><strong>When a {serviceDesc.shortName} fails in {cityName}, our techs at Same Day Appliance Repair trace it to a handful of patterns: {topPatterns.join(', ')}. We dispatch same-day from the {branch?.displayName || 'Los Angeles'} branch across {cityName} — {cityDesc.neighborhoods.slice(0, 3).join(', ')} — carrying {brandPool.slice(0, 3).join(', ')} parts on the truck. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
     <p>{cityDesc.homeStock}</p>
     <p><strong>Climate:</strong> {cityDesc.climateNote}</p>
     <p><strong>Water:</strong> {cityDesc.waterNote}</p>
@@ -172,6 +190,7 @@ const schemaJsons = [
   <div class="container narrow">
     <p class="section-number">Top failure modes</p>
     <h2>What we see most on {serviceDesc.shortName} calls in {cityName}.</h2>
+    <p>Ranked by how often our techs at Same Day Appliance Repair see them on {serviceDesc.shortName} calls in {cityName} — the most common failures come first, the higher-ticket repairs last.</p>
     <ol class="num-list">
       {serviceDesc.failurePatterns.map(f => (
         <li><strong>{f.title}</strong> {f.detail}</li>
@@ -286,6 +305,7 @@ const schemaJsons = [
   .hero h1 { color: #fff; font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 800; margin: 12px 0 18px; line-height: 1.2; }
   .hero .crumb { color: #9a9a9a; font-size: 0.85rem; margin-bottom: 6px; }
   .hero .crumb a { color: #c9c9c9; text-decoration: none; }
+  .hero .eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin: 0 0 10px; }
   .hero .lede { font-size: 1.05rem; color: #d7d7d7; max-width: 720px; line-height: 1.7; margin-bottom: 22px; }
   .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
   .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
