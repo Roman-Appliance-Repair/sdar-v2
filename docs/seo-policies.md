@@ -171,6 +171,34 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 }
 ```
 
+### City-level `address` на ВСЕХ LocalBusiness (2026-06-09) — Google «Missing field address» fix
+
+Google Rich Results требует поле `address` на каждом `LocalBusiness`/`HomeAndConstructionBusiness`.
+Раньше его не было на ~776 непин-объектах → ~863 ошибки. **Теперь каждый LB несёт city-level
+`PostalAddress` БЕЗ `streetAddress`** (SAB-safe — публичный street только на 6 pin pages, см. выше):
+
+```json
+"address": {
+  "@type": "PostalAddress",
+  "addressLocality": "<city or West Hollywood>",
+  "addressRegion": "CA",
+  "addressCountry": "US"
+}
+```
+
+- **`addressLocality`** = город страницы, если у объекта есть `areaServed` типа `City`
+  (city pillars + city×service combos → их город); иначе **`West Hollywood`** (pin-город, гео-нейтральные:
+  brand/service/price-list/commercial/outdoor/credentials).
+- **Pin pages (6)** сохраняют ПОЛНЫЙ `address` со `streetAddress` (`8746 Rangely Ave Ste`) — НЕ перезаписывается.
+- **`location` array entries** — каждая запись несёт `addressLocality = branch.displayCity` (per-branch город).
+
+**SSOT инъекции (не трогать руками per-page):**
+1. `src/data/credentials-schema.ts` → `mergeCredentials()` инжектит address (guard: только LB/HACB, только если `!address`; локалити из `areaServed` City иначе WeHo).
+2. `src/lib/build-location-array.ts` → `buildBranchLocation()` ставит `branch.displayCity` в каждую location-запись.
+3. Raw-inline schemaJson страницы — инъектированы скриптовым sweep'ом (2026-06-09); новые такие страницы должны звать `mergeCredentials()` ИЛИ нести address вручную.
+
+**НЕ удалять `address` при будущих sweep'ах** — это required Google-поле. streetAddress остаётся pin-only.
+
 ### Гео-нейтральные страницы добавляют `location` (все 8 филиалов)
 
 `/`, `/contact/`, `/book/`, services hubs, brand pages, commercial, outdoor, sub-services, price list, credentials → `location` array со всеми 8 branches как `LocalBusiness` entries (branch phone + service_area + opening hours).

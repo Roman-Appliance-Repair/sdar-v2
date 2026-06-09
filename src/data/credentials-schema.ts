@@ -62,13 +62,46 @@ export const CANONICAL_CREDENTIALS: EducationalOccupationalCredential[] = [
  *  - Returns a NEW object (does not mutate input) to avoid side effects when the
  *    same schema reference is reused across calls. Spread copy is shallow but
  *    sufficient — credentials array uses a fresh slice per call. */
+const LB_TYPES = new Set(['LocalBusiness', 'HomeAndConstructionBusiness']);
+
+/** City-level addressLocality from the schema's existing `areaServed` City entry,
+ *  else the West Hollywood pin city. No `streetAddress` — NAP policy: only
+ *  `physical_pin` pages expose the public street address. */
+function deriveLocality(schema: Record<string, unknown>): string {
+  const a = schema['areaServed'];
+  const arr = Array.isArray(a) ? a : (a ? [a] : []);
+  for (const x of arr) {
+    if (x && typeof x === 'object'
+        && (x as Record<string, unknown>)['@type'] === 'City'
+        && (x as Record<string, unknown>)['name']) {
+      return String((x as Record<string, unknown>)['name']);
+    }
+  }
+  return 'West Hollywood';
+}
+
 export function mergeCredentials<T extends Record<string, unknown>>(schema: T): T & {
   legalName: string;
   hasCredential: EducationalOccupationalCredential[];
 } {
-  return {
+  const out: Record<string, unknown> = {
     ...schema,
     legalName: LEGAL_NAME,
     hasCredential: [...CANONICAL_CREDENTIALS]
+  };
+  // Google Rich Results requires `address` on LocalBusiness. Inject a city-level
+  // PostalAddress (no streetAddress) when absent. Only for LB/HACB @types, and
+  // never overwrites an existing address (pin pages keep their full street address).
+  if (LB_TYPES.has(out['@type'] as string) && !out['address']) {
+    out['address'] = {
+      '@type': 'PostalAddress',
+      addressLocality: deriveLocality(out),
+      addressRegion: 'CA',
+      addressCountry: 'US'
+    };
+  }
+  return out as T & {
+    legalName: string;
+    hasCredential: EducationalOccupationalCredential[];
   };
 }

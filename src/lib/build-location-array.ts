@@ -33,6 +33,14 @@ function buildBranchLocation(branch: Branch): Record<string, unknown> {
     telephone: phoneE164(branch.phone),
     email: branch.email,
     priceRange: '$$',
+    // City-level address (no streetAddress) so each location-array entry satisfies
+    // Google's required `address` field while honoring the SAB no-public-street rule.
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: branch.displayCity,
+      addressRegion: 'CA',
+      addressCountry: 'US'
+    },
     openingHoursSpecification: OPENING_HOURS_SCHEMA,
     areaServed: {
       '@type': 'City',
