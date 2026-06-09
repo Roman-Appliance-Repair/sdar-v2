@@ -129,11 +129,13 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 
 | Tier | Сумма | Применение |
 |---|---|---|
-| Residential diagnostic | **$89** | Только residential pages — refrigerator, washer, dryer, oven, etc. |
-| Commercial diagnostic | **$120** | Только commercial pages — walk-in cooler, ice machines, commercial refrigeration |
+| Residential diagnostic | **$89** | Все `residential` pages — refrigerator, washer, dryer, oven, etc. **И ВСЕ `/outdoor/` страницы** (grills, patio heaters, pizza ovens, smokers, fireplaces, wine cellars, outdoor kitchens — включая brand-страницы premium/commercial-grade оборудования). |
+| Commercial diagnostic | **$120** | Только `/commercial/` pages — walk-in cooler, ice machines, commercial refrigeration, и пр. коммерческая кухня |
 | Both waived с repair | да | Упоминать явно: "fee waived when you approve the repair" |
 
 ❌ **Никогда** не показывать оба ценника на одной странице. Mixed-scope pages — выбираем по основному audience.
+
+**`/outdoor/` = $89 universally (2026-06-09).** Раньше outdoor brand-страницы (patio/pizza/smoker + grill brand pillars) ошибочно несли «$120 commercial-tier» диагностику — это отменено. Outdoor — residential scope: один canonical fee **$89**, фраза `$89 outdoor diagnostic, waived with repair` (или `$89 diagnostic, waived with repair`). Никаких «commercial-tier» формулировок для outdoor-диагностики. Реальные цены деталей/услуг и итоговые суммы ремонтов в outdoor-кейсах остаются как есть (это не диагностика). Schema Offer base price для outdoor = `89.00`. Дуальность сохраняется только на границе `/commercial/` (там $120). SSOT виджета: `AIDiagnostic.jsx` `DIAGNOSTIC_FEE.outdoor = "$89"`.
 
 ## 10. Технический персонал — имена
 
