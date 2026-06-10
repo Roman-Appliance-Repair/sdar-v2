@@ -6,6 +6,7 @@ import Layout from './Layout.astro';
 import { mergeCredentials } from '../data/credentials-schema';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../lib/build-location-array';
+import { relatedPosts } from '../data/blog-posts';
 
 export interface Props {
   title: string;
@@ -28,6 +29,7 @@ const {
 } = Astro.props;
 
 const canonical = `https://samedayappliance.repair/blog/${slug}/`;
+const related = relatedPosts(slug);
 const blogPostingSchema = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
@@ -126,18 +128,12 @@ const wave47BlogLb = mergeCredentials({
     <div class="container narrow">
       <h3>More from the field</h3>
       <div class="related-grid">
-        <a href="/blog/repair-vs-replace-refrigerator-la-guide/" class="related-card">
-          <p class="related-cat">Repair Tips</p>
-          <h4>Repair vs Replace: Refrigerator Decision Guide</h4>
-        </a>
-        <a href="/blog/why-dryer-takes-2-hours-diagnosis-guide/" class="related-card">
-          <p class="related-cat">Diagnosis</p>
-          <h4>Why Your Dryer Is Taking 2 Hours</h4>
-        </a>
-        <a href="/blog/la-hard-water-killing-dishwasher/" class="related-card">
-          <p class="related-cat">Maintenance</p>
-          <h4>LA Hard Water Is Killing Your Dishwasher</h4>
-        </a>
+        {related.map((p) => (
+          <a href={`/blog/${p.slug}/`} class="related-card">
+            <p class="related-cat">{p.category}</p>
+            <h4>{p.title}</h4>
+          </a>
+        ))}
       </div>
     </div>
   </section>
