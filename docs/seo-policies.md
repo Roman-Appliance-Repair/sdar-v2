@@ -412,6 +412,42 @@ Phase 2 — manual rewrite, не sweep. Фокус: brand pages (largest cluster
 - Linking на own URL (self-references вне breadcrumbs)
 - Linking на 404 / redirected URLs (после Wave 32 redirects)
 
+### Phase B render-time linkifier (`linkifyInternal`, 2026-06-09)
+
+**Engine:** `src/lib/linkify-internal.ts` — extends the proven `linkify-brands` engine.
+Render-time, tag-aware (passes tags verbatim, NEVER links inside an existing `<a>…</a>`),
+word-boundary, longest-match-first. Wraps the first natural mention of a known
+brand/city in a contextual `<a>`.
+
+**Dictionary (vetted, 0 redirect/404 targets):**
+- brands — `src/data/brand-pillar-map.ts` (55, → `/brands/{slug}/`)
+- cities — `src/data/city-link-map.ts` (84, → `/{slug}/`). EXCLUDES the 4 ambiguous
+  county-names (Ventura, Riverside, San Bernardino, Orange) — they are counties in
+  most prose and must not link to the city pillar.
+- NO services (service-name phrases are page primary-keywords / rarely appear verbatim).
+
+**Locked rules:** per-page cap **4** · sub-caps brand ≤3, city ≤1 · priority brand→city
+· first-occurrence · 1 link/target/page · no self-link · no primary-keyword (term whose
+slug is a segment of the page URL) · min ~8 words between links · pre-existing author
+links in the prose count toward the page budget.
+
+**Budget threading (CRITICAL Astro gotcha):** module-level mutable state does NOT share
+reliably across Astro component/template evaluations. The budget is an EXPLICIT object
+(`newLinkBudget(pageUrl)`) and **all of a page's prose is linkified in ONE call** (join →
+linkify → split) so the cap accumulates within a single synchronous pass. Per-paragraph
+or cross-component calls do NOT share the cap — do not refactor to those.
+
+**Scope (Phase B-1):** wired into shared prose surfaces only —
+`IntroNarrative.astro` (city-pillar intro) + the `[city]/[service].astro` combo template
+prose. ~999 links across 287 pages (87 city pillars + 200 combos), avg ~3.5/page. NOT
+wired into FAQ (stays brand-only via `linkifyBrands`), eyebrow, service-area lists, nav,
+headings, JSON-LD, recent-repairs, or CustomNarrative (cross-component cap can't be shared).
+
+**Phase B-2 (pending):** brand / commercial / outdoor pages author their prose INLINE
+per-file (no shared prose component) — render-time wiring can't reach them. Covering those
+(~1,600 more links) needs a build-time Astro integration (`astro:build:done`) post-processing
+dist prose with the same zone exclusions. Not yet built.
+
 ---
 
 ## 10. IndexNow + GSC submission

@@ -3,6 +3,7 @@
  *  Photo slot 2 (neighborhood) optionally rendered after this block (handled in layout). */
 
 import BookingCard from './BookingCard.astro';
+import { linkifyInternal, newLinkBudget } from '../../../lib/linkify-internal';
 
 export interface Props {
   citySlug: string;
@@ -21,13 +22,21 @@ const {
   bookingTitle = 'Book Same-Day Service',
   bookingSub = `${cityName} · Available Today`
 } = Astro.props;
+// Linkify ALL intro paragraphs in ONE call (joined by a control-char separator)
+// so the per-page LinkBudget cap accumulates reliably within that single render
+// pass, then split back. (Per-paragraph calls do not share mutation reliably
+// under Astro's evaluation model — one call sidesteps that entirely.)
+const linkedParagraphs = linkifyInternal(
+  paragraphs.join('PBSEP'),
+  newLinkBudget(Astro.url.pathname),
+).split('PBSEP');
 ---
 
 <section class="v2-intro">
   <div class="v2-container v2-intro__inner">
     <div class="v2-intro__text">
       <h2 class="v2-intro__h2">{headline}</h2>
-      {paragraphs.map((p) => (<p class="v2-intro__p" set:html={p}></p>))}
+      {linkedParagraphs.map((p) => (<p class="v2-intro__p" set:html={p}></p>))}
     </div>
     <div class="v2-intro__cta">
       <BookingCard citySlug={citySlug} title={bookingTitle} sub={bookingSub} />

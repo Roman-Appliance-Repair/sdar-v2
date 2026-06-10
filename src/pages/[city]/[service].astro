@@ -13,6 +13,7 @@ import { CITY_DESCRIPTORS, SERVICE_DESCRIPTORS, getBrandPool } from '../../data/
 import { CITIES } from '../../data/cities';
 import { BRANCHES, MAIN_PHONE } from '../../data/branches';
 import { mergeCredentials } from '../../data/credentials-schema';
+import { linkifyInternal, newLinkBudget } from '../../lib/linkify-internal';
 import { getBrandPillarSlug } from '../../data/brand-pillar-map';
 import { getCommercialCrossLink } from '../../data/commercial-cross-link-map';
 
@@ -34,6 +35,7 @@ const phoneRaw = phone.replace(/\D/g, '');
 const phoneHref = `tel:+1${phoneRaw}`;
 
 const cityName = cityData?.name || citySlug;
+const linkBudget = newLinkBudget(Astro.url.pathname);
 const serviceName = serviceDesc.name;
 const canonical = `https://samedayappliance.repair/${citySlug}/${serviceSlug}/`;
 
@@ -178,11 +180,11 @@ const schemaJsons = [
   <div class="container narrow">
     <p class="section-number">{cityName} {serviceDesc.shortName} service</p>
     <h2>How {cityName} differs from a generic LA service call.</h2>
-    <p><strong>When a {serviceDesc.shortName} fails in {cityName}, our techs at Same Day Appliance Repair trace it to a handful of patterns: {topPatterns.join(', ')}. We dispatch same-day from the {branch?.displayName || 'Los Angeles'} branch across {cityName} — {cityDesc.neighborhoods.slice(0, 3).join(', ')} — carrying {brandPool.slice(0, 3).join(', ')} parts on the truck. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
-    <p>{cityDesc.homeStock}</p>
+    <p set:html={linkifyInternal(`<strong>When a ${serviceDesc.shortName} fails in ${cityName}, our techs at Same Day Appliance Repair trace it to a handful of patterns: ${topPatterns.join(', ')}. We dispatch same-day from the ${branch?.displayName || 'Los Angeles'} branch across ${cityName} — ${cityDesc.neighborhoods.slice(0, 3).join(', ')} — carrying ${brandPool.slice(0, 3).join(', ')} parts on the truck. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>`, linkBudget)}></p>
+    <p set:html={linkifyInternal(cityDesc.homeStock, linkBudget)}></p>
     <p><strong>Climate:</strong> {cityDesc.climateNote}</p>
     <p><strong>Water:</strong> {cityDesc.waterNote}</p>
-    <p>The {brandPool.slice(0, 3).join(', ')}, and other brands we see in {cityName} carry the failure-pattern profile typical of {cityDesc.tier === 'ULTRA-PREMIUM' ? 'ultra-premium tier' : cityDesc.tier === 'PREMIUM' || cityDesc.tier === 'PREMIUM-OC' ? 'premium tier' : cityDesc.tier.startsWith('INLAND') ? 'inland duty cycle' : 'mid-tier residential'} equipment, calibrated for our local conditions.</p>
+    <p set:html={linkifyInternal(`The ${brandPool.slice(0, 3).join(', ')}, and other brands we see in ${cityName} carry the failure-pattern profile typical of ${cityDesc.tier === 'ULTRA-PREMIUM' ? 'ultra-premium tier' : cityDesc.tier === 'PREMIUM' || cityDesc.tier === 'PREMIUM-OC' ? 'premium tier' : cityDesc.tier.startsWith('INLAND') ? 'inland duty cycle' : 'mid-tier residential'} equipment, calibrated for our local conditions.`, linkBudget)}></p>
   </div>
 </section>
 
