@@ -20,6 +20,8 @@ export interface Props {
   image?: string;
   noindex?: boolean;
   showDiagnosticBanner?: boolean;
+  datePublished?: string;
+  dateModified?: string;
 }
 
 const {
@@ -29,6 +31,8 @@ const {
   image = '/og-image.png',
   noindex = false,
   showDiagnosticBanner = true,
+  datePublished,
+  dateModified,
 } = Astro.props;
 
 const siteUrl = 'https://samedayappliance.repair';
@@ -47,6 +51,22 @@ const ogImage = new URL(image, siteUrl).toString();
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    {/* WebPage freshness + Organization author/reviewer — emitted only when a page passes a real date (no build-date default) */}
+    {dateModified && (
+      <script type="application/ld+json" set:html={JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "@id": canonicalUrl,
+        "url": canonicalUrl,
+        "name": title,
+        "dateModified": dateModified,
+        ...(datePublished ? { datePublished } : {}),
+        "isPartOf": { "@type": "WebSite", "name": "Same Day Appliance Repair", "url": siteUrl },
+        "author": { "@type": "Organization", "name": "Same Day Appliance Repair" },
+        "reviewedBy": { "@type": "Organization", "name": "Same Day Appliance Repair" }
+      })} />
+    )}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -168,6 +188,11 @@ const ogImage = new URL(image, siteUrl).toString();
     <!-- ================== Main Content ================== -->
     <main>
       <slot />
+      {dateModified && (
+        <p style="text-align:center;font-size:0.8rem;color:#888;padding:14px 10px;margin:0;">
+          Last updated: {dateModified}
+        </p>
+      )}
     </main>
 
     <!-- ================== Footer ================== -->
