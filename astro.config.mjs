@@ -182,6 +182,7 @@ export default defineConfig({
     // ====================================================================
     // Pre-existing redirects (preserved from original config)
     // ====================================================================
+    '/brands/beverage-air-repair/': '/brands/beverage-air/',
     '/brand-thermador-appliance-repair/': '/brands/thermador/',
     '/brands/thermador-wall-oven-repair/': '/brands/thermador-oven-repair/',
     '/brand-subzero-appliance-repair/': '/brands/sub-zero/',
