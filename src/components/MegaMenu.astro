@@ -8,6 +8,7 @@
 import { counties as countyData, toSlug } from '../data/counties.ts';
 import { MAIN_PHONE, BRANCHES } from '../data/branches.ts';
 import { CITIES, COUNTIES } from '../data/cities.ts';
+import { COMMERCIAL_BRAND_SLUGS } from '../data/commercial-brand-slugs.ts';
 
 const ACRONYMS = new Set([
   'bbb', 'oem', 'epa', 'osha', 'bbq', 'cslb', 'hvac', 'ac', 'la', 'ca', 'cma', 'ge', 'lg', 'sks', 'zline'
@@ -127,6 +128,15 @@ const credB = credentials.slice(credHalf);
 
 const mainPhone = MAIN_PHONE;
 const mainPhoneTel = `+1${MAIN_PHONE.replace(/\D/g, '')}`;
+
+// Header promo diagnostic fee follows page scope: commercial pages = $120, everything
+// else (residential, outdoor, residential brand pages) = $89. $120 zones: the canonical
+// /commercial/* tree, plus the allowlist of commercial-grade /brands/ pages (foodservice
+// equipment) that carry a $120 fee on the page itself (see commercial-brand-slugs.ts).
+const _path = Astro.url.pathname;
+const _brandSlug = _path.startsWith('/brands/') ? _path.replace(/^\/brands\//, '').replace(/\/$/, '') : null;
+const isCommercialFee = _path.startsWith('/commercial/') || (_brandSlug !== null && COMMERCIAL_BRAND_SLUGS.has(_brandSlug));
+const diagnosticFee = isCommercialFee ? '$120' : '$89';
 
 type Link = { label: string; href: string };
 type Column = { title?: string; links?: Link[]; html?: string };
@@ -275,7 +285,7 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
       kind: 'pricelist',
       residential: priceResidential,
       commercial: priceCommercial,
-      html: '<strong>$89 diagnostic</strong> — waived with repair.<br/>OEM parts, 90-day warranty, no hidden fees.<br/><br/><a href="/price-list/">View full price list →</a>'
+      html: `<strong>${diagnosticFee} diagnostic</strong> — waived with repair.<br/>OEM parts, 90-day warranty, no hidden fees.<br/><br/><a href="/price-list/">View full price list →</a>`
     }
   },
   {
