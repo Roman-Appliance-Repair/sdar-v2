@@ -42,6 +42,11 @@ export interface Props {
   showBranches?: boolean;
   /** Auto-derive photo path from slug; checked against disk at build time. */
   slug?: string;
+  /** Override the brand-logo lookup key. Use when the page slug is a
+   *  brand+category combo (e.g. 'electrolux-refrigerator-repair') but the
+   *  gold logo overlay should resolve by brand ('electrolux'). Falls back
+   *  to `slug` when omitted. */
+  logoSlug?: string;
   /** Photo directory bucket. Default 'services' (residential). Use 'outdoor'
    *  for outdoor-section pages so photos resolve under
    *  public/images/outdoor/{slug}/. */
@@ -71,6 +76,7 @@ const {
   ],
   showBranches = true,
   slug,
+  logoSlug,
   section = 'services',
   image,
   imageWebp,
@@ -92,8 +98,9 @@ const photoMobileWebp = imageWebpMobile ?? null;
 const photoAlt = imageAlt ?? `${heroImageTitle || title || 'Appliance repair'} ${heroImageLocation || ''}`.trim();
 const photoMode = !!(photoWebp && photoJpg);
 
-const logoSrc = section === 'brands' && slug && existsSync(path.join('public', 'brand-logos', `${slug}.webp`))
-  ? `/brand-logos/${slug}.webp`
+const logoKey = logoSlug ?? slug;
+const logoSrc = section === 'brands' && logoKey && existsSync(path.join('public', 'brand-logos', `${logoKey}.webp`))
+  ? `/brand-logos/${logoKey}.webp`
   : null;
 ---
 
