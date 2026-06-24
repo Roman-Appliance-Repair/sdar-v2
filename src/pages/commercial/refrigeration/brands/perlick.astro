@@ -6,6 +6,10 @@
 // $120 commercial / $89 residential dual diagnostic preserved (per pillar policy).
 // BHGS #A49573, EPA 608 Universal #1346255700410.
 import Layout from '../../../../layouts/Layout.astro';
+import { existsSync } from 'node:fs';
+const heroSlug = 'refrigeration/brands/perlick';
+const heroPhoto = existsSync(`public/images/commercial/${heroSlug}/hero.webp`) && existsSync(`public/images/commercial/${heroSlug}/hero.jpg`);
+const heroBase = `/images/commercial/${heroSlug}`;
 import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../../../data/branches';
 import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../../lib/build-location-array';
 
@@ -206,7 +210,20 @@ const schemaJsons = [
     ))}
   </Fragment>
 
-  <section class="brand-hero">
+  <section class={heroPhoto ? "brand-hero brand-hero--photo" : "brand-hero"}>
+    {heroPhoto && (
+      <div class="hero-bg">
+        <picture>
+          <source media="(max-width: 640px)" type="image/webp" srcset={`${heroBase}/hero-640.webp`} />
+          <source media="(max-width: 640px)" type="image/jpeg" srcset={`${heroBase}/hero-640.jpg`} />
+          <source media="(max-width: 960px)" type="image/webp" srcset={`${heroBase}/hero-960.webp`} />
+          <source media="(max-width: 960px)" type="image/jpeg" srcset={`${heroBase}/hero-960.jpg`} />
+          <source type="image/webp" srcset={`${heroBase}/hero.webp`} />
+          <img src={`${heroBase}/hero.jpg`} alt="Commercial refrigeration repair in a professional kitchen — Southern California" width="1920" height="840" loading="eager" fetchpriority="high" />
+        </picture>
+        <div class="hero-overlay"></div>
+      </div>
+    )}
     <div class="container hero-inner">
       <div class="hero-text">
         <p class="eyebrow">Commercial Kitchen · Perlick Bar Refrigeration Troubleshooting · Independent Wisconsin · Same Day</p>
@@ -418,6 +435,13 @@ const schemaJsons = [
 
 <style>
 .brand-hero{background:var(--color-bg);padding:5rem 0 4rem;border-bottom:1px solid var(--color-border)}
+.brand-hero--photo{position:relative;overflow:hidden;border-bottom:none}
+.brand-hero--photo .hero-bg{position:absolute;inset:0;z-index:0}
+.brand-hero--photo .hero-bg picture,.brand-hero--photo .hero-bg img{width:100%;height:100%;object-fit:cover;display:block}
+.brand-hero--photo .hero-overlay{position:absolute;inset:0;z-index:1;background:linear-gradient(100deg,rgba(10,10,10,0.92) 0%,rgba(10,10,10,0.80) 34%,rgba(10,10,10,0.48) 64%,rgba(10,10,10,0.30) 100%)}
+.brand-hero--photo .hero-inner{position:relative;z-index:2}
+.brand-hero--photo h1{color:#fff}
+.brand-hero--photo .hero-sub,.brand-hero--photo .hero-trust{color:rgba(255,255,255,0.85)}
 .hero-inner{display:grid;grid-template-columns:1fr auto;gap:4rem;align-items:center}
 .eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent);margin-bottom:.75rem}
 h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:1rem}
