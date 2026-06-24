@@ -7,6 +7,8 @@
 // Each page: ~1,500-1,800 visible body words, $89 residential, BHGS + EPA,
 // 5 schemas (LocalBusiness + Service + LocalBusiness#service-area + FAQPage + BreadcrumbList).
 
+import { existsSync } from 'node:fs';
+import nodePath from 'node:path';
 import Layout from '../../layouts/Layout.astro';
 import { CITY_SERVICE_MATRIX } from '../../data/city-service-matrix';
 import { CITY_DESCRIPTORS, SERVICE_DESCRIPTORS, getBrandPool } from '../../data/city-service-content';
@@ -38,6 +40,13 @@ const cityName = cityData?.name || citySlug;
 const linkBudget = newLinkBudget(Astro.url.pathname);
 const serviceName = serviceDesc.name;
 const canonical = `https://samedayappliance.repair/${citySlug}/${serviceSlug}/`;
+
+// Full-bleed combo hero photo (per city×service). MODE A when both webp+jpg exist on
+// disk; otherwise the black text hero (MODE B) renders as before. Photos live under
+// public/images/city-service/{city}/{service}/hero{,-960,-640}.{webp,jpg}.
+const comboPhotoBase = `/images/city-service/${citySlug}/${serviceSlug}`;
+const hasComboPhoto = existsSync(nodePath.join('public', 'images', 'city-service', citySlug, serviceSlug, 'hero.webp'))
+  && existsSync(nodePath.join('public', 'images', 'city-service', citySlug, serviceSlug, 'hero.jpg'));
 
 const brandPool = getBrandPool(cityDesc.tier, serviceDesc);
 
@@ -153,7 +162,18 @@ const schemaJsons = [
   {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
 </Fragment>
 
-<section class="hero">
+<section class={hasComboPhoto ? 'hero hero--photo' : 'hero'}>
+  {hasComboPhoto && (
+    <Fragment>
+      <picture class="hero-bg">
+        <source media="(max-width: 640px)" srcset={`${comboPhotoBase}/hero-640.webp`} type="image/webp" />
+        <source media="(max-width: 960px)" srcset={`${comboPhotoBase}/hero-960.webp`} type="image/webp" />
+        <source srcset={`${comboPhotoBase}/hero.webp`} type="image/webp" />
+        <img src={`${comboPhotoBase}/hero.jpg`} alt={`${serviceName} in ${cityName}, California`} width="1920" height="840" loading="eager" fetchpriority="high" />
+      </picture>
+      <div class="hero-overlay"></div>
+    </Fragment>
+  )}
   <div class="container">
     <p class="crumb"><a href="/">Home</a> &rsaquo; <a href={`/${citySlug}/`}>{cityName}</a> &rsaquo; {serviceName}</p>
     <p class="eyebrow">{eyebrowLine}</p>
@@ -302,8 +322,12 @@ const schemaJsons = [
 
 <style>
   :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
-  .hero { background: var(--black); color: #fff; padding: 56px 24px 64px; }
-  .hero .container { max-width: 1100px; margin: 0 auto; }
+  .hero { position: relative; overflow: hidden; background: var(--black); color: #fff; padding: 56px 24px 64px; }
+  .hero--photo { padding: 92px 24px 100px; }
+  .hero-bg { position: absolute; inset: 0; z-index: 0; }
+  .hero-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .hero-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.82) 40%, rgba(10,10,10,0.5) 72%, rgba(10,10,10,0.28) 100%); }
+  .hero .container { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; }
   .hero h1 { color: #fff; font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 800; margin: 12px 0 18px; line-height: 1.2; }
   .hero .crumb { color: #9a9a9a; font-size: 0.85rem; margin-bottom: 6px; }
   .hero .crumb a { color: #c9c9c9; text-decoration: none; }
