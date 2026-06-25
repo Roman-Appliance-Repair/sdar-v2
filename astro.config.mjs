@@ -145,6 +145,8 @@ export default defineConfig({
     }),
   ],
   redirects: {
+    // sub-service slug truncated by users — real page carries the '-issues' suffix.
+    '/services/refrigerator-repair/freezer-side/': '/services/refrigerator-repair/freezer-side-issues/',
     // ====================================================================
     // Wave 63 Sprint 2D (2026-05-27): outdoor city-flat URLs restructured to
     // proper L2 hierarchy. Old /outdoor/<category>-<city>/ → /outdoor/<category>/<city>/
