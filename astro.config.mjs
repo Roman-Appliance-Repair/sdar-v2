@@ -779,7 +779,7 @@ export default defineConfig({
     '/services/commercial-laundry-machine-repair-los-angeles/': '/commercial/washer-repair/',
     '/services/commercial-refrigerator-repair-los-angeles/': '/commercial/refrigeration/',
     '/services/commercial-showcase-refrigerator-repair-los-angeles/': '/commercial/refrigeration/',
-    '/services/commercial-slushie-machine-repair-los-angeles/': '/commercial/ice-machines/',
+    '/services/commercial-slushie-machine-repair-los-angeles/': '/commercial/slushie-machine-repair/',
     '/services/commercial-walk-in-cooler-repair-los-angeles/': '/commercial/refrigeration/walk-in-cooler-repair/',
     '/services/commercial-walk-in-freezer-repair-los-angeles/': '/commercial/refrigeration/walk-in-freezer-repair/',
     '/services/commercial-washing-machine-repair-los-angeles/': '/commercial/washer-repair/',
