@@ -85,14 +85,14 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - [x] /rancho-cucamonga/washer-repair/  (vol 100)  status: done  commit: c8002988
 - [x] /rancho-cucamonga/dishwasher-repair/  (vol 70)  status: done  commit: c8002988
 
-### Anaheim
-- [ ] /anaheim/refrigerator-repair/  (vol 150)  status: pending  commit: —
-- [ ] /anaheim/dishwasher-repair/  (vol 80)  status: pending  commit: —
-- [ ] /anaheim/dryer-repair/  (vol 80)  status: pending  commit: —
-- [ ] /anaheim/freezer-repair/  (vol 80)  status: pending  commit: —
-- [ ] /anaheim/oven-repair/  (vol 80)  status: pending  commit: —
-- [ ] /anaheim/washer-repair/  (vol 80)  status: pending  commit: —
-- [ ] /anaheim/stove-repair/  (vol 70)  status: pending  commit: —
+### Anaheim (пачка 8) — ✅ DONE (commit bcc30f3e)
+- [x] /anaheim/refrigerator-repair/  (vol 150)  status: done  commit: bcc30f3e
+- [x] /anaheim/dishwasher-repair/  (vol 80)  status: done  commit: bcc30f3e
+- [x] /anaheim/dryer-repair/  (vol 80)  status: done  commit: bcc30f3e
+- [x] /anaheim/freezer-repair/  (vol 80)  status: done  commit: bcc30f3e
+- [x] /anaheim/oven-repair/  (vol 80)  status: done  commit: bcc30f3e
+- [x] /anaheim/washer-repair/  (vol 80)  status: done  commit: bcc30f3e
+- [x] /anaheim/stove-repair/  (vol 70)  status: done  commit: bcc30f3e
 
 ### Прочие (одиночные из List A)
 - [ ] /long-beach/refrigerator-repair/  (vol 100)  status: pending  commit: —
@@ -110,3 +110,4 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - **1d78706d** — Burbank batch (5/56 → 32/56 всего): dryer/refrigerator/oven/dishwasher/washer. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
 - **bd085ee6** — Glendale batch (6/56 → 38/56 всего): dryer/refrigerator/dishwasher/oven/washer/stove. Только `combo-overrides.ts`. Build 0 ошибок (счётчик 1095 = 1094 + untracked `src/pages/outdoor/brands/bull.astro` из отдельной outdoor-работы, не часть этой пачки). Не запушено.
 - **c8002988** — Rancho-Cucamonga batch (5/56 → 43/56 всего): refrigerator/dryer/oven/washer/dishwasher. Только `combo-overrides.ts`. Build 0 ошибок (счётчик 1096 = 1094 + untracked outdoor `bull.astro`+`blaze.astro`, отдельный workstream). Не запушено.
+- **bcc30f3e** — Anaheim batch (7/56 → 50/56 всего): refrigerator/dishwasher/dryer/freezer/oven/washer/stove. Только `combo-overrides.ts`. Build 0 ошибок (1096 = 1094 + 2 untracked outdoor). Не запушено.
