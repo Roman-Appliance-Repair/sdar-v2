@@ -18,6 +18,7 @@ import { mergeCredentials } from '../../data/credentials-schema';
 import { linkifyInternal, newLinkBudget } from '../../lib/linkify-internal';
 import { getBrandPillarSlug } from '../../data/brand-pillar-map';
 import { getCommercialCrossLink } from '../../data/commercial-cross-link-map';
+import { getComboOverride } from '../../data/combo-overrides';
 
 export async function getStaticPaths() {
   return CITY_SERVICE_MATRIX.map(combo => ({
@@ -39,6 +40,9 @@ const phoneHref = `tel:+1${phoneRaw}`;
 const cityName = cityData?.name || citySlug;
 const linkBudget = newLinkBudget(Astro.url.pathname);
 const serviceName = serviceDesc.name;
+const ov = getComboOverride(citySlug, serviceSlug);
+const branchDisplay = branch?.displayName || 'Los Angeles';
+const h1Suffix = branchDisplay !== cityName ? `, Same-Day from ${branchDisplay}` : ', Same-Day Service';
 const canonical = `https://samedayappliance.repair/${citySlug}/${serviceSlug}/`;
 
 // Full-bleed combo hero photo (per city×service). MODE A when both webp+jpg exist on
@@ -177,8 +181,8 @@ const schemaJsons = [
   <div class="container">
     <p class="crumb"><a href="/">Home</a> &rsaquo; <a href={`/${citySlug}/`}>{cityName}</a> &rsaquo; {serviceName}</p>
     <p class="eyebrow">{eyebrowLine}</p>
-    <h1>{serviceName} in {cityName}, Same-Day from {branch?.displayName || 'Los Angeles'}</h1>
-    <p class="lede">{cityDesc.serviceContext} ${'89'} residential diagnostic, applied toward repair. <strong>BHGS #A49573</strong>{serviceDesc.epaCertRequired ? '. EPA 608 Universal certified #1346255700410 for sealed-system work' : ''}. {phone}.</p>
+    <h1>{serviceName} in {cityName}{h1Suffix}</h1>
+    <p class="lede">{ov?.lede || cityDesc.serviceContext} ${'89'} residential diagnostic, applied toward repair. <strong>BHGS #A49573</strong>{serviceDesc.epaCertRequired ? '. EPA 608 Universal certified #1346255700410 for sealed-system work' : ''}. {phone}.</p>
     <div class="cta-row">
       <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
       <a href="/contact/" class="btn-secondary">Book Online</a>
@@ -199,12 +203,21 @@ const schemaJsons = [
 <section class="section">
   <div class="container narrow">
     <p class="section-number">{cityName} {serviceDesc.shortName} service</p>
-    <h2>How {cityName} differs from a generic LA service call.</h2>
-    <p set:html={linkifyInternal(`<strong>When a ${serviceDesc.shortName} fails in ${cityName}, our techs at Same Day Appliance Repair trace it to a handful of patterns: ${topPatterns.join(', ')}. We dispatch same-day from the ${branch?.displayName || 'Los Angeles'} branch across ${cityName} — ${cityDesc.neighborhoods.slice(0, 3).join(', ')} — carrying ${brandPool.slice(0, 3).join(', ')} parts on the truck. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>`, linkBudget)}></p>
-    <p set:html={linkifyInternal(cityDesc.homeStock, linkBudget)}></p>
-    <p><strong>Climate:</strong> {cityDesc.climateNote}</p>
-    <p><strong>Water:</strong> {cityDesc.waterNote}</p>
-    <p set:html={linkifyInternal(`The ${brandPool.slice(0, 3).join(', ')}, and other brands we see in ${cityName} carry the failure-pattern profile typical of ${cityDesc.tier === 'ULTRA-PREMIUM' ? 'ultra-premium tier' : cityDesc.tier === 'PREMIUM' || cityDesc.tier === 'PREMIUM-OC' ? 'premium tier' : cityDesc.tier.startsWith('INLAND') ? 'inland duty cycle' : 'mid-tier residential'} equipment, calibrated for our local conditions.`, linkBudget)}></p>
+    {ov?.introHtml ? (
+      <Fragment>
+        <h2>{ov.introHeading || `${serviceName} in ${cityName}: what our techs actually see.`}</h2>
+        <div set:html={linkifyInternal(ov.introHtml, linkBudget)}></div>
+      </Fragment>
+    ) : (
+      <Fragment>
+        <h2>How {cityName} differs from a generic LA service call.</h2>
+        <p set:html={linkifyInternal(`<strong>When a ${serviceDesc.shortName} fails in ${cityName}, our techs at Same Day Appliance Repair trace it to a handful of patterns: ${topPatterns.join(', ')}. We dispatch same-day from the ${branch?.displayName || 'Los Angeles'} branch across ${cityName} — ${cityDesc.neighborhoods.slice(0, 3).join(', ')} — carrying ${brandPool.slice(0, 3).join(', ')} parts on the truck. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>`, linkBudget)}></p>
+        <p set:html={linkifyInternal(cityDesc.homeStock, linkBudget)}></p>
+        <p><strong>Climate:</strong> {cityDesc.climateNote}</p>
+        <p><strong>Water:</strong> {cityDesc.waterNote}</p>
+        <p set:html={linkifyInternal(`The ${brandPool.slice(0, 3).join(', ')}, and other brands we see in ${cityName} carry the failure-pattern profile typical of ${cityDesc.tier === 'ULTRA-PREMIUM' ? 'ultra-premium tier' : cityDesc.tier === 'PREMIUM' || cityDesc.tier === 'PREMIUM-OC' ? 'premium tier' : cityDesc.tier.startsWith('INLAND') ? 'inland duty cycle' : 'mid-tier residential'} equipment, calibrated for our local conditions.`, linkBudget)}></p>
+      </Fragment>
+    )}
   </div>
 </section>
 
@@ -243,7 +256,9 @@ const schemaJsons = [
   <div class="container narrow">
     <p class="section-number">Honest opinion</p>
     <h2>Practitioner take on {cityName} {serviceDesc.shortName} service.</h2>
-    <p>{serviceDesc.honestOpinion}</p>
+    {ov?.honest
+      ? <div set:html={linkifyInternal(ov.honest, linkBudget)}></div>
+      : <p>{serviceDesc.honestOpinion}</p>}
   </div>
 </section>
 
