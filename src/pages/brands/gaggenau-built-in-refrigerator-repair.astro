@@ -1,0 +1,230 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ServiceHero from '../../components/ServiceHero.astro';
+import BrandBranchesGrid from '../../components/BrandBranchesGrid.astro';
+import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../data/branches';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../lib/build-location-array';
+import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
+
+const title = "Gaggenau Built-In Refrigerator Repair — Same Day";
+const description = "Gaggenau Vario cooling built-in refrigerator repair SoCal, 400 + 200 series RC / RF / RB / RY columns, flush-installed integrated. BSH Irvine CA parts. $89 dx.";
+const canonical = "https://samedayappliance.repair/brands/gaggenau-built-in-refrigerator-repair/";
+
+const faqs = [
+  {
+    q: "What is Gaggenau Vario cooling, and how is it different from a standard built-in fridge?",
+    a: "Gaggenau does not make a freestanding refrigerator at all, the entire refrigeration line is built-in Vario cooling, sold as individual columns you combine into a custom run behind cabinetry panels. Two families. The <b>Vario cooling 400 series</b> is the flagship: flush-installed, fully integrated, TFT touch control, each column its own sealed refrigeration system, refrigerator columns (the RC family, roughly 24 / 30 / 36-inch), freezer columns (the RF family, some with an integrated ice maker), fridge-freezer combination columns (the RB family, bottom-freezer), and French-door format (the RY family). The <b>Vario cooling 200 series</b> is the framed, fully-integrated tier (RB and RT fully-integrated bottom-freezer and single-door). Wine climate columns (the RW family) are refrigeration too, but we cover those on our <a href='/brands/gaggenau-wine-cooler-repair/'>Gaggenau wine cooler</a> page. The point of the column system is the same as Sub-Zero or Thermador Freedom, the kitchen designer mixes widths freely, say a 30-inch RC refrigerator plus an 18/24-inch RF freezer plus an RW wine column, rather than working around one fixed side-by-side box. For service that matters: each column is independent, so a fault usually isolates to the one column that's warm."
+  },
+  {
+    q: "Gaggenau is BSH, what does that mean for parts and service in LA?",
+    a: "Gaggenau sits at the top of BSH Home Appliances (Bosch Siemens Hausgeräte), above its sister brands Bosch, Siemens, and Thermador. The practical upside for LA owners is the <b>BSH parts warehouse in Irvine, California</b>, the same distribution center that stocks Thermador, Bosch, and Siemens components. Common Vario cooling service parts, NTC temperature sensors, evaporator fan motors, water inlet valves, start relays, standard gaskets, often ship 1-2 days to our LA dispatch instead of the 5-10 days typical for a Europe-only luxury brand. The honest caveat: Gaggenau is BSH's lowest-volume, most specialized line, so a few flagship-specific parts, a full TFT display board, a panel-overlay hinge set, a legacy-generation sealed-system part, can still route from European manufacturing on a longer lead. We flag that timeline up front when we quote, we don't leave a $12,000 Vario column open-ended. The same Irvine channel serves our <a href='/brands/gaggenau-oven-repair/'>Gaggenau oven</a>, <a href='/brands/gaggenau-dishwasher-repair/'>dishwasher</a>, and <a href='/brands/gaggenau-wine-cooler-repair/'>wine cooler</a> calls."
+  },
+  {
+    q: "Gaggenau Vario column not cooling, what's the diagnostic order?",
+    a: "The 400 series is front-ventilated behind the kick panel, so our techs work a structured path. (1) Condenser, dust loads on the front-mount condenser at 12-24 months, airflow drops, the compressor runs hot, the column drifts warm. A deep clean at $140-$200 resolves a large share of 'not cooling' calls with no parts. (2) Door gasket, the European-profile seal loses compression at 10-15 years and lets warm air infiltrate; per-column gasket $300-$460. (3) NTC temperature sensor drift, throws a column-specific fault; sensor swap $260-$360. (4) Evaporator fan motor, single-column cooling is entirely fan-dependent, a dead fan kills that column's airflow; $340-$500. (5) Compressor start relay plus capacitor, the cheap first-line before anyone touches the sealed system; $280-$440. (6) Compressor or sealed-system work, $1,100-$1,700 with an EPA-608 refrigerant recharge. Because each Vario column is its own refrigeration circuit, the diagnosis is cleaner than a matched dual-zone box, if only one column is warm, the fault lives in that column's parts."
+  },
+  {
+    q: "Which Gaggenau built-in models show up most in LA luxury kitchens?",
+    a: "Gaggenau lands in the design-forward end of the LA luxury market, the kitchens where the appliances are meant to disappear behind flush custom cabinetry. Three patterns. <b>Full Vario 400 column suite</b>, an RC refrigerator column plus an RF freezer column, often plus an RW wine column, run side by side, concentrated in Bel Air, Beverly Hills, Holmby Hills, and the Bird Streets custom-remodel market where the modular look is the point. <b>RB fridge-freezer combination</b>, a single 400 or 200 series bottom-freezer column as the tighter-footprint alternative to a two-column suite, common in Pacific Palisades, Brentwood, and the Sunset Strip high-rise remodels. <b>RY French-door 400</b>, the wide French-door format for larger estate kitchens in Malibu, Hidden Hills, and Newport Coast. Legacy Gaggenau Vario cooling from the 2010s stays in active service across this install base, and the Irvine channel supports most legacy OEM on a 3-5 day typical lead."
+  },
+  {
+    q: "Does Gaggenau pair with a matched BSH kitchen, Bosch, Thermador, Siemens?",
+    a: "Often, yes, and the shared parts channel makes mixed-suite service efficient, but the brands are not interchangeable at the part level. A common LA setup is a Gaggenau oven and Vario refrigeration paired with a Bosch dishwasher, or a full Gaggenau suite where budget allowed. Because Bosch, Thermador, Siemens, and Gaggenau all flow through the Irvine warehouse, we can schedule a multi-appliance visit and pull parts from one channel. But a Gaggenau NTC sensor is not a Bosch NTC sensor even when the same BSH engineering team designed both, catalogs stay brand-specific. What does carry across is diagnostic approach, the BSH refrigeration architecture and error-code logic are family-similar, so a tech who knows the Thermador Freedom platform reads a Gaggenau Vario fault quickly. See our <a href='/brands/gaggenau/'>full Gaggenau brand page</a> for the rest of the line."
+  },
+  {
+    q: "What does Gaggenau built-in refrigerator repair cost in LA?",
+    a: "Residential diagnostic is $89, waived with the repair. Typical Vario cooling bands: condenser deep clean $140-$200 (annual maintenance); NTC temperature sensor $260-$360; water inlet valve $280-$400; ice maker module (RF ice-variant columns) $340-$500; evaporator fan motor $340-$500 per column; defrost heater plus thermostat $340-$500; door gasket, European spec, $300-$460 per column; compressor start relay plus capacitor $280-$440 per column; sealed-system compressor replacement $1,100-$1,700 per column with recharge; main control board $520-$780; TFT touch display board $420-$640; panel-overlay hinge or gasket hardware $360-$560. Gaggenau sits at the very top of the built-in tier, a hair above Sub-Zero and Miele on parts, but the Irvine parts proximity keeps it from running as high as a Europe-only luxury brand. When two or three Vario columns get serviced on one visit, the service-time efficiency helps the total."
+  },
+  {
+    q: "Is a 12-year-old Gaggenau Vario column worth rebuilding, or should I replace it?",
+    a: "Rebuild, in almost every case, and we'll tell you so before we charge a diagnostic. BSH engineers Vario cooling for a 15-20 year service life with periodic component work, and the modular design is rebuild-friendly, each column is serviced on its own without disturbing the ones beside it. A refresh at 10-15 years per column, condenser deep clean plus door gasket plus NTC sensor plus start relay, runs $800-$1,300 and buys another 5-8 years. Set that against replacement: a current Gaggenau Vario 400 column is roughly $8,000-$15,000 depending on width and format, plus $1,500-$3,500 to pull the old one, fit the new one, and rework the custom panel, so $10,000-$18,000 per column installed. An $1,100 refresh on a functioning 12-year column beats that by a wide margin. The honest exceptions where we say replace: cabinet or subfloor water damage from years of a failed gasket; a sealed-system failure stacked with a dead board and multiple sensors, which reads as end-of-life; or a planned remodel where it makes sense to coordinate the swap anyway."
+  },
+  {
+    q: "Where can I find the official Gaggenau manual or warranty information?",
+    a: "Our technicians work independently of Gaggenau's factory service network - we're often faster and available same-day in Southern California."
+  },
+];
+
+const schemaJsons = [
+  { "@context": "https://schema.org", "@type": "Service", "serviceType": "Gaggenau Built-In Refrigerator Repair",
+    "provider": { "@id": canonical + "#org" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "description": "Gaggenau Vario cooling built-in refrigerator repair across Southern California, LA, Orange, Ventura, San Bernardino, Riverside. 400 and 200 series RC refrigerator, RF freezer, RB fridge-freezer, RY French-door columns, flush-installed integrated. BSH Hausgeraete engineering with Irvine CA parts channel. $89 residential diagnostic waived with repair.",
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, waived with repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  { "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Brands", "item": "https://samedayappliance.repair/brands/" },
+      { "@type": "ListItem", "position": 3, "name": "Gaggenau", "item": "https://samedayappliance.repair/brands/gaggenau/" },
+      { "@type": "ListItem", "position": 4, "name": "Gaggenau Built-In Refrigerator Repair", "item": canonical }
+    ]
+  }
+];
+
+const wave46OrgSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': canonical + '#org',
+  name: 'Same Day Appliance Repair',
+  url: canonical,
+  priceRange: '$$',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: [
+    { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
+    { '@type': 'AdministrativeArea', name: 'Orange County' },
+    { '@type': 'AdministrativeArea', name: 'Ventura County' },
+    { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
+    { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  ],
+  location: BRANCH_LOCATIONS_GEO_NEUTRAL
+});
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+  <script type="application/ld+json" set:html={JSON.stringify(wave46OrgSchema)} />{schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}</Fragment>
+  <div class="call-banner"><div class="wrap"><span>Gaggenau Vario cooling column warming up? Same-day across all 5 SoCal counties:</span><a href={`tel:${MAIN_PHONE_TEL}`} class="phone-lg">{MAIN_PHONE}</a></div></div>
+
+  <ServiceHero
+    logoSlug="gaggenau"
+    section="brands"
+    slug="gaggenau-built-in-refrigerator-repair"
+    eyebrow={"Gaggenau · Built-In Refrigerator Repair"}
+    title={"Gaggenau Built-In Refrigerator Repair Across Southern California"}
+    subtitle={description}
+    heroImageTitle={"Gaggenau Built-In Refrigerator Repair"}
+  />
+
+
+<nav class="crumbs" aria-label="Breadcrumb">
+  <a href="/">Home</a> <span class="crumbs-sep">›</span>
+  <a href="/brands/">Brands</a> <span class="crumbs-sep">›</span>
+  <a href="/brands/gaggenau/">Gaggenau</a> <span class="crumbs-sep">›</span>
+  <span aria-current="page">Built-In Refrigerator Repair</span>
+</nav>
+  <BrandBranchesGrid />
+
+  <section class="trust-bar"><div class="wrap"><span>BHGS #A49573 · Insured</span><span>Same-day in 5 SoCal counties</span><span>Residential diagnostic $89 · waived with repair</span></div></section>
+
+  <section class="section"><div class="wrap narrow">
+    <h2>Gaggenau doesn't make a freestanding fridge, it's all Vario cooling</h2>
+    <p>This is the thing to understand about a Gaggenau refrigeration call before we knock on the door: there is no Gaggenau you can wheel out and unplug. The whole line is <b>Vario cooling</b>, built-in columns that live flush inside custom cabinetry, and you almost never see one from the front, it's hidden behind the same wood panel as the run of cabinets around it. So when someone in Bel Air calls and says "the fridge is warming up," we're usually walking into a flush-integrated 400 series column with a TFT touch panel, not a box on rollers.</p>
+    <p>The line splits into two families. The <b>Vario cooling 400 series</b> is the flagship, flush-installed, fully integrated, each column its own sealed refrigeration system: RC refrigerator columns (roughly 24, 30, and 36-inch), RF freezer columns (some with an integrated ice maker), RB fridge-freezer combination columns with a bottom freezer, and the RY French-door format for wide estate kitchens. The <b>Vario cooling 200 series</b> is the framed, fully-integrated tier, RB and RT bottom-freezer and single-door units for kitchens that want the Gaggenau engineering without the full flush-panel install. Wine climate columns (the RW family) are refrigeration too, but those live on our <a href="/brands/gaggenau-wine-cooler-repair/">Gaggenau wine cooler repair</a> page.</p>
+    <p>The column system is the whole design idea, and it's the same logic as Sub-Zero or Thermador Freedom: the kitchen designer combines widths freely, an RC refrigerator next to an RF freezer next to an RW wine column, instead of building the room around one fixed side-by-side. For our techs that's good news. Each column is an independent circuit with its own compressor, sensors, and fan, so when one column drifts warm the fault almost always isolates to that column, and we're not tearing into a matched dual-zone box to find it.</p>
+  </div></section>
+
+  <section class="section alt"><div class="wrap">
+    <h2>Common Gaggenau Vario failures our techs actually see in LA</h2>
+    <div class="fail-block"><h3>Warm column, and it's usually the condenser first</h3><p>The 400 series pulls air through the front kick panel, and in LA that grille loads up with dust and kitchen grease inside 12-24 months. Airflow drops, the compressor runs hot, the column drifts warm. A deep clean at $140-$200 clears a big share of "not cooling" calls with no parts at all, and we'll tell you when that's all it is.</p></div>
+    <div class="fail-block"><h3>Door gasket compression loss, European profile</h3><p>Vario uses a European-spec seal that slowly loses its compression around 10-15 years. Warm room air infiltrates, the column cycles constantly, and the temperature drifts up a few degrees. Per-column gasket $300-$460, and we check hinge alignment while we're in there so the new seal actually seats.</p></div>
+    <div class="fail-block"><h3>NTC temperature sensor drift, error-code diagnostic</h3><p>BSH refrigeration throws column-specific fault codes, and a drifting NTC sensor is one of the most common. Sensor swap $260-$360; the part is usually 1-2 days from the Irvine warehouse.</p></div>
+    <div class="fail-block"><h3>Evaporator fan motor, one column, one fan</h3><p>Because every Vario column cools on its own fan, a dead evaporator fan takes out that column's airflow entirely, freezer fine, fridge warm, or the reverse. Motor swap $340-$500 per column.</p></div>
+    <div class="fail-block"><h3>Ice maker on the RF ice-variant columns</h3><p>The freezer columns spec'd with an ice maker fail the usual two ways: water inlet valve $280-$400, or the ice module itself $340-$500. We check the fill line and valve before condemning the module.</p></div>
+    <div class="fail-block"><h3>TFT display board, and the sealed system last</h3><p>The flagship 400 columns run a TFT touch panel; a dead display reads as "the fridge won't turn on" when the cooling is actually fine, board $420-$640. Sealed-system compressor work is the high end, $1,100-$1,700 with an EPA-608 recharge, and it's the one repair where we sit down and run the replace-or-rebuild math with you first.</p></div>
+  </div></section>
+
+  <section class="section"><div class="wrap narrow">
+    <h2>BSH Irvine parts chain, the honest version for Gaggenau</h2>
+    <p>Gaggenau sits at the top of BSH Home Appliances, above Bosch, Siemens, and Thermador, and it shares their <b>Irvine, California parts warehouse</b>. That's a real advantage most people don't get on a European luxury brand: the everyday Vario cooling parts, NTC sensors, fan motors, inlet valves, start relays, standard gaskets, usually reach our LA dispatch in 1-2 days instead of the 5-10 you'd wait on a Europe-only distribution chain. Where we're straight with owners is the flagship-specific stuff. Gaggenau is BSH's lowest-volume, most specialized line, so a full TFT board, a panel-overlay hinge set, or a legacy sealed-system part can still route from European manufacturing on a longer lead. We quote that timeline up front, a $12,000 column shouldn't sit open with no end date. If you're running a mixed BSH kitchen, a Gaggenau oven and Vario fridge with a <a href="/brands/gaggenau-dishwasher-repair/">Gaggenau dishwasher</a>, we can pull it all through one channel on a single visit. And the broader <a href="/brands/gaggenau/">Gaggenau brand page</a> covers the cooking and dishwashing side.</p>
+  </div></section>
+
+  <section class="section alt"><div class="wrap">
+    <h2>What Gaggenau built-in refrigerator repair typically costs</h2>
+    <table class="price-table">
+      <tr><th>Service</th><th>Typical Range</th><th>Notes</th></tr>
+      <tr><td>Residential diagnostic</td><td>$89</td><td>Waived with repair</td></tr>
+      <tr><td>Condenser deep clean</td><td>$140 – $200</td><td>Annual maintenance, front-vent</td></tr>
+      <tr><td>NTC temperature sensor</td><td>$260 – $360</td><td>BSH error-code diagnostic</td></tr>
+      <tr><td>Water inlet valve</td><td>$280 – $400</td><td>Ice maker + dispenser supply</td></tr>
+      <tr><td>Ice maker module</td><td>$340 – $500</td><td>RF ice-variant columns</td></tr>
+      <tr><td>Evaporator fan motor</td><td>$340 – $500</td><td>Per column</td></tr>
+      <tr><td>Defrost heater + thermostat</td><td>$340 – $500</td><td>Freezer defrost cycle</td></tr>
+      <tr><td>Door gasket (European spec)</td><td>$300 – $460</td><td>Per column; 10-15 yr compression</td></tr>
+      <tr><td>Compressor start relay + capacitor</td><td>$280 – $440</td><td>Per column; first-line diagnostic</td></tr>
+      <tr><td>Sealed-system compressor</td><td>$1,100 – $1,700</td><td>Per column; EPA-608 recharge</td></tr>
+      <tr><td>Main control board</td><td>$520 – $780</td><td>BSH digital architecture</td></tr>
+      <tr><td>TFT touch display board</td><td>$420 – $640</td><td>400 series flagship columns</td></tr>
+      <tr><td>Column refresh package (10-15 yr)</td><td>$800 – $1,300</td><td>Gasket + sensor + relay + clean</td></tr>
+    </table>
+    <p class="small">Related: <a href="/brands/gaggenau/">Gaggenau brand page</a> · <a href="/brands/gaggenau-wine-cooler-repair/">Gaggenau wine cooler repair</a> · <a href="/brands/gaggenau-oven-repair/">Gaggenau oven repair</a> · <a href="/brands/gaggenau-dishwasher-repair/">Gaggenau dishwasher repair</a> · <a href="/services/built-in-refrigerator-repair/">Built-in refrigerator service hub</a>.</p>
+  </div></section>
+
+  <section class="section"><div class="wrap">
+    <h2>Service areas, where our Gaggenau Vario calls come from</h2>
+    <div class="area-grid">
+      <div><h4>Bel Air + Beverly Hills</h4><p><a href="/beverly-hills/">Beverly Hills</a> · Bel Air · Holmby Hills · Bird Streets</p></div>
+      <div><h4>Brentwood + Pacific Palisades</h4><p><a href="/brentwood/">Brentwood</a> · Pacific Palisades</p></div>
+      <div><h4>Malibu + Hidden Hills</h4><p>Malibu · Hidden Hills · Calabasas</p></div>
+      <div><h4>Pasadena + San Marino</h4><p><a href="/pasadena/">Pasadena</a> · San Marino · La Cañada</p></div>
+      <div><h4>West Hollywood + the Hills</h4><p><a href="/west-hollywood/">West Hollywood</a> · Sunset Strip · Hollywood Hills</p></div>
+      <div><h4>OC + Irvine parts-local</h4><p>Newport Coast · Corona del Mar · <a href="/irvine/">Irvine</a> (BSH warehouse)</p></div>
+    </div>
+  </div></section>
+
+  <section class="section alt"><div class="wrap narrow">
+    <h2>Related Gaggenau + built-in refrigerator pages</h2>
+    <ul class="related-links">
+      <li><a href="/brands/gaggenau/">Gaggenau brand page (full line) →</a></li>
+      <li><a href="/brands/gaggenau-wine-cooler-repair/">Gaggenau wine cooler repair →</a></li>
+      <li><a href="/brands/gaggenau-oven-repair/">Gaggenau oven repair →</a></li>
+      <li><a href="/brands/gaggenau-dishwasher-repair/">Gaggenau dishwasher repair →</a></li>
+      <li><a href="/services/built-in-refrigerator-repair/">Built-in refrigerator service hub →</a></li>
+      <li><a href="/brands/thermador-built-in-refrigerator-repair/">Thermador built-in (BSH sister) →</a></li>
+      <li><a href="/brands/sub-zero-built-in-refrigerator-repair/">Sub-Zero built-in (luxury alt) →</a></li>
+      <li><a href="/brands/miele-built-in-refrigerator-repair/">Miele built-in (European alt) →</a></li>
+    </ul>
+  </div></section>
+
+  <section class="section"><div class="wrap narrow">
+    <h2>Gaggenau built-in refrigerator repair, frequently asked</h2>
+    {faqs.map(f => (<details class="faq"><summary>{f.q}</summary><p set:html={f.a}></p></details>))}
+  </div></section>
+
+  <section id="book" class="cta-bottom"><div class="wrap">
+    <h2>Gaggenau Vario column down? Call the branch closest to your home.</h2>
+    <p>Same-day appliance repair across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Residential diagnostic $89, waived with repair.</p>
+  </div></section>
+  <a href={`tel:${MAIN_PHONE_TEL}`} class="float-call" aria-label="Call now">☎ Call {MAIN_PHONE}</a>
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  body { color: var(--text); } .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px; } .wrap.narrow { max-width: 820px; }
+  h1 { font-size: 2.4rem; line-height: 1.15; margin: 12px 0 20px; color: var(--black); }
+  h2 { font-size: 1.8rem; margin: 0 0 16px; color: var(--black); }
+  h3 { font-size: 1.2rem; margin: 0 0 10px; color: var(--black); }
+  h4 { font-size: 1.02rem; margin: 0 0 6px; color: var(--black); }
+  p { line-height: 1.65; margin: 0 0 14px; }
+  .call-banner { background: var(--red); color: #fff; padding: 10px 0; }
+  .call-banner .wrap { display:flex; gap: 14px; align-items: center; justify-content: center; flex-wrap: wrap; }
+  .call-banner .phone-lg { color:#fff; font-weight: 800; text-decoration: underline; font-size: 1.05rem; }
+  .hero { background: var(--black); color: #fff; padding: 42px 0 56px; } .hero h1 { color: #fff; }
+  .trust-bar { background: var(--red); color: #fff; padding: 14px 0; }
+  .trust-bar .wrap { display: flex; gap: 28px; flex-wrap: wrap; justify-content: center; font-size: 0.95rem; font-weight: 600; }
+  .section { padding: 56px 0; } .section.alt { background: var(--gray); }
+  .fail-block { background: #fff; border-left: 3px solid var(--red); padding: 20px 22px; margin: 16px 0; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 14px; background: #fff; }
+  .price-table th, .price-table td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--border); }
+  .price-table th { background: var(--black); color: #fff; font-weight: 700; font-size: 0.95rem; }
+  .small { color: var(--muted); font-size: 0.92rem; margin-top: 12px; }
+  .area-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px; }
+  .area-grid > div { background: #fff; border: 1px solid var(--border); padding: 16px; border-radius: 6px; }
+  .related-links { list-style: none; padding: 0; } .related-links li { padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .related-links a { color: var(--red); font-weight: 600; text-decoration: none; } .related-links a:hover { text-decoration: underline; }
+  .faq { background: #fff; border: 1px solid var(--border); padding: 12px 16px; margin-bottom: 8px; border-radius: 4px; }
+  .faq summary { font-weight: 700; cursor: pointer; padding: 4px 0; } .faq p { margin: 8px 0 0; }
+  .crumbs { max-width: 1200px; margin: 0 auto; padding: 14px 24px; color: var(--muted); font-size: 0.9rem; }
+  .crumbs a { color: var(--red); text-decoration: none; } .crumbs-sep { margin: 0 6px; color: var(--border); }
+  .cta-bottom { background: var(--black); color: #fff; padding: 48px 0; } .cta-bottom h2 { color: #fff; } .cta-bottom p { color: #c9c9c9; }
+  .float-call { position: fixed; bottom: 18px; right: 18px; background: var(--red); color: #fff; padding: 14px 18px; border-radius: 40px; text-decoration: none; font-weight: 700; box-shadow: 0 6px 18px rgba(0,0,0,0.28); z-index: 50; font-size: 0.95rem; }
+  @media (max-width: 820px) { h1 { font-size: 1.9rem; } h2 { font-size: 1.45rem; } .float-call { padding: 11px 14px; font-size: 0.88rem; } .trust-bar .wrap { gap: 14px; font-size: 0.85rem; } }
+</style>
