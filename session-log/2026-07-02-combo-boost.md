@@ -70,13 +70,13 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - [x] /burbank/dishwasher-repair/  (vol 60)  status: done  commit: 1d78706d
 - [x] /burbank/washer-repair/  (vol 60)  status: done  commit: 1d78706d
 
-### Glendale
-- [ ] /glendale/dryer-repair/  (vol 150)  status: pending  commit: —
-- [ ] /glendale/refrigerator-repair/  (vol 100)  status: pending  commit: —
-- [ ] /glendale/dishwasher-repair/  (vol 90)  status: pending  commit: —
-- [ ] /glendale/oven-repair/  (vol 80)  status: pending  commit: —
-- [ ] /glendale/washer-repair/  (vol 80)  status: pending  commit: —
-- [ ] /glendale/stove-repair/  (vol 50)  status: pending  commit: —
+### Glendale (пачка 6) — ✅ DONE (commit bd085ee6)
+- [x] /glendale/dryer-repair/  (vol 150)  status: done  commit: bd085ee6
+- [x] /glendale/refrigerator-repair/  (vol 100)  status: done  commit: bd085ee6
+- [x] /glendale/dishwasher-repair/  (vol 90)  status: done  commit: bd085ee6
+- [x] /glendale/oven-repair/  (vol 80)  status: done  commit: bd085ee6
+- [x] /glendale/washer-repair/  (vol 80)  status: done  commit: bd085ee6
+- [x] /glendale/stove-repair/  (vol 50)  status: done  commit: bd085ee6
 
 ### Rancho-Cucamonga
 - [ ] /rancho-cucamonga/refrigerator-repair/  (vol 150)  status: pending  commit: —
@@ -108,3 +108,4 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - **681aff9c** — Temecula batch (6/56 → 21/56 всего): refrigerator/dryer/oven/washer/stove/dishwasher. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
 - **6a8d755f** — Irvine batch (6/56 → 27/56 всего): dryer/refrigerator/dishwasher/oven/washer/ice-maker. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
 - **1d78706d** — Burbank batch (5/56 → 32/56 всего): dryer/refrigerator/oven/dishwasher/washer. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
+- **bd085ee6** — Glendale batch (6/56 → 38/56 всего): dryer/refrigerator/dishwasher/oven/washer/stove. Только `combo-overrides.ts`. Build 0 ошибок (счётчик 1095 = 1094 + untracked `src/pages/outdoor/brands/bull.astro` из отдельной outdoor-работы, не часть этой пачки). Не запушено.
