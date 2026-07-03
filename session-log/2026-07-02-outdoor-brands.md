@@ -54,5 +54,39 @@ Prod:
 
 ## Следующие шаги (по стратегии кластера)
 - Через 1–2 недели свериться по GSC: вошли ли новые URL в индекс, как двинулась `/services/outdoor-refrigerator-repair/`.
-- Вторая волна брендов из таргет-листа (без прямого спроса пока): Napoleon, Saber, Summerset, Coyote → затем RCS,
-  Delta Heat, American Outdoor, Calcana (patio-heater хаб).
+- Вторая волна брендов из таргет-листа: Napoleon ✅ + Coyote ✅ (сделаны ниже), Viking Outdoor ✅ (сделан ниже);
+  остаются Saber, Summerset, RCS, Delta Heat, American Outdoor, Calcana (patio-heater хаб).
+
+---
+
+## Волна 2: Viking Outdoor + Napoleon + Coyote (2026-07-02, commit `c31235f7` на main)
+
+**Задача:** закрыть 3 оставшихся гриль-бренда без посадочных (аудит покрытия outdoor-гриль-брендов).
+Все три уже упоминались как обслуживаемые в `outdoor/grill-repair.astro`, но без своих страниц — паттерн gap как у Bull/Blaze.
+
+**Что сделано:** 3 страницы по тому же скелету twin-eagles/Bull:
+- `outdoor/brands/viking.astro` (~3710w) — **Viking OUTDOOR ГРИЛЬ**, явно разведён с residential-range (`/brands/viking/`)
+  и перелинкован на холодильник (`/brands/viking-outdoor-refrigerator-repair/`), НЕ дублируя его. Серии VGBQ (open-flame),
+  VGIQ (Tru-Sear infrared), VQGI (5 Series built-in).
+- `outdoor/brands/napoleon.astro` (~3500w) — Prestige / Prestige PRO 500-665 (RSIB freestanding + BIPRO RB built-in) / Rogue;
+  JETFIRE ignition, инфракрасные SIZZLE ZONE (side) + rear burner; честный scope built-in vs cart.
+- `outdoor/brands/coyote.astro` (~3470w) — C-Series (C3C/C3CH/C3CL/C3CO) + S-Series (C3SL) с RapidSear infrared,
+  LED-lit knobs, interior lights (диагностика gas и LED-цепи раздельно).
+
+**Фактура — только сверенная вебом** (curl/поиск): Viking VGBQ53624/54224/55424, VGIQ300-2RE/RT, VGIQ410-3RE/RT, VQGI5421;
+Napoleon PRO500RSIBPSS-3 / PRO665RSIBPSS-3 / BIPRO500RBSS-3 / BIPRO665RBNSS-3 / Rogue 425-625; Coyote C1CHCS, C3C30/34,
+C3CH36, C3CL36/42, C3CO50, C3SL30/36/42. 0 выдуманных SKU.
+
+**Перелинковка (де-орфан):** грид `outdoor/grill-repair` (теперь 13 брендов) + brand-list `outdoor/kitchen-repair` + перекрёст.
+Входящих: Viking 3, Napoleon 4, Coyote 3 (у coyote 3-й — карточка в related-гриде napoleon).
+
+**Комплаенс (dist):** titles 52/46/44 ≤60 · forbidden 0 · em-dash в теле 0/0/0 · aggregateRating 0 · кириллица 0 ·
+$89 присутствует, $120 = global chrome (у coyote был лишний `$120` в цене детали кейса → поправлен на `$130`).
+Build 1097, 0 ошибок. Cloudflare live, три URL по title подтверждены, IndexNow 3 → 200.
+
+**Схема:** geo-neutral, location array 8 филиалов (`mergeCredentials` + `BRANCH_LOCATIONS_GEO_NEUTRAL`), без streetAddress/aggregateRating.
+
+**Откат:** `git revert c31235f7` (3 новых файла + по 3 строки в grill-repair/kitchen-repair). Контент других страниц не тронут.
+
+**Турбулентность:** ветка несколько раз перескакивала под работой (соседние терминалы: fix/refrigeration-hub, fix/slushie-page),
+был `index.lock`-конфликт. Коммит сделан на `main` явными путями (5 файлов), чужие правки `brands/viking*` соседнего терминала не тронуты.
