@@ -145,6 +145,13 @@ export default defineConfig({
     }),
   ],
   redirects: {
+    // Fake brand×appliance pages removed 2026-07-02 (brand does not make that product;
+    // see docs/factual-accuracy.md §2 + wiki briefing "несуществующие товары") → service hub 301.
+    '/brands/jennair-dryer-repair/': '/services/dryer-repair/',
+    '/brands/hestan-dishwasher-repair/': '/services/dishwasher-repair/',
+    '/brands/wolf-pizza-oven-repair/': '/services/pizza-oven-repair/',
+    '/brands/miele-ice-maker-repair/': '/services/ice-maker-repair/',
+    '/brands/thermador-ice-maker-repair/': '/services/ice-maker-repair/',
     // sub-service slug truncated by users — real page carries the '-issues' suffix.
     '/services/refrigerator-repair/freezer-side/': '/services/refrigerator-repair/freezer-side-issues/',
     // ====================================================================
