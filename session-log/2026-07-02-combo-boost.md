@@ -94,13 +94,15 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - [x] /anaheim/washer-repair/  (vol 80)  status: done  commit: bcc30f3e
 - [x] /anaheim/stove-repair/  (vol 70)  status: done  commit: bcc30f3e
 
-### Прочие (одиночные из List A)
-- [ ] /long-beach/refrigerator-repair/  (vol 100)  status: pending  commit: —
-- [ ] /long-beach/dryer-repair/  (vol 50)  status: pending  commit: —
-- [ ] /santa-monica/stove-repair/  (vol 90)  status: pending  commit: —
-- [ ] /west-hollywood/dryer-repair/  (vol 60)  status: pending  commit: —
-- [ ] /hollywood/refrigerator-repair/  (vol 50)  status: pending  commit: —
-- [ ] /thousand-oaks/refrigerator-repair/  (vol 50)  status: pending  commit: —
+### Прочие (одиночные из List A) — пачка 9 — ✅ DONE (commit 7eb71537)
+- [x] /long-beach/refrigerator-repair/  (vol 100)  status: done  commit: 7eb71537
+- [x] /long-beach/dryer-repair/  (vol 50)  status: done  commit: 7eb71537
+- [x] /santa-monica/stove-repair/  (vol 90)  status: done  commit: 7eb71537
+- [x] /west-hollywood/dryer-repair/  (vol 60)  status: done  commit: 7eb71537
+- [x] /hollywood/refrigerator-repair/  (vol 50)  status: done  commit: 7eb71537
+- [x] /thousand-oaks/refrigerator-repair/  (vol 50)  status: done  commit: 7eb71537
+
+## ✅ ЗАВЕРШЕНО: 56/56 combo усилены. Ветка `work/combo-boost-2026-07-02`, НЕ запушено — ждём решения по merge/push.
 
 ## Журнал коммитов
 - **c5bf2163** — LA batch (8/56): refrigerator/dryer/oven/dishwasher/washer/freezer/stove/microwave. + override-механизм (`src/data/combo-overrides.ts` + правка `[city]/[service].astro`) + H1 dedupe (city==branch → «Same-Day Service»). Build 1094, 0 ошибок. Не запушено.
@@ -111,3 +113,4 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - **bd085ee6** — Glendale batch (6/56 → 38/56 всего): dryer/refrigerator/dishwasher/oven/washer/stove. Только `combo-overrides.ts`. Build 0 ошибок (счётчик 1095 = 1094 + untracked `src/pages/outdoor/brands/bull.astro` из отдельной outdoor-работы, не часть этой пачки). Не запушено.
 - **c8002988** — Rancho-Cucamonga batch (5/56 → 43/56 всего): refrigerator/dryer/oven/washer/dishwasher. Только `combo-overrides.ts`. Build 0 ошибок (счётчик 1096 = 1094 + untracked outdoor `bull.astro`+`blaze.astro`, отдельный workstream). Не запушено.
 - **bcc30f3e** — Anaheim batch (7/56 → 50/56 всего): refrigerator/dishwasher/dryer/freezer/oven/washer/stove. Только `combo-overrides.ts`. Build 0 ошибок (1096 = 1094 + 2 untracked outdoor). Не запушено.
+- **7eb71537** — Final singles batch (6/56 → **56/56 ГОТОВО**): long-beach refrigerator+dryer, santa-monica stove, west-hollywood dryer, hollywood refrigerator, thousand-oaks refrigerator. Только `combo-overrides.ts`. Build 0 ошибок. Не запушено.
