@@ -47,13 +47,13 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - [x] /pasadena/refrigerator-repair/  (vol 80)  status: done  commit: ad4ac978
 - [x] /pasadena/cooktop-repair/  (vol 70)  status: done  commit: ad4ac978
 
-### Temecula
-- [ ] /temecula/refrigerator-repair/  (vol 150)  status: pending  commit: —
-- [ ] /temecula/dryer-repair/  (vol 100)  status: pending  commit: —
-- [ ] /temecula/oven-repair/  (vol 100)  status: pending  commit: —
-- [ ] /temecula/washer-repair/  (vol 100)  status: pending  commit: —
-- [ ] /temecula/stove-repair/  (vol 90)  status: pending  commit: —
-- [ ] /temecula/dishwasher-repair/  (vol 70)  status: pending  commit: —
+### Temecula (пачка 3) — ✅ DONE (commit 681aff9c)
+- [x] /temecula/refrigerator-repair/  (vol 150)  status: done  commit: 681aff9c
+- [x] /temecula/dryer-repair/  (vol 100)  status: done  commit: 681aff9c
+- [x] /temecula/oven-repair/  (vol 100)  status: done  commit: 681aff9c
+- [x] /temecula/washer-repair/  (vol 100)  status: done  commit: 681aff9c
+- [x] /temecula/stove-repair/  (vol 90)  status: done  commit: 681aff9c
+- [x] /temecula/dishwasher-repair/  (vol 70)  status: done  commit: 681aff9c
 
 ### Irvine
 - [ ] /irvine/dryer-repair/  (vol 150)  status: pending  commit: —
@@ -105,3 +105,4 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 ## Журнал коммитов
 - **c5bf2163** — LA batch (8/56): refrigerator/dryer/oven/dishwasher/washer/freezer/stove/microwave. + override-механизм (`src/data/combo-overrides.ts` + правка `[city]/[service].astro`) + H1 dedupe (city==branch → «Same-Day Service»). Build 1094, 0 ошибок. Не запушено.
 - **ad4ac978** — Pasadena batch (7/56 → 15/56 всего): washer/dishwasher/oven/stove/dryer/refrigerator/cooktop. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
+- **681aff9c** — Temecula batch (6/56 → 21/56 всего): refrigerator/dryer/oven/washer/stove/dishwasher. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
