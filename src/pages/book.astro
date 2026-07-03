@@ -149,9 +149,8 @@ const breadcrumbSchema = {
     <div class="container form-container">
       <h2>Book online</h2>
       <p class="section-intro">
-        Fastest path is a call — but if you prefer to type, this form opens your email client
-        pre-filled and sends to our dispatch queue. We call back within 30 minutes during
-        business hours.
+        Fastest path is a call — but if you prefer to type, fill this out and hit send. It goes
+        straight to our dispatch queue and we call back within 30 minutes during business hours.
       </p>
 
       <form class="book-form" id="bookingForm" novalidate>
@@ -250,6 +249,7 @@ const breadcrumbSchema = {
         <input type="text" id="f-hp" name="website" autocomplete="off" tabindex="-1" aria-hidden="true"
                style="position:absolute;left:-9999px;opacity:0;pointer-events:none;height:1px;width:1px" />
 
+        <div id="formError" class="form-error-banner" role="alert" hidden></div>
         <button type="button" id="bookSubmit" class="btn-primary submit">Send booking request</button>
         <p class="form-note">
           For same-day service before noon, calling <a href={`tel:${mainPhoneTel}`}>{mainPhone}</a>
@@ -365,35 +365,73 @@ const breadcrumbSchema = {
         });
       }
 
-      btn.addEventListener('click', async function () {
-        var name = val('f-name');
+      var formError = document.getElementById('formError');
+      var MAIN_PHONE = '(424) 325-0520';
+      var REQUIRED = ['f-name','f-phone','f-address','f-city','f-category','f-appliance','f-issue'];
+
+      function fieldWrap(id) {
+        var e = document.getElementById(id);
+        if (!e) return null;
+        return e.closest ? e.closest('label') : e.parentNode;
+      }
+      function showFieldError(id, msg) {
+        var e = document.getElementById(id); if (!e) return;
+        var wrap = fieldWrap(id); if (!wrap) return;
+        var err = wrap.querySelector('.field-error');
+        if (!err) { err = document.createElement('span'); err.className = 'field-error'; wrap.appendChild(err); }
+        err.textContent = msg;
+        e.setAttribute('aria-invalid', 'true');
+        e.classList.add('input-invalid');
+      }
+      function clearFieldError(id) {
+        var e = document.getElementById(id); if (!e) return;
+        var wrap = fieldWrap(id); if (wrap) { var err = wrap.querySelector('.field-error'); if (err) err.textContent = ''; }
+        e.removeAttribute('aria-invalid');
+        e.classList.remove('input-invalid');
+      }
+      function clearAllErrors() { hideFormError(); REQUIRED.forEach(clearFieldError); }
+      function showFormError(html) { if (formError) { formError.innerHTML = html; formError.hidden = false; formError.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
+      function hideFormError() { if (formError) { formError.hidden = true; formError.innerHTML = ''; } }
+      function branchPhoneFor(city) { return BRANCH_PHONES[city] || MAIN_PHONE; }
+      function telHref(p) { return 'tel:+1' + p.replace(/\D/g, ''); }
+
+      // Clear a field's error as soon as the user starts fixing it.
+      REQUIRED.forEach(function (id) {
+        var e = document.getElementById(id); if (!e) return;
+        var ev = (e.tagName === 'SELECT') ? 'change' : 'input';
+        e.addEventListener(ev, function () { clearFieldError(id); });
+      });
+
+      function validate() {
+        clearAllErrors();
+        var firstBad = null;
+        function bad(id, msg) { showFieldError(id, msg); if (!firstBad) firstBad = id; }
+        if (!val('f-name')) bad('f-name', 'Please enter your name.');
         var phone = val('f-phone');
-        var email = val('f-email');
-        var zip = val('f-zip');
-        var address = val('f-address');
-        var city = val('f-city');
-        var category = val('f-category');
-        var appliance = val('f-appliance');
-        var brand = val('f-brand');
-        var issue = val('f-issue');
-        var date = val('f-date');
-        var time = val('f-time');
-        var hp = val('f-hp');
-
-        if (!name) { alert('Please enter your name.'); return; }
-        if (!phone || phone.replace(/\D/g, '').length < 7) {
-          alert('Please enter a valid phone number.');
-          return;
+        if (!phone || phone.replace(/\D/g, '').length < 7) bad('f-phone', 'Enter a valid phone number (at least 7 digits).');
+        if (!val('f-address')) bad('f-address', 'Please enter your service address.');
+        if (!val('f-city')) bad('f-city', 'Please select your service area.');
+        if (!val('f-category')) bad('f-category', 'Please select the service category.');
+        if (!val('f-appliance')) bad('f-appliance', 'Select a category first, then choose the appliance.');
+        if (!val('f-issue')) bad('f-issue', 'Please describe the issue briefly.');
+        if (firstBad) {
+          var e = document.getElementById(firstBad);
+          if (e) { try { e.focus(); } catch (_) {} e.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+          return false;
         }
-        if (!address) { alert('Please enter your service address.'); return; }
-        if (!city) { alert('Please select your service area.'); return; }
-        if (!category) { alert('Please select the service category.'); return; }
-        if (!appliance) { alert('Please select the appliance type.'); return; }
-        if (!issue) { alert('Please describe the issue briefly.'); return; }
+        return true;
+      }
 
-        btn.disabled = true;
+      btn.addEventListener('click', async function () {
+        if (!validate()) return;
+
+        var city = val('f-city');
+        var appliance = val('f-appliance');
         var origText = btn.textContent;
+        var submitted = false;
+        btn.disabled = true;
         btn.textContent = 'Sending…';
+        hideFormError();
 
         try {
           var res = await fetch('/api/contact', {
@@ -402,49 +440,48 @@ const breadcrumbSchema = {
             body: JSON.stringify({
               type: 'booking',
               brand_site: 'samedayappliance.repair',
-              name: name,
-              phone: phone,
-              email: email,
-              zip: zip,
-              address: address,
+              name: val('f-name'),
+              phone: val('f-phone'),
+              email: val('f-email'),
+              zip: val('f-zip'),
+              address: val('f-address'),
               city: city,
-              category: category,
+              category: val('f-category'),
               equipment: appliance,
               appliance: appliance,
-              brand: brand,
-              description: issue,
-              date: date,
-              time: time,
-              _hp: hp
+              brand: val('f-brand'),
+              description: val('f-issue'),
+              date: val('f-date'),
+              time: val('f-time'),
+              _hp: val('f-hp')
             })
           });
-          var data = await res.json();
-          if (data.ok) {
-            // Update success-state phone link to the branch dispatcher
-            var branchPhone = BRANCH_PHONES[city] || BRANCH_PHONES['los-angeles'];
-            if (successCall) {
-              var raw = '+1' + branchPhone.replace(/\D/g, '');
-              successCall.href = 'tel:' + raw;
-              successCall.textContent = 'Call ' + branchPhone;
-            }
+          var data = null;
+          try { data = await res.json(); } catch (_) { data = null; }
+
+          if (res.ok && data && data.ok) {
+            submitted = true;
+            var bp = branchPhoneFor(city);
+            if (successCall) { successCall.href = telHref(bp); successCall.textContent = 'Call ' + bp; }
             form.style.display = 'none';
             success.style.display = 'block';
+            // GA4 conversion — do not remove.
             window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({
               event: 'booking_submitted',
-              branch: data.branch || city,
+              branch: (data && data.branch) || city,
               appliance: appliance
             });
-            window.scrollTo({ top: form.offsetTop - 80, behavior: 'smooth' });
+            success.scrollIntoView({ behavior: 'smooth', block: 'center' });
           } else {
-            alert(data.error || 'Submission failed. Please call (424) 325-0520 directly.');
-            btn.disabled = false;
-            btn.textContent = origText;
+            var bpe = branchPhoneFor(city);
+            showFormError('We couldn’t submit your request. So we don’t lose it, please call your branch directly: <a href="' + telHref(bpe) + '">' + bpe + '</a>.');
           }
         } catch (err) {
-          alert('Network error. Please call (424) 325-0520 directly.');
-          btn.disabled = false;
-          btn.textContent = origText;
+          var bpn = branchPhoneFor(city);
+          showFormError('Network problem — your request didn’t go through. Please call <a href="' + telHref(bpn) + '">' + bpn + '</a> and we’ll book you right away.');
+        } finally {
+          if (!submitted) { btn.disabled = false; btn.textContent = origText; }
         }
       });
     })();
@@ -513,6 +550,10 @@ const breadcrumbSchema = {
   .submit { margin-top: 8px; }
   .form-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
   .form-note a { color: var(--red); }
+  .field-error { display: block; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: var(--red); }
+  .input-invalid { border-color: var(--red) !important; }
+  .form-error-banner { margin: 6px 0 14px; padding: 14px 16px; background: #fff5f5; border: 1px solid var(--red); border-radius: 4px; color: var(--text); font-size: 14px; line-height: 1.5; }
+  .form-error-banner a { color: var(--red); font-weight: 700; text-decoration: underline; }
 
   .branch-phones { padding: 72px 0; }
   .phone-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
