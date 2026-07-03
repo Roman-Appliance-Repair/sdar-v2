@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-05-25
+**Последняя синхронизация:** 2026-07-02
 
 ---
 
@@ -60,6 +60,8 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-07-02:** **Outdoor brand-страницы Bull + Blaze** (commit `78b91487` на main; исходно на `fix/refrigeration-hub` `fe3143aa`+`075cf97c`, перенесены на main файловым `git checkout`, НЕ merge — ветки разошлись, полный merge задвоил бы combo-boost). Закрыт подтверждённый GSC-gap outdoor-кластера: `bull outdoor refrigerator repair` (34 показа/поз.30) и `blaze refrigerator repair` (14/поз.43) шли без посадочной. Две страницы по скелету `twin-eagles.astro` (~4130 / ~4045 слов, 6 schema-сущностей, $89, em-dash в теле=0), дуальный охват гриль+outdoor-холодильник с фокусом на холодильник. **Фактура сверена по доменам производителей** (учтён прецедент Hestan): Bull Series II `13700` + грили Angus/Brahma (`16525`/`16534`/`20505`), Blaze Prelude/LTE/LUX + `BLZ-SSRF` (`50DH` поправлен «50-quart»→«5.2 cu ft double-drawer») + пожизненная гарантия как USP. Перелинковка: по 3 inlink каждой (grill-repair grid, outdoor-refrigerator-repair brand-list с якорем = GSC-запрос → вес просевшей fridge-странице, kitchen-repair). Комплаенс dist чист (titles 50/51, forbidden 0, кириллица 0). Build 1096, 0 ошибок. Cloudflare live, оба URL по title подтверждены, IndexNow 2 URL → 200. Детали: `session-log/2026-07-02-outdoor-brands.md`.
 
 - **2026-06-09:** **De-orphan 29 thin-inlink pages** (commit `bb298fff`, 18 files). Ahrefs "1 internal link" set (был ~114 на 08-Jun) → B-1 + батчи свели к 29 → этот проход довёл **все 29 до ≥3 inlinks**. Группы: (A) 14 blog — BlogLayout related-блок был захардкожен → заменён на **ring-rotation** (`src/data/blog-posts.ts` + `relatedPosts()`, каждый из 20 постов линкует следующие 3 mod N → каждый получает 3 sibling-inlink'а); (B) 7 commercial ice subs — расширен hub troubleshooting-grid 3→7 + тот же grid на error-codes/not-making-ice cluster-страницы; (C) 2 refrigeration subs — related-блок на compressor-issues/not-cooling; (D) 5 niche brand×category combos (пиллары 404 → §7 N/A) — контекстные ссылки с 2 category-хабов каждому; (E) weber-igniter — siblings с burner-not-igniting/electrical-issues. Dist-gate: 29/29 ≥3, overall ≤1 inlink = только 2 ложных нуля (homepage `href="/"` regex-артефакт + google-verify), 0 реальных, 0 broken/self/redirect. Ahrefs link-warning set закрыт. IndexNow 52 URLs → 200. Build 1094, 0 errors.
 
