@@ -114,3 +114,32 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - **c8002988** — Rancho-Cucamonga batch (5/56 → 43/56 всего): refrigerator/dryer/oven/washer/dishwasher. Только `combo-overrides.ts`. Build 0 ошибок (счётчик 1096 = 1094 + untracked outdoor `bull.astro`+`blaze.astro`, отдельный workstream). Не запушено.
 - **bcc30f3e** — Anaheim batch (7/56 → 50/56 всего): refrigerator/dishwasher/dryer/freezer/oven/washer/stove. Только `combo-overrides.ts`. Build 0 ошибок (1096 = 1094 + 2 untracked outdoor). Не запушено.
 - **7eb71537** — Final singles batch (6/56 → **56/56 ГОТОВО**): long-beach refrigerator+dryer, santa-monica stove, west-hollywood dryer, hollywood refrigerator, thousand-oaks refrigerator. Только `combo-overrides.ts`. Build 0 ошибок. Не запушено.
+
+
+---
+
+## Склейка 56 мёртвых combo (canonical → пиллар) — 2026-07-02
+
+**Ветка:** `combo-collapse-2026-07-02` · **Backup:** `backup/combo-collapse-2026-07-02` (= main до правки).
+
+**Что сделано:** 56 combo с нулевым спросом (Ahrefs 0/мес, GSC-показы ≈0 — список A из раздела «Аудит мёртвого хвоста») склеены на городской пиллар. У каждой такой страницы `<link rel=canonical>` и og:url теперь указывают на `/[city]/`, а не на саму себя. Страницы физически остаются (Maps/прямые заходы), но Google перестаёт ранжировать их как отдельные дубли. Остальные 105 combo не тронуты (self-canonical). JSON-LD `@id`/`url` у склеенных остались self (менялся только canonical-тег).
+
+**Механика:** новый `src/data/combo-collapse.ts` (Set из 56 ключей `city/service` + `isCollapsedCombo()`); в `src/pages/[city]/[service].astro` добавлена `pageCanonical` (пиллар для склеенных, self для остальных) → уходит в Layout. Коммит **8de31128**. Build 1096 (=1094 + Bull/Blaze на main), 0 ошибок. Dist-контроль: ровно 56 canonical→пиллар, 105 self.
+
+**КАК ОТКАТИТЬ:** удалить нужные ключи из `COLLAPSED_COMBOS` в `src/data/combo-collapse.ts` (или очистить Set целиком) → страница вернётся к self-canonical. Либо `git revert 8de31128`, либо сброс на `backup/combo-collapse-2026-07-02`. Полностью обратимо, контент страниц не менялся.
+
+**56 склеенных (canonical → /[city]/):**
+- **/anaheim/** ← anaheim/ice-maker-repair, anaheim/microwave-repair, anaheim/wall-oven-repair
+- **/beverly-hills/** ← beverly-hills/freezer-repair, beverly-hills/ice-maker-repair, beverly-hills/range-repair, beverly-hills/stove-repair, beverly-hills/wall-oven-repair
+- **/burbank/** ← burbank/freezer-repair, burbank/ice-maker-repair, burbank/microwave-repair, burbank/range-repair, burbank/wall-oven-repair
+- **/glendale/** ← glendale/freezer-repair, glendale/ice-maker-repair, glendale/microwave-repair, glendale/range-repair, glendale/wall-oven-repair
+- **/hollywood/** ← hollywood/oven-repair
+- **/irvine/** ← irvine/microwave-repair, irvine/wall-oven-repair
+- **/long-beach/** ← long-beach/cooktop-repair, long-beach/freezer-repair, long-beach/ice-maker-repair, long-beach/microwave-repair, long-beach/oven-repair, long-beach/range-repair, long-beach/stove-repair, long-beach/wall-oven-repair
+- **/los-angeles/** ← los-angeles/cooktop-repair, los-angeles/wall-oven-repair
+- **/pasadena/** ← pasadena/microwave-repair, pasadena/wall-oven-repair
+- **/rancho-cucamonga/** ← rancho-cucamonga/microwave-repair, rancho-cucamonga/wall-oven-repair
+- **/santa-monica/** ← santa-monica/cooktop-repair, santa-monica/dryer-repair, santa-monica/freezer-repair, santa-monica/ice-maker-repair, santa-monica/microwave-repair, santa-monica/oven-repair, santa-monica/range-repair, santa-monica/wall-oven-repair, santa-monica/washer-repair
+- **/temecula/** ← temecula/microwave-repair, temecula/wall-oven-repair
+- **/thousand-oaks/** ← thousand-oaks/cooktop-repair, thousand-oaks/freezer-repair, thousand-oaks/ice-maker-repair, thousand-oaks/microwave-repair, thousand-oaks/range-repair, thousand-oaks/stove-repair, thousand-oaks/wall-oven-repair
+- **/west-hollywood/** ← west-hollywood/ice-maker-repair, west-hollywood/stove-repair, west-hollywood/wall-oven-repair
