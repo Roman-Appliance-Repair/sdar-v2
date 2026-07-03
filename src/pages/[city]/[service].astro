@@ -19,6 +19,7 @@ import { linkifyInternal, newLinkBudget } from '../../lib/linkify-internal';
 import { getBrandPillarSlug } from '../../data/brand-pillar-map';
 import { getCommercialCrossLink } from '../../data/commercial-cross-link-map';
 import { getComboOverride } from '../../data/combo-overrides';
+import { isCollapsedCombo } from '../../data/combo-collapse';
 
 export async function getStaticPaths() {
   return CITY_SERVICE_MATRIX.map(combo => ({
@@ -44,6 +45,12 @@ const ov = getComboOverride(citySlug, serviceSlug);
 const branchDisplay = branch?.displayName || 'Los Angeles';
 const h1Suffix = branchDisplay !== cityName ? `, Same-Day from ${branchDisplay}` : ', Same-Day Service';
 const canonical = `https://samedayappliance.repair/${citySlug}/${serviceSlug}/`;
+// Zero-demand combos (briefing "Аудит мёртвого хвоста", list A) canonicalize to the
+// city pillar; every other combo stays self-canonical. Schema @id/url below keep the
+// self URL — only the <link rel=canonical>/og:url (via Layout) points to the pillar.
+const pageCanonical = isCollapsedCombo(citySlug, serviceSlug)
+  ? `https://samedayappliance.repair/${citySlug}/`
+  : canonical;
 
 // Full-bleed combo hero photo (per city×service). MODE A when both webp+jpg exist on
 // disk; otherwise the black text hero (MODE B) renders as before. Photos live under
@@ -161,7 +168,7 @@ const schemaJsons = [
 ];
 ---
 
-<Layout title={title} description={description} canonical={canonical}>
+<Layout title={title} description={description} canonical={pageCanonical}>
 <Fragment slot="head-scripts">
   {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
 </Fragment>
