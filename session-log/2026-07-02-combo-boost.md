@@ -63,12 +63,12 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - [x] /irvine/washer-repair/  (vol 80)  status: done  commit: 6a8d755f
 - [x] /irvine/ice-maker-repair/  (vol 70)  status: done  commit: 6a8d755f
 
-### Burbank
-- [ ] /burbank/dryer-repair/  (vol 150)  status: pending  commit: —
-- [ ] /burbank/refrigerator-repair/  (vol 150)  status: pending  commit: —
-- [ ] /burbank/oven-repair/  (vol 100)  status: pending  commit: —
-- [ ] /burbank/dishwasher-repair/  (vol 60)  status: pending  commit: —
-- [ ] /burbank/washer-repair/  (vol 60)  status: pending  commit: —
+### Burbank (пачка 5) — ✅ DONE (commit 1d78706d)
+- [x] /burbank/dryer-repair/  (vol 150)  status: done  commit: 1d78706d
+- [x] /burbank/refrigerator-repair/  (vol 150)  status: done  commit: 1d78706d
+- [x] /burbank/oven-repair/  (vol 100)  status: done  commit: 1d78706d
+- [x] /burbank/dishwasher-repair/  (vol 60)  status: done  commit: 1d78706d
+- [x] /burbank/washer-repair/  (vol 60)  status: done  commit: 1d78706d
 
 ### Glendale
 - [ ] /glendale/dryer-repair/  (vol 150)  status: pending  commit: —
@@ -107,3 +107,4 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - **ad4ac978** — Pasadena batch (7/56 → 15/56 всего): washer/dishwasher/oven/stove/dryer/refrigerator/cooktop. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
 - **681aff9c** — Temecula batch (6/56 → 21/56 всего): refrigerator/dryer/oven/washer/stove/dishwasher. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
 - **6a8d755f** — Irvine batch (6/56 → 27/56 всего): dryer/refrigerator/dishwasher/oven/washer/ice-maker. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
+- **1d78706d** — Burbank batch (5/56 → 32/56 всего): dryer/refrigerator/oven/dishwasher/washer. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
