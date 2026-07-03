@@ -78,12 +78,12 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - [x] /glendale/washer-repair/  (vol 80)  status: done  commit: bd085ee6
 - [x] /glendale/stove-repair/  (vol 50)  status: done  commit: bd085ee6
 
-### Rancho-Cucamonga
-- [ ] /rancho-cucamonga/refrigerator-repair/  (vol 150)  status: pending  commit: —
-- [ ] /rancho-cucamonga/dryer-repair/  (vol 100)  status: pending  commit: —
-- [ ] /rancho-cucamonga/oven-repair/  (vol 100)  status: pending  commit: —
-- [ ] /rancho-cucamonga/washer-repair/  (vol 100)  status: pending  commit: —
-- [ ] /rancho-cucamonga/dishwasher-repair/  (vol 70)  status: pending  commit: —
+### Rancho-Cucamonga (пачка 7) — ✅ DONE (commit c8002988)
+- [x] /rancho-cucamonga/refrigerator-repair/  (vol 150)  status: done  commit: c8002988
+- [x] /rancho-cucamonga/dryer-repair/  (vol 100)  status: done  commit: c8002988
+- [x] /rancho-cucamonga/oven-repair/  (vol 100)  status: done  commit: c8002988
+- [x] /rancho-cucamonga/washer-repair/  (vol 100)  status: done  commit: c8002988
+- [x] /rancho-cucamonga/dishwasher-repair/  (vol 70)  status: done  commit: c8002988
 
 ### Anaheim
 - [ ] /anaheim/refrigerator-repair/  (vol 150)  status: pending  commit: —
@@ -109,3 +109,4 @@ LA → Pasadena → Temecula → Irvine → Burbank → Glendale → остал�
 - **6a8d755f** — Irvine batch (6/56 → 27/56 всего): dryer/refrigerator/dishwasher/oven/washer/ice-maker. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
 - **1d78706d** — Burbank batch (5/56 → 32/56 всего): dryer/refrigerator/oven/dishwasher/washer. Только `combo-overrides.ts`. Build 1094, 0 ошибок. Не запушено.
 - **bd085ee6** — Glendale batch (6/56 → 38/56 всего): dryer/refrigerator/dishwasher/oven/washer/stove. Только `combo-overrides.ts`. Build 0 ошибок (счётчик 1095 = 1094 + untracked `src/pages/outdoor/brands/bull.astro` из отдельной outdoor-работы, не часть этой пачки). Не запушено.
+- **c8002988** — Rancho-Cucamonga batch (5/56 → 43/56 всего): refrigerator/dryer/oven/washer/dishwasher. Только `combo-overrides.ts`. Build 0 ошибок (счётчик 1096 = 1094 + untracked outdoor `bull.astro`+`blaze.astro`, отдельный workstream). Не запушено.
