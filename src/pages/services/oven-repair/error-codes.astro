@@ -1,0 +1,331 @@
+---
+// src/pages/services/oven-repair/error-codes.astro
+// Info Wave I-3 — "oven error codes" umbrella. Head 50/mo but brand aggregate strong
+// (whirlpool 450, frigidaire 150, ge 80). Per-brand F-code H2 sections.
+// Codes verified vs OEM: Whirlpool/KA/Maytag (producthelp Fx-Ey), GE (OEM support),
+// Frigidaire (owner.frigidaire.com), Samsung (TSG10003529), LG (range code list).
+// DIFFERENTIATOR (prominent): SELF-CLEAN SAFETY — latched door + runaway temp codes;
+// don't force a latched self-cleaning oven, let it cool; runaway -> cut breaker.
+// Flags NOT published as universal: Whirlpool single-digit F2 (era-dependent), Samsung
+// E-0A (unverified); Frigidaire F11/F31 labeled older-platform. Safe DIY = power cycle,
+// clean touchpad, let cool; no forcing latch. $89 residential.
+
+import Layout from '../../../layouts/Layout.astro';
+import ServiceHero from '../../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/services/oven-repair/error-codes/";
+
+const title = "Oven Error Codes by Brand, Explained — Same Day";
+const description = "Oven F-codes decoded: Whirlpool, GE, Frigidaire, Samsung, LG. What each means, which are self-clean safety codes you shouldn't force, which you can clear yourself, and when it's a tech job.";
+
+const faqs = [
+  {
+    q: "My oven threw an error code during self-clean and the door is locked. What do I do?",
+    a: "Do not force the door. During a self-clean cycle the oven runs at 800°F or more and deliberately locks the door for safety; codes like Whirlpool F5, GE F9, Frigidaire F90–F94, and LG F10 are door-latch faults that usually appear because of that heat. The right move is to turn the oven off and let it fully cool — often an hour or more — because most latch mechanisms only release once the interior drops below a safe temperature. After it cools, try a power cycle at the breaker. If the door still won't unlock or the code stays, the latch motor or switch needs a tech. Forcing a locked self-cleaning door can damage the latch and burn you."
+  },
+  {
+    q: "What does an oven over-temperature code mean, and is it dangerous?",
+    a: "An over-temp code — GE F2/F20, Frigidaire F10, Samsung C-24, and on some older Whirlpool models F2 — means the oven measured a higher temperature than it should. The common cause is a welded bake relay that keeps feeding the heating element even after the oven reaches temperature. If the oven is actually still heating and climbing, that's the one situation where you should shut it off at the circuit breaker rather than just pressing cancel, then call for service. If it simply threw the code and cooled down normally, it's a control-board or sensor diagnosis rather than an emergency."
+  },
+  {
+    q: "What's the most common oven error code?",
+    a: "A temperature-sensor (RTD) fault is the single most common one that isn't self-clean-related. Whirlpool shows F3-E0, GE shows F3 or F4, Frigidaire shows F30 or F31, and LG shows F1 or F2 — all meaning the oven's temperature sensor is reading open or shorted. The sensor is an inexpensive part, but it lives inside the oven and has to be tested against spec (a healthy one reads roughly 1080–1100 ohms at room temperature) and replaced, which is a tech job. The good news is it's usually a quick, affordable fix rather than a new oven."
+  },
+  {
+    q: "Can I clear an oven error code myself?",
+    a: "Some of them. A power cycle — shut the oven off at the breaker for a minute, then restore power — clears many one-off control glitches and stuck-state codes. A stuck-key or touchpad code (Whirlpool F2-E0, GE F0/F1/F7, LG F3) sometimes clears after you gently clean grease and moisture off the control panel and reset. And a self-clean latch code often clears on its own once the oven fully cools. What you should not do is open the control console, bypass the door latch, or keep running an oven that's overheating. Sensor, relay, latch-motor, and control-board codes are tech jobs."
+  },
+  {
+    q: "Do the Fx-Ey and single F-number codes mean the same thing?",
+    a: "Newer Whirlpool, KitchenAid, and Maytag ovens use a two-part Fx-Ey format — the F number is the fault family and the E number is the specific sub-fault (for example F3-E0 is the oven temperature sensor). Older units of the same brands used a single digit like F1, F2, F3. They overlap loosely but not perfectly, and one code can mean different things across model years — older single-digit F2, for instance, is documented as over-temperature on some models and a stuck key on others. Because of that, the safest read on any specific oven is its own model manual alongside the general meaning here."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "West Hollywood",
+      "addressRegion": "CA",
+      "addressCountry": "US"
+    },
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+    "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Oven Error Code Diagnosis and Repair",
+    "name": "Oven Error Code Diagnosis and Repair (Whirlpool, GE, Frigidaire, Samsung, LG)",
+    "url": canonical,
+    "description": "Residential oven and range error-code diagnosis and repair across all five SoCal counties. Temperature sensor (RTD), self-clean door latch, over-temperature, keypad, and control-board fault diagnosis and repair for Whirlpool, KitchenAid, Maytag, GE, Frigidaire, Samsung, and LG ovens. $89 residential diagnostic, applied toward repair.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": {
+      "@type": "Offer",
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "price": "89.00",
+        "priceCurrency": "USD",
+        "description": "Residential diagnostic fee, applied toward repair"
+      }
+    }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } }))
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://samedayappliance.repair/services/" },
+      { "@type": "ListItem", "position": 3, "name": "Oven Repair", "item": "https://samedayappliance.repair/services/oven-repair/" },
+      { "@type": "ListItem", "position": 4, "name": "Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  section="services"
+  slug="oven-repair/error-codes"
+  eyebrow="Oven Error Codes · Brand Reference Guide · Same Day Southern California"
+  title="Oven Error Codes, Explained by Brand"
+  subtitle="Whirlpool, GE, Frigidaire, Samsung, and LG F-codes decoded — including the self-clean safety codes you should never force, which you can clear yourself, and when it's a tech job."
+  heroImageTitle="Oven Error Codes by Brand"
+  showBranches={true}
+/>
+
+<!-- 01 ANSWER-FIRST -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 · Start here</p>
+    <h2 class="section-title">Most oven codes are a temperature sensor — or a self-clean door latch.</h2>
+
+    <p><strong>The two most common oven error codes are a temperature-sensor (RTD) fault — Whirlpool F3-E0, GE F3/F4, Frigidaire F30/F31, LG F1/F2 — and a self-clean door-latch fault, which shows up after the self-clean cycle runs the oven at 800°F+. Sensor codes are usually an affordable tech fix. Latch and over-temperature codes are the ones with a safety angle: don't force a locked self-cleaning door, and if an oven is still heating on an over-temp code, cut power at the breaker. Many one-off codes clear with a power cycle. $89 residential diagnostic, waived with repair.</strong></p>
+
+    <p class="callout"><strong>Self-clean safety first:</strong> if your code appeared during or after a self-clean cycle and the door is locked, <strong>let the oven cool fully before doing anything</strong> — most latches only release below a safe temperature. Never pry a locked self-cleaning door. If the oven keeps heating uncontrolled, shut it off at the circuit breaker and call for service.</p>
+  </div>
+</section>
+
+<!-- 02 SELF-CLEAN SAFETY -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">02 · Self-clean safety codes</p>
+    <h2 class="section-title">The codes tied to high-heat cleaning — and why they matter.</h2>
+
+    <p>Self-clean pyrolytic cycles are the single biggest trigger of oven fault codes, because the extreme heat stresses the door latch and can trip the over-temp protection. These are the codes to treat carefully:</p>
+
+    <div class="cause-block">
+      <h3>Door-latch codes — let it cool, don't force</h3>
+      <p>Whirlpool/KitchenAid/Maytag <strong>F5-E0 / F5-E1 / F5-E2</strong>, GE <strong>F9 / FC</strong> (with an "Unlock Door" message), Frigidaire <strong>F90–F94</strong>, and LG <strong>F10 / F20</strong> all mean the door lock circuit is faulting — usually because the latch is still hot and hasn't released. Turn the oven off, wait for it to cool completely, then power-cycle at the breaker. If it still won't unlock, the latch motor or switch needs a tech.</p>
+    </div>
+    <div class="cause-block">
+      <h3>Over-temperature codes — cut power if it keeps heating</h3>
+      <p>GE <strong>F2 / F20</strong>, Frigidaire <strong>F10</strong>, and Samsung <strong>C-24</strong> flag a higher-than-normal temperature, most often from a welded bake relay stuck feeding the element. If the oven is genuinely still climbing, shut it off at the breaker rather than just canceling, and call for service. (On some older Whirlpool models a single-digit F2 can mean over-temp, though on other models F2 is a stuck key — check your manual.)</p>
+    </div>
+    <div class="cause-block">
+      <h3>LG F27 — cooling fan during self-clean</h3>
+      <p>LG's F27 means the cooling fan stalled or locked during a self-clean cycle. Because that fan protects surrounding surfaces from the heat, stop the cycle and let the oven cool; the fan needs a tech.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 03 WHIRLPOOL / KA / MAYTAG -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 · Whirlpool, KitchenAid &amp; Maytag</p>
+    <h2 class="section-title">The Fx-Ey format (shared control platform).</h2>
+
+    <div class="cause-block">
+      <h3>F3-E0 — oven temperature sensor (RTD)</h3>
+      <p>The oven's temp sensor is reading open or shorted. Tested against spec and replaced — an affordable tech fix.</p>
+    </div>
+    <div class="cause-block">
+      <h3>F2-E0 / F2-E1 — keypad</h3>
+      <p>F2-E0 is a shorted or stuck touch key (clean grease and moisture off the panel and power-cycle); F2-E1 is a keypad-to-control cable fault (a tech opens the console).</p>
+    </div>
+    <div class="cause-block">
+      <h3>F1-E0 / F1-E1 — control board · F5 — door latch (self-clean)</h3>
+      <p>F1 codes point to the electronic control board (try a 60-second breaker reset; if it returns, the board needs replacing). F5 is the self-clean door latch — see the safety section above.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 GE -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">04 · GE (and GE Profile / Café)</p>
+    <h2 class="section-title">GE's single-letter F-codes.</h2>
+
+    <div class="cause-block">
+      <h3>F3 / F4 — oven sensor · F0 / F1 / F7 — keypad</h3>
+      <p>F3 (open) and F4 (shorted) mean the temperature sensor needs replacing. F0, F1, and F7 are control-panel or stuck-button faults — clean the ribbon contacts and reset; if it returns immediately, it's a tech job.</p>
+    </div>
+    <div class="cause-block">
+      <h3>F2 / F20 — over-temp · F9 / FC — door lock</h3>
+      <p>F2/F20 is an over-temperature code (see safety section — cut power if it keeps heating). F9/FC is a door-lock circuit fault, usually seen with the self-clean "Unlock Door" prompt — let it cool first.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 05 FRIGIDAIRE + SAMSUNG + LG -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 · Frigidaire, Samsung &amp; LG</p>
+    <h2 class="section-title">The rest of the common ranges.</h2>
+
+    <div class="cause-block">
+      <h3>Frigidaire / Electrolux — F10, F30/F31, F90–F94</h3>
+      <p>F10 is thermal runaway / over-temp (cut power if it keeps heating). F30 (open) and F31 (shorted) are the oven temp sensor. F90–F94 are door-lock motor errors during self-clean. On older Frigidaire "ES" platforms you may also see F11 (keypad) and F31 variants — check the model manual, as those predate the current code set.</p>
+    </div>
+    <div class="cause-block">
+      <h3>Samsung — SE/5E (legacy) vs C-codes (current)</h3>
+      <p>Older Samsung ranges show <strong>SE</strong> or <strong>5E</strong> for a temperature-sensor fault; newer ones use <strong>C-codes</strong> — C-24 (over-temp), C-10 (sensor, often clears itself), and C-F0 (communication). The legacy and current codes are different generations, not the same code. A "C to P" message just means the oven won't self-clean while a cooktop element is on.</p>
+    </div>
+    <div class="cause-block">
+      <h3>LG — F1/F2, F3, F9, F10/F20, F27</h3>
+      <p>F1/F2 is the oven thermistor, F3 a touchpad/sensor-key fault, F9 means the oven isn't heating to temperature, F10/F20 is the door lock, and F27 is the cooling fan during self-clean. Try CLEAR/OFF and a breaker reset first; persistent codes are a tech job.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 06 SAFE FIX -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">06 · What you can safely do</p>
+    <h2 class="section-title">The safe steps, in order.</h2>
+
+    <ol class="diag-list">
+      <li><strong>If it's a self-clean / locked-door code, let it cool first.</strong> Turn the oven off and wait until it's fully cool before touching the door or resetting. Never force a locked self-cleaning door.</li>
+      <li><strong>If the oven is still heating on an over-temp code, cut the breaker.</strong> Then call for service — a stuck relay won't fix itself.</li>
+      <li><strong>Power-cycle.</strong> For most one-off codes, shut the oven off at the breaker for a minute and restore power.</li>
+      <li><strong>Clean the touchpad for stuck-key codes.</strong> Gently wipe grease and moisture off the control panel, then reset.</li>
+      <li><strong>Note if the code returns.</strong> Cleared and gone = a glitch. Comes back = a failed sensor, relay, latch, or board.</li>
+    </ol>
+
+    <p class="callout"><strong>Where to stop:</strong> letting the oven cool, power cycling, and cleaning the panel are safe. Do not open the control console, bypass or force the door latch, or keep running an oven that's overheating. Sensor, relay, latch-motor, and control-board codes carry high-voltage and burn risks and are our techs' work.</p>
+  </div>
+</section>
+
+<!-- 07 TECH + LINKS -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">07 · When it's a tech job</p>
+    <h2 class="section-title">A code that survives a power cycle means a part.</h2>
+
+    <p>When a code returns after the oven has cooled and been reset, the fault is a failed part: an oven temperature sensor, a welded bake relay, a door-latch motor or switch, or the control board. Our techs test the sensor against spec, check the relay, and verify the latch before quoting, so you replace the piece that actually failed rather than the whole control. Sensors and latches are common, affordable fixes; a control board is the higher-ticket end, and we'll tell you honestly which one you're looking at.</p>
+
+    <p>More help: the full <a href="/services/oven-repair/">oven repair</a> hub, and if the oven simply won't get hot, <a href="/services/oven-repair/not-heating/">oven not heating</a> or runs off temperature, <a href="/services/oven-repair/temperature-off/">oven temperature off</a>. Self-clean trouble has its own guide: <a href="/services/oven-repair/self-clean-problems/">oven self-clean problems</a>. Brand coverage: <a href="/brands/ge-oven-repair/">GE</a>, <a href="/brands/lg-oven-repair/">LG</a>, <a href="/brands/samsung-oven-repair/">Samsung</a>, <a href="/brands/whirlpool-wall-oven-repair/">Whirlpool</a>, and <a href="/brands/frigidaire-wall-oven-repair/">Frigidaire</a>. Same-day across <a href="/los-angeles/oven-repair/">Los Angeles</a>, <a href="/beverly-hills/oven-repair/">Beverly Hills</a>, and <a href="/pasadena/oven-repair/">Pasadena</a> in most cases. <strong>$89 residential diagnostic, waived with repair.</strong> <a href="/book/">Book online</a> or call {phone}.</p>
+  </div>
+</section>
+
+<!-- 08 FAQ -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">08 · FAQ</p>
+    <h2 class="section-title">Oven error codes: common questions.</h2>
+
+    <div class="faq-list">
+      {faqs.map(f => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- 09 BOTTOM CTA -->
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Oven code back after a reset? Call today.</h2>
+    <p>$89 diagnostic waived with repair. Same-day across LA, OC, Ventura. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/book/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 64px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 16px; line-height: 1.2; color: var(--text); letter-spacing: -0.01em; }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin: 0 0 22px; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+
+  .cause-block { background: #fff; border: 1px solid var(--border); border-left: 4px solid var(--red); border-radius: 8px; padding: 22px 26px; margin-bottom: 16px; }
+  .cause-block h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 10px; color: var(--text); }
+  .cause-block p { font-size: 0.96rem; line-height: 1.7; margin: 0; }
+
+  .diag-list { padding-left: 22px; margin: 14px 0; }
+  .diag-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 12px; }
+  .diag-list strong { color: var(--text); font-weight: 700; }
+
+  .callout { background: #fff5f7; border: 1px solid #e8a0a0; border-radius: 8px; padding: 16px 20px; font-size: 0.96rem; }
+
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px 22px; margin-bottom: 10px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 0.98rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.93rem; color: var(--text); line-height: 1.7; margin: 12px 0 0; }
+
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: clamp(1.5rem, 3vw, 2rem); }
+  .bottom-cta p { color: #aaa; margin: 0 0 28px; font-size: 1.02rem; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
