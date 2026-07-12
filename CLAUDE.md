@@ -175,3 +175,16 @@ git push origin main
 ```
 
 См. `session-log/README.md` для формата записей.
+
+---
+
+## 9. Worktree convention — параллельные терминалы
+
+**Правило (введено 2026-07-12 после инцидента: status-коммит случайно ушёл на `feature/luxury-wave-1`, потому что соседний терминал переключил ветку в общей директории).**
+
+- **`C:\Users\Roman\WebstormProjects\sdar-v2` = ТОЛЬКО ветка `main`.** Здесь происходят merge готовых веток и обновления status/session-log. **Никогда не переключать ветку в этой директории** (`git checkout <feature>` тут запрещён).
+- **Feature-работа — в отдельных worktree:** `..\sdar-v2-wt1` и `..\sdar-v2-wt2` (т.е. `C:\Users\Roman\WebstormProjects\sdar-v2-wt1` / `-wt2`). **Один терминал = один worktree.** Каждый worktree держит свою ветку; переключения веток не пересекаются между терминалами.
+- **Новую feature-ветку** создавать внутри своего worktree: `cd ..\sdar-v2-wt2 && git checkout main && git pull && git checkout -b feature/<name>` (wt2 стартует с throwaway `placeholder/wt2` — перебей своей веткой).
+- **Каждый worktree — свой `node_modules`** (не шарится, gitignored): при первом заходе `npm install`.
+- **Управление:** `git worktree list` — показать все; `git worktree add ..\sdar-v2-wtN <branch>` — добавить; `git worktree remove ..\sdar-v2-wtN` — убрать (ветка остаётся).
+- **Merge feature → main** делается из main-директории: `cd C:\Users\Roman\WebstormProjects\sdar-v2 && git merge <feature> && git push`. Ветка при этом может оставаться checked-out в своём worktree.
