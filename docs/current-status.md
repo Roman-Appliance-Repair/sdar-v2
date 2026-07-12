@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-07-02
+**Последняя синхронизация:** 2026-07-12
 
 ---
 
@@ -60,6 +60,8 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-07-12:** **Info Wave I-2 — freezer + ice-maker symptoms + refrigerator error-code umbrellas** (merge `932a9978` на main, ветка `feature/info-wave-2`). 6 net-new информационных sub-страниц, закрывают крупнейшие gap'ы из inventory 2026-07-11 (freezer + ice-maker были pillar-only; у refrigerator не было code-снайперов). Ahrefs-спрос подтверждён по всем 6 (samsung ice maker not working **6,100/mo**, ice maker not making ice **3,700**, freezer not freezing **3,300**, lg refrigerator error codes **700**, samsung refrigerator error codes **450**, ice buildup in freezer **200**). **Zero-invention gate:** коды сверены с LG US support + Samsung US support (TSG10007315); числа только из wiki `research/reliability-data-sheet.md` (freezer 10–20 yr NAHB, ремонт $200–500; **ice-maker lifespan = NOT FOUND → не заявлен**); Samsung класс-экшн строго по Layer H (*Bianchi v. Samsung*, нац. сеттлмента нет, dismissed конец 2023, без «подай заявку»). Differentiators в answer-first лидах: **LG CL = Child Lock (не ошибка)**, **Samsung OF OF = demo mode (не поломка)**. Не опубликовано (источники противоречат): `8E1`, жёсткое значение `41E/42E/43E`. Де-каннибализация ice-maker: `refrigerator-repair/ice-maker-issues` (встроенный) ↔ новые `/ice-maker-repair/*` (отдельные/undercounter), взаимная перелинковка. Страницы: freezer-repair/{not-freezing, ice-buildup}, ice-maker-repair/{not-making-ice, samsung-ice-maker-not-working}, refrigerator-repair/{lg-error-codes, samsung-error-codes}. Каждая: answer-first → причины/коды → безопасные проверки → tech + честный repair-vs-replace → FAQPage(4–5 Q) + LocalBusiness+Service+BreadcrumbList schema, $89 residential, гео-нейтрально, никакого опасного DIY. Комплаенс dist: titles 49–56, forbidden 0, aggregateRating 0, кириллица 0. **Build 1110, 0 ошибок.** Cloudflare live, IndexNow → все 6 URL. Детали: `session-log/2026-07-12-info-wave-2.md`.
 
 - **2026-07-03:** **Walk-In cooler & freezer DOOR repair page** (commit `9dcb8bad` на main). Аудит выявил gap: обслуживаем walk-in двери, но своей страницы не было (в cooler/freezer пилларах gasket покрыт, hinge/closer=0). Ahrefs: ≈490 показов/мес по 6 door-фразам, **KD 0**, CPC $0.40–$2.50 (gasket 200, closer 100 — не были покрыты); GSC — поз. 16–97 из-за отсутствия страницы. Новая `commercial/refrigeration/walk-in-door-repair.astro` по скелету walk-in-freezer ($120 commercial, CommercialHero, Service+FAQ(8)+WebPage schema), секции door-anatomy / failures / **safety (inside release)** / brands / 4 кейса / pricing / FAQ. **Фактура сверена вебом** (Kason 1245 cam-rise hinge, 1094/1095 closers, 0058 Safeguard latch + 481-C inside release, self-reg perimeter heater wire), 0 выдуманного. Де-орфан 3 (cooler+freezer+refrigeration-index). Комплаенс dist: title 51, forbidden 0, кириллица 0, $120 (commercial). Build 1099, 0 ошибок. Cloudflare live, IndexNow → 200. Детали: `session-log/2026-07-03-walk-in-door-repair.md`.
 
