@@ -8,7 +8,7 @@
 ## 1. Полный цикл написания страницы — 5 шагов
 
 ```
-GSC анализ → конкурентный анализ → TF-IDF → write → deploy + tracker
+GSC анализ → конкурентный анализ → TF-IDF → write → humanizer gate (см. docs/humanizer-gate.md) → deploy + tracker
 ```
 
 ### Шаг 1 — GSC анализ (Windsor.ai)
@@ -88,6 +88,8 @@ vectorizer = TfidfVectorizer(
 9. CTA bottom
 
 **Word count target** — см. @docs/voice-and-style.md §5.
+
+### Шаг 4.5 — Humanizer gate: см. docs/humanizer-gate.md. Обязателен для всех новых статей.
 
 ### Шаг 5 — Deploy + tracker
 
