@@ -1,0 +1,357 @@
+---
+// src/pages/services/washer-repair/samsung-error-codes.astro
+// Info Wave W4 — Samsung washer error codes (brand umbrella sniper).
+// Differentiator: font-alias block (5C=5E=SC=SE, 4C=4E) in answer-first lead.
+// CL = Child Lock (NOT an error) in lead. dC door-vs-unbalance conflict presented honestly.
+// Codes verified vs Samsung US support (TSG10000997). $89 residential. 4 schema entities.
+import Layout from '../../../layouts/Layout.astro';
+import ServiceHero from '../../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/services/washer-repair/samsung-error-codes/";
+
+const title = "Samsung Washer Error Codes? Causes & Fix — Same Day";
+const description = `Samsung washer flashing 5C, 4C, UE, dC, or LC? Same-day LA. What the codes mean, why 5C=SE, CL is child lock not a fault. BHGS #A49573. $89 dx waived.`;
+
+const faqs = [
+  {
+    q: "My Samsung shows SE (or 5E). The manual only lists 5C. Same thing?",
+    a: "Same thing. On a Samsung washer display the digit 5 and the letter S are drawn with the same segments, so 5C, SC, 5E, and SE all render the exact same drain fault — the washer couldn't pump water out in the time it expected. The trailing letter is just a firmware generation (older machines print E, newer ones print C). So don't waste time hunting for a separate SE definition. Start at the drain pump filter (lower front access panel, customer-cleanable), then the drain hose, then the pump motor. Roughly half of these clear at the filter without a part. $89 residential diagnostic, waived with repair."
+  },
+  {
+    q: "What does 4C (or 4E) mean on a Samsung washer?",
+    a: "Water supply fault. The washer isn't sensing water arriving at the rate or volume it wants. Check both supply valves are fully open, check the fill hoses aren't kinked behind the machine, then check the small mesh screens where the hoses thread onto the inlet valve — sediment clogs those constantly in hard-water pockets across the Valley. About 60 percent of 4C calls clear at the hose or screen. If the inlet valve itself failed it's a $260 to $380 replacement. 4C and 4E are the same fault on different firmware."
+  },
+  {
+    q: "CL is showing and the buttons don't respond. Is my Samsung broken?",
+    a: "No — CL is Child Lock, and it's a feature, not a fault. Someone held the lock button (usually a two-button combo printed under a small padlock icon) and the panel is now ignoring input on purpose. Hold the same two buttons for about 3 seconds and CL clears. Nothing is wrong with the machine. We mention this on every service page because people book a visit for CL more often than you'd think, and there's genuinely nothing to fix."
+  },
+  {
+    q: "I've seen dC mean 'door' one place and 'unbalance' another. Which is right?",
+    a: "Honestly, both — and that's not us dodging. Samsung's own materials are inconsistent here across model years. Lowercase dc most often flags an unbalanced load (same family as UE), while dE and dL are door-lock faults, and some charts print an uppercase dC for the door too. Because the labeling genuinely conflicts, our techs don't guess from the letter alone — we watch what the machine actually does. If it stops during spin and shuffles the load, we chase suspension and the unbalance sensor. If it won't start a cycle at all and won't lock, we chase the door interlock. The behavior tells the truth the code doesn't."
+  },
+  {
+    q: "Samsung shows UE or Ub on every load, even a single towel. What's wrong?",
+    a: "A UE (or Ub / UR) that fires even on small, evenly loaded washes has moved past 'redistribute the laundry' into worn suspension rods, tired shock absorbers, or a failing vibration sensor. Our techs check the suspension and the sensor when the code survives a balanced load, instead of just telling you to rearrange the clothes. Suspension or shock replacement runs $440 to $640. If it only trips on genuinely lopsided loads (one comforter, three jeans on one side), that's the machine doing its job — spread the load and it'll spin."
+  },
+  {
+    q: "LC or 1E keeps coming up. Is that a leak?",
+    a: "LC (and the related 1E / LE on some models) is the water-level or leak sensor speaking up. Sometimes it's a real leak the sensor caught early — a loose hose clamp, a cracked tub-to-pump hose, a worn door boot on a front-loader. Sometimes the sensor or its hose is misreading with no actual water on the floor. These don't clear from a customer power-cycle if the fault is real, so it's an on-site check: we confirm whether there's genuine water intrusion or a sensor reading wrong before quoting anything. A leaking door boot runs $220 to $380; a sensor is less."
+  },
+  {
+    q: "How do I reset a Samsung washer error code?",
+    a: "Universal first move: unplug the washer for about 60 seconds (or flip its breaker), restore power, and run a short rinse-and-spin to see whether the code returns. On many Samsung models you can also press and hold Start for several seconds to clear a latched code. A code that clears and stays gone for weeks was transient sensor noise and needs nothing. A code that returns within a cycle or two every time is a real hardware fault — book a visit. Leak (LC/1E), heater (tE/HE), and communication (AE) codes generally won't clear from a customer reset because they reflect a component that's actually down."
+  },
+  {
+    q: "What does tE or HE mean, and can I fix it myself?",
+    a: "Those are heater-circuit and temperature-sensor faults (tE = thermistor/temperature, HE = heater on models with an internal water heater or a SmartCare heated cycle). They're a technician job — the diagnosis involves testing the heating element, the thermistor, and the control board's heater relay with a meter, and there's mains voltage at the element. Not a DIY reset. We carry the common Samsung thermistors and elements on the van."
+  },
+  {
+    q: "Multiple different Samsung codes in the same month — what's going on?",
+    a: "Usually the main control board aging out. When a year 8-plus Samsung throws a drain code one week, an unbalance code the next, and a door code the week after, that's rarely three separate broken parts — it's the board sending false fault signals. Year 8 to 12 is the typical window. Board replacement runs $580 to $880, which at that age turns into a repair-versus-replace conversation, and we do that math with you on-site instead of just selling you a board."
+  },
+  {
+    q: "What's your warranty?",
+    a: "90 days on SDAR labor and parts for the work we perform — if the same component fails inside 90 days we replace it free. BHGS #A49573, BBB Accredited Business, EPA 608 Universal certified #1346255700410. $89 residential diagnostic, waived when you approve the repair."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+      ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+  "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Samsung Washer Error Code Repair",
+    "name": "Samsung Washer Error Code Diagnostic and Repair Service",
+    "url": canonical,
+    "description": "Residential Samsung washer error code decoding and repair across all five SoCal counties. On-site verification for Samsung WF, WW, and WA codes: 4C/4E fill fault, 5C/5E/SC/SE drain fault, UE/Ub/UR unbalance, dC/dE/dL door, 1E/LC/LE water-level and leak, tE/HE heater (technician), SUd suds, AE communication, PF power. CL is a child-lock feature, not a fault. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, waived with repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://samedayappliance.repair/services/" },
+      { "@type": "ListItem", "position": 3, "name": "Washer Repair", "item": "https://samedayappliance.repair/services/washer-repair/" },
+      { "@type": "ListItem", "position": 4, "name": "Samsung Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  section="services"
+  slug="washer-repair/samsung-error-codes"
+  eyebrow="Samsung Washer Error Codes · Diagnostic-First · LA Home Repair · Same Day"
+  title="Samsung Washer Error Codes, Decoded"
+  subtitle={`5C, 4C, UE, dC, LC on the display and the cycle quit. We fix Samsung WF, WW, and WA washers same-day across LA, Orange, Ventura, San Bernardino, Riverside. $89 residential diagnostic. ${phone}`}
+  heroImageTitle="Samsung Washer Error Code Repair"
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Answer first</p>
+    <h2>Two things throw people off before we even open the machine: the font, and CL.</h2>
+
+    <p><strong>On a Samsung washer, the display font makes different-looking codes mean the same thing. The digit 5 and the letter S are drawn identically, the digit 0 and the letter O are drawn identically, and the last letter (C vs E) is only a firmware generation. So <span class="code">5C = 5E = SC = SE</span> are all one drain fault, and <span class="code">4C = 4E</span> are one water-supply fault. Chasing "SE" as if it were separate from "5C" wastes an evening. And <span class="code">CL</span> is not an error at all — it's Child Lock, cleared by holding the lock button combo for about 3 seconds. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
+
+    <p>Here's the honest version of a Samsung washer code, brand-first. The display flashes something, the wash stops mid-cycle, and the search results argue with each other. Most Samsung faults land in four buckets: a drain fault (the 5C font family, drain pump), a fill fault (4C/4E, inlet valve), an unbalance fault (UE and its cousins, suspension), or a door-lock fault (dE/dL, interlock). Our techs decode the specific code and then confirm on-site, because the same code can trace to a cheap hose or an expensive board depending on what the control logged.</p>
+
+    <p>Below is the font-alias key first, then the full Samsung code table, then the fixes bucket by bucket. This is the same reference our techs at Same Day Appliance Repair carry to Samsung calls across LA County, Orange, Ventura, San Bernardino, and Riverside. Parent reference: <a href="/services/washer-repair/error-codes/">all washer error codes</a>. Brand pillar: <a href="/brands/samsung-washer-repair/">Samsung washer repair</a>.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Font aliases</p>
+    <h2 class="section-title">Same fault, different-looking code. Read this before you Google "SE".</h2>
+    <p class="lead">Samsung's segmented display can't tell a 5 from an S or a 0 from an O — they share the same lit segments. And the trailing letter shifted from E on older machines to C on newer ones. That means several "different" codes are one fault.</p>
+    <table class="price-table">
+      <thead><tr><th>What you might see</th><th>All mean</th><th>Fault</th></tr></thead>
+      <tbody>
+        <tr><td>5C · 5E · SC · SE · nd</td><td>Drain fault</td><td>Pump filter, hose, drain pump motor</td></tr>
+        <tr><td>4C · 4E</td><td>Water-supply / fill fault</td><td>Inlet hose, screen, inlet valve</td></tr>
+        <tr><td>1C · 1E · 1O</td><td>Water-level sensor</td><td>Pressure sensor or its hose</td></tr>
+        <tr><td>UE · Ub · UR · Ur · U6</td><td>Unbalanced load</td><td>Load spread, then suspension / sensor</td></tr>
+        <tr><td>OE · OF · 0C · 0F</td><td>Overflow</td><td>Pressure switch or inlet valve stuck open</td></tr>
+      </tbody>
+    </table>
+    <p>So if the manual you found only lists "5C" but your machine shows "SE," you're already in the right place — same drain fault, no separate hunt needed.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Full code table</p>
+    <h2 class="section-title">Samsung WF / WW / WA washer codes.</h2>
+    <table class="price-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Common cause</th></tr></thead>
+      <tbody>
+        <tr><td>4C / 4E</td><td>Water supply / fill fault</td><td>Inlet hose, mesh screen, inlet valve</td></tr>
+        <tr><td>5C / 5E / SC / SE / nd</td><td>Drain fault</td><td>Pump filter (DIY), drain hose, pump motor</td></tr>
+        <tr><td>UE / Ub / UR</td><td>Unbalanced load</td><td>Redistribute load; suspension / sensor if persistent</td></tr>
+        <tr><td>dc (lowercase)</td><td>Unbalance (redundant signal)</td><td>Same family as UE — see honest note on dC below</td></tr>
+        <tr><td>dE / dL</td><td>Door / door-lock fault</td><td>Door interlock assembly</td></tr>
+        <tr><td>1C / 1E / LC / LE</td><td>Water-level / leak sensor</td><td>Pressure sensor, or a real leak (door boot, hose)</td></tr>
+        <tr><td>OE / OF</td><td>Overflow</td><td>Pressure switch or inlet valve stuck open</td></tr>
+        <tr><td>tE</td><td>Temperature sensor</td><td>Thermistor (technician)</td></tr>
+        <tr><td>HE</td><td>Heater fault</td><td>Heating element / heater relay (technician)</td></tr>
+        <tr><td>SUd / Sud</td><td>Excess suds</td><td>Too much or non-HE detergent (customer-side)</td></tr>
+        <tr><td>AE</td><td>Communication fault</td><td>Board-to-board harness or control board (technician)</td></tr>
+        <tr><td>PF</td><td>Power failure mid-cycle</td><td>Power interruption; restart cycle</td></tr>
+        <tr><td>CL</td><td>Child Lock (not a fault)</td><td>Hold the lock button combo ~3 seconds</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Drain fault</p>
+    <h2 class="section-title">The 5C font family — start at the filter.</h2>
+    <p>A 5C, SE, SC, or nd means the washer tried to pump out and couldn't finish in time. On front-load WF and WW machines there's a drain pump filter behind a small access door at the lower front — that's the first stop, and it's customer-cleanable. Lay down a towel, set a shallow pan under it, twist the cap counterclockwise, and pull out the lint, coins, and the occasional hair clip that's jamming the impeller. Roughly half of these calls end right there.</p>
+    <p>If the filter's clean and the code comes back, the next suspects are a kinked or clogged drain hose at the standpipe and then the drain pump motor itself. Pump replacement runs $380 to $540 with labor. On WA top-load models there's no front filter — the drain path runs straight to the pump, so those go to a hose-and-pump check on the visit. Related symptom page: <a href="/services/washer-repair/not-draining/">washer not draining</a>.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Fill fault</p>
+    <h2 class="section-title">4C / 4E — water isn't arriving fast enough.</h2>
+    <p>The washer expected a certain amount of water in a certain window and didn't get it. Work from cheap to expensive: both supply valves fully open, fill hoses not kinked behind the machine, then the little mesh screens where the hoses screw onto the inlet valve. Those screens catch sediment, and in the harder-water pockets across the Inland Empire and the Valley they clog often enough that we clean them on a good share of 4C calls. If the inlet valve solenoid itself failed, it's a $260 to $380 replacement. 4C and 4E are the identical fault — older firmware just printed the E.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Unbalance</p>
+    <h2 class="section-title">UE, Ub, UR — when it's the laundry and when it's the machine.</h2>
+    <p>An unbalance code on one lopsided load (a single comforter, or three pairs of jeans piled on one side) is the washer protecting itself: it won't ramp to spin speed off-center. Spread the load and it goes away. That's normal, not a fault.</p>
+    <p>The tell that it's hardware is when UE fires on <em>balanced</em> loads, including small ones. At that point our techs look at the suspension rods and shock absorbers (worn ones let the tub wander) and at the vibration sensor that reports position to the board. Suspension or shock replacement runs $440 to $640. We check those before we ever tell you to just rearrange the wash, because if it's the rods, no amount of rearranging fixes it.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Door &amp; the dC conflict</p>
+    <h2 class="section-title">dE and dL are the door. dC is where the sources disagree — so we watch, not guess.</h2>
+    <p>dE and dL are door-lock faults: the washer can't confirm the door is latched, so it won't run (a front-loader will not spin with an unlocked door, by design). The usual fix is the door interlock assembly, $260 to $440.</p>
+    <p>The messy one is dC. Samsung's own materials aren't consistent across model years — lowercase <span class="code">dc</span> is most often an unbalance signal (same family as UE), while some charts print an uppercase <span class="code">dC</span> for the door. Rather than argue with the letter, our techs read the behavior. Quits during spin and shuffles the load? We chase suspension and the unbalance sensor. Won't start and won't lock at all? We chase the interlock. The machine's action settles what the label leaves ambiguous.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Leak, heater, suds, power</p>
+    <h2 class="section-title">The rest of the list, sorted by who fixes it.</h2>
+    <p><strong>Leak / water-level (1C, 1E, LC, LE):</strong> the level or leak sensor spoke up. Could be a genuine early leak — a loose clamp, a cracked tub-to-pump hose, a worn front-load door boot ($220 to $380) — or a sensor reading wrong with a dry floor. These need an on-site look; they don't clear from a power-cycle if the fault is real.</p>
+    <p><strong>Heater (tE, HE):</strong> temperature-sensor and heater-circuit faults. Technician work — there's mains voltage at the element and the diagnosis needs a meter on the thermistor, element, and heater relay.</p>
+    <p><strong>Suds (SUd, Sud):</strong> too much detergent or a non-HE soap foaming up. The washer pauses to clear the foam. Cut the dose, switch to HE detergent, and it stops. Customer-side, no visit.</p>
+    <p><strong>Communication (AE):</strong> the boards lost their handshake — a harness or the control board. Technician diagnosis.</p>
+    <p><strong>Power (PF):</strong> the power blipped mid-cycle. Restart the cycle. If it keeps happening on a circuit that's fine for everything else, then it's worth a look at the machine's power board.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">DIY resets</p>
+    <h2 class="section-title">Try these before you book a visit.</h2>
+    <ol class="num-list">
+      <li><strong>Clear Child Lock (CL).</strong> Hold the two buttons printed under the small padlock icon for about 3 seconds. CL isn't a fault.</li>
+      <li><strong>Power cycle.</strong> Unplug for 60 seconds (or flip the breaker), restore power, run a rinse-and-spin. Clears transient sensor noise.</li>
+      <li><strong>Drain pump filter (front-load).</strong> Lower-front access door, pan underneath, twist counterclockwise, clear debris. Fixes a high share of 5C / SE drain codes.</li>
+      <li><strong>Inlet hose &amp; screen check.</strong> Valves fully open, hoses not kinked, mesh screens clear of sediment. Resolves many 4C / 4E codes.</li>
+      <li><strong>Detergent dose.</strong> For SUd, cut the amount and use HE detergent.</li>
+    </ol>
+    <p>Leak (LC/1E), heater (tE/HE), door (dE/dL), and communication (AE) codes don't clear from a customer reset when the fault is real — those are the ones worth a call.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Honest opinion</p>
+    <h2 class="section-title">A year 8+ Samsung throwing several different codes usually has a dying board.</h2>
+    <p>When an older Samsung shows a drain code one week, an unbalance code the next, and a door code after that, the honest read is rarely three broken parts. It's the main control board aging and sending false signals. Year 8 to 12 is the typical window. Board replacement runs $580 to $880, and at that age the smart move is to weigh it against a new machine — we run that math with you at the door instead of quietly selling you a board on a washer that's near the end anyway.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2 class="section-title">Code-driven part costs.</h2>
+    <p class="lead">$89 residential diagnostic, waived with repair. No emergency surcharge — same $89 anytime.</p>
+    <table class="price-table">
+      <thead><tr><th>Code-driven repair</th><th>Typical cost</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic</td><td>$89, waived with repair</td></tr>
+        <tr><td>Drain pump (5C / SE / nd)</td><td>$380 to $540</td></tr>
+        <tr><td>Inlet valve (4C / 4E)</td><td>$260 to $380</td></tr>
+        <tr><td>Door interlock (dE / dL)</td><td>$260 to $440</td></tr>
+        <tr><td>Pressure switch (OE / OF)</td><td>$260 to $380</td></tr>
+        <tr><td>Door boot / leak repair (LC / 1E)</td><td>$220 to $380</td></tr>
+        <tr><td>Suspension / shocks (UE persistent)</td><td>$440 to $640</td></tr>
+        <tr><td>Heater / thermistor (tE / HE)</td><td>$260 to $460</td></tr>
+        <tr><td>Main control board (multi-code cascade)</td><td>$580 to $880</td></tr>
+        <tr><td>Warranty</td><td>90 days parts and labor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2 class="section-title">Samsung washer code questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Related pages</p>
+    <h2 class="section-title">Other Samsung and washer help.</h2>
+    <ul class="bullet-list">
+      <li><a href="/services/washer-repair/error-codes/">All washer error codes (every brand)</a></li>
+      <li><a href="/brands/samsung-washer-repair/">Samsung washer repair (brand pillar)</a></li>
+      <li><a href="/services/washer-repair/not-draining/">Washer not draining</a></li>
+      <li><a href="/services/washer-repair/wont-spin/">Washer won't spin</a></li>
+      <li><a href="/services/washer-repair/leaking/">Washer leaking water</a></li>
+      <li><a href="/services/washer-repair/">Washer repair (parent pillar)</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Samsung Washer Flashing a Code? Call Today.</h2>
+    <p>Same-day across LA, OC, Ventura. $89 diagnostic waived with repair. BHGS #A49573, EPA 608 Universal #1346255700410. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; color: var(--text); line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 22px; }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.95em; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 6px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: top; }
+  .price-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
