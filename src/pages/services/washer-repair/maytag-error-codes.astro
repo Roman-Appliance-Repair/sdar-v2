@@ -1,0 +1,330 @@
+---
+// src/pages/services/washer-repair/maytag-error-codes.astro
+// Info Wave W4 — Maytag washer error codes (brand umbrella sniper).
+// Differentiator: Maytag = Whirlpool platform byte-for-byte (Bravos=Cabrio, Maxima=Duet).
+// Honest 10-year limited warranty framing (drum+motor parts only, not the boards/pumps
+// that throw most codes). Mutual links to Whirlpool sniper. Codes verified vs Maytag producthelp.
+// $89 residential. 4 schema entities.
+import Layout from '../../../layouts/Layout.astro';
+import ServiceHero from '../../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/services/washer-repair/maytag-error-codes/";
+
+const title = "Maytag Washer Error Codes? Causes & Fix — Same Day";
+const description = `Maytag washer showing F9E1, F7E1, F5E2, or Sud? Same-day LA. Bravos and Maxima codes, what the 10-year warranty really covers. BHGS #A49573. $89 dx waived.`;
+
+const faqs = [
+  {
+    q: "Are Maytag washer codes the same as Whirlpool codes?",
+    a: "Yes — byte-for-byte. Maytag is a Whirlpool brand and shares the same control architecture. The Maytag Bravos is the same platform as the Whirlpool Cabrio (top-load); the Maytag Maxima is the same platform as the Whirlpool Duet (front-load). F9E1 is long-drain on both, F5E2 is a lock fault on both, F7E1 is a motor/basket-speed fault on both, and the parts come from the same catalog families. So a Maytag code lookup and a Whirlpool code lookup land in the same place. $89 residential diagnostic, waived with repair."
+  },
+  {
+    q: "My Maytag has a 10-year warranty — doesn't that cover the error code repair?",
+    a: "Usually not, and this trips people up. Maytag's marketed 10-year limited warranty covers PARTS ONLY on two specific components — the drive motor and the wash basket (drum) — not labor, and not the parts that actually throw most error codes. Drain pumps, inlet valves, door and lid locks, control boards, and dispensers are the usual culprits behind F9E1, F8E1, F5E2, and the rest, and those aren't in the 10-year coverage. Check your paperwork, but in practice the code you're chasing is almost always outside it. We'll tell you honestly if your specific failure happens to fall inside the drum-or-motor coverage."
+  },
+  {
+    q: "Is my Maytag a Bravos or a Maxima, and why does it matter?",
+    a: "Bravos is the high-efficiency TOP-load washer (lid on top, no front door, no front drain filter). Maxima is the FRONT-load washer (round door, drain pump filter behind the lower kickplate). It changes the diagnosis: on a Maxima a drain code F9E1 starts at that accessible filter, which clears roughly half of drain faults without a part, while on a Bravos there's no filter so the same code goes straight to the pump and hose. Tell us which one you have and we bring the right parts."
+  },
+  {
+    q: "What does F9E1 mean on a Maytag washer?",
+    a: "Long-drain / drain fault — the washer couldn't pump the water out in time. On a Maxima front-loader, start at the drain pump filter behind the lower kickplate, then the drain hose at the standpipe, then the pump motor ($380 to $540). On a Bravos top-loader there's no filter, so it's a hose-and-pump check. On older Maytag machines this same fault showed as F21 or F02 before Whirlpool renamed the codes around 2011. Our washer not-draining page walks the full path."
+  },
+  {
+    q: "F7E1 on a Maytag Bravos — what is it?",
+    a: "A motor or basket-speed fault: the control asked for a spin speed and the basket didn't get there, or the rotor-position sensor disagreed. On the Bravos top-load this often traces to the motor rotor position sensor, the shifter (which switches wash and spin), or the drive motor. Older Bravos generations showed this as F51. It's a technician diagnosis because the fix depends on which drive component failed — drive-system repairs run $340 to $620."
+  },
+  {
+    q: "F5E2 — door or lid?",
+    a: "A lock fault, and which hardware depends on the machine. On a Maxima front-loader it's the door interlock; on a Bravos top-loader it's the lid lock. Either way the washer won't spin until it confirms the lock, by safety design, and the fix is a $260 to $440 assembly. On top-load Bravos you may also see F5E1 (reads lid open when closed) or F5E3 (won't unlock at the end) — same lock hardware family."
+  },
+  {
+    q: "How do I reset a Maytag washer code?",
+    a: "Unplug for about 60 seconds (or flip the breaker), restore power, and run a rinse-and-spin to see if the code returns. On many Maytag models you can also press Cancel/Pause or Stop twice to clear a latched code. A code that clears and stays gone was transient noise; a code that returns every cycle is a real fault. Lock faults (F5E2/F5E3) and motor faults (F7E1) won't clear from a reset when the hardware is down — those are worth a call."
+  },
+  {
+    q: "Sud (or F30) keeps showing. Is that a real fault?",
+    a: "It's the washer telling you it's foaming up — too much detergent, or a non-HE soap in an HE machine. The cycle pauses to clear the suds before it can drain or spin. Cut the dose, switch to HE detergent, and it stops. That's a customer-side fix, no visit needed. If Sud shows even with a correct HE dose, then we'd look at the drain path (trapped suds not clearing) on a visit."
+  },
+  {
+    q: "Several different codes on an older Maytag within a month — replace it?",
+    a: "Probably the conversation to have. When a year 8-plus machine throws a drain code, then an unbalance code, then a lock code across a few weeks, it's usually the main control board sending false signals as it ages, not three separate broken parts. Board replacement runs $580 to $880, and on a mid-tier washer that age it's a repair-versus-replace call. We run that math with you at the door — and if the failing part happens to be the drum or motor, that's where the 10-year parts coverage might actually help, so we check."
+  },
+  {
+    q: "What's your warranty on the repair?",
+    a: "90 days on SDAR labor and parts for the work we perform — separate from any Maytag factory warranty. Same component fails inside 90 days, we replace it free. BHGS #A49573, BBB Accredited Business, EPA 608 Universal certified #1346255700410. $89 residential diagnostic, waived when you approve the repair."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+      ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+  "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Maytag Washer Error Code Repair",
+    "name": "Maytag Washer Error Code Diagnostic and Repair Service",
+    "url": canonical,
+    "description": "Residential Maytag washer error code decoding and repair across all five SoCal counties. Bravos top-load and Maxima front-load codes on the shared Whirlpool platform: F7E1 motor/basket, F8E1 fill, F9E1 drain, F5E1/F5E2/F5E3 lock, Sud/F30 suds, legacy F21/F51. Includes honest guidance on what the Maytag 10-year limited parts warranty (drive motor and wash basket only) does and does not cover. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, waived with repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://samedayappliance.repair/services/" },
+      { "@type": "ListItem", "position": 3, "name": "Washer Repair", "item": "https://samedayappliance.repair/services/washer-repair/" },
+      { "@type": "ListItem", "position": 4, "name": "Maytag Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  section="services"
+  slug="washer-repair/maytag-error-codes"
+  eyebrow="Maytag Washer Error Codes · Diagnostic-First · LA Home Repair · Same Day"
+  title="Maytag Washer Error Codes, Decoded"
+  subtitle={`F9E1, F7E1, F5E2, or Sud on the display. We fix Bravos top-load and Maxima front-load washers same-day across LA, Orange, Ventura, San Bernardino, Riverside. $89 residential diagnostic. ${phone}`}
+  heroImageTitle="Maytag Washer Error Code Repair"
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Answer first</p>
+    <h2>Maytag codes are Whirlpool codes — and the 10-year warranty covers less than most people think.</h2>
+
+    <p><strong>Maytag is a Whirlpool brand, and its washers use the identical F-code system. The Maytag Bravos is the Whirlpool Cabrio platform (top-load); the Maytag Maxima is the Whirlpool Duet platform (front-load). So <span class="code">F9E1</span> is a drain fault, <span class="code">F7E1</span> is a motor/basket-speed fault, and <span class="code">F5E2</span> is a lock fault on Maytag exactly as on Whirlpool. Separately: the marketed 10-year limited warranty covers PARTS only on the drive motor and wash basket — not the pumps, valves, locks, and boards that throw most codes, and not labor. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
+
+    <p>Because the platform is shared, the deepest reference — including the full old-code-to-new-code generation transitions (F21 to F9E1, F51 to F7E1) — lives on our <a href="/services/washer-repair/whirlpool-error-codes/">Whirlpool error-codes page</a>, and every word of it applies to your Bravos or Maxima. Below we give you the Maytag-labeled tables and the model families, then the honest read on what the factory warranty actually does for you.</p>
+
+    <p>Our techs at Same Day Appliance Repair service the full Maytag lineup across LA County, Orange, Ventura, San Bernardino, and Riverside. Parent reference: <a href="/services/washer-repair/error-codes/">all washer error codes</a>. Brand pillar: <a href="/brands/maytag-washer-repair/">Maytag washer repair</a>.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Bravos (top-load)</p>
+    <h2 class="section-title">Maytag Bravos / MVW top-load codes.</h2>
+    <p class="lead">Bravos (model prefixes like MVWB, MVWX) is the top-load platform — no front door, no front drain filter. A drain code goes straight to the pump and hose.</p>
+    <table class="price-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Common cause</th></tr></thead>
+      <tbody>
+        <tr><td>F5E1</td><td>Lid reads open when closed</td><td>Lid switch or wiring</td></tr>
+        <tr><td>F5E2</td><td>Lid won't lock</td><td>Lid lock assembly ($260-440)</td></tr>
+        <tr><td>F5E3</td><td>Lid won't unlock at cycle end</td><td>Lid lock stuck</td></tr>
+        <tr><td>F7E1</td><td>Motor / basket speed fault</td><td>Rotor sensor, shifter, drive motor (old F51)</td></tr>
+        <tr><td>F8E1 (LF)</td><td>Long fill / no water</td><td>Inlet valve, hose, screen, pressure</td></tr>
+        <tr><td>F9E1 (Ld)</td><td>Long drain / drain fault</td><td>Drain pump, hose (no front filter)</td></tr>
+        <tr><td>uL / Ub</td><td>Unbalanced load</td><td>Redistribute; suspension if persistent</td></tr>
+        <tr><td>Sd / Sud</td><td>Excess suds</td><td>Too much or non-HE detergent (customer-side)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Maxima (front-load)</p>
+    <h2 class="section-title">Maytag Maxima / MHW front-load codes.</h2>
+    <p class="lead">Maxima (model prefixes like MHW) is the front-load platform — round door, drain pump filter behind the lower kickplate. A drain code starts at that filter.</p>
+    <table class="price-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Common cause</th></tr></thead>
+      <tbody>
+        <tr><td>F5E2</td><td>Door lock fault</td><td>Door interlock assembly ($260-440)</td></tr>
+        <tr><td>F5E3</td><td>Door won't unlock</td><td>Interlock stuck</td></tr>
+        <tr><td>F7E1</td><td>Motor / basket speed fault</td><td>Motor or motor control (old F51)</td></tr>
+        <tr><td>F8E1 (LF)</td><td>Long fill / no water</td><td>Inlet valve, hose, screen, pressure</td></tr>
+        <tr><td>F8E2</td><td>Dispenser / no water detected</td><td>Dispenser motor or clog</td></tr>
+        <tr><td>F9E1 (Ld)</td><td>Long drain / drain fault</td><td>Filter first, then hose, then pump (old F21/F02)</td></tr>
+        <tr><td>Sud / F30</td><td>Excess suds</td><td>Detergent dose / non-HE soap (customer-side)</td></tr>
+      </tbody>
+    </table>
+    <p>Related symptom pages: <a href="/services/washer-repair/not-draining/">washer not draining</a> · <a href="/services/washer-repair/wont-spin/">washer won't spin</a>.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">The 10-year warranty, honestly</p>
+    <h2 class="section-title">What "10-Year Limited Warranty" actually covers on a Maytag washer.</h2>
+    <p class="lead">Maytag markets a 10-year limited PARTS warranty on two components. It's real — and it's narrower than the badge suggests.</p>
+    <table class="price-table">
+      <thead><tr><th>Component</th><th>In the 10-year coverage?</th></tr></thead>
+      <tbody>
+        <tr><td>Drive motor (parts)</td><td>Yes — parts only, not labor</td></tr>
+        <tr><td>Wash basket / drum (parts)</td><td>Yes — parts only, not labor</td></tr>
+        <tr><td>Drain pump (F9E1)</td><td>No</td></tr>
+        <tr><td>Inlet valve (F8E1)</td><td>No</td></tr>
+        <tr><td>Door / lid lock (F5E2)</td><td>No</td></tr>
+        <tr><td>Control board</td><td>No</td></tr>
+        <tr><td>Dispenser (F8E2)</td><td>No</td></tr>
+        <tr><td>Labor, any component</td><td>No — parts only</td></tr>
+      </tbody>
+    </table>
+    <p>So the parts that throw the codes you're most likely reading — drain, fill, lock, board — sit outside the 10-year coverage, which is why "I have the 10-year warranty" rarely means the repair is free. The motor is the one code-adjacent part that might qualify (an F7E1 motor failure), so we check the failing component against your warranty paperwork before quoting. Always read your own documents; coverage terms vary by model and purchase date.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">DIY resets</p>
+    <h2 class="section-title">Try these before you book a visit.</h2>
+    <ol class="num-list">
+      <li><strong>Power cycle.</strong> Unplug for 60 seconds (or flip the breaker), restore power, run a rinse-and-spin. Clears transient sensor noise.</li>
+      <li><strong>Cancel twice.</strong> Press Cancel/Pause or Stop twice on many models to clear a latched code.</li>
+      <li><strong>Drain filter (Maxima front-load).</strong> Lower kickplate, pan underneath, clear debris. Fixes a high share of F9E1 drain codes.</li>
+      <li><strong>Inlet hose &amp; screen (F8E1).</strong> Valves open, hoses not kinked, mesh screens clear.</li>
+      <li><strong>Detergent dose (Sud).</strong> Cut the amount, use HE detergent.</li>
+    </ol>
+    <p>Lock faults (F5E2/F5E3) and motor faults (F7E1) don't clear from a reset when the hardware's down — those are worth a call.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Honest opinion</p>
+    <h2 class="section-title">A year 8+ Maytag throwing several codes usually has a dying board.</h2>
+    <p>When an older Maytag shows a drain code one week, an unbalance code the next, and a lock code after that, the honest read is the main control board aging and sending false signals — not three separate broken parts. Year 8 to 12 is the typical window. Board replacement runs $580 to $880, which on a mid-tier machine that age is a repair-versus-replace call. We run the math with you at the door. And because the drum and motor carry that 10-year parts coverage, if the real failure is one of those two, we point it out — that's the one scenario where the warranty genuinely changes the decision.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2 class="section-title">Code-driven part costs.</h2>
+    <p class="lead">$89 residential diagnostic, waived with repair. No emergency surcharge — same $89 anytime.</p>
+    <table class="price-table">
+      <thead><tr><th>Code-driven repair</th><th>Typical cost</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic</td><td>$89, waived with repair</td></tr>
+        <tr><td>Drain pump (F9E1)</td><td>$380 to $540</td></tr>
+        <tr><td>Inlet valve (F8E1)</td><td>$260 to $380</td></tr>
+        <tr><td>Door / lid lock (F5E2 / F5E3)</td><td>$260 to $440</td></tr>
+        <tr><td>Motor / drive system (F7E1)</td><td>$340 to $620 (motor part may qualify for 10-yr coverage)</td></tr>
+        <tr><td>Dispenser motor (F8E2)</td><td>$220 to $360</td></tr>
+        <tr><td>Suspension / shocks (uL persistent)</td><td>$440 to $640</td></tr>
+        <tr><td>Main control board (multi-code cascade)</td><td>$580 to $880</td></tr>
+        <tr><td>Warranty</td><td>90 days SDAR parts and labor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2 class="section-title">Maytag washer code questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Related pages</p>
+    <h2 class="section-title">Other Whirlpool-family and washer help.</h2>
+    <ul class="bullet-list">
+      <li><a href="/services/washer-repair/whirlpool-error-codes/">Whirlpool washer error codes (full generation transitions)</a></li>
+      <li><a href="/services/washer-repair/error-codes/">All washer error codes (every brand)</a></li>
+      <li><a href="/brands/maytag-washer-repair/">Maytag washer repair (brand pillar)</a></li>
+      <li><a href="/services/washer-repair/not-draining/">Washer not draining</a></li>
+      <li><a href="/services/washer-repair/wont-spin/">Washer won't spin</a></li>
+      <li><a href="/services/washer-repair/">Washer repair (parent pillar)</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Maytag Washer Flashing a Code? Call Today.</h2>
+    <p>Same-day across LA, OC, Ventura. $89 diagnostic waived with repair. BHGS #A49573, EPA 608 Universal #1346255700410. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; color: var(--text); line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 22px; }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.95em; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 6px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: top; }
+  .price-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
