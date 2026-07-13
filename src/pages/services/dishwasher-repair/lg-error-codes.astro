@@ -1,0 +1,332 @@
+---
+// src/pages/services/dishwasher-repair/lg-error-codes.astro
+// Info Wave W6 — LG dishwasher error codes (sniper; umbrella dishwasher/error-codes has a table).
+// THIRD lg-error-codes on site (washer W4 + fridge I-2) — disambiguate/cross-ref.
+// Differentiator: CL = Child Lock (NOT a fault) in lead. Codes beyond umbrella: nE, bE, LE,
+// E1(=AE), heat-dry F31/F35/F37. OMIT dE/tCL (not valid LG dishwasher). PE=legacy caveat.
+// Verified vs LG US support. No LG W2 drain sniper exists -> OE cross-refs generic not-draining.
+// $89 residential. 4 schema entities.
+import Layout from '../../../layouts/Layout.astro';
+import ServiceHero from '../../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/services/dishwasher-repair/lg-error-codes/";
+
+const title = "LG Dishwasher Error Codes? Causes & Fix — Same Day";
+const description = `LG dishwasher showing OE, IE, HE, AE, or nE? Same-day LA. What each code means, why CL is child lock not a fault. BHGS #A49573. $89 dx waived.`;
+
+const faqs = [
+  {
+    q: "My LG dishwasher shows CL. Is it broken?",
+    a: "No — CL is Control Lock (child lock), a feature, not a fault. Someone held the lock button and the panel is ignoring input on purpose. Hold the same button (often marked with a lock icon, or the button labeled in your manual) for about 3 seconds and CL clears. Don't confuse it with LE, which IS a real fault (a wash-motor error, grouped by LG with CE). We flag CL on every LG page because people book visits for it, and there's nothing to repair."
+  },
+  {
+    q: "What does OE mean on an LG dishwasher?",
+    a: "OE is a drain (outlet) error — the tub didn't drain completely, usually a food clog or an install issue. Start with the filter at the bottom of the tub (twist out the cylinder, rinse it), then the drain hose for kinks, then the air gap or garbage-disposal knockout plug if it's newly installed (a very common cause). If those are clear and OE returns, the drain pump is the next stop. Because there's no separate LG dishwasher drain-symptom page, the full drain walkthrough lives on our dishwasher not-draining page. Drain pump replacement runs $89 to $440 depending on whether it's a clog or the pump. $89 residential diagnostic, waived with repair."
+  },
+  {
+    q: "IE keeps showing — what's that?",
+    a: "IE is an inlet error: after about 10 minutes of filling, the water didn't reach the level LG expects. Check the supply valve is fully open and the fill hose isn't kinked, then the inlet screen for sediment (common in our harder-water areas). If the water's arriving fine but LG still throws IE, the inlet valve or the water-level sensor may be at fault. Inlet valve replacement runs $200 to $340. Note LG's own pages group leak and overfill codes (AE/E1/FE) separately from IE — IE is specifically 'not enough water in.'"
+  },
+  {
+    q: "AE (or E1) — is that a leak?",
+    a: "Yes. AE and E1 are the same leak/overfill condition on LG: water in the base pan trips the float switch and the machine shuts off to prevent flooding. It won't clear from a customer reset until the leak source is found and fixed — a door gasket, a hose, or the sump. Our techs trace where the water's coming from before quoting, because the cost swings widely ($200 to $980) depending on the source. If you see AE or E1, it's an on-site diagnosis, not a DIY reset. See also our dishwasher leaking-water page."
+  },
+  {
+    q: "HE or tE — heater problem?",
+    a: "Both are heat-related and both are technician codes. HE is a heater error — LG can't heat the water, or it detected water above about 149°F. tE is a thermal/temperature-sensor error — water above roughly 194°F or a failed thermistor. Each needs a meter on the heating element, thermistor, and control board, and there's mains voltage involved. Not a DIY reset. Heating element or thermistor work runs $200 to $460."
+  },
+  {
+    q: "What are nE, LE, CE, and bE?",
+    a: "nE is a Vario/spray-arm motor error — the spray-arm or impeller motor isn't spinning normally. LE is a wash-motor (cleaning motor) error, and LG groups LE with CE as a motor/harness fault (an issue between the motor and the control board). Those three — nE, LE, CE — are technician-level. bE is different and customer-addressable: it's a bubble/over-sudsing error, meaning too much detergent, the wrong (non-dishwasher) soap, or the unit isn't level. For bE, cut the detergent, use dishwasher detergent only, and confirm the machine sits level. Motor/harness repairs run $300 to $820."
+  },
+  {
+    q: "My LG has Heat Dry and shows F31, F35, or F37. What are those?",
+    a: "Those are Dynamic Heat Dry codes, specific to LG models with that drying system. F31 is a heat-dry fan-motor failure, F35 means the heat-dry temperature can't be measured, and F37 is an auto-open door mechanism error. All three are technician diagnoses on the drying hardware — they won't clear from a reset. If your dishes are also coming out wet, our dishwasher not-drying page covers the broader drying picture, and these codes point us straight at the fan, sensor, or door actuator."
+  },
+  {
+    q: "How do I reset an LG dishwasher code, and what's PE?",
+    a: "Unplug for about 60 seconds (or flip the breaker), restore power, and run a short cycle to see if the code returns. Customer-addressable codes (OE clog, IE supply, FE overfill, bE suds, CL child lock, PF power failure) often clear once you fix the obvious cause. PE is a water-level pressure-sensor fault that LG notes on older models — it's a technician code. Codes that return within a cycle or two of resetting mean real hardware faults: HE, tE, CE/LE, nE, PE, and the F31/F35/F37 heat-dry codes all fall there."
+  },
+  {
+    q: "What's your warranty?",
+    a: "90 days on SDAR labor and parts for the work we perform — separate from any LG factory warranty. Same component fails inside 90 days, we replace it free. BHGS #A49573, BBB Accredited Business, EPA 608 Universal certified #1346255700410. $89 residential diagnostic, waived when you approve the repair."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+      ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+  "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "LG Dishwasher Error Code Repair",
+    "name": "LG Dishwasher Error Code Diagnostic and Repair Service",
+    "url": canonical,
+    "description": "Residential LG dishwasher error code decoding and repair across all five SoCal counties. Codes: OE drain, IE inlet, HE heater, tE thermal, CE/LE motor/harness, nE spray-arm motor, PE water-level sensor (legacy), FE overfill, AE/E1 leak, bE over-sudsing, plus Dynamic Heat Dry codes F31/F35/F37. CL is a control-lock (child-lock) feature, not a fault. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, waived with repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://samedayappliance.repair/services/" },
+      { "@type": "ListItem", "position": 3, "name": "Dishwasher Repair", "item": "https://samedayappliance.repair/services/dishwasher-repair/" },
+      { "@type": "ListItem", "position": 4, "name": "LG Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  section="services"
+  slug="dishwasher-repair/lg-error-codes"
+  eyebrow="LG Dishwasher Error Codes · Diagnostic-First · LA Home Repair · Same Day"
+  title="LG Dishwasher Error Codes, Decoded"
+  subtitle={`OE, IE, HE, AE, or nE on the display and the cycle stopped. We fix LG dishwashers same-day across LA, Orange, Ventura, San Bernardino, Riverside. $89 residential diagnostic. ${phone}`}
+  heroImageTitle="LG Dishwasher Error Code Repair"
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Answer first</p>
+    <h2>Before you book anything: CL isn't an error, and LE isn't CL.</h2>
+
+    <p><strong><span class="code">CL</span> on an LG dishwasher is Control Lock (child lock) — a feature, cleared by holding the lock button about 3 seconds. It is not a fault. Don't confuse it with <span class="code">LE</span>, which is a real wash-motor error. For the actual faults, LG's core codes are readable once you know the pattern: <span class="code">OE</span> is drain (out), <span class="code">IE</span> is inlet (in), <span class="code">HE</span> is heater, <span class="code">AE</span> (= E1) is a leak, and <span class="code">FE</span> is overfill. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
+
+    <p>Here's the honest read. Most LG dishwasher faults land in a few buckets: a drain fault (OE), an inlet fault (IE), heat faults (HE, tE), motor faults (CE, LE, nE), a leak (AE/E1), and overfill (FE). A handful — CL, PF, bE — aren't hardware failures at all. Below we give you the full table, split into what you can clear yourself and what needs a tech.</p>
+
+    <p>Two housekeeping notes: this is the <em>dishwasher</em> page — LG uses some of the same letters on its washers and refrigerators, so if you landed here for those, see <a href="/services/washer-repair/lg-error-codes/">LG washer error codes</a> or <a href="/services/refrigerator-repair/lg-error-codes/">LG refrigerator error codes</a>. Parent reference: <a href="/services/dishwasher-repair/error-codes/">all dishwasher error codes</a>. Brand pillar: <a href="/brands/lg-dishwasher-repair/">LG dishwasher repair</a>.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Not-a-fault codes</p>
+    <h2 class="section-title">CL, PF, bE — clear these yourself.</h2>
+    <table class="price-table">
+      <thead><tr><th>Display</th><th>What it is</th><th>What to do</th></tr></thead>
+      <tbody>
+        <tr><td>CL</td><td>Control Lock / child lock (feature)</td><td>Hold the lock button ~3 seconds</td></tr>
+        <tr><td>PF</td><td>Power failure mid-cycle</td><td>Restart the cycle after power returns</td></tr>
+        <tr><td>bE</td><td>Over-sudsing (too much / wrong detergent, or not level)</td><td>Cut detergent, use dishwasher soap, level the unit</td></tr>
+      </tbody>
+    </table>
+    <p><strong>LE</strong> looks similar to CL but is a real wash-motor fault — see the motor section below.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Full code table</p>
+    <h2 class="section-title">LG dishwasher codes.</h2>
+    <table class="price-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Common cause</th></tr></thead>
+      <tbody>
+        <tr><td>OE</td><td>Drain (outlet) error</td><td>Filter clog, hose, air gap / disposal plug, drain pump</td></tr>
+        <tr><td>IE</td><td>Inlet error (not enough water)</td><td>Supply valve, hose, inlet screen, inlet valve</td></tr>
+        <tr><td>FE</td><td>Fill error (overfill / too much water)</td><td>Inlet valve stuck, float; drain pump auto-runs</td></tr>
+        <tr><td>AE / E1</td><td>Leak / overfill (float tripped)</td><td>Door gasket, hose, or sump — leak source (technician)</td></tr>
+        <tr><td>HE</td><td>Heater error</td><td>Heating element or control (technician)</td></tr>
+        <tr><td>tE</td><td>Thermal / temperature-sensor error</td><td>Thermistor or overheat (technician)</td></tr>
+        <tr><td>CE / LE</td><td>Motor / harness error</td><td>Wash motor or motor-to-board wiring (technician)</td></tr>
+        <tr><td>nE</td><td>Spray-arm (Vario) motor error</td><td>Spray-arm / impeller motor (technician)</td></tr>
+        <tr><td>PE</td><td>Water-level pressure sensor (older models)</td><td>Pressure sensor (technician)</td></tr>
+        <tr><td>bE</td><td>Over-sudsing</td><td>Detergent amount / type; unit not level (customer)</td></tr>
+        <tr><td>F31 / F35 / F37</td><td>Dynamic Heat Dry codes</td><td>Heat-dry fan / temp sensor / auto-open door (technician)</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Not shown here on purpose: dE and tCL. Those aren't valid LG <em>dishwasher</em> codes (dE appears on other LG appliance lines; tCL is an LG washer tub-clean reminder). If a chart lists them as LG dishwasher codes, it's mislabeled.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Drain &amp; inlet</p>
+    <h2 class="section-title">OE is out, IE is in.</h2>
+    <p><strong>OE (drain):</strong> the tub didn't empty. Clean the filter cylinder at the tub bottom, check the drain hose for kinks, and — a big one on new installs — make sure the garbage-disposal knockout plug was removed and the air gap is clear. If OE persists, the drain pump is next. The full drain walkthrough is on our <a href="/services/dishwasher-repair/not-draining/">dishwasher not draining</a> page.</p>
+    <p><strong>IE (inlet):</strong> not enough water arrived. Supply valve fully open, fill hose not kinked, inlet screen clear of sediment. If the water's fine but IE stays, the inlet valve or level sensor is the suspect. Inlet valve runs $200 to $340. The letter is your clue — I for in, O for out.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Leak, heat &amp; motor</p>
+    <h2 class="section-title">AE/E1, HE/tE, CE/LE/nE — the technician codes.</h2>
+    <p><strong>AE / E1 (leak):</strong> water in the base pan tripped the float. Won't clear until the leak source (gasket, hose, sump) is found and fixed. Cost swings $200 to $980 by source — an on-site trace, not a reset. See <a href="/services/dishwasher-repair/leaking-water/">dishwasher leaking water</a>.</p>
+    <p><strong>HE / tE (heat):</strong> HE is a heater fault (can't heat, or water over ~149°F); tE is a temperature-sensor fault (water over ~194°F or a bad thermistor). Both need a meter — $200 to $460.</p>
+    <p><strong>CE / LE / nE (motor):</strong> CE and LE are wash-motor or motor-harness faults; nE is the spray-arm (Vario) motor. Technician diagnosis, $300 to $820 depending on which motor and whether it's the harness or board. LE is the one people mistake for CL — it's real.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Heat-dry codes</p>
+    <h2 class="section-title">F31, F35, F37 — Dynamic Heat Dry models.</h2>
+    <p>If your LG has the Dynamic Heat Dry system and shows an F-code: F31 is a heat-dry fan-motor failure, F35 means the heat-dry temperature can't be measured (sensor), and F37 is an auto-open door mechanism error. All three are drying-hardware faults — technician-level, no customer reset. If dishes are also coming out wet, our <a href="/services/dishwasher-repair/not-drying/">dishwasher not drying</a> page covers the full drying picture, and these codes send us straight to the fan, sensor, or door actuator.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">DIY resets</p>
+    <h2 class="section-title">Try these before you book a visit.</h2>
+    <ol class="num-list">
+      <li><strong>Clear Control Lock (CL).</strong> Hold the lock button ~3 seconds. CL isn't a fault.</li>
+      <li><strong>Power cycle.</strong> Unplug 60 seconds (or flip the breaker), restore power, run a short cycle.</li>
+      <li><strong>Clean the filter (OE).</strong> Twist out the filter cylinder at the tub bottom, rinse, reinstall.</li>
+      <li><strong>Check drain path (OE).</strong> Hose kinks, air gap, disposal knockout plug on new installs.</li>
+      <li><strong>Check supply (IE).</strong> Valve open, hose not kinked, inlet screen clear.</li>
+      <li><strong>Fix suds (bE).</strong> Cut detergent, use dishwasher soap only, confirm the unit is level.</li>
+    </ol>
+    <p>Leak (AE/E1), heat (HE/tE), motor (CE/LE/nE), sensor (PE), and heat-dry (F31/F35/F37) codes don't clear from a customer reset when the hardware's down — those are worth a call.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Honest opinion</p>
+    <h2 class="section-title">A young LG with one code is worth fixing; an old one stacking codes is a conversation.</h2>
+    <p>A single drain, inlet, or leak fault on an LG dishwasher in its first several years is almost always a straightforward repair — bounded parts, clear cost. Once a machine is older and starts throwing several different codes across a short span, that's often the control board sending false signals, and we give you the honest repair-versus-replace math at the door. We'd rather tell you a tired unit isn't worth a board than sell you one. $89 diagnostic, waived if you go ahead with the repair.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2 class="section-title">Code-driven part costs.</h2>
+    <p class="lead">$89 residential diagnostic, waived with repair. No emergency surcharge — same $89 anytime.</p>
+    <table class="price-table">
+      <thead><tr><th>Code-driven repair</th><th>Typical cost</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic</td><td>$89, waived with repair</td></tr>
+        <tr><td>Drain clog / pump (OE)</td><td>$89 to $440</td></tr>
+        <tr><td>Inlet valve (IE / FE)</td><td>$200 to $340</td></tr>
+        <tr><td>Leak repair (AE / E1)</td><td>$200 to $980 (by source)</td></tr>
+        <tr><td>Heater / thermistor (HE / tE)</td><td>$200 to $460</td></tr>
+        <tr><td>Motor / harness (CE / LE / nE)</td><td>$300 to $820</td></tr>
+        <tr><td>Water-level sensor (PE)</td><td>$200 to $380</td></tr>
+        <tr><td>Heat-dry fan / sensor / actuator (F31/F35/F37)</td><td>$260 to $620</td></tr>
+        <tr><td>Warranty</td><td>90 days parts and labor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2 class="section-title">LG dishwasher code questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Related pages</p>
+    <h2 class="section-title">Other LG and dishwasher help.</h2>
+    <ul class="bullet-list">
+      <li><a href="/services/dishwasher-repair/error-codes/">All dishwasher error codes (every brand)</a></li>
+      <li><a href="/brands/lg-dishwasher-repair/">LG dishwasher repair (brand pillar)</a></li>
+      <li><a href="/services/washer-repair/lg-error-codes/">LG washer error codes (different appliance)</a></li>
+      <li><a href="/services/refrigerator-repair/lg-error-codes/">LG refrigerator error codes (different appliance)</a></li>
+      <li><a href="/services/dishwasher-repair/not-draining/">Dishwasher not draining</a></li>
+      <li><a href="/services/dishwasher-repair/not-drying/">Dishwasher not drying</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>LG Dishwasher Flashing a Code? Call Today.</h2>
+    <p>Same-day across LA, OC, Ventura. $89 diagnostic waived with repair. BHGS #A49573, EPA 608 Universal #1346255700410. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; color: var(--text); line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 22px; }
+  .note { font-size: 0.92rem; color: var(--muted); margin-top: 14px; }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.95em; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 6px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: top; }
+  .price-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>

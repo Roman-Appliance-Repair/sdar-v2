@@ -1,0 +1,349 @@
+---
+// src/pages/services/dishwasher-repair/whirlpool-error-codes.astro
+// Info Wave W6 — Whirlpool dishwasher error codes (sniper; umbrella §03 shared F-code table).
+// Differentiator: F#E# FAMILY digit is stable (F6=fill, F7=heat, F8=drain, F9=diverter,
+// FA/F10=dispenser/vent/fan) while E-suffix is model-year dependent; + blink-sequence reading
+// on no-readout models (count Clean/Heavy light flashes). KitchenAid/Maytag shared platform.
+// F0E0 OMITTED (not valid). Drain F8 -> whirlpool-not-draining (W2). Verified vs producthelp.
+// $89 residential. 4 schema entities.
+import Layout from '../../../layouts/Layout.astro';
+import ServiceHero from '../../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/services/dishwasher-repair/whirlpool-error-codes/";
+
+const title = "Whirlpool Dishwasher Error Codes? Causes & Fix — Same Day";
+const description = `Whirlpool dishwasher flashing F#E# or the clean light blinking? Same-day LA. Read the code family (F6 fill, F7 heat, F8 drain, F9 diverter). Also KitchenAid/Maytag. $89 dx.`;
+
+const faqs = [
+  {
+    q: "My Whirlpool dishwasher has no digital display — the Clean light just blinks. How do I read the code?",
+    a: "That blinking is the code. On Whirlpool-family dishwashers without a number readout, a fault blinks out as a flash sequence on the Clean (or Heavy) light — you count the flashes to get the F#E# number (for example, a certain number of blinks, a pause, then more blinks). It's Whirlpool-documented behavior. Watch a full sequence a couple of times to be sure of the count, then match it to the table on this page. If counting blinks is tricky, tell us what the light is doing when you call and we'll interpret it. $89 residential diagnostic, waived with repair."
+  },
+  {
+    q: "How do I read a Whirlpool F#E# code without looking up every one?",
+    a: "Read the first part — the F-digit tells you the system, and that meaning is stable across models: F1 = control board, F2 = user interface/keypad, F3 = thermistor/water sensor (OWI), F4 = pump communication, F5 = door, F6 = fill/water in, F7 = heat, F8 = drain, F9 = diverter (the part that sends water to different spray arms), and FA (also written F10) = dispenser/vent/drying fan. The second part, the E-digit, narrows it down and can vary by model year. So even a code you've never seen, you can place: F8-anything is a drain issue, F7-anything is heat, F6-anything is water coming in."
+  },
+  {
+    q: "What does F2E2 mean — is it a leak?",
+    a: "No, F2E2 is a communication error between the main control and the user-interface board — not a leak, despite what some charts suggest. Whirlpool's own fix is to power-cycle: cut power for 30 seconds, restore it, and see if it clears. If F2E2 comes back, the UI board or the harness between it and the main control is the suspect, and that's a technician diagnosis. F2E1, by contrast, is a stuck button on the keypad. Neither is a water fault."
+  },
+  {
+    q: "F8E1 or F8E2 — drain problem?",
+    a: "Yes. The F8 family is drainage. F8E1 is a slow drain (the machine drained, but too slowly), and F8E2/F8E3 are drain-pump electrical faults (pump problem, or pump stuck on). Start at the filter and the drain hose, check the air gap and the garbage-disposal knockout plug on new installs, then the pump. Because our Whirlpool dishwasher not-draining page walks that full drain path step by step, the F8 codes point there for the fix — this page is the code lookup."
+  },
+  {
+    q: "F6E1, F6E2, F6E4 — what's the difference?",
+    a: "All F6 codes are about water coming in, but they split: F6E1 is 'won't fill / no water detected' (check the supply valve is open and the fill hose isn't kinked), F6E2 is an inlet valve failure, F6E4 is the float switch open (an overfill/float issue), and there are others — F6E3 (suds or air in the pump), F6E6 (incoming water too cold), F6E7 (flow meter disconnected). The F6 family digit tells you it's the fill side; the E-digit says which part. Inlet valve work runs $200 to $340."
+  },
+  {
+    q: "F7E1 and dishes are wet — is that the heater?",
+    a: "Yes. F7E1 means the heating element doesn't work, and F7E2 means it won't shut off. On a heated-dry Whirlpool, a dead element leaves dishes wet (and the water under-heated). Our techs meter the element and the high-limit thermostat on-site; replacement runs $180 to $460. If your dishes are coming out wet but there's no code, that's a broader drying question — see our dishwasher not-drying page, which covers heated-dry versus condensation designs."
+  },
+  {
+    q: "Do KitchenAid and Maytag dishwashers use the same codes?",
+    a: "Yes. KitchenAid, Maytag, and JennAir dishwashers share the Whirlpool Corporation F#E# platform, so F8E1 is a slow drain and F7E1 is a heater fault on all of them, with parts from the same catalog families. That said, a given KitchenAid or Maytag model's manual may not republish every code, so verify a specific model if a code isn't listed — but the family meanings carry straight across. We treat all four as one platform for diagnosis and parts."
+  },
+  {
+    q: "I found a chart listing F0E0 — is that a real Whirlpool code?",
+    a: "Not one we'd rely on. F0E0 doesn't appear in Whirlpool's published dishwasher code set, so we don't present it as a Whirlpool dishwasher code. Stick to the confirmed F#E# families. Also worth knowing: the exact E-suffix pairing for a given fault can shift by control-board generation, so the family digit (F6 fill, F7 heat, F8 drain, and so on) is the reliable part, and the specific sub-code is 'varies by model/year.'"
+  },
+  {
+    q: "How do I reset a Whirlpool dishwasher code?",
+    a: "Start with a power cycle — cut power at the breaker (or unplug) for a minute, restore, and run a short cycle. For F2E2 specifically, Whirlpool's documented step is a 30-second power-off. Fix the obvious cause for fill and drain codes (open the tap, clean the filter, clear the hose) before assuming a part. Codes that return every cycle — control (F1), thermistor (F3), pump comm (F4), heater (F7), diverter (F9) — are real hardware faults and a service visit. There's no single 'clear all' shortcut beyond the power cycle."
+  },
+  {
+    q: "What's your warranty?",
+    a: "90 days on SDAR labor and parts for the work we perform — separate from any Whirlpool factory warranty. Same component fails inside 90 days, we replace it free. BHGS #A49573, BBB Accredited Business, EPA 608 Universal certified #1346255700410. $89 residential diagnostic, waived when you approve the repair."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+      ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+  "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Whirlpool Dishwasher Error Code Repair",
+    "name": "Whirlpool Dishwasher Error Code Diagnostic and Repair Service",
+    "url": canonical,
+    "description": "Residential Whirlpool (and KitchenAid, Maytag, JennAir) dishwasher error code decoding and repair across all five SoCal counties. F#E# platform: F1 control, F2 UI, F3 thermistor/OWI, F4 pump communication, F5 door, F6 fill/water, F7 heat, F8 drain, F9 diverter, FA/F10 dispenser/vent/fan. Includes reading blink-sequence codes on models without a digital display. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, waived with repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://samedayappliance.repair/services/" },
+      { "@type": "ListItem", "position": 3, "name": "Dishwasher Repair", "item": "https://samedayappliance.repair/services/dishwasher-repair/" },
+      { "@type": "ListItem", "position": 4, "name": "Whirlpool Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  section="services"
+  slug="dishwasher-repair/whirlpool-error-codes"
+  eyebrow="Whirlpool Dishwasher Codes · Diagnostic-First · LA · Same Day"
+  title="Whirlpool Dishwasher Error Codes, Decoded"
+  subtitle={`F8E1, F7E1, F6E1, or the Clean light blinking a sequence. We fix Whirlpool, KitchenAid, and Maytag dishwashers same-day across LA, Orange, Ventura, San Bernardino, Riverside. $89 residential diagnostic. ${phone}`}
+  heroImageTitle="Whirlpool Dishwasher Error Code Repair"
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Answer first</p>
+    <h2>You don't need to memorize every code — read the first digit, or count the blinks.</h2>
+
+    <p><strong>Whirlpool dishwasher codes use an <span class="code">F#E#</span> pattern, and the <span class="hl">F-digit tells you the system</span>, stable across models: F6 = fill/water in, F7 = heat, F8 = drain, F9 = diverter, FA (F10) = dispenser/vent/dry, F1 = control, F2 = user interface, F3 = water sensor, F5 = door. The E-digit narrows it and can vary by model year. And if your dishwasher has no number display, <span class="hl">the code blinks out on the Clean light</span> — count the flashes. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
+
+    <p>That family logic is the whole trick. A code you've never seen — say F6E7 — you can still place: F6 is the fill side, so it's a water-in fault (it's the flow meter, as it happens). Below we give the family key, how to read blink sequences, and the full confirmed table. Two codes are worth flagging up front: F2E2 is a communication error, not a leak; and F0E0 is not a real Whirlpool dishwasher code, whatever some charts claim.</p>
+
+    <p>Everything here applies to <strong>KitchenAid, Maytag, and JennAir</strong> too — same Whirlpool platform. Parent reference: <a href="/services/dishwasher-repair/error-codes/">all dishwasher error codes</a>. Brand pillar: <a href="/brands/whirlpool-dishwasher-repair/">Whirlpool dishwasher repair</a>.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">The family key</p>
+    <h2 class="section-title">Read the F-digit first — it's the reliable part.</h2>
+    <p class="lead">The F-family meaning holds across model years. The specific E-suffix varies by control-board generation, so treat the family as certain and the sub-code as "which part in that system."</p>
+    <table class="price-table">
+      <thead><tr><th>Family</th><th>System</th><th>What it covers</th></tr></thead>
+      <tbody>
+        <tr><td>F1</td><td>Control board</td><td>Stuck relay (F1E1), failed board (F1E2)</td></tr>
+        <tr><td>F2</td><td>User interface</td><td>Stuck button (F2E1), UI-to-control comm (F2E2)</td></tr>
+        <tr><td>F3</td><td>Thermistor / OWI sensor</td><td>Sensor failure/short, calibration (F3E1/E2/E3)</td></tr>
+        <tr><td>F4</td><td>Pump communication</td><td>Control-to-circulation-pump comm (F4E3)</td></tr>
+        <tr><td>F5</td><td>Door</td><td>Door switch / won't open (F5E1/E2)</td></tr>
+        <tr><td>F6</td><td>Fill / water in</td><td>Won't fill, inlet valve, float, cold water, flow meter</td></tr>
+        <tr><td>F7</td><td>Heat</td><td>Element doesn't work (F7E1) / won't shut off (F7E2)</td></tr>
+        <tr><td>F8</td><td>Drain</td><td>Slow drain (F8E1), drain pump (F8E2/E3)</td></tr>
+        <tr><td>F9</td><td>Diverter</td><td>Disc position/motor (F9E1/E2/E3)</td></tr>
+        <tr><td>FA / F10</td><td>Dispenser / vent / dry</td><td>Detergent dispenser, vent wax-motor, drying fan</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Not a Whirlpool dishwasher code:</strong> F0E0 (not in the published set). Also there's a <span class="code">H2O</span> notice = low/no water supply.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">No display?</p>
+    <h2 class="section-title">Read the blink sequence on the Clean light.</h2>
+    <p>Many Whirlpool-family dishwashers don't have a number readout — the fault blinks out on the Clean (or Heavy) light instead. The flash pattern encodes the F#E# number: a group of flashes, a pause, then another group, corresponding to the two digits. Watch a couple of full cycles to nail the count, then match it to the family key above. It's documented Whirlpool behavior, not guesswork — the light IS the code. If the pattern is hard to read, describe what the light is doing when you call and we'll translate it.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Full code table</p>
+    <h2 class="section-title">Confirmed Whirlpool / KitchenAid / Maytag F#E# codes.</h2>
+    <table class="price-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Common cause</th></tr></thead>
+      <tbody>
+        <tr><td>F1E1 / F1E2</td><td>Stuck relay / failed control board</td><td>Main control board</td></tr>
+        <tr><td>F2E1</td><td>Stuck button on the keypad</td><td>User-interface control</td></tr>
+        <tr><td>F2E2</td><td>UI ↔ control communication (NOT a leak)</td><td>Power-cycle 30s; then UI board / harness</td></tr>
+        <tr><td>F3E1 / F3E2 / F3E3</td><td>Thermistor / OWI sensor fault or calibration</td><td>Water sensor (technician)</td></tr>
+        <tr><td>F4E3</td><td>Control ↔ circulation-pump communication</td><td>Pump or harness (technician)</td></tr>
+        <tr><td>F5E1 / F5E2</td><td>Door switch fault / control detects door won't open</td><td>Door latch / switch</td></tr>
+        <tr><td>F6E1</td><td>Won't fill / no water detected</td><td>Supply valve, fill hose kink</td></tr>
+        <tr><td>F6E2</td><td>Water inlet valve failure</td><td>Inlet valve ($200-340)</td></tr>
+        <tr><td>F6E3</td><td>Suds or air in the water / pump</td><td>Detergent type/amount; air lock</td></tr>
+        <tr><td>F6E4</td><td>Float switch open (overfill)</td><td>Float / overfill</td></tr>
+        <tr><td>F6E6</td><td>Incoming water too cold</td><td>Run hot tap first; water heater</td></tr>
+        <tr><td>F6E7</td><td>Disconnected / damaged flow meter</td><td>Flow meter (technician)</td></tr>
+        <tr><td>F7E1 / F7E2</td><td>Heating element doesn't work / won't shut off</td><td>Element or high-limit ($180-460)</td></tr>
+        <tr><td>F8E1</td><td>Slow drain</td><td>Filter, hose, air gap → drain guide</td></tr>
+        <tr><td>F8E2 / F8E3</td><td>Drain pump electrical / stuck on</td><td>Drain pump → drain guide</td></tr>
+        <tr><td>F9E1 / F9E2 / F9E3</td><td>Diverter disc position / motor / disc missing</td><td>Diverter motor (technician)</td></tr>
+        <tr><td>FAE1 / FAE2 / FAE3</td><td>Detergent dispenser / vent wax-motor / drying fan</td><td>Dispenser or vent/fan</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Drain &amp; heat</p>
+    <h2 class="section-title">F8 goes to the drain guide; F7 to the drying guide.</h2>
+    <p><strong>F8 (drain):</strong> F8E1 is a slow drain, F8E2/F8E3 are drain-pump electrical faults. Start at the filter, drain hose, air gap, and the disposal knockout plug on new installs. The full step-by-step drain walkthrough is on our <a href="/services/dishwasher-repair/whirlpool-not-draining/">Whirlpool dishwasher not draining</a> page — F8 codes point there for the fix.</p>
+    <p><strong>F7 (heat):</strong> F7E1 is a dead heating element, F7E2 is an element that won't shut off. On heated-dry models a dead element also leaves dishes wet — if that's your symptom, our <a href="/services/dishwasher-repair/not-drying/">dishwasher not drying</a> page covers the heated-dry vs condensation picture. Element/thermostat work runs $180 to $460.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Shared platform</p>
+    <h2 class="section-title">KitchenAid, Maytag, and JennAir use these same codes.</h2>
+    <p>All four brands run the Whirlpool Corporation F#E# platform, so the family key and the table above apply across them, with parts from shared catalog families. A specific KitchenAid or Maytag model's booklet may not reprint every code — verify a code against that model if it's not listed — but the family meanings carry straight over. Our techs treat them as one platform for diagnosis and parts.</p>
+    <p>Related: <a href="/services/dishwasher-repair/whirlpool-not-draining/">Whirlpool not draining</a> · <a href="/services/dishwasher-repair/kitchenaid-not-draining/">KitchenAid not draining</a> · <a href="/services/dishwasher-repair/maytag-not-draining/">Maytag not draining</a> · brand pillars <a href="/brands/kitchenaid-dishwasher-repair/">KitchenAid</a> · <a href="/brands/maytag-dishwasher-repair/">Maytag</a>.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">DIY resets</p>
+    <h2 class="section-title">Try these before you book a visit.</h2>
+    <ol class="num-list">
+      <li><strong>Power cycle.</strong> Cut power at the breaker (or unplug) for a minute, restore, run a short cycle. For F2E2, Whirlpool's step is a 30-second power-off.</li>
+      <li><strong>Read the blink sequence</strong> if there's no display — count the Clean-light flashes to get the F#E# number.</li>
+      <li><strong>Clean the filter (F8E1).</strong> Twist out the filter cylinder at the tub bottom, rinse, reinstall.</li>
+      <li><strong>Check the drain path (F8).</strong> Hose kinks, air gap, disposal knockout plug on new installs.</li>
+      <li><strong>Check the supply (F6E1).</strong> Valve open, fill hose not kinked, inlet screen clear.</li>
+      <li><strong>Run the hot tap (F6E6).</strong> Cold fill water can trip the code.</li>
+    </ol>
+    <p>Control (F1), thermistor (F3), pump comm (F4), heater (F7), diverter (F9), and flow meter (F6E7) codes that return every cycle are real hardware faults — book a visit.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Honest opinion</p>
+    <h2 class="section-title">A young machine with one code is worth fixing; a diverter or board fault on an old one is a conversation.</h2>
+    <p>A single fill, drain, or door code on a Whirlpool-family dishwasher in its first several years is a straightforward, bounded repair. The place we'll tell you to weigh replacement is a control-board (F1) or diverter (F9) failure on an older unit that's also throwing other codes — those parts plus labor can approach a new mid-range machine. We give you that math at the door instead of just installing the part. $89 diagnostic, waived if you go ahead with the repair.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2 class="section-title">Code-driven part costs.</h2>
+    <p class="lead">$89 residential diagnostic, waived with repair. No emergency surcharge — same $89 anytime.</p>
+    <table class="price-table">
+      <thead><tr><th>Code-driven repair</th><th>Typical cost</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic</td><td>$89, waived with repair</td></tr>
+        <tr><td>Drain clog / slow drain (F8E1)</td><td>$89 to $260</td></tr>
+        <tr><td>Drain pump (F8E2 / F8E3)</td><td>$260 to $440</td></tr>
+        <tr><td>Inlet valve (F6E2)</td><td>$200 to $340</td></tr>
+        <tr><td>Heating element / thermostat (F7E1/E2)</td><td>$180 to $460</td></tr>
+        <tr><td>Door latch / switch (F5)</td><td>$260 to $440</td></tr>
+        <tr><td>Thermistor / OWI sensor (F3)</td><td>$200 to $360</td></tr>
+        <tr><td>Diverter motor (F9)</td><td>$300 to $560</td></tr>
+        <tr><td>Control board (F1)</td><td>$480 to $820</td></tr>
+        <tr><td>Warranty</td><td>90 days parts and labor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2 class="section-title">Whirlpool dishwasher code questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Related pages</p>
+    <h2 class="section-title">Other Whirlpool-family and dishwasher help.</h2>
+    <ul class="bullet-list">
+      <li><a href="/services/dishwasher-repair/error-codes/">All dishwasher error codes (every brand)</a></li>
+      <li><a href="/brands/whirlpool-dishwasher-repair/">Whirlpool dishwasher repair (brand pillar)</a></li>
+      <li><a href="/services/dishwasher-repair/whirlpool-not-draining/">Whirlpool dishwasher not draining (F8 fix)</a></li>
+      <li><a href="/services/dishwasher-repair/whirlpool-not-cleaning/">Whirlpool dishwasher not cleaning</a></li>
+      <li><a href="/services/dishwasher-repair/whirlpool-not-drying/">Whirlpool dishwasher not drying</a></li>
+      <li><a href="/services/dishwasher-repair/">Dishwasher repair (parent pillar)</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Whirlpool Dishwasher Flashing a Code? Call Today.</h2>
+    <p>Same-day across LA, OC, Ventura. $89 diagnostic waived with repair. BHGS #A49573, EPA 608 Universal #1346255700410. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; color: var(--text); line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 22px; }
+  .hl { background: #fff3cd; padding: 1px 4px; border-radius: 3px; font-weight: 700; }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.95em; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 6px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: top; }
+  .price-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>

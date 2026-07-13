@@ -1,0 +1,330 @@
+---
+// src/pages/services/dishwasher-repair/bosch-error-codes.astro
+// Info Wave W6 — Bosch dishwasher error codes (sniper; captures e24 code-intent 2200/CPC$60).
+// Differentiator: consumer self-help codes (E14-E25) vs technician service codes (E01-E09) split.
+// OEM-precise E24=drain path/filter, E25=drain pump/cover (E14=flow meter, NOT E04).
+// DOES NOT re-own W2 drain deep-dive: E24/E25 rows point to bosch-not-draining; E15 -> bosch-e15-error.
+// Thermador shares platform. Verified vs Bosch self-help + corroboration. $89 residential. 4 schema.
+import Layout from '../../../layouts/Layout.astro';
+import ServiceHero from '../../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/services/dishwasher-repair/bosch-error-codes/";
+
+const title = "Bosch Dishwasher Error Codes? Causes & Fix — Same Day";
+const description = `Bosch dishwasher showing E15, E24, E25, or E18? Same-day LA. Consumer vs service codes, exact E24 vs E25, E15 reset. Also Thermador. BHGS #A49573. $89 dx.`;
+
+const faqs = [
+  {
+    q: "What's the difference between E24 and E25 on a Bosch dishwasher?",
+    a: "They're both drain faults but different parts, and Bosch's own wording separates them. E24 means the drain route or filter is blocked — a clogged filter, a kinked or blocked drain hose, or a blocked siphon connection (Bosch's page frames it as 'drain filter clogged and not draining'). E25 means the drain pump itself is the problem — debris jamming the impeller (glass, seeds, a stray label) or a loose or missing pump cover. So E24 = clear the path, E25 = check the pump and its cover. The full step-by-step drain walkthrough for both lives on our Bosch dishwasher not-draining page; this page tells you which code points where. $89 residential diagnostic, waived with repair."
+  },
+  {
+    q: "E15 keeps coming back — what is it and how do I reset it?",
+    a: "E15 is Bosch's most common service code: the AquaStop leak protection detected water in the base pan and shut off the water intake. To clear it, tip the machine back over towels or a shallow pan so the base-pan water pours out the front (the pan has no drain), which drops the foam float, then hard-reset by cutting power at the breaker for about 5 minutes. Important: the code will come right back unless the underlying leak — door seal, inlet valve, a hose, or the sump — is found and repaired. Because E15 is its own deep topic, we have a dedicated Bosch E15 page that walks the whole thing."
+  },
+  {
+    q: "My Bosch shows a low-number code like E01 or E09. Why isn't it in the manual?",
+    a: "Because E01 through E09 are Bosch service/technician diagnostic codes, not the consumer self-help codes. They're real and used in Bosch service literature — E01 is a control-board/heating-relay fault, E02 an NTC temperature sensor, E06 a door switch, E09 a heater circuit — but Bosch doesn't publish them on its customer-facing self-help site, which is why you won't find them in your owner's booklet. If your machine is showing an E0-series code, it's pointing at internal hardware and it's a technician diagnosis. We carry the common Bosch boards, sensors, and door latches."
+  },
+  {
+    q: "E18 or E16/E17 — is that a fill problem or a drain problem?",
+    a: "Fill side. E18 means water isn't being drawn in correctly — the level is too low or inflow is insufficient. Bosch says to check for a kinked supply hose, blocked AquaStop or inlet filters, and low water pressure (Bosch wants roughly 10 liters/minute from a fully open tap). E16 and E17 are the opposite — unwanted or uncontrolled water inflow, an inlet valve that isn't closing. For E18, open the tap fully, straighten the supply hose, and clean the inlet screens; if it persists it's the inlet valve or flow path. Inlet-side repairs run $200 to $380."
+  },
+  {
+    q: "What does E14 mean — I thought the flow-meter code was E04?",
+    a: "E14 is the flow-meter (Reed switch) fault on Bosch's consumer-facing codes — a fault in the flow-sensing part of the fill system. E04 is the same idea in Bosch's internal service literature, but the code you'll actually see documented for owners is E14. Either way it's a fill/flow-sensing issue, and it's a technician diagnosis because it involves the flow meter and inlet path. Don't chase E04 in your owner's booklet — look for E14."
+  },
+  {
+    q: "Does this apply to my Thermador dishwasher too?",
+    a: "Yes. Thermador dishwashers share the Bosch platform (both are BSH Home Appliances brands), so the E-code system carries across — E15 leak, E24/E25 drain, E18 fill, and the rest mean the same things and use the same part families. If you have a Thermador flashing an E-code, this page applies, and our techs treat Bosch and Thermador as one platform for diagnosis and parts."
+  },
+  {
+    q: "E22 — is that the same as E24?",
+    a: "Close but not identical. E22 is a filter-blocked / residual-water-in-the-sump fault — water isn't clearing from the sump, usually because the filter is clogged. E24 is broader drain-route blockage (filter plus hose and siphon). In practice both send you to the same first step — clean the filter cylinder at the tub bottom — but E22 is more specifically the filter and sump, while E24 covers the whole drain path. E22 often clears with a filter clean and a $89 diagnostic; if the drain path is genuinely blocked further down, that's the not-draining walkthrough."
+  },
+  {
+    q: "How do I reset a Bosch dishwasher code in general?",
+    a: "For most codes: cut power at the breaker (or unplug) for about 5 minutes, restore, and run a short cycle to see if it returns. For fill and drain codes, fix the obvious cause first (open the tap, clean the filter, clear the hose). E15 additionally needs the base pan drained (tip-and-pour) because of the float. Codes that return immediately after a reset — E01-E09 service codes, E14 flow meter, E25 pump, a persistent E15 — mean a real hardware fault and a service visit. Bosch dishwashers don't have a customer 'clear all codes' shortcut beyond the power cycle."
+  },
+  {
+    q: "What's your warranty?",
+    a: "90 days on SDAR labor and parts for the work we perform — separate from any Bosch factory warranty. Same component fails inside 90 days, we replace it free. BHGS #A49573, BBB Accredited Business, EPA 608 Universal certified #1346255700410. $89 residential diagnostic, waived when you approve the repair."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+      ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+  "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Bosch Dishwasher Error Code Repair",
+    "name": "Bosch Dishwasher Error Code Diagnostic and Repair Service",
+    "url": canonical,
+    "description": "Residential Bosch (and Thermador) dishwasher error code decoding and repair across all five SoCal counties. Consumer self-help codes: E14 flow meter, E15 AquaStop leak (most common), E16/E17 inflow, E18 low fill, E22 filter/sump, E24 drain-path blockage, E25 drain-pump/cover. Technician service codes: E01 control board, E02 NTC sensor, E04 flow meter, E05 overfill, E06 door switch, E09 heater circuit. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, waived with repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://samedayappliance.repair/services/" },
+      { "@type": "ListItem", "position": 3, "name": "Dishwasher Repair", "item": "https://samedayappliance.repair/services/dishwasher-repair/" },
+      { "@type": "ListItem", "position": 4, "name": "Bosch Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  section="services"
+  slug="dishwasher-repair/bosch-error-codes"
+  eyebrow="Bosch & Thermador Dishwasher Codes · Diagnostic-First · LA · Same Day"
+  title="Bosch Dishwasher Error Codes, Decoded"
+  subtitle={`E15, E24, E25, E18 on the display. We fix Bosch and Thermador dishwashers same-day across LA, Orange, Ventura, San Bernardino, Riverside. $89 residential diagnostic. ${phone}`}
+  heroImageTitle="Bosch Dishwasher Error Code Repair"
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Answer first</p>
+    <h2>Bosch has two code sets: the ones in your manual, and the ones a tech reads.</h2>
+
+    <p><strong>Bosch's <span class="hl">consumer self-help codes</span> — the E-numbers in the teens and twenties (E14, E15, E16, E17, E18, E22, E24, E25) — are the ones documented for owners. The <span class="hl">low E0-series (E01–E09)</span> are Bosch service/technician codes that aren't in your booklet. The most common by far is <span class="code">E15</span> (a base-pan leak). And two people constantly mix up: <span class="code">E24</span> is a blocked drain path/filter, <span class="code">E25</span> is the drain pump or its cover — different parts. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
+
+    <p>This page owns the code lookup. The deep fixes for the drain codes and the leak code live on their own pages so we're not repeating ourselves: the full drain walkthrough (E22/E23/E24/E25) is on our <a href="/services/dishwasher-repair/bosch-not-draining/">Bosch dishwasher not draining</a> page, and <a href="/services/dishwasher-repair/bosch-e15-error/">Bosch E15</a> has its own dedicated guide. Here you get the complete table, the consumer-vs-service split, and which code sends you where.</p>
+
+    <p>Everything here applies to <strong>Thermador</strong> too (same BSH platform). Parent reference: <a href="/services/dishwasher-repair/error-codes/">all dishwasher error codes</a>. Brand pillar: <a href="/brands/bosch-dishwasher-repair/">Bosch dishwasher repair</a>.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Consumer codes</p>
+    <h2 class="section-title">The E-codes documented for owners (E14–E25).</h2>
+    <table class="price-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Where to start / who fixes</th></tr></thead>
+      <tbody>
+        <tr><td><strong>E15</strong></td><td><strong>AquaStop leak — water in the base pan</strong></td><td>Drain the pan + fix the leak source → <a href="/services/dishwasher-repair/bosch-e15-error/">E15 guide</a></td></tr>
+        <tr><td>E14</td><td>Flow meter (Reed switch) fault</td><td>Fill/flow sensing (technician)</td></tr>
+        <tr><td>E16</td><td>Unwanted water inflow (inlet not closing)</td><td>Inlet valve (technician)</td></tr>
+        <tr><td>E17</td><td>Too much / uncontrolled inflow</td><td>Check hose kinks, water supply; inlet valve</td></tr>
+        <tr><td>E18</td><td>Water not drawn in (level too low)</td><td>Open tap fully, clear inlet filters, low pressure (~10 L/min)</td></tr>
+        <tr><td>E22</td><td>Filter blocked / residual water in sump</td><td>Clean filter cylinder → often $89 dx only</td></tr>
+        <tr><td><strong>E24</strong></td><td><strong>Drain route/filter blocked (not draining)</strong></td><td>Filter, drain hose, siphon → <a href="/services/dishwasher-repair/bosch-not-draining/">drain guide</a></td></tr>
+        <tr><td><strong>E25</strong></td><td><strong>Drain pump blocked, or pump cover loose/missing</strong></td><td>Debris in impeller / reseat cover → <a href="/services/dishwasher-repair/bosch-not-draining/">drain guide</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Service codes</p>
+    <h2 class="section-title">Technician diagnostic codes (E01–E09) — not in your manual.</h2>
+    <p class="lead">Real codes, used in Bosch service literature, but not published on Bosch's customer self-help site. If you're seeing one of these, it's internal hardware.</p>
+    <table class="price-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Part</th></tr></thead>
+      <tbody>
+        <tr><td>E01</td><td>Control board / heating-relay fault</td><td>Main control board</td></tr>
+        <tr><td>E02</td><td>NTC temperature sensor fault</td><td>Temperature sensor</td></tr>
+        <tr><td>E04</td><td>Flow-meter / water-flow signal (service analog of E14)</td><td>Flow meter / inlet path</td></tr>
+        <tr><td>E05</td><td>Overfill / too much water</td><td>Float switch or inlet valve</td></tr>
+        <tr><td>E06</td><td>Door switch / door-lock fault</td><td>Door latch assembly</td></tr>
+        <tr><td>E09</td><td>Heating element / heater circuit fault</td><td>Heating element or board</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">E15 — the most common one</p>
+    <h2 class="section-title">Leak detected. Drain the pan, then find the leak.</h2>
+    <p>E15 is Bosch's most-seen service code. The AquaStop float in the base pan sensed water and shut off the intake. Clearing it is two steps: tip the machine back over towels so the pan water pours out the front (the pan has no drain), which drops the float, then cut power for about 5 minutes to hard-reset. But E15 will return unless the underlying leak — door seal, inlet valve, a hose, or the sump — gets found and fixed, so the reset alone is only half the job.</p>
+    <p>Because E15 is Bosch's number-one call and has its own diagnostic path, we keep the full guide here: <a href="/services/dishwasher-repair/bosch-e15-error/">Bosch dishwasher E15 error</a>.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Drain codes</p>
+    <h2 class="section-title">E22, E24, E25 — related, but different parts.</h2>
+    <p>The drain-cluster codes overlap, so here's the clean split: <strong>E22</strong> is filter-blocked / residual water in the sump (clean the filter cylinder first). <strong>E24</strong> is a blocked drain route — filter plus drain hose and siphon connection. <strong>E25</strong> is the drain pump itself — debris jamming the impeller, or a loose/missing pump cover. All three start at the filter, but E25 specifically means "check the pump and its cover."</p>
+    <p>Rather than repeat the whole step-by-step here, the full Bosch drain walkthrough (filter, hose, siphon, pump, cover) lives on <a href="/services/dishwasher-repair/bosch-not-draining/">Bosch dishwasher not draining</a> — that page owns the drain fix; this one owns the code lookup.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Fill codes</p>
+    <h2 class="section-title">E14, E16, E17, E18 — water in and flow sensing.</h2>
+    <p><strong>E18 (low fill):</strong> not enough water drawn in. Open the tap fully, straighten the supply hose, clean the AquaStop and inlet filters — Bosch wants about 10 liters/minute from a fully open tap, so weak household pressure alone can trip it. <strong>E16 / E17 (over-inflow):</strong> the opposite — water coming in when it shouldn't, an inlet valve not closing; check hose kinks and the supply first. <strong>E14 (flow meter):</strong> the flow-sensing Reed switch — a technician diagnosis. Inlet-side repairs run $200 to $380.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">DIY resets</p>
+    <h2 class="section-title">Try these before you book a visit.</h2>
+    <ol class="num-list">
+      <li><strong>Power cycle.</strong> Cut power at the breaker (or unplug) for 5 minutes, restore, run a short cycle.</li>
+      <li><strong>E15 — drain the pan.</strong> Tip the machine back over towels so base-pan water pours out, then power-cycle. Fix the leak source or it returns.</li>
+      <li><strong>Clean the filter (E22 / E24).</strong> Twist out the filter cylinder at the tub bottom, rinse, reinstall.</li>
+      <li><strong>Check the drain path (E24 / E25).</strong> Drain hose kinks, siphon connection, pump cover seated.</li>
+      <li><strong>Open the tap (E18).</strong> Supply valve fully open, hose straight, inlet filters clear.</li>
+    </ol>
+    <p>Service codes (E01–E09), flow meter (E14), a jammed drain pump (E25), and a returning E15 mean a real fault — book a visit.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Honest opinion</p>
+    <h2 class="section-title">Bosch is worth repairing longer than most.</h2>
+    <p>Bosch and Thermador dishwashers are built to a durable standard, and their parts catalog stays stable, so a single fault — a leak, a drain blockage, a door latch — is almost always worth fixing rather than replacing, even on an older machine. The place we'll tell you to think twice is a control-board failure (E01) on a unit that's also showing other faults, where the board cost approaches a new mid-range machine. We give you that math at the door. $89 diagnostic, waived if you go ahead with the repair.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2 class="section-title">Code-driven part costs.</h2>
+    <p class="lead">$89 residential diagnostic, waived with repair. No emergency surcharge — same $89 anytime.</p>
+    <table class="price-table">
+      <thead><tr><th>Code-driven repair</th><th>Typical cost</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic</td><td>$89, waived with repair</td></tr>
+        <tr><td>Filter clean (E22 / E24 minor)</td><td>$89 diagnostic only, typically</td></tr>
+        <tr><td>Drain pump (E25)</td><td>$260 to $440</td></tr>
+        <tr><td>Leak repair (E15, by source)</td><td>$200 to $820</td></tr>
+        <tr><td>Inlet valve (E16 / E17 / E18)</td><td>$200 to $380</td></tr>
+        <tr><td>Flow meter (E14)</td><td>$200 to $380</td></tr>
+        <tr><td>NTC sensor (E02)</td><td>$200 to $340</td></tr>
+        <tr><td>Door latch (E06)</td><td>$260 to $440</td></tr>
+        <tr><td>Heater circuit (E09)</td><td>$260 to $820</td></tr>
+        <tr><td>Control board (E01)</td><td>$480 to $820</td></tr>
+        <tr><td>Warranty</td><td>90 days parts and labor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2 class="section-title">Bosch dishwasher code questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Related pages</p>
+    <h2 class="section-title">Other Bosch and dishwasher help.</h2>
+    <ul class="bullet-list">
+      <li><a href="/services/dishwasher-repair/bosch-e15-error/">Bosch dishwasher E15 error (dedicated guide)</a></li>
+      <li><a href="/services/dishwasher-repair/bosch-not-draining/">Bosch dishwasher not draining (E22/E24/E25 fix)</a></li>
+      <li><a href="/services/dishwasher-repair/error-codes/">All dishwasher error codes (every brand)</a></li>
+      <li><a href="/brands/bosch-dishwasher-repair/">Bosch dishwasher repair (brand pillar)</a></li>
+      <li><a href="/services/dishwasher-repair/not-drying/">Dishwasher not drying</a></li>
+      <li><a href="/services/dishwasher-repair/">Dishwasher repair (parent pillar)</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Bosch Dishwasher Flashing a Code? Call Today.</h2>
+    <p>Same-day across LA, OC, Ventura. $89 diagnostic waived with repair. BHGS #A49573, EPA 608 Universal #1346255700410. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; color: var(--text); line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 22px; }
+  .hl { background: #fff3cd; padding: 1px 4px; border-radius: 3px; font-weight: 700; }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.95em; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 6px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: top; }
+  .price-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
