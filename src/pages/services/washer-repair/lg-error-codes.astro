@@ -1,0 +1,335 @@
+---
+// src/pages/services/washer-repair/lg-error-codes.astro
+// Info Wave W4 — LG washer error codes (brand umbrella sniper).
+// NOTE: distinct from /services/refrigerator-repair/lg-error-codes/ (different appliance).
+// Differentiator: CL = Child Lock (NOT an error) in lead; distinguished from LE (locked rotor,
+// a real fault) and tCL (tub-clean reminder). WM/WT/WashTower table. LG built-in diagnostic mode.
+// Codes verified vs lg.com/us support. $89 residential. 4 schema entities.
+import Layout from '../../../layouts/Layout.astro';
+import ServiceHero from '../../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/services/washer-repair/lg-error-codes/";
+
+const title = "LG Washer Error Codes? Causes & Fix — Same Day";
+const description = `LG washer showing OE, IE, UE, LE, or dE? Same-day LA. WM, WT, and WashTower codes, why CL is child lock not a fault. BHGS #A49573. $89 dx waived.`;
+
+const faqs = [
+  {
+    q: "My LG washer shows CL and the buttons are dead. Is it broken?",
+    a: "No — CL is Child Lock, a feature, not a fault. Someone held the Child Lock button (or a two-button combo) and the panel is ignoring input on purpose so a kid can't change the cycle. Hold the same Child Lock button for about 3 seconds and CL clears. Don't confuse it with LE (that one is a locked-rotor motor fault and is a real problem). We flag this on every LG page because people book visits for CL more than you'd expect, and there's genuinely nothing to repair."
+  },
+  {
+    q: "What does OE mean on an LG washer?",
+    a: "Drain fault — the washer couldn't pump the water out in the expected time. On LG front-load WM machines, the very first stop is the drain pump filter behind the small lower-left front access door (customer-cleanable): lay a towel, set a shallow pan, twist the cap counterclockwise, clear the lint and coins. Roughly half of OE calls clear right there. If it comes back, next is a kinked or clogged drain hose, then the drain pump motor at $380 to $540. On top-load WT machines there's no front filter, so OE goes to a hose-and-pump check. Our washer not-draining page walks the full path."
+  },
+  {
+    q: "IE keeps showing — is that the same as OE?",
+    a: "No, opposite end of the water path. IE is an INLET fault: the washer isn't getting water fast enough. OE is a drain fault. For IE, check both supply valves are fully open, the fill hoses aren't kinked, and the mesh inlet screens where the hoses thread on aren't clogged with sediment (common in our harder-water areas). If it's the inlet valve solenoid itself, that's $260 to $380. Easy to mix up OE and IE, so read the letters carefully — I for inlet, O for out/drain."
+  },
+  {
+    q: "LE vs CL vs tCL — these look similar. What's the difference?",
+    a: "They're three different things. CL is Child Lock, a feature you clear by holding the lock button (not a fault). tCL is a tub-clean reminder — the washer is telling you to run a Tub Clean cycle to control odor and residue (maintenance, not a fault). LE is the real fault: a locked-rotor or motor error, meaning the drum isn't turning as commanded. LE can be a jammed drum, worn motor components, or the hall/rotor sensor, and it's a technician diagnosis running $340 to $620 depending on the part. If you're seeing LE, that's the one worth a call."
+  },
+  {
+    q: "UE (or uE) on every load, even balanced ones. What's wrong?",
+    a: "A UE that fires even on small, evenly spread loads has moved past 'redistribute the laundry' into worn suspension, tired shocks, or a failing balance sensor. Our techs check the suspension and the sensor when the code survives a balanced load instead of just telling you to rearrange the clothes. Suspension or shock replacement runs $440 to $640. If UE only trips on genuinely lopsided loads (one comforter, a couple of towels bunched on one side), that's the machine protecting itself — spread the load and it'll spin."
+  },
+  {
+    q: "dE, dE1, or dE2 — door problem?",
+    a: "Yes, a door-lock fault: the washer can't confirm the door is latched, so it won't run (a front-loader will not spin with an unlocked door, by design). On top-load WT machines you may instead see dL or DL for the lid lock. The usual fix is the door interlock (or lid-lock) assembly at $260 to $440. First, though, make sure nothing's physically blocking the door from closing fully and that the boot isn't catching — sometimes it's a laundry item pinched in the seal, not the lock."
+  },
+  {
+    q: "How do I reset an LG washer code, and does LG have a diagnostic mode?",
+    a: "First: unplug for about 60 seconds (or flip the breaker), restore power, and run a rinse-and-spin to see if the code returns. A code that clears and stays gone was transient noise; one that returns every cycle is a real fault. LG also builds a diagnostic mode into its direct-drive machines (a button-press sequence on power-up that reports status), and our techs use it on every LG service call to confirm the fault before quoting parts. Motor-lock (LE), pressure (PE), and overfill (FE) codes generally won't clear from a customer reset."
+  },
+  {
+    q: "PE, FE, or CE showing — can I fix those myself?",
+    a: "Those are technician codes. PE is a water-level pressure-sensor fault, FE is an overfill (water coming in when it shouldn't — often an inlet valve stuck open), and CE is a motor over-current fault. Each needs a meter and, for FE and CE, work around the water and motor circuits. Not a DIY reset. FE in particular can keep filling and overflow if ignored, so if you're seeing it, unplug the machine and call — don't keep running cycles."
+  },
+  {
+    q: "Several different LG codes within a month — replace it?",
+    a: "Probably the conversation to have. When a year 8-plus LG throws a drain code, then an unbalance code, then a door code across a few weeks, it's usually the main control board sending false signals as it ages, not three separate broken parts. Board replacement runs $580 to $880, and on a mid-tier machine that age it's a repair-versus-replace call. We run that math with you at the door. LG's direct-drive motors tend to be durable, so it's more often the board than the motor at that age."
+  },
+  {
+    q: "What's your warranty?",
+    a: "90 days on SDAR labor and parts for the work we perform — separate from any LG factory warranty. Same component fails inside 90 days, we replace it free. BHGS #A49573, BBB Accredited Business, EPA 608 Universal certified #1346255700410. $89 residential diagnostic, waived when you approve the repair."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$",
+    "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+      ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } } ],
+  "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "LG Washer Error Code Repair",
+    "name": "LG Washer Error Code Diagnostic and Repair Service",
+    "url": canonical,
+    "description": "Residential LG washer error code decoding and repair across all five SoCal counties. WM front-load, WT top-load, and WashTower codes: OE drain, IE inlet/fill, UE/uE unbalance, LE/LE1 locked rotor, dE/dE1/dE2 door and dL/DL lid lock, PE pressure sensor (technician), FE overfill (technician), CE over-current (technician), tE heater (technician), SUd suds, tCL tub-clean reminder, PF power. CL is a child-lock feature, not a fault. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified #1346255700410.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, waived with repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Services", "item": "https://samedayappliance.repair/services/" },
+      { "@type": "ListItem", "position": 3, "name": "Washer Repair", "item": "https://samedayappliance.repair/services/washer-repair/" },
+      { "@type": "ListItem", "position": 4, "name": "LG Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  section="services"
+  slug="washer-repair/lg-error-codes"
+  eyebrow="LG Washer Error Codes · Diagnostic-First · LA Home Repair · Same Day"
+  title="LG Washer Error Codes, Decoded"
+  subtitle={`OE, IE, UE, LE, or dE on the display and the cycle stopped. We fix LG WM, WT, and WashTower washers same-day across LA, Orange, Ventura, San Bernardino, Riverside. $89 residential diagnostic. ${phone}`}
+  heroImageTitle="LG Washer Error Code Repair"
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Answer first</p>
+    <h2>Before you book anything: CL isn't an error. And LE, tCL, and CL are three different things.</h2>
+
+    <p><strong><span class="code">CL</span> on an LG washer is Child Lock — a feature, cleared by holding the Child Lock button about 3 seconds. It is not a fault. Don't confuse it with <span class="code">LE</span> (a locked-rotor motor fault, which is real) or <span class="code">tCL</span> (a tub-clean maintenance reminder, also not a fault). For the actual faults, LG's core codes are simple: <span class="code">OE</span> is drain, <span class="code">IE</span> is inlet/fill, <span class="code">UE</span> is unbalance, and <span class="code">dE</span> is the door. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
+
+    <p>Here's the honest read. Most LG washer faults land in a handful of buckets: a drain fault (OE, drain pump), an inlet fault (IE, inlet valve), an unbalance fault (UE, suspension), a door-lock fault (dE, interlock), and a motor-lock fault (LE, drive system). LG builds a diagnostic mode into its direct-drive machines, and our techs at Same Day Appliance Repair use it on every call to confirm the fault before quoting parts — so you're not paying for a guess.</p>
+
+    <p>Below is the full LG code table (WM front-load, WT top-load, and WashTower share it), then the fixes bucket by bucket. Parent reference: <a href="/services/washer-repair/error-codes/">all washer error codes</a>. Brand pillar: <a href="/brands/lg-washer-repair/">LG washer repair</a>. (Looking for the LG <em>refrigerator</em> codes instead? That's a separate page: <a href="/services/refrigerator-repair/lg-error-codes/">LG refrigerator error codes</a>.)</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Not-a-fault codes</p>
+    <h2 class="section-title">CL, tCL — clear these yourself, no visit needed.</h2>
+    <table class="price-table">
+      <thead><tr><th>Display</th><th>What it is</th><th>What to do</th></tr></thead>
+      <tbody>
+        <tr><td>CL</td><td>Child Lock (feature)</td><td>Hold the Child Lock button ~3 seconds</td></tr>
+        <tr><td>tCL</td><td>Tub-clean reminder (maintenance)</td><td>Run a Tub Clean cycle; reminder clears</td></tr>
+        <tr><td>PF</td><td>Power failure mid-cycle</td><td>Restart the cycle after power returns</td></tr>
+      </tbody>
+    </table>
+    <p>None of these three is a hardware fault. <strong>LE</strong>, which looks similar to CL, IS a fault (locked rotor / motor) — see the motor section below.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Full code table</p>
+    <h2 class="section-title">LG WM / WT / WashTower washer codes.</h2>
+    <table class="price-table">
+      <thead><tr><th>Code</th><th>Meaning</th><th>Common cause</th></tr></thead>
+      <tbody>
+        <tr><td>OE</td><td>Drain fault</td><td>Pump filter (DIY, front-load), hose, drain pump motor</td></tr>
+        <tr><td>IE</td><td>Inlet / fill fault</td><td>Supply valve, hose, screen, inlet valve</td></tr>
+        <tr><td>UE / uE / Ub</td><td>Unbalanced load</td><td>Redistribute; suspension / sensor if persistent</td></tr>
+        <tr><td>LE / LE1</td><td>Locked rotor / motor fault</td><td>Jammed drum, motor, rotor/hall sensor (technician)</td></tr>
+        <tr><td>dE / dE1 / dE2</td><td>Door lock fault (front-load)</td><td>Door interlock assembly</td></tr>
+        <tr><td>dL / DL</td><td>Lid lock fault (top-load)</td><td>Lid-lock assembly</td></tr>
+        <tr><td>PE</td><td>Water-level pressure sensor</td><td>Pressure sensor or hose (technician)</td></tr>
+        <tr><td>FE</td><td>Overfill</td><td>Inlet valve stuck open (technician — unplug if seen)</td></tr>
+        <tr><td>CE</td><td>Motor over-current</td><td>Motor or control board (technician)</td></tr>
+        <tr><td>tE</td><td>Heater / temperature fault</td><td>Heater or thermistor (technician)</td></tr>
+        <tr><td>E6 / E3</td><td>Clutch / rotor (top-load)</td><td>Clutch or rotor sensor (technician)</td></tr>
+        <tr><td>SUd / Sud</td><td>Excess suds</td><td>Too much or non-HE detergent (customer-side)</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Drain &amp; inlet</p>
+    <h2 class="section-title">OE is out, IE is in — don't mix them up.</h2>
+    <p><strong>OE (drain):</strong> the washer couldn't pump out in time. On front-load WM machines start at the drain pump filter — small lower-left front access door, customer-cleanable, clears about half of OE calls. Then the drain hose, then the pump motor ($380 to $540). On top-load WT there's no filter, so it's a hose-and-pump check. See <a href="/services/washer-repair/not-draining/">washer not draining</a>.</p>
+    <p><strong>IE (inlet):</strong> water isn't arriving fast enough. Both supply valves fully open, hoses not kinked, mesh inlet screens clear of sediment. If the inlet valve solenoid failed, $260 to $380. The letter is your clue — I for inlet, O for out.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Unbalance &amp; door</p>
+    <h2 class="section-title">UE and dE — laundry, or hardware.</h2>
+    <p><strong>UE (unbalance):</strong> on one lopsided load it's the washer protecting itself — spread the load and it spins. When UE fires on balanced loads, including small ones, that's worn suspension rods, tired shocks, or a failing balance sensor. Our techs check those before telling you to just rearrange the wash. Suspension or shock replacement runs $440 to $640.</p>
+    <p><strong>dE / dE1 / dE2 (door), dL / DL (lid):</strong> the washer can't confirm the door or lid locked, and it won't spin until it does — a safety interlock. First check nothing's pinched in the door boot; if the lock hardware itself failed, the interlock or lid-lock assembly is $260 to $440.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Motor &amp; technician codes</p>
+    <h2 class="section-title">LE, PE, FE, CE, tE — leave these to a tech.</h2>
+    <p><strong>LE / LE1 (locked rotor):</strong> the drum isn't turning as commanded — a jammed drum, worn motor components, or the rotor/hall sensor. Technician diagnosis, $340 to $620 depending on the part. This is the one people mistake for CL; LE is real.</p>
+    <p><strong>PE (pressure sensor):</strong> the water-level sensor is misreading. <strong>FE (overfill):</strong> water's coming in when it shouldn't — often an inlet valve stuck open. If you see FE, unplug the machine and call, because it can keep filling. <strong>CE (over-current):</strong> the motor's drawing too much current — motor or control board. <strong>tE:</strong> heater or temperature-sensor fault on models with an internal heater. All four need a meter and belong to a technician.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">DIY resets</p>
+    <h2 class="section-title">Try these before you book a visit.</h2>
+    <ol class="num-list">
+      <li><strong>Clear Child Lock (CL).</strong> Hold the Child Lock button ~3 seconds. CL isn't a fault.</li>
+      <li><strong>Run Tub Clean (tCL).</strong> tCL is a maintenance reminder — run the Tub Clean cycle and it clears.</li>
+      <li><strong>Power cycle.</strong> Unplug for 60 seconds (or flip the breaker), restore power, run a rinse-and-spin.</li>
+      <li><strong>Drain filter (front-load OE).</strong> Lower-left front access door, pan underneath, clear debris. Fixes a high share of OE codes.</li>
+      <li><strong>Inlet hose &amp; screen (IE).</strong> Valves open, hoses not kinked, mesh screens clear.</li>
+      <li><strong>Detergent dose (SUd).</strong> Cut the amount, use HE detergent.</li>
+    </ol>
+    <p>Motor-lock (LE), pressure (PE), overfill (FE), and over-current (CE) codes don't clear from a customer reset when the hardware's down — and FE means unplug and call.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Honest opinion</p>
+    <h2 class="section-title">A year 8+ LG throwing several codes usually has a dying board, not a bad motor.</h2>
+    <p>When an older LG shows a drain code one week, an unbalance code the next, and a door code after that, the honest read is the main control board aging and sending false signals — not three separate broken parts. LG's direct-drive motors tend to hold up well, so at year 8 to 12 it's more often the board than the motor. Board replacement runs $580 to $880, which on a mid-tier machine that age is a repair-versus-replace call. We run that math with you at the door instead of quietly selling a board on a washer that's near the end.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Pricing</p>
+    <h2 class="section-title">Code-driven part costs.</h2>
+    <p class="lead">$89 residential diagnostic, waived with repair. No emergency surcharge — same $89 anytime.</p>
+    <table class="price-table">
+      <thead><tr><th>Code-driven repair</th><th>Typical cost</th></tr></thead>
+      <tbody>
+        <tr><td>Diagnostic</td><td>$89, waived with repair</td></tr>
+        <tr><td>Drain pump (OE)</td><td>$380 to $540</td></tr>
+        <tr><td>Inlet valve (IE / FE)</td><td>$260 to $380</td></tr>
+        <tr><td>Door / lid lock (dE / dL)</td><td>$260 to $440</td></tr>
+        <tr><td>Motor / drive system (LE / CE)</td><td>$340 to $620</td></tr>
+        <tr><td>Pressure sensor (PE)</td><td>$260 to $380</td></tr>
+        <tr><td>Suspension / shocks (UE persistent)</td><td>$440 to $640</td></tr>
+        <tr><td>Heater / thermistor (tE)</td><td>$260 to $460</td></tr>
+        <tr><td>Main control board (multi-code cascade)</td><td>$580 to $880</td></tr>
+        <tr><td>Warranty</td><td>90 days parts and labor</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2 class="section-title">LG washer code questions.</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p>{f.a}</p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">Related pages</p>
+    <h2 class="section-title">Other LG and washer help.</h2>
+    <ul class="bullet-list">
+      <li><a href="/services/washer-repair/error-codes/">All washer error codes (every brand)</a></li>
+      <li><a href="/brands/lg-washer-repair/">LG washer repair (brand pillar)</a></li>
+      <li><a href="/services/refrigerator-repair/lg-error-codes/">LG refrigerator error codes (different appliance)</a></li>
+      <li><a href="/services/washer-repair/not-draining/">Washer not draining</a></li>
+      <li><a href="/services/washer-repair/wont-spin/">Washer won't spin</a></li>
+      <li><a href="/services/washer-repair/">Washer repair (parent pillar)</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>LG Washer Flashing a Code? Call Today.</h2>
+    <p>Same-day across LA, OC, Ventura. $89 diagnostic waived with repair. BHGS #A49573, EPA 608 Universal #1346255700410. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; color: var(--text); line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .lead { font-size: 1.05rem; line-height: 1.75; color: var(--text); margin-bottom: 22px; }
+  .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; background: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 0.95em; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 10px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 6px; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.95rem; vertical-align: top; }
+  .price-table th { background: var(--gray); font-weight: 700; color: var(--text); }
+  .price-table tr:last-child td { border-bottom: none; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; color: var(--text); line-height: 1.75; margin: 14px 0 0; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>
