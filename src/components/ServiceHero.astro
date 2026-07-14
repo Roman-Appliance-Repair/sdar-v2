@@ -94,7 +94,12 @@ const photoWebp640 = slugPhotoExists ? `/images/${section}/${slug}/hero-640.webp
 const photoJpg640 = slugPhotoExists ? `/images/${section}/${slug}/hero-640.jpg` : null;
 const photoWebp960 = slugPhotoExists ? `/images/${section}/${slug}/hero-960.webp` : null;
 const photoJpg960 = slugPhotoExists ? `/images/${section}/${slug}/hero-960.jpg` : null;
-const photoMobileWebp = imageWebpMobile ?? null;
+// Mobile vertical variant (9:16-ish crop). Auto-detect {base}-mobile.webp at build time;
+// falls back to explicit prop, then to null (→ current landscape behavior, no broken image).
+const slugMobileWebpPath = slug ? path.join('public', 'images', section, slug, 'hero-mobile.webp') : null;
+const slugMobileExists = !!(slugMobileWebpPath && existsSync(slugMobileWebpPath));
+const photoMobileWebp = imageWebpMobile ?? (slugMobileExists ? `/images/${section}/${slug}/hero-mobile.webp` : null);
+const photoMobileJpg = slugMobileExists ? `/images/${section}/${slug}/hero-mobile.jpg` : null;
 const photoAlt = imageAlt ?? `${heroImageTitle || title || 'Appliance repair'} ${heroImageLocation || ''}`.trim();
 const photoMode = !!(photoWebp && photoJpg);
 
@@ -153,13 +158,13 @@ const brandTextName = (() => {
   <section class="hero-photo">
     <div class="hero-photo__bg">
       <picture>
+        {/* Mobile vertical variant FIRST so it wins on phones (a <picture> picks the first matching media). */}
+        {photoMobileWebp && <source type="image/webp" media="(max-width: 768px)" srcset={photoMobileWebp} />}
+        {photoMobileJpg && <source type="image/jpeg" media="(max-width: 768px)" srcset={photoMobileJpg} />}
         {photoWebp640 && <source media="(max-width: 640px)" type="image/webp" srcset={photoWebp640} />}
         {photoJpg640 && <source media="(max-width: 640px)" type="image/jpeg" srcset={photoJpg640} />}
         {photoWebp960 && <source media="(max-width: 960px)" type="image/webp" srcset={photoWebp960} />}
         {photoJpg960 && <source media="(max-width: 960px)" type="image/jpeg" srcset={photoJpg960} />}
-        {photoMobileWebp && (
-          <source type="image/webp" media="(max-width: 768px)" srcset={photoMobileWebp} />
-        )}
         <source srcset={photoWebp} type="image/webp" />
         <source srcset={photoJpg} type="image/jpeg" />
         <img

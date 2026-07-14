@@ -58,6 +58,8 @@ const pageCanonical = isCollapsedCombo(citySlug, serviceSlug)
 const comboPhotoBase = `/images/city-service/${citySlug}/${serviceSlug}`;
 const hasComboPhoto = existsSync(nodePath.join('public', 'images', 'city-service', citySlug, serviceSlug, 'hero.webp'))
   && existsSync(nodePath.join('public', 'images', 'city-service', citySlug, serviceSlug, 'hero.jpg'));
+// Mobile vertical variant (auto-detected; absent → landscape fallback).
+const comboMobileExists = existsSync(nodePath.join('public', 'images', 'city-service', citySlug, serviceSlug, 'hero-mobile.webp'));
 
 const brandPool = getBrandPool(cityDesc.tier, serviceDesc);
 
@@ -177,6 +179,8 @@ const schemaJsons = [
   {hasComboPhoto && (
     <Fragment>
       <picture class="hero-bg">
+        {comboMobileExists && <source media="(max-width: 768px)" srcset={`${comboPhotoBase}/hero-mobile.webp`} type="image/webp" />}
+        {comboMobileExists && <source media="(max-width: 768px)" srcset={`${comboPhotoBase}/hero-mobile.jpg`} type="image/jpeg" />}
         <source media="(max-width: 640px)" srcset={`${comboPhotoBase}/hero-640.webp`} type="image/webp" />
         <source media="(max-width: 960px)" srcset={`${comboPhotoBase}/hero-960.webp`} type="image/webp" />
         <source srcset={`${comboPhotoBase}/hero.webp`} type="image/webp" />

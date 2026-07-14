@@ -6,6 +6,8 @@
 import { CITIES } from '../../../data/cities';
 import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../../../data/branches';
 import BranchNAP from '../../BranchNAP.astro';
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 
 export interface Props {
   citySlug: string;
@@ -46,6 +48,10 @@ const photoSrc640 = `/images/cities/${citySlug}/hero-640.webp`;
 const photoSrc960 = `/images/cities/${citySlug}/hero-960.webp`;
 const photoJpgSrc640 = `/images/cities/${citySlug}/hero-640.jpg`;
 const photoJpgSrc960 = `/images/cities/${citySlug}/hero-960.jpg`;
+// Mobile vertical variant (auto-detected; absent → landscape fallback, no broken image).
+const mobileExists = existsSync(path.join('public', 'images', 'cities', citySlug, 'hero-mobile.webp'));
+const photoMobileWebp = mobileExists ? `/images/cities/${citySlug}/hero-mobile.webp` : null;
+const photoMobileJpg = mobileExists ? `/images/cities/${citySlug}/hero-mobile.jpg` : null;
 const photoAlt = `Appliance repair technician in ${city.name}, CA kitchen`;
 
 // Wave 71-ext Batch 62 — AI-First Z0 eyebrow (all 87 city pillars, one shared edit).
@@ -55,6 +61,8 @@ const eyebrow = `${city.name} · Appliance Repair · Residential + Out-of-Warran
 <section class="v2-hero">
   <div class="v2-hero__bg">
     <picture>
+      {photoMobileWebp && <source media="(max-width: 768px)" srcset={photoMobileWebp} type="image/webp" />}
+      {photoMobileJpg && <source media="(max-width: 768px)" srcset={photoMobileJpg} type="image/jpeg" />}
       <source media="(max-width: 640px)" srcset={photoSrc640} type="image/webp" />
       <source media="(max-width: 960px)" srcset={photoSrc960} type="image/webp" />
       <source srcset={photoSrc} type="image/webp" />
