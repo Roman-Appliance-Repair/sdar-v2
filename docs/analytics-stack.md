@@ -31,6 +31,7 @@
 | GA4 Measurement | `G-PST1TR9G88` | GTM Google Tag config |
 | GA4 Property | `498305027` | GA4 URL paths |
 | IndexNow API Key | `32c2d9cecb72408cbd6f91136388e33a` | `public/{key}.txt` |
+| CF Purge token | (Zone.Cache Purge, зона samedayappliance.repair) | `secrets/cf-purge-token.txt` (git-ignored) → `scripts/cf-purge.py`; setup в шапке скрипта. Image-merge purge-flow: methodology §5.1 |
 | GSC Property | `sc-domain:samedayappliance.repair` | Domain verification |
 | Clarity Project | `wn15edpjlc` | URL path |
 

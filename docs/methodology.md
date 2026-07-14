@@ -108,6 +108,35 @@ git log origin/main -1 --format="%h %s"  # confirm push
 - Спот-чек на live URL
 - **Update Notion tracker** автоматически (без напоминаний): https://www.notion.so/343788eea1d58113aab9fafd42075964
 
+### Шаг 5.1 — Image-bearing merge: deploy poll → purge → verify (обязательно, без ручных кнопок)
+
+Если merge добавляет/перезаписывает файлы в `public/images/**` (новые или перегенерированные
+hero-картинки и т.п.), **Cloudflare edge-cache на custom-домене отдаёт устаревший ответ по
+новому/перезаписанному пути** — часто `Content-Type: text/html` (SPA-fallback) вместо картинки,
+из-за чего `<picture>` берёт битый webp-source и hero ломается (alt). `pages.dev` при этом уже
+отдаёт правильный файл — то есть deploy корректен, виноват только кэш. Лечится **Purge Everything**.
+Автоматизировано, руками в дашборд не ходим:
+
+```bash
+# 1. push прошёл, ждём Cloudflare Pages deploy до Success (pages.dev отдаёт новый файл как image/webp)
+until curl -sI "https://sdar-v2.pages.dev/images/brands/<sample-slug>/hero.webp" \
+        | grep -qi "content-type: image/webp"; do sleep 15; done
+
+# 2. Purge Everything по зоне (см. scripts/cf-purge.py header для setup токена)
+python scripts/cf-purge.py            # exit 0 = OK
+
+# 3. Verify на PRODUCTION-домене (не pages.dev): HTTP 200 + image/webp + cf-cache-status HIT/MISS,
+#    и md5 prod-байтов == md5 local dist (доказывает, что отдаётся именно новый файл)
+curl -sI "https://samedayappliance.repair/images/brands/<slug>/hero.webp"   # 200, image/webp
+```
+
+- **Токен:** `secrets/cf-purge-token.txt` (git-ignored). Права — **Zone.Cache Purge** на зону
+  `samedayappliance.repair` (шаблон "Purge cache"). Setup-инструкция — в шапке `scripts/cf-purge.py`.
+- **Верификация — обязательна**, потому что `cf-cache-status: HIT` сам по себе не гарантирует
+  свежий байт; сверяем `md5` prod-картинки с `dist/`-файлом.
+- Text-only merge (только .astro/.md, без новых картинок) purge **не требует** — новые HTML-роуты
+  Cloudflare Pages отдаёт штатно.
+
 ---
 
 ## 2. Cluster work — wiki-first
