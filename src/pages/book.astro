@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { BRANCHES, type Branch } from '../data/branches';
+import { BRANCHES, MAIN_PHONE, MAIN_PHONE_TEL, type Branch } from '../data/branches';
 import BranchNAP from '../components/BranchNAP.astro';
 
 import { mergeCredentials } from '../data/credentials-schema';
@@ -8,16 +8,16 @@ import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 // Filter out branches with placeholder 555 phones (RC + Temecula are 'pending'
 // until Roman buys real DIDs). Don't publish 555-fake numbers.
 const activeBranches = BRANCHES.filter(b => b.phoneStatus === 'active');
-const phoneRawFor = (b: Branch) => '+1' + b.phone.replace(/\D/g, '');
-const slugToTitle = (slug: string) =>
-  slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
 
 const title = 'Book Appliance Repair Online — Same Day Service';
 const description = 'Book a same-day appliance repair visit online or by phone. $89 dx waived, OEM parts, 90-day labor warranty. 5 branches across SoCal.';
 const canonical = 'https://samedayappliance.repair/book/';
 
-const mainPhone = '(424) 325-0520';
-const mainPhoneTel = '+14243250520';
+const mainPhone = MAIN_PHONE;          // (424) 325-0520 — LA default
+const mainPhoneTel = MAIN_PHONE_TEL;   // +14243250520
+
+// slug -> display phone, for the client-side branch detector (SSOT = branches.ts)
+const branchPhoneMap = Object.fromEntries(activeBranches.map(b => [b.slug, b.phone]));
 
 const localBusinessSchema = mergeCredentials({
   '@context': 'https://schema.org',
@@ -84,20 +84,70 @@ const breadcrumbSchema = {
   <section class="book-hero">
     <div class="container">
       <p class="eyebrow">Book · Same-Day Visits</p>
-      <h1>Book a repair visit. We'll call you back in 30 minutes.</h1>
+      <h1>Broken appliance? Get a tech out today.</h1>
       <p class="lede">
-        Tell us the appliance, the brand, and the zip. A dispatcher from the nearest branch — West
-        Hollywood, Los Angeles, Pasadena, Thousand Oaks, or Irvine — calls back with a 2-hour
-        arrival window. Most same-day requests booked before noon get a tech out the same afternoon.
+        Two ways to book — call the dispatcher direct, or send a 30-second request and we call
+        you back. Most same-day requests booked before noon get a tech out the same afternoon.
       </p>
-      <div class="hero-ctas">
-        <a href={`tel:${mainPhoneTel}`} class="btn-primary">Call {mainPhone}</a>
-        <a href="#book-form" class="btn-ghost">Book online ↓</a>
+
+      <div class="two-path">
+        <!-- Path A: call now -->
+        <a id="heroCall" href={`tel:${mainPhoneTel}`} class="call-now" data-tel>
+          <span class="call-now-label">Call Now — fastest</span>
+          <span class="call-now-phone" id="heroCallPhone">{mainPhone}</span>
+        </a>
+        <p class="call-micro">Phones answered 24/7 · $89 diagnostic, waived when the repair goes ahead</p>
+
+        <div class="path-divider"><span>or book online — 30 seconds</span></div>
+
+        <!-- Path B: 4-field form -->
+        <form class="book-form" id="bookingForm" novalidate>
+          <div class="form-row">
+            <label>
+              <span>Your name *</span>
+              <input type="text" id="f-name" name="name" required autocomplete="name" placeholder="First name" />
+            </label>
+            <label>
+              <span>Phone *</span>
+              <input type="tel" id="f-phone" name="phone" required autocomplete="tel"
+                     inputmode="tel" placeholder="(000) 000-0000" />
+            </label>
+          </div>
+
+          <div class="form-row">
+            <label>
+              <span>ZIP *</span>
+              <input type="text" id="f-zip" name="zip" required inputmode="numeric"
+                     pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code" placeholder="90048" />
+            </label>
+            <label>
+              <span>What's wrong? <em>(optional)</em></span>
+              <input type="text" id="f-issue" name="symptom"
+                     placeholder="e.g. Sub-Zero warm on one side" />
+            </label>
+          </div>
+
+          <input type="text" id="f-hp" name="website" autocomplete="off" tabindex="-1" aria-hidden="true"
+                 style="position:absolute;left:-9999px;opacity:0;pointer-events:none;height:1px;width:1px" />
+
+          <div id="formError" class="form-error-banner" role="alert" hidden></div>
+          <button type="button" id="bookSubmit" class="btn-primary submit">Send booking request</button>
+          <p class="form-note">
+            Prefer to talk it through? Calling <a href={`tel:${mainPhoneTel}`} data-tel>{mainPhone}</a>
+            is the fastest path to a same-day slot.
+          </p>
+        </form>
+
+        <div id="bookingSuccess" class="book-success" style="display:none">
+          <div class="success-check" aria-hidden="true">✓</div>
+          <h3>Booking received</h3>
+          <p>
+            A dispatcher from your nearest branch will call back within 30 minutes during business
+            hours (Mon–Sat 8AM–8PM). For urgent same-day needs, calling directly is fastest.
+          </p>
+          <a id="successCallLink" href={`tel:${mainPhoneTel}`} class="btn-primary submit" data-tel>Call {mainPhone}</a>
+        </div>
       </div>
-      <p class="hero-micro">
-        $89 residential diagnostic, waived when the repair goes ahead. OEM parts. 90-day labor
-        warranty. Commercial rates start at $120 — ask for commercial dispatch.
-      </p>
     </div>
   </section>
 
@@ -107,11 +157,10 @@ const breadcrumbSchema = {
       <div class="step-grid">
         <div class="step">
           <span class="step-num">1</span>
-          <h3>You submit the form or call</h3>
+          <h3>You call or send the form</h3>
           <p>
-            Takes about 60 seconds. We need the appliance, the make/model if you have it, the
-            symptom, and your address. Model plate is usually on the inside wall, door frame,
-            or back panel — no stress if you can't find it.
+            Takes about 30 seconds. Name, phone, ZIP, and a line on what's wrong is all we need to
+            get you in the queue and route you to the nearest branch.
           </p>
         </div>
         <div class="step">
@@ -141,131 +190,6 @@ const breadcrumbSchema = {
             parts warranty on top.
           </p>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="form-section" id="book-form">
-    <div class="container form-container">
-      <h2>Book online</h2>
-      <p class="section-intro">
-        Fastest path is a call — but if you prefer to type, fill this out and hit send. It goes
-        straight to our dispatch queue and we call back within 30 minutes during business hours.
-      </p>
-
-      <form class="book-form" id="bookingForm" novalidate>
-        <div class="form-row">
-          <label>
-            <span>Your name *</span>
-            <input type="text" id="f-name" name="name" required autocomplete="name" />
-          </label>
-          <label>
-            <span>Phone *</span>
-            <input type="tel" id="f-phone" name="phone" required autocomplete="tel" />
-          </label>
-        </div>
-
-        <div class="form-row">
-          <label>
-            <span>Email (for confirmation)</span>
-            <input type="email" id="f-email" name="email" autocomplete="email" />
-          </label>
-          <label>
-            <span>Service zip</span>
-            <input type="text" id="f-zip" name="zip" pattern="[0-9]{5}" autocomplete="postal-code" />
-          </label>
-        </div>
-
-        <label class="full">
-          <span>Service address *</span>
-          <input type="text" id="f-address" name="address" placeholder="Street, unit if any, city" autocomplete="street-address" required />
-        </label>
-
-        <label class="full">
-          <span>Service area * (routes to nearest branch)</span>
-          <select id="f-city" name="city" required>
-            <option value="">— Select your area —</option>
-            {activeBranches.map((b) => (
-              <option value={b.slug}>{b.name} — {b.phone}</option>
-            ))}
-          </select>
-        </label>
-
-        <label class="full">
-          <span>Service category *</span>
-          <select id="f-category" name="category" required>
-            <option value="">— Select category —</option>
-            <option value="home">Home Appliances</option>
-            <option value="restaurant">Restaurant Kitchen</option>
-            <option value="cold">Cold Storage</option>
-            <option value="ice">Ice Machines</option>
-            <option value="outdoor">Outdoor Living</option>
-          </select>
-        </label>
-
-        <div class="form-row">
-          <label>
-            <span>Appliance *</span>
-            <select id="f-appliance" name="appliance" required>
-              <option value="">— Select category first —</option>
-            </select>
-          </label>
-          <label>
-            <span>Brand &amp; model (if known)</span>
-            <input type="text" id="f-brand" name="brand" placeholder="e.g. Sub-Zero 648PROG" />
-          </label>
-        </div>
-
-        <label class="full">
-          <span>What's wrong? *</span>
-          <textarea id="f-issue" name="symptom" rows="4" required placeholder="Freezer fine, fridge side warming. Started about 3 days ago. Compressor runs but not cold."></textarea>
-        </label>
-
-        <div class="form-row">
-          <label>
-            <span>Preferred date</span>
-            <input type="date" id="f-date" name="date" />
-          </label>
-          <label>
-            <span>Preferred time</span>
-            <select id="f-time" name="window">
-              <option value="">— Select time —</option>
-              <option value="ASAP">ASAP — same day if possible</option>
-              <option value="8:00-10:00 AM">8:00–10:00 AM</option>
-              <option value="9:00-11:00 AM">9:00–11:00 AM</option>
-              <option value="10:00 AM-12:00 PM">10:00 AM–12:00 PM</option>
-              <option value="11:00 AM-1:00 PM">11:00 AM–1:00 PM</option>
-              <option value="12:00-2:00 PM">12:00–2:00 PM</option>
-              <option value="1:00-3:00 PM">1:00–3:00 PM</option>
-              <option value="2:00-4:00 PM">2:00–4:00 PM</option>
-              <option value="3:00-5:00 PM">3:00–5:00 PM</option>
-              <option value="4:00-6:00 PM">4:00–6:00 PM</option>
-              <option value="5:00-7:00 PM">5:00–7:00 PM</option>
-              <option value="6:00-8:00 PM">6:00–8:00 PM</option>
-            </select>
-          </label>
-        </div>
-
-        <input type="text" id="f-hp" name="website" autocomplete="off" tabindex="-1" aria-hidden="true"
-               style="position:absolute;left:-9999px;opacity:0;pointer-events:none;height:1px;width:1px" />
-
-        <div id="formError" class="form-error-banner" role="alert" hidden></div>
-        <button type="button" id="bookSubmit" class="btn-primary submit">Send booking request</button>
-        <p class="form-note">
-          For same-day service before noon, calling <a href={`tel:${mainPhoneTel}`}>{mainPhone}</a>
-          is faster than the form. Phones answered 24/7.
-        </p>
-      </form>
-
-      <div id="bookingSuccess" class="book-success" style="display:none">
-        <div class="success-check" aria-hidden="true">✓</div>
-        <h3>Booking received</h3>
-        <p>
-          A dispatcher from your nearest branch will call back within 30 minutes during business
-          hours (Mon–Sat 8AM–8PM). Your branch line is shown below — for urgent same-day needs,
-          calling directly is fastest.
-        </p>
-        <a id="successCallLink" href={`tel:${mainPhoneTel}`} class="btn-primary submit">Call {mainPhone}</a>
       </div>
     </div>
   </section>
@@ -312,6 +236,8 @@ const breadcrumbSchema = {
     </div>
   </section>
 
+  <script is:inline set:html={`window.__SDAR_BRANCH_PHONES = ${JSON.stringify(branchPhoneMap)};`}></script>
+
   <script is:inline>
     (function () {
       var btn = document.getElementById('bookSubmit');
@@ -319,56 +245,124 @@ const breadcrumbSchema = {
       var form = document.getElementById('bookingForm');
       var success = document.getElementById('bookingSuccess');
       var successCall = document.getElementById('successCallLink');
+      var heroCall = document.getElementById('heroCall');
+      var heroCallPhone = document.getElementById('heroCallPhone');
+      var formError = document.getElementById('formError');
 
-      // city slug -> phone (display only — server is authoritative)
-      var BRANCH_PHONES = {
-        'pasadena': '(626) 376-4458',
-        'beverly-hills': '(424) 248-1199',
-        'thousand-oaks': '(424) 208-0228',
-        'irvine': '(213) 401-9019',
-        'rancho-cucamonga': '(909) 457-1030',
-        'riverside': '(951) 577-3877',
-        'west-hollywood': '(323) 870-4790',
-        'los-angeles': '(424) 325-0520'
-      };
+      var BRANCH_PHONES = window.__SDAR_BRANCH_PHONES || {};
+      var MAIN_SLUG = 'los-angeles';
+      var MAIN_PHONE = BRANCH_PHONES[MAIN_SLUG] || '(424) 325-0520';
 
       function val(id) {
         var el = document.getElementById(id);
         return el ? (el.value || '').trim() : '';
       }
+      function telHref(p) { return 'tel:+1' + String(p || '').replace(/\D/g, ''); }
+      function branchPhoneFor(slug) { return BRANCH_PHONES[slug] || MAIN_PHONE; }
 
-      // Category → appliances mapping for the dependent dropdown.
-      var APPLIANCES_BY_CAT = {
-        home: ['Refrigerator','Freezer','Dishwasher','Washer','Dryer','Oven / Range','Cooktop','Microwave','Wine Cooler / Cellar','Range Hood','Wall Oven','Garbage Disposal','Trash Compactor','Stackable Washer-Dryer','Other'],
-        restaurant: ['Commercial Oven','Commercial Range','Commercial Fryer','Commercial Dishwasher','Commercial Refrigerator','Commercial Freezer','Commercial Steamer','Commercial Mixer','Other'],
-        cold: ['Walk-in Cooler','Walk-in Freezer','Reach-in Refrigerator','Reach-in Freezer','Display Case','Prep Table','Undercounter Refrigerator','Other'],
-        ice: ['Ice Machine (Cuber)','Ice Machine (Flaker)','Ice Machine (Nugget)','Ice Dispenser','Ice Storage Bin','Other'],
-        outdoor: ['Gas Grill','Pellet Grill','Patio Heater','Gas Fireplace','Outdoor Refrigerator','Outdoor Ice Maker','Pizza Oven','BBQ Grill','Other']
-      };
+      // ── ZIP → branch slug (5-county coverage, LA default) ───────────────
+      // branches.ts has no ZIP coverage table; this prefix map + boundary
+      // overrides route the payload to the nearest branch for dispatch.
+      function zipToBranch(zip) {
+        zip = String(zip || '').replace(/\D/g, '').slice(0, 5);
+        if (zip.length < 5) return MAIN_SLUG;
+        // Exact-ZIP overrides for branch boundaries
+        var exact = {
+          // West Hollywood pin territory
+          '90048': 'west-hollywood', '90046': 'west-hollywood', '90069': 'west-hollywood',
+          '90038': 'west-hollywood', '90028': 'west-hollywood',
+          // Beverly Hills
+          '90209': 'beverly-hills', '90210': 'beverly-hills', '90211': 'beverly-hills',
+          '90212': 'beverly-hills', '90213': 'beverly-hills',
+          // Thousand Oaks / Conejo Valley zips that live in the 913xx block
+          '91319': 'thousand-oaks', '91320': 'thousand-oaks', '91358': 'thousand-oaks',
+          '91359': 'thousand-oaks', '91360': 'thousand-oaks', '91361': 'thousand-oaks',
+          '91362': 'thousand-oaks', '91377': 'thousand-oaks', '91301': 'thousand-oaks'
+        };
+        if (exact[zip]) return exact[zip];
+        var p3 = zip.slice(0, 3);
+        var map3 = {
+          // LA basin / South Bay / Westside / Long Beach
+          '900': 'los-angeles', '901': 'los-angeles', '902': 'los-angeles', '903': 'los-angeles',
+          '904': 'los-angeles', '905': 'los-angeles', '906': 'los-angeles', '907': 'los-angeles',
+          '908': 'los-angeles',
+          // San Gabriel Valley / Pasadena / Glendale
+          '910': 'pasadena', '911': 'pasadena', '912': 'pasadena', '918': 'pasadena',
+          // San Fernando Valley / Burbank
+          '913': 'los-angeles', '914': 'los-angeles', '915': 'los-angeles',
+          // Inland Empire (San Bernardino county)
+          '917': 'rancho-cucamonga', '923': 'rancho-cucamonga', '924': 'rancho-cucamonga',
+          // Riverside county
+          '922': 'riverside', '925': 'riverside',
+          // Orange county
+          '926': 'irvine', '927': 'irvine', '928': 'irvine',
+          // Ventura county
+          '930': 'thousand-oaks', '931': 'thousand-oaks'
+        };
+        return map3[p3] || MAIN_SLUG;
+      }
 
-      var catSel = document.getElementById('f-category');
-      var appSel = document.getElementById('f-appliance');
-      if (catSel && appSel) {
-        catSel.addEventListener('change', function () {
-          var list = APPLIANCES_BY_CAT[catSel.value] || [];
-          appSel.innerHTML = '';
-          var placeholder = document.createElement('option');
-          placeholder.value = '';
-          placeholder.textContent = list.length ? '— Select appliance —' : '— Select category first —';
-          appSel.appendChild(placeholder);
-          for (var i = 0; i < list.length; i++) {
-            var opt = document.createElement('option');
-            opt.value = list[i];
-            opt.textContent = list[i];
-            appSel.appendChild(opt);
-          }
+      // ── Branch detection for the hero Call button ───────────────────────
+      // Priority: ?city=/?branch= query param → saved choice → LA default.
+      function detectBranch() {
+        try {
+          var qs = new URLSearchParams(window.location.search);
+          var q = (qs.get('city') || qs.get('branch') || '').toLowerCase().trim();
+          if (q && BRANCH_PHONES[q]) { try { localStorage.setItem('sdar_branch', q); } catch (e) {} return q; }
+          var saved = null;
+          try { saved = localStorage.getItem('sdar_branch'); } catch (e) {}
+          if (saved && BRANCH_PHONES[saved]) return saved;
+        } catch (e) {}
+        return MAIN_SLUG;
+      }
+
+      var currentBranch = detectBranch();
+      if (heroCall && heroCallPhone && BRANCH_PHONES[currentBranch]) {
+        var ph = BRANCH_PHONES[currentBranch];
+        heroCall.href = telHref(ph);
+        heroCallPhone.textContent = ph;
+      }
+
+      // ── Tracking: contact_click on every tel: link on the page ──────────
+      window.dataLayer = window.dataLayer || [];
+      document.addEventListener('click', function (e) {
+        var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"]') : null;
+        if (!a) return;
+        window.dataLayer.push({ event: 'contact_click', branch: currentBranch, page: '/book/' });
+      });
+
+      // ── Tracking: form_start on first field focus (once) ────────────────
+      var formStarted = false;
+      if (form) {
+        form.addEventListener('focusin', function () {
+          if (formStarted) return;
+          formStarted = true;
+          window.dataLayer.push({ event: 'form_start' });
         });
       }
 
-      var formError = document.getElementById('formError');
-      var MAIN_PHONE = '(424) 325-0520';
-      var REQUIRED = ['f-name','f-phone','f-address','f-city','f-category','f-appliance','f-issue'];
+      // ── US phone mask ───────────────────────────────────────────────────
+      var phoneEl = document.getElementById('f-phone');
+      if (phoneEl) {
+        phoneEl.addEventListener('input', function () {
+          var d = phoneEl.value.replace(/\D/g, '').slice(0, 10);
+          var out = d;
+          if (d.length > 6) out = '(' + d.slice(0, 3) + ') ' + d.slice(3, 6) + '-' + d.slice(6);
+          else if (d.length > 3) out = '(' + d.slice(0, 3) + ') ' + d.slice(3);
+          else if (d.length > 0) out = '(' + d;
+          phoneEl.value = out;
+        });
+      }
+      // ZIP: digits only
+      var zipEl = document.getElementById('f-zip');
+      if (zipEl) {
+        zipEl.addEventListener('input', function () {
+          zipEl.value = zipEl.value.replace(/\D/g, '').slice(0, 5);
+        });
+      }
 
+      // ── Inline field-error helpers ──────────────────────────────────────
+      var REQUIRED = ['f-name', 'f-phone', 'f-zip'];
       function fieldWrap(id) {
         var e = document.getElementById(id);
         if (!e) return null;
@@ -389,31 +383,24 @@ const breadcrumbSchema = {
         e.removeAttribute('aria-invalid');
         e.classList.remove('input-invalid');
       }
-      function clearAllErrors() { hideFormError(); REQUIRED.forEach(clearFieldError); }
       function showFormError(html) { if (formError) { formError.innerHTML = html; formError.hidden = false; formError.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }
       function hideFormError() { if (formError) { formError.hidden = true; formError.innerHTML = ''; } }
-      function branchPhoneFor(city) { return BRANCH_PHONES[city] || MAIN_PHONE; }
-      function telHref(p) { return 'tel:+1' + p.replace(/\D/g, ''); }
 
-      // Clear a field's error as soon as the user starts fixing it.
       REQUIRED.forEach(function (id) {
         var e = document.getElementById(id); if (!e) return;
-        var ev = (e.tagName === 'SELECT') ? 'change' : 'input';
-        e.addEventListener(ev, function () { clearFieldError(id); });
+        e.addEventListener('input', function () { clearFieldError(id); });
       });
 
       function validate() {
-        clearAllErrors();
+        hideFormError();
+        REQUIRED.forEach(clearFieldError);
         var firstBad = null;
         function bad(id, msg) { showFieldError(id, msg); if (!firstBad) firstBad = id; }
         if (!val('f-name')) bad('f-name', 'Please enter your name.');
         var phone = val('f-phone');
-        if (!phone || phone.replace(/\D/g, '').length < 7) bad('f-phone', 'Enter a valid phone number (at least 7 digits).');
-        if (!val('f-address')) bad('f-address', 'Please enter your service address.');
-        if (!val('f-city')) bad('f-city', 'Please select your service area.');
-        if (!val('f-category')) bad('f-category', 'Please select the service category.');
-        if (!val('f-appliance')) bad('f-appliance', 'Select a category first, then choose the appliance.');
-        if (!val('f-issue')) bad('f-issue', 'Please describe the issue briefly.');
+        if (!phone || phone.replace(/\D/g, '').length < 10) bad('f-phone', 'Enter a 10-digit phone number.');
+        var zip = val('f-zip');
+        if (!/^[0-9]{5}$/.test(zip)) bad('f-zip', 'Enter your 5-digit ZIP.');
         if (firstBad) {
           var e = document.getElementById(firstBad);
           if (e) { try { e.focus(); } catch (_) {} e.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
@@ -425,8 +412,9 @@ const breadcrumbSchema = {
       btn.addEventListener('click', async function () {
         if (!validate()) return;
 
-        var city = val('f-city');
-        var appliance = val('f-appliance');
+        var zip = val('f-zip');
+        var branch = zipToBranch(zip);
+        var issue = val('f-issue');
         var origText = btn.textContent;
         var submitted = false;
         btn.disabled = true;
@@ -442,17 +430,10 @@ const breadcrumbSchema = {
               brand_site: 'samedayappliance.repair',
               name: val('f-name'),
               phone: val('f-phone'),
-              email: val('f-email'),
-              zip: val('f-zip'),
-              address: val('f-address'),
-              city: city,
-              category: val('f-category'),
-              equipment: appliance,
-              appliance: appliance,
-              brand: val('f-brand'),
-              description: val('f-issue'),
-              date: val('f-date'),
-              time: val('f-time'),
+              zip: zip,
+              city: branch,
+              description: issue,
+              symptom: issue,
               _hp: val('f-hp')
             })
           });
@@ -461,7 +442,7 @@ const breadcrumbSchema = {
 
           if (res.ok && data && data.ok) {
             submitted = true;
-            var bp = branchPhoneFor(city);
+            var bp = branchPhoneFor((data && data.branch) || branch);
             if (successCall) { successCall.href = telHref(bp); successCall.textContent = 'Call ' + bp; }
             form.style.display = 'none';
             success.style.display = 'block';
@@ -469,16 +450,16 @@ const breadcrumbSchema = {
             window.dataLayer = window.dataLayer || [];
             window.dataLayer.push({
               event: 'booking_submitted',
-              branch: (data && data.branch) || city,
-              appliance: appliance
+              branch: (data && data.branch) || branch,
+              appliance: issue
             });
             success.scrollIntoView({ behavior: 'smooth', block: 'center' });
           } else {
-            var bpe = branchPhoneFor(city);
+            var bpe = branchPhoneFor(branch);
             showFormError('We couldn’t submit your request. So we don’t lose it, please call your branch directly: <a href="' + telHref(bpe) + '">' + bpe + '</a>.');
           }
         } catch (err) {
-          var bpn = branchPhoneFor(city);
+          var bpn = branchPhoneFor(branch);
           showFormError('Network problem — your request didn’t go through. Please call <a href="' + telHref(bpn) + '">' + bpn + '</a> and we’ll book you right away.');
         } finally {
           if (!submitted) { btn.disabled = false; btn.textContent = origText; }
@@ -489,26 +470,74 @@ const breadcrumbSchema = {
 </Layout>
 
 <style>
-  .book-hero { padding: 80px 0 64px; background: var(--gray); border-bottom: 1px solid var(--border); }
+  .book-hero { padding: 64px 0 72px; background: var(--gray); border-bottom: 1px solid var(--border); }
   .eyebrow { font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--red); margin-bottom: 16px; }
-  h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; margin: 0 0 20px; max-width: 820px; }
-  .lede { max-width: 720px; font-size: 18px; line-height: 1.65; color: var(--muted); margin-bottom: 28px; }
-  .hero-ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
-  .hero-micro { font-size: 14px; color: var(--muted); max-width: 720px; }
+  h1 { font-size: clamp(2rem, 5vw, 3.2rem); line-height: 1.1; margin: 0 0 18px; max-width: 820px; }
+  .lede { max-width: 640px; font-size: 17px; line-height: 1.6; color: var(--muted); margin-bottom: 32px; }
+
+  /* Two-path column — narrow, focused, mobile-first */
+  .two-path { max-width: 560px; }
+
+  /* Path A: the single most prominent element on the screen */
+  .call-now {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px; width: 100%; padding: 20px 24px; background: var(--red); color: var(--white);
+    border-radius: 8px; text-decoration: none; text-align: center;
+    box-shadow: 0 6px 20px rgba(200, 16, 46, 0.28); transition: background 0.2s var(--ease), transform 0.1s var(--ease);
+  }
+  .call-now:hover { background: var(--red-dark, #8a0d20); color: var(--white); }
+  .call-now:active { transform: translateY(1px); }
+  .call-now-label { font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.9; }
+  .call-now-phone { font-family: var(--font-display, inherit); font-size: clamp(1.8rem, 6vw, 2.4rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.01em; }
+  .call-micro { margin: 12px 0 0; font-size: 13px; color: var(--muted); text-align: center; }
+
+  /* Divider between the two paths */
+  .path-divider { display: flex; align-items: center; gap: 14px; margin: 28px 0 24px; color: var(--muted); }
+  .path-divider::before, .path-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .path-divider span { font-size: 13px; font-weight: 600; letter-spacing: 0.02em; white-space: nowrap; }
 
   .btn-primary {
-    display: inline-block; padding: 12px 22px; background: var(--red); color: var(--white);
+    display: inline-block; padding: 14px 22px; background: var(--red); color: var(--white);
     font-weight: 600; border-radius: 4px; text-decoration: none; transition: background 0.2s var(--ease);
-    border: none; font-family: inherit; cursor: pointer; font-size: 15px;
+    border: none; font-family: inherit; cursor: pointer; font-size: 16px;
   }
   .btn-primary:hover { background: var(--red-dark, #8a0d20); color: var(--white); }
-  .btn-ghost {
-    display: inline-block; padding: 12px 22px; background: transparent; color: var(--black);
-    font-weight: 600; border: 1px solid var(--border); border-radius: 4px; text-decoration: none;
-  }
-  .btn-ghost:hover { border-color: var(--black); }
 
-  .flow-section { padding: 72px 0; }
+  .book-form { background: var(--white); padding: 24px; border: 1px solid var(--border); border-radius: 8px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 560px) { .form-row { grid-template-columns: 1fr; } }
+  label { display: block; font-size: 13px; font-weight: 600; color: var(--text); }
+  label span { display: block; margin-bottom: 6px; }
+  label em { font-style: normal; font-weight: 400; color: var(--muted); }
+  input {
+    width: 100%; padding: 12px 12px; border: 1px solid var(--border); border-radius: 4px;
+    font-family: inherit; font-size: 16px; background: var(--white); color: var(--text);
+  }
+  input:focus { outline: 2px solid var(--red); outline-offset: 1px; border-color: var(--red); }
+  .submit { width: 100%; margin-top: 4px; }
+  .form-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
+  .form-note a { color: var(--red); }
+
+  .book-success {
+    max-width: 560px; margin-top: 8px; background: var(--white); padding: 40px 28px;
+    border: 1px solid var(--border); border-radius: 8px; text-align: center;
+  }
+  .book-success h3 { font-size: 1.5rem; margin: 0 0 12px; }
+  .book-success p { color: var(--muted); max-width: 460px; margin: 0 auto 22px; line-height: 1.6; font-size: 15px; }
+  .success-check {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 56px; height: 56px; background: var(--red); color: var(--white);
+    border-radius: 50%; font-size: 28px; font-weight: 700; margin: 0 auto 18px;
+  }
+
+  /* :global — these are created / toggled by inline JS at runtime, so they lack
+     Astro's scope attribute and scoped selectors would not match them. */
+  :global(.field-error) { display: block; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: #C8102E; }
+  :global(.input-invalid) { border-color: #C8102E !important; }
+  :global(#formError.form-error-banner) { margin: 6px 0 14px; padding: 14px 16px; background: #fff5f5; border: 1px solid #C8102E; border-radius: 4px; color: #1a1a1a; font-size: 14px; line-height: 1.5; }
+  :global(#formError.form-error-banner a) { color: #C8102E; font-weight: 700; text-decoration: underline; }
+
+  .flow-section { padding: 64px 0; }
   h2 { font-size: clamp(1.6rem, 3.5vw, 2.2rem); margin: 0 0 14px; }
   .section-intro { color: var(--muted); max-width: 720px; margin-bottom: 32px; font-size: 16px; line-height: 1.6; }
   .step-grid { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); margin-top: 28px; }
@@ -522,54 +551,19 @@ const breadcrumbSchema = {
   .step h3 { font-size: 17px; margin: 8px 0 10px; font-family: var(--font-body); font-weight: 600; }
   .step p { font-size: 14px; line-height: 1.65; color: var(--muted); margin: 0; }
 
-  .book-success {
-    margin-top: 28px; background: var(--white); padding: 48px 32px; border: 1px solid var(--border);
-    border-radius: 6px; text-align: center;
-  }
-  .book-success h3 { font-size: 1.6rem; margin: 0 0 12px; }
-  .book-success p { color: var(--muted); max-width: 520px; margin: 0 auto 24px; line-height: 1.65; font-size: 15px; }
-  .success-check {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 56px; height: 56px; background: var(--red); color: var(--white);
-    border-radius: 50%; font-size: 28px; font-weight: 700; margin: 0 auto 20px;
-  }
-
-  .form-section { padding: 72px 0; background: var(--gray); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .form-container { max-width: 820px; }
-  .book-form { margin-top: 28px; background: var(--white); padding: 28px; border: 1px solid var(--border); border-radius: 6px; }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-  @media (max-width: 640px) { .form-row { grid-template-columns: 1fr; } }
-  label { display: block; font-size: 13px; font-weight: 600; color: var(--text); }
-  label.full { display: block; margin-bottom: 14px; }
-  label span { display: block; margin-bottom: 6px; }
-  input, textarea, select {
-    width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px;
-    font-family: inherit; font-size: 14px; background: var(--white); color: var(--text);
-  }
-  input:focus, textarea:focus, select:focus { outline: 2px solid var(--red); outline-offset: 1px; border-color: var(--red); }
-  .submit { margin-top: 8px; }
-  .form-note { margin-top: 14px; font-size: 13px; color: var(--muted); }
-  .form-note a { color: var(--red); }
-  /* :global — these elements/classes are created or toggled by inline JS at runtime,
-     so they lack Astro's scope attribute and scoped selectors would not match them. */
-  :global(.field-error) { display: block; margin-top: 6px; font-size: 12.5px; font-weight: 600; color: #C8102E; }
-  :global(.input-invalid) { border-color: #C8102E !important; }
-  :global(#formError.form-error-banner) { margin: 6px 0 14px; padding: 14px 16px; background: #fff5f5; border: 1px solid #C8102E; border-radius: 4px; color: #1a1a1a; font-size: 14px; line-height: 1.5; }
-  :global(#formError.form-error-banner a) { color: #C8102E; font-weight: 700; text-decoration: underline; }
-
-  .branch-phones { padding: 72px 0; }
+  .branch-phones { padding: 64px 0; background: var(--gray); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
   .phone-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .phone-card {
     display: flex; flex-direction: column; gap: 4px; padding: 18px 20px;
-    background: var(--gray); border: 1px solid var(--border); border-radius: 6px;
+    background: var(--white); border: 1px solid var(--border); border-radius: 6px;
     text-decoration: none; transition: all 0.2s var(--ease);
   }
-  .phone-card:hover { background: var(--white); border-color: var(--black); transform: translateY(-1px); }
+  .phone-card:hover { border-color: var(--black); transform: translateY(-1px); }
   .phone-city { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--red); }
   .phone-num { font-family: var(--font-display); font-size: 22px; font-weight: 700; color: var(--black); }
   .phone-zones { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
-  .coverage-note { padding: 56px 0 96px; border-top: 1px solid var(--border); }
+  .coverage-note { padding: 56px 0 96px; }
   .note-grid { display: grid; gap: 32px; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
   .note-grid h3 { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--red); margin: 0 0 14px; }
   .note-grid p { font-size: 15px; line-height: 1.7; color: var(--text); }

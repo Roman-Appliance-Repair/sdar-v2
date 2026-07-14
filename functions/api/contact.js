@@ -27,6 +27,7 @@ const SDAR_BRANCH_PHONES = {
   'thousand-oaks': '(424) 208-0228',
   'irvine': '(213) 401-9019',
   'rancho-cucamonga': '(909) 457-1030',
+  'riverside': '(951) 577-3877',
   'temecula': '(951) 577-3877',
   'west-hollywood': '(323) 870-4790',
   'los-angeles': '(424) 325-0520'
