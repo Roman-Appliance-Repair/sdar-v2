@@ -134,7 +134,9 @@ Aspect: 16:9. Quality: 2K.
 
 City hero на странице Beverly Hills → Mikhail в кадре. Pasadena → Artur. Irvine → David.
 
-**Reference photos:** Решение pending — генерить AI на старте или Roman даст реальные фото.
+**Reference photos: РЕШЕНО 2026-07-15** — Roman (owner) is the primary on-photo technician for all people-photos. Real reference photos at `reference-photos/roman/` (local only, not committed — the directory is gitignored; only generated output under `public/images/` ships). Character consistency via Gemini reference-image input: pass the ref crops as `inlineData` parts *before* the text prompt, then instruct the model to match that face (see `scripts/gen-roman-weho-2026-07-15.mjs`). Mikhail V. / Artur S. / David K. names remain available for Recent Repairs **text** content; on-photo person = Roman.
+
+Ref crops in use: `ref-01.jpg` (frontal, sharpest), `ref-02.jpg` (three-quarter), `ref-03.jpg` (frontal, different light) — all cropped face-and-shoulders from Roman's own job photos. **One source photo (`20230815_133847.jpg`) contains a second man (a coworker) — it is NOT a Roman reference and no crop is taken from it.** When adding refs, crop the selfie-taker only and verify no second face enters the crop.
 
 ---
 
