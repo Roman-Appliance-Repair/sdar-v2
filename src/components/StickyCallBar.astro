@@ -1,0 +1,160 @@
+---
+/**
+ * StickyCallBar — persistent mobile call CTA (UI Phase 1, P0-1).
+ *
+ * Rendered ONCE in Layout.astro, so every page gets it without touching the
+ * ~1,900 page files. Replaces the legacy per-page `.float-call` pill, which
+ * only ever covered 254 pages and was absent from the homepage, all 89 city
+ * pillars, the ~908 city×service combos, and both flagship brand pages.
+ * `.float-call` is suppressed in global.css; markup removal is a Phase 2 sweep.
+ *
+ * Phone resolution (no per-page props needed):
+ *   On load, mirror the FIRST `tel:` link inside <main> — that is the page's
+ *   hero Call CTA, which every template already renders with its branch-correct
+ *   number. This keeps the bar branch-correct on every template automatically.
+ *   The bar itself lives OUTSIDE <main>, so it can never mirror itself.
+ *   Fallback when a page has no tel: link in <main> = WeHo HQ (SSOT).
+ *
+ * GA4: the call button is a real <a href="tel:">. Layout.astro's capture-phase
+ * document listener fires `phone_call_click` on EVERY tel: click regardless of
+ * GTM load timing, so this is tracked with no extra wiring.
+ */
+import { HEADQUARTERS } from '../data/branches';
+
+const fallbackPhone = HEADQUARTERS.phone;                        // (323) 870-4790
+const fallbackTel = '+1' + fallbackPhone.replace(/\D/g, '');
+---
+
+<div class="sdar-call-bar" id="sdar-call-bar" data-visible="false">
+  <a
+    class="sdar-call-bar__call"
+    id="sdar-call-bar-call"
+    href={`tel:${fallbackTel}`}
+    data-fallback-tel={`tel:${fallbackTel}`}
+    data-fallback-phone={fallbackPhone}
+  >
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+      <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.4.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.4 0 .8-.2 1l-2.3 2.2z"/>
+    </svg>
+    <span id="sdar-call-bar-label">Call {fallbackPhone}</span>
+  </a>
+  <a class="sdar-call-bar__book" href="/book/">Book Online</a>
+</div>
+
+<style>
+  .sdar-call-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 900;
+    display: none; /* flipped to flex under 768px by the media query below */
+    gap: 10px;
+    padding: 10px 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(10, 10, 10, 0.96);
+    border-top: 1px solid rgba(255, 255, 255, 0.14);
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.3);
+    transform: translateY(100%);
+    transition: transform 0.2s var(--ease);
+  }
+
+  .sdar-call-bar[data-visible='true'] {
+    transform: translateY(0);
+  }
+
+  .sdar-call-bar__call,
+  .sdar-call-bar__book {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 48px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .sdar-call-bar__call {
+    flex: 2 1 0;
+    background: var(--red);
+    color: var(--white);
+  }
+
+  .sdar-call-bar__book {
+    flex: 1 1 0;
+    background: transparent;
+    color: var(--white);
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+  }
+
+  @media (max-width: 767px) {
+    .sdar-call-bar {
+      display: flex;
+    }
+  }
+</style>
+
+<style is:global>
+  /* Reserve room so the fixed bar never covers the tail of the footer.
+     Only below 768px, where the bar actually renders. */
+  @media (max-width: 767px) {
+    body {
+      padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px));
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var bar = document.getElementById('sdar-call-bar');
+    if (!bar) return;
+
+    var link = document.getElementById('sdar-call-bar-call');
+    var label = document.getElementById('sdar-call-bar-label');
+
+    /** (323) 870-4790 from +13238704790 / 3238704790 — else null. */
+    function formatFromTel(href) {
+      var digits = (href || '').replace(/\D/g, '');
+      if (digits.length === 11 && digits.charAt(0) === '1') digits = digits.slice(1);
+      if (digits.length !== 10) return null;
+      return '(' + digits.slice(0, 3) + ') ' + digits.slice(3, 6) + '-' + digits.slice(6);
+    }
+
+    // Mirror the page's own hero Call CTA so the bar shows the branch-correct
+    // number. Scoped to <main> — the bar sits outside it and cannot self-match.
+    var main = document.querySelector('main');
+    var source = main ? main.querySelector('a[href^="tel:"]') : null;
+    if (source) {
+      var href = source.getAttribute('href');
+      var pretty = formatFromTel(href);
+      if (pretty) {
+        link.setAttribute('href', href);
+        label.textContent = 'Call ' + pretty;
+      }
+    }
+
+    // Reveal past 400px. Passive listener; rAF-throttled so scroll stays cheap.
+    var THRESHOLD = 400;
+    var ticking = false;
+
+    function apply() {
+      var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+      bar.setAttribute('data-visible', y > THRESHOLD ? 'true' : 'false');
+      ticking = false;
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(apply);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    apply(); // handle deep-links / restored scroll positions
+  })();
+</script>

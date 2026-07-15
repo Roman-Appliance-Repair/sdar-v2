@@ -253,3 +253,54 @@ img, svg, video { max-width: 100%; height: auto; display: block; }
 
 .text-red { color: var(--red); }
 .text-white { color: var(--white); }
+
+/* ==========================================================================
+   Focus baseline (UI Phase 1)
+   Site-wide keyboard focus ring. Before this, only book.astro + contact.astro
+   form inputs had a designed focus state — every link and button fell back to
+   the UA default. Scoped to :focus-visible so mouse clicks stay ring-free.
+   ========================================================================== */
+:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+
+/* Red on a dark surface is 3.37:1 — below the 3:1 non-text minimum once the
+   ring sits on near-black. Dark sections get a white ring instead. */
+.hp-hero :focus-visible,
+.hp-branches :focus-visible,
+.hp-bottom-cta :focus-visible,
+.navbar :focus-visible,
+.top-bar :focus-visible,
+.footer :focus-visible,
+.v2-hero :focus-visible,
+.bottom-cta :focus-visible,
+.sdar-call-bar :focus-visible {
+  outline-color: var(--white);
+}
+
+/* ==========================================================================
+   Reduced motion (UI Phase 1)
+   Site-wide. Previously only homepage/FAQ.astro (dead code) carried a guard,
+   leaving 2 infinite ChatWidget animations unguarded.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ==========================================================================
+   Legacy per-page float-call pills (UI Phase 1)
+   Superseded by StickyCallBar in Layout.astro. Suppressed here so the two
+   never render together; physical markup removal is a Phase 2 sweep across
+   the ~254 pages that still carry it.
+   ========================================================================== */
+.float-call {
+  display: none !important;
+}
