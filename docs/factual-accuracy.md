@@ -133,7 +133,7 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 | Commercial diagnostic | **$120** | Только `/commercial/` pages — walk-in cooler, ice machines, commercial refrigeration, и пр. коммерческая кухня |
 | Both waived с repair | да | Упоминать явно: "fee waived when you approve the repair" |
 
-❌ **Никогда** не показывать оба ценника на одной странице. Mixed-scope pages — выбираем по основному audience.
+**Mixed-scope pages (city pillars): базовая цена страницы = по основной аудитории ($89 residential). Секционные цены допустимы:** $120 показывается ВНУТРИ коммерческой секции, $89 внутри outdoor/residential секций. **Никогда не ставить два ценника рядом в одном блоке** (hero, pricing cards, FAQ) — только внутри своих секций. Решение Roman 2026-07-15.
 
 **`/outdoor/` = $89 universally (2026-06-09).** Раньше outdoor brand-страницы (patio/pizza/smoker + grill brand pillars) ошибочно несли «$120 commercial-tier» диагностику — это отменено. Outdoor — residential scope: один canonical fee **$89**, фраза `$89 outdoor diagnostic, waived with repair` (или `$89 diagnostic, waived with repair`). Никаких «commercial-tier» формулировок для outdoor-диагностики. Реальные цены деталей/услуг и итоговые суммы ремонтов в outdoor-кейсах остаются как есть (это не диагностика). Schema Offer base price для outdoor = `89.00`. Дуальность сохраняется только на границе `/commercial/` (там $120). SSOT виджета: `AIDiagnostic.jsx` `DIAGNOSTIC_FEE.outdoor = "$89"`.
 
