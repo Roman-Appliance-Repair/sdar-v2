@@ -1,0 +1,234 @@
+---
+/** v2 CommercialSection — back-of-house block for a city pillar.
+ *
+ *  Two tiers of links, deliberately:
+ *    brands    — "do you touch my machine"
+ *    equipment — "do you touch my category"
+ *  Those are different searches, so they get separate rows.
+ *
+ *  Extracted from the WeHo pillar (pilot-2) so the pattern can roll to other cities
+ *  without copying ~150 lines of CSS per page. Content is all props; only the
+ *  equipment icon set is owned here, because it is structural, not editorial.
+ *
+ *  Callers must pass hrefs that are REAL rendered pages — a 301 target burns crawl
+ *  budget (Wave 40). This component does not validate them.
+ */
+import FeeBadge from './FeeBadge.astro';
+
+export interface BrandGroup {
+  /** small uppercase label above the row, e.g. "Ice machines" */
+  label: string;
+  pills: Array<{ name: string; href: string }>;
+}
+
+export interface Props {
+  cityName: string;
+  eyebrow?: string;
+  headline: string;
+  /** HTML allowed — these carry inline contextual links */
+  paragraphs: string[];
+  brandGroups: BrandGroup[];
+  /** equipment-type hubs; `icon` is a key of the ICONS map below */
+  equipmentCards: Array<{ name: string; href: string; icon: string }>;
+  equipmentLabel?: string;
+  /** optional single text link under the brand rows, e.g. ice machines */
+  bridgeLink?: { text: string; href: string };
+  fee?: { label: string; amount: string; note: string };
+  photoSrc?: string;
+  photoAlt?: string;
+}
+
+/** Icon paths live here, not in the page. 20px, single colour, stroke-only —
+ *  no icon library, nothing extra to load.
+ *  `pizza-oven` is a DOME, not a flame: at 20px a flame silhouette is a teardrop
+ *  and reads as the dishwasher droplet two cards over. */
+const ICONS: Record<string, string> = {
+  snowflake:
+    'M12 2v20M12 2 9.5 4.5M12 2l2.5 2.5M12 22l-2.5-2.5M12 22l2.5-2.5M2.7 7l17.3 10M2.7 7l.9 3.4M2.7 7l3.4-.9M20 17l-3.4.9M20 17l-.9-3.4M2.7 17 20 7M2.7 17l3.4.9M2.7 17l.9-3.4M20 7l-.9 3.4M20 7l-3.4-.9',
+  'pizza-oven': 'M2.5 19.5h19M4.5 19.5a7.5 7.5 0 0 1 15 0M9.8 19.5a2.2 2.2 0 0 1 4.4 0M12 5.6V3.2M12 3.2h3',
+  fryer: 'M4 8h16l-1.4 11.2a2 2 0 0 1-2 1.8H7.4a2 2 0 0 1-2-1.8L4 8Zm4 3v7m4-7v7m4-7v7M14 8l4.5-4.5a1.8 1.8 0 0 1 2.6 2.6L19 8',
+  oven: 'M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm0 6h17M6.5 6h.01M10 6h.01M6 12h12v6H6z',
+  droplet: 'M12 2.7s6 6.3 6 10.3a6 6 0 0 1-12 0c0-4 6-10.3 6-10.3Zm0 15.6a5 5 0 0 0 3.5-1.5',
+  laundry: 'M8 3 4.5 5 3 9l3 1.2V21h12V10.2L21 9l-1.5-4L16 3l-2 2h-4L8 3Z'
+};
+
+const {
+  cityName,
+  eyebrow = 'Commercial Kitchens',
+  headline,
+  paragraphs,
+  brandGroups,
+  equipmentCards,
+  equipmentLabel = 'What we service',
+  bridgeLink,
+  fee,
+  photoSrc = '/images/commercial/commercial-hub/hero.webp',
+  photoAlt = `Commercial restaurant kitchen line — appliance repair in ${cityName}`
+} = Astro.props;
+---
+
+<section class="v2-comm">
+  <div class="v2-container">
+    <div class="v2-comm__grid">
+      <div>
+        <p class="v2-comm__eyebrow">{eyebrow}</p>
+        <h2 class="v2-comm__h2">{headline}</h2>
+        {paragraphs.map((p) => (<p class="v2-comm__p" set:html={p}></p>))}
+
+        <div class="v2-comm__pills">
+          {brandGroups.map((g) => (
+            <>
+              <p class="v2-pills__label">{g.label}</p>
+              <div class="v2-pills__row">
+                {g.pills.map((b) => (<a class="v2-pill" href={b.href}>{b.name}</a>))}
+              </div>
+            </>
+          ))}
+          {bridgeLink && (
+            <a class="v2-comm__link" href={bridgeLink.href}>{bridgeLink.text} →</a>
+          )}
+        </div>
+
+        <div class="v2-equip">
+          <p class="v2-pills__label">{equipmentLabel}</p>
+          <div class="v2-equip__grid">
+            {equipmentCards.map((e) => (
+              <a class="v2-equip__card" href={e.href}>
+                <svg
+                  class="v2-equip__icon" viewBox="0 0 24 24" width="20" height="20"
+                  fill="none" stroke="currentColor" stroke-width="1.6"
+                  stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                >
+                  <path d={ICONS[e.icon]} />
+                </svg>
+                <span>{e.name}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+
+        {fee && <FeeBadge label={fee.label} amount={fee.amount} note={fee.note} />}
+      </div>
+
+      <aside>
+        <div class="v2-comm__photo">
+          <img src={photoSrc} alt={photoAlt} width="540" height="320" loading="lazy" decoding="async" />
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-comm { padding: 72px 0; background: var(--v2-gray); }
+  .v2-comm__grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    align-items: start;
+  }
+  .v2-comm__eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--v2-red);
+    margin: 0 0 10px; font-family: var(--v2-font-body);
+  }
+  .v2-comm__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 30px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 16px;
+  }
+  .v2-comm__p {
+    font-size: 16px; line-height: 1.7; color: var(--v2-text);
+    margin: 0 0 16px; font-family: var(--v2-font-body);
+  }
+  .v2-comm__photo {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--v2-border);
+    aspect-ratio: 16 / 10;
+  }
+  .v2-comm__photo img {
+    width: 100%; height: 100%;
+    /* the shared hub hero is a 21:9 plate whose left third is empty wall — it was
+       composed for a text card. Anchor right so the kitchen line shows. */
+    object-fit: cover;
+    object-position: right center;
+    display: block;
+  }
+  .v2-comm__pills { margin-top: 24px; }
+  .v2-comm__link {
+    display: inline-block; margin-top: 4px;
+    font-family: var(--v2-font-body); font-size: 14px; font-weight: 600;
+    color: var(--v2-red); text-decoration: none;
+  }
+  .v2-comm__link:hover { text-decoration: underline; }
+
+  /* ── Equipment cards ── */
+  /* margin-top clears the bridge link directly above */
+  .v2-equip { margin-top: 22px; }
+  /* Explicit column counts, NOT auto-fit: auto-fit(minmax(190px,1fr)) resolved to
+     5 columns at 1100px and collapsed to 1 at 390px. Measured, then fixed. */
+  .v2-equip__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .v2-equip__card {
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 16px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 10px;
+    font-family: var(--v2-font-body);
+    font-size: 13px; font-weight: 600;
+    color: var(--v2-text); text-decoration: none;
+    transition: border-color 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--ease);
+  }
+  .v2-equip__card:hover {
+    border-color: var(--v2-red);
+    color: var(--v2-red);
+    transform: translateY(-2px);
+  }
+  .v2-equip__icon { flex-shrink: 0; color: var(--v2-red); }
+
+  @media (max-width: 1024px) {
+    .v2-comm__grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 768px) {
+    .v2-comm__h2 { font-size: 24px; }
+    .v2-equip__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+
+<style is:global>
+  /* Pills are shared by CommercialSection and OutdoorSection, so the rule cannot be
+     scoped to either — a scoped copy in each would let them drift apart, which is
+     the exact thing this extraction exists to prevent.
+     Motion comes from the global prefers-reduced-motion block; focus from the
+     global :focus-visible ring. */
+  .v2-pills__label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--v2-muted);
+    margin: 0 0 8px; font-family: var(--v2-font-body);
+  }
+  .v2-pills__row {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
+  }
+  .v2-pill {
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 999px;
+    font-family: var(--v2-font-body);
+    font-size: 13px; font-weight: 600;
+    color: var(--v2-text); text-decoration: none;
+    transition: background 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
+  }
+  .v2-pill:hover {
+    background: var(--v2-red);
+    border-color: var(--v2-red);
+    color: var(--v2-white);
+  }
+</style>
