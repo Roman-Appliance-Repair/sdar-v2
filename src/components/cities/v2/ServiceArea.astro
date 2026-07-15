@@ -16,16 +16,24 @@ export interface Props {
    *  over the auto-generated "every neighborhood and street in {shortName} — ZIP codes …" text. */
   subheadline?: string;
   keyStreets: string[];
+  /** Optional neighbourhood photo behind the section. Absent (the default) keeps
+   *  the plain white treatment every other city renders today — this is opt-in per
+   *  page so the other 86 pillars are untouched. When set, the section flips to a
+   *  dark scrim + light text; see the .v2-area--photo block below. */
+  bgImage?: string;
 }
 
-const { cityName, cityShortName, zips, neighborhoods, keyStreets, headline, subheadline } = Astro.props;
+const { cityName, cityShortName, zips, neighborhoods, keyStreets, headline, subheadline, bgImage } = Astro.props;
 const shortName = cityShortName ?? cityName;
 const finalHeadline = headline ?? `We Serve All of ${cityName}`;
 const defaultSub = `Our technicians cover every neighborhood and street in ${shortName} — ZIP codes ${zips.join(', ')}.`;
 const finalSub = subheadline ?? defaultSub;
 ---
 
-<section class="v2-area">
+<section
+  class={`v2-area ${bgImage ? 'v2-area--photo' : ''}`}
+  style={bgImage ? `--v2-area-bg: url('${bgImage}')` : undefined}
+>
   <div class="v2-container">
     <h2 class="v2-section-title">{finalHeadline}</h2>
     <p class="v2-section-sub">{finalSub}</p>
@@ -90,4 +98,39 @@ const finalSub = subheadline ?? defaultSub;
   .v2-area__streets-label { font-weight: 600; color: var(--v2-black); margin-right: 8px; }
   @media (max-width: 1024px) { .v2-area__grid { grid-template-columns: repeat(3, 1fr); } }
   @media (max-width: 600px) { .v2-area__grid { grid-template-columns: repeat(2, 1fr); } }
+
+  /* ── Optional photo background (opt-in via bgImage) ─────────────────────────
+     Only applies when the page passes bgImage, so the other 86 pillars keep the
+     white treatment untouched. The whole section inverts to light-on-dark: a
+     .72 black scrim over the photo is the AA floor for the body text, and the
+     cards get their own darker fill so text sits on a known colour rather than
+     on whatever the photo happens to be underneath.
+     No <img>: a CSS background is never eager, so this costs nothing on LCP and
+     the hero stays the only eager image on the page. */
+  .v2-area--photo {
+    position: relative;
+    background-color: var(--v2-black);
+    background-image: linear-gradient(rgba(10, 10, 10, 0.72), rgba(10, 10, 10, 0.72)), var(--v2-area-bg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  .v2-area--photo .v2-section-title { color: var(--v2-white); }
+  .v2-area--photo .v2-section-sub { color: rgba(255, 255, 255, 0.82); }
+  .v2-area--photo .v2-area__card {
+    background: rgba(10, 10, 10, 0.55);
+    border-color: rgba(255, 255, 255, 0.22);
+  }
+  .v2-area--photo .v2-area__card--featured {
+    background: rgba(200, 16, 46, 0.30);
+    border-color: var(--v2-red);
+  }
+  .v2-area--photo .v2-area__name { color: var(--v2-white); }
+  .v2-area--photo .v2-area__zip { color: rgba(255, 255, 255, 0.78); }
+  .v2-area--photo .v2-area__streets {
+    background: rgba(10, 10, 10, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: rgba(255, 255, 255, 0.86);
+  }
+  .v2-area--photo .v2-area__streets-label { color: var(--v2-white); }
 </style>

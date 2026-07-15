@@ -12,10 +12,8 @@ import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
 import HeroSection from '../components/cities/v2/HeroSection.astro';
 import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
-import NeighborhoodPhoto from '../components/cities/v2/NeighborhoodPhoto.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import LuxurySpecialists from '../components/cities/v2/LuxurySpecialists.astro';
-import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import PropertyManagers from '../components/cities/v2/PropertyManagers.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
@@ -180,6 +178,111 @@ const nearbyCities = [
   { name: 'Los Angeles', slug: 'los-angeles' }
 ];
 
+// All 15 WeHo city x service combos, previously split across three Tier 1/2/3
+// sections. Order preserved (Tier 1, then 2, then 3) so nothing is lost or resorted.
+const serviceLinks = [
+  { name: 'Refrigerator repair', href: '/west-hollywood/refrigerator-repair/' },
+  { name: 'Dryer repair', href: '/west-hollywood/dryer-repair/' },
+  { name: 'Washer repair', href: '/west-hollywood/washer-repair/' },
+  { name: 'Dishwasher repair', href: '/west-hollywood/dishwasher-repair/' },
+  { name: 'Oven repair', href: '/west-hollywood/oven-repair/' },
+  { name: 'Stove repair', href: '/west-hollywood/stove-repair/' },
+  { name: 'Cooktop repair', href: '/west-hollywood/cooktop-repair/' },
+  { name: 'Range hood repair', href: '/west-hollywood/range-hood-repair/' },
+  { name: 'Microwave repair', href: '/west-hollywood/microwave-repair/' },
+  { name: 'Wall oven repair', href: '/west-hollywood/wall-oven-repair/' },
+  { name: 'Freezer repair', href: '/west-hollywood/freezer-repair/' },
+  { name: 'Ice maker repair', href: '/west-hollywood/ice-maker-repair/' },
+  { name: 'Wine cooler repair', href: '/west-hollywood/wine-cooler-repair/' },
+  { name: 'Garbage disposal repair', href: '/west-hollywood/garbage-disposal-repair/' },
+  { name: 'Range repair', href: '/west-hollywood/range-repair/' }
+];
+
+// Commercial brand pills. Every href below was checked against dist/ — each is a
+// real rendered page, not a redirect stub (Wave 40 lesson: linking a 301 burns
+// crawl budget). Any brand without a live page is simply not listed.
+const commercialBrands = [
+  { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+  { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+  { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' },
+  { name: 'Perlick', href: '/commercial/refrigeration/brands/perlick/' },
+  { name: 'Vulcan', href: '/brands/vulcan/' }
+];
+
+// Ice-machine group — the 5-direction bridge. These point at the ice-machine brand
+// pages under /commercial/ice-machines/brands/, not the generic /brands/ pillars,
+// because the context here is ice.
+const iceBrands = [
+  { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+  { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+  { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+];
+
+// Tier 2 of the commercial link system: equipment-type hubs, not brands. All six
+// verified against dist as real rendered pages (no redirect stubs). Icons are
+// inline 20px single-colour SVG paths — no icon library, nothing to load.
+const commercialEquipment = [
+  {
+    name: 'Walk-in coolers',
+    href: '/commercial/refrigeration/walk-in-cooler-repair/',
+    // snowflake
+    icon: 'M12 2v20M12 2 9.5 4.5M12 2l2.5 2.5M12 22l-2.5-2.5M12 22l2.5-2.5M2.7 7l17.3 10M2.7 7l.9 3.4M2.7 7l3.4-.9M20 17l-3.4.9M20 17l-.9-3.4M2.7 17 20 7M2.7 17l3.4.9M2.7 17l.9-3.4M20 7l-.9 3.4M20 7l-3.4-.9'
+  },
+  {
+    name: 'Pizza ovens',
+    href: '/commercial/pizza-oven-repair/',
+    // Domed oven with an arched mouth + chimney. A flame was the obvious pick, but
+    // at 20px its silhouette is a teardrop — indistinguishable from the dishwasher
+    // droplet two cards over. The dome reads as an oven and shares no outline.
+    icon: 'M2.5 19.5h19M4.5 19.5a7.5 7.5 0 0 1 15 0M9.8 19.5a2.2 2.2 0 0 1 4.4 0M12 5.6V3.2M12 3.2h3'
+  },
+  {
+    name: 'Fryers',
+    href: '/commercial/fryer-repair/',
+    // fryer basket
+    icon: 'M4 8h16l-1.4 11.2a2 2 0 0 1-2 1.8H7.4a2 2 0 0 1-2-1.8L4 8Zm4 3v7m4-7v7m4-7v7M14 8l4.5-4.5a1.8 1.8 0 0 1 2.6 2.6L19 8'
+  },
+  {
+    name: 'Commercial ovens',
+    href: '/commercial/oven-repair/',
+    // oven
+    icon: 'M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm0 6h17M6.5 6h.01M10 6h.01M6 12h12v6H6z'
+  },
+  {
+    name: 'Dishwashers',
+    href: '/commercial/dishwasher-repair/',
+    // droplet
+    icon: 'M12 2.7s6 6.3 6 10.3a6 6 0 0 1-12 0c0-4 6-10.3 6-10.3Zm0 15.6a5 5 0 0 0 3.5-1.5'
+  },
+  {
+    name: 'Laundry',
+    href: '/commercial/laundry-repair/',
+    // shirt
+    icon: 'M8 3 4.5 5 3 9l3 1.2V21h12V10.2L21 9l-1.5-4L16 3l-2 2h-4L8 3Z'
+  }
+];
+
+// Premium outdoor brands — all five verified as real pages under /outdoor/brands/.
+// Coyote, Bull and Fire Magic also exist but sit a tier below; WeHo's outdoor stock
+// is the premium built-in end, so these five match the audience.
+const outdoorBrands = [
+  { name: 'Kalamazoo', href: '/outdoor/brands/kalamazoo/' },
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'Twin Eagles', href: '/outdoor/brands/twin-eagles/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' },
+  { name: 'Viking', href: '/outdoor/brands/viking/' }
+];
+
+// Outdoor links — verified present in dist. /outdoor/refrigerator-repair/ does not
+// exist; the outdoor-refrigerator page lives under /services/, so that is used.
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' }
+];
+
 const commercialNarrative = {
   eyebrow: 'COMMERCIAL KITCHENS',
   headline: 'WeHo Restaurant & Hospitality Kitchen Repair',
@@ -213,8 +316,6 @@ const commercialNarrative = {
     paragraphs={introParagraphs}
   />
 
-  <NeighborhoodPhoto citySlug={citySlug} cityName={cityName} />
-
   <ServicesGrid cityName={cityName} services={services} />
 
   <LuxurySpecialists
@@ -223,14 +324,22 @@ const commercialNarrative = {
     headline="Sub-Zero, Thermador & Viking Repair in West Hollywood"
     paragraphs={luxuryParagraphs}
     brands={luxuryBrands}
+    footnote={{
+      lead: 'Built-in & integrated refrigeration is its own specialty — see our',
+      linkText: 'built-in refrigerator repair page',
+      href: '/services/built-in-refrigerator-repair/'
+    }}
   />
 
+  <!-- The neighbourhood photo used to sit here as its own band; it is now the
+       background of this section (bgImage), which is what it was always describing. -->
   <ServiceArea
     cityName={cityName}
     cityShortName="WeHo"
     zips={zips}
     neighborhoods={neighborhoods}
     keyStreets={keyStreets}
+    bgImage="/images/cities/west-hollywood/neighborhood.webp"
   />
 
   <PropertyManagers
@@ -241,12 +350,129 @@ const commercialNarrative = {
     bullets={propertyBullets}
   />
 
-  <CustomNarrative
-    eyebrow={commercialNarrative.eyebrow}
-    headline={commercialNarrative.headline}
-    paragraphs={commercialNarrative.paragraphs}
-    background="gray"
-  />
+  <!-- Commercial: prose (was a plain CustomNarrative) + brand pills + reused photo.
+       Every pill target was verified to be a real rendered page, not a redirect
+       stub. The ice-machine brands are grouped and point at their ice-machine
+       pages rather than the generic brand pillars — that is the direction bridge. -->
+  <section class="weho-comm">
+    <div class="v2-container">
+      <div class="weho-comm__grid">
+        <div>
+          <p class="weho-comm__eyebrow">{commercialNarrative.eyebrow}</p>
+          <h2 class="weho-comm__h2">{commercialNarrative.headline}</h2>
+          {commercialNarrative.paragraphs.map((p) => (
+            <p class="weho-comm__p" set:html={p}></p>
+          ))}
+
+          <div class="weho-pills">
+            <p class="weho-pills__label">Refrigeration &amp; cooking</p>
+            <div class="weho-pills__row">
+              {commercialBrands.map((b) => (
+                <a class="weho-pill" href={b.href}>{b.name}</a>
+              ))}
+            </div>
+
+            <p class="weho-pills__label">Ice machines</p>
+            <div class="weho-pills__row">
+              {iceBrands.map((b) => (
+                <a class="weho-pill" href={b.href}>{b.name}</a>
+              ))}
+            </div>
+            <a class="weho-comm__link" href="/commercial/ice-machines/">Commercial ice machine repair →</a>
+          </div>
+
+          {/* Tier 2: equipment type, not brand. Brands answer "do you touch my
+              machine"; this answers "do you touch my category" — the two searches
+              are different, so they get separate rows. */}
+          <div class="weho-equip">
+            <p class="weho-pills__label">What we service</p>
+            <div class="weho-equip__grid">
+              {commercialEquipment.map((e) => (
+                <a class="weho-equip__card" href={e.href}>
+                  <svg
+                    class="weho-equip__icon" viewBox="0 0 24 24" width="20" height="20"
+                    fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                  >
+                    <path d={e.icon} />
+                  </svg>
+                  <span>{e.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Sectional fee. Per factual-accuracy.md §9 (as amended 2026-07-15) the
+              page's base price stays $89 residential; $120 appears only inside this
+              commercial section, never beside $89 in a shared block.
+              Astro comment, not <!-- -->: an HTML comment nested in markup ships to
+              the browser, which put this note (and a stray "$120") in the page copy. */}
+          <p class="weho-fee">
+            Commercial diagnostic <strong class="weho-fee__amount">$120</strong>
+            <span class="weho-fee__note">· waived when you approve the repair</span>
+          </p>
+        </div>
+
+        <aside class="weho-comm__aside">
+          <div class="weho-comm__photo">
+            <img
+              src="/images/commercial/commercial-hub/hero.webp"
+              alt="Commercial restaurant kitchen line — appliance repair in West Hollywood"
+              width="540" height="320" loading="lazy" decoding="async"
+            />
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- Outdoor direction. Links verified against dist; /outdoor/refrigerator-repair/
+       does not exist, so the outdoor-refrigerator link uses the /services/ page. -->
+  <section class="weho-outdoor">
+    <div class="v2-container">
+      <div class="weho-comm__grid">
+        <div>
+          <p class="weho-comm__eyebrow">Outdoor Kitchens &amp; Patio Equipment</p>
+          <h2 class="weho-comm__h2">Rooftop Decks and Patio Dining Break Things Too</h2>
+          <p class="weho-comm__p">
+            Half the entertaining in WeHo happens outside — the rooftop decks above Sunset, the patio
+            tables that run year-round on Santa Monica Blvd, the courtyard grills behind the Norma
+            Triangle bungalows. That equipment sits in salt air and sun all year and nobody covers it.
+            Our techs work the same outdoor kit on the residential side and the restaurant patios.
+          </p>
+          <div class="weho-pills__row">
+            {outdoorLinks.map((l) => (
+              <a class="weho-pill" href={l.href}>{l.name}</a>
+            ))}
+          </div>
+
+          <p class="weho-pills__label">Premium outdoor brands</p>
+          <div class="weho-pills__row">
+            {outdoorBrands.map((b) => (
+              <a class="weho-pill" href={b.href}>{b.name}</a>
+            ))}
+          </div>
+
+          {/* Outdoor is residential scope — $89, not $120 (factual-accuracy.md §9:
+              "/outdoor/ = $89 universally", 2026-06-09). */}
+          <p class="weho-fee">
+            Diagnostic <strong class="weho-fee__amount">$89</strong>
+            <span class="weho-fee__note">· waived with repair</span>
+          </p>
+        </div>
+
+        <aside class="weho-comm__aside">
+          <div class="weho-comm__photo">
+            <img
+              src="/images/outdoor/kitchen-repair/hero.webp"
+              alt="Built-in outdoor kitchen with grill island and undercounter refrigerator — outdoor appliance repair in West Hollywood"
+              width="540" height="320" loading="lazy" decoding="async"
+            />
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
 
   <RecentRepairs citySlug={citySlug} cityName={cityName} jobs={recentJobs} />
 
@@ -267,48 +493,211 @@ const commercialNarrative = {
     body="Call now — same-day service available for most repairs. Diagnostic fee $89, waived with repair. 90-day warranty on all work."
   />
 
-<section class="section">
-  <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
-    <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">Service-specific pages for West Hollywood</p>
-    <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">West Hollywood appliance repair by service.</h2>
-    <p>Each service-specific page covers brand pool, failure patterns, and pricing relevant to West Hollywood home stock and local conditions.</p>
-    <ul style="padding-left:22px; margin:14px 0 18px;">
-      <li><a href="/west-hollywood/refrigerator-repair/">Refrigerator repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/dryer-repair/">Dryer repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/washer-repair/">Washer repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/dishwasher-repair/">Dishwasher repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/oven-repair/">Oven repair in West Hollywood</a></li>
-    </ul>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
-    <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">More service-specific pages for West Hollywood</p>
-    <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">West Hollywood appliance repair — Tier 2 services.</h2>
-    <p>Additional service-specific pages covering brand pool, failure patterns, and pricing relevant to West Hollywood home stock and local conditions.</p>
-    <ul style="padding-left:22px; margin:14px 0 18px;">
-      <li><a href="/west-hollywood/stove-repair/">Stove repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/cooktop-repair/">Cooktop repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/range-hood-repair/">Range hood repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/microwave-repair/">Microwave repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/wall-oven-repair/">Wall oven repair in West Hollywood</a></li>
-    </ul>
-  </div>
-</section>
-
-<section class="section">
-  <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
-    <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">Tier 3 service-specific pages for West Hollywood</p>
-    <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">West Hollywood appliance repair — Tier 3 services.</h2>
-    <p>Additional service-specific pages covering brand pool, failure patterns, and pricing relevant to West Hollywood home stock and local conditions.</p>
-    <ul style="padding-left:22px; margin:14px 0 18px;">
-      <li><a href="/west-hollywood/freezer-repair/">Freezer repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/ice-maker-repair/">Ice maker repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/wine-cooler-repair/">Wine cooler repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/garbage-disposal-repair/">Garbage disposal repair in West Hollywood</a></li>
-      <li><a href="/west-hollywood/range-repair/">Range repair in West Hollywood</a></li>
-    </ul>
+<!-- Was three near-identical Tier 1/2/3 sections, each with its own intro and a
+     bulleted list, stacked with ~48px padding apiece. Merged into one card grid:
+     all 15 links kept (no link loss), one intro, the two duplicate intros dropped. -->
+<section class="weho-svc">
+  <div class="v2-container">
+    <p class="weho-comm__eyebrow">Service-specific pages for West Hollywood</p>
+    <h2 class="weho-comm__h2">West Hollywood Appliance Repair by Service</h2>
+    <p class="weho-comm__p weho-svc__intro">
+      Each page covers the brand pool, failure patterns, and pricing that actually apply to West
+      Hollywood home stock and local conditions.
+    </p>
+    <div class="weho-svc__grid">
+      {serviceLinks.map((s) => (
+        <a class="weho-svc__card" href={s.href}>
+          <span class="weho-svc__name">{s.name}</span>
+          <span class="weho-svc__arrow">→</span>
+        </a>
+      ))}
+    </div>
   </div>
 </section>
 </CityLayoutV2>
+
+<style>
+  /* Page-scoped: these sections exist only on the WeHo reference pillar.
+     If the pattern is approved for rollout they should graduate into
+     cities/v2/ components rather than be copied 86 times. */
+
+  .weho-comm__eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--v2-red);
+    margin: 0 0 10px; font-family: var(--v2-font-body);
+  }
+  .weho-comm__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 30px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 16px;
+  }
+  .weho-comm__p {
+    font-size: 16px; line-height: 1.7; color: var(--v2-text);
+    margin: 0 0 16px; font-family: var(--v2-font-body);
+  }
+
+  /* ── Commercial ── */
+  .weho-comm { padding: 72px 0; background: var(--v2-gray); }
+  .weho-comm__grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    align-items: start;
+  }
+  .weho-comm__photo {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--v2-border);
+    aspect-ratio: 16 / 10;
+  }
+  .weho-comm__photo img {
+    width: 100%; height: 100%;
+    /* the reused hub hero is a 21:9 plate whose left third is empty wall —
+       it was composed for a text card. Anchor right so the kitchen line shows. */
+    object-fit: cover;
+    object-position: right center;
+    display: block;
+  }
+  .weho-comm__link {
+    display: inline-block; margin-top: 4px;
+    font-family: var(--v2-font-body); font-size: 14px; font-weight: 600;
+    color: var(--v2-red); text-decoration: none;
+  }
+  .weho-comm__link:hover { text-decoration: underline; }
+
+  /* ── Pills ── */
+  .weho-pills { margin-top: 24px; }
+  .weho-pills__label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--v2-muted);
+    margin: 0 0 8px; font-family: var(--v2-font-body);
+  }
+  .weho-pills__row {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
+  }
+  /* ONE pill style, used by the commercial brand rows, the outdoor service chips
+     and the outdoor brand row. Extracted here rather than per-section so the three
+     rows cannot drift apart. At rollout this belongs in a cities/v2 component
+     alongside the equipment card below — see the note at the top of this block.
+     Motion is covered by the global prefers-reduced-motion rule in global.css;
+     focus by the global :focus-visible ring. */
+  .weho-pill {
+    display: inline-block;
+    padding: 8px 16px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 999px;
+    font-family: var(--v2-font-body);
+    font-size: 13px; font-weight: 600;
+    color: var(--v2-text); text-decoration: none;
+    transition: background 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
+  }
+  .weho-pill:hover {
+    background: var(--v2-red);
+    border-color: var(--v2-red);
+    color: var(--v2-white);
+  }
+
+  /* ── Equipment cards (commercial tier 2) ── */
+  /* the ice-machine link sits directly above; without this the "What we service"
+     label collides with it */
+  .weho-equip { margin-top: 22px; }
+  /* Explicit column counts, not auto-fit. auto-fit(minmax(190px,1fr)) resolved to
+     5 columns at 1100px and collapsed to 1 at 390px — the "3 across" it happened to
+     give here was just this text column's width, not the rule. Measured, then fixed. */
+  .weho-equip__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .weho-equip__card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 10px;
+    font-family: var(--v2-font-body);
+    font-size: 13px; font-weight: 600;
+    color: var(--v2-text); text-decoration: none;
+    transition: border-color 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--ease);
+  }
+  .weho-equip__card:hover {
+    border-color: var(--v2-red);
+    color: var(--v2-red);
+    transform: translateY(-2px);
+  }
+  .weho-equip__icon { flex-shrink: 0; color: var(--v2-red); }
+  .weho-equip__card:hover .weho-equip__icon { color: var(--v2-red); }
+
+  /* ── Sectional fee badge ──
+     One shared treatment for both sections so the pair reads as a set. The price
+     itself is the only red element — it is the thing being scanned for. */
+  .weho-fee {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 20px 0 0;
+    padding: 12px 18px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 10px;
+    font-family: var(--v2-font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--v2-text);
+  }
+  .weho-fee__amount {
+    color: var(--v2-red);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .weho-fee__note { color: var(--v2-muted); font-weight: 500; }
+
+  /* ── Outdoor ── */
+  .weho-outdoor { padding: 72px 0; background: var(--v2-white); }
+  /* :not(:hover) matters. This section is white, so its pills need a grey fill to
+     separate — but `.weho-outdoor .weho-pill` and `.weho-pill:hover` have the SAME
+     specificity (0,2,0), and this rule is declared later, so it also beat the hover
+     background. The hover colour (white text) still applied, leaving white-on-grey
+     ~1.07:1 — the label vanished on hover. Scoping to :not(:hover) hands the hover
+     state back to the shared rule. */
+  .weho-outdoor .weho-pill:not(:hover) { background: var(--v2-gray); }
+  /* the commercial section is grey, so its badge needs the white card to read;
+     on the white outdoor section invert to grey for the same separation */
+  .weho-outdoor .weho-fee { background: var(--v2-gray); }
+
+  /* ── Service links ── */
+  .weho-svc { padding: 72px 0; background: var(--v2-gray); }
+  .weho-svc__intro { max-width: 760px; margin-bottom: 28px; }
+  .weho-svc__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .weho-svc__card {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 16px 18px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 10px;
+    font-family: var(--v2-font-body);
+    font-size: 14px; font-weight: 600;
+    color: var(--v2-text); text-decoration: none;
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .weho-svc__card:hover { border-color: var(--v2-red); transform: translateY(-1px); }
+  .weho-svc__arrow { color: var(--v2-red); font-weight: 700; }
+
+  @media (max-width: 1024px) {
+    .weho-comm__grid { grid-template-columns: 1fr; }
+    .weho-svc__grid { grid-template-columns: repeat(3, 1fr); }
+  }
+  @media (max-width: 768px) {
+    .weho-comm__h2 { font-size: 24px; }
+    .weho-svc__grid { grid-template-columns: repeat(2, 1fr); }
+    .weho-equip__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

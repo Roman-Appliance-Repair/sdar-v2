@@ -12,6 +12,10 @@ export interface Props {
   brands: string[];
   stats?: Array<{ num: string; label: string }>;
   citySlug: string;
+  /** Optional line under the brand pills, for pointing at an adjacent specialty
+   *  (e.g. built-in refrigeration). Absent by default, so cities that do not pass
+   *  it render exactly as before. `lead` is plain prose; `linkText` is the anchor. */
+  footnote?: { lead: string; linkText: string; href: string };
 }
 
 const defaultStats = [
@@ -28,7 +32,8 @@ const {
   paragraphs,
   brands,
   stats = defaultStats,
-  citySlug
+  citySlug,
+  footnote
 } = Astro.props;
 
 const photoSrc = `/images/cities/${citySlug}/luxury-repair.webp`;
@@ -61,6 +66,12 @@ const photoAlt = `Sub-Zero / Wolf / Thermador appliance repair ${cityName}`;
             );
           })}
         </div>
+        {footnote && (
+          <p class="v2-luxury__footnote">
+            {footnote.lead}{' '}
+            <a href={footnote.href}>{footnote.linkText} →</a>
+          </p>
+        )}
       </div>
       <aside class="v2-luxury__stats">
         {stats.map((s) => (
@@ -126,6 +137,26 @@ const photoAlt = `Sub-Zero / Wolf / Thermador appliance repair ${cityName}`;
   }
   a.v2-luxury__brand:hover {
     text-decoration: underline;
+  }
+  /* Footnote line under the brand pills. Matches the section's own link
+     convention (.v2-luxury__brand): white text, underline on hover — NOT red.
+     var(--v2-red) on this black is 3.37:1, which fails AA for body text, so the
+     accent here has to be weight/underline rather than colour. */
+  .v2-luxury__footnote {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--muted-on-dark);
+    margin: 18px 0 0;
+    font-family: var(--v2-font-body);
+  }
+  .v2-luxury__footnote a {
+    color: var(--v2-white);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  }
+  .v2-luxury__footnote a:hover {
+    border-bottom-color: var(--v2-white);
   }
   .v2-luxury__stats {
     display: grid;

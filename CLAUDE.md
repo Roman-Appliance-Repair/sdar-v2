@@ -102,7 +102,7 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 - Видимый UI: никаких `aggregateRating`, `4.6 / 37 reviews`, `BBB A+`, `HVAC 777 LLC` (кроме footer copyright), `streetAddress` (кроме WeHo pin pages)
 - BBB: только «BBB Accredited» / «BBB Accredited Business», никогда «BBB A+» (false claim — real grade = A)
 - Cred labeling: «BHGS #A49573», «EPA 608 Universal», «CSLB C-20 HVAC #1138898». Никогда: «BHGS Licensed», «CSLB License #A49573», «CA BHGS»
-- Цены: $89 ИЛИ $120 на одной странице, не оба
+- Цены: базовая цена страницы — по основной аудитории ($89 residential на city pillars). Секционные цены ОК: $120 внутри коммерческой секции, $89 внутри outdoor/residential. Два ценника рядом в одном блоке (hero, pricing cards, FAQ) — никогда. См. @docs/factual-accuracy.md §9
 - Wood-burning fireplaces исключены (SCAQMD restrictions) — only gas
 - Wolf не делает residential refrigerators / dishwashers; Sub-Zero не делает dishwashers; KitchenAid и JennAir не продают washers/dryers в США
 
