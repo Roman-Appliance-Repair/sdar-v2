@@ -117,27 +117,51 @@ const ogImage = new URL(image, siteUrl).toString();
     </script>
     <!-- End Microsoft Clarity -->
 
-    <!-- Google Tag Manager — zero-impact lazy load -->
+    <!-- Google Tag Manager — early idle load + resilient tel: tracking -->
     <script>
       (function() {
+        window.dataLayer = window.dataLayer || [];
+
+        // Resilient phone-tap signal — fires on EVERY tel: click in the capture
+        // phase, independent of GTM load timing, and queues in dataLayer so it
+        // survives even if a fast tap happens before GTM finishes loading.
+        // GTM setup: wire a "Custom Event = phone_call_click" trigger to the GA4
+        // click_phone_number tag AND retire the old "Just Links" trigger so the
+        // two never double-count. Until that swap, this push is inert (no matching
+        // trigger) and click_phone_number keeps firing via Just Links below.
+        document.addEventListener('click', function(e) {
+          var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"]') : null;
+          if (!a) return;
+          window.dataLayer.push({
+            event: 'phone_call_click',
+            link_url: a.getAttribute('href'),
+            page_path: location.pathname
+          });
+        }, true);
+
+        // Load GTM as soon as the browser is idle — NOT gated behind a first user
+        // interaction. The old gate lost ~99% of phone taps: on mobile the tap that
+        // was the first interaction happened before GTM's link listener existed, so
+        // the auto-event "Just Links" trigger never saw it.
         var loaded = false;
         function loadGTM() {
           if (loaded) return;
           loaded = true;
-          window.dataLayer = window.dataLayer || [];
           window.dataLayer.push({'gtm.start': Date.now(), event: 'gtm.js'});
           var s = document.createElement('script');
           s.async = true;
           s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-M43LT47K';
           document.head.appendChild(s);
         }
-        var events = ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'];
-        function trigger() {
-          events.forEach(function(e) { window.removeEventListener(e, trigger); });
-          ('requestIdleCallback' in window) ? requestIdleCallback(loadGTM, {timeout: 2000}) : setTimeout(loadGTM, 200);
+        function schedule() {
+          ('requestIdleCallback' in window) ? requestIdleCallback(loadGTM, {timeout: 1500}) : setTimeout(loadGTM, 300);
         }
-        events.forEach(function(e) { window.addEventListener(e, trigger, {once: true, passive: true}); });
-        setTimeout(trigger, 4000);
+        (document.readyState === 'loading') ? window.addEventListener('DOMContentLoaded', schedule) : schedule();
+        // Fallbacks: any interaction, and a hard 3s cap for idle / bot sessions.
+        ['scroll', 'touchstart', 'click', 'keydown'].forEach(function(e) {
+          window.addEventListener(e, loadGTM, {once: true, passive: true});
+        });
+        setTimeout(loadGTM, 3000);
       })();
     </script>
     <!-- End Google Tag Manager -->
