@@ -1,0 +1,119 @@
+---
+/** v2 OutdoorSection — outdoor kitchen / patio block for a city pillar.
+ *
+ *  Same two-column shape as CommercialSection (photo right), same pill style —
+ *  the pill rule is declared globally in CommercialSection so both sections share
+ *  one definition and cannot drift.
+ *
+ *  Scope note: outdoor is RESIDENTIAL pricing ($89), not commercial — see
+ *  docs/factual-accuracy.md §9 "/outdoor/ = $89 universally". Callers pass the fee,
+ *  but that is the only correct value here.
+ */
+import FeeBadge from './FeeBadge.astro';
+
+export interface Props {
+  cityName: string;
+  eyebrow?: string;
+  headline: string;
+  paragraphs: string[];
+  serviceChips: Array<{ name: string; href: string }>;
+  brandPills?: Array<{ name: string; href: string }>;
+  brandLabel?: string;
+  fee?: { label: string; amount: string; note: string };
+  photoSrc?: string;
+  photoAlt?: string;
+}
+
+const {
+  cityName,
+  eyebrow = 'Outdoor Kitchens & Patio Equipment',
+  headline,
+  paragraphs,
+  serviceChips,
+  brandPills = [],
+  brandLabel = 'Premium outdoor brands',
+  fee,
+  photoSrc = '/images/outdoor/kitchen-repair/hero.webp',
+  photoAlt = `Built-in outdoor kitchen with grill island and undercounter refrigerator — outdoor appliance repair in ${cityName}`
+} = Astro.props;
+---
+
+<section class="v2-outdoor">
+  <div class="v2-container">
+    <div class="v2-outdoor__grid">
+      <div>
+        <p class="v2-outdoor__eyebrow">{eyebrow}</p>
+        <h2 class="v2-outdoor__h2">{headline}</h2>
+        {paragraphs.map((p) => (<p class="v2-outdoor__p" set:html={p}></p>))}
+
+        <div class="v2-pills__row">
+          {serviceChips.map((c) => (<a class="v2-pill" href={c.href}>{c.name}</a>))}
+        </div>
+
+        {brandPills.length > 0 && (
+          <>
+            <p class="v2-pills__label">{brandLabel}</p>
+            <div class="v2-pills__row">
+              {brandPills.map((b) => (<a class="v2-pill" href={b.href}>{b.name}</a>))}
+            </div>
+          </>
+        )}
+
+        {fee && <FeeBadge label={fee.label} amount={fee.amount} note={fee.note} />}
+      </div>
+
+      <aside>
+        <div class="v2-outdoor__photo">
+          <img src={photoSrc} alt={photoAlt} width="540" height="320" loading="lazy" decoding="async" />
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-outdoor { padding: 72px 0; background: var(--v2-white); }
+  .v2-outdoor__grid {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 40px;
+    align-items: start;
+  }
+  .v2-outdoor__eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--v2-red);
+    margin: 0 0 10px; font-family: var(--v2-font-body);
+  }
+  .v2-outdoor__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 30px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 16px;
+  }
+  .v2-outdoor__p {
+    font-size: 16px; line-height: 1.7; color: var(--v2-text);
+    margin: 0 0 16px; font-family: var(--v2-font-body);
+  }
+  .v2-outdoor__photo {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--v2-border);
+    aspect-ratio: 16 / 10;
+  }
+  .v2-outdoor__photo img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  @media (max-width: 1024px) { .v2-outdoor__grid { grid-template-columns: 1fr; } }
+  @media (max-width: 768px) { .v2-outdoor__h2 { font-size: 24px; } }
+</style>
+
+<style is:global>
+  /* This section is white, so its pills and fee badge need the grey fill to read.
+     :not(:hover) is load-bearing: `.v2-outdoor .v2-pill` and `.v2-pill:hover` have
+     IDENTICAL specificity (0,2,0), so whichever is declared later wins. Without the
+     guard this beat the hover background while the hover's white text still
+     applied — white-on-grey ~1.07:1, the label vanished on hover. Measured. */
+  .v2-outdoor .v2-pill:not(:hover) { background: var(--v2-gray); }
+  .v2-outdoor .v2-fee { background: var(--v2-gray); }
+</style>

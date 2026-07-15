@@ -1,0 +1,84 @@
+---
+/** v2 ServiceLinksGrid — the city's service-specific pages as one compact grid.
+ *
+ *  Replaces the legacy pattern of three near-identical "Tier 1 / Tier 2 / Tier 3"
+ *  sections, each with its own intro paragraph and a bulleted list, stacked with
+ *  ~48px of padding apiece. Same links, one section, no dead whitespace.
+ *
+ *  Link preservation is the whole point — callers pass every link the old sections
+ *  carried, in the same order. Nothing here filters.
+ */
+export interface Props {
+  cityName: string;
+  links: Array<{ name: string; href: string }>;
+  eyebrow?: string;
+  headline?: string;
+  intro?: string;
+}
+
+const {
+  cityName,
+  links,
+  eyebrow = `Service-specific pages for ${cityName}`,
+  headline = `${cityName} Appliance Repair by Service`,
+  intro = `Each page covers the brand pool, failure patterns, and pricing that actually apply to ${cityName} home stock and local conditions.`
+} = Astro.props;
+---
+
+<section class="v2-svc">
+  <div class="v2-container">
+    <p class="v2-svc__eyebrow">{eyebrow}</p>
+    <h2 class="v2-svc__h2">{headline}</h2>
+    <p class="v2-svc__intro">{intro}</p>
+    <div class="v2-svc__grid">
+      {links.map((s) => (
+        <a class="v2-svc__card" href={s.href}>
+          <span>{s.name}</span>
+          <span class="v2-svc__arrow">→</span>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .v2-svc { padding: 72px 0; background: var(--v2-gray); }
+  .v2-svc__eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--v2-red);
+    margin: 0 0 10px; font-family: var(--v2-font-body);
+  }
+  .v2-svc__h2 {
+    font-family: var(--v2-font-display);
+    font-size: 30px; font-weight: 700; color: var(--v2-black);
+    margin: 0 0 16px;
+  }
+  .v2-svc__intro {
+    font-size: 16px; line-height: 1.7; color: var(--v2-text);
+    margin: 0 0 28px; max-width: 760px; font-family: var(--v2-font-body);
+  }
+  .v2-svc__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .v2-svc__card {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    padding: 16px 18px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 10px;
+    font-family: var(--v2-font-body);
+    font-size: 14px; font-weight: 600;
+    color: var(--v2-text); text-decoration: none;
+    transition: border-color 150ms var(--ease), transform 150ms var(--ease);
+  }
+  .v2-svc__card:hover { border-color: var(--v2-red); transform: translateY(-1px); }
+  .v2-svc__arrow { color: var(--v2-red); font-weight: 700; }
+
+  @media (max-width: 1024px) { .v2-svc__grid { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 768px) {
+    .v2-svc__h2 { font-size: 24px; }
+    .v2-svc__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

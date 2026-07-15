@@ -1,0 +1,53 @@
+---
+/** v2 FeeBadge — sectional diagnostic fee.
+ *
+ *  Per docs/factual-accuracy.md §9 (amended 2026-07-15): a mixed-scope page keeps a
+ *  base price set by its primary audience, and a section may state its OWN fee
+ *  inside itself. This renders that sectional fee. It must never sit next to a
+ *  second price in the same block — that is still forbidden.
+ *
+ *  The price is the only red element: it is the thing being scanned for.
+ */
+export interface Props {
+  /** e.g. "Commercial diagnostic" or "Diagnostic" */
+  label: string;
+  /** e.g. "$120" — the amount, rendered as the accent */
+  amount: string;
+  /** e.g. "waived when you approve the repair" — the leading "· " is added here */
+  note: string;
+}
+const { label, amount, note } = Astro.props;
+---
+
+<p class="v2-fee">
+  {label} <strong class="v2-fee__amount">{amount}</strong>
+  <span class="v2-fee__note">· {note}</span>
+</p>
+
+<style>
+  .v2-fee {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    margin: 20px 0 0;
+    padding: 12px 18px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 10px;
+    font-family: var(--v2-font-body);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--v2-text);
+  }
+  .v2-fee__amount {
+    color: var(--v2-red);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .v2-fee__note {
+    color: var(--v2-muted);
+    font-weight: 500;
+  }
+  /* On a white section the white card would vanish; the parent section opts it to
+     grey via :global(.v2-outdoor) .v2-fee — see OutdoorSection. */
+</style>
