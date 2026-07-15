@@ -57,13 +57,21 @@ const CONVENTION_SLOTS = [
 ];
 
 const rows = [];
-const add = (page_url, page_type, slot_type, expected_path) =>
+const has = (p) => existsSync(path.join(PUBLIC, p.replace(/^\//, '')));
+
+/**
+ * @param alsoRequire extra sibling files that must ALSO exist for the slot to
+ *   render. ServiceHero MODE A gates on webp AND jpg together
+ *   ([city]/[service].astro: hasComboPhoto), so a lone .webp still renders the
+ *   text hero — checking only .webp would report a gap as filled.
+ */
+const add = (page_url, page_type, slot_type, expected_path, alsoRequire = []) =>
   rows.push({
     page_url,
     page_type,
     slot_type,
     expected_path,
-    exists: existsSync(path.join(PUBLIC, expected_path.replace(/^\//, ''))) ? 'yes' : 'no',
+    exists: has(expected_path) && alsoRequire.every(has) ? 'yes' : 'no',
   });
 
 // ── City pillars ────────────────────────────────────────────────────────────
@@ -94,9 +102,16 @@ for (const { city, service } of CITY_SERVICE_MATRIX) {
     `/${city}/${service}/`,
     'city_service',
     'hero',
-    `/images/city-service/${city}/${service}/hero.webp`
+    `/images/city-service/${city}/${service}/hero.webp`,
+    [`/images/city-service/${city}/${service}/hero.jpg`] // MODE A needs both
   );
 }
+
+// ── Orphan image sets: photos on disk with no page to render them ───────────
+const pillarSlugs = new Set(pillars.map((p) => p.slug));
+const orphanCityImages = readdirSync(path.join(PUBLIC, 'images', 'cities')).filter(
+  (slug) => !pillarSlugs.has(slug)
+);
 
 // ── Write CSV ───────────────────────────────────────────────────────────────
 mkdirSync(OUT_DIR, { recursive: true });
@@ -145,6 +160,11 @@ if (missing.length) {
   }
   console.log('\nMissing rows:');
   for (const r of missing) console.log('  ' + r.page_url + '  ' + r.expected_path);
+}
+
+if (orphanCityImages.length) {
+  console.log('\nOrphan image sets (photos on disk, no pillar page renders them):');
+  for (const s of orphanCityImages) console.log('  /images/cities/' + s + '/');
 }
 
 console.log('\nNot counted as gaps (no file can fill them today):');
