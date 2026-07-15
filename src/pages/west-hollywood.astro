@@ -218,6 +218,61 @@ const iceBrands = [
   { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
 ];
 
+// Tier 2 of the commercial link system: equipment-type hubs, not brands. All six
+// verified against dist as real rendered pages (no redirect stubs). Icons are
+// inline 20px single-colour SVG paths — no icon library, nothing to load.
+const commercialEquipment = [
+  {
+    name: 'Walk-in coolers',
+    href: '/commercial/refrigeration/walk-in-cooler-repair/',
+    // snowflake
+    icon: 'M12 2v20M12 2 9.5 4.5M12 2l2.5 2.5M12 22l-2.5-2.5M12 22l2.5-2.5M2.7 7l17.3 10M2.7 7l.9 3.4M2.7 7l3.4-.9M20 17l-3.4.9M20 17l-.9-3.4M2.7 17 20 7M2.7 17l3.4.9M2.7 17l.9-3.4M20 7l-.9 3.4M20 7l-3.4-.9'
+  },
+  {
+    name: 'Pizza ovens',
+    href: '/commercial/pizza-oven-repair/',
+    // Domed oven with an arched mouth + chimney. A flame was the obvious pick, but
+    // at 20px its silhouette is a teardrop — indistinguishable from the dishwasher
+    // droplet two cards over. The dome reads as an oven and shares no outline.
+    icon: 'M2.5 19.5h19M4.5 19.5a7.5 7.5 0 0 1 15 0M9.8 19.5a2.2 2.2 0 0 1 4.4 0M12 5.6V3.2M12 3.2h3'
+  },
+  {
+    name: 'Fryers',
+    href: '/commercial/fryer-repair/',
+    // fryer basket
+    icon: 'M4 8h16l-1.4 11.2a2 2 0 0 1-2 1.8H7.4a2 2 0 0 1-2-1.8L4 8Zm4 3v7m4-7v7m4-7v7M14 8l4.5-4.5a1.8 1.8 0 0 1 2.6 2.6L19 8'
+  },
+  {
+    name: 'Commercial ovens',
+    href: '/commercial/oven-repair/',
+    // oven
+    icon: 'M4 3h16a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm0 6h17M6.5 6h.01M10 6h.01M6 12h12v6H6z'
+  },
+  {
+    name: 'Dishwashers',
+    href: '/commercial/dishwasher-repair/',
+    // droplet
+    icon: 'M12 2.7s6 6.3 6 10.3a6 6 0 0 1-12 0c0-4 6-10.3 6-10.3Zm0 15.6a5 5 0 0 0 3.5-1.5'
+  },
+  {
+    name: 'Laundry',
+    href: '/commercial/laundry-repair/',
+    // shirt
+    icon: 'M8 3 4.5 5 3 9l3 1.2V21h12V10.2L21 9l-1.5-4L16 3l-2 2h-4L8 3Z'
+  }
+];
+
+// Premium outdoor brands — all five verified as real pages under /outdoor/brands/.
+// Coyote, Bull and Fire Magic also exist but sit a tier below; WeHo's outdoor stock
+// is the premium built-in end, so these five match the audience.
+const outdoorBrands = [
+  { name: 'Kalamazoo', href: '/outdoor/brands/kalamazoo/' },
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'Twin Eagles', href: '/outdoor/brands/twin-eagles/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' },
+  { name: 'Viking', href: '/outdoor/brands/viking/' }
+];
+
 // Outdoor links — verified present in dist. /outdoor/refrigerator-repair/ does not
 // exist; the outdoor-refrigerator page lives under /services/, so that is used.
 const outdoorLinks = [
@@ -326,6 +381,27 @@ const commercialNarrative = {
             <a class="weho-comm__link" href="/commercial/ice-machines/">Commercial ice machine repair →</a>
           </div>
 
+          {/* Tier 2: equipment type, not brand. Brands answer "do you touch my
+              machine"; this answers "do you touch my category" — the two searches
+              are different, so they get separate rows. */}
+          <div class="weho-equip">
+            <p class="weho-pills__label">What we service</p>
+            <div class="weho-equip__grid">
+              {commercialEquipment.map((e) => (
+                <a class="weho-equip__card" href={e.href}>
+                  <svg
+                    class="weho-equip__icon" viewBox="0 0 24 24" width="20" height="20"
+                    fill="none" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"
+                  >
+                    <path d={e.icon} />
+                  </svg>
+                  <span>{e.name}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+
           {/* Sectional fee. Per factual-accuracy.md §9 (as amended 2026-07-15) the
               page's base price stays $89 residential; $120 appears only inside this
               commercial section, never beside $89 in a shared block.
@@ -367,6 +443,13 @@ const commercialNarrative = {
           <div class="weho-pills__row">
             {outdoorLinks.map((l) => (
               <a class="weho-pill" href={l.href}>{l.name}</a>
+            ))}
+          </div>
+
+          <p class="weho-pills__label">Premium outdoor brands</p>
+          <div class="weho-pills__row">
+            {outdoorBrands.map((b) => (
+              <a class="weho-pill" href={b.href}>{b.name}</a>
             ))}
           </div>
 
@@ -492,18 +575,62 @@ const commercialNarrative = {
   .weho-pills__row {
     display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px;
   }
+  /* ONE pill style, used by the commercial brand rows, the outdoor service chips
+     and the outdoor brand row. Extracted here rather than per-section so the three
+     rows cannot drift apart. At rollout this belongs in a cities/v2 component
+     alongside the equipment card below — see the note at the top of this block.
+     Motion is covered by the global prefers-reduced-motion rule in global.css;
+     focus by the global :focus-visible ring. */
   .weho-pill {
     display: inline-block;
-    padding: 8px 14px;
+    padding: 8px 16px;
     background: var(--v2-white);
     border: 1px solid var(--v2-border);
-    border-radius: 20px;
+    border-radius: 999px;
     font-family: var(--v2-font-body);
     font-size: 13px; font-weight: 600;
     color: var(--v2-text); text-decoration: none;
-    transition: border-color 0.2s, color 0.2s;
+    transition: background 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease);
   }
-  .weho-pill:hover { border-color: var(--v2-red); color: var(--v2-red); }
+  .weho-pill:hover {
+    background: var(--v2-red);
+    border-color: var(--v2-red);
+    color: var(--v2-white);
+  }
+
+  /* ── Equipment cards (commercial tier 2) ── */
+  /* the ice-machine link sits directly above; without this the "What we service"
+     label collides with it */
+  .weho-equip { margin-top: 22px; }
+  /* Explicit column counts, not auto-fit. auto-fit(minmax(190px,1fr)) resolved to
+     5 columns at 1100px and collapsed to 1 at 390px — the "3 across" it happened to
+     give here was just this text column's width, not the rule. Measured, then fixed. */
+  .weho-equip__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .weho-equip__card {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--v2-white);
+    border: 1px solid var(--v2-border);
+    border-radius: 10px;
+    font-family: var(--v2-font-body);
+    font-size: 13px; font-weight: 600;
+    color: var(--v2-text); text-decoration: none;
+    transition: border-color 150ms var(--ease), color 150ms var(--ease), transform 150ms var(--ease);
+  }
+  .weho-equip__card:hover {
+    border-color: var(--v2-red);
+    color: var(--v2-red);
+    transform: translateY(-2px);
+  }
+  .weho-equip__icon { flex-shrink: 0; color: var(--v2-red); }
+  .weho-equip__card:hover .weho-equip__icon { color: var(--v2-red); }
 
   /* ── Sectional fee badge ──
      One shared treatment for both sections so the pair reads as a set. The price
@@ -531,7 +658,13 @@ const commercialNarrative = {
 
   /* ── Outdoor ── */
   .weho-outdoor { padding: 72px 0; background: var(--v2-white); }
-  .weho-outdoor .weho-pill { background: var(--v2-gray); }
+  /* :not(:hover) matters. This section is white, so its pills need a grey fill to
+     separate — but `.weho-outdoor .weho-pill` and `.weho-pill:hover` have the SAME
+     specificity (0,2,0), and this rule is declared later, so it also beat the hover
+     background. The hover colour (white text) still applied, leaving white-on-grey
+     ~1.07:1 — the label vanished on hover. Scoping to :not(:hover) hands the hover
+     state back to the shared rule. */
+  .weho-outdoor .weho-pill:not(:hover) { background: var(--v2-gray); }
   /* the commercial section is grey, so its badge needs the white card to read;
      on the white outdoor section invert to grey for the same separation */
   .weho-outdoor .weho-fee { background: var(--v2-gray); }
@@ -565,5 +698,6 @@ const commercialNarrative = {
   @media (max-width: 768px) {
     .weho-comm__h2 { font-size: 24px; }
     .weho-svc__grid { grid-template-columns: repeat(2, 1fr); }
+    .weho-equip__grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
