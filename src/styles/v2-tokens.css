@@ -60,8 +60,23 @@
   width: 56px;
   height: 56px;
   color: rgba(255, 255, 255, 0.18);
-  position: relative;
+  /* Out of flow: the slot is a flex container and the glyph is a SIBLING of
+     <picture>, so in-flow it stole ~53px of width and letterboxed the photo
+     next to it. Absolute keeps it centred (a flex container positions an
+     abspos child at its align/justify static position) while letting the photo
+     fill the slot. It stays as the empty-state marker underneath. */
+  position: absolute;
   z-index: 1;
+}
+/* Fill the slot and paint over the empty-state glyph. Until this pilot every
+   slot was empty, so nothing ever exercised the filled state: the photo came out
+   letterboxed beside the glyph instead of covering it. When the photo is missing
+   the components' onerror hides the <img>, leaving this box transparent and the
+   glyph visible underneath — the empty state still works. */
+.v2-photo-slot picture {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
 }
 .v2-photo-slot img {
   width: 100%;
