@@ -13,7 +13,7 @@
 - **Юр. лицо:** HVAC 777 LLC dba Same Day Appliance Repair (в visible UI только в footer copyright line; в JSON-LD `legalName` во всех LocalBusiness schemas site-wide через `src/data/credentials-schema.ts` → `mergeCredentials()` helper)
 - **Зоны:** 5 каунти SoCal — LA, Orange, Ventura, San Bernardino, Riverside
 - **Часы:** Пн–Сб 8:00–20:00, Вс закрыто. Звонки принимаются 24/7
-- **Цены:** $89 residential / $120 commercial (waived с repair). НИКОГДА не смешивать на одной странице
+- **Цены:** $89 residential / $120 commercial (waived с repair). На mixed-scope страницах — базовая по основной аудитории, секционные цены внутри своих секций; два ценника рядом в одном блоке — никогда. См. §5 + @docs/factual-accuracy.md §9
 - **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, эмитится в schema на 4 pin pages: `/`, `/west-hollywood/`, `/contact/` (в WeHo entry), `/book/`
 - **Aggregate Rating:** не используется нигде (ни в JSON-LD, ни в visible UI). Google берёт rating напрямую из GMB. См. @docs/factual-accuracy.md §6
 - **Технари в текстах:** Mikhail V., Artur S., David K.
