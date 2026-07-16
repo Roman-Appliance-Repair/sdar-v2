@@ -29,6 +29,8 @@ import PricingCards from '../components/cities/v2/PricingCards.astro';
 import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
 import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
 import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import { CITIES } from '../data/cities';
 import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
@@ -240,6 +242,61 @@ const nearbyCities = [
   { name: 'Eagle Rock', slug: 'eagle-rock' },
   { name: 'Silver Lake', slug: 'silver-lake' }
 ];
+
+// Commercial brand pills + equipment cards — same verified sets the WeHo template
+// uses. Ice brands point at /commercial/ice-machines/brands/ because the context is ice.
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' },
+      { name: 'Perlick', href: '/commercial/refrigeration/brands/perlick/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Pizza ovens', href: '/commercial/pizza-oven-repair/', icon: 'pizza-oven' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+const commercialNarrative = {
+  eyebrow: 'COMMERCIAL KITCHENS',
+  headline: 'Glendale Restaurant & Kitchen Service',
+  paragraphs: [
+    `Brand Blvd runs the length of downtown, and the kitchens along it keep our techs busy — the Americana dining rooms, the older independents down toward Colorado Blvd, and the Armenian and Mediterranean places that give this city a kebab scene the rest of LA underrates. Charbroilers and high-volume ranges take a beating in rooms like that. Up in Montrose the scale changes completely: smaller dining rooms, tighter equipment closets, a walk-in wedged wherever it fit rather than where a service tech would want it. We work both ends of that. When a Brand Blvd kitchen loses its <a href="/commercial/ice-machines/">commercial ice machine</a> on a Friday, or a Montrose cafe has a <a href="/commercial/dishwasher-repair/">commercial dishwasher</a> that won't drain before the lunch rush, those calls move up the queue. We cover <a href="/commercial/refrigeration/">commercial refrigeration</a> and walk-in service across the city too.`
+  ]
+};
+
+// Outdoor service chips — verified present in dist. /outdoor/refrigerator-repair/
+// does not exist; the outdoor-refrigerator page lives under /services/.
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' }
+];
+
+const outdoorParagraphs = [
+  `Glendale's outdoor equipment is practical rather than showpiece, and we'd rather say so than oversell it. The hillside houses in Verdugo Woodlands and Chevy Chase Canyon usually have a built-in grill on a back patio and not much beyond it. Rossmoyne and Adams Hill yards run smaller still. What we get called for is ordinary and fixable — igniters that stopped sparking, burners lighting unevenly after a season under no cover, a patio heater that won't stay lit the first cold week anyone wants it. The city sits far enough inland that salt corrosion isn't part of the picture, so what we're fixing is wear.`
+];
+
 ---
 
 <CityLayoutV2
@@ -288,6 +345,25 @@ const nearbyCities = [
     headline={glendaleContextNarrative.headline}
     paragraphs={glendaleContextNarrative.paragraphs}
     background="black"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow={commercialNarrative.eyebrow}
+    headline={commercialNarrative.headline}
+    paragraphs={commercialNarrative.paragraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Backyard Grills and Patio Equipment in Glendale"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <RecentRepairs
