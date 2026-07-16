@@ -1,17 +1,111 @@
 ---
-/** v2 ServicesGrid — 8 service cards (icon + name + issues + brands + Learn more →).
- *  Service links route to canonical /services/{slug}-repair/ hubs (Option C). */
+/** v2 ServicesGrid — service cards (icon + name + issues + brands + Learn more →).
+ *  Service links route to canonical /services/{slug}-repair/ hubs (Option C).
+ *
+ *  ICONS (2026-07-16): the emoji that pages pass in `icon` are no longer rendered. Icons are
+ *  now inline SVG keyed on `slug`, in the same visual language as CommercialSection's ICONS
+ *  map — 24px viewBox, fill none, currentColor, stroke 1.6, round caps/joins, one path each.
+ *
+ *  Keyed on SLUG, not on the emoji, deliberately. The emoji were never consistent: the same
+ *  service carries different characters across pages (refrigerator is ❄️ on some, 🧊 on
+ *  others, 🔧 on one; cooktop is ♨️/⚡/🍳/🔆). `slug` is the only stable key, and it is
+ *  already what the card links on. The `icon` prop stays in the interface so no page has to
+ *  change — it is now unused, and pages may drop it whenever they are next touched.
+ *
+ *  There are 20 distinct slugs in use across the 87 pillars, not the 12 core ones — the tail
+ *  (commercial-refrigerator, range-hood, outdoor-appliance, ice-machine, bbq, wine-cellar,
+ *  wall-heater, commercial) is small but real. All 20 are drawn. UNKNOWN_ICON is the explicit
+ *  fallback: CommercialSection does `ICONS[e.icon]` with no fallback and renders an empty
+ *  <path> silently when a key is missing, which is a bug class that no build gate catches.
+ *  This component never does that — an unmapped slug gets a visible generic wrench.
+ */
 
 export interface ServiceCard {
-  icon: string;
+  /** @deprecated emoji, no longer rendered — icons are keyed on `slug`. Kept so pages need no edit. */
+  icon?: string;
   name: string;
-  /** slug WITHOUT "-repair" suffix; component appends it */
+  /** slug WITHOUT "-repair" suffix; component appends it. Also the icon key. */
   slug: string;
   /** Optional — omit for 2-tier (icon + name + cta only). */
   issues?: string;
   /** Optional — omit for 2-tier. */
   brands?: string;
 }
+
+/** Explicit fallback — a wrench. Visible and obviously generic, never a blank card. */
+const UNKNOWN_ICON =
+  'M14.7 6.3a3.9 3.9 0 0 0 5 5l-8.6 8.6a2.1 2.1 0 0 1-3-3l8.6-8.6a3.9 3.9 0 0 0-5-5l2.6 2.6-2.4 2.4-2.6-2.6a3.9 3.9 0 0 0 1.4 3.6Z';
+
+const ICONS: Record<string, string> = {
+  // — the 12 core services —
+  // fridge: tall box, divider, two handles
+  refrigerator:
+    'M6 2.5h12a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H6A1.5 1.5 0 0 1 4.5 20V4A1.5 1.5 0 0 1 6 2.5Z M4.5 9.5h15 M7.8 5.6v2.2 M7.8 11.6v2.6',
+  // washer: box, porthole drum, concentric inner ring
+  washer:
+    'M4.5 2.5h15v19h-15z M4.5 6.5h15 M7.2 4.5h.01 M10 4.5h.01 M12 18.5a4.8 4.8 0 1 0 0-9.6 4.8 4.8 0 0 0 0 9.6Z M12 15.6a1.9 1.9 0 1 0 0-3.8 1.9 1.9 0 0 0 0 3.8Z',
+  // dryer: box, drum, three dots (the tumble-dry mark). Dots read at 24px; the wave crests
+  // this first carried did not — they collapsed into a blob and only the silhouette separated
+  // it from `washer`. Verified on the 24px raster, not on the 3x preview.
+  dryer:
+    'M4.5 2.5h15v19h-15z M4.5 6.5h15 M7.2 4.5h.01 M10 4.5h.01 M12 18.8a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z M10 13.2h.01 M14 13.2h.01 M12 15.8h.01',
+  // dishwasher: box, control strip, rack tines, droplet
+  dishwasher:
+    'M4.5 2.5h15v19h-15z M4.5 7h15 M7 4.7h.01 M9.5 4.7h.01 M8 11v7 M12 11v7 M16 11v7 M17 3.4s1.4 1.6 1.4 2.5a1.4 1.4 0 0 1-2.8 0c0-.9 1.4-2.5 1.4-2.5Z',
+  // oven & range: front view — door window + handle, no burners (that's `stove`)
+  oven:
+    'M4 2.5h16a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H4a1.5 1.5 0 0 1-1.5-1.5V4A1.5 1.5 0 0 1 4 2.5Z M2.5 7.5h19 M5.5 5h.01 M8.5 5h.01 M6 10.5h12v8H6z M9 14.5h6',
+  // stove: range with burners on top + door (vs oven's plain door, vs cooktop's top-down rings)
+  stove:
+    'M4 6.5h16a1.5 1.5 0 0 1 1.5 1.5v12a1.5 1.5 0 0 1-1.5 1.5H4a1.5 1.5 0 0 1-1.5-1.5V8A1.5 1.5 0 0 1 4 6.5Z M2.5 11.5h19 M6.8 9a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2Z M17.2 9a1.6 1.6 0 1 0 0-3.2 1.6 1.6 0 0 0 0 3.2Z M6 14.5h12v5H6z',
+  // microwave: wide box, door split, control panel, waves
+  microwave:
+    'M2.5 5.5h19v13h-19z M15.5 5.5v13 M17.4 8.8h2.2 M17.4 11.5h2.2 M17.4 15.6h2.2 M5.2 10c.8-.9 1.6-.9 2.4 0 .8.9 1.6.9 2.4 0 M5.2 13.4c.8-.9 1.6-.9 2.4 0 .8.9 1.6.9 2.4 0',
+  // ice maker: a single 3D ice cube
+  'ice-maker':
+    'M12 2.6 20 6.9v10.2L12 21.4 4 17.1V6.9L12 2.6Z M4 6.9 12 11.2l8-4.3 M12 11.2v10.2',
+  // wine cooler: glass with stem and base
+  'wine-cooler':
+    'M7.5 3h9l-.7 5.4a3.9 3.9 0 0 1-7.6 0L7.5 3Z M7.9 6.6h8.2 M12 12.3v6.2 M8.6 21h6.8',
+  // freezer: box + a bare 3-axis snowflake. The barbed 6-arm version turned to mush inside
+  // 10px of drawable area — barbs are the first thing to go at this size. Three clean axes
+  // still read as cold and stay distinct from refrigerator's divider + handles.
+  freezer:
+    'M4.5 2.5h15v19h-15z M12 6.6v10.8 M7.3 9.3l9.4 5.4 M16.7 9.3l-9.4 5.4',
+  // garbage disposal: sink basin + drain swirl
+  'garbage-disposal':
+    'M3 7.5h18 M4.6 7.5l1 4.6a3 3 0 0 0 2.9 2.4h7a3 3 0 0 0 2.9-2.4l1-4.6 M12 7.5V4.2a2 2 0 0 1 2-2h2.6 M12 18.2a2.1 2.1 0 1 0 0-4.2 2.1 2.1 0 0 0 0 4.2Z M12 21.6v-3.4',
+  // cooktop: top-down — plate with four rings of two sizes
+  cooktop:
+    'M3.5 3.5h17a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1h-17a1 1 0 0 1-1-1v-15a1 1 0 0 1 1-1Z M8.2 10.6a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z M16.2 9.8a1.9 1.9 0 1 0 0-3.8 1.9 1.9 0 0 0 0 3.8Z M8.2 18.4a1.9 1.9 0 1 0 0-3.8 1.9 1.9 0 0 0 0 3.8Z M16.2 18.6a2.6 2.6 0 1 0 0-5.2 2.6 2.6 0 0 0 0 5.2Z',
+
+  // — the tail: 8 more slugs that are really in use —
+  // commercial fridge: double upright, two doors (vs residential's divider)
+  'commercial-refrigerator':
+    'M4.5 2.5h15v19h-15z M12 2.5v19 M9 8v3 M15 8v3 M4.5 2.5h15 M7 21.5v1.4 M17 21.5v1.4',
+  // range hood: canopy + rising air
+  'range-hood':
+    'M2.5 10.5 6 4.5h12l3.5 6h-19Z M2.5 10.5h19v3h-19z M8 17.4c.8-.9 1.6-.9 2.4 0 .8.9 1.6.9 2.4 0 M9.2 20.6c.8-.9 1.6-.9 2.4 0 .8.9 1.6.9 2.4 0',
+  // outdoor kitchen: counter island with a grill set into it
+  'outdoor-appliance':
+    'M2.5 11.5h19v3h-19z M4.5 14.5v6 M19.5 14.5v6 M7.5 11.5a4.5 4.5 0 0 1 9 0 M12 4.5V2.6 M9.5 17.5h5',
+  // ice machine: cabinet with a cube inside (vs the bare cube of ice-maker)
+  'ice-machine':
+    'M4 2.5h16a1.5 1.5 0 0 1 1.5 1.5v16a1.5 1.5 0 0 1-1.5 1.5H4a1.5 1.5 0 0 1-1.5-1.5V4A1.5 1.5 0 0 1 4 2.5Z M2.5 8h19 M12 10 17 12.7v4.6L12 20l-5-2.7v-4.6L12 10Z M7 12.7 12 15.4l5-2.7',
+  // bbq: kettle grill — dome, grate line, legs
+  bbq:
+    'M3.5 9.5h17a8.5 8.5 0 0 1-17 0Z M3.5 9.5h17 M6.5 15.6 4.2 21.4 M17.5 15.6l2.3 5.8 M9.5 6.2V4 M12 6.2V3.2 M14.5 6.2V4',
+  // wine cellar: bottles on a rack (vs the single glass of wine-cooler)
+  'wine-cellar':
+    'M3.5 3.5h17v17h-17z M3.5 12h17 M7.3 3.5v8.5 M12 3.5v8.5 M16.7 3.5v8.5 M7.3 12v8.5 M12 12v8.5 M16.7 12v8.5',
+  // wall heater: panel with HORIZONTAL fins + heat rising. Vertical bars (the first draft)
+  // made this read as wine-cellar's rack at 24px — the two were the same silhouette.
+  'wall-heater':
+    'M3.5 6.5h17v11h-17z M6 9.4h12 M6 12h12 M6 14.6h12 M9 21c.7-.8 1.4-.8 2.1 0 .7.8 1.4.8 2.1 0 M12 21v-3.5',
+  // commercial (general): storefront with awning
+  commercial:
+    'M3 9.5h18v11h-18z M3 9.5 4.8 4.2h14.4L21 9.5 M9 20.5v-6h6v6 M3 9.5h18'
+};
 
 export interface Props {
   cityName: string;
@@ -29,10 +123,10 @@ const {
 } = Astro.props;
 const finalHeadline = headline ?? `Appliances We Repair in ${cityName}`;
 
-const toHref = (slug: string) => {
-  const cleaned = slug.replace(/^\/+|\/+$/g, '').replace(/-repair$/, '');
-  return `/services/${cleaned}-repair/`;
-};
+/** Same normalisation the href uses, so the icon key can never drift from the link. */
+const iconKey = (slug: string) => slug.replace(/^\/+|\/+$/g, '').replace(/-repair$/, '');
+
+const toHref = (slug: string) => `/services/${iconKey(slug)}-repair/`;
 ---
 
 <section class="v2-services">
@@ -42,7 +136,13 @@ const toHref = (slug: string) => {
     <div class="v2-services__grid">
       {services.map((s) => (
         <a href={toHref(s.slug)} class="v2-svc-card">
-          <div class="v2-svc-card__icon" aria-hidden="true">{s.icon}</div>
+          <svg
+            class="v2-svc-card__icon" viewBox="0 0 24 24" width="24" height="24"
+            fill="none" stroke="currentColor" stroke-width="1.6"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"
+          >
+            <path d={ICONS[iconKey(s.slug)] ?? UNKNOWN_ICON} />
+          </svg>
           <div class="v2-svc-card__name">{s.name}</div>
           {s.issues && <div class="v2-svc-card__issues">{s.issues}</div>}
           {s.brands && <div class="v2-svc-card__brands">{s.brands}</div>}
@@ -54,7 +154,13 @@ const toHref = (slug: string) => {
 </section>
 
 <style>
-  .v2-services { padding: 72px 0; background: var(--v2-gray); }
+  /* Warm gradient rather than the flat grey — the cards are white, so the section needs to
+     read as a surface behind them rather than as another card. Not a photo: this block sits
+     directly above/below photo-backed sections on most pillars and two images would fight. */
+  .v2-services {
+    padding: 72px 0;
+    background: linear-gradient(180deg, #faf8f5 0%, #ffffff 100%);
+  }
   .v2-section-title {
     font-family: var(--v2-font-display);
     font-size: 30px;
@@ -78,17 +184,31 @@ const toHref = (slug: string) => {
   .v2-svc-card {
     background: var(--v2-white);
     border: 1px solid var(--v2-border);
-    border-radius: 12px;
+    border-radius: 14px;
     padding: 24px 20px;
     text-decoration: none;
     color: var(--v2-text);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
     transition: box-shadow 0.2s, transform 0.2s;
     display: block;
     font-family: var(--v2-font-body);
   }
-  .v2-svc-card:hover { box-shadow: 0 4px 24px rgba(0,0,0,0.1); transform: translateY(-2px); text-decoration: none; }
-  .v2-svc-card__icon { font-size: 28px; margin-bottom: 10px; }
-  .v2-svc-card__name { font-size: 16px; font-weight: 600; color: var(--v2-black); margin-bottom: 8px; }
+  .v2-svc-card:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+    transform: translateY(-2px);
+    text-decoration: none;
+  }
+  /* The icon is the accent and stays put on hover — only the title moves to red, so the
+     card has one thing changing colour rather than two. */
+  .v2-svc-card__icon { display: block; color: var(--v2-red); margin-bottom: 12px; }
+  .v2-svc-card__name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--v2-black);
+    margin-bottom: 8px;
+    transition: color 0.2s;
+  }
+  .v2-svc-card:hover .v2-svc-card__name { color: var(--v2-red); }
   .v2-svc-card__issues { font-size: 13px; color: var(--v2-muted); line-height: 1.5; margin-bottom: 8px; }
   .v2-svc-card__brands { font-size: 12px; color: var(--v2-muted); margin-bottom: 12px; }
   .v2-svc-card__cta { font-size: 13px; color: var(--v2-red); font-weight: 500; }
