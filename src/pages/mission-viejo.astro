@@ -23,6 +23,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -73,6 +75,61 @@ const introParagraphs = [
   "Mission Viejo is one of the more pleasant places to work in Orange County. It's a well-maintained planned community — the housing stock is consistent, the neighborhoods are clean, and people take care of their homes. The appliances reflect that: mostly well-maintained, mostly major brands, and people want them fixed right the first time without a lot of back-and-forth.",
   "The city is a mix of housing eras — a lot of the original Mission Viejo development from the 1960s through the 1980s has appliances that are getting to the age where repair-or-replace decisions come up. The newer Rancho Mission Viejo builds (92694) have more recent appliances — Bosch dishwashers, Samsung refrigerators, LG washers — that are still worth repairing. We give honest guidance on both. If a repair doesn't make financial sense, we'll tell you.",
   `Our diagnostic fee is $89, credited toward the repair. We arrive with OEM parts for the brands common in Mission Viejo, and most calls get resolved same visit. Call <a href="tel:${phoneRaw}">${branch.phone}</a> and someone who knows our OC schedule answers — not a call center.`
+];
+
+// Commercial: written new — this page had no commercial prose. The only prior
+// commercial material, where any existed, was an FAQ answer feeding FAQPage schema
+// and therefore not liftable; nothing was moved.
+const commercialParagraphs = [
+  "Commercial work in Mission Viejo is master-planned the same way the rest of the city is. There is no old restaurant row — the kitchens live in the places the plan put them: the mall and its dining, the village and shopping centers spaced through the neighborhoods, the medical and office food service off Crown Valley, the club and community kitchens that come with an association this size. What that means practically is that most of these operations are tenants, not owners, and the equipment came with the space. We spend more time on Mission Viejo calls sorting out what a landlord maintains from what a tenant maintains than we do anywhere else in south county, and the honest answer is often that nobody has, which is why the coil looks the way it does."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map — it does ICONS[e.icon] with no
+// fallback, so a wrong key renders an empty <path> silently. Valid keys:
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// NO premium outdoor brand pills anywhere in wave 5: not one of these 28 pages names a
+// single outdoor brand (Lynx/DCS/Twin Eagles/Alfresco/Coyote/Bull = 0 occurrences across
+// the whole set). The $$$ pages have heavy premium evidence but all of it is indoor estate
+// brands. Pills would assert an outdoor install base no page here claims. Pasadena precedent.
+const outdoorParagraphs = [
+  "Outdoor kitchens in Mission Viejo were mostly permitted, and that shows up in the repair. Between the association rules and the tract setbacks, the island tends to sit exactly where it was allowed to sit rather than where it should have — often tight against a rear wall or under a solid patio cover, because that is the footprint that got approved. Both of those choke the same thing: the refrigerator has no air path behind it and the grill has nowhere to put its heat. Add a south Orange County summer that is warm but never brutal, and the equipment survives just long enough for nobody to connect the failure to the placement. Our techs measure the clearance before quoting a compressor on a Mission Viejo island, because more of these are suffocating than are broken."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
 ];
 
 const services = [
@@ -273,6 +330,25 @@ const nearbyCities = [
     headline={repairOrReplaceNarrative.headline}
     paragraphs={repairOrReplaceNarrative.paragraphs}
     background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Mission Viejo Commercial Kitchen Service"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Mission Viejo Outdoor Kitchens and the Association Rules"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea
