@@ -7,7 +7,12 @@
  * Verbatim contract: every word, paragraph, FAQ, recent job, review,
  * neighborhood, and street from the T7 dump appears here. The unique
  * "Anaheim Hills vs. the Rest of the City" narrative is rendered through
- * <CustomNarrative>; commercial mentions are preserved in narrative.
+ * <CustomNarrative>.
+ *
+ * Update 2026-07-16 (writer wave 4): that narrative's 4th paragraph — the resort
+ * commercial one — now renders through <CommercialSection> instead, still verbatim
+ * apart from its dropped "And " connector (see the note at commercialParagraphs).
+ * The verbatim contract holds: the paragraph moved, it did not go away.
  *
  * Pricing-discipline (narrow):
  *   - $120 commercial pricing card removed from PricingCards (only the
@@ -34,6 +39,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -112,15 +119,85 @@ const services = [
 // 4 paragraphs verbatim. Paragraph 4 has the "$120" commercial-pricing
 // sentence replaced (only sentence with the dollar figure); rest verbatim.
 // =====================================================================
+// Paragraph 4 (the resort/commercial one) moved out of this const into CommercialSection
+// below. The headline survives the lift untouched: it promises "Hills vs. the rest", and the
+// three paragraphs left still deliver exactly that (thesis / Anaheim Hills / Platinum Triangle).
 const anaheimHillsNarrative = {
   headline: 'Anaheim Hills vs. the Rest of the City — Why It Matters',
   paragraphs: [
     "Most appliance repair companies treat Anaheim as one market. It isn't. When we get a call from Anaheim Hills, our technicians load differently than when heading to West Anaheim or the Platinum Triangle. The difference isn't attitude — it's parts inventory.",
     "Anaheim Hills homes in the 92807 and 92808 zip codes tend to have kitchen suites that rival Newport Beach — Sub-Zero built-in refrigerators, GE Monogram column units, Wolf ranges, Thermador steam ovens. These are not off-the-shelf fixes. You need the right diagnostic tools, the right OEM part, and a technician who has actually worked on that model before. We stock parts for Sub-Zero, GE Monogram, Wolf, and Thermador on our OC trucks specifically because Anaheim Hills generates that volume of calls.",
-    "The Platinum Triangle — the area around Angel Stadium and the Anaheim Convention Center — is a newer construction zone with mostly Samsung and LG appliances in the high-rise and mid-rise condos. These calls are different: flex drawer control boards, linear compressor issues on LG refrigerators, Samsung ice maker wire harness failures. We know these failure patterns well.",
-    `And the resort area generates its own separate category: commercial ice machines, walk-in coolers for restaurants, commercial refrigerators. If you're running a food service operation near Disneyland and a unit goes down, call our commercial line at <a href="tel:${phoneRaw}">${branch.phone}</a>. We move quickly on food safety calls.`
+    "The Platinum Triangle — the area around Angel Stadium and the Anaheim Convention Center — is a newer construction zone with mostly Samsung and LG appliances in the high-rise and mid-rise condos. These calls are different: flex drawer control boards, linear compressor issues on LG refrigerators, Samsung ice maker wire harness failures. We know these failure patterns well."
   ]
 };
+
+// Commercial: LIFTED verbatim out of anaheimHillsNarrative (it was p[3] there).
+// SEAM, fixed not flagged (same call as newport-beach): the paragraph opened "And the resort
+// area generates its own separate category" — an "And…" connector to the three paragraphs it
+// used to follow. Standing as its own section it now opens on "The resort area…". One word
+// dropped; the rest, including the tel: link, is byte-identical.
+// NOTE (not fixed, deliberate): introParagraphs[1] still closes on "And then there's the
+// commercial corridor near the resort… ice machines, walk-in coolers, commercial refrigeration."
+// That sentence lives in IntroNarrative and is not liftable. It now reads as a foreshadow of
+// this section rather than a handoff to the next paragraph, which is still true and still
+// scans — rewriting it would mean editing indexed intro prose for a cosmetic gain.
+const commercialParagraphs = [
+  `The resort area generates its own separate category: commercial ice machines, walk-in coolers for restaurants, commercial refrigerators. If you're running a food service operation near Disneyland and a unit goes down, call our commercial line at <a href="tel:${phoneRaw}">${branch.phone}</a>. We move quickly on food safety calls.`
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (no fallback):
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Hotel laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// Outdoor: written new. Premium pills carried by this page's own prose — anaheimHillsNarrative[1]
+// names Sub-Zero/GE Monogram/Wolf/Thermador as the Anaheim Hills norm and says we stock those
+// parts on the OC trucks because of the call volume. Scope is honest: the Hills, not the city.
+const outdoorParagraphs = [
+  `Outdoor kitchens follow the same 92807/92808 line the indoor ones do. Up in the Hills the back patio usually has a built-in grill, a refrigerator drawer and an ice maker sitting in a stone island; in West Anaheim and around the Platinum Triangle it's more often a freestanding grill on a slab. Inland Orange County heat is what separates them from a coastal install: an outdoor refrigerator rated to 100°F ambient spends August fighting for it, and the ones tucked into a solid island with no clearance behind them fight hardest. Our techs check the airflow path and the ignition circuit before condemning anything, and we'd rather rebuild the guts of an island than tell you to tear out the stonework.`
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
+];
+
+const outdoorBrands = [
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'Twin Eagles', href: '/outdoor/brands/twin-eagles/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' },
+  { name: 'Bull', href: '/outdoor/brands/bull/' },
+  { name: 'Blaze', href: '/outdoor/brands/blaze/' }
+];
 
 // =====================================================================
 // Section 6: NEIGHBORHOODS — H2 "Anaheim Neighborhoods We Service"
@@ -333,6 +410,26 @@ const nearbyCities = [
     headline={anaheimHillsNarrative.headline}
     paragraphs={anaheimHillsNarrative.paragraphs}
     background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Anaheim Resort-Corridor Commercial Kitchens"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Anaheim Outdoor Kitchens and the Inland Heat"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    brandPills={outdoorBrands}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea

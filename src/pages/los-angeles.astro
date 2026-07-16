@@ -34,6 +34,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import ServiceLinksGrid from '../components/cities/v2/ServiceLinksGrid.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
@@ -86,6 +88,65 @@ const introParagraphs = [
   "Los Angeles is the largest appliance repair market in the country — and one of the most varied. A Koreatown apartment building with 40 LG units. A Hancock Park craftsman with a Sub-Zero refrigerator and a wine cellar cooling unit that's been making noise for a month. A Mid-City fourplex where three dryers in the laundry room haven't worked right since last winter. A West Adams restaurant with a <a href=\"/commercial/refrigeration/walk-in-cooler-repair/\">walk-in cooler</a> or <a href=\"/commercial/refrigeration/walk-in-freezer-repair/\">walk-in freezer</a> failing on a Friday morning.",
   `We handle all of it. Our Los Angeles base covers the Westside corridor — from Koreatown west to the 405, and from Hollywood south to Culver City. When you call same day appliance repair Los Angeles and reach <a href="tel:${phoneRaw}">${branch.phone}</a>, you're talking to someone who schedules the LA runs. Not a national dispatch center.`,
   "LA's heat is harder on appliances than people realize. Refrigerator compressors work harder during summer. Condenser coils clog faster in the dry, dusty inland neighborhoods. We check for those things on every diagnostic call — because fixing the symptom without finding the cause means the same call in three months."
+];
+
+// Commercial + outdoor: both written new. The page had commercial mentions but none of them
+// were liftable — introParagraphs[1] carries the walk-in links inside a four-item list,
+// services[6] is a card, and the FAQ answer feeds FAQPage schema. Nothing moved; this is new
+// prose that the existing intro links now lead into.
+// NO premium brand pills, deliberately. This page's premium evidence is a single indoor
+// pricing tier (Sub-Zero/Viking/Wolf) plus an FAQ line, while its whole register is explicitly
+// anti-estate (Koreatown 40-unit buildings, a Mid-City fourplex, a West Adams restaurant) and
+// priceRange is $$. Outdoor luxury pills would argue with the page.
+// NOTE: this is the one page in the set whose <title> advertises $89. The $120 badge lives
+// inside the commercial section only — sectional pricing per factual-accuracy §9 — and no
+// single block puts the two numbers side by side.
+const commercialParagraphs = [
+  "The commercial side of Los Angeles is not one market and we do not pretend it is. A West Adams restaurant with a walk-in down on a Friday morning, a Koreatown kitchen running past midnight, a Mid-City cafe with one reach-in and no margin for a second one, a downtown bar that lives and dies on its ice machine — the equipment overlaps, the economics do not. What they have in common is that the fix has to be today. Nobody in this city has a spare walk-in. Our techs carry the common gaskets, start components and control boards for True, Traulsen, Turbo Air, Hoshizaki and Manitowoc so that the diagnosis and the repair are usually the same visit rather than two."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map — it does ICONS[e.icon] with no
+// fallback, so a wrong key renders an empty <path> silently. Valid keys:
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+const outdoorParagraphs = [
+  "Outdoor cooking in most of Los Angeles is not an island with a wine fridge in it — it is a gas grill that has lived outside since somebody moved in, a patio heater that comes out three weeks a year, and a fire pit plumbed off a line that predates everyone involved. That is the honest version of this city's outdoor work and it is most of what we see. What kills those units is neglect plus geography: a grill that never gets covered collects a decade of grease and spiders in the burner tubes, and the ones west of La Brea take marine air on top of it while the ones over the hill just bake. The good news is that this equipment is usually worth fixing. A burner assembly and an igniter kit are not a new grill, and our techs will tell you plainly on the ones that have gone past that."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
 ];
 
 const services = [
@@ -292,6 +353,25 @@ const serviceLinks = [
     headline={wineCellarNarrative.headline}
     paragraphs={wineCellarNarrative.paragraphs}
     background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Los Angeles Commercial Kitchen Service"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Los Angeles Backyards and the Grill That Lives Outside"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea

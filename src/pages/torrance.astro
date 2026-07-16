@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -57,6 +59,63 @@ const introParagraphs = [
   "Torrance spans more terrain than most South Bay cities. The Hollywood Riviera in the southwest sits on a coastal bluff with ocean views and correspondingly nice homes — Sub-Zero and Wolf show up here with some regularity. Old Torrance around Sartori Avenue has Craftsman bungalows from the 1910s and 1920s that are well maintained and well loved. Walteria on the eastern hills has larger mid-century homes. North Torrance along Crenshaw and Hawthorne is one of the South Bay's most active corridors with a dense mix of housing types. South Torrance near the boundary with Redondo Beach and Palos Verdes is established residential.",
   "The Hollywood Riviera does see some coastal influence — not as aggressive as oceanfront Newport Beach or Huntington Harbour, but enough that refrigerators on the bluff side can see accelerated coil wear compared to inland Torrance. We check on relevant calls. Inland Torrance is standard South Bay — no salt air factor, just reliable same-day service with an honest written estimate.",
   "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong>. Weekends available."
+];
+
+// Commercial + outdoor: both written new — this page had neither, and no prose links at all.
+//
+// NO premium brand pills on either section, deliberately (Roman, 2026-07-16: follow the page's
+// own prose). Torrance's strongest premium claim is intro p[1] — "Sub-Zero and Wolf show up
+// here with some regularity" in the Hollywood Riviera — which is a hedge about one
+// neighborhood; the featured pricing tier is the $150–$400 refrigerator card, not the
+// Sub-Zero/Wolf one; there is no Thermador/Miele/Gaggenau density and no estate language;
+// priceRange is $$. The page levels down on purpose ("bluff homes to North Torrance corridor
+// apartments to Old Torrance bungalows... we cover all of it with the same same-day
+// commitment"), and premium pills would argue with that.
+const commercialParagraphs = [
+  `Torrance's back-of-house work looks nothing like the beach-city version of it. What we get called to here is the industrial belt and the strip-mall kitchens that feed it: the restaurants along Hawthorne and Pacific Coast Highway, the sushi bars and izakayas around Old Torrance and the Del Amo corridor, the break rooms and cafeterias attached to the aerospace and auto plants on the east side. That mix is heavy on under-counter refrigeration, bar coolers and ice — and light on the showpiece equipment. A tasting-room bar cooler can wait until Tuesday; a walk-in at a restaurant doing weekday lunch volume cannot. We put walk-in and ice calls on same-day priority for that reason.`
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (no fallback):
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+const outdoorParagraphs = [
+  `Torrance backyards run to the practical end of outdoor cooking — a gas grill on a slab, a patio heater that comes out in January, the occasional built-in island up on the Hollywood Riviera bluff. The split that matters here is a couple of miles wide: west of Hawthorne the marine layer puts salt on everything overnight, and grates, burner tubes and igniter electrodes corrode on a coastal clock; inland toward the 405 the same grill just collects dust and spiders in the venturis. Both end at the same phone call — it won't light, or it lights and won't hold heat — and the fix is rarely the part the owner expects. Our techs clear and test the ignition path first; a burner assembly that's pitted through gets the OEM replacement, because the universal one corrodes again on the same schedule.`
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
 ];
 
 const areasNarrative = {
@@ -296,6 +355,25 @@ const nearbyCities = [
     headline="What We Repair in Torrance"
     subhead="All brands · Coastal & inland · All ZIP codes · South Bay same-day"
     services={services}
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Torrance Restaurant & Plant-Kitchen Service"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Torrance Backyards, Two Miles Apart"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea
