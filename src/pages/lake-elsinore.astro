@@ -13,6 +13,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -76,6 +78,61 @@ const introParagraphs = [
 // =====================================================================
 // SERVICES — 8 cards (2-tier, icon + name only per legacy).
 // =====================================================================
+// Commercial: written new — this page had no commercial prose. The only prior
+// commercial material, where any existed, was an FAQ answer feeding FAQPage schema
+// and therefore not liftable; nothing was moved.
+const commercialParagraphs = [
+  "Commercial kitchens here run on a season and a schedule that the rest of Riverside County does not keep. The lakefront and the Main Street blocks fill on summer weekends and go quiet midweek; the stadium and the outlet stores off the 15 spike on event days; the chain kitchens along Grape Street work a steadier lunch. That on-off pattern is harder on equipment than steady volume is — a walk-in that cycles hard for two days and then idles for four goes through more thermal swing in a week than a downtown kitchen sees in a month, and the door gaskets and start components are what show it first. We would rather see a Lake Elsinore account in the spring, before the season loads it up, than on the first hot Saturday."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map — it does ICONS[e.icon] with no
+// fallback, so a wrong key renders an empty <path> silently. Valid keys:
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// NO premium outdoor brand pills anywhere in wave 5: not one of these 28 pages names a
+// single outdoor brand (Lynx/DCS/Twin Eagles/Alfresco/Coyote/Bull = 0 occurrences across
+// the whole set). The $$$ pages have heavy premium evidence but all of it is indoor estate
+// brands. Pills would assert an outdoor install base no page here claims. Pasadena precedent.
+const outdoorParagraphs = [
+  "The lake changes the arithmetic on outdoor equipment in a way the temperature chart does not show. Afternoons here are as hot as anywhere inland, but the air coming off the water carries humidity that the rest of Riverside County simply does not have, and it settles on the patios closest to the shoreline every evening. Damp air plus inland heat is a worse combination for outdoor gear than dry heat alone: burner assemblies and igniter electrodes corrode on a coastal-looking schedule while the condensers work an inland-looking load. The other half is wind — it comes across the open water with nothing to break it, lifts covers and drops grit into anything left open. Our techs check the ignition path for corrosion and the condenser for packing on every Lake Elsinore outdoor call, because the failures out here rarely have one cause."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
+];
+
 const services = [
   { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
   { icon: '🌀', name: 'Washer Repair', slug: 'washer' },
@@ -328,6 +385,25 @@ const nearbyCities = [
     paragraphs={housingNarrative.paragraphs}
     subSections={housingNarrative.subSections}
     background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Lake Elsinore Commercial Kitchen Service"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Lake Elsinore Patios and the Air Off the Water"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea

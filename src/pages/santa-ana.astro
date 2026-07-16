@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -60,6 +62,57 @@ const introParagraphs = [
   "Our Irvine branch runs Santa Ana on the regular OC route. Floral Park and French Park calls usually involve older renovated homes where appliance-side service has to account for legacy electrical and plumbing — we work with that, and we tell homeowners up front when something is appliance scope versus when it needs an electrician or plumber separately. South Coast Metro condo work runs comparable to Newport Beach + Irvine luxury-tier service. Downtown commercial is restaurants and small-business kitchens running both commercial-spec and high-cycle residential equipment. Mid-market neighborhoods are the standard mainstream brand mix any OC technician handles routinely.",
   "Santa Ana also has a meaningful institutional and government appliance footprint — the Civic Center, OC Superior Court, government kitchens and cafeterias, plus hotels (DoubleTree by Hilton, Embassy Suites Anaheim South nearby) and the cluster around MainPlace + Discovery Cube + Bowers Museum. We service commercial appliances. Call us for commercial pricing.",
   `Call <a href="tel:${phoneRaw}">${branch.phone}</a> — someone with our actual OC schedule picks up.`
+];
+
+// Commercial: WRAP. The prose in commercialNarrative below is live indexed content and is
+// consumed by CommercialSection unchanged — only the component's structural extras (brand
+// pills, equipment cards, ice bridge, $120 diagnostic badge) are new. long-beach shape.
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map — it does ICONS[e.icon] with no
+// fallback, so a wrong key renders an empty <path> silently. Valid keys:
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// NO premium outdoor brand pills anywhere in wave 5: not one of these 28 pages names a
+// single outdoor brand (Lynx/DCS/Twin Eagles/Alfresco/Coyote/Bull = 0 occurrences across
+// the whole set). The $$$ pages have heavy premium evidence but all of it is indoor estate
+// brands. Pills would assert an outdoor install base no page here claims. Pasadena precedent.
+const outdoorParagraphs = [
+  "Santa Ana outdoor cooking happens on lots that were not drawn with an outdoor kitchen in mind. The older neighborhoods around Downtown and Floral Park run deep and narrow, and the grill usually ends up tucked against a fence, under a patio cover, or inside a carport bay that was never meant to hold a burner. That geometry is the whole diagnosis here. A grill boxed into a corner with a solid cover overhead does not clear its own exhaust, so the firebox runs hotter than it should and the control valves and igniter module cook slowly from above; an outdoor fridge shoved against a block wall has nowhere to reject heat. Our techs look at where the unit sits before looking at what failed, because on a tight Santa Ana lot the placement is usually the reason the part gave up early."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
 ];
 
 const services = [
@@ -294,10 +347,23 @@ const nearbyCities = [
     jobs={recentJobs}
   />
 
-  <CustomNarrative
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
     headline={commercialNarrative.headline}
     paragraphs={commercialNarrative.paragraphs}
-    background="gray"
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Santa Ana Backyards and the Tight Lot"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <WhyCallsUsBack

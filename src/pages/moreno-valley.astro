@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -55,6 +57,61 @@ const introParagraphs = [
   "March Air Reserve Base creates a specific service dynamic we don't see in many other cities. Military families PCS in and out regularly, and the homes they move into have maintenance histories that are often unknown — vents never cleaned, filters never replaced, coils never touched. We treat military household calls with this in mind: we inspect the full maintenance picture when we're there, not just the presenting failure.",
   "The climate is standard Inland Valley: 100–108°F summers, dry and dusty, hard water throughout Riverside County. Condenser coil cleaning in May — before the heat arrives — is the single most effective preventive step Moreno Valley homeowners can take. We recommend it on every applicable service call, and we perform it as part of every summer refrigerator diagnosis.",
   `Same-day coverage across all Moreno Valley ZIP codes. Call <a href="tel:${phoneRaw}">${phone}</a>.`
+];
+
+// Commercial: written new — this page had no commercial prose. The only prior
+// commercial material, where any existed, was an FAQ answer feeding FAQPage schema
+// and therefore not liftable; nothing was moved.
+const commercialParagraphs = [
+  "Moreno Valley's commercial appliance work follows the warehouses more than the restaurants. The distribution corridor along the 60 and out toward the March field runs break rooms, canteens and cold storage for shifts that never stop, and around them sit the chain kitchens and drive-thrus that feed those shifts at hours nobody else is serving. Two things make this different from a normal restaurant market. The equipment runs around the clock rather than across a dinner service, so wear accumulates on a schedule closer to commercial laundry than to a dining room. And it sits in the hottest, dustiest air we work in. A break-room reach-in in a metal building in August is doing genuinely hard work, and it is usually the last thing anyone thinks to maintain until it quits."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map — it does ICONS[e.icon] with no
+// fallback, so a wrong key renders an empty <path> silently. Valid keys:
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// NO premium outdoor brand pills anywhere in wave 5: not one of these 28 pages names a
+// single outdoor brand (Lynx/DCS/Twin Eagles/Alfresco/Coyote/Bull = 0 occurrences across
+// the whole set). The $$$ pages have heavy premium evidence but all of it is indoor estate
+// brands. Pills would assert an outdoor install base no page here claims. Pasadena precedent.
+const outdoorParagraphs = [
+  "Moreno Valley gets wind that the rest of the Inland Empire does not, and it is the defining fact for outdoor equipment here. The gap out toward the Badlands funnels it across the east side of the city hard enough and often enough that a grill cover is a temporary arrangement, and what the wind brings with it is the problem: fine grit, driven, into burner ports and condenser fins and any seam left open. Then the heat does the rest. A burner that cannot draw cleanly runs rich and sooty, an igniter buried in grit stops sparking reliably, and a condenser packed while it is trying to reject a 105-degree afternoon simply gives up early. Our techs blow out and inspect the whole intake and ignition path on Moreno Valley outdoor calls first, because out here that is not maintenance — it is usually the repair."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
 ];
 
 const services = [
@@ -283,6 +340,25 @@ const nearbyCities = [
     headline={morenoValleyContextNarrative.headline}
     subSections={morenoValleyContextNarrative.subSections}
     background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Moreno Valley Commercial & Distribution Kitchens"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Moreno Valley Patios and the Wind Off the Badlands"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea

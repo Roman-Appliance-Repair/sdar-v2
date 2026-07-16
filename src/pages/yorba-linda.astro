@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -56,6 +58,61 @@ const introParagraphs = [
   "Refrigerator compressors cycle more frequently when ambient temperatures are high. In a Yorba Linda home during a 100°F summer week, a refrigerator with fouled condenser coils is running under significant thermal stress. Coil cleaning in Yorba Linda isn't a once-a-year job — we recommend every 6 months, more often in homes with pets. The dust and debris that accumulates in an inland valley home is different from what we see at the coast, but the effect on coil performance is just as real.",
   "The larger homes also mean longer dryer vent runs. A 22-foot vent with two elbows is common in Yorba Linda estates. During Santa Ana conditions in fall, a lint-clogged dryer vent is a fire hazard. We inspect dryer vents on every dryer call here and give you an honest assessment of what we find.",
   `Diagnostic fee is $89, credited toward the repair. Call <a href="tel:${phoneRaw}">${branch.phone}</a>.`
+];
+
+// Commercial: written new — this page had no commercial prose. The only prior
+// commercial material, where any existed, was an FAQ answer feeding FAQPage schema
+// and therefore not liftable; nothing was moved.
+const commercialParagraphs = [
+  "Yorba Linda's commercial kitchens are concentrated in a handful of places — the Savi Ranch centers down by the 91, the neighborhood centers along Yorba Linda Boulevard and Imperial, and the school and community food service in between. It is a small market and the operators know each other. What is distinctive is the temperature: this end of the county runs hot, and the Savi Ranch pads in particular are open, paved and unshaded, so a condensing unit out on one of those roofs in August is doing work that the same model does not do ten miles toward the coast. The equipment that survives here is the equipment somebody cleaned in June. We would rather be the ones who did that than the ones called out on the first triple-digit Saturday."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map — it does ICONS[e.icon] with no
+// fallback, so a wrong key renders an empty <path> silently. Valid keys:
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// NO premium outdoor brand pills anywhere in wave 5: not one of these 28 pages names a
+// single outdoor brand (Lynx/DCS/Twin Eagles/Alfresco/Coyote/Bull = 0 occurrences across
+// the whole set). The $$$ pages have heavy premium evidence but all of it is indoor estate
+// brands. Pills would assert an outdoor install base no page here claims. Pasadena precedent.
+const outdoorParagraphs = [
+  "Yorba Linda kept its bridle trails, and outdoor equipment here lives alongside them. The trails and the dry hillsides they run along send a constant fine dust across the backyards on that side of the city all summer — decomposed granite, dry brush, whatever the horses lift — and it lands in the places that matter: burner ports, igniter shrouds, and the condenser fins of an outdoor fridge that is already working hard in genuine inland heat. This is not a coastal city with an occasional hot spell; the afternoons here commit. So the two problems arrive together, dust and load, and the equipment degrades rather than breaks. Our techs clear the fins and the burner ports first on Yorba Linda calls and only then put a gauge on anything, because out here the sealed system is usually innocent and the trail is not."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
 ];
 
 const services = [
@@ -256,6 +313,25 @@ const nearbyCities = [
     headline={heatNarrative.headline}
     paragraphs={heatNarrative.paragraphs}
     background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Yorba Linda Commercial Kitchen Service"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Yorba Linda Patios, Horses and the Hot Slope"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea

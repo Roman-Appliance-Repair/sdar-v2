@@ -4,6 +4,8 @@ import HeroSection from '../components/cities/v2/HeroSection.astro';
 import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -54,6 +56,61 @@ const introParagraphs = [
   "Hard water is a consistent factor. Temple City is served by the San Gabriel Valley Municipal Water District, drawing from the mineral-rich SGV groundwater basin. Ice maker inlet valves and dishwasher spray arms accumulate scale faster here than in softer-water cities. We test for this on every relevant Temple City call involving ice makers and dishwashers — it's a recurring pattern throughout the SGV, and Temple City is no exception.",
   "Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Available <strong>Saturdays and Sundays</strong>.",
   "<strong>Hard water tip for Temple City:</strong> SGVMWD groundwater accelerates mineral scale on refrigerator ice maker inlet valves and dishwasher spray arms. If your ice output has been declining gradually — not a sudden stop, but a slow decrease over months — the inlet valve is almost certainly the cause. Replacing your refrigerator's in-door filter every 6 months instead of 12 makes a meaningful difference in SGV hard water cities like Temple City."
+];
+
+// Commercial: written new — this page had no commercial prose. The only prior
+// commercial material, where any existed, was an FAQ answer feeding FAQPage schema
+// and therefore not liftable; nothing was moved.
+const commercialParagraphs = [
+  "Temple City's commercial kitchens are neighborhood kitchens — the Las Tunas Drive blocks, the Rosemead corridor, the bakeries, cafes and family restaurants that serve the people living two streets away. They are small operations, most of them owner-run, and the equipment is expected to last because replacing it is a real expense against a real margin. The city's water is the constant. Temple City draws the same mineral-heavy San Gabriel Valley supply as its neighbors, and on a commercial ice machine or a dish machine running all day that scale is not a slow nuisance — it is a measurable loss of production every week, and it is the reason behind a large share of the calls we get here. We treat the water path as part of the diagnosis on Temple City accounts rather than as an afterthought."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map — it does ICONS[e.icon] with no
+// fallback, so a wrong key renders an empty <path> silently. Valid keys:
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// NO premium outdoor brand pills anywhere in wave 5: not one of these 28 pages names a
+// single outdoor brand (Lynx/DCS/Twin Eagles/Alfresco/Coyote/Bull = 0 occurrences across
+// the whole set). The $$$ pages have heavy premium evidence but all of it is indoor estate
+// brands. Pills would assert an outdoor install base no page here claims. Pasadena precedent.
+const outdoorParagraphs = [
+  "Temple City's outdoor equipment fights the same water the kitchen inside does, and it fights it worse. The grills and patio setups here are ordinary and well kept — this is a city of tidy yards — but anything outside with a water line on it is running mineral-heavy SGV supply on a seasonal schedule, which is the exact combination that scales a valve shut. The water sits in the line all winter, the minerals settle out, and the outdoor ice maker or fridge dispenser that worked in September will not run in May. It presents as a dead unit and it is usually a blocked path. The grills have a simpler story: flat lots, no wind, no salt, and failures that are honestly just age and spiders in the venturis. Our techs check the water side first on anything plumbed here, and we tell Temple City owners the filter interval that actually applies to this water rather than the one in the manual."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
 ];
 
 const services = [
@@ -242,6 +299,25 @@ const nearbyCities = [
     headline="What We Repair in Temple City"
     subhead="All brands · SGVMWD hard water aware · Single-family homes · 91780"
     services={services}
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Temple City Commercial Kitchen Service"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Temple City Patios and the Scale You Cannot See"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea
