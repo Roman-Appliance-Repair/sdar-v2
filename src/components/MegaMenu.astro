@@ -151,17 +151,28 @@ type Panel =
   | { kind: 'pricelist'; residential: PriceCell[]; commercial: PriceCell[]; html: string };
 
 // Brand pillar mega-menu (Wave 55, 2026-05-26). Hand-curated grouping —
-// auto-glob would mix 416 brand combo pages with 35 pillars. We want only
+// auto-glob would mix the brand combo pages with the pillars. We want only
 // pillar pages here (one entry per real brand pillar), grouped by audience
 // tier so the nav both teaches scope and distributes link equity from all
-// 1054 pages to the top 32 brand pillars.
-// Note: lynx + perlick excluded — pillars not yet created (Wave 53b backlog).
+// 1179 pages to the brand pillars.
+//
+// Ordering inside each column is by prominence (luxury/most-searched first),
+// NOT alphabetical — keep new entries in their tier cluster.
+//
+// Brand-surfaces sync (2026-07-16): +15 residential and +4 outdoor pillars
+// that had pages and hub cards but no nav entry. Every href below is verified
+// against dist to resolve to a real page, not a redirect stub.
 const brandResidentialPremium: Link[] = [
   { label: 'Sub-Zero',                 href: '/brands/sub-zero/' },
   { label: 'Wolf',                     href: '/brands/wolf/' },
   { label: 'Viking',                   href: '/brands/viking/' },
   { label: 'Thermador',                href: '/brands/thermador/' },
   { label: 'Miele',                    href: '/brands/miele/' },
+  { label: 'Gaggenau',                 href: '/brands/gaggenau/' },
+  { label: 'GE Monogram',              href: '/brands/ge-monogram/' },
+  { label: 'Bertazzoni',               href: '/brands/bertazzoni/' },
+  { label: 'BlueStar',                 href: '/brands/bluestar/' },
+  { label: 'Hestan',                   href: '/brands/hestan/' },
   { label: 'Bosch',                    href: '/brands/bosch/' },
   { label: 'KitchenAid',               href: '/brands/kitchenaid/' },
   { label: 'Dacor',                    href: '/brands/dacor/' },
@@ -172,16 +183,27 @@ const brandResidentialPremium: Link[] = [
   { label: 'Smeg',                     href: '/brands/smeg/' }
 ];
 
+// Magic Chef is deliberately absent: /brands/magic-chef/ is a 301 to
+// /services/refrigerator-repair/ (astro.config.mjs), not a pillar. Linking it
+// from the nav would point at a noindex redirect stub. See brands/index.astro.
 const brandResidentialMass: Link[] = [
-  { label: 'LG',         href: '/brands/lg/' },
-  { label: 'Samsung',    href: '/brands/samsung/' },
-  { label: 'GE',         href: '/brands/ge/' },
-  { label: 'Whirlpool',  href: '/brands/whirlpool/' },
-  { label: 'Maytag',     href: '/brands/maytag/' },
-  { label: 'Frigidaire', href: '/brands/frigidaire/' },
-  { label: 'Amana',      href: '/brands/amana/' },
-  { label: 'JennAir',    href: '/brands/jennair/' },
-  { label: 'Sharp',      href: '/brands/sharp/' }
+  { label: 'LG',          href: '/brands/lg/' },
+  { label: 'Samsung',     href: '/brands/samsung/' },
+  { label: 'GE',          href: '/brands/ge/' },
+  { label: 'GE Café',     href: '/brands/ge-cafe/' },
+  { label: 'GE Profile',  href: '/brands/ge-profile/' },
+  { label: 'Whirlpool',   href: '/brands/whirlpool/' },
+  { label: 'Maytag',      href: '/brands/maytag/' },
+  { label: 'Frigidaire',  href: '/brands/frigidaire/' },
+  { label: 'Amana',       href: '/brands/amana/' },
+  { label: 'JennAir',     href: '/brands/jennair/' },
+  { label: 'Electrolux',  href: '/brands/electrolux/' },
+  { label: 'Asko',        href: '/brands/asko/' },
+  { label: 'Speed Queen', href: '/brands/speed-queen/' },
+  { label: 'Haier',       href: '/brands/haier/' },
+  { label: 'Kenmore',     href: '/brands/kenmore/' },
+  { label: 'Panasonic',   href: '/brands/panasonic/' },
+  { label: 'Sharp',       href: '/brands/sharp/' }
 ];
 
 const brandSpecialtyWine: Link[] = [
@@ -194,7 +216,11 @@ const brandSpecialtyWine: Link[] = [
   { label: 'Vinotemp',                  href: '/brands/vinotemp/' },
   { label: 'Danby Wine Cooler',         href: '/brands/danby-wine-cooler/' },
   { label: 'Summit Wine Cooler',        href: '/brands/summit-wine-cooler/' },
-  { label: 'Wine Enthusiast Wine Cooler', href: '/brands/wine-enthusiast-wine-cooler/' }
+  { label: 'Wine Enthusiast Wine Cooler', href: '/brands/wine-enthusiast-wine-cooler/' },
+  // Ventilation — the column renderer has no sub-heading slot, so the column
+  // title carries the scope ("Specialty, Wine & Ventilation").
+  { label: 'Zephyr',                    href: '/brands/zephyr/' },
+  { label: 'Broan',                     href: '/brands/broan/' }
 ];
 
 // Wave 59 mega-nav expansion (2026-05-26) — Commercial column split into two
@@ -236,14 +262,21 @@ const brandCommercialCookingFryers: Link[] = [
 
 // Outdoor brand pillars live at /outdoor/brands/{slug}/ (not /brands/{slug}/).
 // T1 audit 2026-05-26 confirmed all 7 exist with strong content (3,500-4,100w).
+// Hestan, Viking and Wolf also have /outdoor/brands/ pillars, but the nav sends
+// all three to their /brands/ pillar (primary identity is indoor premium) so a
+// brand resolves to one canonical nav target. Their outdoor pillars stay
+// reachable from the outdoor grids.
 const brandOutdoor: Link[] = [
   { label: 'Lynx',         href: '/outdoor/brands/lynx/' },
   { label: 'Alfresco',     href: '/outdoor/brands/alfresco/' },
   { label: 'DCS',          href: '/outdoor/brands/dcs/' },
   { label: 'Twin Eagles',  href: '/outdoor/brands/twin-eagles/' },
   { label: 'Fire Magic',   href: '/outdoor/brands/fire-magic/' },
-  { label: 'Hestan',       href: '/outdoor/brands/hestan/' },
-  { label: 'Kalamazoo',    href: '/outdoor/brands/kalamazoo/' }
+  { label: 'Kalamazoo',    href: '/outdoor/brands/kalamazoo/' },
+  { label: 'Blaze',        href: '/outdoor/brands/blaze/' },
+  { label: 'Bull',         href: '/outdoor/brands/bull/' },
+  { label: 'Coyote',       href: '/outdoor/brands/coyote/' },
+  { label: 'Napoleon',     href: '/outdoor/brands/napoleon/' }
 ];
 
 const menu: Array<{ label: string; href: string; panel: Panel }> = [
@@ -266,7 +299,7 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
       columns: [
         { title: 'Residential Premium',              links: brandResidentialPremium },
         { title: 'Residential Mass Market',          links: brandResidentialMass },
-        { title: 'Specialty & Wine',                 links: brandSpecialtyWine },
+        { title: 'Specialty, Wine & Ventilation',    links: brandSpecialtyWine },
         { title: 'Commercial — Refrigeration & Ice', links: brandCommercialRefrigerationIce },
         { title: 'Commercial — Cooking & Fryers',    links: brandCommercialCookingFryers },
         { title: 'Outdoor & Grills',                 links: brandOutdoor }
