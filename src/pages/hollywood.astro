@@ -29,6 +29,7 @@ import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
 import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
 import FinalCTA from '../components/cities/v2/FinalCTA.astro';
 import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
 import { CITIES } from '../data/cities';
 import { BRANCHES } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
@@ -105,10 +106,26 @@ const services = [
 // the "$120 commercial diagnostic waived with repair" sentence.
 // =====================================================================
 const housingNarrative = {
+  // The commercial paragraph that used to sit third here moved into CommercialSection
+  // below, verbatim. This block is about housing stock; the commercial aside never
+  // belonged to that headline, so the remaining two (pre-war vs new-build) read
+  // tighter without it.
   headline: "Hollywood's Housing Stock Requires a Different Approach",
   paragraphs: [
     "A significant part of Hollywood's housing is pre-war — buildings from the 1920s and 30s that were designed for iceboxes, not 36-inch Sub-Zero refrigerators. Getting large appliances in and out of Beachwood Canyon homes, Whitley Heights craftsmans, or narrow Franklin Village apartments requires planning. Our technicians know this before they show up.",
-    "On the other end, the newer developments along Vine Street and around the 101 corridor have modern kitchens with full suites of high-end appliances — Thermador, Miele, Wolf — that require factory-level knowledge to diagnose properly. We carry OEM parts for these brands on the truck.",
+    "On the other end, the newer developments along Vine Street and around the 101 corridor have modern kitchens with full suites of high-end appliances — Thermador, Miele, Wolf — that require factory-level knowledge to diagnose properly. We carry OEM parts for these brands on the truck."
+  ]
+};
+
+// Lifted verbatim out of housingNarrative.paragraphs[2] — not a word changed, INCLUDING
+// its "And then there's the commercial side" opener. That was a connector back to the
+// two housing paragraphs above it, and it now opens a section with nothing before it.
+// Rewriting it would read better and would also stop being the indexed text — so it
+// stays as-is and the seam is flagged for a copy decision instead.
+const commercialNarrative = {
+  eyebrow: 'COMMERCIAL KITCHENS',
+  headline: 'Hollywood Restaurant & Café Kitchen Service',
+  paragraphs: [
     "And then there's the commercial side. Hollywood Boulevard and Sunset Avenue have a dense restaurant corridor. East Hollywood has dozens of small cafés and restaurants that depend on commercial refrigeration. We handle that too — same-day response. Call us for commercial pricing."
   ]
 };
@@ -294,6 +311,38 @@ const outdoorParagraphs = [
   `Outdoor equipment in Hollywood lives wherever it fits. Up in Beachwood Canyon and Whitley Heights that means a grill on a hillside deck at the top of a flight of stairs — our techs bring a smaller kit for those, because nothing rolls up to a canyon house. Franklin Village and the Cahuenga corridor run to courtyard grills shared between units, which get used hard and maintained by nobody in particular. East Hollywood is small yards and portable equipment. The call is usually an igniter, a burner, or a gas fireplace that lights and won't stay lit.`
 ];
 
+
+// Commercial brand pills + equipment cards — the verified sets the WeHo template uses.
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' },
+      { name: 'Perlick', href: '/commercial/refrigeration/brands/perlick/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Pizza ovens', href: '/commercial/pizza-oven-repair/', icon: 'pizza-oven' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
 ---
 
 <CityLayoutV2
@@ -332,6 +381,17 @@ const outdoorParagraphs = [
     headline={housingNarrative.headline}
     paragraphs={housingNarrative.paragraphs}
     background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow={commercialNarrative.eyebrow}
+    headline={commercialNarrative.headline}
+    paragraphs={commercialNarrative.paragraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
   />
 
   <ServiceArea
