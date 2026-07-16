@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import ServiceLinksGrid from '../components/cities/v2/ServiceLinksGrid.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
@@ -72,6 +74,58 @@ const services = [
   { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler', issues: 'Not cooling · Temperature swings · Compressor issues', brands: 'Sub-Zero · EuroCave · Liebherr · Thermador · Vinotemp' },
   { icon: '🔆', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burner won't light · Induction not heating · Control issues", brands: 'Thermador · Viking · Bosch · GE · Miele' },
   { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Not freezing · Ice buildup · Temperature drifting · Noisy', brands: 'Whirlpool · GE · Samsung · LG · Sub-Zero' }
+];
+
+// Commercial: prose below moves into CommercialSection byte-identical — including its
+// closing "Call us for commercial pricing." That sentence is about REPAIR pricing; the
+// $120 badge is the DIAGNOSTIC fee. Different things, so both stand. (Roman, 2026-07-16.)
+// This const already carries 7 commercial hrefs; the pills/cards repeat some of those
+// targets, which is what the wave-1 precedent (long-beach) does too.
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (no fallback):
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// Outdoor: written new. NO premium brand pills here on purpose — this page's premium
+// evidence (FAQ, PricingCards footnote) is all INDOOR estate brands; it says nothing about
+// outdoor equipment, and outdoor brand pills would be asserting an install base the page
+// has never claimed. Same honest-scaling call as hemet in wave 3.
+const outdoorParagraphs = [
+  `Pasadena's outdoor equipment skews old and gas-fed rather than showroom-new. A grill plumbed into a line that was run for a very different appliance two owners ago, a patio heater that sat through a decade of San Gabriel summers, a fire pit on a deep craftsman porch off Oak Knoll or up in San Rafael. Heat is the constant: inland summers here run hot enough for long enough that an outdoor refrigerator fights its condenser all afternoon, and igniters and thermocouples age faster than the manuals assume. Our techs check the gas path and the ignition before touching anything else, and we say plainly when a twenty-year-old unit is worth the part and when it isn't.`
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' }
 ];
 
 const commercialNarrative = {
@@ -293,11 +347,23 @@ const serviceLinks = [
     bgImage="/images/cities/pasadena/neighborhood.webp"
   />
 
-  <CustomNarrative
+  <CommercialSection
+    cityName={cityName}
     eyebrow={commercialNarrative.eyebrow}
     headline={commercialNarrative.headline}
     paragraphs={commercialNarrative.paragraphs}
-    background="black"
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Pasadena Patios, Old Gas Lines and Long Summers"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <RecentRepairs

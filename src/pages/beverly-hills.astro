@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import ServiceLinksGrid from '../components/cities/v2/ServiceLinksGrid.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
@@ -91,6 +93,65 @@ const repairOrReplaceNarrative = {
     "Typical lifespans: Sub-Zero Refrigerator — 20+ years · Wolf Range — 20+ years · Thermador Cooktop — 15–20 years · Miele Dishwasher — 15–20 years · Viking Range — 15–20 years · Standard Brands — 10–15 years."
   ]
 };
+
+// Commercial: the prose below is live indexed content and moves into CommercialSection
+// byte-identical — only the component's structural extras (brand pills, equipment cards,
+// ice bridge, $120 diagnostic badge) are new. The badge is the DIAGNOSTIC fee; it does not
+// speak to repair pricing, so it sits alongside the prose without contradicting it.
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Perlick', href: '/commercial/refrigeration/brands/perlick/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map — it does `ICONS[e.icon]` with no
+// fallback, so a wrong key renders an empty <path> silently. Valid: snowflake, pizza-oven,
+// fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Pizza ovens', href: '/commercial/pizza-oven-repair/', icon: 'pizza-oven' },
+  { name: 'Hotel & banquet laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// Outdoor: written new — the page had no outdoor prose, only the link list in the raw
+// section further down. Premium brand pills are carried by this page's own evidence
+// (luxuryBrandsNarrative, repairOrReplaceNarrative, the estate register throughout).
+const outdoorParagraphs = [
+  `Trousdale, the hills off Coldwater Canyon, Beverly Park behind the gates — up there the back of the house holds as much equipment as the kitchen does. A built-in grill with sear and rotisserie burners, refrigerator drawers rated for outdoor ambient, an ice maker plumbed out to the pool deck, and a cellar holding temperature through a September heat wave. Same tier as indoors: Wolf, Lynx, Twin Eagles, Kalamazoo, Hestan. What fails out there is not what fails inside — burner ports and venturis silt up, outdoor condensers breathe pool chemistry and landscaping dust until they can't hold temperature, and a long ice line picks up scale the indoor machine never sees. Our techs carry the OEM igniters and boards for these brands instead of fitting a universal part that dies by next summer, and we rebuild the guts of an island rather than condemning the island.`
+];
+
+const outdoorLinks = [
+  { name: 'Built-in grill repair in Beverly Hills', href: '/outdoor/grill-repair/beverly-hills/' },
+  { name: 'Wine cellar repair in Beverly Hills', href: '/outdoor/wine-cellar-repair/beverly-hills/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' }
+];
+
+const outdoorBrands = [
+  { name: 'Kalamazoo', href: '/outdoor/brands/kalamazoo/' },
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'Twin Eagles', href: '/outdoor/brands/twin-eagles/' },
+  { name: 'Wolf', href: '/outdoor/brands/wolf/' },
+  { name: 'Hestan', href: '/outdoor/brands/hestan/' }
+];
 
 const commercialNarrative = {
   eyebrow: 'COMMERCIAL KITCHENS',
@@ -320,11 +381,24 @@ const serviceLinks = [
     background="gray"
   />
 
-  <CustomNarrative
+  <CommercialSection
+    cityName={cityName}
     eyebrow={commercialNarrative.eyebrow}
     headline={commercialNarrative.headline}
     paragraphs={commercialNarrative.paragraphs}
-    background="white"
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Beverly Hills Outdoor Kitchens and Cellars"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    brandPills={outdoorBrands}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <RecentRepairs

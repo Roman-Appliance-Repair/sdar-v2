@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -102,14 +104,78 @@ const wineCoolerNarrative = {
         "Dedicated wine cellar cooling systems — split systems or self-contained through-wall units — are a step above wine coolers and require different diagnosis. We service WhisperKOOL, CellarPro, Breezaire, and Wine Guardian units. If your cellar temperature is drifting, the first checks are door seals, refrigerant level, and evaporator coil condition. A cellar that runs 5°F above set point in summer but holds temperature in winter almost always has a refrigerant issue or insufficient cooling capacity for the summer heat load."
       ]
     },
-    {
-      title: "For Winery & Tasting Room Equipment",
-      paragraphs: [
-        "We service <a href=\"/commercial/refrigeration/\">commercial refrigerators</a>, bar coolers, undercounter wine storage, and <a href=\"/commercial/refrigeration/walk-in-cooler-repair/\">walk-in coolers</a> and <a href=\"/commercial/refrigeration/walk-in-freezer-repair/\">walk-in freezers</a> for wineries and tasting rooms along Rancho California Road and De Portola Road. Call us for commercial pricing. We prioritize tasting room calls and aim for same-day service — a failed bar cooler during weekend tasting hours is a revenue problem, not just an inconvenience."
-      ]
-    }
   ]
 };
+
+// Commercial: LIFTED verbatim out of wineCoolerNarrative — it was subSections[4],
+// "For Winery & Tasting Room Equipment". Two notes on the shape of that move:
+//   1. CommercialSection takes flat `paragraphs: string[]`, so a subSection title has
+//      nowhere to live. Rather than drop it (that would be deleting rendered text, not
+//      moving it), the title becomes this section's HEADLINE. Roman's call, 2026-07-16.
+//   2. The wine-cooler headline it left behind — "Wine Cooler & Wine Cellar Repair in
+//      Temecula — What We Know" — is MORE truthful now, not less: the four subSections
+//      still under it are all residential wine cooler/cellar work, and this winery one
+//      was the only thing there that wasn't.
+// The paragraph itself, including "Call us for commercial pricing." and all three
+// commercial links, is byte-identical. That sentence is about repair pricing; the $120
+// badge is the diagnostic fee — different things, both stand.
+const commercialParagraphs = [
+  "We service <a href=\"/commercial/refrigeration/\">commercial refrigerators</a>, bar coolers, undercounter wine storage, and <a href=\"/commercial/refrigeration/walk-in-cooler-repair/\">walk-in coolers</a> and <a href=\"/commercial/refrigeration/walk-in-freezer-repair/\">walk-in freezers</a> for wineries and tasting rooms along Rancho California Road and De Portola Road. Call us for commercial pricing. We prioritize tasting room calls and aim for same-day service — a failed bar cooler during weekend tasting hours is a revenue problem, not just an inconvenience."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & bar',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Perlick', href: '/commercial/refrigeration/brands/perlick/' },
+      { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (no fallback):
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial refrigeration', href: '/commercial/refrigeration/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Glass & bar washing', href: '/commercial/dishwasher-repair/', icon: 'droplet' }
+];
+
+// Outdoor: written new. Premium pills carried by the page's own prose — housingNarrative
+// subSections[1] puts "Wolf ranges, Sub-Zero columns, and outdoor kitchens with refrigerators
+// and ice makers" on the wine-country estates and says we handle them like Beverly Hills work.
+const outdoorParagraphs = [
+  `The wine-country estates off De Portola and Rancho California Road treat the outdoor kitchen as the real kitchen for half the year — a built-in grill, a refrigerator drawer, an ice maker, and often a wine fridge sitting out under a ramada. Temecula weather is the whole story: 100°F-plus afternoons followed by a genuinely cold night, over and over, and that daily swing is harder on an outdoor unit than steady heat is. Condensers work all afternoon and then sit through a 40-degree drop; gaskets and igniter electrodes age on that cycle, not on the calendar. Our techs check the clearance behind an island before blaming the compressor — half the "failed" outdoor refrigerators out here are simply suffocating in a stone box with nowhere to dump heat.`
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Wine cellar repair', href: '/outdoor/wine-cellar-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' }
+];
+
+const outdoorBrands = [
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'Twin Eagles', href: '/outdoor/brands/twin-eagles/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' },
+  { name: 'Bull', href: '/outdoor/brands/bull/' },
+  { name: 'Blaze', href: '/outdoor/brands/blaze/' }
+];
 
 const housingNarrative = {
   headline: "Temecula Housing Stock — Three Different Markets",
@@ -326,6 +392,26 @@ const nearbyCities = [
     paragraphs={wineCoolerNarrative.paragraphs}
     subSections={wineCoolerNarrative.subSections}
     background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="For Winery & Tasting Room Equipment"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Temecula Outdoor Kitchens and the Daily Swing"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    brandPills={outdoorBrands}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <ServiceArea

@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -56,7 +58,6 @@ const introParagraphs = [
   "<strong>When an appliance fails in Newport Beach, our techs at Same Day Appliance Repair trace it to a handful of patterns: Sub-Zero built-ins cycling constantly and getting loud because oceanfront salt air has packed the condenser coils and worn the fan motor (waterfront homes need coil cleaning every 4-5 months), Wolf dual-fuel range igniter electrodes corroded by salt-moisture, True outdoor refrigerators losing cooling as coastal air degrades the coils, and Miele dishwashers throwing F70 flood errors from a seeping inlet connection. Built-in Sub-Zero, Wolf, and Gaggenau repairs run $300–$800+ with OEM parts and gate coordination. We dispatch same-day across Balboa Island, Corona del Mar, and Newport Coast. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
   "Newport Beach is one of the most desirable addresses in California — and the Pacific Ocean is about 200 feet from most of it. That proximity is wonderful for residents. It's harder on appliances.",
   "Salt air is the defining environmental factor for appliance maintenance in Newport Beach. Refrigerator condenser coils that would last 12–18 months in an inland city accumulate salt-laden particulate much faster here — particularly in oceanfront properties on Balboa Island, The Peninsula, and the waterfront homes in Corona del Mar. A coil that's overloaded makes the compressor work harder, shortens its life, and drives up energy costs. We inspect and clean condenser coils on every Newport Beach refrigerator call — it's consistently relevant here in a way it isn't inland.",
-  "Outdoor kitchen appliances — outdoor-rated refrigerators, ice makers, BBQ igniter systems — see this effect even more acutely. Salt air exposure on an outdoor unit is dramatically more aggressive than on indoor equipment. Igniter electrode corrosion, coil degradation, and control board moisture ingress are all accelerated in an oceanfront outdoor kitchen. We service and repair outdoor appliances throughout Newport Beach, including <a href=\"/brands/marvel/\">Marvel outdoor refrigeration</a> (MO24RAS units engineered for 110°F ambient + direct sun — very common on Newport Coast and Pelican Hill pool decks).",
   "Inside, the kitchens are serious: Sub-Zero, Wolf, Thermador, Miele, Gaggenau — standard in Newport Beach estates and high-rise units alike. Our technicians carry OEM parts for all of these on every service vehicle. We're also familiar with the access logistics for Newport Coast, Pelican Hill, Crystal Cove, and other gated communities.",
   `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on all parts and labor. Call <a href="tel:${phoneRaw}">${phone}</a>.`
 ];
@@ -78,6 +79,68 @@ const saltAirTipNarrative = {
     "<strong>Salt air tip for Newport Beach:</strong> If your refrigerator has been running louder than usual, or cycling on and off more frequently — especially in an oceanfront property — the most likely cause is condenser coils loaded with salt-air particulate. Clean coils every 4–6 months in a coastal property, not the 12-month recommendation written for inland environments. We include this inspection on every Newport Beach fridge call."
   ]
 };
+
+// Outdoor: LIFTED verbatim out of introParagraphs (it was p[3] there) into OutdoorSection.
+// SEAM, fixed not flagged (Roman, 2026-07-16): the paragraph opened "…see this effect even
+// more acutely" — an anaphor pointing back at the salt-air-coil paragraph that used to sit
+// above it. Standing alone it referred to an effect never introduced. One phrase changed,
+// "this effect" -> "salt-air exposure", so the opener is self-contained. Nothing else in the
+// paragraph moved; the Marvel link and MO24RAS detail are byte-identical.
+const outdoorParagraphs = [
+  "Outdoor kitchen appliances — outdoor-rated refrigerators, ice makers, BBQ igniter systems — see salt-air exposure even more acutely. Salt air exposure on an outdoor unit is dramatically more aggressive than on indoor equipment. Igniter electrode corrosion, coil degradation, and control board moisture ingress are all accelerated in an oceanfront outdoor kitchen. We service and repair outdoor appliances throughout Newport Beach, including <a href=\"/brands/marvel/\">Marvel outdoor refrigeration</a> (MO24RAS units engineered for 110°F ambient + direct sun — very common on Newport Coast and Pelican Hill pool decks)."
+];
+
+const outdoorLinks = [
+  { name: 'Outdoor kitchen repair in Newport Beach', href: '/outdoor/kitchen-repair/newport-beach/' },
+  { name: 'Wine cellar repair in Newport Beach', href: '/outdoor/wine-cellar-repair/newport-beach/' },
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' }
+];
+
+// Premium pills carried by the page's own prose: intro p[4] names Sub-Zero/Wolf/Thermador/
+// Miele/Gaggenau as standard in Newport Beach estates, pricingTiers lead with them, and
+// whyReasons says "Estate managers welcome." priceRange is $$$.
+const outdoorBrands = [
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'Twin Eagles', href: '/outdoor/brands/twin-eagles/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' },
+  { name: 'Alfresco', href: '/outdoor/brands/alfresco/' },
+  { name: 'Hestan', href: '/outdoor/brands/hestan/' }
+];
+
+// Commercial: prose below moves into CommercialSection byte-identical; only the structural
+// extras (pills, equipment cards, ice bridge, $120 diagnostic badge) are new.
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Perlick', href: '/commercial/refrigeration/brands/perlick/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (no fallback):
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Pizza ovens', href: '/commercial/pizza-oven-repair/', icon: 'pizza-oven' },
+  { name: 'Resort & club laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
 
 const commercialNarrative = {
   eyebrow: 'COMMERCIAL & HOSPITALITY KITCHENS',
@@ -290,11 +353,24 @@ const nearbyCities = [
     jobs={recentJobs}
   />
 
-  <CustomNarrative
+  <CommercialSection
+    cityName={cityName}
     eyebrow={commercialNarrative.eyebrow}
     headline={commercialNarrative.headline}
     paragraphs={commercialNarrative.paragraphs}
-    background="gray"
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Newport Beach Outdoor Kitchens and the Salt Air"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    brandPills={outdoorBrands}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <WhyCallsUsBack

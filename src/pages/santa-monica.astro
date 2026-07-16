@@ -5,6 +5,8 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import ServiceLinksGrid from '../components/cities/v2/ServiceLinksGrid.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
@@ -91,6 +93,61 @@ const repairOrReplaceNarrative = {
     "Coastal climate note: in Santa Monica, refrigerators and dishwashers near the ocean often show major component wear 2–3 years earlier than these national averages."
   ]
 };
+
+// Commercial: prose below moves into CommercialSection byte-identical; only the
+// structural extras (pills, equipment cards, ice bridge, $120 diagnostic badge) are new.
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (no fallback there):
+// snowflake, pizza-oven, fryer, oven, droplet, laundry.
+const commercialEquipment = [
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Commercial ranges', href: '/commercial/range-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Pizza ovens', href: '/commercial/pizza-oven-repair/', icon: 'pizza-oven' },
+  { name: 'Hotel laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// Outdoor: written new — no outdoor prose existed. Premium pills are modest on purpose:
+// this page's own prose bifurcates (luxury north of Montana, value in Ocean Park and Pico,
+// priceRange $$), so the luxury register carries half the page, not the page.
+const outdoorParagraphs = [
+  `The built-in outdoor kitchen is mostly a north-of-Montana feature here — a grill, a refrigerator drawer, sometimes an ice maker on a back patio a mile from the water — while Ocean Park and Pico lean to freestanding gear on a balcony. Either way the ocean sets the terms, and it does it year-round rather than seasonally: salt sits in the marine layer and works on grate hardware, burner assemblies, and the condenser of anything rated for outdoor use. We see outdoor refrigerators give up their charge here years earlier than the same unit does inland. Our techs read the condenser and the whole ignition path on an outdoor call rather than only the symptom that got called in, and a corroded burner assembly gets the OEM part — the universal one pits again by next season.`
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
+];
+
+const outdoorBrands = [
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' },
+  { name: 'Fire Magic', href: '/outdoor/brands/fire-magic/' },
+  { name: 'Viking', href: '/outdoor/brands/viking/' }
+];
 
 const commercialNarrative = {
   eyebrow: 'COMMERCIAL KITCHENS',
@@ -300,11 +357,24 @@ const serviceLinks = [
     jobs={recentJobs}
   />
 
-  <CustomNarrative
+  <CommercialSection
+    cityName={cityName}
     eyebrow={commercialNarrative.eyebrow}
     headline={commercialNarrative.headline}
     paragraphs={commercialNarrative.paragraphs}
-    background="gray"
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Santa Monica Patios and the Salt Air"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    brandPills={outdoorBrands}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
   />
 
   <CustomNarrative
