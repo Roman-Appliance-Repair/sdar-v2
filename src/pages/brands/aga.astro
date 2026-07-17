@@ -1,0 +1,400 @@
+---
+// src/pages/brands/aga.astro
+// AGA brand pillar (Tier 2, brand-pillar wave 2026-07-17).
+// Spine = the R7-vs-eR7 code split. Every claim sourced; see log below.
+//
+// SOURCE LOG (facts that must not drift):
+//  - OWNERSHIP: Middleby completed the AGA Rangemaster Group plc acquisition 29 Sept 2015
+//    (£1.85/share, ~£129.2M). On 2 Feb 2026 26North Partners took 51% of Middleby's
+//    Residential Kitchen business ($885M valuation); Middleby retains a 49% NON-CONTROLLING
+//    interest in a standalone JV (+~$540M cash + $135M seller note) — so "Middleby sold AGA"
+//    is imprecise; it is a joint venture. Business rebranded COMPOSITION BRANDS.
+//    AGA's OWN US site footer confirms: "©2026 AGA Ranges … a member of THE COMPOSITION
+//    BRANDS LUXURY PORTFOLIO". [agarangeusa.com/customer-care; compositionbrands.com/our-brands;
+//    investors.middleby.com …/completion-aga-rangemaster-group; businesswire 20260202412606]
+//
+//  - FACTORIES — our old pages were wrong on BOTH:
+//      Leamington Spa = HQ / corporate office, NOT a cooker factory.
+//      Coalbrookdale foundry CLOSED November 2017 ("no longer economically viable").
+//        *** "cast at Coalbrookdale" has been FALSE since 2017. Do not restore it. ***
+//      CURRENT: assembly + enamelling at KETLEY, TELFORD, Shropshire. Castings now come
+//        from THIRD-PARTY foundries in the UK and Europe, none owned by the AGA group.
+//    [shropshirestar.com 2017/05/24 aga-rangemaster-set-to-close-coalbrookdale-foundry;
+//     shropshirestar.com 2022/08/23 telfords-aga-workers-celebrate-centenary]
+//    NOT VERIFIED from AGA's own site — agarangemaster.com and agaliving.com 403 automated
+//    fetches. Rests on Shropshire Star reporting.
+//
+//  - ERROR CODES — THE SPINE. The split is PCB-controlled vs THERMOSTAT-controlled,
+//    NOT "classic vs electric". An electric AGA can still have zero codes.
+//      eR7 (all-electric, replaces Total Control): FULL documented table, 002-159.
+//        User-panel codes a homeowner can actually read: FE / VE / CE.
+//        [AGA eR7 Field Service Manual USA & Canada p.11, p.16; AGA CDN /file/287]
+//      Total Control / TC3: codes EXIST but AGA does NOT publish meanings to owners —
+//        "error codes may be displayed on your handset, for example: nn 133. Please provide
+//        AGA Service with this information." [TC3 User Guide US & CAN, 07/17 EINS 516294 p.30]
+//      AGA ERA (110-3i induction): codes exist, same withheld-meaning pattern; induction hob
+//        E2/E6. [AGA ERA User Guide 05/24 EOPI 518031 pp.19, 62]
+//      *** R7 (= Dual Control electric): NO CODES. Thermostat-controlled. Verified by
+//        exhaustive grep of all 26 pages — one hit, the phrase "electrical fault diagnosis".
+//        [AGA R7 Electric Field Service Manual USA & CANADA; AGA CDN /file/288 — verified
+//         directly from AGA's own CDN] ***
+//      AGA Classic 24" heat-storage: NO CODES. Grep of all 24 pages -> 0 hits.
+//        [d181zs8i7gehnm.cloudfront.net/file/192]
+//    *** THE TRAP: R7 and eR7 differ by ONE LETTER, are both electric, are sold side by side
+//    in the US, and have OPPOSITE answers. A table published under "R7" would be wrong. ***
+//
+//  - eControl is NOT an AGA product. UK Innovations Group Ltd, a third-party electric
+//    conversion, states verbatim it is "an independent company and not affiliated with AGA
+//    Rangemaster Group, Middleby Corporation or any of its affiliates".
+//    [myecontrol.co.uk/user-manuals] Do not list it as an AGA line.
+//
+//  - SCOPE — the "AGA is cooking only" premise is FALSE. AGA-branded US refrigeration and
+//    dishwashers EXIST: "AGA 36\" Mercury French Door Refrigerator", "AGA 24\" Mercury
+//    Dishwasher", with published AGA REFRIGERATION and AGA DISHWASHERS owner's guides.
+//    Marvel is a SEPARATE brand (undercounter, Greenville MI, own Composition Brands entry).
+//    "AGA Marvel" is a historical entity, not a current product brand.
+//    *** LAUNDRY is the real gap — AGA sells none. ***
+//    [agarangeusa.com; agarangeusa.com/resources/product-owners-guides]
+//    NOT VERIFIED: whether the AGA-branded fridges/dishwashers are OEM-sourced; whether they
+//    carry error codes. Do not speculate.
+//
+//  - PARTS — our old note said Greenwood MS. WRONG: Greenwood MS is VIKING's plant.
+//    Live, checked post-rebrand: "Parts are distributed through Middleby Residential.
+//    US & Canada … 1-800-241-9152 Option 1 … parts@middlebyresidential.com". The corporate
+//    rebrand has landed but the PARTS CHANNEL IS STILL MIDDLEBY-BRANDED.
+//    [agarangeusa.com/customer-care]
+//    NOT VERIFIED: an authorized-servicer list (only a dealer locator exists); lead times.
+//
+//  - DEMAND: ~100/mo nationally at best. "aga service" 300, "aga parts" 200, "aga stove
+//    repair" 10 (CPC $2.50), "aga cooker repair" 0 (Britishism — Americans say stove/range),
+//    "aga error codes" 0, "aga repair los angeles" no data. SERP is soft: a DR 2 Santa
+//    Barbara page ranks top-10 nationally and AGA's UK site outranks its US site.
+//    This is an AUTHORITY page, not a traffic play. Justified on job value, not volume.
+//
+//  - LA THERMAL ANGLE: NOT VERIFIED for LA. The always-on heat-storage design genuinely
+//    heats a kitchen (sourced), and 44% of UK owners switch off for summer (Blake and Bull
+//    2019 survey, via rangexchange.co.uk — UK, 2019, second-hand via a retailer). There is
+//    NO LA/SoCal-specific documented figure. Attribute the UK stat or omit; never write
+//    "in LA, AGAs overheat kitchens" as if measured.
+//
+// No fabricated repair records.
+
+import Layout from '../../layouts/Layout.astro';
+import ServiceHero from '../../components/ServiceHero.astro';
+import { MAIN_PHONE } from '../../data/branches';
+
+const phone = MAIN_PHONE;
+const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
+const phoneHref = `tel:+1${phoneRaw}`;
+const canonical = "https://samedayappliance.repair/brands/aga/";
+
+const title = "AGA Appliance Repair Los Angeles — Same Day";
+const description = "AGA repair in LA — Classic heat-storage, R7, eR7, Total Control, ERA. R7 has no fault codes, eR7 does. Telford-built cast iron. $89 diagnostic, waived with repair.";
+
+const faqs = [
+  {
+    q: "What does my AGA's error code mean?",
+    a: "That depends on one letter, and it's the single most important thing to get right on this brand. <strong>The eR7 has a full fault-code table</strong> — codes in the 002 to 159 range covering thermocouples, triacs, relays and the PCB, plus three panel codes you can actually read out to us over the phone: <code>FE</code> (touch panel unresponsive), <code>VE</code> (controller firmware incompatible with the PCB) and <code>CE</code> (no response from the main controller). <strong>The R7 has no codes at all.</strong> None. It's thermostat-controlled, and its field service manual contains no fault-diagnostics section — we checked the whole document. R7 and eR7 are both electric, sold side by side, and differ by one letter. If a company reads you an \"R7 code table,\" they are reading the eR7 manual and don't know it. <strong>The Classic heat-storage AGA also has no codes</strong> — nothing to display them on. <strong>Total Control and ERA do have codes</strong>, with a twist worth knowing: AGA deliberately doesn't publish what they mean."
+  },
+  {
+    q: "My Total Control is showing a number on the handset and I can't find what it means.",
+    a: "You won't find it, and that's by design rather than an oversight on your part. AGA's own Total Control user guide says it plainly: in the unlikely event an error occurs, error codes may be displayed on your handset — for example <code>nn 133</code> — and you should <strong>provide AGA Service with this information</strong> so it can assist the engineer in diagnosing the fault. That's the whole entry. The meanings are withheld from owners and live in the service documentation. The ERA guide does the same thing with its own example. So when you search your code and find nothing, the internet isn't failing you — the manufacturer decided the number is for the technician, not for you. Read it to us on the phone and it does its job."
+  },
+  {
+    q: "Is my AGA still cast at Coalbrookdale?",
+    a: "No — and this is worth correcting because it's repeated everywhere, including on pages that ought to know better. <strong>The Coalbrookdale foundry closed in November 2017</strong>; AGA said it was no longer economically viable. Since then the castings come from <strong>third-party foundries in the UK and across Europe</strong>, none of them part of the AGA group. What still happens in Shropshire is the part that arguably matters more: <strong>assembly and enamelling at Ketley, in Telford</strong>, where AGA has been for a century. Leamington Spa, which you'll also see quoted as \"the factory,\" is the corporate head office, not a cooker plant. So the honest description of a modern AGA is: assembled and enamelled in Telford, from iron poured elsewhere."
+  },
+  {
+    q: "Does AGA make refrigerators and dishwashers, or is that Marvel?",
+    a: "Both exist, and they're different things — this trips up a lot of people. <strong>AGA-branded refrigeration and dishwashers genuinely exist in the US lineup</strong>: there's an AGA 36-inch Mercury French Door Refrigerator, an AGA 24-inch Mercury Dishwasher, and AGA publishes owner's guides for AGA Refrigeration and AGA Dishwashers. Separately, <strong>Marvel</strong> is its own brand — premium undercounter refrigeration, built in Greenville, Michigan since 1892, with its own entry in the Composition Brands portfolio. \"AGA Marvel\" was a historical corporate entity, not a current product badge. So an AGA fridge and a Marvel fridge are both real and are not the same product. The thing <strong>AGA genuinely doesn't make is laundry</strong> — there are no AGA washers or dryers, full stop. We service the Marvel side too: <a href=\"/brands/marvel/\">Marvel repair</a>."
+  },
+  {
+    q: "Who owns AGA now?",
+    a: "<strong>Composition Brands</strong> — and AGA's own US site says so in its footer, which reads that AGA Ranges is a member of the Composition Brands luxury portfolio. The chain: Middleby completed its acquisition of AGA Rangemaster Group in <strong>September 2015</strong>. Then on <strong>2 February 2026</strong>, 26North Partners bought <strong>51%</strong> of Middleby's residential kitchen business in a deal valuing it at $885 million, and the group was renamed Composition Brands. One nuance most coverage skips: <strong>Middleby didn't fully exit</strong> — it kept a 49% non-controlling stake in what is structurally a joint venture, plus a seller's note. So \"Middleby sold AGA\" is a bit too clean. AGA now sits alongside Viking, Rangemaster, La Cornue, Lynx, U-Line and Marvel in that portfolio."
+  },
+  {
+    q: "Where do AGA parts actually come from in the US?",
+    a: `Through <strong>Middleby Residential</strong> — and this is a live oddity worth knowing. AGA's US customer-care page states that parts are distributed through Middleby Residential, on <strong>1-800-241-9152</strong> (option 1). The interesting part: that same page's footer already carries the Composition Brands rebrand, but <strong>the parts channel is still Middleby-branded</strong>. The corporate change landed; the parts plumbing hasn't been renamed. Also worth correcting a claim that circulates: AGA parts are <em>not</em> routed through Greenwood, Mississippi — <strong>Greenwood is Viking's plant</strong>, a sister brand, not AGA's parts address. On lead times we won't quote a number, because nobody publishes one and we're not going to invent it. Call ${phone} and we'll tell you what we actually know about your part when we've seen the model plate.`
+  },
+  {
+    q: "Are you an AGA authorized service company?",
+    a: "<strong>No — independent, and we'll say so first.</strong> AGA publishes a dealer locator for sales and routes service requests through its own customer care (800-241-9152); we found no published authorized-servicer list for the US. If your cooker is in warranty, start with AGA's customer care — that's the honest route. Where an independent earns the work is out-of-warranty cookers, second-owner AGAs that came with a house, and the ones where nobody local will touch a two-tonne cast-iron heat-storage cooker. We're BHGS #A49573 and our name is on the invoice."
+  },
+  {
+    q: "Does an AGA make sense in a Los Angeles kitchen?",
+    a: "We'll be straight rather than sell you a story. A traditional heat-storage AGA is <strong>always on</strong> — that's the whole design; the cast iron is a thermal battery. In a cold British house that doubles as heating. In a hot kitchen it's a real consideration, and owners actively manage it: a UK owners' survey from 2019 found that <strong>44% of AGA owners switch theirs off for the summer</strong> (that's a UK figure, second-hand via a retailer, and we're not going to pretend it's an LA number — nobody has published one). The modern answer is the controllable models: <strong>Dual Control, Total Control, R7 and eR7</strong> exist precisely so ovens and hotplates can be turned off when you're not using them, which is why they're the ones we mostly see in Southern California. If someone tells you a confident statistic about AGAs overheating LA kitchens, ask where it came from."
+  }
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "AGA Cooker and Appliance Repair",
+    "name": "AGA Appliance Repair, Same Day Appliance Repair",
+    "url": canonical,
+    "description": "Same-day AGA repair across Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties. Classic heat-storage cookers, Dual Control, R7 and eR7 electric, Total Control, and the ERA induction range, plus AGA rangetops, hoods, and the AGA-branded refrigeration and dishwasher suite. The fault-code position differs by line: the eR7 carries a full documented table plus FE/VE/CE panel codes, while the R7 and the Classic heat-storage cookers are thermostat-controlled and have no codes at all; Total Control and ERA display codes whose meanings AGA does not publish to owners. Assembled and enamelled at Ketley, Telford; the Coalbrookdale foundry closed in 2017. AGA is part of Composition Brands since February 2026. Independent service, not factory-authorized. $89 residential diagnostic, applied toward repair.",
+    "provider": {
+      "@type": "LocalBusiness",
+      "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
+      "name": "Same Day Appliance Repair",
+      "legalName": "HVAC 777 LLC",
+      "url": "https://samedayappliance.repair/",
+      "telephone": phone,
+      "priceRange": "$$$",
+      "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "20:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+      ],
+      "hasCredential": [
+        { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } },
+        { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } },
+        { "@type": "EducationalOccupationalCredential", "credentialCategory": "CSLB C-20 HVAC", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Contractors State License Board" } },
+        { "@type": "EducationalOccupationalCredential", "credentialCategory": "BBB Accredited Business", "recognizedBy": { "@type": "Organization", "name": "Better Business Bureau" } }
+      ]
+    },
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }
+    ],
+    "brand": { "@type": "Brand", "name": "AGA", "sameAs": "https://www.agarangeusa.com/" },
+    "offers": { "@type": "Offer", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, waived when the repair is approved." }
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": canonical + "#faq",
+    "mainEntity": faqs.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a.replace(/<[^>]+>/g, '') } }))
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "@id": canonical + "#breadcrumb",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Brands", "item": "https://samedayappliance.repair/brands/" },
+      { "@type": "ListItem", "position": 3, "name": "AGA", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+  </Fragment>
+
+  <ServiceHero
+    title={"AGA Appliance Repair Los Angeles"}
+    subtitle={"Classic heat-storage, Dual Control, R7, eR7, Total Control and ERA. One letter decides whether your AGA has fault codes at all. $89 diagnostic, waived with the repair."}
+    heroImageTitle="AGA"
+  />
+
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="/">Home</a> <span class="crumbs-sep">›</span>
+    <a href="/brands/">Brands</a> <span class="crumbs-sep">›</span>
+    <span aria-current="page">AGA</span>
+  </nav>
+
+  <section class="section">
+    <div class="container">
+      <p class="section-number">01, the split that decides everything</p>
+      <h2 class="section-title">R7 or eR7 — one letter, and the answer to "what's my error code" flips completely.</h2>
+      <div class="prose">
+        <p>Most brand pages sort AGAs into "the old cast-iron ones" and "the electric ones," then hand you a code table. That division is wrong, and the table is usually wrong with it. The real split is <strong>PCB-controlled versus thermostat-controlled</strong> — and an electric AGA can still have no codes whatsoever.</p>
+        <p>The <strong>R7</strong> and the <strong>eR7</strong> are both electric. They're sold side by side. They differ by one letter. And they have opposite answers.</p>
+      </div>
+      <div class="model-grid">
+        <div class="model-card">
+          <h3>eR7 — a full table</h3>
+          <p>The eR7 runs a PCB with real diagnostics, and its field service manual documents the lot: codes from <strong>002 to 159</strong>, covering comms faults, thermocouple differential and open circuit, relay short and open circuit, triac faults, cooking-zone overheat, configuration-key errors and RF handset faults.</p>
+          <p>Three of them are <strong>panel codes you can read to us down the phone</strong>: <code>FE</code> (the touch panel's microcontroller has stopped responding), <code>VE</code> (controller firmware incompatible — needs a newer PCB), <code>CE</code> (no response from the main controller, usually the comms cable).</p>
+        </div>
+        <div class="model-card">
+          <h3>R7 — none at all</h3>
+          <p>The R7, which is the Dual Control electric, is <strong>thermostat-controlled</strong>. Its field service manual has no fault-diagnostics section — the only place the word appears in twenty-six pages is the phrase "electrical fault diagnosis," describing a procedure, not a code list.</p>
+          <p>So there is no code to look up, and anyone reciting one is reading the eR7 manual by mistake.</p>
+        </div>
+        <div class="model-card">
+          <h3>Classic heat-storage — none</h3>
+          <p>The traditional always-on AGA has no display, no PCB and no codes. Diagnosis is by symptom and by measurement, the same discipline we use on <a href="/brands/la-cornue/">La Cornue</a>. Its manual contains no fault codes anywhere.</p>
+        </div>
+        <div class="model-card">
+          <h3>Total Control and ERA — codes exist, meanings withheld</h3>
+          <p>Both display codes. Neither tells you what they mean. AGA's own guide says a code "may be displayed on your handset, for example <code>nn 133</code>," and asks you to <strong>give that information to AGA Service</strong> so the engineer can diagnose the fault. The meanings live in service documentation, not in your hands. The ERA does the same, plus induction-hob codes.</p>
+        </div>
+      </div>
+      <div class="prose" style="margin-top:24px;">
+        <p>One more thing that isn't a code but gets reported as a fault: on an eR7, the <strong>full-power timeout codes in the 010-014 band are usually operator conditions</strong>, not failures — not enough heat-up time allowed, doors left open, a pan too large or too full, a cold plain shelf left sitting in the simmering oven. We'd rather tell you that than sell you a thermocouple.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-gray">
+    <div class="container">
+      <p class="section-number">02, where an AGA is actually made</p>
+      <h2 class="section-title">Nothing has been cast at Coalbrookdale since 2017.</h2>
+      <div class="prose">
+        <p>This one is repeated so widely that our own older pages carried it, and it's been wrong for years. <strong>The Coalbrookdale foundry closed in November 2017</strong> — AGA said it was no longer economically viable. Since then, the iron is poured by <strong>third-party foundries in the UK and across Europe</strong>, none of them owned by AGA.</p>
+        <p><strong>Leamington Spa</strong> is the other half of the myth: it's the corporate head office, not a cooker plant. What actually happens in Shropshire is <strong>assembly and enamelling at Ketley, in Telford</strong> — a site AGA has occupied for a century.</p>
+        <p>The accurate sentence, then: your AGA was assembled and enamelled in Telford, from iron cast elsewhere. Why does a repair company care? Because when someone quotes you provenance as a reason to trust them with a $20,000 cooker, it's worth knowing whether they've checked it since 2017.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="section-number">03, scope</p>
+      <h2 class="section-title">AGA makes more than cookers — and the thing it doesn't make isn't what you'd guess.</h2>
+      <div class="prose">
+        <p>The reasonable assumption is that AGA is cooking-only and any AGA fridge is really a rebadged Marvel. That's not right, and we'd rather correct it than repeat it.</p>
+      </div>
+      <div class="model-grid">
+        <div class="model-card">
+          <h3>Cooking — the core</h3>
+          <p>Classic heat-storage cookers, the controllable electrics (Dual Control, R7, eR7, Total Control), and the <strong>ERA</strong> with its induction hob. Plus rangetops, and the hood range — Euclid, Marquee, Cascade, Loge. Hood work has its own page: <a href="/brands/aga-range-hood-repair/">AGA range hood repair</a>. Cooker work in depth: <a href="/brands/aga-stove-repair/">AGA stove repair</a>.</p>
+        </div>
+        <div class="model-card">
+          <h3>AGA refrigeration — it's real</h3>
+          <p>There is an <strong>AGA 36-inch Mercury French Door Refrigerator</strong> and an Elise equivalent, sold as AGA-branded, with AGA-published refrigeration owner's guides. It is not a Marvel with a different badge on it.</p>
+        </div>
+        <div class="model-card">
+          <h3>AGA dishwashers — also real</h3>
+          <p>An <strong>AGA 24-inch Mercury Dishwasher</strong> and an Elise version, again with AGA's own published guides. Whether these are OEM-sourced under the hood we genuinely don't know, and we're not going to guess at it.</p>
+        </div>
+        <div class="model-card">
+          <h3>Marvel is a different brand</h3>
+          <p><strong>Marvel</strong> builds premium undercounter refrigeration in Greenville, Michigan, and carries its own entry in the Composition Brands portfolio. "AGA Marvel" was a corporate entity, not a product badge. Both are real; they aren't the same thing.</p>
+        </div>
+        <div class="model-card">
+          <h3>What AGA does NOT make</h3>
+          <p><strong>Laundry.</strong> No washers, no dryers, anywhere in the lineup. That's the actual gap.</p>
+        </div>
+        <div class="model-card">
+          <h3>eControl is not AGA</h3>
+          <p>If your AGA was converted to electric with an <strong>eControl</strong> system, that's a third-party product from UK Innovations Group, which states plainly that it is not affiliated with AGA. Worth telling us up front — a converted cooker is a different machine from the one in AGA's manual.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-gray">
+    <div class="container">
+      <p class="section-number">04, owner and parts</p>
+      <h2 class="section-title">Composition Brands now — but the parts still say Middleby.</h2>
+      <div class="prose">
+        <p>Middleby completed its purchase of AGA Rangemaster Group in <strong>September 2015</strong>. On <strong>2 February 2026</strong>, 26North Partners took <strong>51%</strong> of Middleby's residential kitchen business — a deal valuing it at $885 million — and the group was renamed <strong>Composition Brands</strong>. AGA's own US site confirms it in the footer. One nuance worth keeping: Middleby didn't walk away, it kept a <strong>49% non-controlling stake</strong> in what is structurally a joint venture, so "Middleby sold AGA" is a little too tidy.</p>
+        <p>Now the part that matters at 8am. AGA's US customer-care page says <strong>parts are distributed through Middleby Residential — 1-800-241-9152, option 1</strong>. The rebrand has reached the footer of that very page, but not the parts channel. So if you're chasing a component and someone tells you Composition Brands, and someone else says Middleby, they're both describing the same plumbing mid-rename.</p>
+        <p>And a correction, because we had it wrong ourselves until we checked: <strong>AGA parts do not route through Greenwood, Mississippi.</strong> Greenwood is <a href="/brands/viking/">Viking</a>'s plant — a sister brand in the same portfolio, not AGA's parts address. On lead times we won't quote a number. Nobody publishes one, and a made-up figure is worse than an honest "we'll find out."</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="section-number">05, the honest bit</p>
+      <h2 class="section-title">An always-on cast-iron cooker in Southern California.</h2>
+      <div class="prose">
+        <p>A traditional AGA is a thermal battery: two tonnes of enamelled cast iron held at temperature around the clock. In a cold, damp British house that's a feature — the cooker heats the kitchen. In a warm one it's a decision, and owners treat it as one. A UK owners' survey in 2019 found <strong>44% of AGA owners switch theirs off for the summer</strong>.</p>
+        <p>We're flagging what that number is and isn't: it's a UK figure, from 2019, reaching us second-hand through a retailer. <strong>There is no published Los Angeles statistic</strong>, and we're not going to invent one — if you see a page confidently telling you what AGAs do to LA kitchens, ask where the number came from.</p>
+        <p>What we can say is what walks through the door. The controllable models — <strong>Dual Control, Total Control, R7, eR7</strong> — exist precisely so individual ovens and hotplates can be switched off, and they're the ones that make sense in this climate. The Classic heat-storage cookers we see tend to belong to people who knew exactly what they were buying.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-gray">
+    <div class="container">
+      <p class="section-number">06, coverage</p>
+      <h2 class="section-title">AGA service across Greater Los Angeles.</h2>
+      <div class="prose">
+        <p>AGAs are rare here, and they cluster where the kitchen was designed around one: Pasadena and San Marino craftsman remodels, Hancock Park, Brentwood, Pacific Palisades, the hillside houses above Sunset, and out into Montecito-adjacent Ventura County. There is no volume to this brand in Los Angeles — we'd rather tell you that than pretend we run AGA calls daily.</p>
+        <p>Call <a href={phoneHref}>{phone}</a> with the <strong>model off the plate</strong> — and if there's a code on a handset or panel, that number too. On this brand the model name settles whether a code even exists: R7 or eR7, Classic or Total Control. That one answer decides what we bring.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <p class="section-number">07, FAQ</p>
+      <h2 class="section-title">AGA repair, common questions.</h2>
+      <div class="faq-list">
+        {faqs.map((f) => (
+          <details class="faq-item">
+            <summary>{f.q}</summary>
+            <div class="faq-answer"><p set:html={f.a} /></div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-light">
+    <div class="container">
+      <h2>All AGA services in one place</h2>
+      <div class="related-grid">
+        <a href="/brands/aga-stove-repair/" class="related-card">
+          <h3>AGA Stove Repair</h3>
+          <p>The cookers in depth — Classic, Dual Control, Total Control, eClassic.</p>
+        </a>
+        <a href="/brands/aga-range-hood-repair/" class="related-card">
+          <h3>AGA Range Hood Repair</h3>
+          <p>Euclid, Marquee, Cascade, Loge — fan motors, switches, lighting.</p>
+        </a>
+        <a href="/brands/marvel/" class="related-card">
+          <h3>Marvel Repair</h3>
+          <p>The separate undercounter brand in the same portfolio — not an AGA badge.</p>
+        </a>
+        <a href="/brands/la-cornue/" class="related-card">
+          <h3>La Cornue Repair</h3>
+          <p>The French portfolio sibling. Also mechanical, also no error codes.</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="bottom-cta">
+    <div class="container">
+      <h2>AGA down? Same-day service across Southern California.</h2>
+      <p>$89 diagnostic, waived when you approve the repair. Independent, BHGS #A49573.</p>
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/book/" class="btn-outline">Book Online</a>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .crumbs { max-width: 1200px; margin: 0 auto; padding: 18px 16px 0; font-size: 0.85rem; color: var(--muted); }
+  .crumbs a { color: var(--muted); text-decoration: none; }
+  .crumbs a:hover { color: var(--red); }
+  .crumbs-sep { margin: 0 6px; opacity: 0.5; }
+  .section { padding: 64px 0; }
+  .section-gray { background: var(--gray); }
+  .section-light { background: #fff; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 0 16px; }
+  .section-number { font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--red); font-weight: 700; margin: 0 0 12px; }
+  .section-title { font-size: 1.8rem; line-height: 1.35; font-weight: 800; margin: 0 0 24px; max-width: 900px; }
+  .prose p { font-size: 1.05rem; line-height: 1.75; margin: 0 0 18px; max-width: 860px; }
+  .model-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 28px; }
+  .model-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 24px; }
+  .model-card h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 12px; }
+  .model-card p { font-size: 0.92rem; line-height: 1.7; color: var(--text); margin: 0 0 10px; }
+  .faq-list { margin-top: 28px; max-width: 900px; }
+  .faq-item { border-bottom: 1px solid var(--border); padding: 18px 0; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1.02rem; }
+  .faq-answer p { font-size: 0.95rem; line-height: 1.75; color: var(--text); margin: 12px 0 0; }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 30px; }
+  .related-card { display: block; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+  .related-card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .related-card h3 { font-size: 1rem; font-weight: 800; margin: 0 0 10px; color: var(--text); }
+  .related-card p { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.6; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 0; text-align: center; }
+  .bottom-cta h2 { font-size: 1.9rem; font-weight: 800; margin: 0 0 12px; }
+  .bottom-cta p { color: rgba(255,255,255,0.75); margin: 0 0 26px; }
+  .bottom-cta .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; margin: 0 8px; display: inline-block; }
+  .bottom-cta .btn-outline { border: 1px solid rgba(255,255,255,0.4); color: #fff; padding: 14px 28px; border-radius: 6px; text-decoration: none; font-weight: 700; margin: 0 8px; display: inline-block; }
+  @media (max-width: 768px) { .section-title { font-size: 1.4rem; } .section { padding: 48px 0; } }
+</style>
