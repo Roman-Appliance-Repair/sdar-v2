@@ -17,7 +17,8 @@
 
 | Бренд | Owner | Не путать с |
 |---|---|---|
-| **True Manufacturing** | Trulaske family (commercial) | True Residential (Middleby) — это другая компания |
+| **True Manufacturing** | Trulaske family, O'Fallon MO, family-owned с 1945 (4-е поколение) | Не Middleby. См. ниже — **True Residential это ЕГО ЖЕ резидентная линия**, не другая компания |
+| **True Residential** | **Та же True Manufacturing / Trulaske.** Резидентная линия, запущена 2008 (ранее «True Professional Series») | **НЕ Middleby.** Путают с U-Line / Marvel — вот те действительно Middleby |
 | **Perlick** | Wisconsin family company с 1917, **независимая** | Не Ali Group |
 | **AHT Cooling Systems** | Daikin (с 2017) | Не Ali Group |
 | **Beverage-Air** | Ali Group (с ~2005) | — |
@@ -25,9 +26,29 @@
 | **Sub-Zero / Wolf / Cove** | Sub-Zero Group, Inc. (Madison, WI) | — |
 | **Fulgor Milano US** | Fulgor USA LLC + Maple Distributing | Не «Fulgor Americas» |
 | **Thermador** | BSH Home Appliances | — |
-| **Viking** | Middleby Residential | — |
+| **Viking** | **Composition Brands** (см. §1.1) — НЕ «Middleby Residential» | Формулировка «Middleby Residential» устарела 02.02.2026 |
 | **Dacor** | Samsung (с 2016) | — |
 | **JennAir / KitchenAid / Maytag** | Whirlpool | — |
+
+### 1.1 Composition Brands — Middleby больше НЕ владеет резидентными брендами (с 02.02.2026)
+
+**02 февраля 2026** 26North Partners закрыла покупку **контрольных 51%** резидентного
+подразделения Middleby (Residential Kitchen unit, оценка ~$885 млн). Бизнес переименован в
+**Composition Brands**; Middleby сохранила неконтрольные ~49%.
+
+**Ушли в Composition Brands:** Viking, AGA, Rangemaster, La Cornue, Lynx, U-Line, Marvel.
+
+**Остались у Middleby:** коммерческие foodservice-бренды (сделка касалась ТОЛЬКО residential).
+При корректирующей правке коммерческие Middleby-бренды **не трогать**.
+
+**Как писать:** «Middleby brand» про Viking / AGA / Lynx / U-Line / Marvel / La Cornue —
+**устарело**. Либо Composition Brands, либо честная формулировка «портфель, сменивший
+владельца в феврале 2026». U-Line и Marvel по-прежнему корректно противопоставлять True
+Residential как конкурентов — просто они теперь Composition Brands, а не Middleby.
+
+⚠️ **Долг:** ~141 файл упоминает Middleby; из них Viking ×67, AGA ×60, Lynx ×24, U-Line ×16,
+Marvel ×15, La Cornue ×11 привязывают бренд к Middleby. **Отдельная корректирующая волна,
+слепой свип запрещён** — часть вхождений про коммерческие бренды верна.
 
 ## 2. Что бренды НЕ делают (частая ошибка)
 
