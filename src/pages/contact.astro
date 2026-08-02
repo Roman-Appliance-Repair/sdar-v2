@@ -91,6 +91,17 @@ const localBusinessSchema = mergeCredentials({
         addressCountry: 'US'
       };
       entry.email = sharedEmail;
+    } else {
+      // SAB branches: city-level PostalAddress (locality + ZIP, NEVER street) so
+      // every location entry carries Google's required `address` field. ZIP only
+      // from the PUBLIC branch address (internalAddress is never rendered).
+      entry.address = {
+        '@type': 'PostalAddress',
+        addressLocality: b.displayCity,
+        addressRegion: 'CA',
+        ...(b.address?.zip ? { postalCode: b.address.zip } : {}),
+        addressCountry: 'US'
+      };
     }
     // Branch-level sameAs (verified GBP place_id maps URL + YT; WeHo also FB).
     // Source: branch.sameAs in src/data/branches.ts. Same pattern as

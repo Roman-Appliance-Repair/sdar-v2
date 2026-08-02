@@ -39,6 +39,10 @@ function buildBranchLocation(branch: Branch): Record<string, unknown> {
       '@type': 'PostalAddress',
       addressLocality: branch.displayCity,
       addressRegion: 'CA',
+      // Branch ZIP from the PUBLIC address only — internalAddress is marked
+      // "NEVER rendered publicly" in branches.ts, so SAB branches without a
+      // public address (LA) stay ZIP-less. City-level, never streetAddress.
+      ...(branch.address?.zip ? { postalCode: branch.address.zip } : {}),
       addressCountry: 'US'
     },
     openingHoursSpecification: OPENING_HOURS_SCHEMA,
