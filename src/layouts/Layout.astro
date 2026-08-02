@@ -97,13 +97,22 @@ const ogImage = new URL(image, siteUrl).toString();
     <meta name="theme-color" content="#0a0a0a" />
 
     <!-- Self-hosted fonts: Playfair Display + DM Sans (latin subset, WOFF2).
-         Preload the 5 most-used weights above-the-fold; other weights
-         resolve on-demand via @font-face in fonts.css. -->
-    <link rel="preload" href="/fonts/playfair-display-800.woff2" as="font" type="font/woff2" crossorigin />
+         Preload ONLY the two weights painted above the fold on every page
+         (H1/header logo = Playfair 700, body/subtitle = DM Sans 400) so they
+         don't compete with the hero image for bandwidth. All other weights
+         (incl. Playfair 800 on the homepage H1) resolve on-demand via
+         @font-face in fonts.css — every face has font-display: swap. -->
     <link rel="preload" href="/fonts/playfair-display-700.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/dm-sans-400.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/dm-sans-500.woff2" as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href="/fonts/dm-sans-600.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Warm up connections for the tracking stack that loads after HTML
+         parse (GTM chain: gtag/Clarity/FB/Nextdoor). DNS+TCP+TLS done early
+         costs nothing on the main thread but shaves the first request RTTs. -->
+    <link rel="preconnect" href="https://www.googletagmanager.com" />
+    <link rel="preconnect" href="https://www.clarity.ms" />
+    <link rel="preconnect" href="https://scripts.clarity.ms" />
+    <link rel="preconnect" href="https://connect.facebook.net" />
+    <link rel="preconnect" href="https://ads.nextdoor.com" />
 
     <!-- Page-specific head content (JSON-LD schema, etc.) -->
     <slot name="head-scripts" />
