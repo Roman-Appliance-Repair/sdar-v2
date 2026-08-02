@@ -8,6 +8,13 @@
 
 export const LEGAL_NAME = 'HVAC 777 LLC';
 
+// WeHo pin branch — default identity for geo-neutral schemas (telephone +
+// city-level address fallback). Source: branches.ts SSOT, not hardcoded.
+import { BRANCHES } from './branches';
+const WEHO_BRANCH = BRANCHES.find((b) => b.slug === 'west-hollywood');
+const DEFAULT_TELEPHONE = '+1' + (WEHO_BRANCH?.phone ?? '(323) 870-4790').replace(/\D/g, '');
+const WEHO_ZIP = WEHO_BRANCH?.address?.zip ?? '90048';
+
 export interface EducationalOccupationalCredential {
   '@type': 'EducationalOccupationalCredential';
   credentialCategory: string;
@@ -93,12 +100,22 @@ export function mergeCredentials<T extends Record<string, unknown>>(schema: T): 
   // PostalAddress (no streetAddress) when absent. Only for LB/HACB @types, and
   // never overwrites an existing address (pin pages keep their full street address).
   if (LB_TYPES.has(out['@type'] as string) && !out['address']) {
+    const locality = deriveLocality(out);
     out['address'] = {
       '@type': 'PostalAddress',
-      addressLocality: deriveLocality(out),
+      addressLocality: locality,
       addressRegion: 'CA',
+      // ZIP only for the WeHo default identity — city-derived localities have no
+      // reliable city→ZIP mapping here and stay ZIP-less (address itself is what
+      // Google requires; streetAddress stays pin-page-only either way).
+      ...(locality === 'West Hollywood' ? { postalCode: WEHO_ZIP } : {}),
       addressCountry: 'US'
     };
+  }
+  // Google recommends `telephone` on LocalBusiness. Geo-neutral schemas default
+  // to the WeHo pin line; pages that set their own branch phone are untouched.
+  if (LB_TYPES.has(out['@type'] as string) && !out['telephone']) {
+    out['telephone'] = DEFAULT_TELEPHONE;
   }
   return out as T & {
     legalName: string;

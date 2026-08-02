@@ -1,6 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import { COLLAPSED_COMBOS } from './src/data/combo-collapse';
 import react from '@astrojs/react';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -138,6 +139,13 @@ export default defineConfig({
   integrations: [
     react(),
     sitemap({
+      // Collapsed zero-demand combos carry rel=canonical to their city pillar
+      // (src/data/combo-collapse.ts) — a sitemap must list canonical URLs only,
+      // so those 56 pages are excluded here.
+      filter: (page) => {
+        const key = new URL(page).pathname.replace(/^\/|\/$/g, '');
+        return !COLLAPSED_COMBOS.has(key);
+      },
       serialize(item) {
         item.lastmod = getLastmodForUrl(item.url);
         return item;
