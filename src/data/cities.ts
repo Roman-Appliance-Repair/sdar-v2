@@ -17,12 +17,8 @@
 //   - 0 disk pages were missing from any branch.citiesServed.
 //   - These are reported in the Step 1 verification output, not auto-fixed.
 //
-// Santa Barbara exception (2026-08-06, feat/santa-barbara Stage A):
-//   6 santa-barbara-county cities (santa-barbara, montecito, goleta,
-//   carpinteria, summerland, hope-ranch) are registered here BEFORE their
-//   .astro pillar pages exist (Stage B). All six sit in CITIES_WITHOUT_PAGES
-//   (branches.ts), and nav/areas surfaces filter by the 5 legacy counties,
-//   so no clickable 404 links are emitted. Remove this note when pillars ship.
+// Santa Barbara (2026-08-06, feat/santa-barbara): 6 santa-barbara-county
+// cities added; all 6 pillar pages shipped in Stage B+C. Canonical rule holds.
 
 import { BRANCHES, getBranchForCity } from './branches';
 

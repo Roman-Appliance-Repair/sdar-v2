@@ -126,7 +126,16 @@ const finalHeadline = headline ?? `Appliances We Repair in ${cityName}`;
 /** Same normalisation the href uses, so the icon key can never drift from the link. */
 const iconKey = (slug: string) => slug.replace(/^\/+|\/+$/g, '').replace(/-repair$/, '');
 
-const toHref = (slug: string) => `/services/${iconKey(slug)}-repair/`;
+// Slug→hub aliases where the icon key and the canonical hub slug differ.
+// 'bbq' pages (malibu, calabasas, the 4 SB-coast pillars) were emitting
+// /services/bbq-repair/ — a 404 with no redirect; the real hub is
+// /services/bbq-grill-repair/. Icon stays keyed on the original slug.
+const HREF_ALIAS: Record<string, string> = { bbq: 'bbq-grill' };
+
+const toHref = (slug: string) => {
+  const key = iconKey(slug);
+  return `/services/${HREF_ALIAS[key] ?? key}-repair/`;
+};
 ---
 
 <section class="v2-services">

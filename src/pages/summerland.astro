@@ -1,0 +1,297 @@
+---
+/**
+ * Summerland, CA — city pillar (feat/santa-barbara Stage C).
+ * Branch: Santa Barbara — service_area (no public street address).
+ *
+ * Angle (distinct from siblings): tiny coastal village between Montecito and
+ * Carpinteria. Old cottages on narrow lots, compact and stacked laundry,
+ * undersized kitchens where full-size appliances were retrofitted into spaces
+ * never designed for them. Honest about scale — small town, covered from the
+ * Santa Barbara branch on the daily 101 route.
+ *
+ * Zero-invention: repair cases reuse site-established patterns only (LG OE
+ * drain code, KitchenAid counter-depth airflow, Samsung oven bake element,
+ * dishwasher air-gap cleaning per our CA-code flagship page). No ReviewsBlock.
+ * Residential → $89 only.
+ */
+
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const citySlug = 'summerland';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Summerland';
+const zips = ['93067'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Summerland CA — Same Day Service`;
+const description = "Same-day appliance repair in Summerland 93067 — hillside cottages, compact kitchens, stacked laundry. Covered daily from Santa Barbara. $89 dx. (805) 500-0855.";
+const canonical = 'https://samedayappliance.repair/summerland/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Summerland', sameAs: 'https://en.wikipedia.org/wiki/Summerland,_California' },
+    { '@type': 'Place', name: 'Lillie Avenue' },
+    { '@type': 'Place', name: 'Lookout Park area' }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'BHGS #A49573'
+});
+
+const introParagraphs = [
+  "<strong>When an appliance fails in Summerland, our techs at Same Day Appliance Repair are usually working inside a space problem: hillside cottages on narrow lots where the laundry is a stacked pair in a hall closet, the kitchen was framed a century ago, and the refrigerator that lives there now is bigger than anything the builder imagined. We dispatch same-day along the Lillie Avenue village and the hillside lanes above Lookout Park. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
+  "Let's be honest about scale: Summerland is a few hundred households on a hillside between <a href=\"/montecito/\">Montecito</a> and <a href=\"/carpinteria/\">Carpinteria</a>, and no repair company keeps a truck parked here. What we keep instead is a daily 101 route that passes the Summerland exit every working day — our Santa Barbara branch covers the whole South Coast corridor, and Summerland sits dead-center on it. Same-day here isn't a stretch goal; it's geometry.",
+  "The village's building stock drives the work. Summerland's cottages date to an era of small rooms and smaller kitchens, and decades of remodels have packed modern equipment into them: counter-depth and full-size refrigerators boxed into alcoves with an inch of clearance, stacked washer-dryers in closets without much airflow, dishwashers plumbed into cabinetry that predates the plumbing code that governs them. Machines squeezed into tight spaces run hotter, vent worse, and get serviced less — because getting them out is a project. Tight-space extraction is routine for us: floor protection, appliance rollers, and the patience to do it without scarring a hundred-year-old doorframe.",
+  "The ocean is right there, too — most of the village looks at it. Salt exposure here is real but gentler than Carpinteria's beach grid; the hillside elevation helps. We still check coils and gaskets on refrigeration calls, because the coastal schedule applies, just with more forgiving math.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for same-day service in 93067 — and the rest of the <a href="/santa-barbara-county/">South Coast corridor</a>.`
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Alcove airflow · Counter-depth units · Coastal coil wear', brands: 'KitchenAid · Whirlpool · GE · LG · Samsung · Sub-Zero' },
+  { icon: '🫧', name: 'Washer & Dryer Repair', slug: 'washer', issues: 'Stacked pairs · Closet installs · Drain codes · Venting', brands: 'LG · Samsung · Whirlpool · GE · Bosch' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Air gap backups · Retrofit plumbing · Compact units', brands: 'Bosch · Miele · KitchenAid · Whirlpool · GE' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven', issues: 'Not heating · Elements · Igniters · Cottage kitchens', brands: 'Samsung · GE · Whirlpool · Wolf · Viking' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burners won't light · Compact cooktops · Glass tops", brands: 'GE · Bosch · Whirlpool · Wolf' },
+  { icon: '❄️', name: 'Freezer & Undercounter', slug: 'freezer', issues: 'Undercounter units · Frost · Small-space installs', brands: 'U-Line · GE · Frigidaire · Sub-Zero' }
+];
+
+const cottageNarrative = {
+  eyebrow: 'SMALL VILLAGE, TIGHT KITCHENS',
+  headline: 'Full-Size Appliances in Cottage-Size Spaces',
+  paragraphs: [
+    "Summerland's remodels all faced the same constraint: the rooms weren't getting bigger. So the village is full of modern appliances installed at the very edge of fit — refrigerators in alcoves with no side clearance, stacked laundry behind louvered closet doors, dishwashers whose supply lines snake through cabinetry never meant to hold plumbing.",
+    "Tight installs create their own service patterns. A refrigerator with an inch of clearance recirculates its own heat, runs longer, and wears its cooling system faster than the same unit breathing freely — on boxed-in units, condenser airflow is the first thing we check, not the last. Stacked pairs in closets vent poorly, so lint and moisture issues show up earlier. And everything is harder to reach, which means small faults get ignored until they're big ones, because nobody wants to wrestle the machine out of its nook to look.",
+    "Wrestling machines out of nooks is, frankly, a skill we've built. Rollers, floor protection, door-frame padding, and the two-person patience to extract a unit from a space with zero margin — then put it back without a mark. If your last technician declined the job because the appliance was 'inaccessible,' that's the call we're used to getting next."
+  ]
+};
+
+const neighborhoods = [
+  { name: 'Lillie Avenue village', zip: '93067', featured: true },
+  { name: 'Hillside lanes above Lookout Park', zip: '93067', featured: true },
+  { name: 'Ortega Hill side (toward Montecito)', zip: '93067' },
+  { name: 'Padaro side (toward Carpinteria)', zip: '93067' }
+];
+
+const recentJobs = [
+  {
+    appliance: 'LG Washer',
+    location: 'Hillside lane, 93067',
+    quote: 'Stacked washer shows OE and the closet smells damp',
+    description: "Stacked LG pair in a hall closet — OE is LG's drain code, and the damp smell said the water wasn't leaving. The drain hose had kinked where the stack pressed it against the closet's back wall, a pure tight-install failure. Artur re-routed and secured the hose with proper clearance, cleared the pump filter while the unit was out, and confirmed clean draining through a full cycle before sliding the stack back in.",
+    outcome: '✓ Same day · Hose re-routed · Full cycle verified'
+  },
+  {
+    appliance: 'KitchenAid Refrigerator',
+    location: 'Lillie Avenue area, 93067',
+    quote: 'Counter-depth fridge runs warm on top, hot on the sides',
+    description: "Counter-depth KitchenAid boxed into a cottage alcove with almost no clearance — hot side panels are the tell that the unit can't shed heat into the space. The condenser area was heavily loaded with dust the airflow could never clear on its own. Deep-cleaned the condenser, restored what clearance the alcove allowed, and set expectations honestly: in this install, coil cleaning is an annual item, not a someday item.",
+    outcome: '✓ Same day · Condenser serviced · Annual schedule set'
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'Ortega Hill side, 93067',
+    quote: 'Sink air gap sputtering water every time the dishwasher drains',
+    description: "Cottage remodel with the dishwasher retrofitted into original cabinetry. Water spitting from the counter air gap means the line past it is restricted — debris had built up at the disposer inlet. Cleared the air gap cap and lower hose, cleared the blockage, ran the machine through a drain cycle to confirm quiet, clean flow. California plumbing code puts that air gap there for a reason; when it sputters, it's doing its job of telling you something.",
+    outcome: '✓ Same day · Air gap path cleared · Drain verified'
+  },
+  {
+    appliance: 'Samsung Range',
+    location: 'Lookout Park area, 93067',
+    quote: 'Oven takes forever and never browns anything',
+    description: "Samsung electric range in a compact kitchen — long preheats and pale baking are the bake element's retirement announcement. Confirmed the element had failed, replaced it, and verified temperature at multiple setpoints with a thermometer. Small kitchen, small job, done in an hour — the kind of visit that reminds people repair is usually the sane option.",
+    outcome: '✓ Same day · Bake element replaced · Temps verified'
+  }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'clock' as const,
+    title: 'On the Route Every Day',
+    body: "Our Santa Barbara branch passes the Summerland exit every working day, headed to jobs on both sides of you. That's why a village this small still gets big-city response times."
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Tight-Space Extraction',
+    body: 'Alcoves, closets, zero-clearance installs, hundred-year-old doorframes — getting the machine out without a mark is half the job in Summerland, and we bring the rollers, pads, and patience for it.'
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Compact & Stacked Specialists',
+    body: 'Stacked pairs, counter-depth units, undercounter refrigeration, compact dishwashers — the small-space equipment this village actually runs, serviced with OEM parts.'
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Written estimate before we start; the invoice matches it. $89 diagnostic, waived with repair.'
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator', range: '$200–$450', note: 'Alcove airflow service · Counter-depth · Coastal coil checks', featured: true },
+  { appliance: 'Stacked Washer / Dryer', range: '$150–$380', note: 'Closet installs · Extraction included in the job' },
+  { appliance: 'Dishwasher', range: '$150–$320', note: 'Air gap backups · Retrofit plumbing · Compact units' },
+  { appliance: 'Oven / Range', range: '$175–$420', note: 'Elements · Igniters · Calibration' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' }
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Summerland, CA?',
+    answer: "Yes — and Summerland is one of the easier places for us to promise it. Our Santa Barbara branch runs the 101 corridor daily, and the village sits in the middle of the route between Montecito and Carpinteria. Call before noon and we can usually be there the same day."
+  },
+  {
+    question: 'Is Summerland too small for you to actually service?',
+    answer: "No, and we'd rather answer this honestly than let you wonder: no company stations a technician in a village of a few hundred households. What matters is route geometry — we pass the Summerland exit every working day, so you get the same response as our Santa Barbara customers, from the same branch, at the same $89 diagnostic."
+  },
+  {
+    question: 'Can you get an appliance out of a really tight space?',
+    answer: "That's practically the Summerland specialty. Refrigerators in zero-clearance alcoves, stacked laundry in hall closets, dishwashers behind original cottage cabinetry — extraction with floor protection and door-frame padding is a normal part of the job here, not a reason to decline it."
+  },
+  {
+    question: 'Do stacked washer-dryers need different service than side-by-side pairs?',
+    answer: 'The machines are similar; the install is not. Stacks in closets vent poorly, pinch drain hoses against walls, and hide problems until they smell or leak. We service the pair as an installation — hose routing, venting, and clearance — not just the component that threw the error code.'
+  },
+  {
+    question: 'Does salt air affect appliances in Summerland?',
+    answer: "Yes, though more gently than in beach-grid Carpinteria — the hillside elevation buys some margin. We still check condenser coils and door gaskets on refrigeration calls, because the coastal wear schedule applies everywhere the ocean is visible, and in Summerland it's visible from almost everywhere."
+  },
+  {
+    question: 'What is your diagnostic fee in Summerland?',
+    answer: '$89, waived the moment you approve the repair. Written estimate before any work starts — no trip surcharge for the village, because you\'re on our daily route anyway.'
+  },
+  {
+    question: 'What warranty do you provide on repairs in Summerland?',
+    answer: '90 days on parts and labor, with OEM parts wherever available. Tight-install repairs get the same warranty as easy ones — extraction difficulty is our problem, not yours.'
+  }
+];
+
+const nearbyCities = [
+  { name: 'Montecito', slug: 'montecito' },
+  { name: 'Carpinteria', slug: 'carpinteria' },
+  { name: 'Santa Barbara', slug: 'santa-barbara' },
+  { name: 'Ventura', slug: 'ventura' }
+];
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Summerland, CA"
+    subheadline="Hillside cottages, compact kitchens, stacked laundry in closets — small-space appliance work is the village specialty. On our route daily. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={2}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Summerland — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Summerland Service"
+    bookingSub="93067 · Cottages · Compact Installs"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Summerland"
+    subhead="Compact installs · Stacked laundry · Cottage kitchens · 93067"
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={cottageNarrative.eyebrow}
+    headline={cottageNarrative.headline}
+    paragraphs={cottageNarrative.paragraphs}
+    background="white"
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Summerland Areas We Service"
+    subheadline="The whole village — Lillie Avenue to the hillside lanes."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Summerland"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Summerland Calls Us"
+    reasons={whyReasons}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Summerland"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Summerland Clients Ask"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Summerland?"
+    body="Cottage kitchens · Stacked laundry · Tight installs · All of 93067. $89 diagnostic waived with repair. 90-day warranty."
+  />
+
+  <section class="section">
+    <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">Santa Barbara County coverage</p>
+      <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">One branch for the whole South Coast.</h2>
+      <p>Summerland sits mid-corridor in our <a href="/santa-barbara-county/">Santa Barbara County service area</a> — the same branch and techs cover <a href="/montecito/">Montecito</a>, <a href="/carpinteria/">Carpinteria</a>, <a href="/santa-barbara/">Santa Barbara</a>, <a href="/hope-ranch/">Hope Ranch</a>, and <a href="/goleta/">Goleta</a>. (805) 500-0855 covers all of it.</p>
+    </div>
+  </section>
+</CityLayoutV2>

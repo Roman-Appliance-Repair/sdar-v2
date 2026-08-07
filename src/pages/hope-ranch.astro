@@ -1,0 +1,319 @@
+---
+/**
+ * Hope Ranch, CA — city pillar (feat/santa-barbara Stage C).
+ * Branch: Santa Barbara — service_area (no public street address).
+ *
+ * Angle (distinct from /montecito/ — the cannibalization risk): Hope Ranch is
+ * the gated/private-road estate enclave with MULTI-BUILDING properties. The
+ * page owns: pool houses, guest houses, secondary kitchens, multiple
+ * refrigeration units per property, equestrian-property logistics, private
+ * roads / gate codes / patrol scheduling. Montecito keeps the "aging Sub-Zero
+ * 500/600-series without service history" angle — deliberately NOT used here.
+ *
+ * Zero-invention: repair cases reuse site-established patterns/brands only
+ * (Lynx igniters, U-Line undercounter condenser, Thermador older-model F-codes
+ * per our L-2 enrich, Miele F12/F13 inlet per our L-2 fix). No ReviewsBlock.
+ * Residential → $89 only.
+ */
+
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const citySlug = 'hope-ranch';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Hope Ranch';
+const zips = ['93110'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Hope Ranch CA — Same Day Service`;
+const description = "Appliance repair in Hope Ranch 93110 — main kitchens, pool houses, guest houses, outdoor kitchens. Private-road logistics handled. $89 dx. (805) 500-0855.";
+const canonical = 'https://samedayappliance.repair/hope-ranch/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Hope Ranch', sameAs: 'https://en.wikipedia.org/wiki/Hope_Ranch,_California' },
+    { '@type': 'Place', name: 'Las Palmas Drive' },
+    { '@type': 'Place', name: 'Laguna Blanca area' }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$$',
+  license: 'BHGS #A49573'
+});
+
+const introParagraphs = [
+  "<strong>When an appliance fails in Hope Ranch, our techs at Same Day Appliance Repair rarely find just one kitchen. A typical property here runs a main kitchen, a butler's pantry, a pool house with its own refrigeration, a guest house with a second full appliance set, and an outdoor kitchen on the terrace — five or six refrigeration units on one parcel is normal, not exceptional. We service the whole inventory in one relationship, and we know the drill on private roads, gate codes, and patrol check-ins. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
+  "Hope Ranch is its own kind of estate community — not a city, not quite a neighborhood, but a private enclave of large parcels behind its own roads, with the lake, the bridle trails, and an equestrian culture that shapes how properties are built. Homes here spread out instead of up: separate structures, long driveways, outbuildings with plumbing and power. Every one of those structures accumulates appliances, and every appliance eventually needs someone who'll actually drive past the gate to look at it.",
+  "The multi-building layout changes the service math. When we come out for the pool house ice maker, it costs almost nothing to also look at the guest house refrigerator that's been making a noise since spring — same visit, same trip, one invoice. We encourage Hope Ranch clients to keep a running list; batching two or three small items into one call is the efficient way to run a property this size, and it's how the properties that look after themselves actually do it.",
+  "Logistics get handled like locals: gate codes and access notes stay in the property's job record, we call ahead the way the household prefers, we're comfortable coordinating through house staff or a property manager, and we treat the private roads at the speed they're posted — slower where the horses are. None of this is exotic; it's just Hope Ranch, and we work it regularly enough that it's routine.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for service across 93110 — and the rest of the <a href="/santa-barbara-county/">South Coast corridor</a>.`
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigeration — Every Building', slug: 'refrigerator', issues: 'Main kitchen · Pool house · Guest house · Beverage centers', brands: 'Sub-Zero · Thermador · U-Line · True · GE Monogram · KitchenAid' },
+  { icon: '🔆', name: 'Outdoor Kitchen Repair', slug: 'bbq', issues: 'Built-in grills · Side burners · Terrace refrigeration', brands: 'Lynx · Fire Magic · Twin Eagles · Viking · Wolf · DCS' },
+  { icon: '🔥', name: 'Range & Oven Repair', slug: 'oven', issues: 'Fault codes · Igniters · Calibration · Double ovens', brands: 'Thermador · Wolf · Viking · Miele · Dacor' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Panel-front units · Butler’s pantry second units · Fill faults', brands: 'Miele · Bosch · Thermador · KitchenAid' },
+  { icon: '🍷', name: 'Wine & Beverage Cooling', slug: 'wine-cooler', issues: 'Undercounter units · Beverage centers · Temperature drift', brands: 'U-Line · Sub-Zero · Perlick · EuroCave' },
+  { icon: '🫧', name: 'Laundry Repair', slug: 'washer', issues: 'Main + guest house sets · Large-capacity machines', brands: 'LG · Miele · Whirlpool · Speed Queen' },
+  { icon: '❄️', name: 'Freezer & Undercounter', slug: 'freezer', issues: 'Garage and outbuilding units · Ice makers · Drawers', brands: 'Sub-Zero · U-Line · True · Frigidaire' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burners won't light · Induction · Pool-house cooktops", brands: 'Thermador · Wolf · Miele · GE' }
+];
+
+const multiBuildingNarrative = {
+  eyebrow: 'ONE PARCEL, MANY KITCHENS',
+  headline: 'Hope Ranch Properties Are Appliance Fleets, Not Households',
+  paragraphs: [
+    "Count the refrigeration on a typical Hope Ranch parcel: the main kitchen's built-in, the butler's pantry column or drawers, the pool house undercounter, the guest house's full-size unit, a beverage center at the outdoor kitchen, maybe a garage freezer holding the overflow. That's six compressors on one property — a small fleet, each unit with its own age, duty cycle, and environment.",
+    "Fleets deserve fleet thinking. The pool house undercounter that only runs hard in summer fails differently from the garage freezer that runs year-round in an unconditioned space, and differently again from the pampered main-kitchen built-in. When we service one unit, we log what we saw on the others worth glancing at — a gasket going soft here, a condenser loading up there — so the property has an actual picture of its inventory instead of a series of surprises.",
+    "The outbuildings are where problems hide. Main kitchens get noticed; the guest house refrigerator gets discovered — usually by a guest. A twice-a-year walkthrough of the secondary units costs one service visit and catches the quiet failures while they're cheap. Several Hope Ranch properties run exactly that arrangement with us, and their 'appliance emergencies' have mostly stopped being emergencies."
+  ]
+};
+
+const accessNarrative = {
+  eyebrow: 'PRIVATE ROADS, HANDLED PROPERLY',
+  headline: 'The Logistics Are Part of the Service',
+  paragraphs: [
+    "Getting a service truck to a Hope Ranch kitchen involves things a normal service call doesn't: the gate, the access list, the patrol that keeps an eye on unfamiliar vehicles, the long shared driveways, the household's preferences about when and where service traffic is welcome. We treat all of it as part of the job, not friction around it.",
+    "Practically: access notes and gate procedures live in the property's job record so nothing gets re-explained on the second visit. We confirm arrival windows the way the household prefers — with the owner, the house manager, or the property office. We drive the ranch roads at ranch speeds, especially anywhere near the bridle trails, and we position and park where we're told. Horses spook; our trucks don't need to be the reason.",
+    "And when the caller is a property manager running the parcel for an owner who's elsewhere, everything forwards cleanly: written estimates for remote approval, photos of what we found, invoices to the office, and one number — the same <a href=\"/santa-barbara/\">Santa Barbara branch</a> — covering this property and any others on the South Coast."
+  ]
+};
+
+const neighborhoods = [
+  { name: 'Las Palmas Drive corridor', zip: '93110', featured: true },
+  { name: 'Laguna Blanca area', zip: '93110', featured: true },
+  { name: 'Bridle-trail lanes', zip: '93110' },
+  { name: 'Marina-side slopes', zip: '93110' },
+  { name: 'Hope Ranch Annex', zip: '93110' }
+];
+
+const recentJobs = [
+  {
+    appliance: 'Lynx Grill',
+    location: 'Pool house terrace, 93110',
+    quote: 'Built-in grill clicking, one burner low, party this weekend',
+    description: "Outdoor kitchen at the pool house — Lynx built-in with a corroded igniter module and a burner starving on a partially blocked port. Artur replaced the igniter module with an OEM Lynx part, cleaned and cleared the burner, and verified even flame across all positions. While there, glanced at the terrace beverage center at the household's request — added its aging gasket to the property log for next visit.",
+    outcome: '✓ Same day · OEM Lynx igniter · Weekend saved'
+  },
+  {
+    appliance: 'U-Line Undercounter',
+    location: 'Guest house, 93110',
+    quote: 'Guest house beverage fridge warm — discovered by the guests',
+    description: "Classic outbuilding failure: a U-Line undercounter that had been quietly struggling for months with nobody around to notice. The condenser was choked with dust in a cabinet corner that never gets vacuumed. Deep-cleaned the condenser and verified pulldown to setpoint. This is exactly the unit type our twice-a-year secondary-building walkthroughs exist for.",
+    outcome: '✓ Same day · Condenser serviced · Added to walkthrough list'
+  },
+  {
+    appliance: 'Thermador Oven',
+    location: 'Main kitchen, Las Palmas corridor, 93110',
+    quote: 'Older double oven flashing an F code and locking us out',
+    description: "Older-generation Thermador double wall oven throwing one of the F-series fault codes these models use. Diagnosed it to the door-latch circuit rather than the control board — a meaningful difference in repair cost, and the reason code-reading needs verification rather than parts-cannon guessing. Repaired the latch mechanism, cleared the fault, and ran both cavities through full heat cycles.",
+    outcome: '✓ Latch repaired · Board spared · Both cavities verified'
+  },
+  {
+    appliance: 'Miele Dishwasher',
+    location: "Butler's pantry, 93110",
+    quote: 'Second dishwasher hesitates filling, then quits with a fault',
+    description: "The butler's-pantry Miele — the entertaining workhorse — showing a fill-side fault (F12/F13 family points at water intake). Found the inlet screen clogged with mineral grit, exactly what South Coast hard water does to intake paths over years. Cleaned the intake screen and valve area, verified fill rate and a complete cycle. The main-kitchen unit got a preventive intake check on the same visit — one trip, one invoice, both dishwashers covered.",
+    outcome: '✓ Same day · Intake cleared · Second unit checked preventively'
+  }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'Whole-Property Coverage',
+    body: 'Main kitchen, pool house, guest house, outdoor kitchen, garage — one relationship covers every appliance on the parcel, with a running property log instead of six separate service histories.'
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Batched Visits, One Invoice',
+    body: "Multi-building properties run efficiently on batched calls: the urgent item plus the list of small ones, handled in one trip. It's cheaper for you and better for the machines, because small faults get seen while they're small."
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Private-Road Fluent',
+    body: 'Gate codes on file, patrol-aware arrivals, ranch-speed driving near the bridle trails, coordination through house staff or property managers. The logistics are part of the service, not an obstacle to it.'
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor, OEM parts throughout — outdoor and outbuilding units included. $89 diagnostic, waived with repair.'
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Built-In / Column Refrigeration', range: '$300–$700+', note: 'Main kitchen and pantry units · OEM parts', featured: true },
+  { appliance: 'Outdoor Kitchen / Grill', range: '$150–$400', note: 'Lynx, Fire Magic, Viking · Igniters · Burners · Terrace units' },
+  { appliance: 'Undercounter / Beverage', range: '$175–$450', note: 'Pool house and guest house units · Condensers · Gaskets' },
+  { appliance: 'Range / Oven', range: '$175–$500', note: 'Thermador, Wolf, Viking · Fault codes · Calibration' },
+  { appliance: 'Dishwasher', range: '$150–$350', note: 'Miele, Bosch · Fill faults · Panel-front units' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair · Per property visit' }
+];
+
+const faqs = [
+  {
+    question: 'Do you service Hope Ranch, including the private roads?',
+    answer: "Yes. Hope Ranch is part of our daily Santa Barbara territory — 93110, from the Las Palmas Drive corridor to the Laguna Blanca area and the bridle-trail lanes. We handle the access logistics as part of the job: gate procedures on file, patrol-aware arrivals, and scheduling through whoever runs the household."
+  },
+  {
+    question: 'Can you service all the buildings on our property, not just the main house?',
+    answer: "That's the way we prefer to work in Hope Ranch. Pool house, guest house, outdoor kitchen, garage units — one relationship covers the whole parcel, with a property log tracking every unit. Batching the urgent repair with the list of small items into one visit is the efficient way to run a multi-building property."
+  },
+  {
+    question: 'Why did our guest house refrigerator fail without warning?',
+    answer: "It almost certainly warned — nobody was there to hear it. Outbuilding units run unattended for long stretches, so gradual failures (a loading condenser, a softening gasket, a longer run time) go unnoticed until a guest opens a warm refrigerator. A twice-a-year walkthrough of the secondary units catches these while they're one-visit fixes, and several Hope Ranch properties run exactly that schedule with us."
+  },
+  {
+    question: 'Do you repair outdoor kitchens in Hope Ranch?',
+    answer: 'Yes — built-in grills, side burners, and terrace refrigeration from Lynx, Fire Magic, Twin Eagles, Viking, Wolf, and DCS. Pool-house and terrace equipment lives outdoors year-round here, and igniters and gaskets wear on the outdoor schedule. We service it all with OEM parts.'
+  },
+  {
+    question: 'Do you work with property managers and house staff in Hope Ranch?',
+    answer: 'Yes — most Hope Ranch jobs are coordinated by house managers or property offices, and the workflow fits: estimates you can forward for sign-off, photos of what we found, billing wherever the bookkeeping lives, and the gate procedure remembered from visit to visit so nobody re-explains it.'
+  },
+  {
+    question: 'What is your diagnostic fee in Hope Ranch?',
+    answer: "$89 per visit, waived the moment you approve a repair — and one visit can cover multiple units on the property, which is where the multi-building math works in your favor. Written estimate before any work; the invoice matches it."
+  },
+  {
+    question: 'What warranty do you provide on repairs in Hope Ranch?',
+    answer: '90 days on parts and labor with OEM parts throughout — including outdoor kitchen and outbuilding equipment, which some companies exclude. A repair in the pool house carries the same warranty as one in the main kitchen.'
+  }
+];
+
+const nearbyCities = [
+  { name: 'Santa Barbara', slug: 'santa-barbara' },
+  { name: 'Goleta', slug: 'goleta' },
+  { name: 'Montecito', slug: 'montecito' },
+  { name: 'Ventura', slug: 'ventura' }
+];
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Hope Ranch, CA"
+    subheadline="Main kitchen, pool house, guest house, outdoor kitchen — whole-property appliance service behind the gates. Private-road logistics handled. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={1}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Hope Ranch — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Hope Ranch Service Team"
+    bookingSub="93110 · Multi-Building Properties · Estates"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Hope Ranch"
+    subhead="Every building on the parcel · Outdoor kitchens · 93110"
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={multiBuildingNarrative.eyebrow}
+    headline={multiBuildingNarrative.headline}
+    paragraphs={multiBuildingNarrative.paragraphs}
+    background="white"
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Hope Ranch Areas We Service"
+    subheadline="The whole enclave — Las Palmas Drive to the bridle-trail lanes."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <CustomNarrative
+    eyebrow={accessNarrative.eyebrow}
+    headline={accessNarrative.headline}
+    paragraphs={accessNarrative.paragraphs}
+    background="gray"
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Hope Ranch"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Hope Ranch Properties Call Us"
+    reasons={whyReasons}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Hope Ranch"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Hope Ranch Clients Ask"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Hope Ranch?"
+    body="Main kitchen · Pool house · Guest house · Outdoor kitchen · All of 93110. $89 diagnostic waived with repair. 90-day warranty. OEM parts."
+  />
+
+  <section class="section">
+    <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">Santa Barbara County coverage</p>
+      <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">One branch for the whole South Coast.</h2>
+      <p>Hope Ranch is part of our <a href="/santa-barbara-county/">Santa Barbara County service area</a> — the same branch and techs cover <a href="/santa-barbara/">Santa Barbara</a>, <a href="/goleta/">Goleta</a>, <a href="/montecito/">Montecito</a>, <a href="/summerland/">Summerland</a>, and <a href="/carpinteria/">Carpinteria</a>. For outdoor equipment deep-dives, see <a href="/outdoor/kitchen-repair/">outdoor kitchen repair</a> and <a href="/outdoor/grill-repair/">grill repair</a>.</p>
+    </div>
+  </section>
+</CityLayoutV2>
