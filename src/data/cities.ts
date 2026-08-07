@@ -16,6 +16,13 @@
 //      beverly-glen, playa-del-rey, venice, mar-vista, sierra-madre, altadena).
 //   - 0 disk pages were missing from any branch.citiesServed.
 //   - These are reported in the Step 1 verification output, not auto-fixed.
+//
+// Santa Barbara exception (2026-08-06, feat/santa-barbara Stage A):
+//   6 santa-barbara-county cities (santa-barbara, montecito, goleta,
+//   carpinteria, summerland, hope-ranch) are registered here BEFORE their
+//   .astro pillar pages exist (Stage B). All six sit in CITIES_WITHOUT_PAGES
+//   (branches.ts), and nav/areas surfaces filter by the 5 legacy counties,
+//   so no clickable 404 links are emitted. Remove this note when pillars ship.
 
 import { BRANCHES, getBranchForCity } from './branches';
 
@@ -24,7 +31,8 @@ export type CountySlug =
   | 'orange'
   | 'ventura'
   | 'san-bernardino'
-  | 'riverside';
+  | 'riverside'
+  | 'santa-barbara';
 
 export interface City {
   slug: string;
@@ -40,7 +48,8 @@ export const COUNTIES: Record<CountySlug, { name: string; hubUrl: string }> = {
   'orange':         { name: 'Orange County',          hubUrl: '/orange-county/' },
   'ventura':        { name: 'Ventura County',         hubUrl: '/ventura-county/' },
   'san-bernardino': { name: 'San Bernardino County',  hubUrl: '/san-bernardino-county/' },
-  'riverside':      { name: 'Riverside County',       hubUrl: '/riverside-county/' }
+  'riverside':      { name: 'Riverside County',       hubUrl: '/riverside-county/' },
+  'santa-barbara':  { name: 'Santa Barbara County',   hubUrl: '/santa-barbara-county/' }
 };
 
 export const CITIES: City[] = [
@@ -55,6 +64,7 @@ export const CITIES: City[] = [
   { slug: 'burbank',              name: 'Burbank',              county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'calabasas',            name: 'Calabasas',            county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'camarillo',            name: 'Camarillo',            county: 'ventura',        primaryBranch: 'thousand-oaks' },
+  { slug: 'carpinteria',          name: 'Carpinteria',          county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
   { slug: 'chino-hills',          name: 'Chino Hills',          county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'corona',               name: 'Corona',               county: 'riverside',      primaryBranch: 'riverside' },
   { slug: 'costa-mesa',           name: 'Costa Mesa',           county: 'orange',         primaryBranch: 'irvine' },
@@ -67,9 +77,11 @@ export const CITIES: City[] = [
   { slug: 'fullerton',            name: 'Fullerton',            county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'glassell-park',        name: 'Glassell Park',        county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'glendale',             name: 'Glendale',             county: 'los-angeles',    primaryBranch: 'pasadena' },
+  { slug: 'goleta',               name: 'Goleta',               county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
   { slug: 'hemet',                name: 'Hemet',                county: 'riverside',      primaryBranch: 'riverside' },
   { slug: 'highland-park',        name: 'Highland Park',        county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'hollywood',            name: 'Hollywood',            county: 'los-angeles',    primaryBranch: 'west-hollywood' },
+  { slug: 'hope-ranch',           name: 'Hope Ranch',           county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
   { slug: 'huntington-beach',     name: 'Huntington Beach',     county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'irvine',               name: 'Irvine',               county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'koreatown',            name: 'Koreatown',            county: 'los-angeles',    primaryBranch: 'los-angeles' },
@@ -87,6 +99,7 @@ export const CITIES: City[] = [
   { slug: 'menifee',              name: 'Menifee',              county: 'riverside',      primaryBranch: 'riverside' },
   { slug: 'mission-viejo',        name: 'Mission Viejo',        county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'monrovia',             name: 'Monrovia',             county: 'los-angeles',    primaryBranch: 'los-angeles' },
+  { slug: 'montecito',            name: 'Montecito',            county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
   { slug: 'monterey-park',        name: 'Monterey Park',        county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'moorpark',             name: 'Moorpark',             county: 'ventura',        primaryBranch: 'thousand-oaks' },
   { slug: 'moreno-valley',        name: 'Moreno Valley',        county: 'riverside',      primaryBranch: 'riverside' },
@@ -109,12 +122,14 @@ export const CITIES: City[] = [
   { slug: 'san-gabriel',          name: 'San Gabriel',          county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'san-marino',           name: 'San Marino',           county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'santa-ana',            name: 'Santa Ana',            county: 'orange',         primaryBranch: 'irvine' },
+  { slug: 'santa-barbara',        name: 'Santa Barbara',        county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
   { slug: 'santa-monica',         name: 'Santa Monica',         county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'sherman-oaks',         name: 'Sherman Oaks',         county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'silver-lake',          name: 'Silver Lake',          county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'simi-valley',          name: 'Simi Valley',          county: 'ventura',        primaryBranch: 'thousand-oaks' },
   { slug: 'south-pasadena',       name: 'South Pasadena',       county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'studio-city',          name: 'Studio City',          county: 'los-angeles',    primaryBranch: 'los-angeles' },
+  { slug: 'summerland',           name: 'Summerland',           county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
   { slug: 'tarzana',              name: 'Tarzana',              county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'temecula',             name: 'Temecula',             county: 'riverside',      primaryBranch: 'riverside' },
   { slug: 'temple-city',          name: 'Temple City',          county: 'los-angeles',    primaryBranch: 'pasadena' },

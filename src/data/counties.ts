@@ -54,6 +54,14 @@ export const counties: County[] = [
       "Corona", "Hemet", "Lake Elsinore", "Menifee",
       "Moreno Valley", "Murrieta", "Riverside", "Temecula"
     ]
+  },
+  {
+    name: "Santa Barbara County",
+    slug: "santa-barbara-county",
+    cities: [
+      "Carpinteria", "Goleta", "Hope Ranch",
+      "Montecito", "Santa Barbara", "Summerland"
+    ]
   }
 ];
 

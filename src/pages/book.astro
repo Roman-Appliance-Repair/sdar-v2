@@ -10,7 +10,7 @@ import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 const activeBranches = BRANCHES.filter(b => b.phoneStatus === 'active');
 
 const title = 'Book Appliance Repair Online — Same Day Service';
-const description = 'Book a same-day appliance repair visit online or by phone. $89 dx waived, OEM parts, 90-day labor warranty. 5 branches across SoCal.';
+const description = 'Book a same-day appliance repair visit online or by phone. $89 dx waived, OEM parts, 90-day labor warranty. 9 branches across SoCal.';
 const canonical = 'https://samedayappliance.repair/book/';
 
 const mainPhone = MAIN_PHONE;          // (424) 325-0520 — LA default
@@ -218,9 +218,10 @@ const breadcrumbSchema = {
           <h3>Service area</h3>
           <p>
             Los Angeles County (from Malibu to the San Gabriel Valley), Orange County, Ventura
-            County (through Thousand Oaks to Oxnard), plus parts of western San Bernardino and
-            Riverside counties from the Irvine and Los Angeles branches. If you're outside the
-            map, call anyway — we've driven further for the right repair.
+            County (through Thousand Oaks to Oxnard), the Santa Barbara South Coast (Carpinteria
+            through Montecito and Santa Barbara to Goleta), plus parts of western San Bernardino
+            and Riverside counties. If you're outside the map, call anyway — we've driven further
+            for the right repair.
           </p>
         </div>
         <div>
@@ -260,7 +261,7 @@ const breadcrumbSchema = {
       function telHref(p) { return 'tel:+1' + String(p || '').replace(/\D/g, ''); }
       function branchPhoneFor(slug) { return BRANCH_PHONES[slug] || MAIN_PHONE; }
 
-      // ── ZIP → branch slug (5-county coverage, LA default) ───────────────
+      // ── ZIP → branch slug (6-county coverage, LA default) ───────────────
       // branches.ts has no ZIP coverage table; this prefix map + boundary
       // overrides route the payload to the nearest branch for dispatch.
       function zipToBranch(zip) {
@@ -277,7 +278,16 @@ const breadcrumbSchema = {
           // Thousand Oaks / Conejo Valley zips that live in the 913xx block
           '91319': 'thousand-oaks', '91320': 'thousand-oaks', '91358': 'thousand-oaks',
           '91359': 'thousand-oaks', '91360': 'thousand-oaks', '91361': 'thousand-oaks',
-          '91362': 'thousand-oaks', '91377': 'thousand-oaks', '91301': 'thousand-oaks'
+          '91362': 'thousand-oaks', '91377': 'thousand-oaks', '91301': 'thousand-oaks',
+          // Santa Barbara branch — South Coast corridor (2026-08-06).
+          // 930xx/931xx prefixes stay thousand-oaks (Ventura county); these
+          // exact SB-county ZIPs override: Carpinteria, Summerland,
+          // Santa Barbara city (incl. 93108 Montecito, 93110 Hope Ranch), Goleta.
+          '93013': 'santa-barbara', '93067': 'santa-barbara',
+          '93101': 'santa-barbara', '93102': 'santa-barbara', '93103': 'santa-barbara',
+          '93104': 'santa-barbara', '93105': 'santa-barbara', '93106': 'santa-barbara',
+          '93107': 'santa-barbara', '93108': 'santa-barbara', '93109': 'santa-barbara',
+          '93110': 'santa-barbara', '93111': 'santa-barbara', '93117': 'santa-barbara'
         };
         if (exact[zip]) return exact[zip];
         var p3 = zip.slice(0, 3);

@@ -9,7 +9,7 @@
 // The parametric template at src/pages/[city]/[service].astro consumes these structures.
 
 export interface CityDescriptor {
-  tier: 'ULTRA-PREMIUM' | 'PREMIUM' | 'GENERAL' | 'PREMIUM-OC' | 'MID-TIER-NE' | 'MID-TIER-VENTURA' | 'INLAND-EMPIRE' | 'INLAND-RIVERSIDE';
+  tier: 'ULTRA-PREMIUM' | 'PREMIUM' | 'GENERAL' | 'PREMIUM-OC' | 'MID-TIER-NE' | 'MID-TIER-VENTURA' | 'INLAND-EMPIRE' | 'INLAND-RIVERSIDE' | 'PREMIUM-SB';
   neighborhoods: string[];
   climateNote: string;
   waterNote: string;
@@ -104,6 +104,15 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     homeStock: "Suburban single-family, 1990s-2010s construction. Wine Country has custom estates with premium built-in appliances. Mid-tier brands standard in valley tracts.",
     serviceContext: "Riverside branch covers Riverside, Corona, Moreno Valley, Norco, Eastvale, Temecula, Murrieta, Menifee, Lake Elsinore, Hemet.",
     branchSlug: 'riverside'
+  },
+  'santa-barbara': {
+    tier: 'PREMIUM-SB',
+    neighborhoods: ['The Riviera', 'The Mesa', 'San Roque', 'Upper East', 'Downtown / Funk Zone', 'Samarkand'],
+    climateNote: "Coastal Mediterranean climate with persistent marine layer and salt-air exposure along the Mesa and waterfront. Refrigerator condenser coils corrode faster near the beach — coil cleaning at year 2-3 is high-leverage. Summers stay mild; heat stress on compressors is lower than inland LA.",
+    waterNote: "City of Santa Barbara water runs moderately hard to hard (blend of Cachuma Lake, groundwater, and desalination). Scaling on dishwashers, washers, and ice makers shows up at year 3-5 without descaling PM.",
+    homeStock: "Spanish Colonial Revival and craftsman inventory across the Riviera, Upper East, and San Roque; estate properties in the Montecito and Hope Ranch belt with built-in Sub-Zero, Wolf, Viking, Thermador, and Miele installations standard; condos downtown and student-adjacent stock toward Goleta.",
+    serviceContext: "Santa Barbara branch covers Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch — the South Coast corridor from Carpinteria to the Goleta line.",
+    branchSlug: 'santa-barbara'
   },
   // ====================================================================
   // Wave 24b — Top 5 non-hub priority cities (15,516 imp/mo GSC top + others)
@@ -693,6 +702,9 @@ SERVICE_DESCRIPTORS['range-repair'] = {
 export function getBrandPool(cityTier: CityDescriptor['tier'], service: ServiceDescriptor): string[] {
   switch (cityTier) {
     case 'ULTRA-PREMIUM':
+    // PREMIUM-SB: Santa Barbara / Montecito / Hope Ranch estate corridor —
+    // luxury pool (Sub-Zero, Wolf, Viking, Thermador, Miele) per 2026-08-06 decision.
+    case 'PREMIUM-SB':
       return service.brandPoolUltraPremium;
     case 'PREMIUM':
     case 'PREMIUM-OC':

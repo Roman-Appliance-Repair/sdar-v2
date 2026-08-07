@@ -1,6 +1,6 @@
 // src/data/branches.ts
 //
-// SINGLE SOURCE OF TRUTH for all 7 service locations.
+// SINGLE SOURCE OF TRUTH for all 9 service locations.
 //
 // CRITICAL RULE — DO NOT VIOLATE:
 //   Only `physical_pin` type renders public street address.
@@ -90,7 +90,7 @@ export interface Branch {
     close: string;
   };
   /** County this branch primarily services */
-  primaryCounty: 'los-angeles' | 'orange' | 'ventura' | 'san-bernardino' | 'riverside';
+  primaryCounty: 'los-angeles' | 'orange' | 'ventura' | 'san-bernardino' | 'riverside' | 'santa-barbara';
   /** All cities served by this branch (city slugs) */
   citiesServed: string[];
   /** Curated 3-4 neighborhood/city names to display on brand pages.
@@ -521,6 +521,48 @@ export const BRANCHES: Branch[] = [
     sameAs: [
       'https://www.youtube.com/@SameDayAppliance.Repair'
     ]
+  },
+
+  // ─────────────────────────────────────────────────
+  // 9. SANTA BARBARA — Service Territory (Santa Barbara County)
+  // Added 2026-08-06 (feat/santa-barbara Stage A — 9th branch, 6th county).
+  //   Covers the South Coast corridor: Santa Barbara city anchor plus the
+  //   Montecito / Hope Ranch estate belt, Goleta, Summerland, Carpinteria.
+  //   SAB — NO public street address (WeHo stays the only physical_pin).
+  //   City pillar pages for these slugs are Stage B — all six slugs sit in
+  //   CITIES_WITHOUT_PAGES below until the .astro pages ship.
+  // ─────────────────────────────────────────────────
+  {
+    slug: 'santa-barbara',
+    name: 'Santa Barbara',
+    fullName: 'Same Day Appliance Repair — Santa Barbara',
+    gbpName: 'Same Day Appliance Repair Santa Barbara',
+    displayCity: 'Santa Barbara',
+    isServiceArea: true,
+    type: 'service_area',
+    gbpStatus: 'pending',
+    phone: '(805) 500-0855',
+    phoneStatus: 'active',
+    email: 'santabarbara@samedayappliance.repair',
+    geo: {
+      cityCenterLat: 34.4208,
+      cityCenterLng: -119.6982,
+      serviceRadius: 20
+    },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
+    primaryCounty: 'santa-barbara',
+    citiesServed: [
+      'santa-barbara',
+      'montecito',
+      'goleta',
+      'carpinteria',
+      'summerland',
+      'hope-ranch'
+    ],
+    displayAreas: ['Santa Barbara', 'Montecito', 'Goleta', 'Carpinteria'],
+    sameAs: [
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   }
 ];
 
@@ -581,7 +623,9 @@ export const CITIES_WITHOUT_PAGES = new Set<string>([
   // Pasadena
   'sierra-madre', 'altadena',
   // Riverside (new entries 2026-05-08; pages not yet authored)
-  'norco', 'eastvale'
+  'norco', 'eastvale',
+  // Santa Barbara (branch added 2026-08-06; city pillars are Stage B)
+  'santa-barbara', 'montecito', 'goleta', 'carpinteria', 'summerland', 'hope-ranch'
 ]);
 
 /** Returns citiesServed for a branch, but ONLY those with .astro pages on disk.

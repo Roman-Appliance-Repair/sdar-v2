@@ -175,10 +175,10 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 
 Распределение по филиалам (внутреннее, для текстов / quote attributions):
 - Mikhail V. → West Hollywood, Beverly Hills, LA
-- Artur S. → Pasadena, Thousand Oaks
+- Artur S. → Pasadena, Thousand Oaks, Santa Barbara
 - David K. → Irvine, Rancho Cucamonga, Temecula
 
-## 11. Branch phones (8 филиалов)
+## 11. Branch phones (9 филиалов)
 
 | Branch | Phone | Email | Status |
 |---|---|---|---|
@@ -190,5 +190,8 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 | Irvine | (213) 401-9019 | irvine@samedayappliance.repair | Live |
 | Rancho Cucamonga | (909) 457-1030 | ranchocucamonga@samedayappliance.repair | Live (real DID, GBP pending) |
 | Temecula | (951) 577-3877 | temecula@samedayappliance.repair | Live (real DID, GBP pending) |
+| Santa Barbara | (805) 500-0855 | santabarbara@samedayappliance.repair | Live (service_area, GBP pending; добавлен 2026-08-06, 6-й каунти) |
 
 **Источник правды:** `src/data/branches.ts` — не дублировать здесь при изменениях.
+
+**Примечание (2026-08-06):** строка «Temecula» в таблице выше — исторический лейбл; в `branches.ts` этот филиал с 2026-05-08 называется Riverside (email `riverside@samedayappliance.repair`). SSOT — branches.ts.
