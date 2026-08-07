@@ -43,7 +43,7 @@ export const HOMEPAGE_FAQ: FAQItem[] = [
   {
     question: 'Do you service my area?',
     answer:
-      `We cover Los Angeles, Orange, Ventura, Santa Barbara, San Bernardino, and Riverside counties — ${TOTAL_CITY_COUNT} cities total. Our headquarters is in West Hollywood with service territories across all ${COUNTY_COUNT} counties for fast same-day dispatch.`
+      `We cover Los Angeles, Orange, Ventura, Santa Barbara, San Bernardino, Riverside, and San Diego counties — ${TOTAL_CITY_COUNT} cities total. Our headquarters is in West Hollywood with service territories across all ${COUNTY_COUNT} counties for fast same-day dispatch.`
   },
   {
     question: 'How do you handle pricing?',

@@ -1,6 +1,6 @@
 // src/data/branches.ts
 //
-// SINGLE SOURCE OF TRUTH for all 9 service locations.
+// SINGLE SOURCE OF TRUTH for all 10 service locations.
 //
 // CRITICAL RULE — DO NOT VIOLATE:
 //   Only `physical_pin` type renders public street address.
@@ -90,7 +90,7 @@ export interface Branch {
     close: string;
   };
   /** County this branch primarily services */
-  primaryCounty: 'los-angeles' | 'orange' | 'ventura' | 'san-bernardino' | 'riverside' | 'santa-barbara';
+  primaryCounty: 'los-angeles' | 'orange' | 'ventura' | 'san-bernardino' | 'riverside' | 'santa-barbara' | 'san-diego';
   /** All cities served by this branch (city slugs) */
   citiesServed: string[];
   /** Curated 3-4 neighborhood/city names to display on brand pages.
@@ -563,6 +563,50 @@ export const BRANCHES: Branch[] = [
     sameAs: [
       'https://www.youtube.com/@SameDayAppliance.Repair'
     ]
+  },
+
+  // ─────────────────────────────────────────────────
+  // 10. SAN DIEGO — Service Territory (San Diego County)
+  // Added 2026-08-07 (feat/san-diego Stage A — 10th branch, 7th county).
+  //   WAVE 1 footprint = North County Coastal + La Jolla only (recon
+  //   wiki/briefings/san-diego-recon-2026-08-06.md: KD 0-13 openings).
+  //   City of San Diego proper + inland = Wave 2; do NOT claim it yet.
+  //   SAB — NO public street address. No assigned technician name yet —
+  //   content must use generic "our San Diego technicians" framing
+  //   (factual-accuracy §10 has no SD row on purpose).
+  //   All six city slugs sit in CITIES_WITHOUT_PAGES until pillars ship.
+  // ─────────────────────────────────────────────────
+  {
+    slug: 'san-diego',
+    name: 'San Diego',
+    fullName: 'Same Day Appliance Repair — San Diego',
+    gbpName: 'Same Day Appliance Repair San Diego',
+    displayCity: 'San Diego',
+    isServiceArea: true,
+    type: 'service_area',
+    gbpStatus: 'pending',
+    phone: '(858) 667-7237',
+    phoneStatus: 'active',
+    email: 'sandiego@samedayappliance.repair',
+    geo: {
+      cityCenterLat: 32.8669,
+      cityCenterLng: -117.2531,
+      serviceRadius: 20
+    },
+    hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
+    primaryCounty: 'san-diego',
+    citiesServed: [
+      'la-jolla',
+      'carlsbad',
+      'del-mar',
+      'rancho-santa-fe',
+      'encinitas',
+      'solana-beach'
+    ],
+    displayAreas: ['La Jolla', 'Carlsbad', 'Del Mar', 'Rancho Santa Fe'],
+    sameAs: [
+      'https://www.youtube.com/@SameDayAppliance.Repair'
+    ]
   }
 ];
 
@@ -623,8 +667,10 @@ export const CITIES_WITHOUT_PAGES = new Set<string>([
   // Pasadena
   'sierra-madre', 'altadena',
   // Riverside (new entries 2026-05-08; pages not yet authored)
-  'norco', 'eastvale'
+  'norco', 'eastvale',
   // Santa Barbara: all 6 city pillars shipped (Stage B+C, 2026-08-06) — none pending.
+  // San Diego Wave 1 (branch added 2026-08-07; pillars pending)
+  'la-jolla', 'carlsbad', 'del-mar', 'rancho-santa-fe', 'encinitas', 'solana-beach'
 ]);
 
 /** Returns citiesServed for a branch, but ONLY those with .astro pages on disk.

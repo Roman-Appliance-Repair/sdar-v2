@@ -177,8 +177,9 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 - Mikhail V. → West Hollywood, Beverly Hills, LA
 - Artur S. → Pasadena, Thousand Oaks, Santa Barbara
 - David K. → Irvine, Rancho Cucamonga, Temecula
+- **San Diego: техник НЕ закреплён (2026-08-07).** В текстах — только generic «our San Diego technicians», никаких имён, пока Roman не назначит.
 
-## 11. Branch phones (9 филиалов)
+## 11. Branch phones (10 филиалов)
 
 | Branch | Phone | Email | Status |
 |---|---|---|---|
@@ -191,6 +192,7 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 | Rancho Cucamonga | (909) 457-1030 | ranchocucamonga@samedayappliance.repair | Live (real DID, GBP pending) |
 | Temecula | (951) 577-3877 | temecula@samedayappliance.repair | Live (real DID, GBP pending) |
 | Santa Barbara | (805) 500-0855 | santabarbara@samedayappliance.repair | Live (service_area, GBP pending; добавлен 2026-08-06, 6-й каунти) |
+| San Diego | (858) 667-7237 | sandiego@samedayappliance.repair | Live (service_area, GBP pending; добавлен 2026-08-07, 7-й каунти, Wave 1 = North County Coastal + La Jolla) |
 
 **Источник правды:** `src/data/branches.ts` — не дублировать здесь при изменениях.
 

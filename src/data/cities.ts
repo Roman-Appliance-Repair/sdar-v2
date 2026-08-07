@@ -19,6 +19,13 @@
 //
 // Santa Barbara (2026-08-06, feat/santa-barbara): 6 santa-barbara-county
 // cities added; all 6 pillar pages shipped in Stage B+C. Canonical rule holds.
+//
+// San Diego Wave 1 (2026-08-07, feat/san-diego Stage A): 6 san-diego-county
+// cities (la-jolla, carlsbad, del-mar, rancho-santa-fe, encinitas,
+// solana-beach) registered BEFORE their .astro pillars exist. All six sit in
+// CITIES_WITHOUT_PAGES (branches.ts); nav/areas COUNTY_ORDER lists do not yet
+// include 'san-diego', so no clickable 404 links are emitted. City of San
+// Diego proper is Wave 2 — deliberately absent here.
 
 import { BRANCHES, getBranchForCity } from './branches';
 
@@ -28,7 +35,8 @@ export type CountySlug =
   | 'ventura'
   | 'san-bernardino'
   | 'riverside'
-  | 'santa-barbara';
+  | 'santa-barbara'
+  | 'san-diego';
 
 export interface City {
   slug: string;
@@ -45,7 +53,8 @@ export const COUNTIES: Record<CountySlug, { name: string; hubUrl: string }> = {
   'ventura':        { name: 'Ventura County',         hubUrl: '/ventura-county/' },
   'san-bernardino': { name: 'San Bernardino County',  hubUrl: '/san-bernardino-county/' },
   'riverside':      { name: 'Riverside County',       hubUrl: '/riverside-county/' },
-  'santa-barbara':  { name: 'Santa Barbara County',   hubUrl: '/santa-barbara-county/' }
+  'santa-barbara':  { name: 'Santa Barbara County',   hubUrl: '/santa-barbara-county/' },
+  'san-diego':      { name: 'San Diego County',       hubUrl: '/san-diego-county/' }
 };
 
 export const CITIES: City[] = [
@@ -60,14 +69,17 @@ export const CITIES: City[] = [
   { slug: 'burbank',              name: 'Burbank',              county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'calabasas',            name: 'Calabasas',            county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'camarillo',            name: 'Camarillo',            county: 'ventura',        primaryBranch: 'thousand-oaks' },
+  { slug: 'carlsbad',             name: 'Carlsbad',             county: 'san-diego',      primaryBranch: 'san-diego' },
   { slug: 'carpinteria',          name: 'Carpinteria',          county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
   { slug: 'chino-hills',          name: 'Chino Hills',          county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'corona',               name: 'Corona',               county: 'riverside',      primaryBranch: 'riverside' },
   { slug: 'costa-mesa',           name: 'Costa Mesa',           county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'culver-city',          name: 'Culver City',          county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'dana-point',           name: 'Dana Point',           county: 'orange',         primaryBranch: 'irvine' },
+  { slug: 'del-mar',              name: 'Del Mar',              county: 'san-diego',      primaryBranch: 'san-diego' },
   { slug: 'eagle-rock',           name: 'Eagle Rock',           county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'el-segundo',           name: 'El Segundo',           county: 'los-angeles',    primaryBranch: 'los-angeles' },
+  { slug: 'encinitas',            name: 'Encinitas',            county: 'san-diego',      primaryBranch: 'san-diego' },
   { slug: 'encino',               name: 'Encino',               county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'fontana',              name: 'Fontana',              county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'fullerton',            name: 'Fullerton',            county: 'orange',         primaryBranch: 'irvine' },
@@ -82,6 +94,7 @@ export const CITIES: City[] = [
   { slug: 'irvine',               name: 'Irvine',               county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'koreatown',            name: 'Koreatown',            county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'la-canada-flintridge', name: 'La Canada Flintridge', county: 'los-angeles',    primaryBranch: 'pasadena' },
+  { slug: 'la-jolla',             name: 'La Jolla',             county: 'san-diego',      primaryBranch: 'san-diego' },
   { slug: 'laguna-beach',         name: 'Laguna Beach',         county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'laguna-niguel',        name: 'Laguna Niguel',        county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'lake-elsinore',        name: 'Lake Elsinore',        county: 'riverside',      primaryBranch: 'riverside' },
@@ -110,6 +123,7 @@ export const CITIES: City[] = [
   { slug: 'pacific-palisades',    name: 'Pacific Palisades',    county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'pasadena',             name: 'Pasadena',             county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'rancho-cucamonga',     name: 'Rancho Cucamonga',     county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
+  { slug: 'rancho-santa-fe',      name: 'Rancho Santa Fe',      county: 'san-diego',      primaryBranch: 'san-diego' },
   { slug: 'redlands',             name: 'Redlands',             county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'redondo-beach',        name: 'Redondo Beach',        county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'riverside',            name: 'Riverside',            county: 'riverside',      primaryBranch: 'riverside' },
@@ -123,6 +137,7 @@ export const CITIES: City[] = [
   { slug: 'sherman-oaks',         name: 'Sherman Oaks',         county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'silver-lake',          name: 'Silver Lake',          county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'simi-valley',          name: 'Simi Valley',          county: 'ventura',        primaryBranch: 'thousand-oaks' },
+  { slug: 'solana-beach',         name: 'Solana Beach',         county: 'san-diego',      primaryBranch: 'san-diego' },
   { slug: 'south-pasadena',       name: 'South Pasadena',       county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'studio-city',          name: 'Studio City',          county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'summerland',           name: 'Summerland',           county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
