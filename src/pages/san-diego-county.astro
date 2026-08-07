@@ -1,0 +1,369 @@
+---
+// Appliance Repair San Diego County | Same Day Appliance Repair
+// /san-diego-county/  (Wave 1: North County Coastal + La Jolla ONLY — the page
+// frames coverage honestly and claims nothing east or south of the corridor.)
+// Positioning per wiki/briefings/san-diego-recon-2026-08-06.md:
+//   - price stated once, plainly — NOT the differentiator here (Spark publishes $80)
+//   - NEVER imply Sub-Zero factory authorization (Box Appliance holds it) —
+//     honest independent framing only
+//   - no technician names ("our San Diego technicians") — no tech assigned yet
+import Layout from '../layouts/Layout.astro';
+import CountyMap from '../components/CountyMap.astro';
+import { BRANCHES, type Branch } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const title = "Appliance Repair San Diego County CA | Same Day";
+const description = "Appliance repair on San Diego's North Coastal corridor — La Jolla, Carlsbad, Del Mar, Rancho Santa Fe. $89 diagnostic. (858) 667-7237.";
+
+const activeBranches = BRANCHES.filter((b) => b.phoneStatus === 'active');
+const slugToTitle = (s: string) => s.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+const sharedEmail = 'support@samedayappliance.repair';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': 'https://samedayappliance.repair/san-diego-county/#business',
+  name: 'Same Day Appliance Repair — San Diego County',
+  telephone: '(858) 667-7237',
+  url: 'https://samedayappliance.repair/san-diego-county/',
+  areaServed: { '@type': 'AdministrativeArea', name: 'San Diego County' },
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  location: activeBranches.map((b: Branch) => {
+    const entry: Record<string, unknown> = {
+      '@type': 'LocalBusiness',
+      name: b.gbpName,
+      telephone: b.phone,
+      openingHoursSpecification: OPENING_HOURS_SCHEMA,
+      areaServed: b.citiesServed.slice(0, 8).map((slug) => ({ '@type': 'City', name: slugToTitle(slug) })),
+      hasOfferCatalog: { '@id': 'https://samedayappliance.repair/#service-catalog' }
+    };
+    if (b.type === 'physical_pin' && b.address) {
+      entry.address = {
+        '@type': 'PostalAddress',
+        streetAddress: b.address.street,
+        addressLocality: b.address.city,
+        addressRegion: b.address.state,
+        postalCode: b.address.zip,
+        addressCountry: 'US'
+      };
+      entry.email = sharedEmail;
+    } else {
+      entry.address = {
+        '@type': 'PostalAddress',
+        addressLocality: b.displayCity,
+        addressRegion: 'CA',
+        ...(b.address?.zip ? { postalCode: b.address.zip } : {}),
+        addressCountry: 'US'
+      };
+    }
+    if (Array.isArray(b.sameAs) && b.sameAs.length > 0) {
+      entry.sameAs = [...b.sameAs];
+    }
+    return entry;
+  })
+});
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: 'Which parts of San Diego County do you actually serve?', acceptedAnswer: { '@type': 'Answer', text: 'The North Coastal corridor plus La Jolla: La Jolla, Carlsbad, Del Mar, Rancho Santa Fe, Encinitas (including Cardiff), and Solana Beach. We would rather name the territory precisely than claim the whole county — East County, South Bay, and inland San Diego are not on our routes yet.' } },
+    { '@type': 'Question', name: 'What does an appliance repair visit cost in San Diego County?', acceptedAnswer: { '@type': 'Answer', text: '$89 residential diagnostic, waived when you approve the repair; $120 for commercial equipment. Written estimate before any work.' } },
+    { '@type': 'Question', name: 'Are you a Sub-Zero factory service company?', acceptedAnswer: { '@type': 'Answer', text: 'No, and we say so plainly: Sub-Zero routes factory service in San Diego County through its authorized partner. We are an independent repair company — you call us when you want OEM-parts work on your schedule instead of a manufacturer dispatch queue.' } },
+    { '@type': 'Question', name: 'Do you repair outdoor kitchens and wine cellar cooling in San Diego County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes — built-in grills, terrace refrigeration, and dedicated wine cellar cooling systems are core services for us on the coastal corridor, not add-ons. Lynx, Fire Magic, Twin Eagles, DCS on the outdoor side; cellar cooling units and undercounter wine refrigeration on the wine side.' } },
+    { '@type': 'Question', name: 'How fast can your San Diego technicians arrive?', acceptedAnswer: { '@type': 'Answer', text: 'Same-day in most of the Wave-1 territory when you call before noon. Our San Diego technicians run the coastal corridor daily from La Jolla to Carlsbad. $89 residential diagnostic, waived with repair.' } },
+    { '@type': 'Question', name: 'Do you handle commercial kitchens on the North Coastal corridor?', acceptedAnswer: { '@type': 'Answer', text: 'Yes — restaurant refrigeration, ice machines, and cooking equipment along the corridor, $120 commercial diagnostic waived with repair, COI on request.' } }
+  ]
+};
+---
+
+<Layout title={title} description={description}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
+
+  <style>
+    :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, sans-serif; color: var(--text); line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    .hero { position: relative; overflow: hidden; background: #0a0a0a; color: #fff; padding: 80px 24px 72px; }
+    .hero-bg { position: absolute; inset: 0; z-index: 0; }
+    .hero-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.82) 38%, rgba(10,10,10,0.5) 70%, rgba(10,10,10,0.28) 100%); }
+    .hero-inner { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; }
+    .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
+    .hero h1 { font-size: clamp(30px, 4vw, 50px); font-weight: 700; line-height: 1.1; margin-bottom: 18px; letter-spacing: -.02em; max-width: 760px; color: #fff; }
+    .hero-sub { font-size: 18px; color: rgba(255,255,255,.85); margin-bottom: 32px; max-width: 620px; line-height: 1.65; }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+    .btn-red { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; }
+    .btn-outline { border: 1.5px solid rgba(255,255,255,.3); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; }
+    .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+    .hero-stat-num { font-size: 28px; font-weight: 700; color: #fff; }
+    .hero-stat-label { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 2px; }
+    .trust-bar { background: var(--red); padding: 14px 24px; }
+    .trust-bar-inner { max-width: 1100px; margin: 0 auto; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+    .ti { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #fff; }
+    .section { padding: 72px 24px; }
+    .section-gray { background: var(--gray); }
+    .section-black { background: var(--black); color: #fff; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .sl { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--red); margin-bottom: 12px; }
+    h2 { font-size: clamp(24px, 3.2vw, 36px); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; margin-bottom: 18px; }
+    .section-black h2 { color: #fff; }
+    .lead { font-size: 17px; line-height: 1.7; color: var(--muted); max-width: 700px; margin-bottom: 40px; }
+    .body-text p { font-size: 16px; line-height: 1.75; margin-bottom: 16px; color: var(--text); }
+    .cities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 32px; }
+    .city-link { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; }
+    .city-link:hover { border-color: var(--red); color: var(--red); }
+    .city-plain { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--muted); }
+    .city-soon { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .city-arrow { font-size: 12px; color: var(--muted); }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 32px; }
+    .svc-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .svc-icon { font-size: 24px; margin-bottom: 10px; }
+    .svc-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+    .svc-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .context-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+    .context-text p { font-size: 16px; line-height: 1.75; color: rgba(255,255,255,.72); margin-bottom: 14px; }
+    .context-facts { display: flex; flex-direction: column; gap: 12px; }
+    .cfact { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 16px; }
+    .cfact h4 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .cfact p { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.5; }
+    .repairs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 32px; }
+    .repair-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .rtag { display: inline-block; background: var(--gray); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 3px 8px; border-radius: 4px; margin-bottom: 10px; }
+    .repair-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 7px; line-height: 1.3; }
+    .repair-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .pricing-table { width: 100%; border-collapse: collapse; margin-top: 28px; font-size: 15px; }
+    .pricing-table th { text-align: left; padding: 12px 16px; background: var(--black); color: #fff; font-size: 13px; font-weight: 600; }
+    .pricing-table td { padding: 13px 16px; border-bottom: 1px solid var(--border); }
+    .pricing-table tr:last-child td { border-bottom: none; }
+    .pricing-table tr:nth-child(even) td { background: #fafafa; }
+    .price-val { font-weight: 700; color: var(--red); }
+    .pricing-note { font-size: 13px; color: var(--muted); margin-top: 14px; padding: 13px 16px; background: var(--gray); border-radius: 6px; border-left: 3px solid var(--red); }
+    .faq-list { margin-top: 36px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 18px 0; }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-q { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .faq-a { font-size: 15px; line-height: 1.7; color: var(--muted); }
+    .nearby-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .nb { background: var(--gray); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 14px; }
+    .section-commercial { padding: 72px 24px; background: #fafafa; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .commercial-intro { font-size: 16px; line-height: 1.75; color: var(--text); max-width: 760px; margin: 0 0 28px; }
+    .commercial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .ccard { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; }
+    .ccard-icon { font-size: 24px; margin-bottom: 10px; }
+    .ccard h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 6px; }
+    .ccard p { font-size: 13px; line-height: 1.6; color: var(--muted); margin: 0; }
+    .commercial-cta { display: flex; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--red); color: #fff; padding: 20px 26px; border-radius: 10px; margin-top: 12px; }
+    .commercial-cta .cta-text { font-size: 14px; line-height: 1.5; flex: 1; min-width: 280px; color: #fff; }
+    .commercial-cta .cta-phone { background: #fff; color: var(--red); padding: 12px 22px; border-radius: 6px; font-weight: 700; font-size: 16px; white-space: nowrap; text-decoration: none; }
+    .commercial-cta .cta-phone:hover { background: #0a0a0a; color: #fff; }
+    @media (max-width: 768px) { .commercial-grid { grid-template-columns: 1fr; } .context-cols { grid-template-columns: 1fr; } }
+    .bottom-cta { background: var(--black); color: #fff; padding: 72px 24px; text-align: center; }
+    .bottom-cta h2 { color: #fff; margin-bottom: 14px; }
+    .bottom-cta p { font-size: 17px; color: rgba(255,255,255,.62); margin-bottom: 30px; max-width: 540px; margin-left: auto; margin-right: auto; }
+    .bottom-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  </style>
+
+<section class="hero">
+  <picture class="hero-bg">
+    <source media="(max-width: 640px)" srcset="/images/counties/san-diego-county/hero-640.webp" type="image/webp" />
+    <source media="(max-width: 960px)" srcset="/images/counties/san-diego-county/hero-960.webp" type="image/webp" />
+    <source srcset="/images/counties/san-diego-county/hero.webp" type="image/webp" />
+    <img src="/images/counties/san-diego-county/hero.jpg" alt="Appliance repair on the San Diego North Coastal corridor" width="1920" height="840" loading="eager" fetchpriority="high" />
+  </picture>
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <p class="hero-eyebrow">San Diego County · North Coastal Corridor · Residential + Commercial · Same Day</p>
+    <h1>Appliance Repair on San Diego's North Coast</h1>
+    <p class="hero-sub">La Jolla to Carlsbad — the coastal corridor and the Rancho Santa Fe estate belt. A dedicated San Diego branch, not a truck sent down from LA.</p>
+    <div class="hero-ctas">
+      <a href="tel:+18586677237" class="btn-red">☎ (858) 667-7237</a>
+      <a href="/book/" class="btn-outline">Book Online</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Coastal Communities</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">$89</div><div class="hero-stat-label">Diagnostic · Waived With Repair</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <div class="ti">🏅 BHGS #A49573</div>
+    <div class="ti">🛡️ Fully Insured</div>
+    <div class="ti">⚡ Same Day Available</div>
+    <div class="ti">🔩 OEM Parts · All Major Brands</div>
+    <div class="ti">💬 $89 Diagnostic — Waived With Repair</div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">San Diego County Service · Wave 1</p>
+    <h2>We serve the North Coastal corridor — and we'd rather say that precisely</h2>
+    <p><strong>Our San Diego territory is deliberately specific: La Jolla, Carlsbad, Del Mar, Rancho Santa Fe, Encinitas (including Cardiff-by-the-Sea), and Solana Beach. Our San Diego technicians run that corridor daily at (858) 667-7237, with OEM parts for the built-in refrigeration, professional ranges, outdoor kitchens, and wine cellar cooling that this stretch of coast runs on. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
+    <div class="body-text">
+      <p>San Diego County is enormous, and most repair companies respond by claiming all of it. We're doing the opposite. East County, South Bay, and the inland valleys are not on our routes yet, and pretending otherwise would mean slow arrivals and thin coverage — the two things this corridor already tolerates too often. What we cover, we cover with same-day intent.</p>
+      <p>The corridor itself splits into three service personalities. <a href="/la-jolla/">La Jolla</a> is bluff-top and village housing with the densest concentration of built-in refrigeration south of Orange County — and the saltiest air. <a href="/rancho-santa-fe/">Rancho Santa Fe</a> is the inland estate belt: multi-building properties, equestrian acreage, secondary kitchens, and the property managers who run them. <a href="/carlsbad/">Carlsbad</a> is the volume market — a real city of families, master-planned neighborhoods, and vacation rentals along the coast. Three different appliance populations, one branch.</p>
+      <p>On Sub-Zero, a word of honesty most companies skip: factory service in San Diego County runs through Sub-Zero's authorized partner, and we are not it. We're the independent option — OEM parts, our own schedule, no manufacturer dispatch queue. Some owners want the factory network; plenty want a technician this week. We exist for the second group, and we say so on every page.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">Service Map</p>
+    <h2>Communities we serve in San Diego County</h2>
+    <p class="lead">Wave 1 — the coastal corridor from La Jolla to Carlsbad plus the Rancho Santa Fe estate belt.</p>
+  </div>
+</section>
+<CountyMap county="san-diego-county" height="460px" />
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="sl">Service Areas</p>
+    <h2>6 communities on the corridor</h2>
+    <p class="lead">City pages for La Jolla, Rancho Santa Fe, and Carlsbad are live — the rest of the corridor is covered by the same branch.</p>
+    <div class="cities-grid">
+      <a href="/la-jolla/" class="city-link">La Jolla <span class="city-arrow">→</span></a>
+      <a href="/rancho-santa-fe/" class="city-link">Rancho Santa Fe <span class="city-arrow">→</span></a>
+      <a href="/carlsbad/" class="city-link">Carlsbad <span class="city-arrow">→</span></a>
+      <div class="city-plain">Del Mar <span class="city-soon">Covered</span></div>
+      <div class="city-plain">Encinitas &amp; Cardiff <span class="city-soon">Covered</span></div>
+      <div class="city-plain">Solana Beach <span class="city-soon">Covered</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">What We Repair</p>
+    <h2>Every major home appliance on the North Coast</h2>
+    <div class="services-grid">
+      <a href="/services/refrigerator-repair/" class="svc-card"><div class="svc-icon">❄️</div><h3>Refrigerator Repair</h3><p>Built-in columns and mass-market units. Coastal condenser care is standard practice here.</p></a>
+      <a href="/services/wine-cellar-cooling-repair/" class="svc-card"><div class="svc-icon">🍷</div><h3>Wine Cellar Cooling</h3><p>Dedicated cellar systems and undercounter wine units — a real category on this corridor.</p></a>
+      <a href="/services/oven-repair/" class="svc-card"><div class="svc-icon">🔥</div><h3>Oven & Range Repair</h3><p>Wolf, Viking, Thermador and the mass-market brands alike, with OEM parts.</p></a>
+      <a href="/services/bbq-grill-repair/" class="svc-card"><div class="svc-icon">🔆</div><h3>BBQ & Outdoor Kitchen</h3><p>Built-in grills and terrace refrigeration — coastal air is hard on igniters.</p></a>
+      <a href="/services/dishwasher-repair/" class="svc-card"><div class="svc-icon">🍽️</div><h3>Dishwasher Repair</h3><p>Panel-front built-ins to rental workhorses. Hard-water scale is the local constant.</p></a>
+      <a href="/services/washer-repair/" class="svc-card"><div class="svc-icon">🫧</div><h3>Washer & Dryer Repair</h3><p>Family laundry rooms and vacation-rental machines that earn their living.</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-black">
+  <div class="container">
+    <div class="context-cols">
+      <div class="context-text">
+        <p class="sl">North Coast Appliance Context</p>
+        <h2>One corridor, two climates, one hard-water supply</h2>
+        <p>The coast side — La Jolla, Del Mar, Solana Beach, coastal Carlsbad — lives with Pacific salt air that loads refrigerator condensers and outdoor kitchen igniters on an accelerated schedule. Four miles inland, Rancho Santa Fe swaps the salt for dry heat and dust: different failure calendar, same physics of neglected condensers.</p>
+        <p>What the whole corridor shares is water. San Diego's imported blend runs hard, and dishwashers, ice makers, and cellar cooling humidifier lines all collect scale on a year-3-to-5 schedule. Our San Diego technicians check the local wear item first on every call — coils near the coast, scale everywhere — because that's usually the answer.</p>
+      </div>
+      <div class="context-facts">
+        <div class="cfact"><h4>🌊 Salt line (La Jolla → coastal Carlsbad)</h4><p>Condenser and igniter corrosion runs ahead of the manuals within a mile of the water.</p></div>
+        <div class="cfact"><h4>🏇 Estate belt (Rancho Santa Fe)</h4><p>Multi-building properties with refrigeration fleets — dry-heat condenser schedules, dust loading.</p></div>
+        <div class="cfact"><h4>💧 Hard imported water, corridor-wide</h4><p>Dishwasher, ice maker, and wine-unit scale at year 3–5 without descaling maintenance.</p></div>
+        <div class="cfact"><h4>🏢 Dedicated (858) branch</h4><p>Our San Diego technicians run the corridor daily — not an LA truck making the trip.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-commercial">
+  <div class="container">
+    <p class="sl">Commercial Service · North Coastal Corridor</p>
+    <h2>Commercial Appliance Repair Along the Corridor</h2>
+    <p class="commercial-intro">Restaurant rows in La Jolla Village and Carlsbad Village, the resort kitchens near the Carlsbad flower fields and lagoons, delis and cafés from Del Mar to Encinitas — the corridor's commercial kitchens run hard and sit close to salt air. We service the refrigeration, ice machines, and cooking equipment behind them at a $120 commercial diagnostic, waived with repair, with COI available on request.</p>
+    <div class="commercial-grid">
+      <div class="ccard"><div class="ccard-icon">🍽️</div><h3><a href="/commercial/refrigeration/">Commercial Refrigeration</a></h3><p>Walk-ins, reach-ins, prep tables. <a href="/brands/true/">True</a>, Turbo Air, <a href="/brands/beverage-air/">Beverage-Air</a>.</p></div>
+      <div class="ccard"><div class="ccard-icon">🧊</div><h3><a href="/commercial/ice-machines/">Ice Machine Repair</a></h3><p><a href="/brands/hoshizaki/">Hoshizaki</a>, <a href="/brands/manitowoc/">Manitowoc</a>, <a href="/brands/scotsman/">Scotsman</a> — scale from hard water is the corridor's ice-machine tax.</p></div>
+      <div class="ccard"><div class="ccard-icon">🔥</div><h3><a href="/commercial/range-repair/">Commercial Ranges & Ovens</a></h3><p><a href="/brands/vulcan/">Vulcan</a>, <a href="/brands/garland/">Garland</a>, US Range — gas and electric.</p></div>
+      <div class="ccard"><div class="ccard-icon">🚿</div><h3><a href="/commercial/dishwasher-repair/">Commercial Dishwashers</a></h3><p>Hobart, Jackson, CMA — high-temp and chemical sanitizing.</p></div>
+    </div>
+    <div class="commercial-cta">
+      <span class="cta-text">$120 commercial diagnostic — waived with repair. COI provided on request. Same day available.</span>
+      <a href="tel:+18586677237" class="cta-phone">Call (858) 667-7237</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="sl">Recent Repairs</p>
+    <h2>What corridor calls look like</h2>
+    <div class="repairs-grid">
+      <div class="repair-card"><span class="rtag">La Jolla</span><h3>"Built-in fridge runs nonstop and the kitchen feels warm"</h3><p>Bluff-side home, condenser coils packed with salt-borne buildup. Deep coil service, condenser fan verified, owner set on a 4-month cleaning cycle before the compressor could pay the price.</p></div>
+      <div class="repair-card"><span class="rtag">Rancho Santa Fe</span><h3>"Guest house refrigerator warm — found out when guests arrived"</h3><p>Classic outbuilding pattern: a unit that struggled quietly for months with no one around. Condenser choked with paddock dust; cleaned, verified pulldown, and the property's other units logged for a walkthrough.</p></div>
+      <div class="repair-card"><span class="rtag">Carlsbad</span><h3>"Rental washer quits mid-cycle with a drum full of water"</h3><p>Vacation unit near the coast — drain pump filter loaded with debris from months of guest laundry. Cleared the path, ran two full cycles, left the manager a filter-check note.</p></div>
+      <div class="repair-card"><span class="rtag">Del Mar</span><h3>"Wine fridge creeping up two degrees a week"</h3><p>Undercounter wine unit in a beach house — airflow starved in its cabinet bay. Serviced the condenser, confirmed setpoint hold; the collection stayed put.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">Pricing</p>
+    <h2>Appliance repair costs on the North Coast</h2>
+    <table class="pricing-table">
+      <thead><tr><th>Appliance</th><th>Typical Range</th><th>Luxury Brands</th></tr></thead>
+      <tbody>
+        <tr><td>Refrigerator</td><td class="price-val">$200–$450</td><td>$300–$700+ (built-in columns)</td></tr>
+        <tr><td>Washer / Dryer</td><td class="price-val">$150–$350</td><td>$200–$450 (Miele, Bosch)</td></tr>
+        <tr><td>Oven / Range</td><td class="price-val">$175–$420</td><td>$250–$500+ (Wolf, Viking, Thermador)</td></tr>
+        <tr><td>Wine Cellar Cooling</td><td class="price-val">$200–$500</td><td>System diagnostics included</td></tr>
+        <tr><td>BBQ / Outdoor Kitchen</td><td class="price-val">$150–$400</td><td>Lynx, Fire Magic, DCS</td></tr>
+        <tr><td>Residential diagnostic</td><td class="price-val">$89</td><td>Applied to repair</td></tr>
+        <tr><td>Commercial diagnostic</td><td class="price-val">$120</td><td>Applied to repair</td></tr>
+      </tbody>
+    </table>
+    <p class="pricing-note">Written estimate before we start. Invoice matches the estimate. OEM parts. 90-day warranty.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="sl">FAQ</p>
+    <h2>Questions about appliance repair in San Diego County</h2>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-q">Which parts of San Diego County do you actually serve?</div><div class="faq-a">The North Coastal corridor plus La Jolla: La Jolla, Carlsbad, Del Mar, Rancho Santa Fe, Encinitas (including Cardiff), and Solana Beach. We'd rather name the territory precisely than claim the whole county — East County, South Bay, and inland San Diego aren't on our routes yet.</div></div>
+      <div class="faq-item"><div class="faq-q">What does a repair visit cost?</div><div class="faq-a">$89 residential diagnostic, waived when you approve the repair; $120 commercial. Written estimate before any work, and the invoice matches it.</div></div>
+      <div class="faq-item"><div class="faq-q">Are you a Sub-Zero factory service company?</div><div class="faq-a">No — and we say so plainly. Factory service in San Diego County runs through Sub-Zero's authorized partner. We're the independent option: OEM parts on our own calendar. Different owners want different things; we're honest about which one we are.</div></div>
+      <div class="faq-item"><div class="faq-q">Do you repair outdoor kitchens and wine cellars?</div><div class="faq-a">Yes — both are core services on this corridor. Built-in grills and terrace refrigeration on the outdoor side; dedicated cellar cooling systems and undercounter wine units on the wine side.</div></div>
+      <div class="faq-item"><div class="faq-q">How fast can your San Diego technicians arrive?</div><div class="faq-a">Same-day in most of the corridor when you call before noon — our techs run La Jolla to Carlsbad daily.</div></div>
+      <div class="faq-item"><div class="faq-q">Do you handle commercial kitchens?</div><div class="faq-a">Yes — refrigeration, ice machines, and cooking equipment along the corridor. $120 commercial diagnostic, waived with repair, COI on request.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">Related Areas</p>
+    <h2>Other service areas</h2>
+    <div class="nearby-grid">
+      <a href="/la-jolla/" class="nb">La Jolla</a>
+      <a href="/rancho-santa-fe/" class="nb">Rancho Santa Fe</a>
+      <a href="/carlsbad/" class="nb">Carlsbad</a>
+      <a href="/orange-county/" class="nb">Orange County</a>
+      <a href="/san-clemente/" class="nb">San Clemente</a>
+      <a href="/dana-point/" class="nb">Dana Point</a>
+    </div>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Appliance repair on the North Coastal corridor</h2>
+    <p>La Jolla to Carlsbad, plus the Rancho Santa Fe estate belt. Same day available.</p>
+    <div class="bottom-ctas">
+      <a href="tel:+18586677237" class="btn-red">☎ Call (858) 667-7237</a>
+      <a href="/book/" class="btn-outline">Book Online</a>
+    </div>
+  </div>
+</section>
+</Layout>

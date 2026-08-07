@@ -1,0 +1,322 @@
+---
+/**
+ * Rancho Santa Fe, CA — estate-belt pillar of the San Diego Wave-1 cluster.
+ * Branch: San Diego — service_area (no public street address).
+ *
+ * Angle: INLAND estate country — deliberately differentiated from La Jolla
+ * (no salt-air story here; dry heat, dust, longer condenser intervals) and
+ * from Montecito/Hope Ranch prose (same species of market, fresh material:
+ * Covenant framing, equestrian dust, manager-first workflow with gate access
+ * and batched multi-appliance visits).
+ *
+ * Positioning per recon: $89 once; no factory-authorization implication;
+ * NO technician names ("our San Diego technicians").
+ * Zero-invention: Fire Magic / Perlick / Sub-Zero BI-series / cellar-unit
+ * failure patterns limited to site-established material. No ReviewsBlock.
+ */
+
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const citySlug = 'rancho-santa-fe';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Rancho Santa Fe';
+const zips = ['92067', '92091'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Rancho Santa Fe CA — Same Day`;
+const description = "Appliance repair in Rancho Santa Fe 92067 — Covenant estates, guest houses, outdoor kitchens, wine rooms. Estate managers welcome. (858) 667-7237.";
+const canonical = 'https://samedayappliance.repair/rancho-santa-fe/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Rancho Santa Fe', sameAs: 'https://en.wikipedia.org/wiki/Rancho_Santa_Fe,_California' },
+    { '@type': 'Place', name: 'The Covenant' },
+    { '@type': 'Place', name: 'Fairbanks Ranch area' },
+    { '@type': 'Place', name: 'The Crosby area' }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$$',
+  license: 'BHGS #A49573'
+});
+
+const introParagraphs = [
+  "<strong>A Rancho Santa Fe service call is rarely one appliance. Our San Diego technicians typically walk a property that runs a main kitchen, a butler's pantry, a guest house, a pool cabana, an outdoor kitchen, and a wine room — six or eight compressors spread across several buildings behind one gate. We work the whole inventory in one relationship: gate codes on file, estimates a manager can forward, and small problems batched into the same visit as the urgent one. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
+  "The Covenant set the template a century ago — large parcels, eucalyptus rows, architecture that hides its size — and the surrounding enclaves followed it. What that means for appliances is dispersion: equipment scattered across buildings, some of it running unattended for months, most of it premium, and all of it far enough from the next service company that 'we'll fit you in' often means next week. Our answer is a branch that treats the RSF estate belt as a primary route, not a detour.",
+  "This is inland country, and we service it as inland country. No salt-air speech here — Rancho Santa Fe's enemies are dry heat, airborne dust from paddocks and landscaping, and time. Condensers load slowly with fine dust instead of quickly with salt; door gaskets bake instead of corroding; equipment closets turn into ovens by August. The failure calendar runs longer than the coast's, which tempts owners to skip maintenance entirely — and that's exactly how a quiet guest-house refrigerator becomes a spoiled-food discovery.",
+  "Most of our RSF calls come from estate managers, house managers, and property offices rather than owners. The workflow is built for that: written estimates that forward cleanly for approval, scheduling around household calendars and event weeks, invoicing to whoever runs the books, and horses given the right-of-way our trucks owe them on the trails and lanes. Discretion isn't a premium option; it's the default setting.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for service across 92067 and 92091 — and the rest of the <a href="/san-diego-county/">North Coastal corridor</a>.`
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigeration — Every Building', slug: 'refrigerator', issues: 'Main kitchen · Guest house · Cabana · Beverage centers', brands: 'Sub-Zero · Thermador · U-Line · True · Perlick · Miele' },
+  { icon: '🔆', name: 'Outdoor Kitchen Repair', slug: 'bbq', issues: 'Built-in grills · Side burners · Terrace refrigeration', brands: 'Fire Magic · Lynx · Twin Eagles · DCS · Viking · Wolf' },
+  { icon: '🍷', name: 'Wine Room & Cellar Cooling', slug: 'wine-cellar', issues: 'Cellar systems · Temperature drift · Humidity', brands: 'Sub-Zero · EuroCave · WhisperKool · U-Line' },
+  { icon: '🔥', name: 'Range & Oven Repair', slug: 'oven', issues: 'Pro ranges · Double ovens · Igniters · Calibration', brands: 'Wolf · Viking · Thermador · Miele · Dacor · La Cornue' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: "Panel-front units · Butler's-pantry seconds · Scale", brands: 'Miele · Bosch · Thermador · KitchenAid' },
+  { icon: '🫧', name: 'Laundry Repair', slug: 'washer', issues: 'Main + guest-house sets · Large-capacity machines', brands: 'LG · Miele · Whirlpool · Speed Queen' },
+  { icon: '❄️', name: 'Freezer & Undercounter', slug: 'freezer', issues: 'Garage and outbuilding units · Drawers · Ice makers', brands: 'Sub-Zero · U-Line · True · Frigidaire' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burners won't light · Induction · Cabana cooktops", brands: 'Wolf · Thermador · Miele · GE Monogram' }
+];
+
+const estateNarrative = {
+  eyebrow: 'THE DISPERSION PROBLEM',
+  headline: 'Estate Appliances Fail Quietly, in Buildings Nobody Checks',
+  paragraphs: [
+    "Count compressors on a Covenant parcel and you'll usually pass six before you leave the main house: the kitchen column, the pantry drawers, the bar's beverage center, then the guest house, the cabana, the garage freezer, the wine room. Each unit has its own duty cycle and its own environment — and the further a unit sits from daily life, the longer its problems go unnoticed. The classic RSF discovery isn't a breakdown; it's a guest opening a warm refrigerator that's been failing since spring.",
+    "Dispersion also changes the economics of a service visit. Once a technician has cleared the gate and reached the property, looking at a second and third unit costs a fraction of a separate call — so we encourage managers to keep a running list and empty it every visit. The urgent repair pays for the trip; the batched inspections are where an estate's appliance budget actually gets efficient. The properties that hand us a standing spring-and-fall route through their outbuildings trade surprise breakdowns for line items — which is the whole point of having a budget.",
+    "And when a unit is genuinely done — a decades-old outbuilding refrigerator with a failed sealed system, say — we say so before the repair, not after it. Estate managers keep working with companies that protect their credibility with the owner. That's the entire long game."
+  ]
+};
+
+const managerNarrative = {
+  eyebrow: 'MANAGER-FIRST WORKFLOW',
+  headline: 'Built Around the Person Who Actually Makes the Call',
+  paragraphs: [
+    "On most Rancho Santa Fe jobs, the owner never meets us — and the process is designed so they never need to. The estate or property manager gets a written estimate within hours of diagnosis, formatted to forward for a one-line approval. Scheduling respects the household calendar: not during the event, not during the trainer's morning at the barn, yes during the window the manager names. Gate procedures, preferred entrances, and dog-and-horse notes live in the property's job record so the second visit skips the orientation.",
+    "Billing follows the same logic — invoices to the management office or the family's bookkeeper, itemized the way accountants want them, with the property name on every line. If you manage several properties across our territory, one number covers all of them, from RSF to <a href=\"/la-jolla/\">La Jolla</a> and up the <a href=\"/carlsbad/\">Carlsbad</a> coast, with a consolidated paper trail.",
+    "None of this is a premium tier. It's just how service has to work in a community where the caller, the payer, and the person who opens the gate are three different people."
+  ]
+};
+
+const neighborhoods = [
+  { name: 'The Covenant', zip: '92067', featured: true },
+  { name: 'Fairbanks Ranch area', zip: '92067', featured: true },
+  { name: 'The Crosby area', zip: '92067' },
+  { name: 'Del Rayo', zip: '92067' },
+  { name: 'The Bridges area', zip: '92067' },
+  { name: 'Rancho Santa Fe Farms', zip: '92067' },
+  { name: 'Whispering Palms', zip: '92091' }
+];
+
+const recentJobs = [
+  {
+    appliance: 'Fire Magic Grill',
+    quote: "Outdoor kitchen won't light for the weekend — clicking only",
+    location: 'The Covenant, 92067',
+    description: "Built-in Fire Magic on a terrace kitchen, igniter module degraded and one burner starving on a dust-clogged port — the inland version of the failure the coast gets from salt. Our San Diego technicians replaced the igniter module with an OEM part, cleared and verified every burner, and cleaned a grease tray that was overdue enough to matter. The estate's Saturday went ahead as planned.",
+    outcome: '✓ Same day · OEM igniter module · All burners verified'
+  },
+  {
+    appliance: 'Perlick Outdoor Refrigerator',
+    quote: 'Cabana fridge barely cold after the hot spell',
+    location: 'Fairbanks Ranch area, 92067',
+    description: "Outdoor-rated Perlick in a pool cabana — built for heat, but its condenser had spent two summers collecting fine paddock dust and the August week finally outran it. Deep condenser service, airflow path cleared, pulldown to setpoint verified. Added the unit to the property's walkthrough list so the third summer goes differently.",
+    outcome: '✓ Condenser serviced · Setpoint verified · Walkthrough listed'
+  },
+  {
+    appliance: 'Sub-Zero BI-48',
+    quote: 'Main kitchen fridge sweating and running long',
+    location: 'Del Rayo, 92067',
+    description: "BI-series built-in with a stiffened door gasket letting warm air in — inland heat bakes gaskets where the coast corrodes them — plus a condenser due for service. Replaced the gasket with OEM Sub-Zero material, serviced the condenser, confirmed run-times returned to normal overnight. Independent work, factory parts, no dispatch queue: exactly the trade the manager wanted.",
+    outcome: '✓ OEM gasket · Condenser serviced · Run-time verified'
+  },
+  {
+    appliance: 'Wine Room Cooling',
+    quote: 'Cellar humidity dropping — corks are the worry, not the temperature',
+    location: 'The Crosby area, 92067',
+    description: "Purpose-built wine room holding steady at 55 but drying out — the failure owners don't notice until corks do. Found the cooling unit short-cycling against an oversized setpoint differential, stripping humidity on every cycle. Corrected the control behavior, verified recovery with a logged week of readings, and left the manager a one-page explanation of why temperature-only monitoring misses this.",
+    outcome: '✓ Short-cycling corrected · Humidity recovered · Logged verification'
+  }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'parts' as const,
+    title: 'Whole-Property Coverage',
+    body: 'Main kitchen, guest house, cabana, outdoor kitchen, wine room, garage — one relationship, one property log, every compressor on the parcel accounted for.'
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Batched Visits That Respect the Gate',
+    body: "Once we're on the property, the second and third units cost a fraction of separate calls. Managers keep a running list; we empty it each visit. It's the efficient way to run an estate's appliance budget."
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Inland Diagnostics, Not Coastal Ones',
+    body: 'Dust-loaded condensers, heat-baked gaskets, equipment closets that turn into ovens — the RSF failure calendar is its own thing, and we service it as its own thing rather than reciting a salt-air script fifteen miles from the surf.'
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed 90 days on parts and labor, OEM parts throughout — outbuildings included. $89 diagnostic, waived with repair, and one visit can cover multiple units.'
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Built-In / Column Refrigeration', range: '$300–$700+', note: 'OEM parts · Gaskets · Condensers · Defrost systems', featured: true },
+  { appliance: 'Outdoor Kitchen / Grill', range: '$150–$400', note: 'Fire Magic, Lynx, DCS · Igniters · Burners · Cabana units' },
+  { appliance: 'Wine Room Cooling', range: '$200–$500', note: 'Systems · Controls · Humidity behavior · Logged verification' },
+  { appliance: 'Range / Oven', range: '$175–$500', note: 'Wolf, Viking, Thermador · Calibration · Igniters' },
+  { appliance: 'Dishwasher', range: '$150–$350', note: 'Miele, Bosch panel-front · Hard-water scale' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived with repair · One visit can cover several units' }
+];
+
+const faqs = [
+  {
+    question: 'Do you service Rancho Santa Fe, including the Covenant?',
+    answer: 'Yes — 92067 and 92091 are core Wave-1 territory for our San Diego branch: the Covenant, the Fairbanks Ranch and Crosby areas, Del Rayo, the Bridges area, RSF Farms, and Whispering Palms. Gate procedures and access notes stay in the property record after the first visit.'
+  },
+  {
+    question: 'Can you handle every appliance on a multi-building property?',
+    answer: "That's the way we prefer to work here. Main kitchen, butler's pantry, guest house, cabana, outdoor kitchen, wine room, garage units — one relationship covers the parcel, with a property log tracking each unit's history. Batching the urgent repair with the running list of small items is how estates make service visits efficient."
+  },
+  {
+    question: 'Do you work through estate managers and property offices?',
+    answer: 'On most RSF jobs the manager is our only contact, and the workflow is built for it: forwardable written estimates, scheduling around household calendars and event weeks, invoices to the office or bookkeeper, and discretion as the default rather than an upgrade.'
+  },
+  {
+    question: 'Is Rancho Santa Fe service different from coastal service?',
+    answer: "Meaningfully. There's no salt-air story fifteen miles inland — RSF's wear pattern is dry heat, fine dust from paddocks and landscaping, and long unattended stretches in outbuildings. Condensers load slowly, gaskets bake rather than corrode, and the failure calendar runs longer, which tempts everyone to skip maintenance. A twice-a-year walkthrough of the secondary units is the antidote."
+  },
+  {
+    question: 'Do you repair outdoor kitchens and pool-house equipment in RSF?',
+    answer: 'Yes — built-in grills, side burners, and outdoor-rated refrigeration from Fire Magic, Lynx, Twin Eagles, DCS, Viking, and Wolf. Cabana and terrace units live in heat and dust year-round, and they\'re a standing part of our RSF route.'
+  },
+  {
+    question: 'Are you Sub-Zero factory service?',
+    answer: "No — factory service in San Diego County runs through Sub-Zero's authorized partner, and we say that plainly. We're the independent option: OEM parts, our own schedule, no manufacturer queue. Managers who need a column looked at this week rather than when the queue clears are exactly who we exist for."
+  },
+  {
+    question: 'What does a diagnostic visit cost in Rancho Santa Fe?',
+    answer: '$89 residential, waived when you approve the repair, with a written estimate first — and one visit can cover several units on the property, which is where the multi-building math starts working in your favor.'
+  }
+];
+
+const nearbyCities = [
+  { name: 'La Jolla', slug: 'la-jolla' },
+  { name: 'Carlsbad', slug: 'carlsbad' },
+  { name: 'San Clemente', slug: 'san-clemente' },
+  { name: 'Laguna Niguel', slug: 'laguna-niguel' },
+  { name: 'Mission Viejo', slug: 'mission-viejo' }
+];
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Rancho Santa Fe, CA"
+    subheadline="Covenant estates, guest houses, outdoor kitchens, wine rooms — whole-property appliance service behind the gates, coordinated through your manager. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={1}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Rancho Santa Fe — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Rancho Santa Fe Service Team"
+    bookingSub="92067 · 92091 · Estates · Multi-Building Properties"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Rancho Santa Fe"
+    subhead="Every building on the parcel · Outdoor & wine · 92067"
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={estateNarrative.eyebrow}
+    headline={estateNarrative.headline}
+    paragraphs={estateNarrative.paragraphs}
+    background="white"
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Rancho Santa Fe Areas We Service"
+    subheadline="The Covenant to Whispering Palms — 92067 and 92091."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <CustomNarrative
+    eyebrow={managerNarrative.eyebrow}
+    headline={managerNarrative.headline}
+    paragraphs={managerNarrative.paragraphs}
+    background="gray"
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Rancho Santa Fe"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Rancho Santa Fe Properties Call Us"
+    reasons={whyReasons}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Rancho Santa Fe"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Rancho Santa Fe Clients Ask"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Rancho Santa Fe?"
+    body="Main kitchen · Guest house · Outdoor kitchen · Wine room · 92067 & 92091. $89 diagnostic waived with repair. 90-day warranty. OEM parts."
+  />
+
+  <section class="section">
+    <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">San Diego County coverage</p>
+      <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">One branch for the North Coastal corridor.</h2>
+      <p>Rancho Santa Fe is the estate belt of our <a href="/san-diego-county/">San Diego County service area</a> — the same branch covers <a href="/la-jolla/">La Jolla</a>, <a href="/carlsbad/">Carlsbad</a>, Del Mar, Encinitas, and Solana Beach. For the outdoor side, see <a href="/outdoor/kitchen-repair/">outdoor kitchen repair</a> and <a href="/outdoor/grill-repair/">grill repair</a>.</p>
+    </div>
+  </section>
+</CityLayoutV2>
