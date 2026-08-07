@@ -117,8 +117,8 @@ REPORT BACK:
 **Перед любой cluster задачей** — прочитать в порядке:
 1. `wiki/page-plans/METHODOLOGY.md` (v1.3.1) — главная методология
 2. `wiki/page-plans/cluster-XX-NAME/index.md` — текущий cluster
-3. Notion: writing standard
-4. Notion: соответствующая Brand × Service DB
+3. `docs/voice-and-style.md` + `docs/humanizer-gate.md` — писательский стандарт (Notion мёртв, удалён 2026-08-07)
+4. Brand × Service данные — из writer-handoff блоков cluster file
 
 Wiki **beats** project knowledge files. Project knowledge **beats** chat memory. Memory **beats** assumptions.
 
