@@ -4,7 +4,7 @@ import { mergeCredentials } from '../../data/credentials-schema';
 import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 import CountyMap from '../../components/CountyMap.astro';
 import BranchNAP from '../../components/BranchNAP.astro';
-import { BRANCHES } from '../../data/branches';
+import { BRANCHES, CITIES_WITHOUT_PAGES } from '../../data/branches';
 import { CITIES, COUNTIES, type CountySlug } from '../../data/cities';
 import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../lib/build-location-array';
 
@@ -13,6 +13,7 @@ const COUNTY_ORDER: CountySlug[] = [
   'los-angeles',
   'orange',
   'ventura',
+  'santa-barbara',
   'san-bernardino',
   'riverside'
 ];
@@ -24,8 +25,11 @@ const branchesByCounty = COUNTY_ORDER.map((countySlug) => {
   const county = COUNTIES[countySlug];
   const branches = BRANCHES.filter((b) => b.primaryCounty === countySlug);
   const branchSections = branches.map((branch) => {
+    // Only cities with live .astro pillar pages — CITIES_WITHOUT_PAGES slugs
+    // (e.g. 4 Santa Barbara County communities pending Stage C) must not
+    // render as clickable 404 links.
     const cities = CITIES
-      .filter((c) => c.primaryBranch === branch.slug)
+      .filter((c) => c.primaryBranch === branch.slug && !CITIES_WITHOUT_PAGES.has(c.slug))
       .sort((a, b) => a.name.localeCompare(b.name));
     return { branch, cities };
   });
@@ -51,8 +55,8 @@ const counties = branchesByCounty.map((c) => ({
 const totalCities = counties.reduce((sum, c) => sum + c.cities, 0);
 const totalBranches = BRANCHES.length;
 
-const title = 'Service Areas — LA, OC, Ventura, SB, Riverside';
-const description = `Same-day appliance repair across LA, OC, Ventura, SB, Riverside. ${totalCities} cities served from ${totalBranches} branch locations. BHGS #A49573, EPA 608, CSLB C-20. $89 / $120 dx.`;
+const title = 'Service Areas — LA, OC, Ventura, Santa Barbara & More';
+const description = `Same-day appliance repair across 6 SoCal counties. ${totalCities} cities served from ${totalBranches} branch locations. BHGS #A49573, EPA 608, CSLB C-20. $89 / $120 dx.`;
 
 const residentialServices = [
   { label: 'Refrigerator Repair', href: '/services/refrigerator-repair/' },
@@ -107,7 +111,7 @@ const wave47GeoNeutralLb = mergeCredentials({
     <div class="container">
       <p class="eyebrow">Service Areas · Southern California</p>
       <h1>Appliance Repair Across Southern California</h1>
-      <p class="subtitle">{totalCities} cities across 5 counties. {totalBranches} branch locations. Same day available. Residential and commercial.</p>
+      <p class="subtitle">{totalCities} cities across 6 counties. {totalBranches} branch locations. Same day available. Residential and commercial.</p>
     </div>
   </section>
 
@@ -122,7 +126,7 @@ const wave47GeoNeutralLb = mergeCredentials({
   <section class="section">
     <div class="container">
       <p class="sl">Brand coverage</p>
-      <h2>Every major brand, all 5 counties</h2>
+      <h2>Every major brand, all 6 counties</h2>
       <p class="section-intro">
         We service all major brands across these areas — from premium lines like
         <a href="/brands/sub-zero/" class="brand-inline-link">Sub-Zero</a>,
@@ -143,7 +147,7 @@ const wave47GeoNeutralLb = mergeCredentials({
   <section class="section">
     <div class="container">
       <p class="sl">County Hubs</p>
-      <h2>Five counties across Southern California</h2>
+      <h2>Six counties across Southern California</h2>
       <div class="county-grid">
         {counties.map((c) => (
           <a href={c.href} class="county-card">

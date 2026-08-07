@@ -624,8 +624,9 @@ export const CITIES_WITHOUT_PAGES = new Set<string>([
   'sierra-madre', 'altadena',
   // Riverside (new entries 2026-05-08; pages not yet authored)
   'norco', 'eastvale',
-  // Santa Barbara (branch added 2026-08-06; city pillars are Stage B)
-  'santa-barbara', 'montecito', 'goleta', 'carpinteria', 'summerland', 'hope-ranch'
+  // Santa Barbara (branch added 2026-08-06; santa-barbara + montecito pillars
+  // shipped in Stage B — remaining 4 pending)
+  'goleta', 'carpinteria', 'summerland', 'hope-ranch'
 ]);
 
 /** Returns citiesServed for a branch, but ONLY those with .astro pages on disk.

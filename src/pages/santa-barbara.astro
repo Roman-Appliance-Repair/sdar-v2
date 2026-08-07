@@ -1,0 +1,375 @@
+---
+/**
+ * Santa Barbara, CA — flagship city pillar (feat/santa-barbara Stage B).
+ * Branch: Santa Barbara — service_area (no public street address).
+ *
+ * Positioning vs the SB competitive field (wiki/briefings/santa-barbara-recon-2026-08-06.md):
+ *   - We publish the diagnostic price ($89). No SB competitor publishes any price.
+ *   - Neighborhood depth (Riviera / Mesa / San Roque / Upper East / Samarkand /
+ *     Eastside / Westside) — no SB competitor names a single neighborhood.
+ *   - Outdoor kitchen + built-in grill + wine cellar coverage — zero SB coverage.
+ *   - Salt air + hard water diagnostics angle, transplanted honestly from our
+ *     coastal LA playbook (Malibu / Santa Monica).
+ *
+ * Zero-invention notes:
+ *   - Model numbers limited to site-established patterns (Sub-Zero 650 evaporator
+ *     fan, Wolf DF486G, Bosch E15, LG WT7300CW).
+ *   - No ReviewsBlock on this page — no verifiable Santa Barbara reviews exist yet,
+ *     and inventing quotes is prohibited.
+ *   - Residential page → $89 only, no $120 (city pages rule).
+ *   - Schema: single LocalBusiness for the SB branch, NO location array
+ *     (seo-policies §1 city-page rule).
+ */
+
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const citySlug = 'santa-barbara';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Santa Barbara';
+const zips = ['93101', '93103', '93105', '93109'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Santa Barbara CA — Same Day Service`;
+const description = "Same-day appliance repair in Santa Barbara — Riviera, Mesa, San Roque. Sub-Zero, Wolf, wine cellars, outdoor kitchens. $89 diagnostic. (805) 500-0855.";
+const canonical = 'https://samedayappliance.repair/santa-barbara/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Santa Barbara', sameAs: 'https://en.wikipedia.org/wiki/Santa_Barbara,_California' },
+    { '@type': 'Place', name: 'The Riviera' },
+    { '@type': 'Place', name: 'The Mesa' },
+    { '@type': 'Place', name: 'San Roque' },
+    { '@type': 'Place', name: 'Upper East' }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'BHGS #A49573'
+});
+
+const introParagraphs = [
+  "<strong>When an appliance fails in Santa Barbara, our techs at Same Day Appliance Repair trace it to a handful of local patterns: refrigerator condenser coils corroding in the salt air on the Mesa and near the harbor, dishwashers and ice makers scaling up on the South Coast's hard water, Sub-Zero built-ins on the Riviera running behind cabinet fronts that were retrofitted into 1920s kitchens, and Wolf dual-fuel ranges that need calibration, not replacement. We dispatch same-day across the Riviera, the Mesa, San Roque, and the Upper East. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
+  "Here's something odd about the Santa Barbara appliance repair market: nobody publishes a price. Call around and you'll hear \"depends,\" \"we'll tell you on site,\" or a service-call fee that appears only after the technician is standing in your kitchen. Ours is on this page: <strong>$89 diagnostic, and it goes away the moment you approve the repair.</strong> You shouldn't have to call three companies to learn a number.",
+  "Santa Barbara's housing stock is really three different cities as far as appliances are concerned. The Riviera and the Upper East run on Spanish Colonial Revival homes from the 1920s and 30s — the rebuild era after the 1925 earthquake — with tight galley kitchens, built-in refrigeration retrofitted decades after the walls went up, and electrical panels that were never sized for a modern kitchen. The Mesa is postwar ranch construction with the Pacific a few blocks away. San Roque and Samarkand sit in between — mid-century homes with a mix of original and updated kitchens. Each one fails differently, and we work all three every week.",
+  "The estate side of our Santa Barbara work — Hope Ranch, the upper Riviera, and next door in <a href=\"/montecito/\">Montecito</a> — runs on built-in Sub-Zero refrigeration, Wolf and Viking ranges, Miele dishwashers, wine rooms, and full outdoor kitchens. Most repair outfits on the South Coast service some of that list. Almost none service all of it, and nearly nobody touches the outdoor side.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for same-day service across Santa Barbara — and the rest of the <a href="/santa-barbara-county/">South Coast corridor</a>.`,
+  "<strong>From our techs on coastal Santa Barbara:</strong> if you live on the Mesa, near West Beach, or anywhere within a mile of the water — have your refrigerator's condenser coils cleaned every 4–6 months. Salt air deposits on coil fins faster than inland dust ever will, the compressor works harder to shed heat, and the failure you eventually pay for is the expensive one. We check coils on every Santa Barbara refrigerator call as standard, not as an add-on."
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Salt-air coil corrosion · Not cooling · Built-in columns · Ice maker', brands: 'Sub-Zero · Wolf · Viking · GE Monogram · Samsung · LG' },
+  { icon: '🍷', name: 'Wine Cellar Cooling', slug: 'wine-cellar', issues: 'Wine room cooling units · Temperature drift · Humidity control', brands: 'Sub-Zero · EuroCave · Liebherr · U-Line · WhisperKool' },
+  { icon: '🔥', name: 'Oven, Range & Stove Repair', slug: 'oven', issues: 'Not heating · Igniter · Temperature calibration · Dual-fuel', brands: 'Wolf · Viking · Thermador · Miele · GE · Dacor' },
+  { icon: '🔆', name: 'BBQ & Outdoor Grill Repair', slug: 'bbq', issues: 'Igniter failure · Burner replacement · Gas valve · Rotisserie', brands: 'Lynx · Fire Magic · Twin Eagles · DCS · Viking · Wolf' },
+  { icon: '🫧', name: 'Washer & Dryer Repair', slug: 'washer', issues: 'Not draining · Not spinning · Scale buildup · Stacked units', brands: 'LG · Samsung · Miele · Bosch · Speed Queen · Whirlpool' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Hard-water scale · Not draining · Leaking · Error codes', brands: 'Miele · Bosch · KitchenAid · Thermador · Samsung' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Not freezing · Ice buildup · Sub-Zero columns · Undercounter', brands: 'Sub-Zero · True · GE · U-Line · Whirlpool' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burner won't light · Induction faults · Downdraft issues", brands: 'Wolf · Viking · Thermador · Miele · GE · Bosch' }
+];
+
+const neighborhoodsNarrative = {
+  eyebrow: 'WE KNOW EVERY PART OF SANTA BARBARA',
+  headline: 'From the Riviera to the Mesa — Every Neighborhood, Every Kitchen Era',
+  paragraphs: [
+    "Santa Barbara isn't one housing market, and it isn't one appliance market either. Where you live in this city predicts what's in your kitchen and how it fails. When you tell us your neighborhood, we usually know what we're driving into before we knock."
+  ],
+  subSections: [
+    {
+      title: 'The Riviera & Upper East',
+      paragraphs: [
+        'Spanish Colonial Revival from the 1920s and 30s — the post-earthquake rebuild that gave Santa Barbara its look. Beautiful houses, difficult kitchens: tight galley layouts, built-in refrigeration retrofitted into cabinetry that was never designed for it, and electrical panels sized for a different century. Pulling a built-in Sub-Zero out of a Riviera galley kitchen for service is a two-person, protect-the-floors job — we plan for it, and we bring the pads.'
+      ]
+    },
+    {
+      title: 'The Mesa & Westside',
+      paragraphs: [
+        'Postwar ranch homes on the bluff with the Pacific a few blocks away. This is our salt-air zone: condenser coils corrode faster here than anywhere else in the city, door gaskets age early, and outdoor kitchens take the same beating our Malibu customers know well. Coil cleaning every 4–6 months is the cheapest insurance a Mesa refrigerator can get.'
+      ]
+    },
+    {
+      title: 'San Roque, Samarkand & Hidden Valley',
+      paragraphs: [
+        'Mid-century neighborhoods in the foothill lee of the marine layer — less salt, more scale. The water here does the damage: dishwashers with film on every glass, ice makers slowing down year over year, washers with mineral-crusted valves. Most of it is fixable without replacing the machine, and we tell you honestly when it is not.'
+      ]
+    },
+    {
+      title: 'Eastside, Downtown & the Funk Zone edge',
+      paragraphs: [
+        'Condos, apartments, and older single-family stock — compact kitchens, stacked laundry, landlord and property-manager calls. We coordinate directly with property managers, and a tenant does not need to take a day off work for a repair window: we call ahead, we show up inside the window, and we leave the kitchen the way we found it.'
+      ]
+    }
+  ]
+};
+
+const outdoorWineNarrative = {
+  eyebrow: 'OUTDOOR KITCHENS & WINE ROOMS',
+  headline: 'The Two Santa Barbara Categories Almost Nobody Services',
+  paragraphs: [
+    "Drive the estate streets off Alameda Padre Serra or through Hope Ranch and count the outdoor kitchens: built-in grills, side burners, outdoor refrigeration, whole covered patios plumbed for gas and water. Now try to find a Santa Barbara company that repairs them. That gap is why our <a href=\"/outdoor/grill-repair/\">grill repair</a> and <a href=\"/outdoor/kitchen-repair/\">outdoor kitchen</a> teams take so many South Coast calls: Lynx and Fire Magic igniters corroded by coastal air, DCS burners that won't hold flame, outdoor refrigerators that were never built for the fog line they live on. We service the whole outdoor category with OEM parts — it's a core service for us, not a favor.",
+    "Wine is the other one. This close to the Santa Ynez Valley, serious collections live in Santa Barbara houses — dedicated wine rooms, cellar conversions, undercounter units in butler's pantries. When a <a href=\"/services/wine-cellar-cooling-repair/\">wine cellar cooling unit</a> drifts two degrees, that's not an inconvenience, it's an inventory problem. We diagnose cellar cooling systems, wine refrigerators, and humidity complaints with the same OEM-parts discipline we bring to a Sub-Zero — because half the time, it is a Sub-Zero.",
+    "If your outdoor kitchen or wine room has been broken for months because nobody returns the call — this is the call that gets returned."
+  ]
+};
+
+const waterNarrative = {
+  eyebrow: 'SALT AIR OUT FRONT, HARD WATER BEHIND THE WALLS',
+  headline: 'What Actually Kills Appliances in Santa Barbara',
+  paragraphs: [
+    "Two forces do most of the damage here, and they split the city between them. Within about a mile of the water — the Mesa, West Beach, the harbor blocks, the lower Eastside — salt air settles on refrigerator condenser coils and corrodes them years ahead of schedule. The refrigerator runs longer to shed the same heat, the kitchen gets warmer, the electric bill creeps up, and eventually the compressor pays for all of it. We clean and inspect coils on every coastal refrigerator call as standard procedure.",
+    "Inland of the salt line, it's the water. Santa Barbara's supply is a blend — Cachuma Lake, groundwater, State Water Project deliveries, and the city's desalination plant — and it runs hard. Scale builds in dishwasher spray arms and heaters, ice maker fill valves, and washer inlet screens, typically showing up as real symptoms around year 3–5: cloudy glassware, slow ice, a washer that fills at half speed. A descaling service visit costs a fraction of the pump or valve replacement it prevents. We'll tell you which one you actually need."
+  ]
+};
+
+const neighborhoods = [
+  { name: 'The Riviera', zip: '93103', featured: true },
+  { name: 'The Mesa', zip: '93109', featured: true },
+  { name: 'San Roque', zip: '93105', featured: true },
+  { name: 'Upper East', zip: '93101' },
+  { name: 'Samarkand', zip: '93105' },
+  { name: 'Westside', zip: '93101' },
+  { name: 'Eastside', zip: '93103' },
+  { name: 'Downtown / West Beach', zip: '93101' },
+  { name: 'Hope Ranch Annex', zip: '93110' },
+  { name: 'Upper State corridor', zip: '93105' }
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero Refrigerator',
+    location: 'The Mesa, 93109',
+    quote: 'Fridge runs all day and the kitchen feels warm',
+    description: "Four blocks from the bluff — exactly the pattern we expected. The condenser coils carried heavy salt-air corrosion and dust load, so the unit ran nearly continuously to hold temperature. Artur cleaned the coils completely, verified the condenser fan, checked door seals for early coastal wear, and set the owner up on a 4-month coil-cleaning schedule. Caught before it became a compressor job.",
+    outcome: '✓ Same day · Coil service · Maintenance schedule set'
+  },
+  {
+    appliance: 'Wolf Range',
+    location: 'The Riviera, 93103',
+    quote: "Oven runs cold — dinner party Saturday, panicking Thursday",
+    description: "48-inch Wolf DF486G dual-fuel in a 1920s Spanish Revival kitchen, remodeled around the range a decade ago. The oven was reading 25°F below setpoint and one surface igniter clicked without lighting. Replaced the surface igniter electrode with an OEM Wolf part, recalibrated the oven, and verified with a thermometer at three setpoints. Done Thursday evening — two days ahead of the dinner.",
+    outcome: '✓ Same day · OEM Wolf parts · Oven recalibrated'
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    location: 'San Roque, 93105',
+    quote: 'E15 code, pump keeps running, will not shut off',
+    description: "Bosch's E15 means water has reached the base pan and tripped leak protection — the pump runs to protect the kitchen floor. Found a slow leak at a scale-crusted water inlet connection, cleaned up the mineral buildup, resealed the connection, dried the base pan, and reset the system. Ran two full cycles to confirm the fix. Hard water started this one, like it starts a lot of San Roque calls.",
+    outcome: '✓ Same day · Leak sourced & sealed · No replacement needed'
+  },
+  {
+    appliance: 'LG Washer',
+    location: 'Eastside, 93103',
+    quote: 'Washer fills with water but won’t spin',
+    description: "LG WT7300CW top-loader in a rental unit — property manager called on the tenant's behalf. The washer filled normally but never advanced to spin. Diagnosed a failed lid lock assembly, replaced it with an OEM part from the truck, and ran a full cycle with the tenant present before leaving. Landlord invoiced directly; tenant lost zero laundry days.",
+    outcome: '✓ Same day · Property manager coordinated · OEM part on truck'
+  }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'We Publish the Price',
+    body: "The diagnostic is $89, it's printed on this page, and it disappears when you approve the repair. Written estimate before any work. The invoice matches the estimate. If that sounds basic — try finding another Santa Barbara company that puts a number in writing before the truck rolls."
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'The Whole Kitchen, Indoors and Out',
+    body: 'Sub-Zero columns, Wolf ranges, Miele dishwashers — and the Lynx grill, the outdoor refrigerator, and the wine room cooling unit that most companies decline. One number covers the entire property, with OEM parts across all of it.'
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Coastal Diagnostics, Not Generic Ones',
+    body: "Salt-air coil corrosion on the Mesa and hard-water scale in San Roque are different diseases with different cures. We check for the local failure pattern first — it's usually the answer — instead of running a generic checklist."
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed by 90 days on parts and labor. Genuine OEM parts, which matters double on coastal units — aftermarket components corrode faster within sight of the ocean. $89 diagnostic waived with repair.'
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator', range: '$200–$500', note: 'Coastal coil inspection standard · Ice maker · Built-ins' },
+  { appliance: 'Sub-Zero / Built-In Column', range: '$300–$700+', note: 'OEM parts · Galley-kitchen extraction handled', featured: true },
+  { appliance: 'Oven / Range', range: '$175–$450', note: 'Wolf, Viking, Thermador · Calibration · Igniters' },
+  { appliance: 'Dishwasher', range: '$150–$350', note: 'Hard-water descale · Leak protection codes · OEM parts' },
+  { appliance: 'BBQ / Outdoor Kitchen', range: '$150–$400', note: 'Igniters · Burners · Gas valves · Lynx / Fire Magic / DCS' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' }
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Santa Barbara, CA?',
+    answer: 'Yes. Our technicians cover all of Santa Barbara — 93101, 93103, 93105, and 93109 — from the Riviera and Upper East through San Roque and Samarkand to the Mesa, Westside, and Eastside. Call before noon for same-day service in most parts of the city.'
+  },
+  {
+    question: 'What is your diagnostic fee in Santa Barbara?',
+    answer: "$89, waived the moment you approve the repair — and we publish it, which is rare on the South Coast. You get a written estimate before any work starts, and the invoice matches the estimate. Commercial equipment is quoted separately."
+  },
+  {
+    question: 'Do you repair Sub-Zero, Wolf, and Viking appliances in Santa Barbara?',
+    answer: 'Yes. Built-in Sub-Zero refrigeration, Wolf ranges and ovens, Viking indoor and outdoor equipment, plus Thermador, Miele, and GE Monogram — with OEM parts. Riviera and Upper East homes with built-ins retrofitted into 1920s kitchens are a specialty: extraction from tight cabinetry is part of the job, and we plan for it.'
+  },
+  {
+    question: 'Do you repair outdoor kitchens and built-in grills in Santa Barbara?',
+    answer: 'Yes — and almost nobody else here does. Lynx, Fire Magic, Twin Eagles, DCS, Viking, and Wolf outdoor equipment: igniter failures, burner replacement, gas valve issues, outdoor refrigeration. Coastal air is brutal on outdoor igniter systems, so this is a steady category for us, not a sideline.'
+  },
+  {
+    question: 'Do you service wine cellars and wine refrigerators in Santa Barbara?',
+    answer: "Yes. Wine room cooling units, cellar conversions, and undercounter wine refrigerators — Sub-Zero, EuroCave, Liebherr, U-Line, and dedicated cellar cooling systems. This close to the Santa Ynez Valley, a two-degree drift is an inventory problem, and we treat it with that urgency."
+  },
+  {
+    question: 'Does salt air really damage appliances in Santa Barbara?',
+    answer: "Within a mile or so of the water, yes — measurably. The Mesa, West Beach, and the harbor blocks see condenser coil corrosion well ahead of inland timelines. The refrigerator runs longer, works harder, and fails earlier unless the coils are cleaned regularly. We inspect coils on every coastal refrigerator call as standard, and we recommend a 4–6 month cleaning cycle for homes near the bluff."
+  },
+  {
+    question: 'Is Santa Barbara water hard on dishwashers and ice makers?',
+    answer: "Yes. The city's supply blends Cachuma Lake, groundwater, State Water, and desalinated water, and it runs hard. Scale shows up in dishwasher spray arms, ice maker fill valves, and washer inlet screens around year 3–5 — cloudy glassware and slow ice are the usual first symptoms. Descaling maintenance is far cheaper than the pump or valve replacement it prevents."
+  }
+];
+
+const nearbyCities = [
+  { name: 'Montecito', slug: 'montecito' },
+  { name: 'Ventura', slug: 'ventura' },
+  { name: 'Oxnard', slug: 'oxnard' },
+  { name: 'Camarillo', slug: 'camarillo' },
+  { name: 'Thousand Oaks', slug: 'thousand-oaks' },
+  { name: 'Westlake Village', slug: 'westlake-village' }
+];
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Santa Barbara, CA"
+    subheadline="Riviera galley kitchens, Mesa salt air, San Roque hard water — we know which one is breaking your appliance. Sub-Zero, Wolf, wine rooms, outdoor kitchens. $89 diagnostic, published right here, waived with repair."
+    zips={zips}
+    tier={1}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Santa Barbara — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Santa Barbara Service Team"
+    bookingSub="93101 · 93103 · 93105 · 93109 · South Coast"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Santa Barbara"
+    subhead="Indoor & outdoor · Luxury brands · Wine rooms · Hard-water specialists"
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={neighborhoodsNarrative.eyebrow}
+    headline={neighborhoodsNarrative.headline}
+    paragraphs={neighborhoodsNarrative.paragraphs}
+    subSections={neighborhoodsNarrative.subSections}
+    background="white"
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Santa Barbara Areas We Service"
+    subheadline="The Riviera, the Mesa, San Roque, Upper East, Samarkand, Westside, Eastside — the whole city."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <CustomNarrative
+    eyebrow={outdoorWineNarrative.eyebrow}
+    headline={outdoorWineNarrative.headline}
+    paragraphs={outdoorWineNarrative.paragraphs}
+    background="gray"
+  />
+
+  <CustomNarrative
+    eyebrow={waterNarrative.eyebrow}
+    headline={waterNarrative.headline}
+    paragraphs={waterNarrative.paragraphs}
+    background="white"
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Santa Barbara"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Santa Barbara Homeowners & Property Managers Call Us"
+    reasons={whyReasons}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Santa Barbara"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Santa Barbara Clients Ask"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Santa Barbara?"
+    body="Riviera to the Mesa · Wine rooms · Outdoor kitchens · Property managers welcome. $89 diagnostic waived with repair. 90-day warranty. OEM parts."
+  />
+
+  <section class="section">
+    <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">Santa Barbara County coverage</p>
+      <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">The whole South Coast corridor, one branch.</h2>
+      <p>Santa Barbara is the anchor of our <a href="/santa-barbara-county/">Santa Barbara County service area</a> — the same branch and the same techs cover <a href="/montecito/">Montecito</a>, Goleta, Carpinteria, Summerland, and Hope Ranch. If you're anywhere on the corridor from the Carpinteria line to western Goleta, (805) 500-0855 is the number.</p>
+    </div>
+  </section>
+</CityLayoutV2>

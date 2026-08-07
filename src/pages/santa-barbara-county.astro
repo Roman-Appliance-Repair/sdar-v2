@@ -1,0 +1,370 @@
+---
+// Appliance Repair Santa Barbara County | Same Day Appliance Repair
+// /santa-barbara-county/
+import Layout from '../layouts/Layout.astro';
+import CountyMap from '../components/CountyMap.astro';
+import { BRANCHES, type Branch } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const title = "Appliance Repair Santa Barbara County CA | Same Day";
+const description = "Appliance repair across Santa Barbara County — Santa Barbara, Montecito, Goleta, Carpinteria. $89 diagnostic. (805) 500-0855.";
+
+const activeBranches = BRANCHES.filter((b) => b.phoneStatus === 'active');
+const slugToTitle = (s: string) => s.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+const sharedEmail = 'support@samedayappliance.repair';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  '@id': 'https://samedayappliance.repair/santa-barbara-county/#business',
+  name: 'Same Day Appliance Repair — Santa Barbara County',
+  telephone: '(805) 500-0855',
+  url: 'https://samedayappliance.repair/santa-barbara-county/',
+  areaServed: { '@type': 'AdministrativeArea', name: 'Santa Barbara County' },
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  location: activeBranches.map((b: Branch) => {
+    const entry: Record<string, unknown> = {
+      '@type': 'LocalBusiness',
+      name: b.gbpName,
+      telephone: b.phone,
+      openingHoursSpecification: OPENING_HOURS_SCHEMA,
+      areaServed: b.citiesServed.slice(0, 8).map((slug) => ({ '@type': 'City', name: slugToTitle(slug) })),
+      hasOfferCatalog: { '@id': 'https://samedayappliance.repair/#service-catalog' }
+    };
+    if (b.type === 'physical_pin' && b.address) {
+      entry.address = {
+        '@type': 'PostalAddress',
+        streetAddress: b.address.street,
+        addressLocality: b.address.city,
+        addressRegion: b.address.state,
+        postalCode: b.address.zip,
+        addressCountry: 'US'
+      };
+      entry.email = sharedEmail;
+    } else {
+      // SAB branches: city-level PostalAddress (locality + ZIP, NEVER street) so
+      // every location entry carries Google's required `address` field. ZIP only
+      // from the PUBLIC branch address (internalAddress is never rendered).
+      entry.address = {
+        '@type': 'PostalAddress',
+        addressLocality: b.displayCity,
+        addressRegion: 'CA',
+        ...(b.address?.zip ? { postalCode: b.address.zip } : {}),
+        addressCountry: 'US'
+      };
+    }
+    if (Array.isArray(b.sameAs) && b.sameAs.length > 0) {
+      entry.sameAs = [...b.sameAs];
+    }
+    return entry;
+  })
+});
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    { '@type': 'Question', name: 'Do you offer same day appliance repair across Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. We cover the South Coast corridor — Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch. Call (805) 500-0855 for availability.' } },
+    { '@type': 'Question', name: 'What is the diagnostic fee for appliance repair in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: '$89 for residential — applied to the repair. $120 for commercial. Quote before we start.' } },
+    { '@type': 'Question', name: 'Which communities do you cover in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch — the South Coast corridor from the Carpinteria line to western Goleta.' } },
+    { '@type': 'Question', name: 'Do you repair Sub-Zero, Wolf, and Viking in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. The Montecito and Hope Ranch estate belt runs on built-in Sub-Zero refrigeration, Wolf and Viking ranges, and wine cellar cooling — our techs at Same Day Appliance Repair service all of it with OEM parts. $89 residential diagnostic, waived with repair.' } },
+    { '@type': 'Question', name: 'Does salt air affect appliances in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Homes on the Mesa, near the harbor, and along the Carpinteria and Summerland coast see condenser coil corrosion faster than inland properties. We inspect coils on every refrigerator call as standard.' } },
+    { '@type': 'Question', name: 'Do you offer commercial appliance repair in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Restaurants, tasting rooms, hotels, property managers — $120 commercial diagnostic, waived with repair, COI on request. Call (805) 500-0855.' } }
+  ]
+};
+---
+
+<Layout title={title} description={description}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
+  </Fragment>
+
+  <style>
+    :root { --red: #C8102E; --black: #0a0a0a; --gray: #f5f5f5; --border: #e2e2e2; --text: #1a1a1a; --muted: #6b6b6b; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', -apple-system, sans-serif; color: var(--text); line-height: 1.6; }
+    a { color: inherit; text-decoration: none; }
+    .hero { position: relative; overflow: hidden; background: #0a0a0a; color: #fff; padding: 80px 24px 72px; }
+    .hero-bg { position: absolute; inset: 0; z-index: 0; }
+    .hero-bg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .hero-overlay { position: absolute; inset: 0; z-index: 1; background: linear-gradient(90deg, rgba(10,10,10,0.92) 0%, rgba(10,10,10,0.82) 38%, rgba(10,10,10,0.5) 70%, rgba(10,10,10,0.28) 100%); }
+    .hero-inner { position: relative; z-index: 2; max-width: 1100px; margin: 0 auto; }
+    .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
+    .hero h1 { font-size: clamp(30px, 4vw, 50px); font-weight: 700; line-height: 1.1; margin-bottom: 18px; letter-spacing: -.02em; max-width: 760px; color: #fff; }
+    .hero-sub { font-size: 18px; color: rgba(255,255,255,.85); margin-bottom: 32px; max-width: 620px; line-height: 1.65; }
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+    .btn-red { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; }
+    .btn-outline { border: 1.5px solid rgba(255,255,255,.3); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; }
+    .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
+    .hero-stat-num { font-size: 28px; font-weight: 700; color: #fff; }
+    .hero-stat-label { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 2px; }
+    .trust-bar { background: var(--red); padding: 14px 24px; }
+    .trust-bar-inner { max-width: 1100px; margin: 0 auto; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+    .ti { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #fff; }
+    .section { padding: 72px 24px; }
+    .section-gray { background: var(--gray); }
+    .section-black { background: var(--black); color: #fff; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .sl { font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--red); margin-bottom: 12px; }
+    h2 { font-size: clamp(24px, 3.2vw, 36px); font-weight: 700; line-height: 1.2; letter-spacing: -.02em; margin-bottom: 18px; }
+    .section-black h2 { color: #fff; }
+    .lead { font-size: 17px; line-height: 1.7; color: var(--muted); max-width: 700px; margin-bottom: 40px; }
+    .body-text p { font-size: 16px; line-height: 1.75; margin-bottom: 16px; color: var(--text); }
+    .cities-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; margin-top: 32px; }
+    .city-link { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; }
+    .city-link:hover { border-color: var(--red); color: var(--red); }
+    .city-plain { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; font-size: 14px; font-weight: 500; color: var(--muted); }
+    .city-soon { font-size: 11px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+    .city-arrow { font-size: 12px; color: var(--muted); }
+    .services-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 32px; }
+    .svc-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .svc-icon { font-size: 24px; margin-bottom: 10px; }
+    .svc-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 5px; }
+    .svc-card p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+    .context-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start; }
+    .context-text p { font-size: 16px; line-height: 1.75; color: rgba(255,255,255,.72); margin-bottom: 14px; }
+    .context-facts { display: flex; flex-direction: column; gap: 12px; }
+    .cfact { background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 10px; padding: 16px; }
+    .cfact h4 { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 5px; }
+    .cfact p { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.5; }
+    .repairs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 32px; }
+    .repair-card { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
+    .rtag { display: inline-block; background: var(--gray); font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 3px 8px; border-radius: 4px; margin-bottom: 10px; }
+    .repair-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 7px; line-height: 1.3; }
+    .repair-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .pricing-table { width: 100%; border-collapse: collapse; margin-top: 28px; font-size: 15px; }
+    .pricing-table th { text-align: left; padding: 12px 16px; background: var(--black); color: #fff; font-size: 13px; font-weight: 600; }
+    .pricing-table td { padding: 13px 16px; border-bottom: 1px solid var(--border); }
+    .pricing-table tr:last-child td { border-bottom: none; }
+    .pricing-table tr:nth-child(even) td { background: #fafafa; }
+    .price-val { font-weight: 700; color: var(--red); }
+    .pricing-note { font-size: 13px; color: var(--muted); margin-top: 14px; padding: 13px 16px; background: var(--gray); border-radius: 6px; border-left: 3px solid var(--red); }
+    .faq-list { margin-top: 36px; }
+    .faq-item { border-bottom: 1px solid var(--border); padding: 18px 0; }
+    .faq-item:first-child { border-top: 1px solid var(--border); }
+    .faq-q { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .faq-a { font-size: 15px; line-height: 1.7; color: var(--muted); }
+    .nearby-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .nb { background: var(--gray); border: 1px solid var(--border); border-radius: 6px; padding: 8px 14px; font-size: 14px; }
+    .section-commercial { padding: 72px 24px; background: #fafafa; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .commercial-intro { font-size: 16px; line-height: 1.75; color: var(--text); max-width: 760px; margin: 0 0 28px; }
+    .commercial-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+    .ccard { background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px; }
+    .ccard-icon { font-size: 24px; margin-bottom: 10px; }
+    .ccard h3 { font-size: 15px; font-weight: 700; color: var(--text); margin: 0 0 6px; }
+    .ccard p { font-size: 13px; line-height: 1.6; color: var(--muted); margin: 0; }
+    .commercial-cta { display: flex; gap: 18px; align-items: center; justify-content: space-between; flex-wrap: wrap; background: var(--red); color: #fff; padding: 20px 26px; border-radius: 10px; margin-top: 12px; }
+    .commercial-cta .cta-text { font-size: 14px; line-height: 1.5; flex: 1; min-width: 280px; color: #fff; }
+    .commercial-cta .cta-phone { background: #fff; color: var(--red); padding: 12px 22px; border-radius: 6px; font-weight: 700; font-size: 16px; white-space: nowrap; text-decoration: none; }
+    .commercial-cta .cta-phone:hover { background: #0a0a0a; color: #fff; }
+    @media (max-width: 768px) { .commercial-grid { grid-template-columns: 1fr; } }
+    .bottom-cta { background: var(--black); color: #fff; padding: 72px 24px; text-align: center; }
+    .bottom-cta h2 { color: #fff; margin-bottom: 14px; }
+    .bottom-cta p { font-size: 17px; color: rgba(255,255,255,.62); margin-bottom: 30px; max-width: 540px; margin-left: auto; margin-right: auto; }
+    .bottom-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    @media (max-width: 768px) { .context-cols { grid-template-columns: 1fr; } }
+  </style>
+
+<section class="hero">
+  <picture class="hero-bg">
+    <source media="(max-width: 640px)" srcset="/images/counties/santa-barbara-county/hero-640.webp" type="image/webp" />
+    <source media="(max-width: 960px)" srcset="/images/counties/santa-barbara-county/hero-960.webp" type="image/webp" />
+    <source srcset="/images/counties/santa-barbara-county/hero.webp" type="image/webp" />
+    <img src="/images/counties/santa-barbara-county/hero.jpg" alt="Appliance repair across Santa Barbara County, California" width="1920" height="840" loading="eager" fetchpriority="high" />
+  </picture>
+  <div class="hero-overlay"></div>
+  <div class="hero-inner">
+    <p class="hero-eyebrow">Santa Barbara County · Appliance Repair Coverage · Residential + Commercial · Same Day</p>
+    <h1>Appliance Repair Across Santa Barbara County</h1>
+    <p class="hero-sub">From Carpinteria through Montecito and Santa Barbara to Goleta — the whole South Coast corridor. Dedicated Santa Barbara branch. Same day available.</p>
+    <div class="hero-ctas">
+      <a href="tel:+18055000855" class="btn-red">☎ (805) 500-0855</a>
+      <a href="/book/" class="btn-outline">Book Online</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">South Coast Communities</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">$89</div><div class="hero-stat-label">Diagnostic · Waived With Repair</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="trust-bar">
+  <div class="trust-bar-inner">
+    <div class="ti">🏅 BHGS #A49573</div>
+    <div class="ti">🛡️ Fully Insured</div>
+    <div class="ti">⚡ Same Day Available</div>
+    <div class="ti">🔩 OEM Parts · All Major Brands</div>
+    <div class="ti">💬 $89 Diagnostic — Waived With Repair</div>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">Santa Barbara County Service</p>
+    <h2>The South Coast has serious kitchens and very few companies that publish a price</h2>
+    <p><strong>When an appliance fails anywhere on the Santa Barbara South Coast, our techs at Same Day Appliance Repair dispatch same-day across Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch. Our Santa Barbara branch at (805) 500-0855 is dedicated to this corridor — we factor in salt air on the Mesa and the harbor against the hard water that scales dishwashers from Carpinteria to Goleta. We quote labor and parts before any work. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong></p>
+    <div class="body-text">
+      <p>Santa Barbara County's South Coast is a strange market. The Montecito and Hope Ranch estate belt carries built-in <a href="/brands/sub-zero/">Sub-Zero</a> refrigeration, <a href="/brands/wolf/">Wolf</a> ranges, and wine rooms at a density comparable to Bel Air — and yet most local repair outfits either stop at mass-market brands or service only one luxury brand and nothing else. Almost nobody covers outdoor kitchens. Nobody publishes a diagnostic price. We do both.</p>
+      <p>Our Santa Barbara branch is run by Artur S., who also covers our Thousand Oaks territory — so the 101 corridor from the Conejo Valley up through Carpinteria is one continuous route, not a special trip. Same-day service on the South Coast is scheduling, not luck: call before noon and we can usually be there the same day.</p>
+      <p>The housing stock tells you what breaks. Spanish Colonial Revival homes from the 1920s and 30s on the Riviera and Upper East have tight galley kitchens where built-in units were retrofitted decades later. The Mesa is postwar ranch construction with salt air a few blocks away. Goleta runs newer — tract homes and townhomes with Samsung, LG, and Whirlpool. Each of those is a different service call, and we work all three daily.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">Service Map</p>
+    <h2>Communities we serve in Santa Barbara County</h2>
+    <p class="lead">The South Coast corridor — from the Carpinteria line through Montecito and Santa Barbara to western Goleta.</p>
+  </div>
+</section>
+<CountyMap county="santa-barbara-county" height="460px" />
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="sl">Service Areas</p>
+    <h2>6 communities across the South Coast</h2>
+    <p class="lead">City pages for Santa Barbara and Montecito are live — the rest of the corridor is covered by the same branch and the same techs.</p>
+    <div class="cities-grid">
+      <a href="/santa-barbara/" class="city-link">Santa Barbara <span class="city-arrow">→</span></a>
+      <a href="/montecito/" class="city-link">Montecito <span class="city-arrow">→</span></a>
+      <div class="city-plain">Goleta <span class="city-soon">Covered</span></div>
+      <div class="city-plain">Carpinteria <span class="city-soon">Covered</span></div>
+      <div class="city-plain">Summerland <span class="city-soon">Covered</span></div>
+      <div class="city-plain">Hope Ranch <span class="city-soon">Covered</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">What We Repair</p>
+    <h2>Every major home appliance across Santa Barbara County</h2>
+    <div class="services-grid">
+      <a href="/services/refrigerator-repair/" class="svc-card"><div class="svc-icon">❄️</div><h3>Refrigerator Repair</h3><p>All brands and built-ins. Sub-Zero columns and coastal coil corrosion handled.</p></a>
+      <a href="/services/washer-repair/" class="svc-card"><div class="svc-icon">👕</div><h3>Washer Repair</h3><p>Front-load, top-load, stacked. Hard-water scale is a South Coast staple.</p></a>
+      <a href="/services/dryer-repair/" class="svc-card"><div class="svc-icon">💨</div><h3>Dryer Repair</h3><p>Gas and electric. Vent inspection included when relevant.</p></a>
+      <a href="/services/dishwasher-repair/" class="svc-card"><div class="svc-icon">🍽️</div><h3>Dishwasher Repair</h3><p>Miele, Bosch, KitchenAid, Samsung. Scale from hard water is the local pattern.</p></a>
+      <a href="/services/oven-repair/" class="svc-card"><div class="svc-icon">🔥</div><h3>Oven & Range Repair</h3><p>Gas, electric, dual-fuel. Wolf, Viking, Thermador serviced with OEM parts.</p></a>
+      <a href="/services/wine-cellar-cooling-repair/" class="svc-card"><div class="svc-icon">🍷</div><h3>Wine Cellar Cooling</h3><p>Wine rooms and cellar cooling units — a real category here, this close to the Santa Ynez Valley.</p></a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-black">
+  <div class="container">
+    <div class="context-cols">
+      <div class="context-text">
+        <p class="sl">Santa Barbara County Appliance Context</p>
+        <h2>Two things break appliances here: salt air and hard water</h2>
+        <p>The marine layer sits on the South Coast most mornings from May through August, and homes on the Mesa, near the harbor, and along the Summerland and Carpinteria coast get salt air on top of it. Condenser coils corrode faster within a mile of the water — we inspect them on every refrigerator call as standard, because catching coil corrosion early is the difference between a cleaning and a sealed-system repair.</p>
+        <p>Inland of the salt line, the problem flips to water. The South Coast's supply blends Cachuma Lake, groundwater, State Water Project deliveries, and the city's desalination plant — and it runs moderately hard to hard. Dishwashers, ice makers, and washers scale at year 3–5 without descaling maintenance. If your dishwasher leaves film and your ice tastes off, that's the water, and it's fixable.</p>
+      </div>
+      <div class="context-facts">
+        <div class="cfact"><h4>🏡 Estate density (Montecito, Hope Ranch)</h4><p>Built-in Sub-Zero, Wolf, Viking, Thermador, Miele at Bel Air density. OEM parts on the truck.</p></div>
+        <div class="cfact"><h4>🌊 Salt air (Mesa, harbor, Summerland, Carpinteria)</h4><p>Coil corrosion runs faster near the water. Coil inspection standard on every fridge call.</p></div>
+        <div class="cfact"><h4>💧 Hard water (Cachuma + State Water blend)</h4><p>Dishwasher and ice maker scale at year 3–5. Descaling maintenance pays for itself.</p></div>
+        <div class="cfact"><h4>🏢 Dedicated Santa Barbara branch</h4><p>(805) 500-0855 is a South Coast number — one continuous 101 route with our Thousand Oaks branch, not LA dispatch.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMERCIAL -->
+<section class="section section-commercial">
+  <div class="container">
+    <p class="sl">Commercial Service · Santa Barbara County</p>
+    <h2>Commercial Appliance Repair in Santa Barbara County</h2>
+    <p class="commercial-intro">The South Coast's commercial calls cluster in three places: the State Street and Funk Zone restaurant and tasting-room scene, the waterfront and harbor kitchens where salt air chews through commercial refrigeration the way it does on residential units, and the hotel corridor from Montecito through Goleta. Wine tasting rooms are their own category — undercounter refrigeration and glass washers in spaces that were never designed as kitchens. We service all of it from the Santa Barbara branch, $120 commercial diagnostic, waived with repair.</p>
+    <div class="commercial-grid">
+      <div class="ccard"><div class="ccard-icon">🍽️</div><h3><a href="/commercial/refrigeration/">Commercial Refrigeration</a></h3><p>Walk-in coolers, reach-ins, prep tables. <a href="/brands/true/">True</a>, Turbo Air, <a href="/brands/beverage-air/">Beverage-Air</a>.</p></div>
+      <div class="ccard"><div class="ccard-icon">🧊</div><h3><a href="/commercial/ice-machines/">Ice Machine Repair</a></h3><p><a href="/brands/hoshizaki/">Hoshizaki</a>, <a href="/brands/manitowoc/">Manitowoc</a>, <a href="/brands/scotsman/">Scotsman</a>. Hard water means scale — the thing that kills ice machines here.</p></div>
+      <div class="ccard"><div class="ccard-icon">🔥</div><h3><a href="/commercial/range-repair/">Commercial Ovens & Ranges</a></h3><p><a href="/brands/vulcan/">Vulcan</a>, <a href="/brands/garland/">Garland</a>, US Range. Gas and electric.</p></div>
+      <div class="ccard"><div class="ccard-icon">🚿</div><h3><a href="/commercial/dishwasher-repair/">Commercial Dishwashers</a></h3><p>Hobart, Jackson, CMA. High-temp and chemical sanitizing — plus the glass washers tasting rooms run.</p></div>
+    </div>
+    <div class="commercial-cta">
+      <span class="cta-text">$120 commercial diagnostic — waived with repair. COI provided on request. Same day available.</span>
+      <a href="tel:+18055000855" class="cta-phone">Call (805) 500-0855</a>
+    </div>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="sl">Recent Repairs</p>
+    <h2>What appliance calls look like on the South Coast</h2>
+    <div class="repairs-grid">
+      <div class="repair-card"><span class="rtag">Montecito</span><h3>"Freezer is fine but the fridge side keeps warming up"</h3><p>Sub-Zero 650 with a failed evaporator fan motor — the classic pattern on this series. Artur replaced the fan with an OEM Sub-Zero part, defrosted the iced coils, and confirmed stable temperatures before leaving.</p></div>
+      <div class="repair-card"><span class="rtag">The Mesa, Santa Barbara</span><h3>"Refrigerator runs constantly and the kitchen is warm"</h3><p>A few blocks from the bluff — condenser coils loaded with salt-air corrosion and dust. Deep coil cleaning, condenser fan checked, owner set up on a 4-month cleaning schedule. Caught before the compressor paid the price.</p></div>
+      <div class="repair-card"><span class="rtag">Goleta</span><h3>"Samsung ice maker frozen solid, water leaking inside"</h3><p>Samsung French door with the ice maker assembly iced over after a defrost failure. Defrosted the assembly, replaced the defrost sensor, confirmed the ice maker cycling correctly.</p></div>
+      <div class="repair-card"><span class="rtag">Carpinteria</span><h3>"Washer stops mid-cycle with water still in the drum"</h3><p>LG front-loader with a drain pump clogged by scale and debris — hard water at work. Cleared the pump, cleaned the filter housing, ran two full cycles to verify drainage.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">Pricing</p>
+    <h2>Appliance repair costs in Santa Barbara County</h2>
+    <table class="pricing-table">
+      <thead><tr><th>Appliance</th><th>Typical Range</th><th>Luxury Brands</th></tr></thead>
+      <tbody>
+        <tr><td>Refrigerator</td><td class="price-val">$200–$450</td><td>$300–$700+ (Sub-Zero, built-in)</td></tr>
+        <tr><td>Washer / Dryer</td><td class="price-val">$150–$350</td><td>$200–$450 (Miele, Bosch)</td></tr>
+        <tr><td>Oven / Range</td><td class="price-val">$175–$420</td><td>$250–$500+ (Wolf, Viking, Thermador)</td></tr>
+        <tr><td>Dishwasher</td><td class="price-val">$150–$320</td><td>$200–$450 (Miele)</td></tr>
+        <tr><td>Wine Cellar Cooling</td><td class="price-val">$200–$500</td><td>OEM parts, humidity-aware diagnostics</td></tr>
+        <tr><td>Residential diagnostic</td><td class="price-val">$89</td><td>Applied to repair</td></tr>
+        <tr><td>Commercial diagnostic</td><td class="price-val">$120</td><td>Applied to repair</td></tr>
+      </tbody>
+    </table>
+    <p class="pricing-note">Quote before we start. Invoice matches the quote. OEM parts. 90-day warranty.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="sl">FAQ</p>
+    <h2>Questions about appliance repair in Santa Barbara County</h2>
+    <div class="faq-list">
+      <div class="faq-item"><div class="faq-q">Do you offer same day appliance repair across Santa Barbara County?</div><div class="faq-a">Yes. We cover the South Coast corridor — Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch. Call (805) 500-0855 for availability in your community.</div></div>
+      <div class="faq-item"><div class="faq-q">What is the diagnostic fee for appliance repair in Santa Barbara County?</div><div class="faq-a">$89 for residential appliances — applied to the repair the moment you approve the work. For commercial it's $120. Quote before we start. We publish these numbers because almost nobody else on the South Coast does.</div></div>
+      <div class="faq-item"><div class="faq-q">Do you repair Sub-Zero, Wolf, and Viking in Santa Barbara County?</div><div class="faq-a">Yes. The Montecito and Hope Ranch estate belt runs on built-in Sub-Zero refrigeration, Wolf and Viking ranges, and wine cellar cooling — our techs service all of it with OEM parts.</div></div>
+      <div class="faq-item"><div class="faq-q">Which communities do you cover in Santa Barbara County?</div><div class="faq-a">Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch — the corridor from the Carpinteria line to western Goleta.</div></div>
+      <div class="faq-item"><div class="faq-q">Does salt air affect appliances in Santa Barbara County?</div><div class="faq-a">Yes. The Mesa, the harbor area, Summerland, and coastal Carpinteria see condenser coil corrosion measurably faster than inland homes. We inspect coils on every refrigerator call as a standard part of diagnostics, not an add-on.</div></div>
+      <div class="faq-item"><div class="faq-q">Is the water in Santa Barbara County hard on appliances?</div><div class="faq-a">Yes. The supply blends Cachuma Lake, groundwater, State Water, and desalination, and runs moderately hard to hard. Dishwashers, washers, and ice makers scale at year 3–5 without maintenance. Descaling is cheaper than a new pump.</div></div>
+      <div class="faq-item"><div class="faq-q">Do you offer commercial appliance repair in Santa Barbara County?</div><div class="faq-a">Yes. Restaurants, tasting rooms, hotels, property managers — $120 commercial diagnostic, waived with repair, COI on request. Call (805) 500-0855.</div></div>
+      <div class="faq-item"><div class="faq-q">What warranty do you provide on appliance repairs in Santa Barbara County?</div><div class="faq-a">90 days on parts and labor. OEM parts wherever available — which matters more on coastal units, where aftermarket parts corrode faster.</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="sl">Related Areas</p>
+    <h2>Other service areas</h2>
+    <div class="nearby-grid">
+      <a href="/santa-barbara/" class="nb">Santa Barbara</a>
+      <a href="/montecito/" class="nb">Montecito</a>
+      <a href="/ventura-county/" class="nb">Ventura County</a>
+      <a href="/ventura/" class="nb">Ventura</a>
+      <a href="/oxnard/" class="nb">Oxnard</a>
+      <a href="/los-angeles-county/" class="nb">Los Angeles County</a>
+    </div>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Appliance repair anywhere on the South Coast</h2>
+    <p>Carpinteria to Goleta. Same day available. $89 diagnostic applied to repair.</p>
+    <div class="bottom-ctas">
+      <a href="tel:+18055000855" class="btn-red">☎ Call (805) 500-0855</a>
+      <a href="/book/" class="btn-outline">Book Online</a>
+    </div>
+  </div>
+</section>
+</Layout>
