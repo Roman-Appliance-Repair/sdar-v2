@@ -26,9 +26,9 @@
    - CSLB C-20 HVAC
    - BBB Accredited Business (БЕЗ буквы рейтинга — на BBB реально A, не A+)
 
-5. **`location` array (все 8 филиалов)** → на гео-нейтральных страницах: `/`, `/contact/`, `/book/`, и ~700 страниц без city anchor (services hubs, brand pages, commercial, outdoor, sub-services, price list, credentials). Все 8 — `LocalBusiness` entries с branch phone + service_area.
+5. **`location` array (все 9 филиалов)** → на гео-нейтральных страницах: `/`, `/contact/`, `/book/`, и ~700 страниц без city anchor (services hubs, brand pages, commercial, outdoor, sub-services, price list, credentials). Все 9 — `LocalBusiness` entries с branch phone + service_area.
 
-6. **City pages (87) + city × service combos (908)** → single LocalBusiness своего primary branch, БЕЗ location array (не дублируем все 8 веток на каждой city page — geographic specificity побеждает).
+6. **City pages (93) + city × service combos (908)** → single LocalBusiness своего primary branch, БЕЗ location array (не дублируем все 9 веток на каждой city page — geographic specificity побеждает).
 
 7. **`6230 Wilshire / PMB 2267`** — mailing-only PMB юр. лица. Нигде на сайте/в schema не рендерится.
 
@@ -49,7 +49,7 @@ grep -c "BHGS Licensed\|CA BHGS"  <page>  # = 0
 - BBB Accredited Business добавлен как 4-й credential (был "BBB A+" в некоторых старых местах — false claim).
 - CSLB C-20 возвращён site-wide (был удалён в Wave 35; нужен для NAP/LSA match).
 - legalName policy расширен на все 1009 страниц (был на legal pages only).
-- location array (все 8 branches) policy сформулирован для гео-нейтральных страниц.
+- location array (все 9 branches — c 2026-08-06) policy сформулирован для гео-нейтральных страниц.
 - streetAddress pin pages =  6 (homepage + WeHo + contact + book + privacy + terms; больше не Hollywood pillar).
 - streetAddress canonical form: «8746 Rangely Ave Ste, West Hollywood, CA 90048» (был "8746 Rangely Ave"; уточнено "Ste").
 
@@ -199,13 +199,13 @@ Google Rich Results требует поле `address` на каждом `LocalBu
 
 **НЕ удалять `address` при будущих sweep'ах** — это required Google-поле. streetAddress остаётся pin-only.
 
-### Гео-нейтральные страницы добавляют `location` (все 8 филиалов)
+### Гео-нейтральные страницы добавляют `location` (все 9 филиалов)
 
-`/`, `/contact/`, `/book/`, services hubs, brand pages, commercial, outdoor, sub-services, price list, credentials → `location` array со всеми 8 branches как `LocalBusiness` entries (branch phone + service_area + opening hours).
+`/`, `/contact/`, `/book/`, services hubs, brand pages, commercial, outdoor, sub-services, price list, credentials → `location` array со всеми 9 branches как `LocalBusiness` entries (branch phone + service_area + opening hours).
 
-### City pages (87) + city × service combos (908) — single branch
+### City pages (93) + city × service combos (908) — single branch
 
-Без `location` array. Single LocalBusiness своего `primaryBranch` (per `cities.ts`). Geographic specificity побеждает on-page (Beverly Hills page = Beverly Hills branch, не все 8).
+Без `location` array. Single LocalBusiness своего `primaryBranch` (per `cities.ts`). Geographic specificity побеждает on-page (Beverly Hills page = Beverly Hills branch, не все 9).
 
 ### `aggregateRating` — НЕ ИСПОЛЬЗУЕТСЯ
 

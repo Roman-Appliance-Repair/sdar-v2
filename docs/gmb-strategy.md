@@ -14,6 +14,7 @@
 | Thousand Oaks | ✅ Активен | Ventura County | (424) 208-0228 |
 | Pasadena | 🔄 На одобрении | Pasadena + East LA | (626) 376-4458 |
 | Irvine | 🔄 На одобрении | Orange County | (213) 401-9019 |
+| Santa Barbara | ⏳ GBP pending | Santa Barbara County South Coast (SB, Montecito, Goleta, Carpinteria, Summerland, Hope Ranch) | (805) 500-0855 |
 
 ---
 

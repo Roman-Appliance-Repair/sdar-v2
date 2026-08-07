@@ -3,7 +3,7 @@
 //
 // Pipeline:
 //   1. Click That Hood CA counties → socal-raw.geojson
-//   2. mapshaper -filter to 5 counties + -simplify 15% keep-shapes
+//   2. mapshaper -filter to 6 counties + -simplify 15% keep-shapes
 //   3. mapshaper -proj Albers Equal Area (lat_1=34 lat_2=40.5 lon_0=-120)
 //   4. node scripts/maps/geojson-to-svg.mjs
 

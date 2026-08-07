@@ -2,6 +2,12 @@
 // Homepage FAQ data — single source of truth for both:
 //   - FAQ.astro (visible accordion)
 //   - HomepageSchema.astro (FAQPage JSON-LD entity)
+// County/city counts derive from the data-layer SSOT (Stage D 2026-08-06) so
+// these answers can't silently rot when the footprint grows again.
+
+import { TOTAL_CITY_COUNT, COUNTIES } from './cities';
+
+const COUNTY_COUNT = Object.keys(COUNTIES).length;
 
 export interface FAQItem {
   question: string;
@@ -12,7 +18,7 @@ export const HOMEPAGE_FAQ: FAQItem[] = [
   {
     question: 'How quickly can you repair my appliance?',
     answer:
-      'We offer same-day service across all 5 Southern California counties when you call before 2 PM. Most repairs are completed in a single visit — our technicians stock 200+ OEM parts on every truck.'
+      `We offer same-day service across all ${COUNTY_COUNT} Southern California counties when you call before 2 PM. Most repairs are completed in a single visit — our technicians stock 200+ OEM parts on every truck.`
   },
   {
     question: "What's your diagnostic fee?",
@@ -37,7 +43,7 @@ export const HOMEPAGE_FAQ: FAQItem[] = [
   {
     question: 'Do you service my area?',
     answer:
-      'We cover Los Angeles, Orange, Ventura, San Bernardino, and Riverside counties — 87+ cities total. Our headquarters is in West Hollywood with service territories across all 5 counties for fast same-day dispatch.'
+      `We cover Los Angeles, Orange, Ventura, Santa Barbara, San Bernardino, and Riverside counties — ${TOTAL_CITY_COUNT} cities total. Our headquarters is in West Hollywood with service territories across all ${COUNTY_COUNT} counties for fast same-day dispatch.`
   },
   {
     question: 'How do you handle pricing?',

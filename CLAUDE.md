@@ -11,7 +11,7 @@
 
 - **Домен:** samedayappliance.repair
 - **Юр. лицо:** HVAC 777 LLC dba Same Day Appliance Repair (в visible UI только в footer copyright line; в JSON-LD `legalName` во всех LocalBusiness schemas site-wide через `src/data/credentials-schema.ts` → `mergeCredentials()` helper)
-- **Зоны:** 5 каунти SoCal — LA, Orange, Ventura, San Bernardino, Riverside
+- **Зоны:** 6 каунти SoCal — LA, Orange, Ventura, Santa Barbara, San Bernardino, Riverside (Santa Barbara добавлен 2026-08-06, ветка feat/santa-barbara)
 - **Часы:** Пн–Сб 8:00–20:00, Вс закрыто. Звонки принимаются 24/7
 - **Цены:** $89 residential / $120 commercial (waived с repair). На mixed-scope страницах — базовая по основной аудитории, секционные цены внутри своих секций; два ценника рядом в одном блоке — никогда. См. §5 + @docs/factual-accuracy.md §9
 - **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, эмитится в schema на 4 pin pages: `/`, `/west-hollywood/`, `/contact/` (в WeHo entry), `/book/`
@@ -72,12 +72,12 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 
 | Файл `src/data/` | Содержит |
 |---|---|
-| `branches.ts` | 8 филиалов: slug, name, phone, address, county, cities[] |
-| `cities.ts` | 89 городов: flat slug→branch→county lookup (без tier) |
+| `branches.ts` | 9 филиалов: slug, name, phone, address, county, cities[] |
+| `cities.ts` | 93 города: flat slug→branch→county lookup (без tier) |
 | `city-service-content.ts` | `CITY_DESCRIPTORS` — tier города (8 значений), brand pool, climate notes |
 | `services.ts` | 31 услуга: slug, name, commercial flag, **service tier** (tier1/2/3 — приоритет контента) |
 | `city-service-matrix.ts` | Какие city × service комбинации генерятся (hubs × 15, non-hub × 5) |
-| `counties.ts` + `county-boundaries.ts` | 5 county hubs + Leaflet polygon data |
+| `counties.ts` + `county-boundaries.ts` | 6 county hubs + Leaflet polygon data (boundaries: полигоны только 5 legacy-каунти) |
 | `pricing.ts` + `repair-estimates.ts` | Pricing tiers (residential/commercial) |
 | `business-hours.ts` | Часы работы |
 | `credentials.ts` | Лицензии и сертификации |
