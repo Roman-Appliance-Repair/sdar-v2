@@ -1,0 +1,346 @@
+---
+/**
+ * Encinitas, CA — city pillar (San Diego Wave-1, Stage C).
+ * Branch: San Diego — service_area (no public street address).
+ *
+ * Angle: five genuinely different communities under one city name — Old
+ * Encinitas, Leucadia, Cardiff-by-the-Sea (92007), Olivenhain, New Encinitas /
+ * Village Park. Brand mix honestly spans mass-market to built-in by pocket.
+ * Olivenhain = the SECOND large-lot angle, deliberately NOT Rancho Santa Fe:
+ * semi-rural, horsey, owner-run acreage — no gates, no estate managers.
+ *
+ * Positioning: $89 once; no factory-authorization implication; no tech names.
+ * Zero-invention: Maytag 10-yr warranty framing (W1), Samsung UR unbalance
+ * (W-FINAL), Traeger LEr low-temp code (O-1 OEM-verified), Frigidaire garage
+ * false-alarm pattern (W-FINAL). No ReviewsBlock.
+ */
+
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const citySlug = 'encinitas';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Encinitas';
+const zips = ['92024', '92007'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Encinitas CA — Same Day Service`;
+const description = "Appliance repair in Encinitas & Cardiff — Leucadia, Olivenhain, Village Park. From surf-town bungalows to horse-country kitchens. $89 dx. (858) 667-7237.";
+const canonical = 'https://samedayappliance.repair/encinitas/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Encinitas', sameAs: 'https://en.wikipedia.org/wiki/Encinitas,_California' },
+    { '@type': 'Place', name: 'Leucadia' },
+    { '@type': 'Place', name: 'Cardiff-by-the-Sea' },
+    { '@type': 'Place', name: 'Olivenhain' },
+    { '@type': 'Place', name: 'Village Park' }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'BHGS #A49573'
+});
+
+const introParagraphs = [
+  "<strong>Encinitas is five towns wearing one name, and our San Diego technicians pack the truck accordingly: a Leucadia bungalow's twenty-year-old laundry pair, a Cardiff cottage's compact kitchen, an Olivenhain ranch property's outdoor cooker and garage freezer, and a Village Park tract home's sensor-driven Samsung all live within the same fifteen-minute drive. We service every one of those machines across 92024 and 92007. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
+  "Honesty about the brand mix, because it genuinely varies by pocket: Old Encinitas and Leucadia run on veteran mass-market machines — Whirlpool, Maytag, GE platforms that reward simple repairs and punish premature replacement. Cardiff and the newer coastal remodels mix in Bosch and KitchenAid. Village Park and New Encinitas skew toward recent LG and Samsung machines that flag their own faults on the display. And Olivenhain's larger properties add built-in refrigeration, serious outdoor cooking, and the occasional wine setup. No single sales pitch fits this city, so we don't bring one.",
+  "Olivenhain deserves its own sentence, because it's large-lot country with none of the estate-belt machinery. There's no gate code and no house manager — there's an owner with acreage, horses down the trail, a workshop, a garage freezer doing real work, and an outdoor cooking setup that gets used hard. It's semi-rural self-reliance, and the service style matches: straight talk, one visit that covers the outbuildings while we're there, and honest math on machines that live in dusty, unconditioned spaces.",
+  "The coastal pockets carry the corridor's usual physics — salt exposure near the water in Leucadia and Cardiff, hard imported water everywhere — but the failure profile here skews practical: hard-working family machines, surf-town towel loads, garage refrigerators that see summer heat. It's volume-market service with a few luxury pockets, and we're honest about which street is which.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for same-day service across 92024 and 92007 — and the rest of the <a href="/san-diego-county/">North Coastal corridor</a>.`
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling · Ice makers · Garage units · Built-ins in Olivenhain', brands: 'Whirlpool · GE · LG · Samsung · KitchenAid · Sub-Zero' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'Unbalance codes · Not draining · Surf-town towel loads', brands: 'Samsung · LG · Whirlpool · Maytag · GE' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer', issues: 'Not heating · Vents · Veteran platforms', brands: 'Maytag · Whirlpool · LG · Samsung · GE' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Hard-water scale · Drain paths · Compact cottage units', brands: 'Bosch · Whirlpool · KitchenAid · GE' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven', issues: 'Elements · Igniters · Calibration', brands: 'GE · Whirlpool · Samsung · Wolf · Viking' },
+  { icon: '🔆', name: 'BBQ, Grill & Smoker Repair', slug: 'bbq', issues: 'Pellet cookers · Igniters · Acreage outdoor kitchens', brands: 'Traeger · Weber · Lynx · Fire Magic · Bull' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Garage and workshop units · Summer heat alarms', brands: 'Frigidaire · GE · Whirlpool · Kenmore' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burners won't light · Glass tops · Induction", brands: 'GE · Bosch · Whirlpool · Thermador' }
+];
+
+const communitiesNarrative = {
+  eyebrow: 'FIVE COMMUNITIES, FIVE APPLIANCE POPULATIONS',
+  headline: 'Old Encinitas, Leucadia, Cardiff, Olivenhain, Village Park',
+  paragraphs: [
+    "The city merged five real places, and the merge never flattened them. Each one still calls us about different machines failing in different ways."
+  ],
+  subSections: [
+    {
+      title: 'Old Encinitas & Leucadia',
+      paragraphs: [
+        'Downtown bungalows and the funky Leucadia streets west of the tracks — older housing stock, veteran appliances, and owners who would rather fix a twenty-year Maytag than feed a new machine to the landfill. We agree with them more often than not: these platforms were built for exactly this kind of repair, the parts are cheap, and the salt exposure this close to the water is the main thing shortening their lives.'
+      ]
+    },
+    {
+      title: 'Cardiff-by-the-Sea (92007)',
+      paragraphs: [
+        'Cardiff keeps its own ZIP and its own temperament — coastal cottages, tight kitchens, remodels that mixed Bosch and KitchenAid into 1970s footprints. Composer District streets and the campground side both sit close enough to the water that refrigeration coils earn a coastal inspection habit. Yes, 92007 is fully inside our routing — Cardiff calls don\'t get bounced to a "different area."'
+      ]
+    },
+    {
+      title: 'Olivenhain',
+      paragraphs: [
+        'Semi-rural acreage on the east side: horse properties, workshops, long gravel drives, and appliances that work outdoors and in outbuildings. The service profile is its own thing — pellet smokers and built-in grills that get real use, garage freezers holding a season of storage, dust from arena and trail loading condensers the way the inland estates see it. One visit covers the house and the outbuildings; that\'s just how acreage service should work.'
+      ]
+    },
+    {
+      title: 'New Encinitas & Village Park',
+      paragraphs: [
+        'The postwar-to-recent tracts along El Camino Real — family volume territory. Late-model LG and Samsung machines dominate here, and a two-letter display code is usually the opening line of the service call; the corridor\'s hard water does its usual quiet work on dishwashers and ice makers. This is where our truck stocking earns its keep: the high-turnover parts are on board because these streets use them.'
+      ]
+    }
+  ]
+};
+
+const acreageNarrative = {
+  eyebrow: 'THE OLIVENHAIN DIFFERENCE',
+  headline: 'Large Lots Without the Estate Machinery',
+  paragraphs: [
+    "Fifteen minutes apart, Olivenhain and Rancho Santa Fe both have acreage — and almost nothing else in common as service calls. RSF runs through managers, gates, and property offices. Olivenhain answers its own door, often in work gloves. The properties are owner-run: a main house, a workshop with a second refrigerator, a serious outdoor cooking setup, sometimes a barn fridge keeping medications and produce. Nobody is forwarding estimates to a family office; the owner wants the straight answer, the real price, and everything looked at in one trip.",
+    "So that's the shape of an Olivenhain visit: the machine that prompted the call, then the outbuilding units while the truck is parked — because dusty, unconditioned spaces are where refrigeration quietly struggles, and because driving back out next month for the garage freezer serves nobody. Straight talk on repair-versus-replace comes standard; acreage owners can smell an upsell a pasture away, and we'd rather keep the relationship than win one invoice."
+  ]
+};
+
+const neighborhoods = [
+  { name: 'Old Encinitas / downtown', zip: '92024', featured: true },
+  { name: 'Leucadia', zip: '92024', featured: true },
+  { name: 'Cardiff-by-the-Sea', zip: '92007', featured: true },
+  { name: 'Olivenhain', zip: '92024' },
+  { name: 'Village Park', zip: '92024' },
+  { name: 'New Encinitas', zip: '92024' }
+];
+
+const recentJobs = [
+  {
+    appliance: 'Samsung Washer',
+    quote: 'Washer stops every load screaming UR at us',
+    location: 'Cardiff-by-the-Sea, 92007',
+    description: "Surf-house classic: a Samsung top-loader throwing UR — the unbalance code — on every load. UR usually isn't a broken machine; it's the machine refusing to spin an unbalanced drum, and a household washing beach towels in ropes triggers it constantly. Our San Diego technicians verified the suspension was actually sound, leveled the machine properly on an old cottage floor, and left the honest advice: towels load flat, not twisted. The code hasn't been back.",
+    outcome: '✓ Suspension verified · Machine leveled · No parts needed'
+  },
+  {
+    appliance: 'Maytag Dryer',
+    quote: 'Fifteen-year-old dryer finally quit heating — worth fixing?',
+    location: 'Leucadia, 92024',
+    description: "Leucadia bungalow, veteran Maytag, owner braced for a replacement lecture. Got the opposite: these Whirlpool-platform dryers are the most repairable machines we touch, and this one needed the platform's signature part — a thermal fuse — plus a vent clearing to stop it recurring. Fifteen more years is optimistic, but five isn't, and the repair cost a fraction of the cheapest new unit. Worth noting honestly: Maytag's 10-year warranty covers the drum and motor only, so heating parts like this were never covered — the repair math has to stand on its own, and here it did.",
+    outcome: '✓ Same day · Fuse + vent · Repair beat replacement'
+  },
+  {
+    appliance: 'Traeger Pellet Grill',
+    quote: 'Smoker shows LEr every cold morning and shuts down',
+    location: 'Olivenhain, 92024',
+    description: "Acreage property, well-used Traeger on the patio, LEr on chilly mornings — the platform's low-temperature error, meaning the fire couldn't hold. Cause was unglamorous: a firepot overdue for cleaning and damp pellets from an outdoor bin absorbing the marine-layer mornings. Cleaned the firepot and burn chamber, verified the hot rod and induction fan, and set the owner up with dry-storage advice. While parked, we also looked at the workshop freezer on the owner's list — that's the acreage way.",
+    outcome: '✓ Firepot serviced · Components verified · Workshop unit checked'
+  },
+  {
+    appliance: 'Frigidaire Freezer',
+    quote: 'Garage freezer alarm going off every hot afternoon',
+    location: 'Village Park, 92024',
+    description: "Chest freezer in a west-facing garage, alarming on summer afternoons — the classic garage false-alarm pattern, where ambient heat pushes the cabinet's limits without the food ever actually warming. Verified interior temps held safe through a heat cycle, serviced the condenser so the unit had its full capacity back, and repositioned it off the hot wall. Sometimes the fix is confirming the machine is fine and giving it a fighting chance.",
+    outcome: '✓ Temps verified safe · Condenser serviced · Repositioned'
+  }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Five Communities, One Literate Truck',
+    body: "A Leucadia veteran platform, a Cardiff compact kitchen, an Olivenhain outbuilding, a Village Park error code — we know which Encinitas is calling and stock accordingly."
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Acreage Visits That Cover the Property',
+    body: 'In Olivenhain the second and third units get looked at while the truck is parked — garage freezers, workshop refrigerators, the smoker on the patio. One trip, straight answers, no return-visit padding.'
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Cardiff Included, Explicitly',
+    body: "92007 is inside our routing, not an exception to it. Cardiff cottages get the same same-day intent as the rest of the corridor — and the coastal coil habit their location earns."
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Parts',
+    body: 'Every repair backed 90 days on parts and labor. Veteran platforms get genuine parts too — that\'s why they keep being worth fixing. $89 diagnostic, waived with repair.'
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator', range: '$200–$450', note: 'Garage units · Ice makers · Coastal coil service', featured: true },
+  { appliance: 'Washer / Dryer', range: '$150–$350', note: 'Veteran platforms · Fuses · Suspension · Vents' },
+  { appliance: 'Dishwasher', range: '$150–$320', note: 'Scale · Drain paths · Compact cottage units' },
+  { appliance: 'Oven / Range', range: '$175–$420', note: 'Elements · Igniters · Calibration' },
+  { appliance: 'Grill / Smoker', range: '$150–$400', note: 'Traeger, Weber, built-ins · Igniters · Firepots' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' }
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Encinitas?',
+    answer: 'Yes — across all five communities: Old Encinitas, Leucadia, Cardiff-by-the-Sea, Olivenhain, and New Encinitas / Village Park, covering 92024 and 92007. Morning calls usually land a same-day slot anywhere in the city; Olivenhain acreage visits get scheduled with enough time to cover the outbuildings too.'
+  },
+  {
+    question: 'Do you cover Cardiff-by-the-Sea specifically?',
+    answer: "Explicitly yes — 92007 is wired into our booking and routing, not an afterthought. Cardiff's coastal cottages get the corridor's coastal treatment: refrigeration coils inspected as standard, because the water is right there."
+  },
+  {
+    question: 'Do you service Olivenhain properties, including outbuildings?',
+    answer: "Yes, and we service them the acreage way: the call that brought us out, then the workshop refrigerator, garage freezer, and outdoor cooker while the truck is parked. Owner-run properties get straight answers and one-trip coverage — no gates, no managers, no return-visit padding."
+  },
+  {
+    question: 'My washer keeps showing an unbalance code — is it broken?',
+    answer: "Often it isn't. Unbalance codes (Samsung's UR is the classic) mean the machine refuses to spin a badly loaded or badly leveled drum — heavy towel households trigger them constantly. We verify the suspension honestly, level the machine, and only replace parts that are actually worn. Sometimes the repair is loading advice, and we're fine with that."
+  },
+  {
+    question: 'Is my old Maytag or Whirlpool worth repairing?',
+    answer: "In Leucadia and Old Encinitas, usually yes — these veteran platforms are the most repairable machines in the county, with cheap parts and simple architectures. One honesty note: Maytag's famous 10-year warranty covers the drive motor and drum only, not heating parts or pumps, so most repairs stand on their own math. That math still favors repair far more often than replacement."
+  },
+  {
+    question: 'Do you repair pellet smokers and outdoor grills?',
+    answer: 'Yes — Traeger pellet cookers (including their error codes, which we read from the OEM side rather than guessing), Weber, and the built-in brands on Olivenhain patios. Outdoor cooking gear is a core service on this corridor, not a favor.'
+  },
+  {
+    question: 'What does a diagnostic visit cost in Encinitas?',
+    answer: '$89 for residential appliances, waived when you approve the repair, with a written estimate first. One visit can cover several machines on an acreage property — where the math starts working for you.'
+  }
+];
+
+const nearbyCities = [
+  { name: 'Carlsbad', slug: 'carlsbad' },
+  { name: 'Solana Beach', slug: 'solana-beach' },
+  { name: 'Del Mar', slug: 'del-mar' },
+  { name: 'Rancho Santa Fe', slug: 'rancho-santa-fe' },
+  { name: 'La Jolla', slug: 'la-jolla' }
+];
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Encinitas, CA"
+    subheadline="Five communities, one city — Leucadia bungalows to Olivenhain acreage, Cardiff cottages to Village Park tracts. We know which one is calling. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={2}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Encinitas — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Encinitas Service Team"
+    bookingSub="92024 · 92007 · Leucadia · Cardiff · Olivenhain"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Encinitas"
+    subhead="Veteran platforms to error-code electronics · Acreage outbuildings · 92024 & 92007"
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={communitiesNarrative.eyebrow}
+    headline={communitiesNarrative.headline}
+    paragraphs={communitiesNarrative.paragraphs}
+    subSections={communitiesNarrative.subSections}
+    background="white"
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Encinitas Areas We Service"
+    subheadline="All five communities — 92024 and Cardiff's 92007."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <CustomNarrative
+    eyebrow={acreageNarrative.eyebrow}
+    headline={acreageNarrative.headline}
+    paragraphs={acreageNarrative.paragraphs}
+    background="gray"
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Encinitas"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Encinitas Calls Us"
+    reasons={whyReasons}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Encinitas"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Encinitas Clients Ask"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Encinitas?"
+    body="Leucadia · Cardiff · Olivenhain · Village Park · All of 92024 & 92007. $89 diagnostic waived with repair. 90-day warranty."
+  />
+
+  <section class="section">
+    <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">San Diego County coverage</p>
+      <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">One branch for the North Coastal corridor.</h2>
+      <p>Encinitas sits at the heart of our <a href="/san-diego-county/">San Diego County service area</a> — the same branch covers <a href="/carlsbad/">Carlsbad</a>, <a href="/solana-beach/">Solana Beach</a>, <a href="/del-mar/">Del Mar</a>, <a href="/rancho-santa-fe/">Rancho Santa Fe</a>, and <a href="/la-jolla/">La Jolla</a>. For the outdoor side, see <a href="/outdoor/grill-repair/">grill repair</a> and our <a href="/outdoor/smoker-repair/traeger-error-codes/">Traeger error-code guide</a>.</p>
+    </div>
+  </section>
+</CityLayoutV2>

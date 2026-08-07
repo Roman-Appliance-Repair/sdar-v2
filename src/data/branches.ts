@@ -669,9 +669,7 @@ export const CITIES_WITHOUT_PAGES = new Set<string>([
   // Riverside (new entries 2026-05-08; pages not yet authored)
   'norco', 'eastvale',
   // Santa Barbara: all 6 city pillars shipped (Stage B+C, 2026-08-06) — none pending.
-  // San Diego Wave 1 (la-jolla/rancho-santa-fe/carlsbad pillars shipped
-  // Stage B 2026-08-07; remaining 3 pending)
-  'del-mar', 'encinitas', 'solana-beach'
+  // San Diego Wave 1: all 6 city pillars shipped (Stage B+C, 2026-08-07) — none pending.
 ]);
 
 /** Returns citiesServed for a branch, but ONLY those with .astro pages on disk.
