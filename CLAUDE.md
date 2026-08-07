@@ -3,7 +3,7 @@
 > **Точка входа в любой новый чат или сессию Claude Code.**
 > Прочти этот файл первым. Он компактный — детали подгружай через @-ссылки внизу под конкретную задачу.
 
-**Последняя синхронизация:** 2026-05-07 (после P0 schema sync для LSA trust restoration)
+**Последняя синхронизация:** 2026-08-07 (Notion purge + консистентность после Santa Barbara expansion; main = 9 филиалов / 6 каунти / 93 города / 1190 страниц)
 
 ---
 
@@ -14,7 +14,7 @@
 - **Зоны:** 6 каунти SoCal — LA, Orange, Ventura, Santa Barbara, San Bernardino, Riverside (Santa Barbara добавлен 2026-08-06, ветка feat/santa-barbara)
 - **Часы:** Пн–Сб 8:00–20:00, Вс закрыто. Звонки принимаются 24/7
 - **Цены:** $89 residential / $120 commercial (waived с repair). На mixed-scope страницах — базовая по основной аудитории, секционные цены внутри своих секций; два ценника рядом в одном блоке — никогда. См. §5 + @docs/factual-accuracy.md §9
-- **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, эмитится в schema на 4 pin pages: `/`, `/west-hollywood/`, `/contact/` (в WeHo entry), `/book/`
+- **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, эмитится в schema на 6 pin pages: `/`, `/west-hollywood/`, `/contact/` (в WeHo entry), `/book/`, `/privacy-policy/`, `/terms/` (см. seo-policies §1)
 - **Aggregate Rating:** не используется нигде (ни в JSON-LD, ни в visible UI). Google берёт rating напрямую из GMB. См. @docs/factual-accuracy.md §6
 - **Технари в текстах:** Mikhail V., Artur S., David K.
 
@@ -61,10 +61,9 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 
 1. **`src/data/*.ts`** в sdar-v2 — техническая правда (branches, cities, services, content)
 2. **`wiki/page-plans/METHODOLOGY.md`** v1.3.1 — методология кластерной работы
-3. **Notion writing standard** — `343788eea1d581f9b8f5d4cadd7a54e2`
-4. **Notion tracker** — `343788eea1d58113aab9fafd42075964` (обновляется после каждой страницы)
-5. Этот **CLAUDE.md** + `docs/`
-6. **Project Knowledge** в claude.ai — зеркало этого файла
+3. **`docs/*.md`** — правила (писательский стандарт = voice-and-style + humanizer-gate; Notion мёртв и удалён из процесса 2026-08-07)
+4. Этот **CLAUDE.md**
+5. **Project Knowledge** в claude.ai — зеркало docs; память чата — последней
 
 При конфликте: верхний пункт побеждает. Не доверять старым `.docx`/`.md` без даты — данные могут быть устаревшими ("WordPress legacy", 76 cities — это устаревшая информация).
 
@@ -74,7 +73,7 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 |---|---|
 | `branches.ts` | 9 филиалов: slug, name, phone, address, county, cities[] |
 | `cities.ts` | 93 города: flat slug→branch→county lookup (без tier) |
-| `city-service-content.ts` | `CITY_DESCRIPTORS` — tier города (8 значений), brand pool, climate notes |
+| `city-service-content.ts` | `CITY_DESCRIPTORS` — tier города (9 значений на main, 10 с feat/san-diego), brand pool, climate notes |
 | `services.ts` | 31 услуга: slug, name, commercial flag, **service tier** (tier1/2/3 — приоритет контента) |
 | `city-service-matrix.ts` | Какие city × service комбинации генерятся (hubs × 15, non-hub × 5) |
 | `counties.ts` + `county-boundaries.ts` | 6 county hubs + Leaflet polygon data (boundaries: полигоны только 5 legacy-каунти) |
@@ -86,7 +85,7 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 | `testimonials.ts` | Отзывы |
 
 ### Две независимых tier-системы — не путать!
-- **`CityDescriptor.tier`** в `city-service-content.ts` → социально-экономический + гео-кластер: `ULTRA-PREMIUM | PREMIUM | GENERAL | PREMIUM-OC | MID-TIER-NE | MID-TIER-VENTURA | INLAND-EMPIRE | INLAND-RIVERSIDE`. Управляет brand pool на city × service страницах.
+- **`CityDescriptor.tier`** в `city-service-content.ts` → социально-экономический + гео-кластер: `ULTRA-PREMIUM | PREMIUM | GENERAL | PREMIUM-OC | MID-TIER-NE | MID-TIER-VENTURA | INLAND-EMPIRE | INLAND-RIVERSIDE | PREMIUM-SB` (+`PREMIUM-SD` на feat/san-diego). Управляет brand pool на city × service страницах.
 - **`Service.tier`** в `services.ts` → приоритет контента: `tier1 | tier2 | tier3`. Управляет какие city × service страницы генерятся (hubs × 15 vs non-hub × 5).
 
 ---

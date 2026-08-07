@@ -106,7 +106,7 @@ git log origin/main -1 --format="%h %s"  # confirm push
 **После deploy:**
 - Cloudflare auto-deploys ~75-90 секунд
 - Спот-чек на live URL
-- **Update Notion tracker** автоматически (без напоминаний): https://www.notion.so/343788eea1d58113aab9fafd42075964
+- Запись в `session-log/<today>.md` (см. CLAUDE.md §8) — это и есть трекинг страниц (Notion-трекер мёртв и удалён из процесса 2026-08-07)
 
 ### Шаг 5.1 — Image-bearing merge: deploy poll → purge → verify (обязательно, без ручных кнопок)
 
@@ -146,10 +146,10 @@ curl -sI "https://samedayappliance.repair/images/brands/<slug>/hero.webp"   # 20
 **Перед любой cluster задачей:**
 1. Read `wiki/page-plans/METHODOLOGY.md`
 2. Read `wiki/page-plans/cluster-XX-NAME/index.md`
-3. Read Notion writing standard
-4. Read Notion: соответствующая Brand × Service DB
+3. Read `docs/voice-and-style.md` + `docs/humanizer-gate.md` (писательский стандарт живёт здесь; Notion мёртв — 2026-08-07)
+4. Read Brand × Service данные из cluster file (writer-handoff блоки) — внешних БД больше нет
 
-Никогда не писать `.astro` из непросмотренных cluster plans. Никогда не пропускать Notion writing standard.
+Никогда не писать `.astro` из непросмотренных cluster plans. Никогда не пропускать voice-and-style + humanizer gate.
 
 ---
 

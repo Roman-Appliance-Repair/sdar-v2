@@ -219,10 +219,6 @@ we know exactly what we're walking into before we knock on your door."
 
 ---
 
-## 7. Notion writing standard
+## 7. Где живёт писательский стандарт
 
-Перед написанием каждой страницы **читать** Notion стандарт:
-https://www.notion.so/343788eea1d581f9b8f5d4cadd7a54e2
-
-После написания **обновлять** tracker:
-https://www.notion.so/343788eea1d58113aab9fafd42075964
+Этот файл + `docs/humanizer-gate.md` — полный писательский стандарт (Notion-страницы мертвы и удалены из процесса 2026-08-07). Трекинг написанных страниц — `session-log/` (CLAUDE.md §8).
