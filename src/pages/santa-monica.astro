@@ -4,6 +4,8 @@ import HeroSection from '../components/cities/v2/HeroSection.astro';
 import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import LuxurySpecialists from '../components/cities/v2/LuxurySpecialists.astro';
+import PropertyManagers from '../components/cities/v2/PropertyManagers.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
 import CommercialSection from '../components/cities/v2/CommercialSection.astro';
 import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
@@ -18,6 +20,7 @@ import FinalCTA from '../components/cities/v2/FinalCTA.astro';
 import { CITIES } from '../data/cities';
 import { BRANCHES } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { getLuxuryBrands } from '../data/luxury-rollout';
 
 import { mergeCredentials } from '../data/credentials-schema';
 const citySlug = 'santa-monica';
@@ -71,6 +74,37 @@ const services = [
   { icon: '💨', name: 'Range Hood Repair', slug: 'range-hood', issues: 'Fan not working · Lights out · Control panel · Under-cabinet & island hoods', brands: 'Broan · Zephyr · Wolf · Viking · KitchenAid · Thermador' },
   { icon: '❄️', name: 'Freezer & Ice Maker Repair', slug: 'freezer', issues: 'Not freezing · Ice maker not working · Temperature off · Frost buildup', brands: 'Sub-Zero · GE · Samsung · LG · Whirlpool · Frigidaire' }
 ];
+
+// LuxurySpecialists (wave 1, 2026-08-08): WOVEN — luxury previously lived in one
+// paragraph of coastalNarrative. Angle the prose lacked: the two luxury geographies
+// (north-of-Montana remodels vs Ocean Avenue condo towers) and what vertical service
+// logistics change. The page's own bifurcation (luxury north / value south) is kept —
+// the block speaks for half the city and says so.
+const luxuryNarrative = {
+  headline: 'Two Luxury Worlds: North of Montana and the Ocean Avenue Towers',
+  paragraphs: [
+    "Santa Monica's luxury splits into two worlds. North of Montana it lives in remodeled craftsmans — Sub-Zero and Wolf set into custom cabinetry in houses that have been renovated more than once, holding equipment their original builders couldn't have imagined. On Ocean Avenue it lives vertically: newer condo towers where the same brands sit high above the beach, and where service means freight elevators, HOA scheduling windows, and a parking plan made before the truck leaves.",
+    "Both worlds run on the same coastal clock this page describes, and both get the same handling: OEM parts for both worlds' brands, a coil check as standard on every refrigerator call, and techs who have worked enough Montana Avenue kitchens and Ocean Avenue towers to know the access routine before we arrive."
+  ]
+};
+
+// PropertyManagers (wave 1, 2026-08-08): NEW block — the renter side of the city had
+// no section at all despite being the majority of it. Angle per segmentation: rent
+// control, ~70% renter share, portfolio-scale management companies.
+const propertyNarrative = {
+  headline: "Most of Santa Monica Rents — We're Built for That",
+  paragraphs: [
+    "Roughly seven in ten Santa Monica households rent, a large share of them in rent-stabilized buildings that professional management companies run as portfolios — dozens of buildings, hundreds of units, one maintenance coordinator fielding all of it. When a tenant reports a dead refrigerator in a rent-controlled unit, the clock matters: habitability obligations don't wait, and neither does the tenant.",
+    "We work those portfolios the way a coordinator needs. One call opens the ticket, we schedule directly with the tenant, and the invoice and service report go back to your office — with consistent pricing across the portfolio. For the Ocean Park fourplexes and the apartment corridors off Wilshire and Pico, that's the difference between a maintenance queue and a maintenance problem."
+  ],
+  bullets: [
+    'Rent-stabilized units handled with habitability timelines in mind — refrigeration calls get same-day priority',
+    'Portfolio workflow: one call opens the ticket, we schedule with the tenant, paperwork returns to your office',
+    'Ocean Park and Pico multi-unit buildings, Wilshire and Montana corridor apartments — daily territory',
+    'Ocean Avenue condo towers: HOA scheduling windows, freight elevators, building-manager coordination',
+    'Consistent portfolio pricing and a 90-day parts-and-labor warranty on every unit we touch'
+  ]
+};
 
 const coastalNarrative = {
   eyebrow: 'COASTAL CLIMATE & APPLIANCES',
@@ -332,6 +366,14 @@ const serviceLinks = [
     services={services}
   />
 
+  <LuxurySpecialists
+    citySlug={citySlug}
+    cityName={cityName}
+    headline={luxuryNarrative.headline}
+    paragraphs={luxuryNarrative.paragraphs}
+    brands={getLuxuryBrands(citySlug)}
+  />
+
   <ServiceArea
     cityName={cityName}
     headline="We Cover All of Santa Monica"
@@ -366,6 +408,14 @@ const serviceLinks = [
     equipmentCards={commercialEquipment}
     bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
     fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <PropertyManagers
+    citySlug={citySlug}
+    cityName={cityName}
+    headline={propertyNarrative.headline}
+    paragraphs={propertyNarrative.paragraphs}
+    bullets={propertyNarrative.bullets}
   />
 
   <OutdoorSection

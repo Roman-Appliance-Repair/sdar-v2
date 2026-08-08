@@ -4,7 +4,7 @@ import HeroSection from '../components/cities/v2/HeroSection.astro';
 import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
-import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import LuxurySpecialists from '../components/cities/v2/LuxurySpecialists.astro';
 import CommercialSection from '../components/cities/v2/CommercialSection.astro';
 import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
@@ -18,6 +18,7 @@ import FinalCTA from '../components/cities/v2/FinalCTA.astro';
 import { CITIES } from '../data/cities';
 import { BRANCHES } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { getLuxuryBrands } from '../data/luxury-rollout';
 
 import { mergeCredentials } from '../data/credentials-schema';
 const citySlug = 'bel-air';
@@ -139,13 +140,18 @@ const services = [
   { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Built-in columns · Not freezing · Sealed system · Frost buildup', brands: 'Sub-Zero · True · GE Monogram · Thermador · Viking' }
 ];
 
-const brandedExpertiseNarrative = {
+// LuxurySpecialists (wave 1, 2026-08-08): REPLACES the prior hand-written black
+// CustomNarrative ('LUXURY BRAND SPECIALISTS') that carried the same role. The authored
+// headline is kept; the platform-enumeration sentence is reworded around this page's own
+// specifics (Gaggenau F63, Miele T1 F73) so it no longer shares its wording with the
+// san-marino/beverly-hills blocks; the plain-text brand list became linked pills
+// (override in luxury-rollout.ts, same brands).
+const luxuryNarrative = {
   eyebrow: 'LUXURY BRAND SPECIALISTS',
   headline: 'The Brands Common in Bel Air Kitchens — And What We Know About Them',
   paragraphs: [
-    "Sub-Zero's dual-evaporator architecture. Wolf's star burner ignition system and dual-fuel oven configurations. Thermador's Freedom induction and ProGrand range specifics. Gaggenau's steam combi oven electronic controls. Miele's T1 dryer heat pump system. These machines have fundamentally different failure modes, service procedures, and part sourcing than standard brands.",
-    "Our technicians carry OEM parts for all of these on every Bel Air vehicle. We diagnose correctly on the first visit because we know what these appliances actually do when they fail — not just what they're supposed to do when they're working.",
-    "Brands we service: Sub-Zero · Wolf · Thermador · Gaggenau · Miele · Monogram · Viking · La Cornue · True Residential · Dacor · Fisher & Paykel · Cove. Plus all standard brands — Samsung, LG, GE, Whirlpool, Bosch, KitchenAid, Maytag, and more."
+    "Sub-Zero's twin-evaporator columns. Wolf's dual-fuel ignition and its habit of glowing without lighting when the igniter weakens. Thermador's Freedom induction. Gaggenau's steam combi electronics. Miele's T1 heat-pump laundry. Each has failure modes, service procedures, and parts sourcing that have nothing in common with standard brands — when a Gaggenau throws F63 or a Miele T1 shows F73, the repair starts with knowing what that code means on that platform, not with guessing at parts.",
+    "Our technicians carry OEM parts for all of these on every Bel Air vehicle. We diagnose correctly on the first visit because we know what these appliances actually do when they fail — not just what they're supposed to do when they're working. The standard brands ride the same truck — Samsung, LG, GE, Whirlpool — for the staff kitchens and guest houses that run them."
   ]
 };
 
@@ -321,11 +327,13 @@ const nearbyCities = [
     bookingSub="90077 · Estate-ready · Same day"
   />
 
-  <CustomNarrative
-    eyebrow={brandedExpertiseNarrative.eyebrow}
-    headline={brandedExpertiseNarrative.headline}
-    paragraphs={brandedExpertiseNarrative.paragraphs}
-    background="black"
+  <LuxurySpecialists
+    citySlug={citySlug}
+    cityName={cityName}
+    eyebrow={luxuryNarrative.eyebrow}
+    headline={luxuryNarrative.headline}
+    paragraphs={luxuryNarrative.paragraphs}
+    brands={getLuxuryBrands(citySlug)}
   />
 
   <ServicesGrid

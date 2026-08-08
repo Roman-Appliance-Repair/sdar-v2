@@ -4,7 +4,7 @@ import HeroSection from '../components/cities/v2/HeroSection.astro';
 import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
-import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import LuxurySpecialists from '../components/cities/v2/LuxurySpecialists.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
 import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
 import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
@@ -18,6 +18,7 @@ import CommercialSection from '../components/cities/v2/CommercialSection.astro';
 import { CITIES } from '../data/cities';
 import { BRANCHES } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { getLuxuryBrands } from '../data/luxury-rollout';
 
 import { mergeCredentials } from '../data/credentials-schema';
 const citySlug = 'pacific-palisades';
@@ -73,14 +74,17 @@ const services = [
   { icon: '🔧', name: 'New Installation Service', slug: 'refrigerator', issues: 'Rebuilt home commissioning · Oven calibration · System checks · Built-in setup', brands: 'All luxury brands · New construction · Remodel projects' }
 ];
 
+// LuxurySpecialists (wave 1, 2026-08-08): this converts the prior black CustomNarrative
+// ('RARE BRANDS. FULLY COVERED.') into the component at the same position. The authored
+// rare-European-brands angle and headline are preserved verbatim; the plain-text brand
+// list became the component's linked pills (override in luxury-rollout.ts, same brands).
 const luxuryNarrative = {
   eyebrow: 'RARE BRANDS. FULLY COVERED.',
   headline: 'La Cornue, Gaggenau & European Luxury Repair in Pacific Palisades',
   paragraphs: [
     'Most appliance repair companies in LA will tell you they service "all luxury brands" and then pause when you say La Cornue or Gaggenau. These are not niche appliances in Pacific Palisades — they appear regularly in The Riviera and Huntington Palisades kitchens, particularly in homes designed by architects who specify European equipment.',
     "La Cornue ranges — including the CornuFé and Château models — require specific knowledge of their dual-fuel configurations, the oven door hinge systems, and the gas valve assemblies that differ substantially from American brands. Gaggenau induction cooktops, steam ovens, and combi-steam units have electronic control systems that need correct diagnostic equipment and software.",
-    "Our technicians have worked on these brands. We carry OEM parts, source manufacturer-spec components, and don't guess at repairs on equipment this valuable.",
-    'Brands we service: La Cornue · Gaggenau · Sub-Zero · Wolf · Miele · Thermador · Viking · GE Monogram.'
+    "Our technicians have worked on these brands. We carry OEM parts, source manufacturer-spec components, and don't guess at repairs on equipment this valuable."
   ]
 };
 
@@ -329,11 +333,13 @@ const commercialEquipment = [
     services={services}
   />
 
-  <CustomNarrative
+  <LuxurySpecialists
+    citySlug={citySlug}
+    cityName={cityName}
     eyebrow={luxuryNarrative.eyebrow}
     headline={luxuryNarrative.headline}
     paragraphs={luxuryNarrative.paragraphs}
-    background="black"
+    brands={getLuxuryBrands(citySlug)}
   />
 
   <ServiceArea

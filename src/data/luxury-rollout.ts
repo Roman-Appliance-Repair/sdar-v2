@@ -82,6 +82,19 @@ export const CITY_BRAND_OVERRIDES: Partial<Record<string, string[]>> = {
   'san-marino': ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Gaggenau', 'GE Monogram', 'Viking', 'True Residential', 'Dacor', 'Fisher & Paykel', 'Cove', 'La Cornue'],
   'westlake-village': ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Gaggenau', 'Viking', 'Dacor', 'EuroCave'],
   'villa-park': ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Dacor', 'Viking', 'La Cornue', 'Gaggenau', 'Fisher & Paykel', 'Bertazzoni'],
+  // ---- wave 1 full (2026-08-08) — lists sourced from each page's own prose/grid ----
+  'beverly-hills': ['Sub-Zero', 'Wolf', 'Viking', 'Thermador', 'Miele', 'Dacor', 'GE Monogram', 'True Residential', 'Bosch', 'Fisher & Paykel', 'Liebherr'],
+  'bel-air': ['Sub-Zero', 'Wolf', 'Thermador', 'Gaggenau', 'Miele', 'GE Monogram', 'Viking', 'La Cornue', 'True Residential', 'Dacor', 'Fisher & Paykel', 'Cove'],
+  'brentwood': ['Sub-Zero', 'Wolf', 'Viking', 'Thermador', 'Cove', 'Miele', 'GE Monogram', 'Liebherr', 'EuroCave', 'Fisher & Paykel'],
+  'pacific-palisades': ['La Cornue', 'Gaggenau', 'Sub-Zero', 'Wolf', 'Miele', 'Thermador', 'Viking', 'GE Monogram'],
+  'malibu': ['Sub-Zero', 'Wolf', 'Viking', 'Miele', 'Thermador', 'True Residential'],
+  'calabasas': ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Viking', 'GE Monogram', 'True Residential', 'EuroCave'],
+  'la-canada-flintridge': ['Sub-Zero', 'Wolf', 'Viking', 'Thermador', 'Miele', 'Dacor', 'Liebherr', 'True Residential'],
+  'manhattan-beach': ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Liebherr', 'Marvel', 'Bosch'],
+  'santa-monica': ['Sub-Zero', 'Wolf', 'Thermador', 'Bosch'],
+  'toluca-lake': ['Sub-Zero', 'Wolf', 'Viking', 'Thermador', 'Miele', 'KitchenAid', 'Bosch', 'GE Profile'],
+  'newport-beach': ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Gaggenau', 'Marvel'],
+  'laguna-beach': ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Gaggenau'],
 };
 
 export function getLuxuryBrands(citySlug: string): string[] {

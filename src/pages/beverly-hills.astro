@@ -5,6 +5,7 @@ import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
 import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
 import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
 import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import LuxurySpecialists from '../components/cities/v2/LuxurySpecialists.astro';
 import CommercialSection from '../components/cities/v2/CommercialSection.astro';
 import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
 import ServiceArea from '../components/cities/v2/ServiceArea.astro';
@@ -19,6 +20,7 @@ import FinalCTA from '../components/cities/v2/FinalCTA.astro';
 import { CITIES } from '../data/cities';
 import { BRANCHES } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { getLuxuryBrands } from '../data/luxury-rollout';
 
 import { mergeCredentials } from '../data/credentials-schema';
 const citySlug = 'beverly-hills';
@@ -73,13 +75,17 @@ const services = [
   { icon: '🧊', name: 'Ice Machine Repair', slug: 'ice-maker', issues: 'Not producing · Inconsistent output · Leaking · Under-counter units', brands: 'Sub-Zero · True · U-Line · GE Monogram · Scotsman' }
 ];
 
-const luxuryBrandsNarrative = {
-  eyebrow: 'LUXURY APPLIANCE SPECIALISTS',
-  headline: 'Sub-Zero, Wolf, Viking & Thermador Repair in Beverly Hills',
+// LuxurySpecialists (wave 1, 2026-08-08): this REPLACES the prior hand-written black
+// CustomNarrative that carried the same eyebrow and role. Its prose is preserved with
+// one change — the platform-enumeration sentence is reworded so it no longer n-gram-
+// matches the san-marino block's list — and its plain-text brand line became the
+// component's linked pills (override in luxury-rollout.ts, old list + Liebherr which
+// the intro already claims).
+const luxuryNarrative = {
+  headline: 'The Machines That Define Beverly Hills Kitchens',
   paragraphs: [
     "These are the brands that define Beverly Hills kitchens — and they require a fundamentally different level of service than standard appliances. A Sub-Zero built-in refrigerator with a failed sealed system isn't the same repair as a Whirlpool French door. A Wolf dual-fuel range with a failing ignition module needs someone who actually knows how Wolf's burner technology works, not someone who watched a YouTube video.",
-    "Our technicians are trained specifically on these luxury systems — Sub-Zero's dual-evaporator architecture, Wolf's precision gas valve and star burner configurations, Thermador's ProGrand range quirks, Miele's electronic control platforms. We've serviced these appliances in The Flats off Rodeo and Carmelita, in the hillside estates in Trousdale and Benedict Canyon, in the Wilshire Corridor high-rises. We know these machines.",
-    "Brands we service: Sub-Zero · Wolf · Viking · Thermador · Miele · Dacor · GE Monogram · True Residential · Bosch · Fisher & Paykel."
+    "Our technicians are trained on what makes each of these systems its own discipline — the way a Sub-Zero manages two evaporators, what Wolf's gas valves and star burners need after years of daily use, where the ProGrand ranges hide their quirks, how Miele's control electronics report a fault before the owner notices one. We've serviced these appliances in The Flats off Rodeo and Carmelita, in the hillside estates in Trousdale and Benedict Canyon, in the Wilshire Corridor high-rises. We know these machines."
   ]
 };
 
@@ -350,11 +356,12 @@ const serviceLinks = [
     bookingSub="Same-day available · 90210 · 90211 · 90212"
   />
 
-  <CustomNarrative
-    eyebrow={luxuryBrandsNarrative.eyebrow}
-    headline={luxuryBrandsNarrative.headline}
-    paragraphs={luxuryBrandsNarrative.paragraphs}
-    background="black"
+  <LuxurySpecialists
+    citySlug={citySlug}
+    cityName={cityName}
+    headline={luxuryNarrative.headline}
+    paragraphs={luxuryNarrative.paragraphs}
+    brands={getLuxuryBrands(citySlug)}
   />
 
   <ServicesGrid
