@@ -37,9 +37,9 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     tier: 'PREMIUM',
     neighborhoods: ['Sunset Strip', 'Norma Triangle', 'West Hollywood West', 'Tri-West', 'Beverly Center area'],
     climateNote: "Mediterranean climate, marine layer reaches the Strip during May-Gray and June-Gloom; warm dry summers stress refrigeration sealed systems.",
-    waterNote: "LADWP serves WeHo with moderate to hard water (12-18 grains per gallon TDS). Scaling on dishwashers and washers shows up at year 3-5 without descaling PM.",
+    waterNote: "LADWP serves West Hollywood with moderate to hard water (12-18 grains per gallon TDS). Scaling on dishwashers and washers shows up at year 3-5 without descaling PM.",
     homeStock: "Mid-century apartments, condos, and 1920s-50s Spanish + craftsman bungalows. Premium built-in refrigerators (Sub-Zero, Miele) common in Sunset Strip estates and Norma Triangle.",
-    serviceContext: "Premium service expectations. Same-day priority dispatch on the WeHo route from the West Hollywood branch.",
+    serviceContext: "Premium service expectations. Same-day priority dispatch on the West Hollywood route from the West Hollywood branch.",
     branchSlug: 'west-hollywood'
   },
   'beverly-hills': {
@@ -90,7 +90,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
   'rancho-cucamonga': {
     tier: 'INLAND-EMPIRE',
     neighborhoods: ['Alta Loma', 'Etiwanda', 'Terra Vista', 'Victoria Gardens area', 'Haven and Foothill corridor'],
-    climateNote: "Hot inland summers (95-105°F July-Sept) put significant thermal stress on refrigerator condensers. We see compressor failures earlier in IE than coastal LA — year 8-10 inland vs year 10-12 coastal on premium tier.",
+    climateNote: "Hot inland summers (95-105°F July-Sept) put significant thermal stress on refrigerator condensers. We see compressor failures earlier in the Inland Empire than coastal LA — year 8-10 inland vs year 10-12 coastal on premium tier.",
     waterNote: "Cucamonga Valley Water District; harder water than LADWP. Scaling on dishwashers, washers, ice makers shows up faster — year 2-4 typical.",
     homeStock: "Suburban single-family, 1990s-2010s construction predominant. Mid-tier brands (Whirlpool, GE, Samsung, LG) standard. Premium tier in newer Etiwanda and north Alta Loma.",
     serviceContext: "Rancho Cucamonga branch covers Rancho Cucamonga, Ontario, Upland, Fontana, Chino Hills, Loma Linda, Redlands, San Bernardino.",
@@ -132,7 +132,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     climateNote: "Mediterranean San Fernando Valley climate; runs 5-10°F warmer than westside LA in summer. Refrigerator condenser stress moderate. Less marine layer than coastal LA.",
     waterNote: "Burbank Water and Power; moderately hard water similar to LADWP (12-18 grains per gallon). Scaling on dishwashers and washers at year 3-5 without descaling PM.",
     homeStock: "Mix: 1920s-1940s craftsman + Spanish revival in older neighborhoods (Magnolia Park, Toluca Lake-adjacent), 1970s-2000s tract single-family in Burbank Hills, condos near Media District. Brand mix correlates to neighborhood.",
-    serviceContext: "Dispatched from our Los Angeles branch (Wilshire HQ). Burbank's Hollywood-adjacent industry plus residential mix produces high service-call volume — 15,516 imp/mo GSC top priority for our SoCal coverage.",
+    serviceContext: "Dispatched from our Los Angeles branch (Wilshire HQ). Burbank's Hollywood-adjacent industry plus residential mix produces high service-call volume — 15,516 imp/mo GSC top priority for our Southern California coverage.",
     branchSlug: 'los-angeles'
   },
   'glendale': {
@@ -165,7 +165,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
   'anaheim': {
     tier: 'PREMIUM-OC',
     neighborhoods: ['Anaheim Hills', 'Platinum Triangle', 'Colony Historic District', 'West Anaheim', 'Disney area', 'East Anaheim'],
-    climateNote: "Inland Orange County climate; warm dry summers (90-95°F July-Sept), mild winters. Refrigerator condenser stress moderate, less than IE inland but more than coastal OC.",
+    climateNote: "Inland Orange County climate; warm dry summers (90-95°F July-Sept), mild winters. Refrigerator condenser stress moderate, less than Inland Empire inland but more than coastal OC.",
     waterNote: "Anaheim Public Utilities; moderately hard water. Scaling on dishwashers and washers year 3-5 standard.",
     homeStock: "Anaheim Hills has 1980s-2000s premium master-planned tracts (Sub-Zero, Wolf in custom estate pockets). Colony Historic District has 1920s-1940s Spanish + craftsman. Western and central Anaheim mix mid-century + 1960s-70s tracts. Mid-tier brand mix predominant.",
     serviceContext: "Dispatched from our Irvine branch. Anaheim's family-suburban demographic plus Disney-area service-economy households produce high service-call volume; we cover the full city from Anaheim Hills to West Anaheim same-day.",
@@ -178,7 +178,7 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     climateNote: "Mediterranean basin climate. Hollywood Hills above-Sunset sits at elevation, less marine layer, warmer summer afternoons stress refrigerator condensers more than the basin floor. Hollywood proper runs basin-typical with marine layer May-June.",
     waterNote: "LADWP serves Hollywood with moderately hard water (12-18 grains per gallon). Hard-water descaling on dishwashers and washers year 3-5 standard; ice maker filter service annual.",
     homeStock: "Two-tier mix. Hollywood Hills above-Sunset is ultra-premium territory: Outpost Estates, Whitley Heights, Beachwood Canyon — Sub-Zero, Wolf, Miele, Thermador, La Cornue installations standard in custom kitchens, often integrated with Sub-Zero Designer columns and matched Wolf rangetops. Hollywood proper is mid-premium entertainment-industry mix: Bosch, KitchenAid, GE Profile, Samsung premium are common alongside the tier-mixed condo and apartment inventory.",
-    serviceContext: "Dispatched from our West Hollywood branch (323) 870-4790. Hollywood is distinct from West Hollywood — different city boundaries, different incorporation, common confusion among new residents. We service both with the same WeHo branch infrastructure; same-day priority dispatch across the Hollywood Hills above-Sunset estate corridor and the Hollywood proper apartment-and-condo density.",
+    serviceContext: "Dispatched from our West Hollywood branch (323) 870-4790. Hollywood is distinct from West Hollywood — different city boundaries, different incorporation, common confusion among new residents. We service both with the same West Hollywood branch infrastructure; same-day priority dispatch across the Hollywood Hills above-Sunset estate corridor and the Hollywood proper apartment-and-condo density.",
     branchSlug: 'west-hollywood'
   }
 };
@@ -294,7 +294,7 @@ export const SERVICE_DESCRIPTORS: Record<string, ServiceDescriptor> = {
       { title: 'Door spring / hinge (year 6-9).', detail: '$180-280. Door slams shut or won\'t stay open at any angle.' },
       { title: 'Detergent dispenser (year 7-10).', detail: '$180-280. Pod or powder won\'t release, dishes come out dirty.' },
       { title: 'Door latch / interlock (year 6-9).', detail: '$180-280. Dishwasher won\'t start because control reads door open.' },
-      { title: 'Hard-water scaling (LADWP / Pasadena / IE areas).', detail: '$120-220 descaling service. Scale buildup damages heating element and wash arm spray jets.' }
+      { title: 'Hard-water scaling (LADWP / Pasadena / Inland Empire areas).', detail: '$120-220 descaling service. Scale buildup damages heating element and wash arm spray jets.' }
     ],
     brandPoolUltraPremium: ['Miele', 'Bosch', 'Asko', 'KitchenAid', 'Thermador', 'Cove (Sub-Zero family)', 'Gaggenau'],
     brandPoolPremium: ['Bosch', 'Miele', 'KitchenAid', 'Thermador', 'LG', 'Samsung', 'Asko', 'Fisher & Paykel'],

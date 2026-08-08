@@ -1,0 +1,215 @@
+---
+/** HeroBranchBand — full-width branch-card band across the bottom of a hero.
+ *
+ *  2 rows × 5 cards on desktop, over a bottom-anchored dark scrim so the cards
+ *  read cleanly on any photo. Cards keep the translucent frosted style.
+ *  Card order: the page's own branch first (primaryBranchSlug), then SSOT order.
+ *
+ *  Contrast (computed 2026-08-08, worst case = white photo pixel under the
+ *  0.94 scrim + 0.08 card fill → card bg rgb(41,41,41)):
+ *    phone #FF5A4E  4.70:1  (brand red #C8102E fails at 2.46:1 — too dark)
+ *    city  #D4AF37  6.88:1  (brand gold)
+ *    hover: white on #C8102E 5.88:1
+ *  All three pass WCAG AA 4.5:1 for normal text. Cards must stay inside the
+ *  solid-scrim zone — the gradient fade lives above the content padding.
+ *
+ *  Mobile: every card is server-rendered (crawlers see all 10); JS adds
+ *  `is-collapsed` so only the primary branch shows, with an "All N branches"
+ *  toggle. No JS → all cards stay visible.
+ */
+import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+
+export interface Props {
+  /** Slug of the branch shown first — the page's own branch. */
+  primaryBranchSlug?: string;
+}
+
+const { primaryBranchSlug = 'west-hollywood' } = Astro.props;
+
+const ordered = [
+  ...BRANCHES.filter((b) => b.slug === primaryBranchSlug),
+  ...BRANCHES.filter((b) => b.slug !== primaryBranchSlug),
+];
+
+const cards = ordered.map((b) => {
+  // Pending-DID guard (same as BrandBranchesGrid): never dial a placeholder.
+  const isPending = b.phoneStatus === 'pending' || isPlaceholderPhone(b.phone);
+  const phone = isPending ? MAIN_PHONE : b.phone;
+  return {
+    slug: b.slug,
+    city: b.displayCity,
+    phone,
+    href: 'tel:+1' + phone.replace(/\D/g, ''),
+  };
+});
+const total = cards.length;
+---
+
+<div class="hbb">
+  <div class="hbb__inner">
+    <p class="hbb__label">Call your local branch</p>
+    <div class="hbb__grid">
+      {cards.map((c, i) => (
+        <a href={c.href} class={`hbb__card${i === 0 ? ' hbb__card--primary' : ''}`}>
+          <span class="hbb__city">{c.city}</span>
+          <span class="hbb__phone">{c.phone}</span>
+        </a>
+      ))}
+    </div>
+    <button class="hbb__toggle" type="button" aria-expanded="false" data-total={total} hidden>
+      All {total} branches ▾
+    </button>
+  </div>
+</div>
+
+<style>
+  .hbb {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    /* Solid 0.94 scrim behind the cards; the fade band sits above the content
+       padding so every card stays on the computed-contrast background. */
+    background: linear-gradient(
+      to top,
+      rgba(8, 8, 8, 0.94) 0%,
+      rgba(8, 8, 8, 0.94) calc(100% - 44px),
+      rgba(8, 8, 8, 0) 100%
+    );
+  }
+  .hbb__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 24px 18px;
+  }
+  .hbb__label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.6);
+    margin: 0 0 10px;
+  }
+  .hbb__grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .hbb__card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-height: 48px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    text-decoration: none;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: background 150ms ease, border-color 150ms ease;
+  }
+  .hbb__city {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #d4af37;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .hbb__phone {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ff5a4e;
+    white-space: nowrap;
+  }
+  .hbb__card:hover,
+  .hbb__card:active {
+    background: #c8102e;
+    border-color: #c8102e;
+  }
+  .hbb__card:hover .hbb__city,
+  .hbb__card:hover .hbb__phone,
+  .hbb__card:active .hbb__city,
+  .hbb__card:active .hbb__phone {
+    color: #ffffff;
+  }
+  .hbb__toggle {
+    display: none;
+  }
+
+  @media (max-width: 1024px) {
+    .hbb__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hbb__inner {
+      padding: 48px 16px 14px;
+    }
+    .hbb__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    /* Collapsed (JS-applied): primary branch only, full width. All cards are
+       in the HTML either way — this is presentation, crawlers see everything. */
+    .hbb.is-collapsed .hbb__card:not(.hbb__card--primary) {
+      display: none;
+    }
+    .hbb.is-collapsed .hbb__card--primary {
+      grid-column: 1 / -1;
+    }
+    .hbb__toggle {
+      display: block;
+      width: 100%;
+      min-height: 44px;
+      margin-top: 10px;
+      padding: 10px 14px;
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 10px;
+      color: #ffffff;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+    }
+    .hbb__toggle[hidden] {
+      display: none;
+    }
+  }
+</style>
+
+<script is:inline>
+  (function () {
+    var band = document.querySelector('.hbb');
+    if (!band) return;
+    var btn = band.querySelector('.hbb__toggle');
+    if (!btn) return;
+    var total = btn.getAttribute('data-total') || '10';
+    var mq = window.matchMedia('(max-width: 767px)');
+
+    function collapse(on) {
+      band.classList.toggle('is-collapsed', on);
+      btn.setAttribute('aria-expanded', String(!on));
+      btn.textContent = on ? 'All ' + total + ' branches ▾' : 'Hide branches ▴';
+    }
+    function apply() {
+      if (mq.matches) {
+        btn.hidden = false;
+        collapse(true);
+      } else {
+        btn.hidden = true;
+        band.classList.remove('is-collapsed');
+      }
+    }
+    btn.addEventListener('click', function () {
+      collapse(!band.classList.contains('is-collapsed'));
+    });
+    if (mq.addEventListener) mq.addEventListener('change', apply);
+    else if (mq.addListener) mq.addListener(apply);
+    apply();
+  })();
+</script>
