@@ -62,6 +62,14 @@ export const counties: County[] = [
       "Carpinteria", "Goleta", "Hope Ranch",
       "Montecito", "Santa Barbara", "Summerland"
     ]
+  },
+  {
+    name: "San Diego County",
+    slug: "san-diego-county",
+    cities: [
+      "Carlsbad", "Del Mar", "Encinitas",
+      "La Jolla", "Rancho Santa Fe", "Solana Beach"
+    ]
   }
 ];
 

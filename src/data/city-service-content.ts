@@ -9,7 +9,7 @@
 // The parametric template at src/pages/[city]/[service].astro consumes these structures.
 
 export interface CityDescriptor {
-  tier: 'ULTRA-PREMIUM' | 'PREMIUM' | 'GENERAL' | 'PREMIUM-OC' | 'MID-TIER-NE' | 'MID-TIER-VENTURA' | 'INLAND-EMPIRE' | 'INLAND-RIVERSIDE' | 'PREMIUM-SB';
+  tier: 'ULTRA-PREMIUM' | 'PREMIUM' | 'GENERAL' | 'PREMIUM-OC' | 'MID-TIER-NE' | 'MID-TIER-VENTURA' | 'INLAND-EMPIRE' | 'INLAND-RIVERSIDE' | 'PREMIUM-SB' | 'PREMIUM-SD';
   neighborhoods: string[];
   climateNote: string;
   waterNote: string;
@@ -104,6 +104,15 @@ export const CITY_DESCRIPTORS: Record<string, CityDescriptor> = {
     homeStock: "Suburban single-family, 1990s-2010s construction. Wine Country has custom estates with premium built-in appliances. Mid-tier brands standard in valley tracts.",
     serviceContext: "Riverside branch covers Riverside, Corona, Moreno Valley, Norco, Eastvale, Temecula, Murrieta, Menifee, Lake Elsinore, Hemet.",
     branchSlug: 'riverside'
+  },
+  'la-jolla': {
+    tier: 'PREMIUM-SD',
+    neighborhoods: ['The Village', 'La Jolla Shores', 'Bird Rock', 'Muirlands', 'La Jolla Farms', 'Windansea'],
+    climateNote: "Coastal Mediterranean with persistent marine layer and direct Pacific salt-air exposure on the bluffs and Shores. Condenser coils on refrigeration corrode faster within a mile of the water; mild summers keep inland-style heat stress low.",
+    waterNote: "City of San Diego water (Colorado River + State Water blend) runs hard; scale on dishwashers, ice makers, and washers shows up at year 3-5 without descaling maintenance.",
+    homeStock: "1920s-30s Spanish and Mediterranean revival in the Village, mid-century post-and-beam on the hillsides, contemporary bluff estates in La Jolla Farms and along the Shores. Built-in Sub-Zero, Wolf, Viking, Thermador, and Miele installations standard in the estate belt.",
+    serviceContext: "San Diego branch (Wave 1) covers La Jolla, Carlsbad, Del Mar, Rancho Santa Fe, Encinitas, and Solana Beach — the North County Coastal corridor.",
+    branchSlug: 'san-diego'
   },
   'santa-barbara': {
     tier: 'PREMIUM-SB',
@@ -705,6 +714,9 @@ export function getBrandPool(cityTier: CityDescriptor['tier'], service: ServiceD
     // PREMIUM-SB: Santa Barbara / Montecito / Hope Ranch estate corridor —
     // luxury pool (Sub-Zero, Wolf, Viking, Thermador, Miele) per 2026-08-06 decision.
     case 'PREMIUM-SB':
+    // PREMIUM-SD: La Jolla / North County Coastal estate belt — same luxury pool
+    // (2026-08-07 Stage A decision; hub city = La Jolla, not San Diego proper).
+    case 'PREMIUM-SD':
       return service.brandPoolUltraPremium;
     case 'PREMIUM':
     case 'PREMIUM-OC':

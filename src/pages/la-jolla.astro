@@ -1,0 +1,493 @@
+---
+/**
+ * La Jolla, CA — flagship city pillar of the San Diego Wave-1 cluster.
+ * Branch: San Diego — service_area (no public street address).
+ *
+ * Positioning per wiki/briefings/san-diego-recon-2026-08-06.md:
+ *   - $89 stated once, plainly. NOT the lead differentiator (Spark publishes $80).
+ *     We win on neighborhood depth, wine-cellar systems, and outdoor coverage.
+ *   - NEVER imply Sub-Zero factory authorization (Box holds it for SD County).
+ *     Honest independent framing: OEM parts, our schedule, no factory queue.
+ *   - NO technician names — no SD tech assigned. "Our San Diego technicians."
+ *   - Unclaimed angles carried here: neighborhood-level prose (nobody in SD
+ *     goes below city grids), wine cellar cooling as a SYSTEM (query not even
+ *     indexed — greenfield), bluff/canyon access logistics.
+ *
+ * Zero-invention: model numbers limited to site-established patterns
+ * (Sub-Zero 600-series defrost/evaporator per our problems-by-series page,
+ * Wolf surface igniters, Bosch E24 drain path). No ReviewsBlock — no
+ * verifiable La Jolla reviews exist yet.
+ */
+
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import LuxurySpecialists from '../components/cities/v2/LuxurySpecialists.astro';
+import PropertyManagers from '../components/cities/v2/PropertyManagers.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const citySlug = 'la-jolla';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'La Jolla';
+const zips = ['92037'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair La Jolla CA — Same Day Service`;
+const description = "Appliance repair in La Jolla 92037 — the Village, Bird Rock, the Shores, Muirlands. Built-in refrigeration, wine cellars, outdoor kitchens. (858) 667-7237.";
+const canonical = 'https://samedayappliance.repair/la-jolla/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'La Jolla', sameAs: 'https://en.wikipedia.org/wiki/La_Jolla' },
+    { '@type': 'Place', name: 'The Village' },
+    { '@type': 'Place', name: 'Bird Rock' },
+    { '@type': 'Place', name: 'La Jolla Shores' },
+    { '@type': 'Place', name: 'Muirlands' }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$$',
+  license: 'BHGS #A49573'
+});
+
+const introParagraphs = [
+  "<strong>When an appliance fails in La Jolla, our San Diego technicians usually know the failure before they park: condenser coils corroding on the bluff line, a built-in column wedged into a 1920s Village kitchen that was never framed for it, a wine room drifting off setpoint behind a pantry wall, or an outdoor kitchen whose igniters have been eating salt air since the last El Niño. We dispatch across the Village, Bird Rock, the Shores, and the Muirlands daily. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
+  "La Jolla has more built-in refrigeration per square mile than anywhere else in San Diego County, and almost every unit lives in one of two difficult situations. Either it was retrofitted into a Spanish or Mediterranean kitchen from the 1920s and 30s — plaster walls, tight clearances, electrical panels sized for a different century — or it sits in a contemporary bluff-edge build where the ocean is close enough to salt the coils. Both situations reward technicians who have seen them before. Both punish generic checklists.",
+  "A word about Sub-Zero, since La Jolla runs on it: factory service in San Diego County goes through Sub-Zero's authorized partner, and that is not us. We're independent — genuine OEM parts, our own calendar, no manufacturer dispatch queue. If you want the factory network, use it. If you want a technician looking at your column this week instead of when the queue clears, that's the job we built the San Diego branch for.",
+  "The wine side of La Jolla deserves its own paragraph, because nobody else gives it one. Between the Village cellars, the Muirlands wine rooms, and the collector houses above the Shores, this ZIP holds serious bottle storage — and the cooling systems behind it get serviced by almost no one. We treat cellar cooling as a system: the cooling unit, the airflow path, the humidity behavior, the insulation reality of the room it lives in. More on that below.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for same-day service across 92037 — and the rest of the <a href="/san-diego-county/">North Coastal corridor</a>.`,
+  "<strong>From our techs on coastal refrigeration:</strong> if your kitchen is west of La Jolla Boulevard or anywhere along the Shores, put condenser cleaning on a 4-month calendar. Salt-bearing air loads coil fins at roughly double the inland rate, the compressor works harder every week it's ignored, and the repair you eventually buy is the expensive one. We check coils on every 92037 refrigeration call as standard procedure."
+];
+
+const services = [
+  { icon: '🧊', name: 'Built-In Refrigeration', slug: 'refrigerator', issues: 'Salt-air coil corrosion · Columns in retrofit kitchens · Ice makers', brands: 'Sub-Zero · Thermador · GE Monogram · Miele · Viking' },
+  { icon: '🍷', name: 'Wine Cellar Cooling', slug: 'wine-cellar', issues: 'Cellar systems · Temperature drift · Humidity · Collector rooms', brands: 'Sub-Zero · EuroCave · Liebherr · U-Line · WhisperKool' },
+  { icon: '🔥', name: 'Range & Oven Repair', slug: 'oven', issues: 'Weak burners · Temperature drift · Dual-fuel systems', brands: 'Wolf · Viking · Thermador · Miele · Dacor' },
+  { icon: '🔆', name: 'Outdoor Kitchen Repair', slug: 'bbq', issues: 'Salt-corroded igniters · Burners · Terrace refrigeration', brands: 'Lynx · Fire Magic · Twin Eagles · DCS · Viking · Wolf' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Panel-front units · Hard-water scale · Drain-path codes', brands: 'Miele · Bosch · Thermador · KitchenAid' },
+  { icon: '🫧', name: 'Washer & Dryer Repair', slug: 'washer', issues: 'Compact Village installs · Stacked pairs · Scale', brands: 'Miele · LG · Bosch · Whirlpool · Samsung' },
+  { icon: '❄️', name: 'Freezer & Undercounter', slug: 'freezer', issues: 'Column freezers · Undercounter drawers · Beverage centers', brands: 'Sub-Zero · U-Line · True · Perlick' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop', issues: "Burners won't light · Induction · Downdraft", brands: 'Wolf · Thermador · Miele · Gaggenau · GE' }
+];
+
+const neighborhoodsNarrative = {
+  eyebrow: 'BELOW THE CITY GRID — WHERE NOBODY ELSE GOES',
+  headline: 'Seven La Jollas, Seven Different Service Calls',
+  paragraphs: [
+    "Every repair company in San Diego lists 'La Jolla' on a coverage grid. None of them write another word about it. That's a mistake, because 92037 is seven distinct appliance markets wearing one ZIP code, and knowing which one you're calling from changes what goes on the truck."
+  ],
+  subSections: [
+    {
+      title: 'The Village',
+      paragraphs: [
+        'Spanish and Mediterranean revival blocks from the 1920s and 30s, remodeled in layers ever since. The signature call: a modern built-in column living inside cabinetry and wall framing that predate it by ninety years, on an electrical panel that was generous in 1931. Extraction clearances are tight, floors are original, and the amperage math matters as much as the appliance. We bring pads, rollers, and patience — and we check what the circuit can actually feed before condemning a control board.'
+      ]
+    },
+    {
+      title: 'Bird Rock',
+      paragraphs: [
+        'Mid-century stock on the sandstone shelf between the Boulevard and the water — close enough to the surf that garage freezers and laundry pairs corrode on the ocean schedule. Bird Rock calls skew practical: family kitchens, hard-working laundry, grills on small patios that taste salt every afternoon.'
+      ]
+    },
+    {
+      title: 'La Jolla Shores & the Farms',
+      paragraphs: [
+        'The flats behind the beach and the estate parcels up La Jolla Farms Road. The Shores puts appliances a few hundred yards from breaking surf — our most aggressive corrosion environment in San Diego County — while the Farms adds long gated driveways and multi-refrigerator households. Access planning is part of the visit: some Farms kitchens are a genuine hike from where a truck can legally stop.'
+      ]
+    },
+    {
+      title: 'Muirlands, Hidden Valley & Windansea',
+      paragraphs: [
+        'Hillside mid-century and contemporary homes stepping up from Windansea toward Mt. Soledad. Elevation buys a little relief from salt, and the housing vintage brings its own pattern: original 1960s kitchens mid-remodel, wine rooms carved out of lower levels, and the occasional bluff-edge build where the architect hid the refrigeration somewhere spectacular and inaccessible. We\'ve learned to ask for photos before we quote an arrival window.'
+      ]
+    }
+  ]
+};
+
+const wineNarrative = {
+  eyebrow: 'WINE CELLAR COOLING — THE CATEGORY NOBODY SERVICES',
+  headline: 'A Wine Room Is a Refrigeration System, Not a Fancy Fridge',
+  paragraphs: [
+    "Search for wine cellar cooling repair in San Diego and you'll find companies that sell wine coolers — the undercounter kind — and almost nobody who services the systems behind real cellars. La Jolla has real cellars: converted lower-level rooms in the Muirlands, purpose-built collector spaces in the Farms, conditioned closets in Village remodels. When one drifts from 55 toward 60, the owner discovers that the installer retired and the appliance companies don't want the call.",
+    "We want the call. A cellar system is a refrigeration loop plus everything around it: the through-wall or ducted cooling unit, the condenser's airflow supply (usually starved in an equipment closet nobody opens), the evaporator side's humidity behavior (a cellar that dries corks is failing even at the right temperature), and the room itself — insulation, vapor barrier, door seal. Half the 'failing cooling units' we see are healthy machines suffocating in a closed closet or fighting a door that no longer seals. The other half need real refrigeration work, and we hold EPA 608 Universal certification for exactly that.",
+    "A cellar visit here follows a fixed discipline. Temperatures logged at rack level, not just at the thermostat — stratification is real in tall rooms. Condenser airflow measured where the unit actually breathes, which in most La Jolla installs means a closet, a crawl space, or a cabinet toe-kick that hasn't seen a vacuum since the remodel. Evaporator inspected for icing, drain line for the algae plug that coastal humidity grows, door seal checked with the lights-off test. Then, and only then, refrigerant questions — because condemning a compressor before ruling out airflow is how cellars end up with two expensive repairs instead of one cheap one. You get the findings in writing either way.",
+    "We service dedicated cellar cooling units, through-wall and split systems, and the undercounter and column wine refrigeration from Sub-Zero, EuroCave, Liebherr, and U-Line that backs up the main room. Temperature drift, short cycling, humidity complaints, ice on the evaporator — diagnosed as a system, quoted in writing before work starts. If your collection is sitting in a warming room right now, say so when you call and we'll schedule it with the urgency a cellar actually deserves."
+  ]
+};
+
+const coastalNarrative = {
+  eyebrow: 'THE SALT LINE AND THE BLUFF LOGISTICS',
+  headline: 'What the Pacific Does to La Jolla Kitchens',
+  paragraphs: [
+    "This is the strongest version of the coastal-corrosion story anywhere on our routes. La Jolla wraps around its ocean on three sides, the marine layer parks on the Village most mornings, and homes from the Shores to Windansea keep windows open to it all summer. Salt-bearing air settles on condenser coils and outdoor kitchen components and does quiet, compounding damage: refrigerators run longer to shed heat, igniters click without lighting, door gaskets stiffen years early. On every 92037 refrigeration call we inspect the coils first — it's the cause behind half the symptoms, and catching it early is the difference between a cleaning and a sealed-system job.",
+    "The second La Jolla-specific reality is access. Bluff-edge and canyon-lot homes were designed around views, not appliance paths — switchback stairs, motor courts a floor above the kitchen, pocket doors an inch narrower than a 48-inch column. Moving a built-in in or out of these houses is a planned operation with floor protection and a second technician, not an improvisation. We ask the access questions before the visit, so the arrival window survives contact with the driveway."
+  ]
+};
+
+const luxuryNarrative = {
+  headline: 'The Deepest Luxury Bench in San Diego County',
+  paragraphs: [
+    "La Jolla's kitchens run the deepest luxury roster in San Diego County: Sub-Zero columns behind panel fronts in the Muirlands and the Farms, Wolf and Thermador ranges in Village remodels, Miele dishwashers, Gaggenau wall ovens in the newer bluff builds. We service the full bench with OEM parts — and we're independent, which in a Sub-Zero market with one factory-exclusive player means a second competent opinion exists.",
+    "Judgment is most of the job at this tier. A built-in with a worn evaporator fan deserves the repair; one with a dead sealed system may not, and you hear that verdict before any parts are ordered. Gas cooking gets the same discipline — a surface igniter that clicks weak on a 48-inch range is a component, not a reason to remodel."
+  ],
+  brands: ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Gaggenau', 'Viking'],
+  footnote: {
+    lead: 'Built-in acting its age? Our',
+    linkText: 'Sub-Zero problems-by-series guide',
+    href: '/services/refrigerator-repair/sub-zero-problems-by-series/'
+  }
+};
+
+const propertyParagraphs = [
+  "The person calling from La Jolla is often a property manager with a Village condo portfolio, a host running a vacation rental near the Shores, or an assistant handling the house while the owners travel. We run the workflow that makes that easy: written estimates that forward for approval, arrival windows coordinated with whoever is actually on site, and invoices to the office with the property on every line.",
+  "Vacation units near the beach get the idle-then-full-house treatment — machines checked before the booking calendar tightens, priority when a failure lands mid-stay. One number covers a mixed San Diego County portfolio, from the Village to <a href=\"/del-mar/\">Del Mar</a> and up the coast."
+];
+
+const propertyBullets = [
+  'Estimates formatted for one-line approvals',
+  'Arrival windows coordinated with whoever holds the keys',
+  'Priority for occupied vacation units',
+  'One consolidated record per property'
+];
+
+const commercialNarrative = {
+  eyebrow: 'PROSPECT & GIRARD',
+  headline: 'Light-Commercial Repair Behind the Village Dining Rooms',
+  paragraphs: [
+    "Prospect Street and Girard Avenue carry a restaurant density most of San Diego envies, and behind those dining rooms sits the light-commercial layer we service: reach-in and undercounter refrigeration, prep tables, commercial dishwashers cycling through health-code sanitization, fryers and cooking lines in kitchens the size of a walk-in closet. The GE and Whirlpool breakroom refrigerators in the Village's offices and galleries count too — light commercial is a scope, not a brand tier.",
+    "Commercial timing rules apply: same-day intent, written estimates a manager can approve between seatings, OEM parts. Walk-in boxes and commercial ice machines are the county commercial team's lane — the same San Diego routes, with the commercial-grade bench behind them."
+  ]
+};
+
+const commercialBrandGroups = [
+  {
+    label: 'Reach-in & undercounter refrigeration',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' },
+      { name: 'Perlick', href: '/commercial/refrigeration/brands/perlick/' }
+    ]
+  }
+];
+
+const commercialEquipment = [
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Pizza ovens', href: '/commercial/pizza-oven-repair/', icon: 'pizza-oven' }
+];
+
+const outdoorNarrative = {
+  headline: 'Outdoor Kitchens on a Three-Sided Ocean Exposure',
+  paragraphs: [
+    "Outdoor kitchens here live on the same three-sided ocean exposure that works over the indoor equipment — Lynx and Fire Magic islands on Windansea patios, DCS burners above the Shores, beverage centers and outdoor refrigeration on bluff decks. Igniters corrode into the endless click, burner ports pit, and outdoor-rated refrigeration loads its condenser with salt film on a schedule inland patios never see.",
+    "We treat the outdoor line as core work: OEM igniter modules and burners, condenser and gasket service on outdoor refrigeration, and gas-side checks handled by technicians rather than left to luck. Garage and second refrigerators — the overflow units every La Jolla household seems to run — ride the same visit."
+  ]
+};
+
+const outdoorLinks = [
+  { name: 'Grill repair', href: '/outdoor/grill-repair/' },
+  { name: 'Outdoor kitchens', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerators', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heaters', href: '/outdoor/patio-heater-repair/' }
+];
+
+const outdoorBrands = [
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'Fire Magic', href: '/outdoor/brands/fire-magic/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' },
+  { name: 'Twin Eagles', href: '/outdoor/brands/twin-eagles/' },
+  { name: 'Coyote', href: '/outdoor/brands/coyote/' }
+];
+
+const neighborhoods = [
+  { name: 'The Village', zip: '92037', featured: true },
+  { name: 'Bird Rock', zip: '92037', featured: true },
+  { name: 'La Jolla Shores', zip: '92037', featured: true },
+  { name: 'Muirlands', zip: '92037' },
+  { name: 'Hidden Valley', zip: '92037' },
+  { name: 'La Jolla Farms', zip: '92037' },
+  { name: 'Windansea', zip: '92037' },
+  { name: 'Upper Hermosa', zip: '92037' }
+];
+
+const recentJobs = [
+  {
+    appliance: 'Sub-Zero 600-Series',
+    quote: 'Frost inside the fridge section and it never stops running',
+    location: 'The Village, 92037',
+    description: "A 600-series built-in from an early-2000s remodel, wedged into 1920s cabinetry. The pattern our problems-by-series work sees constantly: defrost components worn to the point that the evaporator ices over and airflow dies. Our San Diego technicians restored the defrost function, replaced a door gasket feeding humid Village air into the cabinet, and measured the panel circuit while everything was open — this kitchen's wiring had less headroom than its owner assumed.",
+    outcome: '✓ Defrost restored · Gasket replaced · Circuit documented'
+  },
+  {
+    appliance: 'Cellar Cooling System',
+    quote: 'Wine room crept from 55 to 61 over two weeks',
+    location: 'Muirlands, 92037',
+    description: "Converted lower-level cellar, roughly six hundred bottles, through-wall cooling unit. The machine itself was healthy — its evaporator fan had failed, so cold was being made and never moved. Replaced the fan, verified setpoint recovery overnight by data logger, and flagged the real long-term issue honestly: the room's door sweep had worn away, and the system had been fighting the hallway for months.",
+    outcome: '✓ Fan replaced · Setpoint verified overnight · Door seal flagged'
+  },
+  {
+    appliance: 'Wolf Range',
+    quote: 'Two burners click forever before they light',
+    location: 'Bird Rock, 92037',
+    description: "Mid-century Bird Rock kitchen three blocks off the water — surface igniter electrodes corroded by salt air until the spark couldn't jump cleanly. Replaced both electrodes with OEM Wolf parts, verified crisp ignition on every burner, and cleaned the burner ports while the grates were off. Same corrosion story as the outdoor kitchens here, just indoors with the windows open.",
+    outcome: '✓ Same day · OEM Wolf electrodes · All burners verified'
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    quote: 'E24 after the kitchen remodel wrapped up',
+    location: 'La Jolla Shores, 92037',
+    description: "Fresh remodel, brand-new Bosch, E24 on the third cycle — the drain-path code. Construction debris had found its way into the new drain run, and the hose landed with a low loop that let water sit. Cleared the path, corrected the hose routing to spec, ran two full cycles clean. New kitchens fail differently than old ones; the code just tells you where to start looking.",
+    outcome: '✓ Same day · Drain path corrected · Two clean cycles verified'
+  }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Neighborhood Literacy',
+    body: "A Village retrofit, a Shores corrosion case, and a Muirlands cellar are three different jobs. We plan the visit around which La Jolla you're in — parts, access gear, and the questions we ask before the truck moves."
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Honestly Independent on Sub-Zero',
+    body: 'Factory service in this county runs through the authorized partner — we say that on every page. What we offer is the independent alternative: OEM parts, our own schedule, and a written estimate before work starts — booked for this week, not for whenever a queue clears.'
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Cellars Treated Like Cellars',
+    body: 'Wine cooling diagnosed as a system — unit, airflow, humidity, room — with EPA 608 Universal certification behind the refrigerant work. A drifting cellar gets collector-grade urgency, not a next-available slot.'
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed 90 days on parts and labor. OEM components matter double within sight of the ocean — aftermarket parts corrode first. $89 diagnostic, waived with repair.'
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Built-In / Column Refrigeration', range: '$300–$700+', note: 'OEM parts · Retrofit-kitchen extraction planned', featured: true },
+  { appliance: 'Wine Cellar Cooling', range: '$200–$500', note: 'System diagnostics · Fans · Controls · Refrigerant work' },
+  { appliance: 'Range / Oven', range: '$175–$500', note: 'Pro ranges and wall ovens · Igniter and calibration work' },
+  { appliance: 'Outdoor Kitchen / Grill', range: '$150–$400', note: 'Salt-corroded igniters · Burners · Terrace units' },
+  { appliance: 'Dishwasher', range: '$150–$350', note: 'Panel-front units · Drain codes · Hard-water scale' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' }
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in La Jolla?',
+    answer: 'Yes — our San Diego technicians run 92037 daily, from the Village and Bird Rock through the Shores, Muirlands, Hidden Valley, Windansea, and La Jolla Farms. Call before noon and same-day is realistic for most of the ZIP.'
+  },
+  {
+    question: 'Are you Sub-Zero factory-authorized in La Jolla?',
+    answer: "No. Sub-Zero routes factory service in San Diego County through its authorized partner, and we tell you that up front. We're the independent option — genuine OEM parts, our own calendar, no manufacturer queue. Owners who want the factory network should use it; owners who want a technician at the column this week call us."
+  },
+  {
+    question: 'Do you service wine cellars in La Jolla, or just wine fridges?',
+    answer: "Both — and the distinction matters. Undercounter and column wine refrigeration is straightforward for us; dedicated cellar cooling systems are the specialty almost nobody here touches. We diagnose the cellar as a system: cooling unit, condenser airflow, humidity behavior, and the room's own insulation and door seal. EPA 608 Universal certification covers the refrigerant side."
+  },
+  {
+    question: 'Can you get a built-in refrigerator out of an old Village kitchen?',
+    answer: "That's a defining La Jolla job. Columns retrofitted into 1920s-30s Spanish kitchens sit in clearances the original builders never imagined, over floors worth protecting, on panels with limited headroom. Extraction is a planned two-person operation with pads and rollers — and we check the circuit's actual capacity before blaming the appliance's electronics."
+  },
+  {
+    question: 'Does salt air really shorten appliance life in La Jolla?',
+    answer: "Measurably, and more than anywhere else we service in San Diego County. West of La Jolla Boulevard and along the Shores, condenser coils load with salt-borne deposits at roughly twice the inland rate, outdoor igniters corrode into endless clicking, and gaskets age early. Coil inspection is standard on every 92037 refrigeration call, and a 4-month cleaning cycle is the cheapest insurance a coastal kitchen can buy."
+  },
+  {
+    question: 'Do you repair outdoor kitchens in La Jolla?',
+    answer: 'Yes — Lynx, Fire Magic, Twin Eagles, DCS, Viking, and Wolf outdoor equipment: igniters, burners, gas valves, and terrace refrigeration. Bluff patios feed their grills a steady salt diet, so this is one of our most regular La Jolla calls.'
+  },
+  {
+    question: 'Our kitchen is hard to reach — steep driveway, stairs, tight doorways. Is that a problem?',
+    answer: "It's a normal La Jolla condition, not a problem — bluff and canyon lots put kitchens below motor courts and behind doorways older than the appliances in them. Tell us what the path looks like when you book (photos help), and we plan the visit around it: right crew size, floor protection, rollers, and an honest arrival window that accounts for the driveway."
+  },
+  {
+    question: 'What does a diagnostic visit cost in La Jolla?',
+    answer: '$89 for residential equipment, waived the moment you approve the repair, with a written estimate before any work begins. Commercial equipment is $120. The invoice matches the estimate.'
+  }
+];
+
+const nearbyCities = [
+  { name: 'Del Mar', slug: 'del-mar' },
+  { name: 'Solana Beach', slug: 'solana-beach' },
+  { name: 'Rancho Santa Fe', slug: 'rancho-santa-fe' },
+  { name: 'Encinitas', slug: 'encinitas' },
+  { name: 'Carlsbad', slug: 'carlsbad' }
+];
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="La Jolla, CA"
+    subheadline="Village retrofits, bluff-edge built-ins, wine cellars, outdoor kitchens — seven neighborhoods, one salt-heavy ZIP, serviced by a dedicated San Diego branch. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={1}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in La Jolla — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="La Jolla Service Team"
+    bookingSub="92037 · Village · Shores · Bird Rock · Muirlands"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in La Jolla"
+    subhead="Built-ins · Wine cellars · Outdoor kitchens · 92037"
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={neighborhoodsNarrative.eyebrow}
+    headline={neighborhoodsNarrative.headline}
+    paragraphs={neighborhoodsNarrative.paragraphs}
+    subSections={neighborhoodsNarrative.subSections}
+    background="white"
+  />
+
+  <LuxurySpecialists
+    citySlug={citySlug}
+    cityName={cityName}
+    headline={luxuryNarrative.headline}
+    paragraphs={luxuryNarrative.paragraphs}
+    brands={luxuryNarrative.brands}
+    footnote={luxuryNarrative.footnote}
+  />
+
+  <PropertyManagers
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Managers, Hosts & Assistants — the People Who Actually Call"
+    paragraphs={propertyParagraphs}
+    bullets={propertyBullets}
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="La Jolla Areas We Service"
+    subheadline="The Village to the Farms — every corner of 92037."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <CustomNarrative
+    eyebrow={wineNarrative.eyebrow}
+    headline={wineNarrative.headline}
+    paragraphs={wineNarrative.paragraphs}
+    background="gray"
+  />
+
+  <CustomNarrative
+    eyebrow={coastalNarrative.eyebrow}
+    headline={coastalNarrative.headline}
+    paragraphs={coastalNarrative.paragraphs}
+    background="white"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow={commercialNarrative.eyebrow}
+    headline={commercialNarrative.headline}
+    paragraphs={commercialNarrative.paragraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Walk-in coolers & commercial ice machines — county commercial service', href: '/commercial/refrigeration/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline={outdoorNarrative.headline}
+    paragraphs={outdoorNarrative.paragraphs}
+    serviceChips={outdoorLinks}
+    brandPills={outdoorBrands}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in La Jolla"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why La Jolla Calls Us"
+    reasons={whyReasons}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in La Jolla"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions La Jolla Clients Ask"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in La Jolla?"
+    body="Village · Shores · Bird Rock · Muirlands · Wine cellars · Outdoor kitchens. $89 diagnostic waived with repair. 90-day warranty. OEM parts."
+  />
+
+  <section class="section">
+    <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">San Diego County coverage</p>
+      <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">The North Coastal corridor, one branch.</h2>
+      <p>La Jolla anchors our <a href="/san-diego-county/">San Diego County service area</a> — the same branch covers <a href="/rancho-santa-fe/">Rancho Santa Fe</a>, <a href="/carlsbad/">Carlsbad</a>, Del Mar, Encinitas, and Solana Beach. For refrigeration deep-dives, see our <a href="/services/refrigerator-repair/sub-zero-problems-by-series/">Sub-Zero problems-by-series guide</a> and <a href="/services/wine-cellar-cooling-repair/">wine cellar cooling service</a>.</p>
+    </div>
+  </section>
+</CityLayoutV2>

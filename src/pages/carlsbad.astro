@@ -1,0 +1,443 @@
+---
+/**
+ * Carlsbad, CA — volume-market pillar of the San Diego Wave-1 cluster.
+ * Branch: San Diego — service_area (no public street address).
+ *
+ * Angle: the VOLUME play, not the luxury play. ~115k people, three housing
+ * populations: older coastal stock in the Village, large master-planned
+ * inland tracts (La Costa, Bressi Ranch, Aviara), and resort/vacation-rental
+ * pockets near the coast. Mass-market brands carry the page; built-ins appear
+ * only where the newer luxury tracts genuinely have them.
+ *
+ * Positioning per recon: $89 once; no factory-authorization implication;
+ * NO technician names. Zero-invention: repair cases reuse site-established
+ * patterns only (Samsung ice maker defrost, Whirlpool-platform dryer thermal
+ * fuse + vent, Frigidaire i20, KitchenAid counter-depth airflow).
+ * No ReviewsBlock.
+ */
+
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import LuxurySpecialists from '../components/cities/v2/LuxurySpecialists.astro';
+import PropertyManagers from '../components/cities/v2/PropertyManagers.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const citySlug = 'carlsbad';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Carlsbad';
+const zips = ['92008', '92009', '92010', '92011'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Carlsbad CA — Same Day Service`;
+const description = "Appliance repair in Carlsbad — the Village, La Costa, Bressi Ranch, Aviara. LG, Samsung, Whirlpool, GE. Vacation rentals welcome. $89 dx. (858) 667-7237.";
+const canonical = 'https://samedayappliance.repair/carlsbad/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Carlsbad', sameAs: 'https://en.wikipedia.org/wiki/Carlsbad,_California' },
+    { '@type': 'Place', name: 'Carlsbad Village' },
+    { '@type': 'Place', name: 'La Costa' },
+    { '@type': 'Place', name: 'Bressi Ranch' },
+    { '@type': 'Place', name: 'Aviara' }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+  license: 'BHGS #A49573'
+});
+
+const introParagraphs = [
+  "<strong>Carlsbad is the working heart of our San Diego territory — a real city of 115,000 where the calls are family refrigerators, hard-run laundry pairs, and dishwashers that do a full shift every night. Our San Diego technicians stock the parts these homes actually use: LG and Samsung for the newer tracts, Whirlpool and GE for the older streets, and the built-in brands where Aviara and La Costa kitchens carry them. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
+  "The city splits cleanly by construction era, and the appliance population follows. The Village and the streets near the coast run older — cottages and remodels where a twelve-year-old Whirlpool set is still earning its keep, and where repair beats replacement almost every time the math is run honestly. The master-planned east — La Costa, Bressi Ranch, Aviara, the Calavera Hills side — runs newer: LG and Samsung with sensors and error codes, plus genuine built-in kitchens in the upper tracts. Two diagnostic styles, one truck.",
+  "The coastal strip adds a third population: vacation rentals and resort-adjacent homes whose appliances live an odd rhythm — quiet for weeks, then hammered by a full house through a holiday week. Machines fail at check-in here, not gradually, because idle time dries seals and settles debris that the first heavy weekend then exposes all at once. We schedule around bookings, prioritize occupied-rental calls, and do pre-season checkouts that catch the quiet failures before a guest does.",
+  "And because Carlsbad sits on the same hard imported water as the rest of the corridor, scale is the constant across all three populations: dishwashers filming glassware, ice makers slowing down, washer inlet screens crusting shut on a year-3-to-5 schedule. Most of it is a service visit, not a replacement — and we'll tell you plainly which one you're looking at before anything is spent beyond the diagnostic.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for same-day service across 92008–92011 — and the rest of the <a href="/san-diego-county/">North Coastal corridor</a>.`
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling · Ice makers · French-door units · Built-ins in Aviara', brands: 'LG · Samsung · Whirlpool · GE · KitchenAid · Sub-Zero' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer', issues: 'Not draining · Not spinning · Error codes · Rental wear', brands: 'LG · Samsung · Whirlpool · Maytag · GE' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer', issues: 'Not heating · Vent airflow · Thermal fuses · Coastal lint', brands: 'Samsung · LG · Whirlpool · Maytag · GE' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Hard-water scale · Drain codes · Not cleaning', brands: 'Whirlpool · Bosch · KitchenAid · Samsung · GE' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven', issues: 'Not heating · Elements · Igniters · Calibration', brands: 'GE · Whirlpool · Samsung · LG · Wolf · Viking' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker', issues: 'Frozen assemblies · Scale in fill valves · Slow production', brands: 'Samsung · LG · GE · Whirlpool · U-Line' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Garage units · Frost buildup · Not freezing', brands: 'Frigidaire · GE · Whirlpool · Kenmore' },
+  { icon: '🔆', name: 'BBQ & Grill Repair', slug: 'bbq', issues: 'Coastal igniter wear · Burners · Patio kitchens', brands: 'Weber · Lynx · Fire Magic · Bull · DCS' }
+];
+
+const housingNarrative = {
+  eyebrow: 'THREE CARLSBADS, ONE TRUCK',
+  headline: 'The Village, the Master Plans, and the Rental Strip',
+  paragraphs: [
+    "Knowing which Carlsbad is calling tells us most of the diagnosis before we arrive — and which parts belong on the truck."
+  ],
+  subSections: [
+    {
+      title: 'The Village & the older coastal streets',
+      paragraphs: [
+        'Cottages, remodels, and mid-century homes within walking distance of the beach. The machines here are veterans — Whirlpool and GE platforms with simple architectures and cheap, available parts. This is where repair-versus-replace math lands hardest on the repair side: a drain pump or bake element buys years. Salt exposure is real this close to the water, so refrigeration coils and patio grills get the coastal inspection habit.'
+      ]
+    },
+    {
+      title: 'La Costa, Bressi Ranch & Aviara',
+      paragraphs: [
+        'The master-planned east side, built in waves from the 1980s through the 2010s. Newer LG and Samsung dominate — sensor-driven machines that announce problems in error codes, which point at systems rather than parts and reward verification over parts-cannon guessing. The upper tracts add true built-in kitchens: counter-depth and column refrigeration, panel-front dishwashers, pro-style ranges. Aviara and the newer Bressi builds are where our luxury-brand parts see Carlsbad daylight.'
+      ]
+    },
+    {
+      title: 'The resort corridor & vacation rentals',
+      paragraphs: [
+        'From the flower-fields overlook down through the coastal rental pockets, appliances work a feast-or-famine schedule. We support hosts and managers with pre-season checkouts, priority scheduling when guests are in the house, remote-approval estimates, and per-property records — the machinery of keeping reviews about the beach rather than the refrigerator.'
+      ]
+    }
+  ]
+};
+
+const rentalNarrative = {
+  eyebrow: 'LANDLORDS, HOSTS & PROPERTY MANAGERS',
+  headline: 'Volume Service, Run Like Volume Service',
+  paragraphs: [
+    "A city this size runs on rental stock as much as owner-occupied homes, and we service it accordingly. Multi-unit owners get batched visits — the urgent machine plus the list — with one invoice to the office. Vacation-rental managers get turnover-window scheduling and a straight answer on whether a machine has one more season of guest duty left in it. Long-term landlords get the boring, valuable thing: a technician who shows up inside the window, fixes the machine the tenant actually complained about, and leaves paperwork the bookkeeper can file.",
+    "For the mass-market platforms that fill Carlsbad's rental stock, our trucks carry the high-turnover parts — drain pumps, lid locks, thermal fuses, heating elements, igniters — because a second visit to finish a simple repair is a failure of stocking, not of diagnosis. Same-day intent only means something if the part is already on board.",
+    "Details for hosts live on our <a href=\"/for-business/airbnb-short-term-rentals/\">short-term rental service</a> page; portfolio owners can start at <a href=\"/for-business/property-management/\">property management service</a>."
+  ]
+};
+
+const propertyBullets = [
+  'Batched multi-unit visits with one invoice to the office',
+  'Turnover-window scheduling for vacation stock',
+  'High-turnover parts stocked on the truck',
+  'Paperwork the bookkeeper can file without a phone call'
+];
+
+const luxuryNarrative = {
+  headline: 'Aviara and La Costa Carry the Luxury End',
+  paragraphs: [
+    "Carlsbad's luxury tier concentrates in Aviara and La Costa: Sub-Zero built-ins, Wolf and Thermador cooking, Miele dishwashers — resort-neighborhood kitchens a short drive from the tract housing that makes up most of the city. We service both ends from the same San Diego County routes: OEM parts for the luxury bench, high-turnover parts for the LG, Samsung, Whirlpool, and GE stock everywhere else.",
+    "That range is the point. One company treats a La Costa Sub-Zero and a Village rental's Whirlpool with the same written-estimate discipline — the luxury work gets extraction planning and calibration patience, the workhorse platforms get fixed fast because the parts are already on board."
+  ],
+  brands: ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Bosch', 'GE Monogram']
+};
+
+const commercialNarrative = {
+  eyebrow: 'THE VILLAGE, THE TAPROOMS, THE PARKS',
+  headline: 'Light-Commercial Repair for a City That Actually Has Commerce',
+  paragraphs: [
+    "Carlsbad Village's restaurant rows along State Street and Carlsbad Village Drive, the taprooms scattered through the industrial parks, the breakfast spots feeding beach traffic — that's the front line of Carlsbad's light-commercial equipment. Behind it: reach-in refrigeration, prep tables, commercial dishwashers, fryers, and the breakroom kitchens of the city's office and biotech parks.",
+    "Commercial calls run on commercial urgency — a dead reach-in on a Saturday is lost revenue, not inconvenience — with written estimates a manager can approve by phone. Walk-ins and commercial ice machines belong to the county commercial team; everything lighter belongs on this page."
+  ]
+};
+
+const commercialBrandGroups = [
+  {
+    label: 'Reach-in & undercounter refrigeration',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' }
+    ]
+  }
+];
+
+const commercialEquipment = [
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+const outdoorNarrative = {
+  headline: 'Backyard Grills by Neighborhood, Garage Fridges Everywhere',
+  paragraphs: [
+    "Carlsbad's outdoor cooking splits by neighborhood: freestanding grills behind the tract homes, built-in islands in Aviara and La Costa backyards, and beach-adjacent patios west of the 101 where salt air does its quiet work on igniters and burner ports. Garage refrigerators and chest freezers — standard equipment in a garage-rich city — round out the outdoor-and-adjacent category.",
+    "We service the full line: igniter and burner replacements with OEM parts, outdoor refrigeration condenser care on a coastal schedule, patio heaters checked before the marine-layer evenings set in. If the grill dies the week of a graduation party, that's a same-day call and we treat it like one."
+  ]
+};
+
+const outdoorLinks = [
+  { name: 'Grill repair', href: '/outdoor/grill-repair/' },
+  { name: 'Outdoor kitchens', href: '/outdoor/kitchen-repair/' },
+  { name: 'Patio heaters', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Outdoor refrigerators', href: '/services/outdoor-refrigerator-repair/' }
+];
+
+const outdoorBrands = [
+  { name: 'Bull', href: '/outdoor/brands/bull/' },
+  { name: 'Blaze', href: '/outdoor/brands/blaze/' },
+  { name: 'Coyote', href: '/outdoor/brands/coyote/' },
+  { name: 'Napoleon', href: '/outdoor/brands/napoleon/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' }
+];
+
+const neighborhoods = [
+  { name: 'Carlsbad Village', zip: '92008', featured: true },
+  { name: 'La Costa', zip: '92009', featured: true },
+  { name: 'Bressi Ranch', zip: '92009', featured: true },
+  { name: 'Aviara', zip: '92011' },
+  { name: 'Calavera Hills', zip: '92010' },
+  { name: 'Olde Carlsbad', zip: '92008' },
+  { name: 'Terramar', zip: '92011' },
+  { name: 'Rancho Carrillo', zip: '92009' }
+];
+
+const recentJobs = [
+  {
+    appliance: 'Samsung Refrigerator',
+    quote: 'Ice maker frozen into one solid block again',
+    location: 'La Costa, 92009',
+    description: "Samsung French-door with the ice maker assembly iced over after a defrost failure — a documented pattern on these models, and one we carry the parts for. Our San Diego technicians defrosted the assembly, replaced the defrost sensor, and confirmed a clean harvest cycle before leaving. The owner had been chipping it out monthly; that stops now.",
+    outcome: '✓ Same day · Defrost sensor replaced · Harvest verified'
+  },
+  {
+    appliance: 'Whirlpool Dryer',
+    quote: 'Dryer spins but everything comes out damp and cold',
+    location: 'Carlsbad Village, 92008',
+    description: "Whirlpool-platform dryer with a blown thermal fuse — the platform's signature no-heat part — and the reason behind it: a vent run packed with coastal-damp lint. Replaced the fuse, cleared the vent to full airflow, and explained the sequence honestly: the fuse is the symptom, the vent is the cause, and replacing one without the other means a repeat call.",
+    outcome: '✓ Same day · Fuse + vent airflow · Root cause handled'
+  },
+  {
+    appliance: 'Frigidaire Dishwasher',
+    quote: 'Rental dishwasher flashing i20 between guest stays',
+    location: 'Coastal rental, 92011',
+    description: "Frigidaire showing i20 — restricted drainage — in a vacation unit during a turnover window. Filter and glass-trap loaded with a season's debris, drain path cleared end to end, full cycle verified before the next check-in. Left the manager a one-page filter routine that turns this from an annual emergency into a five-minute habit.",
+    outcome: '✓ Turnover window met · Drain path cleared · Manager briefed'
+  },
+  {
+    appliance: 'KitchenAid Built-In',
+    quote: 'Counter-depth fridge runs warm on top, sides feel hot',
+    location: 'Aviara, 92011',
+    description: "Built-in KitchenAid flush in Aviara cabinetry — hot side panels are the tell that the unit can't shed heat into its niche. Condenser was heavily loaded in an enclosure airflow could never clear on its own. Deep condenser service, clearances verified, and honest expectations set: in a flush install, coil cleaning is an annual appointment, not a someday item.",
+    outcome: '✓ Condenser serviced · Airflow verified · Annual schedule set'
+  }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: 'Stocked for the Brands Carlsbad Owns',
+    body: 'LG, Samsung, Whirlpool, GE — the high-turnover parts ride on the truck, because same-day only counts when the repair finishes same-day. Built-in brands covered where the upper tracts carry them.'
+  },
+  {
+    iconKey: 'clock' as const,
+    title: 'Rental-Rhythm Scheduling',
+    body: 'Turnover windows, occupied-guest priority, pre-season checkouts, batched multi-unit visits. Carlsbad runs on rental stock; our calendar knows it.'
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Honest Repair-vs-Replace Math',
+    body: "A veteran Village Whirlpool almost always deserves its repair; a builder-grade unit with a dead sealed system usually doesn't. We run the numbers with you before you spend past the $89 diagnostic — which is waived if you proceed."
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Parts',
+    body: 'Every repair backed 90 days on parts and labor, OEM wherever available. On rentals, paperwork follows the machine, not the tenant.'
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator', range: '$200–$450', note: 'Ice makers · Fans · Defrost systems · French-door units', featured: true },
+  { appliance: 'Washer / Dryer', range: '$150–$350', note: 'Pumps · Fuses · Elements · Vent airflow checked' },
+  { appliance: 'Dishwasher', range: '$150–$320', note: 'Drain paths · Scale · Filters · Spray arms' },
+  { appliance: 'Oven / Range', range: '$175–$420', note: 'Elements · Igniters · Calibration' },
+  { appliance: 'Built-In Refrigeration (Aviara / La Costa)', range: '$300–$700+', note: 'OEM parts · Flush-install airflow service' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' }
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Carlsbad?',
+    answer: 'Yes — Carlsbad is core Wave-1 territory for our San Diego branch: the Village and Olde Carlsbad, La Costa, Bressi Ranch, Aviara, Calavera Hills, Terramar, and Rancho Carrillo across 92008–92011. Call before noon and same-day is realistic for most of the city.'
+  },
+  {
+    question: 'Do you repair LG, Samsung, Whirlpool, and GE?',
+    answer: "That's most of what Carlsbad runs on, and most of what our truck stock exists for. Newer LG and Samsung with their error-code electronics get code-first verification; older Whirlpool and GE platforms get the simple, durable repairs they were designed for."
+  },
+  {
+    question: 'Do you service vacation rentals in Carlsbad?',
+    answer: 'Constantly — the coastal strip runs on them. Pre-season checkouts, turnover-window repairs, priority calls when guests are in the house, remote-approval estimates, and per-property records. Idle-then-slammed is a real failure rhythm in rental appliances, and catching it before check-in is the whole job.'
+  },
+  {
+    question: 'Why do my dishes have film and my ice taste off?',
+    answer: "Hard water — Carlsbad shares the corridor's imported blend, and it scales dishwasher spray arms, heaters, and ice-maker fill valves on a year-3-to-5 schedule. Cloudy glassware and slow ice are the usual first symptoms. A descaling service visit costs a fraction of the pump or valve it saves."
+  },
+  {
+    question: 'Do you handle the built-in kitchens in Aviara and La Costa?',
+    answer: 'Yes — counter-depth and column refrigeration, panel-front dishwashers, and pro-style ranges in the upper tracts, serviced with OEM parts. Flush installs have their own failure mode: units that cannot shed heat into tight niches. Condenser airflow is the first thing we check on any built-in call.'
+  },
+  {
+    question: 'What does a repair visit cost in Carlsbad?',
+    answer: '$89 residential diagnostic, waived the moment you approve the repair, with a written estimate before any work. The invoice matches the estimate.'
+  },
+  {
+    question: 'What warranty do you provide in Carlsbad?',
+    answer: '90 days on parts and labor with OEM parts wherever available — rentals and owner-occupied homes alike.'
+  }
+];
+
+const nearbyCities = [
+  { name: 'Encinitas', slug: 'encinitas' },
+  { name: 'Solana Beach', slug: 'solana-beach' },
+  { name: 'Del Mar', slug: 'del-mar' },
+  { name: 'La Jolla', slug: 'la-jolla' },
+  { name: 'Rancho Santa Fe', slug: 'rancho-santa-fe' }
+];
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Carlsbad, CA"
+    subheadline="The Village, La Costa, Bressi Ranch, Aviara — family kitchens, rental stock, and the built-ins of the upper tracts. Stocked for the brands Carlsbad actually owns. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={2}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Carlsbad — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Carlsbad Service Team"
+    bookingSub="92008–92011 · Village · La Costa · Aviara"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Carlsbad"
+    subhead="Workhorse brands · Rental stock · Upper-tract built-ins"
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={housingNarrative.eyebrow}
+    headline={housingNarrative.headline}
+    paragraphs={housingNarrative.paragraphs}
+    subSections={housingNarrative.subSections}
+    background="white"
+  />
+
+  <LuxurySpecialists
+    citySlug={citySlug}
+    cityName={cityName}
+    headline={luxuryNarrative.headline}
+    paragraphs={luxuryNarrative.paragraphs}
+    brands={luxuryNarrative.brands}
+  />
+
+  <PropertyManagers
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Volume Service, Run Like Volume Service"
+    paragraphs={rentalNarrative.paragraphs}
+    bullets={propertyBullets}
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Carlsbad Areas We Service"
+    subheadline="Village to Rancho Carrillo — 92008, 92009, 92010, 92011."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow={commercialNarrative.eyebrow}
+    headline={commercialNarrative.headline}
+    paragraphs={commercialNarrative.paragraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Walk-in coolers & commercial ice machines — county commercial service', href: '/commercial/refrigeration/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline={outdoorNarrative.headline}
+    paragraphs={outdoorNarrative.paragraphs}
+    serviceChips={outdoorLinks}
+    brandPills={outdoorBrands}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Carlsbad"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Carlsbad Homeowners & Landlords Call Us"
+    reasons={whyReasons}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Carlsbad"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Carlsbad Clients Ask"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Carlsbad?"
+    body="Village · La Costa · Bressi Ranch · Aviara · Rentals welcome. $89 diagnostic waived with repair. 90-day warranty."
+  />
+
+  <section class="section">
+    <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">San Diego County coverage</p>
+      <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">One branch for the North Coastal corridor.</h2>
+      <p>Carlsbad is the northern anchor of our <a href="/san-diego-county/">San Diego County service area</a> — the same branch covers <a href="/la-jolla/">La Jolla</a>, <a href="/rancho-santa-fe/">Rancho Santa Fe</a>, Del Mar, Encinitas, and Solana Beach. (858) 667-7237 is the number for all of it.</p>
+    </div>
+  </section>
+</CityLayoutV2>

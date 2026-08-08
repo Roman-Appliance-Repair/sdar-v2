@@ -1,0 +1,436 @@
+---
+/**
+ * Del Mar, CA — city pillar (San Diego Wave-1, Stage C).
+ * Branch: San Diego — service_area (no public street address).
+ *
+ * Angle: seasonal town. ~4k residents but county-top household value; the
+ * racetrack/fairgrounds season swings the population — second homes sit empty
+ * for months, then fill for race weeks. Fresh salt-air framing (NOT La Jolla's
+ * corrosion prose): here the problem is VACANCY — salt settles hardest on
+ * machines that are switched off, and failures happen invisibly in empty
+ * houses. Beach colony west of the 101 vs hillside builds east.
+ *
+ * Positioning: $89 once; no factory-authorization implication; no tech names.
+ * Zero-invention: Samsung OF OF demo-mode (W5-established), Bosch E15
+ * base-pan leak (established), Viking surface igniters, LG dryer thermal
+ * fuse + vent (W1-established). No ReviewsBlock.
+ */
+
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import LuxurySpecialists from '../components/cities/v2/LuxurySpecialists.astro';
+import PropertyManagers from '../components/cities/v2/PropertyManagers.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
+import CustomNarrative from '../components/cities/v2/CustomNarrative.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { mergeCredentials } from '../data/credentials-schema';
+
+const citySlug = 'del-mar';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = 'Del Mar';
+const zips = ['92014'];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Del Mar CA — Same Day Service`;
+const description = "Appliance repair in Del Mar 92014 — beach colony, hillside homes, second houses on the race-season clock. Pre-season checkouts. (858) 667-7237.";
+const canonical = 'https://samedayappliance.repair/del-mar/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.fullName,
+  image: 'https://samedayappliance.repair/images/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: 'Del Mar', sameAs: 'https://en.wikipedia.org/wiki/Del_Mar,_California' },
+    { '@type': 'Place', name: 'Beach Colony' },
+    { '@type': 'Place', name: 'Del Mar Village' },
+    { '@type': 'Place', name: 'Del Mar Heights' }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$$',
+  license: 'BHGS #A49573'
+});
+
+const introParagraphs = [
+  "<strong>Del Mar runs on a calendar no other city on our routes has: quiet streets most of the year, then the racetrack and fairgrounds season fills every second home at once — and every appliance that spent months switched off gets asked to perform for a full house on day one. Our San Diego technicians work both halves of that cycle: pre-season checkouts before the houses fill, and fast response when a machine that 'was fine last summer' turns out not to be. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>",
+  "Here's the counterintuitive physics of a Del Mar kitchen: the ocean is hardest on the appliances that aren't running. A refrigerator in daily use moves air across its condenser and sheds the salt film as it goes; a second-home unit powered down in October sits in marine air for eight months while the film builds undisturbed, gaskets dry into their folds, and drain traps evaporate open. Then July arrives, the house fills, and the machine is asked to sprint from a standing start. Most of the 'sudden' failures we see in 92014 were eight months in the making — in an empty house where nobody could hear them coming.",
+  "The town splits at the 101. West of it, the beach colony: cottages and contemporary rebuilds on the sand where everything mechanical lives closest to the water — and where many houses stand empty between race weeks and holidays. East of it, the hillside — Del Mar Heights and the canyon-edge streets — with year-round households, bigger kitchens, and the same imported hard water that scales dishwashers and ice makers all along the corridor. Two different service rhythms, five minutes apart.",
+  "For owners who are elsewhere most of the year, we work the way second homes require: keyholder and house-sitter coordination, written estimates approved by phone or email from another time zone, photos of what we found, and a pre-arrival checkout that runs every machine before the family lands — because discovering the ice maker is dead on the first morning of race week is a Del Mar tradition nobody actually wants.",
+  `Diagnostic fee: <strong>$89</strong> — waived with repair. Written estimate before we start. <strong>90-day warranty</strong> on parts and labor. Call <a href="tel:${phoneRaw}">${branch.phone}</a> for service across 92014 — and the rest of the <a href="/san-diego-county/">North Coastal corridor</a>.`
+];
+
+const services = [
+  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Post-vacancy restarts · Coil film on idle units · Built-ins', brands: 'Sub-Zero · GE Monogram · KitchenAid · Samsung · LG' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'First-run leaks after idle months · Scale · Panel-front units', brands: 'Bosch · Miele · KitchenAid · Thermador' },
+  { icon: '🔥', name: 'Range & Oven Repair', slug: 'oven', issues: 'Season-opening igniter faults · Calibration · Dual-fuel', brands: 'Viking · Wolf · Thermador · GE · Dacor' },
+  { icon: '🫧', name: 'Washer & Dryer Repair', slug: 'washer', issues: 'Race-week laundry surges · Vents · Compact pairs', brands: 'LG · Samsung · Miele · Whirlpool · GE' },
+  { icon: '🍷', name: 'Wine & Beverage Cooling', slug: 'wine-cooler', issues: 'Season-long drift in empty houses · Undercounter units', brands: 'Sub-Zero · EuroCave · U-Line · Liebherr' },
+  { icon: '🔆', name: 'BBQ & Grill Repair', slug: 'bbq', issues: 'Idle-season corrosion · Igniters · Deck kitchens', brands: 'Lynx · Weber · DCS · Fire Magic' },
+  { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Garage units in empty homes · Frost · Undercounter', brands: 'Sub-Zero · U-Line · Frigidaire · GE' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker', issues: 'Dead on arrival day · Scale in fill valves · Slow harvests', brands: 'GE · Samsung · Whirlpool · U-Line' }
+];
+
+const seasonNarrative = {
+  eyebrow: 'THE RACE-SEASON CLOCK',
+  headline: 'A Town That Fills Up All at Once',
+  paragraphs: [
+    "When the fairgrounds season opens, Del Mar's population doesn't grow — it multiplies, and it multiplies overnight. Houses that hosted nobody since Labor Day host twelve people by Friday. Every appliance in town hits its annual peak load in the same two-week window, which is also exactly when a repair company with no local presence is hardest to book.",
+    "We plan for the calendar instead of fighting it. Late spring is checkout season: a single visit that runs every machine in the house — first ice harvest verified, dishwasher cycled and watched for first-run leaks, laundry pair run loaded, grill lit, wine storage logged overnight. What that visit catches gets fixed in the quiet weeks at quiet-week availability. What a checkout skips gets discovered by your guests instead, at peak-season availability, which is a worse deal in every way.",
+    "During the season itself, occupied houses jump the queue. A dead refrigerator with a full house and race tickets is a same-day problem, and our San Diego technicians treat it like one — the corridor is compact enough that Del Mar is minutes from wherever the truck already is."
+  ]
+};
+
+const vacancyNarrative = {
+  eyebrow: 'WHAT EMPTY HOUSES DO TO MACHINES',
+  headline: 'Salt Works Hardest on Appliances That Are Switched Off',
+  paragraphs: [
+    "Every coastal page we publish talks about salt air, so here is the Del Mar-specific version: running machines defend themselves, idle machines don't. Airflow, heat cycles, and vibration keep a working refrigerator shedding moisture and film; a unit powered down for the off-season just sits there while marine air settles into it. Door gaskets dry in the folded position and split on first opening. Trap water evaporates and lets odors migrate. Fill valves crust closed. The first week of occupancy then exposes eight months of quiet accumulation all at once.",
+    "The fix is cheap and unglamorous: don't let the house go fully dark. Refrigeration left running at sane setpoints defends itself all winter. Machines that must be shut down get a proper shutdown — doors propped, water lines closed, traps topped — and a proper wake-up before the family arrives. We do both as standard second-home visits, and we leave the keyholder a one-page seasonal routine so the off-season stops being an ambush."
+  ]
+};
+
+const luxuryNarrative = {
+  headline: 'Luxury Equipment on a Seasonal Duty Cycle',
+  paragraphs: [
+    "Del Mar's housing skews small-lot and high-value, and the kitchens follow: Sub-Zero columns in beach-colony remodels, Wolf and Thermador cooking, Miele dishwashers, wine storage tucked wherever the floor plan allowed. Much of it lives in second homes — luxury equipment that sits idle for months, then has to perform for a full house on the first weekend of the season.",
+    "So our luxury service here is calendarized like everything else in Del Mar: pre-season checks on the built-ins and wine storage, OEM-parts repairs in the quiet months, honest sealed-system verdicts on units that spent too many winters switched off. A Sub-Zero that sat dark since September needs a different inspection than one that ran all year — we know the difference."
+  ],
+  brands: ['Sub-Zero', 'Wolf', 'Thermador', 'Miele', 'Viking', 'U-Line'],
+  footnote: {
+    lead: 'Wine storage in a second home fails its own way — see',
+    linkText: 'wine cellar cooling repair',
+    href: '/services/wine-cellar-cooling-repair/'
+  }
+};
+
+const propertyParagraphs = [
+  "Most Del Mar rental calls come through managers and hosts, and the race-season calendar makes the relationship unusually rhythmic: checkout visits in late spring, priority service during the packed weeks, shutdown-and-wake-up work around the shoulder seasons. We keep a record per property, so the keyholder never re-explains the house.",
+    "Between seasons the portfolio logic matches the rest of our San Diego County routes: batched visits, estimates approved remotely, invoices to the office. Hosts can start with our <a href=\"/for-business/airbnb-short-term-rentals/\">short-term rental service</a> page."
+];
+
+const propertyBullets = [
+  'Checkout visits before the season, wake-ups after',
+  'Occupied houses jump the queue in race weeks',
+  'Remote-approval estimates and office invoicing',
+  'A keyholder-friendly record per property'
+];
+
+const commercialNarrative = {
+  eyebrow: 'CAMINO DEL MAR & THE PLAZA',
+  headline: 'A Compact Restaurant Scene That Swells Every Summer',
+  paragraphs: [
+    "Del Mar's commercial kitchens cluster along Camino Del Mar and in the plaza above the beach — a compact restaurant scene that swells toward fairground scale every summer. Underneath is the standard light-commercial bench: reach-in refrigeration, commercial dishwashers, gas cooking lines that run hardest exactly when the town is fullest.",
+    "We schedule around service hours, put commercial urgency on dead refrigeration, and write estimates a manager can approve between seatings. Walk-in boxes and commercial ice machines route to the county commercial side of the same branch."
+  ]
+};
+
+const commercialBrandGroups = [
+  {
+    label: 'Reach-in & undercounter refrigeration',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Beverage-Air', href: '/commercial/refrigeration/brands/beverage-air/' }
+    ]
+  }
+];
+
+const commercialEquipment = [
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' }
+];
+
+const outdoorNarrative = {
+  headline: 'Grills That Wait All Winter for One Busy Season',
+  paragraphs: [
+    "Del Mar patios earn their outdoor kitchens — and then leave them idle eight months a year, which is the hardest duty cycle salt air can ask of a grill. Igniters that corroded quietly all winter announce themselves at the first cookout; outdoor refrigerators that sat dark develop the same gasket and valve problems as their indoor cousins, faster.",
+    "The fix mirrors our second-home logic: light the grill at the checkout visit, run the outdoor refrigeration before the family lands, replace igniter modules and burners with OEM parts in the quiet weeks. Patio heaters get checked before fall — the ocean evening cools fast, and the heater that won't light gets discovered at dinner."
+  ]
+};
+
+const outdoorLinks = [
+  { name: 'Grill repair', href: '/outdoor/grill-repair/' },
+  { name: 'Outdoor kitchens', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerators', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heaters', href: '/outdoor/patio-heater-repair/' }
+];
+
+const outdoorBrands = [
+  { name: 'Lynx', href: '/outdoor/brands/lynx/' },
+  { name: 'DCS', href: '/outdoor/brands/dcs/' },
+  { name: 'Fire Magic', href: '/outdoor/brands/fire-magic/' },
+  { name: 'Bull', href: '/outdoor/brands/bull/' },
+  { name: 'Blaze', href: '/outdoor/brands/blaze/' }
+];
+
+const neighborhoods = [
+  { name: 'Beach Colony', zip: '92014', featured: true },
+  { name: 'Del Mar Village', zip: '92014', featured: true },
+  { name: 'Del Mar Heights', zip: '92014', featured: true },
+  { name: 'Crest Canyon side', zip: '92014' },
+  { name: 'Fairgrounds area', zip: '92014' }
+];
+
+const recentJobs = [
+  {
+    appliance: 'Samsung Refrigerator',
+    quote: 'Display just says OF OF and nothing gets cold',
+    location: 'Beach Colony, 92014',
+    description: "Second home, opening weekend, panic call — the display read OF OF and the owner assumed the worst. OF OF is Samsung's demo mode, not a failure: it lights the shelves and disables cooling, and it gets triggered surprisingly often during off-season cleaning. Our San Diego technicians took it out of demo mode, verified pulldown, and — since the truck was already there — ran the whole kitchen through its season-opening checks. The 'dead refrigerator' cost exactly one diagnostic.",
+    outcome: '✓ Demo mode exited · Pulldown verified · Kitchen checked out'
+  },
+  {
+    appliance: 'Bosch Dishwasher',
+    quote: 'First wash of the season and there’s water under the machine',
+    location: 'Del Mar Village, 92014',
+    description: "Classic first-run-after-idle failure: E15 — Bosch's base-pan leak protection — tripped minutes into the season's first cycle. A supply-side seal had dried out over the empty months and wept just enough to trip the float. Reseated and resealed the connection, dried the base pan, reset the system, and ran two full cycles clean. This is the exact failure a spring checkout catches on our schedule instead of race week's.",
+    outcome: '✓ Same day · Seal resealed · Two clean cycles verified'
+  },
+  {
+    appliance: 'Viking Range',
+    quote: 'Half the burners click but won’t catch since we got back',
+    location: 'Del Mar Heights, 92014',
+    description: "Viking range that sat unused through the wet months — surface igniters corroded in the idle marine air until the spark quit jumping cleanly on two burners. Replaced the igniter electrodes with OEM Viking parts, cleaned every burner port while the grates were off, and verified crisp ignition across the top. Idle time did this, not cooking — the burners that were used occasionally over winter were fine.",
+    outcome: '✓ Same day · OEM Viking electrodes · Full top verified'
+  },
+  {
+    appliance: 'LG Dryer',
+    quote: 'Dryer gave up mid-race-week with a house full of towels',
+    location: 'Beach Colony, 92014',
+    description: "Peak-season surge load: a dryer that handles one household's laundry most of the year met twelve people's beach towels and quit heating. The thermal fuse — LG's classic no-heat culprit — had opened, and the vent run behind it was packed tight. Replaced the fuse, cleared the vent to full airflow, and explained the pairing honestly: the fuse is the fuse, but the vent is why it blew, and only fixing both keeps race week moving.",
+    outcome: '✓ Same day · Fuse + vent airflow · Surge-ready again'
+  }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'clock' as const,
+    title: 'Built Around the Season',
+    body: 'Spring checkouts at quiet-week availability, occupied-house priority during race weeks, and a corridor compact enough that Del Mar is minutes from wherever our truck already is.'
+  },
+  {
+    iconKey: 'team' as const,
+    title: 'Second-Home Fluent',
+    body: 'Keyholders, house sitters, owners approving estimates from another time zone — the Del Mar workflow is remote-first: written estimates, photos of findings, and a seasonal routine your keyholder can actually run.'
+  },
+  {
+    iconKey: 'parts' as const,
+    title: 'Idle-Time Diagnostics',
+    body: "We know what eight dark months do to a machine — dried seals, crusted valves, salt film on cold coils — and we check for the vacancy pattern first, because in this ZIP it usually is the answer."
+  },
+  {
+    iconKey: 'shield' as const,
+    title: '90-Day Warranty, OEM Only',
+    body: 'Every repair backed 90 days on parts and labor with OEM parts throughout — which matters more on machines that spend half their life idle in marine air. $89 diagnostic, waived with repair.'
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Refrigerator / Built-In', range: '$200–$700+', note: 'Post-vacancy restarts · Coils · Gaskets · OEM parts', featured: true },
+  { appliance: 'Dishwasher', range: '$150–$350', note: 'First-run leak protection faults · Seals · Scale' },
+  { appliance: 'Range / Oven', range: '$175–$500', note: 'Viking, Wolf, Thermador · Season-opening igniter work' },
+  { appliance: 'Washer / Dryer', range: '$150–$380', note: 'Surge-load failures · Fuses · Vent airflow' },
+  { appliance: 'Wine & Beverage Cooling', range: '$200–$500', note: 'Season-long drift · Undercounter units' },
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Waived when you proceed with the repair' }
+];
+
+const faqs = [
+  {
+    question: 'Do you offer same-day appliance repair in Del Mar?',
+    answer: 'Yes — 92014 sits in the middle of our North Coastal route, from the beach colony and the Village up through Del Mar Heights and the Crest Canyon side. During the fairgrounds season, occupied houses get priority scheduling; the rest of the year a morning call almost always books a same-day visit.'
+  },
+  {
+    question: 'Can you get our second home ready before we arrive for the season?',
+    answer: "That's our favorite Del Mar job, because it prevents all the others. A pre-arrival checkout runs every machine in the house — first ice harvest, a watched dishwasher cycle, loaded laundry run, grill ignition, overnight wine-storage log — and anything it catches gets fixed in the quiet weeks. We coordinate entirely through your keyholder if you're not here."
+  },
+  {
+    question: 'Why do appliances in our beach house fail right when we arrive?',
+    answer: "Because idle machines can't defend themselves. Running appliances shed salt film and moisture through their own airflow and heat cycles; a unit powered down for the off-season just accumulates — dried gaskets, crusted fill valves, film on cold coils — and the first heavy week exposes it all at once. It isn't coincidence; it's the standard vacancy pattern, and a proper shutdown plus a wake-up visit breaks it."
+  },
+  {
+    question: 'Should we leave the refrigerator running over the off-season?',
+    answer: "Usually yes. A refrigerator running at sane setpoints all winter protects its own gaskets, coils, and drains far better than a dark one — the electricity costs less than the repair it prevents. If a unit genuinely must be shut down, it needs a real shutdown: doors propped open, water lines closed, and a wake-up check before first use. We handle both directions as standard second-home visits."
+  },
+  {
+    question: 'Do you repair Viking, Wolf, and built-in refrigeration in Del Mar?',
+    answer: "Yes, with OEM parts. One honesty note that applies county-wide: Sub-Zero's factory service runs through its authorized partner, and that's not us — we're the independent option, on our schedule rather than a manufacturer queue. For a second home on a season deadline, that scheduling difference is usually the whole point."
+  },
+  {
+    question: 'Do you service the hillside neighborhoods east of the 101?',
+    answer: 'All of them — Del Mar Heights, the Crest Canyon side, and the streets above the Village. The east side runs on a year-round rhythm rather than the seasonal one, with the corridor\'s usual hard-water scale in dishwashers and ice makers as the standing local pattern.'
+  },
+  {
+    question: 'What does a diagnostic visit cost in Del Mar?',
+    answer: '$89 for residential appliances, waived the moment you approve the repair, with a written estimate first. A pre-season checkout visit is quoted flat in advance — tell us the house size and appliance count when you call.'
+  }
+];
+
+const nearbyCities = [
+  { name: 'Solana Beach', slug: 'solana-beach' },
+  { name: 'La Jolla', slug: 'la-jolla' },
+  { name: 'Rancho Santa Fe', slug: 'rancho-santa-fe' },
+  { name: 'Encinitas', slug: 'encinitas' },
+  { name: 'Carlsbad', slug: 'carlsbad' }
+];
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair"
+    headlineCity="Del Mar, CA"
+    subheadline="Second homes on the race-season clock — pre-season checkouts, keyholder coordination, and fast response when the house is full. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={1}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Repair in Del Mar — How We Actually Work Here"
+    paragraphs={introParagraphs}
+    bookingTitle="Del Mar Service Team"
+    bookingSub="92014 · Beach Colony · Village · Heights"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="What We Repair in Del Mar"
+    subhead="Second homes · Season openings · Built-ins · 92014"
+    services={services}
+  />
+
+  <CustomNarrative
+    eyebrow={seasonNarrative.eyebrow}
+    headline={seasonNarrative.headline}
+    paragraphs={seasonNarrative.paragraphs}
+    background="white"
+  />
+
+  <LuxurySpecialists
+    citySlug={citySlug}
+    cityName={cityName}
+    headline={luxuryNarrative.headline}
+    paragraphs={luxuryNarrative.paragraphs}
+    brands={luxuryNarrative.brands}
+    footnote={luxuryNarrative.footnote}
+  />
+
+  <PropertyManagers
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Hosts, Managers & Keyholders — Service on the Race-Season Clock"
+    paragraphs={propertyParagraphs}
+    bullets={propertyBullets}
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Del Mar Areas We Service"
+    subheadline="Beach colony to the Heights — all of 92014."
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={[]}
+  />
+
+  <CustomNarrative
+    eyebrow={vacancyNarrative.eyebrow}
+    headline={vacancyNarrative.headline}
+    paragraphs={vacancyNarrative.paragraphs}
+    background="gray"
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow={commercialNarrative.eyebrow}
+    headline={commercialNarrative.headline}
+    paragraphs={commercialNarrative.paragraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Walk-in coolers & commercial ice machines — county commercial service', href: '/commercial/refrigeration/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline={outdoorNarrative.headline}
+    paragraphs={outdoorNarrative.paragraphs}
+    serviceChips={outdoorLinks}
+    brandPills={outdoorBrands}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
+  />
+
+  <RecentRepairs
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Jobs Our Team Did in Del Mar"
+    jobs={recentJobs}
+  />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Del Mar Households Call Us"
+    reasons={whyReasons}
+  />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Appliance Repair Costs in Del Mar"
+    subhead="Written estimate before we start. $89 diagnostic — waived with repair. OEM parts only."
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Questions Del Mar Clients Ask"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    nearbyCities={nearbyCities}
+    headline="Also Serving Nearby Areas"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Appliance Broken in Del Mar?"
+    body="Beach colony · Village · Heights · Second homes on the season clock. $89 diagnostic waived with repair. 90-day warranty. OEM parts."
+  />
+
+  <section class="section">
+    <div class="container narrow" style="max-width:820px;margin:0 auto;padding:48px 24px;">
+      <p style="font-size:0.75rem; font-weight:700; letter-spacing:0.14em; text-transform:uppercase; color:#C8102E; margin-bottom:10px;">San Diego County coverage</p>
+      <h2 style="font-size:1.6rem; font-weight:800; margin:0 0 18px;">One branch for the North Coastal corridor.</h2>
+      <p>Del Mar sits mid-corridor in our <a href="/san-diego-county/">San Diego County service area</a> — the same branch covers <a href="/la-jolla/">La Jolla</a>, <a href="/solana-beach/">Solana Beach</a>, <a href="/encinitas/">Encinitas</a>, <a href="/rancho-santa-fe/">Rancho Santa Fe</a>, and <a href="/carlsbad/">Carlsbad</a>. (858) 667-7237 covers all of it.</p>
+    </div>
+  </section>
+</CityLayoutV2>
