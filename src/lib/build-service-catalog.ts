@@ -37,7 +37,7 @@ const AREAS_SERVED = [
   { '@type': 'AdministrativeArea', name: 'Orange County' },
   { '@type': 'AdministrativeArea', name: 'Ventura County' },
   { '@type': 'AdministrativeArea', name: 'Santa Barbara County' }, { '@type': 'AdministrativeArea', name: 'San Bernardino County' },
-  { '@type': 'AdministrativeArea', name: 'Riverside County' }
+  { '@type': 'AdministrativeArea', name: 'Riverside County' }, { '@type': 'AdministrativeArea', name: 'San Diego County' }
 ];
 
 function buildOffer(service: CatalogService): Record<string, unknown> {
