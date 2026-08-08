@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-08-07 (San Diego expansion LIVE — 10 филиалов / 7 каунти / 99 городов / 1197 страниц; SB+SD cluster rollout смержены)
+**Последняя синхронизация:** 2026-08-08 (hero branch cards + abbreviation purge — merge 187ddb5f)
 
 ---
 
@@ -60,6 +60,8 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-08-08:** **Hero branch cards + сайтвайд abbreviation purge** (merge `187ddb5f`, ветка `feat/hero-branch-cards`, бэкап `backup/pre-abbrev-sweep-2026-08-08`). PART 1: 866 файлов, ~2 620 замен — SoCal→Southern California, WeHo→West Hollywood, SGV/IE/BH/SB развёрнуты по контексту; ловушки соблюдены (IE=код ошибки LG, Delfield SB=salad bar, Sub-Zero SD=серия, SoCalGas/SGVMWD=имена организаций, 5 клиентских цитат неприкосновенны); протухший «across LA, OC, Ventura, SB, Riverside» (~40 desc) → «across 7 Southern California counties»; «LA, Orange, Ventura»→полные имена (372×); тикер = 10 BRANCHES · 7 COUNTIES · SOUTHERN CALIFORNIA. Rendered-dist греп: 0 городских аббревиатур. PART 2: HeroBranchBand (2×5 карточек внизу hero, главная + 99 city pillars, свой филиал первым, полупрозрачные карточки, контраст посчитан: phone #FF5A4E 4.70:1 / city #D4AF37 6.88:1 / hover white-on-#C8102E 5.88:1 — все AA; мобайл primary+тоггл, SSR всех карточек). Build 1197/0. Прод верифицирован (4 стр., 1440+412), purge OK. **Хвосты:** 121 meta desc >160 после полных имён (audit-output/abbrev-overflow-final.txt) + LA/OC-покет (титулы Wave 39, 10 733 «LA») — ждут решения Романа. Детали: session-log/2026-08-08-hero-branch-cards-abbrev-purge.md
 
 - **2026-08-07:** **San Diego expansion — 10-й филиал + 7-й каунти LIVE на main** (merge `c3c5f614`). Обе ветки смержены: `feat/sb-clusters` `4ca1f09a` (5 бизнес-кластеров компонентами на 7 SB-страницах) + `feat/san-diego` (`b188a0d2` Stages A–C: county hub + 6 пилларов la-jolla/RSF/carlsbad/del-mar/encinitas/solana-beach; `69b74fd0` 5 кластеров; `2e38e456` counter sweep). **Counter sweep 7-го каунти** (реюз Stage D скриптов): 786 замен/365 файлов (9→10 branches, six→seven counties, 93→99 cities, name-lists += San Diego), 872 замены/711 файлов протухшего «5/five SoCal counties» (долг ещё до-SB эпохи), areaServed «San Diego County» после Riverside в 817 файлах/1504 массивах; /areas/ COUNTY_ORDER += san-diego + догнан пропущенный Santa Barbara в его areaServed. **Ловушка:** riverside-county.astro держит areaServed одиночным объектом (не массивом) — вставка сломала синтаксис, откачена. Также main `189b2803`: LuxurySpecialists county-stat из counties.ts (было хардкод «5»). **Билд 1197 страниц, 0 ошибок; dist-греп протухших счётчиков: 0.** Прод верифицирован: 7/7 SD URL 200 + верные titles (san-diego-county — после Purge Everything), /areas/ 10 Branches / 7 counties, book ZIP 92037/92067 → san-diego, homepage JSON-LD (858) 667-7237. IndexNow 18 URL → 200. TF-IDF после cluster rollout: in band 5→8 из 14 (santa-barbara 0.552 = +0.002 над band, решение Roman; 6 суб-пилларов ниже band — writer-pass отдельно). Детали: `wiki/briefings/cluster-rollout-2026-08-07.md` + session-log 2026-08-07. **Хвосты:** GBP San Diego (858-DID в branches.ts), фото-слоты Lux/PM для 13 новых страниц, city×service combos для SD-городов (matrix не расширяли).
 
