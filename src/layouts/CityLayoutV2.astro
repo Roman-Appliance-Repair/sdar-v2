@@ -16,9 +16,17 @@ export interface Props {
 }
 
 const { title, description, canonical, localBusinessSchema, showDiagnosticBanner = true } = Astro.props;
+
+// Branch-correct phone for the sticky call bar's STATIC render (NAP for no-JS
+// crawlers). Sourced from the page's own LocalBusiness schema telephone.
+const rawTel = String(localBusinessSchema?.telephone ?? '');
+const telDigits = rawTel.replace(/\D/g, '').replace(/^1/, '');
+const stickyPhone = telDigits.length === 10
+  ? `(${telDigits.slice(0, 3)}) ${telDigits.slice(3, 6)}-${telDigits.slice(6)}`
+  : undefined;
 ---
 
-<Layout title={title} description={description} canonical={canonical} showDiagnosticBanner={showDiagnosticBanner}>
+<Layout title={title} description={description} canonical={canonical} showDiagnosticBanner={showDiagnosticBanner} stickyPhone={stickyPhone}>
   <Fragment slot="head-scripts">
     {localBusinessSchema && (
       <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
