@@ -15,6 +15,7 @@
 | Pasadena | 🔄 На одобрении | Pasadena + East LA | (626) 376-4458 |
 | Irvine | 🔄 На одобрении | Orange County | (213) 401-9019 |
 | Santa Barbara | ⏳ GBP pending | Santa Barbara County South Coast (SB, Montecito, Goleta, Carpinteria, Summerland, Hope Ranch) | (805) 500-0855 |
+| San Diego | ⏳ GBP pending | San Diego County Wave 1 — North County Coastal + La Jolla (La Jolla, Rancho Santa Fe, Carlsbad, Del Mar, Encinitas, Solana Beach) | (858) 667-7237 |
 
 ---
 
