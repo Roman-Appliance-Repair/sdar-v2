@@ -120,13 +120,32 @@ const ogImage = new URL(image, siteUrl).toString();
     <!-- Page-specific head content (JSON-LD schema, etc.) -->
     <slot name="head-scripts" />
 
-    <!-- Microsoft Clarity — async, loads immediately for full session capture -->
+    <!-- Microsoft Clarity — deferred with the SAME trigger mechanism as GTM below
+         (idle after DOMContentLoaded / first interaction / hard 3s cap). Delay,
+         not removal: still fires on every page. Pre-load clarity() calls queue
+         in window.clarity.q exactly as with the stock async snippet. -->
     <script type="text/javascript">
-      (function(c,l,a,r,i,t,y){
-          c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-          t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-          y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-      })(window, document, "clarity", "script", "wn15edpjlc");
+      (function() {
+        var c = window;
+        c.clarity = c.clarity || function() { (c.clarity.q = c.clarity.q || []).push(arguments); };
+        var loaded = false;
+        function loadClarity() {
+          if (loaded) return;
+          loaded = true;
+          var t = document.createElement('script');
+          t.async = 1;
+          t.src = 'https://www.clarity.ms/tag/wn15edpjlc';
+          document.head.appendChild(t);
+        }
+        function schedule() {
+          ('requestIdleCallback' in window) ? requestIdleCallback(loadClarity, {timeout: 1500}) : setTimeout(loadClarity, 300);
+        }
+        (document.readyState === 'loading') ? window.addEventListener('DOMContentLoaded', schedule) : schedule();
+        ['scroll', 'touchstart', 'click', 'keydown'].forEach(function(e) {
+          window.addEventListener(e, loadClarity, {once: true, passive: true});
+        });
+        setTimeout(loadClarity, 3000);
+      })();
     </script>
     <!-- End Microsoft Clarity -->
 
