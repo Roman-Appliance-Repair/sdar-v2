@@ -3,7 +3,7 @@
 // /orange-county/
 import Layout from '../layouts/Layout.astro';
 import CountyMap from '../components/CountyMap.astro';
-import { BRANCHES, type Branch } from '../data/branches';
+import { BRANCHES, type Branch, toE164 } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { mergeCredentials } from '../data/credentials-schema';
 
@@ -18,8 +18,8 @@ const localBusinessSchema = mergeCredentials({
   '@context': 'https://schema.org',
   '@type': 'HomeAndConstructionBusiness',
   '@id': 'https://samedayappliance.repair/orange-county/#business',
-  name: 'Same Day Appliance Repair — Orange County',
-  telephone: '(213) 401-9019',
+  name: 'Same Day Appliance Repair Irvine',
+  telephone: '+12134019019',
   url: 'https://samedayappliance.repair/orange-county/',
   areaServed: { '@type': 'AdministrativeArea', name: 'Orange County' },
   openingHoursSpecification: OPENING_HOURS_SCHEMA,
@@ -28,7 +28,7 @@ const localBusinessSchema = mergeCredentials({
     const entry: Record<string, unknown> = {
       '@type': 'LocalBusiness',
       name: b.gbpName,
-      telephone: b.phone,
+      telephone: toE164(b.phone),
       openingHoursSpecification: OPENING_HOURS_SCHEMA,
       areaServed: b.citiesServed.slice(0, 8).map((slug) => ({ '@type': 'City', name: slugToTitle(slug) })),
       hasOfferCatalog: { '@id': 'https://samedayappliance.repair/#service-catalog' }
@@ -100,7 +100,6 @@ const faqSchema = {
     .hero-stats { display: flex; gap: 32px; flex-wrap: wrap; }
     .hero-stat-num { font-size: 28px; font-weight: 700; color: #fff; }
     .hero-stat-label { font-size: 12px; color: rgba(255,255,255,.45); margin-top: 2px; }
-    .stars { color: #f59e0b; }
     .trust-bar { background: var(--red); padding: 14px 24px; }
     .trust-bar-inner { max-width: 1100px; margin: 0 auto; display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
     .ti { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 500; color: #fff; }

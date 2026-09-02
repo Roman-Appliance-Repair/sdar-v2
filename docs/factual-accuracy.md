@@ -91,7 +91,7 @@ Marvel ×15, La Cornue ×11 привязывают бренд к Middleby. **О�
 
 ## 5. NAP — physical pin
 
-- **Единственный публичный адрес сайта:** **8746 Rangely Ave Ste, West Hollywood, CA 90048**
+- **Единственный публичный адрес сайта:** **8746 Rangely Ave, West Hollywood, CA 90048** (без «Ste» — форма сверена с карточкой GBP 2026-09-02)
 - Это `address` поле у WeHo branch в `branches.ts` (type: `physical_pin`)
 - **GMB-verified** — этот адрес показывается в Google Maps для WeHo profile.
 

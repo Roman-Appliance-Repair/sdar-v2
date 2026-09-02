@@ -10,13 +10,33 @@
 
 1. **AggregateRating НЕ используется нигде** — ни в JSON-LD, ни в visible UI. Google берёт rating напрямую из GMB. Schema rating brittle и создаёт mismatch risk. Никаких «★ 4.6», «37 reviews», звёзд, чисел.
 
-2. **streetAddress `8746 Rangely Ave Ste, West Hollywood, CA 90048`** → в schema только на 6 pin pages:
+2. **streetAddress `8746 Rangely Ave, West Hollywood, CA 90048`** — ровно одна форма записи,
+   без хвоста «Ste». Сверено с карточкой GBP (Local Falcon, `gbp_linked`, place_id
+   `ChIJ9ysncSy_woARe44arhSyTOY`): карточка отдаёт `8746 Rangely Ave, West Hollywood, CA 90048`.
+   SSOT — `src/data/branches.ts` (`street: '8746 Rangely Ave'`). «Ste» без номера юнита адрес
+   не уточняет, а строковую сверку NAP ломает. Исправлено 2026-09-02.
+
+   Адрес эмитится **на 14 страницах**, и все 15 сущностей с ним — это одна и та же запись
+   West Hollywood (`addressLocality: West Hollywood`, телефон `(323) 870-4790`). Ни один
+   другой филиал адреса не несёт нигде.
+
+   **6 собственных pin-страниц** (адрес у главной сущности страницы):
    - `/` (homepage primary LocalBusiness)
    - `/west-hollywood/` (WeHo city pillar)
    - `/contact/` (WeHo entry в location array)
    - `/book/`
    - `/privacy-policy/`
    - `/terms/`
+
+   **+8 страниц, где адрес приходит внутри массива филиалов:** 7 county-хабов
+   (`los-angeles-county`, `orange-county`, `riverside-county`, `san-bernardino-county`,
+   `san-diego-county`, `santa-barbara-county`, `ventura-county`) и `/credentials/`.
+   Причина — два разных билдера массива `location`: общий
+   `src/lib/build-location-array.ts` намеренно отдаёт только city-level адрес по SAB-правилу,
+   а county-хабы строят массив сами (`src/pages/orange-county.astro` и аналоги) и для
+   `type === 'physical_pin'` подставляют настоящий адрес филиала. Для WeHo это корректно —
+   это GBP-подтверждённый физический пин, скрывать его адрес не требуется. Расхождение
+   зафиксировано намеренно; при сведении county-хабов к общему билдеру этот список вернётся к 6.
 
 3. **`legalName: "HVAC 777 LLC"`** → во всех LocalBusiness schema на всех 1009 страницах (не только pin pages, не только legal). В visible UI — только в footer copyright line `© 2026 HVAC 777 LLC dba Same Day Appliance Repair`.
 
@@ -51,7 +71,7 @@ grep -c "BHGS Licensed\|CA BHGS"  <page>  # = 0
 - legalName policy расширен на все 1009 страниц (был на legal pages only).
 - location array (все 9 branches — c 2026-08-06) policy сформулирован для гео-нейтральных страниц.
 - streetAddress pin pages =  6 (homepage + WeHo + contact + book + privacy + terms; больше не Hollywood pillar).
-- streetAddress canonical form: «8746 Rangely Ave Ste, West Hollywood, CA 90048» (был "8746 Rangely Ave"; уточнено "Ste").
+- streetAddress canonical form: «8746 Rangely Ave, West Hollywood, CA 90048». (В мае 2026 сюда ошибочно добавили хвост «Ste»; снят 2026-09-02 после сверки с карточкой GBP.)
 
 Текущий статус (2026-05-07): **policy переписана, code/schema sync — отдельный P0 commit** (см. current-status.md).
 
@@ -163,7 +183,7 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 ```json
 "address": {
   "@type": "PostalAddress",
-  "streetAddress": "8746 Rangely Ave Ste",
+  "streetAddress": "8746 Rangely Ave",
   "addressLocality": "West Hollywood",
   "addressRegion": "CA",
   "postalCode": "90048",
@@ -189,7 +209,7 @@ Google Rich Results требует поле `address` на каждом `LocalBu
 - **`addressLocality`** = город страницы, если у объекта есть `areaServed` типа `City`
   (city pillars + city×service combos → их город); иначе **`West Hollywood`** (pin-город, гео-нейтральные:
   brand/service/price-list/commercial/outdoor/credentials).
-- **Pin pages (6)** сохраняют ПОЛНЫЙ `address` со `streetAddress` (`8746 Rangely Ave Ste`) — НЕ перезаписывается.
+- **Pin pages (6)** сохраняют ПОЛНЫЙ `address` со `streetAddress` (`8746 Rangely Ave`) — НЕ перезаписывается. Ещё 8 страниц получают тот же адрес внутри массива `location` — см. §1 п.2.
 - **`location` array entries** — каждая запись несёт `addressLocality = branch.displayCity` (per-branch город).
 
 **SSOT инъекции (не трогать руками per-page):**

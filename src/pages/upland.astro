@@ -38,15 +38,17 @@ const canonical = "https://samedayappliance.repair/upland/";
 const localBusinessSchema = mergeCredentials({
   "@context": "https://schema.org",
   "@type": "HomeAndConstructionBusiness",
-  name: branchRaw.fullName,
-  image: "https://samedayappliance.repair/images/logo.webp",
+  name: branchRaw.gbpName,
+  image: "https://samedayappliance.repair/logo.webp",
   url: canonical,
   telephone: phoneRaw,
   email: branch.email,
-  areaServed: zips.map((zip) => ({ "@type": "PostalCode", postalCode: zip })),
+  // `PostalCode` is not a schema.org type, and being the only areaServed entry it
+  // also made mergeCredentials fall back to West Hollywood for addressLocality.
+  // Same City shape as the other 96 city pillars; the ZIPs stay in the page copy.
+  areaServed: [{ "@type": "City", name: cityName }],
   openingHoursSpecification: OPENING_HOURS_SCHEMA,
   priceRange: "$$",
-  license: "BHGS #A49573"
 
 });
 

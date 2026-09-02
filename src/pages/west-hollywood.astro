@@ -48,8 +48,8 @@ const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
 const localBusinessSchema = mergeCredentials({
   '@context': 'https://schema.org',
   '@type': 'HomeAndConstructionBusiness',
-  name: branch.fullName,
-  image: 'https://samedayappliance.repair/images/logo.webp',
+  name: branch.gbpName,
+  image: 'https://samedayappliance.repair/logo.webp',
   url: canonical,
   telephone: phoneRaw,
   email: branch.email,
@@ -61,15 +61,16 @@ const localBusinessSchema = mergeCredentials({
     postalCode: branch.address!.zip,
     addressCountry: 'US'
   },
+  // This entity carries the full street address, so `geo` must be the door, not
+  // the city centre — cityCenter* stays for serviceArea midpoints.
   geo: {
     '@type': 'GeoCoordinates',
-    latitude: branch.geo.cityCenterLat,
-    longitude: branch.geo.cityCenterLng
+    latitude: branch.address!.lat,
+    longitude: branch.address!.lng
   },
   openingHoursSpecification: OPENING_HOURS_SCHEMA,
   areaServed: { '@type': 'City', name: 'West Hollywood', sameAs: 'https://en.wikipedia.org/wiki/West_Hollywood,_California' },
   priceRange: '$$',
-  license: 'BHGS #A49573',
   sameAs: [...(branch.sameAs ?? [])],
   hasOfferCatalog: { '@id': 'https://samedayappliance.repair/#service-catalog' }
 });

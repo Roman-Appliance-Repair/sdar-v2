@@ -98,7 +98,7 @@ GMB в самом дорогом городе каунти → выше сред
 
 **Главный физический пин (West Hollywood) ≠ остальные branches.**
 
-- **West Hollywood:** physical address `8746 Rangely Ave Ste, West Hollywood, CA 90048` (только этот в schema streetAddress на сайте — 6 pin pages, см. @docs/seo-policies.md §1)
+- **West Hollywood:** physical address `8746 Rangely Ave, West Hollywood, CA 90048` — ровно как в карточке GBP, без «Ste» (только этот адрес в schema streetAddress на сайте, 14 страниц, см. @docs/seo-policies.md §1)
 - **Other branches:** virtual office / PMB / service area only — НЕ показывать streetAddress в site schema
 
 GMB profile может иметь свой address (для Google), но visible на сайте = только West Hollywood.
