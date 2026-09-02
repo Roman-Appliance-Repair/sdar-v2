@@ -130,11 +130,53 @@ const iconKey = (slug: string) => slug.replace(/^\/+|\/+$/g, '').replace(/-repai
 // 'bbq' pages (malibu, calabasas, the 4 SB-coast pillars) were emitting
 // /services/bbq-repair/ — a 404 with no redirect; the real hub is
 // /services/bbq-grill-repair/. Icon stays keyed on the original slug.
-const HREF_ALIAS: Record<string, string> = { bbq: 'bbq-grill' };
+//
+// A value WITHOUT a leading slash is a /services/{value}-repair/ hub slug.
+// A value WITH one is a full path, for the cards whose real hub does not live
+// under /services/ at all (commercial and outdoor have their own sections).
+// The five entries below were all emitting 404s (Ahrefs crawl 2026-09-01):
+//   commercial-refrigerator → /services/commercial-refrigerator-repair/  (5 pages)
+//   outdoor-appliance       → /services/outdoor-appliance-repair/        (3 pages)
+//   ice-machine             → /services/ice-machine-repair/              (3 pages)
+//   wall-heater             → /services/wall-heater-repair/              (1 page)
+//   commercial              → /services/commercial-repair/               (1 page)
+const HREF_ALIAS: Record<string, string> = {
+  bbq: 'bbq-grill',
+  'commercial-refrigerator': '/commercial/refrigerator-repair/',
+  'outdoor-appliance': '/outdoor/',
+  'ice-machine': 'ice-maker',
+  // No wall-heater page exists anywhere: every HVAC route was moved out and 301'd
+  // to the services index (astro.config.mjs:799-809), so /services/ is where the
+  // site itself already sends this URL. Flagged as a content gap.
+  'wall-heater': '/services/',
+  commercial: '/commercial/'
+};
 
-const toHref = (slug: string) => {
+// Every route Astro emits from src/pages — same derivation as Breadcrumbs.astro.
+// Used only as a guard: a card whose resolved href has no page behind it renders
+// as plain text rather than as a broken link.
+const PAGE_FILES = import.meta.glob('/src/pages/**/*.astro');
+const ROUTE_CACHE = '__sdarServiceGridRoutes';
+
+function getRoutes(): Set<string> {
+  const g = globalThis as any;
+  if (g[ROUTE_CACHE]) return g[ROUTE_CACHE];
+  const routes = new Set<string>();
+  for (const file of Object.keys(PAGE_FILES)) {
+    const rel = file.replace('/src/pages/', '').replace(/\.astro$/, '');
+    const trimmed = rel === 'index' ? '' : rel.replace(/\/index$/, '');
+    routes.add(trimmed ? `/${trimmed}/` : '/');
+  }
+  g[ROUTE_CACHE] = routes;
+  return routes;
+}
+
+/** Resolved hub URL, or null when no page exists behind it. */
+const toHref = (slug: string): string | null => {
   const key = iconKey(slug);
-  return `/services/${HREF_ALIAS[key] ?? key}-repair/`;
+  const alias = HREF_ALIAS[key];
+  const href = alias?.startsWith('/') ? alias : `/services/${alias ?? key}-repair/`;
+  return getRoutes().has(href) ? href : null;
 };
 ---
 
@@ -143,21 +185,33 @@ const toHref = (slug: string) => {
     <h2 class="v2-section-title">{finalHeadline}</h2>
     <p class="v2-section-sub">{subhead}</p>
     <div class="v2-services__grid">
-      {services.map((s) => (
-        <a href={toHref(s.slug)} class="v2-svc-card">
-          <svg
-            class="v2-svc-card__icon" viewBox="0 0 24 24" width="24" height="24"
-            fill="none" stroke="currentColor" stroke-width="1.6"
-            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"
-          >
-            <path d={ICONS[iconKey(s.slug)] ?? UNKNOWN_ICON} />
-          </svg>
-          <div class="v2-svc-card__name">{s.name}</div>
-          {s.issues && <div class="v2-svc-card__issues">{s.issues}</div>}
-          {s.brands && <div class="v2-svc-card__brands">{s.brands}</div>}
-          <div class="v2-svc-card__cta">Learn more →</div>
-        </a>
-      ))}
+      {services.map((s) => {
+        const href = toHref(s.slug);
+        const body = (
+          <>
+            <svg
+              class="v2-svc-card__icon" viewBox="0 0 24 24" width="24" height="24"
+              fill="none" stroke="currentColor" stroke-width="1.6"
+              stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"
+            >
+              <path d={ICONS[iconKey(s.slug)] ?? UNKNOWN_ICON} />
+            </svg>
+            <div class="v2-svc-card__name">{s.name}</div>
+            {s.issues && <div class="v2-svc-card__issues">{s.issues}</div>}
+            {s.brands && <div class="v2-svc-card__brands">{s.brands}</div>}
+          </>
+        );
+        // No hub behind the slug → the card still lists the service, it just does
+        // not pretend to link anywhere (and drops the "Learn more" affordance).
+        return href ? (
+          <a href={href} class="v2-svc-card">
+            {body}
+            <div class="v2-svc-card__cta">Learn more →</div>
+          </a>
+        ) : (
+          <div class="v2-svc-card">{body}</div>
+        );
+      })}
     </div>
   </div>
 </section>
@@ -202,7 +256,9 @@ const toHref = (slug: string) => {
     display: block;
     font-family: var(--v2-font-body);
   }
-  .v2-svc-card:hover {
+  /* Hover is qualified to `a` so the guard's non-linking card (rendered as a div
+     when a slug resolves to no page) does not lift or redden as if it were clickable. */
+  a.v2-svc-card:hover {
     box-shadow: 0 6px 16px rgba(0,0,0,0.10);
     transform: translateY(-2px);
     text-decoration: none;
@@ -217,7 +273,7 @@ const toHref = (slug: string) => {
     margin-bottom: 8px;
     transition: color 0.2s;
   }
-  .v2-svc-card:hover .v2-svc-card__name { color: var(--v2-red); }
+  a.v2-svc-card:hover .v2-svc-card__name { color: var(--v2-red); }
   .v2-svc-card__issues { font-size: 13px; color: var(--v2-muted); line-height: 1.5; margin-bottom: 8px; }
   .v2-svc-card__brands { font-size: 12px; color: var(--v2-muted); margin-bottom: 12px; }
   .v2-svc-card__cta { font-size: 13px; color: var(--v2-red); font-weight: 500; }

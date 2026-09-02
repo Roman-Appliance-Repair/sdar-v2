@@ -90,6 +90,37 @@ interface Crumb {
   name: string;
   href: string;
   isCurrent: boolean;
+  /** false → render as plain text, because `href` has no page behind it. */
+  hasPage: boolean;
+}
+
+// Build-time set of every route Astro emits from src/pages — the same tree the
+// sitemap is generated from. Derived, never hand-maintained: import.meta.glob is
+// resolved by Vite at transform time, so this is a plain key list, not an import.
+//   /src/pages/index.astro              → /
+//   /src/pages/outdoor/brands/bull.astro → /outdoor/brands/bull/
+//   /src/pages/areas/index.astro        → /areas/
+// Cached on globalThis: the frontmatter re-runs for each of the ~1200 pages and
+// the Set only needs building once per build.
+const PAGE_FILES = import.meta.glob('/src/pages/**/*.astro');
+const ROUTE_CACHE = '__sdarBreadcrumbRoutes';
+
+function getRoutes(): Set<string> {
+  const g = globalThis as any;
+  if (g[ROUTE_CACHE]) return g[ROUTE_CACHE];
+  const routes = new Set<string>();
+  for (const file of Object.keys(PAGE_FILES)) {
+    const rel = file.replace('/src/pages/', '').replace(/\.astro$/, '');
+    const trimmed = rel === 'index' ? '' : rel.replace(/\/index$/, '');
+    routes.add(trimmed ? `/${trimmed}/` : '/');
+  }
+  g[ROUTE_CACHE] = routes;
+  return routes;
+}
+
+/** True when `href` is a real route. Only intermediate crumbs are checked. */
+function routeExists(href: string): boolean {
+  return getRoutes().has(href);
 }
 
 function resolveLeafLabel(section: string, slug: string): string {
@@ -115,31 +146,41 @@ function resolveLeafLabel(section: string, slug: string): string {
 let crumbs: Crumb[] = [];
 
 if (segments.length > 0) {
-  crumbs.push({ name: 'Home', href: '/', isCurrent: false });
+  crumbs.push({ name: 'Home', href: '/', isCurrent: false, hasPage: true });
 
   if (segments.length === 1) {
     // Single-level page like /privacy-policy/, /price-list/, /commercial/, /credentials/.
     const seg = segments[0];
     const label = SECTION_LABELS[seg] ?? titleCaseSlug(seg);
-    crumbs.push({ name: label, href: `/${seg}/`, isCurrent: true });
+    crumbs.push({ name: label, href: `/${seg}/`, isCurrent: true, hasPage: true });
   } else {
     // Multi-level: /services/foo/, /commercial/foo/, /credentials/foo/, /brands/foo/, …
     const section = segments[0];
     const sectionLabel = SECTION_LABELS[section] ?? titleCaseSlug(section);
-    crumbs.push({ name: sectionLabel, href: `/${section}/`, isCurrent: false });
+    crumbs.push({ name: sectionLabel, href: `/${section}/`, isCurrent: false, hasPage: true });
 
     // Leaf is the last segment; intermediate segments (rare here) get title-cased.
+    // An intermediate segment is a real page for most sections (/commercial/mixer-repair/,
+    // /services/refrigerator-repair/, /brands/viking/) but not all — /outdoor/brands/ and
+    // /commercial/dishwasher-repair/brands/ have no index page. Those stay in the trail as
+    // text; only the link is dropped.
     for (let i = 1; i < segments.length - 1; i++) {
       const seg = segments[i];
       const href = '/' + segments.slice(0, i + 1).join('/') + '/';
-      crumbs.push({ name: titleCaseSlug(seg), href, isCurrent: false });
+      crumbs.push({
+        name: titleCaseSlug(seg),
+        href,
+        isCurrent: false,
+        hasPage: routeExists(href)
+      });
     }
     const leafSlug = segments[segments.length - 1];
     const leafHref = '/' + segments.join('/') + '/';
     crumbs.push({
       name: resolveLeafLabel(section, leafSlug),
       href: leafHref,
-      isCurrent: true
+      isCurrent: true,
+      hasPage: true
     });
   }
 }
@@ -149,11 +190,15 @@ const breadcrumbSchema =
     ? {
         '@context': 'https://schema.org',
         '@type': 'BreadcrumbList',
+        // A crumb with no page behind it keeps its position and name but carries no
+        // `item` — pointing BreadcrumbList at a 404 is worse than omitting the URL,
+        // and ListItem is valid with name alone (same shape Google documents for the
+        // trailing crumb). Positions stay 1..n, so the list itself stays valid.
         itemListElement: crumbs.map((c, i) => ({
           '@type': 'ListItem',
           position: i + 1,
           name: c.name,
-          item: SITE + c.href
+          ...(c.hasPage ? { item: SITE + c.href } : {})
         }))
       }
     : null;
@@ -167,8 +212,10 @@ const breadcrumbSchema =
           <li class="breadcrumbs-item">
             {c.isCurrent ? (
               <span aria-current="page">{c.name}</span>
-            ) : (
+            ) : c.hasPage ? (
               <a href={c.href}>{c.name}</a>
+            ) : (
+              <span class="breadcrumbs-plain">{c.name}</span>
             )}
             {i < crumbs.length - 1 && <span class="breadcrumbs-sep" aria-hidden="true">›</span>}
           </li>
@@ -207,6 +254,11 @@ const breadcrumbSchema =
   }
   .breadcrumbs-item a:hover {
     color: #ffffff;
+  }
+  /* Intermediate crumb with no page behind it — same resting look as a link
+     (links carry no underline), just not clickable. */
+  .breadcrumbs-item .breadcrumbs-plain {
+    color: var(--muted);
   }
   .breadcrumbs-item span[aria-current="page"] {
     color: #ffffff;
