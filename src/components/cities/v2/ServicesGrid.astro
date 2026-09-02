@@ -134,21 +134,22 @@ const iconKey = (slug: string) => slug.replace(/^\/+|\/+$/g, '').replace(/-repai
 // A value WITHOUT a leading slash is a /services/{value}-repair/ hub slug.
 // A value WITH one is a full path, for the cards whose real hub does not live
 // under /services/ at all (commercial and outdoor have their own sections).
-// The five entries below were all emitting 404s (Ahrefs crawl 2026-09-01):
+// The four entries below were all emitting 404s (Ahrefs crawl 2026-09-01):
 //   commercial-refrigerator → /services/commercial-refrigerator-repair/  (5 pages)
 //   outdoor-appliance       → /services/outdoor-appliance-repair/        (3 pages)
 //   ice-machine             → /services/ice-machine-repair/              (3 pages)
-//   wall-heater             → /services/wall-heater-repair/              (1 page)
 //   commercial              → /services/commercial-repair/               (1 page)
+//
+// 'wall-heater' (los-angeles.astro) is deliberately NOT aliased. No wall-heater
+// page exists anywhere — every HVAC route was moved out and 301'd to the services
+// index (astro.config.mjs:799-809) — so there is nothing honest to point it at.
+// The guard below renders that card as plain text: the service stays listed, it
+// just does not pretend to lead somewhere. Add an alias here if a page is written.
 const HREF_ALIAS: Record<string, string> = {
   bbq: 'bbq-grill',
   'commercial-refrigerator': '/commercial/refrigerator-repair/',
   'outdoor-appliance': '/outdoor/',
   'ice-machine': 'ice-maker',
-  // No wall-heater page exists anywhere: every HVAC route was moved out and 301'd
-  // to the services index (astro.config.mjs:799-809), so /services/ is where the
-  // site itself already sends this URL. Flagged as a content gap.
-  'wall-heater': '/services/',
   commercial: '/commercial/'
 };
 
