@@ -130,8 +130,11 @@ export const BRANCHES: Branch[] = [
       city: 'West Hollywood',
       state: 'CA',
       zip: '90048',
-      lat: 34.0894,
-      lng: -118.3895
+      // Coordinate of 8746 Rangely Ave exactly as the verified GBP card reports it
+      // (Local Falcon, place_id ChIJ9ysncSy_woARe44arhSyTOY). Was 34.0894/-118.3895,
+      // roughly a kilometre off the door. Only consumed by LocalBusiness `geo`.
+      lat: 34.0800742,
+      lng: -118.384211
     },
     geo: {
       cityCenterLat: 34.0900,
