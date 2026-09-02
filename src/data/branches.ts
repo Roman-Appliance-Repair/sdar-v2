@@ -622,6 +622,18 @@ export const MAIN_PHONE = '(424) 325-0520';
  *  surface that needs a phone tel: link without re-deriving the format inline. */
 export const MAIN_PHONE_TEL = '+1' + MAIN_PHONE.replace(/\D/g, '');
 
+/** Canonical telephone spelling for JSON-LD: E.164, no separators — exactly the
+ *  shape the Google Business Profile card returns (+13238704790), and the shape
+ *  Google itself uses for every listing. Digits are preserved verbatim; anything
+ *  that is not a recognisable US number is returned unchanged. Display strings
+ *  (hero, footer, tel: links) keep MAIN_PHONE / branch.phone — this is markup only. */
+export function toE164(phone: string): string {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.length === 10) return '+1' + digits;
+  if (digits.length === 11 && digits.startsWith('1')) return '+' + digits;
+  return phone;
+}
+
 /** Legal entity name — used in copyright line only.
  *  NAP/SSOT 2026-05-06: legal-entity STREET ADDRESS is no longer rendered
  *  anywhere on the site (it was the PMB mailing address, not a service

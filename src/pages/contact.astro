@@ -1,6 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { BRANCHES, type Branch } from '../data/branches';
+import { BRANCHES, type Branch, toE164 } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import BranchNAP from '../components/BranchNAP.astro';
 
@@ -19,6 +19,7 @@ const canonical = 'https://samedayappliance.repair/contact/';
 
 const mailingAddress = '';
 const mainPhone = '(424) 325-0520';
+const wehoPhone = BRANCHES.find(b => b.slug === 'west-hollywood')?.phone ?? '(323) 870-4790';
 const mainPhoneTel = '+14243250520';
 const generalEmail = 'support@samedayappliance.repair';
 
@@ -44,7 +45,11 @@ const localBusinessSchema = mergeCredentials({
   legalName: 'HVAC 777 LLC',
   alternateName: 'SDAR',
   url: 'https://samedayappliance.repair/',
-  telephone: mainPhone,
+  // NAP: this entity carries the West Hollywood pin address below, so it must
+  // carry the West Hollywood line too — the GBP card for 8746 Rangely Ave lists
+  // (323) 870-4790. The general LA number stays everywhere it is a general
+  // number; it just cannot sit on the entity that claims the pin address.
+  telephone: wehoPhone,
   email: generalEmail,
   priceRange: '$89 diagnostic · OEM parts · 90-day warranty',
   address: {
@@ -74,7 +79,7 @@ const localBusinessSchema = mergeCredentials({
     const entry: Record<string, unknown> = {
       '@type': 'LocalBusiness',
       name: b.gbpName,
-      telephone: b.phone,
+      telephone: toE164(b.phone),
       openingHoursSpecification: OPENING_HOURS_SCHEMA,
       areaServed: b.citiesServed.slice(0, 8).map((slug) => ({
         '@type': 'City',

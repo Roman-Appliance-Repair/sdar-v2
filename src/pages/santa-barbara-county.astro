@@ -3,7 +3,7 @@
 // /santa-barbara-county/
 import Layout from '../layouts/Layout.astro';
 import CountyMap from '../components/CountyMap.astro';
-import { BRANCHES, type Branch } from '../data/branches';
+import { BRANCHES, type Branch, toE164 } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { mergeCredentials } from '../data/credentials-schema';
 
@@ -19,7 +19,7 @@ const localBusinessSchema = mergeCredentials({
   '@type': 'HomeAndConstructionBusiness',
   '@id': 'https://samedayappliance.repair/santa-barbara-county/#business',
   name: 'Same Day Appliance Repair Santa Barbara',
-  telephone: '(805) 500-0855',
+  telephone: '+18055000855',
   url: 'https://samedayappliance.repair/santa-barbara-county/',
   areaServed: { '@type': 'AdministrativeArea', name: 'Santa Barbara County' },
   openingHoursSpecification: OPENING_HOURS_SCHEMA,
@@ -28,7 +28,7 @@ const localBusinessSchema = mergeCredentials({
     const entry: Record<string, unknown> = {
       '@type': 'LocalBusiness',
       name: b.gbpName,
-      telephone: b.phone,
+      telephone: toE164(b.phone),
       openingHoursSpecification: OPENING_HOURS_SCHEMA,
       areaServed: b.citiesServed.slice(0, 8).map((slug) => ({ '@type': 'City', name: slugToTitle(slug) })),
       hasOfferCatalog: { '@id': 'https://samedayappliance.repair/#service-catalog' }

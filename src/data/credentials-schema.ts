@@ -10,7 +10,7 @@ export const LEGAL_NAME = 'HVAC 777 LLC';
 
 // WeHo pin branch — default identity for geo-neutral schemas (telephone +
 // city-level address fallback). Source: branches.ts SSOT, not hardcoded.
-import { BRANCHES } from './branches';
+import { BRANCHES, toE164 } from './branches';
 const WEHO_BRANCH = BRANCHES.find((b) => b.slug === 'west-hollywood');
 const DEFAULT_TELEPHONE = '+1' + (WEHO_BRANCH?.phone ?? '(323) 870-4790').replace(/\D/g, '');
 const WEHO_ZIP = WEHO_BRANCH?.address?.zip ?? '90048';
@@ -113,9 +113,26 @@ export function mergeCredentials<T extends Record<string, unknown>>(schema: T): 
     };
   }
   // Google recommends `telephone` on LocalBusiness. Geo-neutral schemas default
-  // to the WeHo pin line; pages that set their own branch phone are untouched.
+  // to the WeHo pin line; pages that set their own branch phone keep that number —
+  // only its formatting is canonicalised (see toE164 below).
   if (LB_TYPES.has(out['@type'] as string) && !out['telephone']) {
     out['telephone'] = DEFAULT_TELEPHONE;
+  }
+  // NAP: one telephone spelling site-wide. The GBP card returns E.164 with no
+  // separators (+13238704790) and so does every Google listing, so that is the
+  // canonical form. Digits are never changed — only the punctuation around them.
+  if (typeof out['telephone'] === 'string') {
+    out['telephone'] = toE164(out['telephone'] as string);
+  }
+  // Branch entries embedded via `location` carry their own number; canonicalise
+  // those too, otherwise county hubs keep emitting the display format.
+  if (Array.isArray(out['location'])) {
+    out['location'] = (out['location'] as unknown[]).map((entry) => {
+      if (!entry || typeof entry !== 'object') return entry;
+      const e = entry as Record<string, unknown>;
+      if (typeof e['telephone'] !== 'string') return entry;
+      return { ...e, telephone: toE164(e['telephone'] as string) };
+    });
   }
   return out as T & {
     legalName: string;

@@ -14,7 +14,7 @@
 - **Зоны:** 6 каунти SoCal — LA, Orange, Ventura, Santa Barbara, San Bernardino, Riverside (Santa Barbara добавлен 2026-08-06, ветка feat/santa-barbara)
 - **Часы:** Пн–Сб 8:00–20:00, Вс закрыто. Звонки принимаются 24/7
 - **Цены:** $89 residential / $120 commercial (waived с repair). На mixed-scope страницах — базовая по основной аудитории, секционные цены внутри своих секций; два ценника рядом в одном блоке — никогда. См. §5 + @docs/factual-accuracy.md §9
-- **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, эмитится в schema на 6 pin pages: `/`, `/west-hollywood/`, `/contact/` (в WeHo entry), `/book/`, `/privacy-policy/`, `/terms/` (см. seo-policies §1)
+- **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, ровно в этой форме, без «Ste» (сверено с карточкой GBP 2026-09-02). Эмитится в schema на **14 страницах**: 6 собственных pin-страниц (`/`, `/west-hollywood/`, `/contact/`, `/book/`, `/privacy-policy/`, `/terms/`) плюс 8, где тот же адрес приходит внутри массива филиалов — 7 county-хабов и `/credentials/` (county-хабы строят массив `location` сами, а не через `src/lib/build-location-array.ts`). Все 15 сущностей с адресом — одна запись West Hollywood; у остальных филиалов адреса нет нигде (см. seo-policies §1)
 - **Aggregate Rating:** не используется нигде (ни в JSON-LD, ни в visible UI). Google берёт rating напрямую из GMB. См. @docs/factual-accuracy.md §6
 - **Технари в текстах:** Mikhail V., Artur S., David K.
 

@@ -9,7 +9,7 @@
 //   - no technician names ("our San Diego technicians") — no tech assigned yet
 import Layout from '../layouts/Layout.astro';
 import CountyMap from '../components/CountyMap.astro';
-import { BRANCHES, type Branch } from '../data/branches';
+import { BRANCHES, type Branch, toE164 } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { mergeCredentials } from '../data/credentials-schema';
 
@@ -25,7 +25,7 @@ const localBusinessSchema = mergeCredentials({
   '@type': 'HomeAndConstructionBusiness',
   '@id': 'https://samedayappliance.repair/san-diego-county/#business',
   name: 'Same Day Appliance Repair San Diego',
-  telephone: '(858) 667-7237',
+  telephone: '+18586677237',
   url: 'https://samedayappliance.repair/san-diego-county/',
   areaServed: { '@type': 'AdministrativeArea', name: 'San Diego County' },
   openingHoursSpecification: OPENING_HOURS_SCHEMA,
@@ -34,7 +34,7 @@ const localBusinessSchema = mergeCredentials({
     const entry: Record<string, unknown> = {
       '@type': 'LocalBusiness',
       name: b.gbpName,
-      telephone: b.phone,
+      telephone: toE164(b.phone),
       openingHoursSpecification: OPENING_HOURS_SCHEMA,
       areaServed: b.citiesServed.slice(0, 8).map((slug) => ({ '@type': 'City', name: slugToTitle(slug) })),
       hasOfferCatalog: { '@id': 'https://samedayappliance.repair/#service-catalog' }
