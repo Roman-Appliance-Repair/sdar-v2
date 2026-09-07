@@ -100,7 +100,7 @@ export const CREDENTIALS: Credential[] = [
   {
     id: 'same-day-service',
     title: 'Same Day Service',
-    description: '7 days a week — appointments available same day or next day.',
+    description: 'Technicians Mon–Sat 8am–8pm, phones answered 24/7 — appointments same day or next day.',
     preferredSlug: 'same-day-service',
     iconSvg: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
   <circle cx="32" cy="32" r="20" stroke="#D4AF37" stroke-width="2"/>

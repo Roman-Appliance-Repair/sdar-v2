@@ -6,7 +6,7 @@
 import Layout from '../layouts/Layout.astro';
 import HomepageSchema from '../components/homepage/HomepageSchema.astro';
 import HeroBranchBand from '../components/HeroBranchBand.astro';
-import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { BRANCHES, MAIN_PHONE } from '../data/branches';
 import { TOTAL_CITY_COUNT } from '../data/cities';
 
 const phone = MAIN_PHONE;
@@ -58,16 +58,20 @@ const COUNTY_CITIES = [
 function countyTitle(slug: string): string {
   return slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') + ' County';
 }
+// Branch cards link to the branch's own page — no phone numbers on the
+// homepage bar (2026-09-06). San Diego has no city pillar yet, so it points
+// at the county hub. Full phone list lives on /contact/.
+const BRANCH_PAGE_OVERRIDES: Record<string, string> = {
+  'san-diego': '/san-diego-county/',
+};
 const BRANCH_DISPLAY = BRANCHES.map(b => ({
   name: b.name,
   county: countyTitle(b.primaryCounty).toUpperCase(),
-  phone: b.phone,
-  isPlaceholder: isPlaceholderPhone(b.phone),
-  href: `tel:+1${b.phone.replace(/\D/g, '')}`
+  href: BRANCH_PAGE_OVERRIDES[b.slug] ?? `/${b.slug}/`
 }));
 ---
 
-<Layout title={title} description={description}>
+<Layout title={title} description={description} stickyPhone={MAIN_PHONE}>
   <HomepageSchema slot="head-scripts" />
   <!-- Preload the hero (LCP element) so the fetch starts from <head>,
        before the parser reaches <picture>. Media queries mirror the
@@ -160,17 +164,13 @@ const BRANCH_DISPLAY = BRANCHES.map(b => ({
       <p class="hp-branches-label">{BRANCHES.length} Branches Across Southern California</p>
       <div class="hp-branches-grid">
         {BRANCH_DISPLAY.map(b => (
-          <div class="hp-branch-card">
+          <a href={b.href} class="hp-branch-card">
             <div class="hp-branch-name">{b.name}</div>
             <div class="hp-branch-county">{b.county}</div>
-            {b.isPlaceholder ? (
-              <div class="hp-branch-coming">Coming soon</div>
-            ) : (
-              <a href={b.href} class="hp-branch-phone">{b.phone}</a>
-            )}
-          </div>
+          </a>
         ))}
       </div>
+      <p class="hp-branches-allphones"><a href="/contact/">All branch phones &rarr;</a></p>
     </div>
   </section>
 
@@ -346,15 +346,17 @@ const BRANCH_DISPLAY = BRANCHES.map(b => ({
   .hp-branches-inner { max-width: 1200px; margin: 0 auto; }
   .hp-branches-label { font-size: 12px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: #b8b8b8; margin: 0 0 24px; text-align: center; }
   .hp-branches-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
-  .hp-branch-card { background: #1a1a1a; border: 1px solid #222; border-radius: 8px; padding: 18px 16px; text-align: center; }
+  .hp-branch-card { display: block; background: #1a1a1a; border: 1px solid #222; border-radius: 8px; padding: 18px 16px; text-align: center; text-decoration: none; }
+  .hp-branch-card:hover { border-color: #333; }
+  .hp-branch-card:hover .hp-branch-name { color: #ffffff; }
   .hp-branch-name { color: #aaa; font-weight: 700; font-size: 15px; margin-bottom: 4px; }
   .hp-branch-county { font-size: 9px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #9a9a9a; margin-bottom: 10px; }
   /* inline-block + padding lifts the tap target from 18px to ~44px (P0-4).
      The card is text-align:center, so the link stays centred and every card
      grows by the same amount — the 4-up grid keeps its shape. */
-  .hp-branch-phone { display: inline-block; padding: 11px 8px; color: #ffffff; font-weight: 700; font-size: 14px; text-decoration: none; }
-  .hp-branch-phone:hover { color: #ff1f47; }
-  .hp-branch-coming { color: #8a8a8a; font-size: 12px; font-style: italic; }
+  .hp-branches-allphones { text-align: center; margin: 20px 0 0; }
+  .hp-branches-allphones a { color: #b8b8b8; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; text-decoration: none; }
+  .hp-branches-allphones a:hover { color: #ffffff; }
   @media (max-width: 900px) { .hp-branches-grid { grid-template-columns: repeat(2, 1fr); } }
 
   /* niches */
