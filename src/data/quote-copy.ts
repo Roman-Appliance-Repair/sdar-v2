@@ -94,6 +94,10 @@ export const PHOTOS_COPY = {
   hint: 'A photo of the model plate or the fault helps the tech stock the right part.',
   max: 2,
   skip: 'Skip — no photo',
+  /** Mirrors the 5 MB ceiling in functions/api/chat/upload.js. Checked before the
+   *  request so a phone photo that is too big fails instantly, not after the upload. */
+  maxBytes: 5 * 1024 * 1024,
+  tooBig: 'That photo is over 5 MB — send a smaller one, or carry on without it.',
 } as const;
 
 /** Error copy. 429 is deliberately worded differently from a genuine failure. */

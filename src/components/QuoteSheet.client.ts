@@ -35,7 +35,7 @@ interface QuoteData {
     totalSteps: number;
     outOfZone: string;
     visitTimes: { id: string; label: string; hint: string }[];
-    photos: { hint: string; max: number; skip: string };
+    photos: { hint: string; max: number; skip: string; maxBytes: number; tooBig: string };
     errors: { rateLimited: string; failed: string };
   };
   zone: {
@@ -723,6 +723,14 @@ function photoSession(): string {
 }
 
 async function uploadPhoto(file: File): Promise<void> {
+  // Phone cameras routinely clear the endpoint's 5 MB ceiling. Say so now rather
+  // than after a slow upload that was always going to be rejected.
+  if (file.size > data.copy.photos.maxBytes) {
+    const status = document.getElementById('qs-photo-status');
+    if (status) status.textContent = data.copy.photos.tooBig;
+    return;
+  }
+
   // The thumbnail goes up immediately from a local object URL — the visitor sees
   // their photo the moment they pick it, whatever the network is doing.
   const localUrl = URL.createObjectURL(file);
