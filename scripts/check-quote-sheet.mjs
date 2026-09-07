@@ -33,6 +33,30 @@ function check(name, condition, detail = '') {
   }
 }
 
+/**
+ * Pull the DIAGNOSTIC_TERMS strings out of quote-copy.ts by scanning, not by
+ * regex — the quoting inside those lines (apostrophes in "can't") makes a regex
+ * fragile and this file is a gate, so it has to be dependable.
+ */
+function readTerms(src) {
+  const open = src.indexOf('export const DIAGNOSTIC_TERMS = [');
+  if (open === -1) return null;
+  const close = src.indexOf('];', open);
+  if (close === -1) return null;
+  const body = src.slice(src.indexOf('[', open) + 1, close);
+  const out = [];
+  for (const rawLine of body.split(String.fromCharCode(10))) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith('//')) continue;
+    const q = line[0];
+    if (q !== "'" && q !== '"') continue;
+    const last = line.lastIndexOf(q);
+    if (last <= 0) continue;
+    out.push(line.slice(1, last));
+  }
+  return out;
+}
+
 function countMatches(haystack, re) {
   return (haystack.match(re) || []).length;
 }
@@ -84,19 +108,39 @@ for (const file of SHEET_SOURCES) {
   );
 }
 
-// ── 6. waived clause is byte-equal to the constant ───────────────────────────
+// ── 6. the three diagnostic terms ship byte-equal to the constants ───────────
 {
-  const m = copySrc.match(/export const WAIVED_CLAUSE\s*=\s*'([^']*)'/);
-  if (!m) {
-    check('WAIVED_CLAUSE readable from quote-copy.ts', false, 'export not found');
+  const terms = readTerms(copySrc);
+  if (!terms) {
+    check('DIAGNOSTIC_TERMS readable from quote-copy.ts', false, 'export not found');
   } else {
-    const clause = m[1];
-    const inPage = html.includes(clause);
-    check('waived clause ships byte-equal on /book/', inPage, `looked for ${JSON.stringify(clause)}`);
-    // and nothing that only nearly matches it
-    const nearMiss = /Waived (?!when you go ahead with the repair)/.test(html);
-    check('no divergent "Waived …" wording on /book/', !nearMiss);
+    check('DIAGNOSTIC_TERMS has exactly three lines', terms.length === 3, `found ${terms.length}`);
+    for (const term of terms) {
+      check(
+        `term ships byte-equal on /book/: "${term.slice(0, 34)}…"`,
+        html.includes(term),
+        'not found in the built page'
+      );
+    }
+    // The retired single-line clause must not linger anywhere in the built page.
+    check(
+      'old "Waived when you go ahead…" wording is gone',
+      !html.includes('Waived when you go ahead with the repair')
+    );
   }
+}
+
+// ── 6b. no forbidden marketing words in the sheet's own copy ─────────────────
+{
+  const FORBIDDEN = [
+    'certified technicians', 'our team of experts', 'look no further', 'hassle-free',
+    'peace of mind', 'second to none', 'top-of-the-line', 'hesitate to call',
+    'we understand the urgency', 'trusted name in the industry',
+    'passionate about delivering', 'your satisfaction is our priority',
+  ];
+  const copyLower = copySrc.toLowerCase();
+  const hits = FORBIDDEN.filter((w) => copyLower.includes(w));
+  check('no forbidden marketing phrases in quote-copy.ts', hits.length === 0, hits.join(', '));
 }
 
 // ── 7. canary containment: the sheet is on /book/ and nowhere else ───────────

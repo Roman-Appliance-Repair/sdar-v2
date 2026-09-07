@@ -148,12 +148,23 @@ async function journey(browser, base, viewport, label) {
     price.text === String.fromCharCode(36) + '89',
     price.text
   );
-  const waived = await page.locator('.qs-price-waived').innerText();
-  expect(
-    `${label}: waived clause on the price step`,
-    waived === 'Waived when you go ahead with the repair',
-    waived
-  );
+  // The three terms, in order, byte-equal to what quote-copy.ts exports.
+  const TERMS = [
+    'Credited toward the repair when you hire us for the job.',
+    "If our technician can't diagnose the problem, there's no diagnostic fee.",
+    'You get a written report: what failed and which parts need replacing.',
+  ];
+  const shown = await page.locator('.qs-terms li').allInnerTexts();
+  expect(`${label}: price step lists three terms`, shown.length === 3, `${shown.length} line(s)`);
+  TERMS.forEach((t, i) => {
+    expect(
+      `${label}: term ${i + 1} byte-equal`,
+      (shown[i] || '').trim() === t,
+      JSON.stringify(shown[i])
+    );
+  });
+  const heading = await page.locator('#qs-heading').innerText();
+  expect(`${label}: price heading is "Diagnostic visit"`, heading.trim() === 'Diagnostic visit', heading);
 
   // back = exactly one step
   await page.click('#qs-back');

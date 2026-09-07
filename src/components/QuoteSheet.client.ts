@@ -21,7 +21,8 @@ interface QuoteData {
   appliances: Record<Scope, Appliance[]>;
   price: Record<Scope, string>;
   copy: {
-    waived: string;
+    terms: string[];
+    scopeLabels: Record<Scope, string>;
     hours: string;
     callback: { heading: string; body: string; callPrompt: string };
     price: {
@@ -42,12 +43,20 @@ interface QuoteData {
     prefix3: Record<string, string>;
     mainSlug: string;
   };
-  phones: { main: string; mainTel: string; branches: Record<string, string> };
+  phones: {
+    main: string;
+    mainTel: string;
+    branches: Record<string, { name: string; phone: string }>;
+  };
 }
 
 interface Photo {
+  /** Remote URL once the upload lands; empty while it is still in flight. */
   url: string;
+  /** Local object URL, so the thumbnail appears the moment the file is picked. */
+  localUrl: string;
   name: string;
+  state: 'uploading' | 'done' | 'failed';
 }
 
 interface State {
@@ -155,7 +164,11 @@ function inZone(zip: string): boolean {
 }
 
 function branchPhone(slug: string): string {
-  return data.phones.branches[slug] || data.phones.main;
+  return data.phones.branches[slug]?.phone || data.phones.main;
+}
+
+function branchName(slug: string): string {
+  return data.phones.branches[slug]?.name || slug;
 }
 
 function appliancesFor(scope: Scope): Appliance[] {
@@ -199,6 +212,9 @@ function restore(): void {
     const saved = JSON.parse(raw) as Partial<State>;
     if (!saved || typeof saved !== 'object') return;
     state = { ...blank(), ...saved };
+    // Object URLs from the previous page load are dead; keep only uploaded photos.
+    state.photos = (state.photos || []).filter((p) => p && p.state === 'done' && p.url)
+      .map((p) => ({ ...p, localUrl: '' }));
     if (typeof state.step !== 'number' || state.step < 0 || state.step >= data.copy.totalSteps) {
       state.step = 0;
     }
@@ -450,7 +466,10 @@ function viewPhotos(): string {
     state.photos
       .map(
         (p, i) =>
-          `<div class="qs-thumb"><img src="${esc(p.url)}" alt="${esc(p.name)}" />` +
+          `<div class="qs-thumb qs-thumb-${esc(p.state)}">` +
+          `<img src="${esc(p.localUrl || p.url)}" alt="${esc(p.name)}" />` +
+          (p.state === 'uploading' ? `<span class="qs-thumb-badge">Uploading…</span>` : '') +
+          (p.state === 'failed' ? `<span class="qs-thumb-badge qs-thumb-bad">Not attached</span>` : '') +
           `<button type="button" data-act="rmphoto" data-val="${i}" aria-label="Remove photo">×</button></div>`
       )
       .join('') +
@@ -471,11 +490,13 @@ function viewPrice(): string {
     scope === 'commercial' ? data.copy.price.commercialLabel : data.copy.price.residentialLabel;
   return (
     `<div class="qs-price">` +
-    `<span class="qs-price-eyebrow">${esc(data.copy.price.eyebrow)} · ${esc(label)}</span>` +
+    `<span class="qs-price-eyebrow">${esc(label)}</span>` +
     `<span class="qs-price-amount">${esc(amount)}</span>` +
-    `<span class="qs-price-waived">${esc(data.copy.waived)}</span>` +
-    `<p class="qs-price-note">${esc(data.copy.price.note)}</p>` +
     `</div>` +
+    `<ul class="qs-terms">` +
+    data.copy.terms.map((t) => `<li>${esc(t)}</li>`).join('') +
+    `</ul>` +
+    `<p class="qs-price-note">${esc(data.copy.price.note)}</p>` +
     `<p class="qs-hours">${esc(data.copy.hours)}</p>`
   );
 }
@@ -618,11 +639,15 @@ function onBodyClick(ev: Event): void {
       render();
       break;
 
-    case 'rmphoto':
-      state.photos.splice(Number(val), 1);
+    case 'rmphoto': {
+      const [gone] = state.photos.splice(Number(val), 1);
+      if (gone?.localUrl) {
+        try { URL.revokeObjectURL(gone.localUrl); } catch { /* already released */ }
+      }
       save();
       render();
       break;
+    }
 
     case 'skip-photos':
       state.photos = [];
@@ -698,22 +723,37 @@ function photoSession(): string {
 }
 
 async function uploadPhoto(file: File): Promise<void> {
-  const status = document.getElementById('qs-photo-status');
-  if (status) status.textContent = 'Uploading…';
+  // The thumbnail goes up immediately from a local object URL — the visitor sees
+  // their photo the moment they pick it, whatever the network is doing.
+  const localUrl = URL.createObjectURL(file);
+  const photo: Photo = { url: '', localUrl, name: file.name, state: 'uploading' };
+  state.photos.push(photo);
+  render();
+
+  const finish = (nextState: Photo['state'], remoteUrl = '') => {
+    photo.state = nextState;
+    photo.url = remoteUrl;
+    // Only the remote URL is worth persisting; an object URL dies with the page.
+    save();
+    render();
+    const status = document.getElementById('qs-photo-status');
+    if (status && nextState === 'failed') {
+      status.textContent = "Couldn't attach — continuing without photo.";
+    }
+  };
+
   try {
     const fd = new FormData();
     fd.append('file', file);
     fd.append('session_id', photoSession());
     fd.append('page_path', location.pathname);
     const res = await fetch('/api/chat/upload', { method: 'POST', body: fd });
-    const body = (await res.json()) as { public_url?: string };
+    const body = (await res.json().catch(() => ({}))) as { public_url?: string };
     if (!res.ok || !body.public_url) throw new Error('upload');
-    state.photos.push({ url: body.public_url, name: file.name });
-    save();
-    render();
+    finish('done', body.public_url);
   } catch {
     // A photo is a nice-to-have. Never let it stall the lead.
-    if (status) status.textContent = "Couldn't attach that photo — carry on without it.";
+    finish('failed');
   }
 }
 
@@ -793,9 +833,15 @@ async function submit(): Promise<void> {
         where: state.where,
         appliance: state.appliance,
         appliance_label: app ? app.label : '',
+        // Rendered by the sheet from quote-copy.ts so the Telegram card prints the
+        // same fee and the same wording the visitor just read.
+        price_display: state.where ? data.price[state.where] : '',
+        scope_label: state.where ? data.copy.scopeLabels[state.where] : '',
+        branch_label: branchName(branch),
+        branch_phone: branchPhone(branch),
         problems: state.problems,
         problem_text: state.problemText,
-        photos: state.photos.map((p) => p.url),
+        photos: state.photos.filter((p) => p.state === 'done' && p.url).map((p) => p.url),
         name: state.name,
         phone: state.phone,
         address: state.address,

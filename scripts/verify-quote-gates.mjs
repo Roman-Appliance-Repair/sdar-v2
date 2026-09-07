@@ -71,18 +71,27 @@ const CASES = [
     mutate: (s) => s.replace('const STORE_KEY', "const PRICE_HARDCODED = '$89';\nconst STORE_KEY"),
   },
   {
-    gate: 'static', name: 'waived clause drifts from the constant', file: COPY_TS, cmd: STATIC_GATE,
+    gate: 'static', name: 'a diagnostic term drifts from the constant', file: COPY_TS, cmd: STATIC_GATE,
     mutate: (s) => s.replace(
-      "export const WAIVED_CLAUSE = 'Waived when you go ahead with the repair'",
-      "export const WAIVED_CLAUSE = 'Waived with repair'"
+      "'Credited toward the repair when you hire us for the job.'",
+      "'Credited toward the repair.'"
     ),
   },
   {
-    gate: 'static', name: 'sheet leaks onto a second page', file: path.join(ROOT, 'dist', 'contact', 'index.html'), cmd: STATIC_GATE,
-    mutate: (s) => s.replace('<body', '<body><dialog id="quote-sheet"></dialog>'),
+    gate: 'static', name: 'a fourth diagnostic term sneaks in', file: COPY_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(
+      "'You get a written report: what failed and which parts need replacing.',",
+      "'You get a written report: what failed and which parts need replacing.', 'A fourth line nobody approved.',"
+    ),
+  },
+  {
+    gate: 'static', name: 'forbidden marketing phrase in the copy', file: COPY_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(
+      'export const HOURS_LINE =',
+      "export const MARKETING_SLIP = 'peace of mind'; export const HOURS_LINE ="
+    ),
   },
 
-  // ── smoke gate ────────────────────────────────────────────────────────────
   {
     gate: 'smoke', name: 'tile border removed', file: PAGE, cmd: SMOKE_GATE,
     mutate: (s) => s.replace(/\.qs-tile\{([^}]*?)border:1px solid var\(--border\)/, '.qs-tile{$1border:none'),
@@ -98,6 +107,17 @@ const CASES = [
   {
     gate: 'smoke', name: 'payload type is not "quote"', file: CHUNK, cmd: SMOKE_GATE,
     mutate: (s) => s.replace('type:"quote"', 'type:"booking"'),
+  },
+  {
+    gate: 'smoke', name: 'a price term is reworded in the shipped island', file: CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('qs-terms', 'qs-terms-renamed'),
+  },
+  {
+    gate: 'smoke', name: 'price heading changed', file: PAGE, cmd: SMOKE_GATE,
+    // replaceAll: the phrase appears several times in the serialised payload, and
+    // changing only the first one leaves the rendered heading intact — which is
+    // exactly the false pass this harness caught the first time round.
+    mutate: (s) => s.replaceAll('Diagnostic visit', 'Your price'),
   },
   {
     gate: 'smoke', name: 'no-JS form posts somewhere else', file: PAGE, cmd: SMOKE_GATE,

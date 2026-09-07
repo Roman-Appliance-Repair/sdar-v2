@@ -53,8 +53,11 @@ export async function onRequestPost({ request, env }) {
 
     const publicUrl = `${env.R2_PUBLIC_URL}/${key}`;
 
+    // The quote sheet uploads with a synthetic `quote-…` session id and has no chat
+    // session, and Preview environments may not bind the KV namespace at all. The
+    // file is already in R2 by this point — never fail the upload over the log.
     const sessionKey = `session:${sessionId}`;
-    const session = await env.SDAR_CHAT.get(sessionKey, 'json');
+    const session = env.SDAR_CHAT ? await env.SDAR_CHAT.get(sessionKey, 'json') : null;
     if (session) {
       session.last_index = (session.last_index || 0) + 1;
       session.messages.push({

@@ -13,7 +13,8 @@
 import {
   DIAGNOSTIC_RES_DISPLAY,
   DIAGNOSTIC_COM_DISPLAY,
-  WAIVED_CLAUSE,
+  DIAGNOSTIC_TERMS,
+  SCOPE_LABELS,
   HOURS_LINE,
   CALLBACK_COPY,
   PRICE_COPY,
@@ -35,8 +36,10 @@ export interface Props {
 
 const { phone = MAIN_PHONE } = Astro.props;
 
-const branchPhones = Object.fromEntries(
-  BRANCHES.filter((b) => b.phoneStatus === 'active').map((b) => [b.slug, b.phone])
+// slug -> { name, phone } for the done screen and for the Telegram card, which
+// prints the branch by name, not by slug.
+const branchDirectory = Object.fromEntries(
+  BRANCHES.filter((b) => b.phoneStatus === 'active').map((b) => [b.slug, { name: b.name, phone: b.phone }])
 );
 
 const payload = {
@@ -46,7 +49,8 @@ const payload = {
     commercial: DIAGNOSTIC_COM_DISPLAY,
   },
   copy: {
-    waived: WAIVED_CLAUSE,
+    terms: DIAGNOSTIC_TERMS,
+    scopeLabels: SCOPE_LABELS,
     hours: HOURS_LINE,
     callback: CALLBACK_COPY,
     price: PRICE_COPY,
@@ -62,7 +66,7 @@ const payload = {
     prefix3: ZIP_PREFIX3,
     mainSlug: MAIN_BRANCH_SLUG,
   },
-  phones: { main: phone, mainTel: MAIN_PHONE_TEL, branches: branchPhones },
+  phones: { main: phone, mainTel: MAIN_PHONE_TEL, branches: branchDirectory },
 };
 ---
 
@@ -349,7 +353,29 @@ const payload = {
     color: var(--black);
     margin: 6px 0 4px;
   }
-  .qs :global(.qs-price-waived) { font-size: 15px; font-weight: 600; color: var(--text); }
+  .qs :global(.qs-terms) {
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+  }
+  .qs :global(.qs-terms li) {
+    position: relative;
+    padding: 0 0 0 26px;
+    margin: 0 0 10px;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .qs :global(.qs-terms li::before) {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--red);
+  }
   .qs :global(.qs-price-note) {
     font-size: 14px;
     line-height: 1.6;
@@ -375,6 +401,20 @@ const payload = {
     background: var(--gray);
   }
   .qs :global(.qs-thumb img) { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .qs :global(.qs-thumb-badge) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 3px 4px;
+    background: rgba(10, 10, 10, 0.72);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .qs :global(.qs-thumb-badge.qs-thumb-bad) { background: var(--red); }
+  .qs :global(.qs-thumb-uploading img) { opacity: 0.55; }
   .qs :global(.qs-thumb button) {
     position: absolute;
     top: 2px;

@@ -12,7 +12,7 @@
 // The honeypot is LAST in source order and display:none. Real people never fill it;
 // the endpoint answers a silent 200 when it arrives non-empty.
 
-import { HOURS_LINE, WAIVED_CLAUSE, DIAGNOSTIC_RES_DISPLAY } from '../data/quote-copy';
+import { HOURS_LINE, DIAGNOSTIC_TERMS, DIAGNOSTIC_RES_DISPLAY, SCOPE_LABELS } from '../data/quote-copy';
 import { MAIN_PHONE, MAIN_PHONE_TEL } from '../data/branches';
 
 export interface Props {
@@ -33,6 +33,9 @@ const { phone = MAIN_PHONE, phoneTel = MAIN_PHONE_TEL } = Astro.props;
   <input type="hidden" name="type" value="quote" />
   <input type="hidden" name="brand_site" value="samedayappliance.repair" />
   <input type="hidden" name="source" value="fallback-form" />
+  <input type="hidden" name="where" value="residential" />
+  <input type="hidden" name="scope_label" value={SCOPE_LABELS.residential} />
+  <input type="hidden" name="price_display" value={DIAGNOSTIC_RES_DISPLAY} />
 
   <label class="qsf-field">
     <span>Your name</span>
@@ -62,8 +65,11 @@ const { phone = MAIN_PHONE, phoneTel = MAIN_PHONE_TEL } = Astro.props;
 
   <button type="submit" class="qsf-submit">Send request</button>
 
+  <p class="qsf-price">{DIAGNOSTIC_RES_DISPLAY} diagnostic visit</p>
+  <ul class="qsf-terms">
+    {DIAGNOSTIC_TERMS.map((term) => <li>{term}</li>)}
+  </ul>
   <p class="qsf-note">
-    {DIAGNOSTIC_RES_DISPLAY} diagnostic · {WAIVED_CLAUSE}.<br />
     {HOURS_LINE}<br />
     Prefer to talk it through? <a href={`tel:${phoneTel}`} data-tel>{phone}</a>.
   </p>
@@ -128,6 +134,32 @@ const { phone = MAIN_PHONE, phoneTel = MAIN_PHONE_TEL } = Astro.props;
     cursor: pointer;
   }
   .qsf-submit:hover { background: var(--red-dark); }
+  .qsf-price {
+    margin-top: 18px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--black);
+  }
+  .qsf-terms { list-style: none; margin: 8px 0 0; padding: 0; }
+  .qsf-terms li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .qsf-terms li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+  }
   .qsf-note { margin-top: 14px; font-size: 13px; line-height: 1.6; color: var(--muted); }
   .qsf-note a { color: var(--red); font-weight: 600; }
 </style>

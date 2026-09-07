@@ -25,8 +25,20 @@ export function money(amount: number): string {
 export const DIAGNOSTIC_RES_DISPLAY = money(DIAGNOSTIC_RES);
 export const DIAGNOSTIC_COM_DISPLAY = money(DIAGNOSTIC_COM);
 
-/** The waived clause. Byte-equality with what ships in dist/book/index.html is a gate. */
-export const WAIVED_CLAUSE = 'Waived when you go ahead with the repair';
+/**
+ * What the diagnostic fee actually buys. Three plain lines instead of one clause —
+ * each one answers a question people ask on the phone before they book.
+ * Byte-equality with what ships in dist/book/index.html is a gate, so edit here
+ * and nowhere else. The sheet, the fallback form and the Telegram card all read these.
+ */
+export const DIAGNOSTIC_TERMS = [
+  'Credited toward the repair when you hire us for the job.',
+  "If our technician can't diagnose the problem, there's no diagnostic fee.",
+  'You get a written report: what failed and which parts need replacing.',
+] as const;
+
+/** Single-line form, for places with no room for three (the Telegram card). */
+export const WAIVED_CLAUSE = DIAGNOSTIC_TERMS[0];
 
 /** Business hours line, shown on the price step and again on the done step. */
 export const HOURS_LINE =
@@ -42,9 +54,16 @@ export const CALLBACK_COPY = {
 /** Price-step framing. */
 export const PRICE_COPY = {
   eyebrow: 'Diagnostic visit',
+  heading: 'Diagnostic visit',
   residentialLabel: 'At home',
   commercialLabel: 'In a business',
   note: 'A technician comes out, finds the fault, and gives you a flat written repair price before anything is touched.',
+} as const;
+
+/** Scope labels reused by the sheet and the Telegram card. */
+export const SCOPE_LABELS = {
+  residential: 'at home',
+  commercial: 'in a business',
 } as const;
 
 /** Step headings, in order. The counter renders as "N / TOTAL_STEPS". */
@@ -53,7 +72,7 @@ export const STEP_COPY = [
   { id: 'appliance', heading: 'What needs fixing?' },
   { id: 'problem', heading: "What's it doing?" },
   { id: 'photos', heading: 'Add a photo?' },
-  { id: 'price', heading: 'Your diagnostic price' },
+  { id: 'price', heading: PRICE_COPY.heading },
   { id: 'contact', heading: 'Where do we come out?' },
 ] as const;
 

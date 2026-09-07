@@ -44,6 +44,7 @@ const SDAR_BRANCH_PHONES = {
 
 // Rate limit: 5 submits / 10 min per IP. KV when a binding exists, in-memory
 // (per-isolate, best effort) when it does not.
+const NEWLINE = String.fromCharCode(10);
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const memoryHits = new Map();
@@ -252,61 +253,80 @@ function buildTelegramText(p) {
 }
 
 /**
- * Quote-sheet card. Monospace block, four sections, one glanceable screen on a
- * dispatcher's phone: WHAT / CLIENT / UNIT / PHOTOS, then the provenance footer.
+ * Quote-sheet card — plain text, no monospace block, so it reads the same on a
+ * phone as on desktop and stays copy-pasteable line by line.
+ *
+ *   line 1  source banner
+ *   line 2  fee + scope + how it arrived
+ *   line 3  address warning, only when the address looks unusable
+ *   then    WHAT THEY WANT / CLIENT / UNIT / PHOTOS, two-space indent
+ *   footer  page + source
  */
 function buildQuoteCard(p) {
-  const branch = sdarBranch(p);
-  const pad = (k) => (k + '         ').slice(0, 10);
-  const row = (k, v) => (v || v === 0 ? '  ' + pad(k) + escape(String(v)) : null);
+  const row = (k, v) => (v || v === 0 ? '  ' + k + ': ' + escape(String(v)) : null);
 
-  const scope = p.where === 'commercial' ? 'In a business' : 'At home';
+  // The sheet sends a real branch name; the no-JS form has no ZIP field, so say so
+  // plainly rather than printing a slug the dispatcher has to decode.
+  const fallbackBranch = sdarBranch(p);
+  const branchLabel = p.branch_label || 'not set (no ZIP)';
+  const branchPhone = p.branch_phone || fallbackBranch.phone;
+  const scope = p.scope_label || (p.where === 'commercial' ? 'in a business' : 'at home');
+  const via = p.source === 'fallback-form' ? 'via form (no JS)' : 'via sheet';
+
   const whenMap = {
     asap: 'ASAP',
     today_tomorrow: 'Today or tomorrow',
-    pick_date: p.visit_date ? 'On ' + p.visit_date : 'Specific date',
+    pick_date: p.visit_date || 'Specific date',
   };
 
-  const what = [
-    'WHAT',
-    row('Scope', scope),
-    row('When', whenMap[p.visit_time] || p.visit_time || '—'),
-    row('Branch', branch.slug + ' → ' + branch.phone),
-    p.out_of_zone ? row('Zone', 'OUT OF ZONE — confirm before dispatch') : null,
+  const head = [
+    '🌐 Новый лид с сайта (samedayappliance.repair)',
+    'DIAGNOSTIC ' + escape(p.price_display || '') + ' — ' + escape(scope) + ' · ' + via,
+    addressLooksIncomplete(p.address) ? 'ADDRESS INCOMPLETE — check by phone' : null,
+    '',
   ];
 
-  const client = [
+  const symptoms = Array.isArray(p.problems) ? p.problems.join(', ') : p.problems || '';
+
+  const body = [
+    'WHAT THEY WANT',
+    row('Scope', scope),
+    row('When', whenMap[p.visit_time] || p.visit_time || '—'),
+    row('Branch', branchLabel + ' · ' + branchPhone),
     '',
     'CLIENT',
     row('Name', p.name || '—'),
     row('Phone', p.phone || '—'),
     row('Address', p.address || '—'),
     row('ZIP', p.zip || '—'),
+    p.out_of_zone ? row('Out of zone', 'yes — confirm before dispatch') : null,
     p.notes ? row('Notes', truncate(p.notes, 300)) : null,
-  ];
-
-  const symptoms = Array.isArray(p.problems) ? p.problems.join(', ') : p.problems || '';
-  const unit = [
     '',
     'UNIT',
     row('Appliance', p.appliance_label || p.appliance || '—'),
-    symptoms ? row('Symptoms', symptoms) : null,
+    symptoms ? row('Symptom', symptoms) : null,
     p.problem_text ? row('Detail', truncate(p.problem_text, 400)) : null,
+    '',
+    'PHOTOS',
+    '',
   ];
 
-  const urls = Array.isArray(p.photos) ? p.photos.filter(Boolean) : [];
-  const photos = ['', 'PHOTOS'].concat(
-    urls.length ? urls.map((u, i) => row(String(i + 1), u)) : [row('—', 'none attached')]
-  );
+  const foot = [
+    'Страница: ' + escape(p.page_url || '—'),
+    'Источник: samedayappliance.repair',
+  ];
 
-  const body = []
-    .concat(what, client, unit, photos)
+  return []
+    .concat(head, body, foot)
     .filter((l) => l !== null)
-    .join('\n');
+    .join(NEWLINE);
+}
 
-  const footer = 'via sheet · ' + escape(p.page_url || p.source || '—');
-
-  return '🧾 <b>SDAR QUOTE REQUEST</b>\n<pre>' + body + '</pre>' + footer;
+/** No house number at the front, or too short to route a truck to. */
+function addressLooksIncomplete(address) {
+  const a = String(address || '').trim();
+  if (a.length < 6) return true;
+  return !/^\d/.test(a);
 }
 
 /** Plain-HTML answer for the no-JS form leg, which navigates here. */
@@ -334,6 +354,23 @@ a.back{display:block;margin-top:20px;color:#6b6b6b;font-size:14px}</style></head
   });
 }
 
+// Telegram truncates a photo caption at 1024 characters. The card must never be
+// cut, so anything longer goes out as its own message and the photos reply to it.
+const TG_CAPTION_LIMIT = 1024;
+
+async function tg(env, method, body) {
+  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${method}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, ...body }),
+  });
+  try {
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
 async function sendTelegram(env, text, payload) {
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
@@ -342,15 +379,47 @@ async function sendTelegram(env, text, payload) {
     return;
   }
 
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
+  const photos = (payload && Array.isArray(payload.photos) ? payload.photos : [])
+    .filter((u) => typeof u === 'string' && /^https?:\/\//.test(u))
+    .slice(0, 10);
+
+  // No photos, or not a quote — one plain message, as before.
+  if (!photos.length) {
+    await tg(env, 'sendMessage', { text, parse_mode: 'HTML', disable_web_page_preview: true });
+    return;
+  }
+
+  // Card too long to ride as a caption: send it whole, hang the photos off it.
+  if (text.length > TG_CAPTION_LIMIT) {
+    const sent = await tg(env, 'sendMessage', {
       text,
       parse_mode: 'HTML',
       disable_web_page_preview: true,
-    }),
+    });
+    const replyTo = sent && sent.result && sent.result.message_id;
+    if (photos.length === 1) {
+      await tg(env, 'sendPhoto', { photo: photos[0], reply_to_message_id: replyTo });
+    } else {
+      await tg(env, 'sendMediaGroup', {
+        media: photos.map((u) => ({ type: 'photo', media: u })),
+        reply_to_message_id: replyTo,
+      });
+    }
+    return;
+  }
+
+  // Card fits: it becomes the caption, so the dispatcher sees photo and details together.
+  if (photos.length === 1) {
+    await tg(env, 'sendPhoto', { photo: photos[0], caption: text, parse_mode: 'HTML' });
+    return;
+  }
+
+  await tg(env, 'sendMediaGroup', {
+    media: photos.map((u, i) =>
+      i === 0
+        ? { type: 'photo', media: u, caption: text, parse_mode: 'HTML' }
+        : { type: 'photo', media: u }
+    ),
   });
 }
 
