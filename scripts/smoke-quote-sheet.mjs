@@ -252,6 +252,157 @@ async function noJsLeg(browser, base) {
   await ctx.close();
 }
 
+/**
+ * Stands in for the Google Maps JS library. Installed via addInitScript so it is
+ * present before the island wires step 6, exactly as a warm real script would be.
+ * `failing: true` makes fetchAutocompleteSuggestions throw, which is the only
+ * condition allowed to turn the note red.
+ */
+function mapsMock(failing) {
+  return `(() => {
+    const PLACE = {
+      id: 'mock-place-1',
+      formattedAddress: '8746 Rangely Ave, West Hollywood, CA 90048, USA',
+      addressComponents: [
+        { types: ['street_number'], longText: '8746' },
+        { types: ['route'], longText: 'Rangely Ave' },
+        { types: ['locality'], longText: 'West Hollywood' },
+        { types: ['administrative_area_level_1'], longText: 'California' },
+        { types: ['postal_code'], longText: '90048' },
+      ],
+      location: { lat: () => 34.0800742, lng: () => -118.384211 },
+      fetchFields: async () => {},
+    };
+    window.google = {
+      maps: {
+        places: {
+          AutocompleteSessionToken: function () {},
+          Place: function () { return PLACE; },
+          AutocompleteSuggestion: {
+            fetchAutocompleteSuggestions: async () => {
+              if (${failing ? 'true' : 'false'}) throw new Error('mock lookup failure');
+              return {
+                suggestions: [{
+                  placePrediction: {
+                    text: { text: '8746 Rangely Ave, West Hollywood, CA, USA' },
+                    structuredFormat: {
+                      mainText: { text: '8746 Rangely Ave' },
+                      secondaryText: { text: 'West Hollywood, CA, USA' },
+                    },
+                    placeId: 'mock-place-1',
+                    toPlace: () => PLACE,
+                  },
+                }],
+              };
+            },
+          },
+        },
+      },
+    };
+  })();`;
+}
+
+/** Drives steps 1-5 so the caller lands on step 6 with a resumable state. */
+async function walkToContact(page) {
+  await page.click('[data-quote-source]');
+  await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 5000 });
+  await (await tileByText(page, 'At home')).click();
+  await (await tileByText(page, 'Refrigerator')).click();
+  await (await tileByText(page, 'Not cooling')).click();
+  await page.click('#qs-primary'); // problem -> photos
+  await page.click('#qs-primary'); // photos  -> price
+  await page.click('#qs-primary'); // price   -> contact
+}
+
+/** Address verification, both legs. */
+async function addressLeg(browser, base, failing) {
+  const label = failing ? 'address (lookup fails)' : 'address (verified)';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
+  await ctx.addInitScript(mapsMock(failing));
+  const page = await ctx.newPage();
+
+  // The real library must never be fetched during the test.
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+
+  const captured = [];
+  await page.route('**/api/contact', async (route) => {
+    captured.push(route.request().postData() || '');
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+  });
+
+  await page.goto(`${base}/book/`, { waitUntil: 'domcontentloaded' });
+  await walkToContact(page);
+  expect(`${label}: reached step 6`, (await counter(page)) === '6 / 6', await counter(page));
+
+  // Type enough to pass the 4-character threshold and let the 250 ms debounce fire.
+  await page.fill('#qs-address', '8746 Rangely');
+  await page.waitForTimeout(600);
+
+  if (!failing) {
+    const items = await page.locator('#qs-addr-list .qs-addr-item').count();
+    expect(`${label}: suggestion list opens`, items === 1, `${items} item(s)`);
+
+    // Click the suggestion the way a visitor does — the island's own pointerdown
+    // handler, not a class poked from the test.
+    await page.locator('#qs-addr-list .qs-addr-item').first().dispatchEvent('pointerdown');
+    await page.waitForTimeout(300);
+
+    const note = await page.locator('#qs-addr-note').evaluate((el) => ({
+      cls: el.className,
+      text: el.textContent.trim(),
+      color: getComputedStyle(el).color,
+    }));
+    expect(`${label}: note turns green`, note.cls === 'qs-ok', JSON.stringify(note));
+    expect(`${label}: note reads the city`, note.text === '✓ West Hollywood, CA', note.text);
+
+    const addr = await page.inputValue('#qs-address');
+    const zip = await page.inputValue('#qs-zip');
+    expect(`${label}: address replaced by the formatted one`,
+      addr === '8746 Rangely Ave, West Hollywood, CA 90048, USA', addr);
+    expect(`${label}: ZIP filled from the place`, zip === '90048', zip);
+  } else {
+    const note = await page.locator('#qs-addr-note').evaluate((el) => ({
+      cls: el.className,
+      text: el.textContent.trim(),
+    }));
+    expect(`${label}: note turns red`, note.cls === 'qs-err', JSON.stringify(note));
+    expect(
+      `${label}: red text is the lookup message`,
+      note.text === "Address lookup isn't responding — type it in full and we'll confirm by phone.",
+      note.text
+    );
+    const items = await page.locator('#qs-addr-list .qs-addr-item').count();
+    expect(`${label}: no suggestion list`, items === 0, `${items} item(s)`);
+    // A broken lookup must never stop a submit — fill the rest by hand.
+    await page.fill('#qs-zip', '90048');
+  }
+
+  await page.fill('#qs-name', 'Dana');
+  await page.fill('#qs-phone', '3105550134');
+  await (await tileByText(page, 'ASAP')).click();
+  await page.click('#qs-primary');
+  await page.waitForTimeout(400);
+
+  expect(`${label}: submit went through`, captured.length === 1, `${captured.length} request(s)`);
+  if (captured.length) {
+    const p = JSON.parse(captured[0]);
+    expect(`${label}: address_verified is ${!failing}`, p.address_verified === !failing,
+      String(p.address_verified));
+    if (!failing) {
+      expect(`${label}: place_id in payload`, p.place_id === 'mock-place-1', String(p.place_id));
+      expect(`${label}: lat/lng in payload`,
+        Math.abs(p.lat - 34.0800742) < 1e-6 && Math.abs(p.lng + 118.384211) < 1e-6,
+        `${p.lat}, ${p.lng}`);
+      expect(`${label}: city from Google in payload`, p.city_display === 'West Hollywood',
+        String(p.city_display));
+      expect(`${label}: branch still routed by ZIP`, p.city === 'west-hollywood', String(p.city));
+    }
+  }
+
+  await ctx.close();
+}
+
 // ── run ──────────────────────────────────────────────────────────────────────
 const { server, base } = await serve();
 const browser = await chromium.launch({ headless: !HEADED });
@@ -259,6 +410,8 @@ try {
   await journey(browser, base, { width: 375, height: 812 }, 'phone');
   await journey(browser, base, { width: 1280, height: 800 }, 'desktop');
   await noJsLeg(browser, base);
+  await addressLeg(browser, base, false);
+  await addressLeg(browser, base, true);
 } finally {
   await browser.close();
   server.close();

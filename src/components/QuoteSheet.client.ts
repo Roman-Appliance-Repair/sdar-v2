@@ -18,6 +18,7 @@ interface Appliance {
 }
 
 interface QuoteData {
+  hasMaps: boolean;
   appliances: Record<Scope, Appliance[]>;
   price: Record<Scope, string>;
   copy: {
@@ -34,6 +35,7 @@ interface QuoteData {
     steps: { id: string; heading: string }[];
     totalSteps: number;
     outOfZone: string;
+    address: { label: string; placeholder: string; lookupFailed: string; streetOnly: string };
     visitTimes: { id: string; label: string; hint: string }[];
     photos: { hint: string; max: number; skip: string; maxBytes: number; tooBig: string };
     errors: { rateLimited: string; failed: string };
@@ -74,6 +76,12 @@ interface State {
   visitDate: string;
   notes: string;
   source: string;
+  /** Address verification, all filled by a Google pick and cleared by hand-editing. */
+  addressVerified: boolean;
+  placeId: string;
+  lat: number | null;
+  lng: number | null;
+  cityFromGoogle: string;
 }
 
 const STORE_KEY = 'sdar_qs_v1';
@@ -114,6 +122,11 @@ function blank(): State {
     visitDate: '',
     notes: '',
     source: 'unknown',
+    addressVerified: false,
+    placeId: '',
+    lat: null,
+    lng: null,
+    cityFromGoogle: '',
   };
 }
 
@@ -383,6 +396,12 @@ function render(): void {
   elPrimary.disabled = false;
   elPrimary.textContent = primaryLabel(step.id);
 
+  if (step.id === 'contact') {
+    // Rendering step 6 replaces the field, so the widget is wired to the fresh node.
+    // Nothing before this point has touched the Maps library.
+    void wireAddress();
+  }
+
   if (step.id === 'price' && !priceSeen) {
     priceSeen = true;
     track('quote_price_shown', {
@@ -512,10 +531,17 @@ function viewContact(): string {
       inputmode: 'numeric',
       placeholder: '(000) 000-0000',
     }) +
-    field('Address', 'qs-address', 'address', 'text', {
-      autocomplete: 'street-address',
-      placeholder: 'Street address',
-    }) +
+    `<div class="qs-field qs-addr-wrap">` +
+    `<span>${esc(data.copy.address.label)}</span>` +
+    `<input class="qs-input" type="text" id="qs-address" data-field="address"` +
+    ` value="${esc(state.address)}" autocomplete="street-address" autocapitalize="words"` +
+    ` placeholder="${esc(data.copy.address.placeholder)}"` +
+    (errors.address ? ` aria-invalid="true"` : '') +
+    ` />` +
+    `<ul class="qs-addr-list" id="qs-addr-list" role="listbox" hidden></ul>` +
+    `<span class="qs-hint" id="qs-addr-note"></span>` +
+    (errors.address ? `<span class="qs-err">${esc(errors.address)}</span>` : '') +
+    `</div>` +
     field('ZIP', 'qs-zip', 'zip', 'text', {
       autocomplete: 'postal-code',
       inputmode: 'numeric',
@@ -680,6 +706,8 @@ function onBodyInput(ev: Event): void {
   }
 
   (state as unknown as Record<string, string>)[key] = el.value;
+  // Typing a ZIP by hand after Google filled one detaches it from the verified place.
+  if (key === 'zip' && state.addressVerified) state.addressVerified = false;
   if (errors[key]) {
     delete errors[key];
     el.removeAttribute('aria-invalid');
@@ -765,6 +793,258 @@ async function uploadPhoto(file: File): Promise<void> {
   }
 }
 
+// ── address verification ─────────────────────────────────────────────────────
+
+let mapsPromise: Promise<void> | null = null;
+
+/** Loads the Maps JS library from the config the .astro emitted. Never called before
+ *  step 6 is on screen, so nothing about Maps touches the earlier steps. */
+function loadMaps(): Promise<void> {
+  return (mapsPromise ??= new Promise<void>((done) => {
+    const cfg = document.querySelector('[data-quote-sheet-maps]');
+    if (!cfg) return done();
+    let src = '';
+    try {
+      src = (JSON.parse(cfg.textContent || '{}') as { src?: string }).src || '';
+    } catch {
+      /* malformed config — fall through to the plain text field */
+    }
+    if (!src) return done();
+    (window as unknown as Record<string, unknown>).__quoteSheetMapsReady = () => done();
+    const el = document.createElement('script');
+    el.async = true;
+    el.src = src;
+    el.onerror = () => done();
+    document.head.appendChild(el);
+    // A warm script may never fire the callback again; the capability check in
+    // fetchSuggestions is what actually gates use, so a missed callback costs nothing.
+    window.setTimeout(done, 6000);
+  }));
+}
+
+interface Suggestion {
+  text: string;
+  main: string;
+  secondary: string;
+  placeId: string;
+  prediction: any;
+}
+
+async function wireAddress(): Promise<void> {
+  const input = document.getElementById('qs-address') as HTMLInputElement | null;
+  const list = document.getElementById('qs-addr-list') as HTMLUListElement | null;
+  const note = document.getElementById('qs-addr-note') as HTMLElement | null;
+  if (!input || !list || !note) return;
+  if (input.dataset.qsWired === '1') return;
+  input.dataset.qsWired = '1';
+
+  /**
+   * EVERY MUTABLE BINDING IS DECLARED HERE, ABOVE THE LISTENERS, DELIBERATELY.
+   * The input listener is attached immediately and calls schedule(), which touches
+   * `timer`. Declared further down — below the await at the end — a keystroke typed
+   * while Maps was still loading throws "Cannot access 'timer' before initialization"
+   * and takes the whole handler with it, including the line that stores what was typed.
+   * On a blocked or slow Maps that window is the six-second loader timeout, not an instant.
+   */
+  let token: unknown = null;
+  let timer: number | undefined;
+  let pointerInList = false;
+  let suggestions: Suggestion[] = [];
+
+  const g = () => (window as unknown as { google?: any }).google;
+  const ready = () => Boolean(g()?.maps?.places?.AutocompleteSuggestion);
+
+  /** Three states in one function, so a green tick can never survive a later failure. */
+  const setNote = (text: string, kind: 'ok' | 'err' | 'hint') => {
+    note.className = kind === 'ok' ? 'qs-ok' : kind === 'err' ? 'qs-err' : 'qs-hint';
+    note.textContent = text ? (kind === 'ok' ? '✓ ' + text : text) : '';
+  };
+
+  // Coming back to a resumed step 6 should still show the confirmation it earned.
+  if (state.addressVerified && state.cityFromGoogle) {
+    setNote(state.cityFromGoogle + ', CA', 'ok');
+  }
+
+  const close = () => {
+    list.hidden = true;
+    list.replaceChildren();
+  };
+
+  function schedule() {
+    window.clearTimeout(timer);
+    timer = window.setTimeout(fetchSuggestions, 250);
+  }
+
+  const txt = (v: unknown) =>
+    typeof v === 'string' ? v : ((v as { text?: string } | null)?.text ?? '');
+
+  async function fetchSuggestions(): Promise<void> {
+    if (!ready() || input!.value.trim().length < 4) return close();
+    try {
+      if (!token) token = new (g().maps.places.AutocompleteSessionToken)();
+      const res = await g().maps.places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
+        input: input!.value,
+        sessionToken: token,
+        includedRegionCodes: ['us'],
+        // Southern California, the seven counties we actually drive to.
+        locationBias: { south: 32.5, west: -119.65, north: 35.1, east: -114.1 },
+        language: 'en-US',
+        region: 'us',
+      });
+      suggestions = ((res && res.suggestions) || [])
+        .map((r: any) => r.placePrediction)
+        .filter(Boolean)
+        .map((p: any) => ({
+          text: txt(p.text),
+          main: txt(p.mainText ?? p.structuredFormat?.mainText),
+          secondary: txt(p.secondaryText ?? p.structuredFormat?.secondaryText),
+          placeId: p.placeId || p.place_id || '',
+          prediction: p,
+        }))
+        .filter((x: Suggestion) => x.text)
+        .slice(0, 5);
+      if (!suggestions.length) return close();
+
+      list!.replaceChildren();
+      suggestions.forEach((sg, i) => {
+        const li = document.createElement('li');
+        li.className = 'qs-addr-item';
+        li.setAttribute('role', 'option');
+        const main = document.createElement('span');
+        main.className = 'qs-addr-main';
+        main.textContent = sg.main || sg.text;
+        li.append(main);
+        if (sg.secondary) {
+          const sec = document.createElement('span');
+          sec.className = 'qs-addr-sec';
+          sec.textContent = ', ' + sg.secondary;
+          li.append(sec);
+        }
+        // pointerdown, not click: on touch the input blurs before a click can land.
+        li.addEventListener('pointerdown', (e) => {
+          e.preventDefault();
+          pointerInList = true;
+          void choose(i);
+          pointerInList = false;
+        });
+        list!.appendChild(li);
+      });
+      list!.hidden = false;
+    } catch (err) {
+      // The only place the error style is used: the lookup request itself failed. It says
+      // what to do next and stops there — a broken autocomplete never blocks a submit.
+      console.warn('[quote-sheet] address suggestions unavailable:', err);
+      setNote(data.copy.address.lookupFailed, 'err');
+      close();
+    }
+  }
+
+  async function choose(i: number): Promise<void> {
+    const sg = suggestions[i];
+    if (!sg) return;
+    input!.value = sg.text;
+    state.address = sg.text;
+    close();
+    try {
+      const place =
+        typeof sg.prediction.toPlace === 'function'
+          ? sg.prediction.toPlace()
+          : new (g().maps.places.Place)({ id: sg.placeId });
+      await place.fetchFields({ fields: ['formattedAddress', 'addressComponents', 'location'] });
+      applyPlace(place, sg.placeId);
+    } catch (err) {
+      console.warn('[quote-sheet] place details unavailable:', err);
+      setNote(data.copy.address.lookupFailed, 'err');
+    }
+    save();
+    // A pick closes the billing session; the next keystroke starts a fresh one.
+    token = ready() ? new (g().maps.places.AutocompleteSessionToken)() : null;
+  }
+
+  function applyPlace(place: any, fallbackId: string): void {
+    const comps: any[] = place.addressComponents || place.address_components || [];
+    const pick = (type: string) => {
+      const c = comps.find((x) => Array.isArray(x.types) && x.types.includes(type));
+      return c ? (c.longText ?? c.long_name ?? '') : '';
+    };
+    const city =
+      pick('locality') || pick('sublocality') || pick('postal_town') ||
+      pick('administrative_area_level_3');
+    const zip = pick('postal_code');
+    const houseNumber = pick('street_number');
+    const formatted = place.formattedAddress || place.formatted_address || '';
+
+    if (formatted) {
+      input!.value = formatted;
+      state.address = formatted;
+    }
+    const loc = place.location;
+    state.lat = typeof loc?.lat === 'function' ? loc.lat() : (loc?.lat ?? null);
+    state.lng = typeof loc?.lng === 'function' ? loc.lng() : (loc?.lng ?? null);
+    state.placeId = place.id || place.place_id || fallbackId || '';
+    state.cityFromGoogle = city;
+
+    if (zip) {
+      state.zip = zip;
+      const zipEl = document.getElementById('qs-zip') as HTMLInputElement | null;
+      if (zipEl) zipEl.value = zip;
+      delete errors.zip;
+      syncZoneNote();
+    }
+
+    if (houseNumber) {
+      state.addressVerified = true;
+      setNote(city ? city + ', CA' : 'Address confirmed', 'ok');
+    } else {
+      // A street without a number is not a dispatchable address, but it is not an error
+      // either — keep it, keep the city, and nudge rather than block.
+      state.addressVerified = false;
+      setNote(data.copy.address.streetOnly, 'hint');
+    }
+    delete errors.address;
+    save();
+  }
+
+  input.addEventListener('input', () => {
+    state.address = input.value.trim();
+    // Hand-editing after a pick invalidates the verification — silently keeping the
+    // green tick would tell dispatch an address was confirmed when it no longer is.
+    if (state.addressVerified || state.placeId) {
+      state.addressVerified = false;
+      state.placeId = '';
+      state.lat = null;
+      state.lng = null;
+      state.cityFromGoogle = '';
+      setNote('', 'hint');
+    }
+    if (note.className === 'qs-err') setNote('', 'hint');
+    save();
+    schedule();
+  });
+
+  list.addEventListener('pointerdown', () => {
+    pointerInList = true;
+  });
+  document.addEventListener('pointerup', () => {
+    pointerInList = false;
+  });
+  input.addEventListener('blur', () => {
+    if (!pointerInList) close();
+  });
+
+  /**
+   * LOADING THE LIBRARY IS THE LAST THING THIS FUNCTION DOES, AND THAT IS THE POINT.
+   * schedule / fetchSuggestions / choose are function declarations, so the listeners
+   * above can reach them the moment they are attached — whereas an await in the middle
+   * of the body would leave every const below it in the temporal dead zone. With a warm
+   * Maps script ready() is already true, so a visitor could get a list, tap it, and hit
+   * "Cannot access 'close' before initialization" — the address silently never commits.
+   * Nothing may be declared after this line.
+   */
+  if (!data.hasMaps) return;
+  await loadMaps();
+}
+
 // ── validation + submit ──────────────────────────────────────────────────────
 
 function validateContact(): boolean {
@@ -847,6 +1127,13 @@ async function submit(): Promise<void> {
         scope_label: state.where ? data.copy.scopeLabels[state.where] : '',
         branch_label: branchName(branch),
         branch_phone: branchPhone(branch),
+        // Address verification. Branch routing stays keyed to the ZIP above — the
+        // Google city is for display and for the dispatcher's card, nothing else.
+        address_verified: state.addressVerified,
+        place_id: state.placeId,
+        lat: state.lat,
+        lng: state.lng,
+        city_display: state.cityFromGoogle,
         problems: state.problems,
         problem_text: state.problemText,
         photos: state.photos.filter((p) => p.state === 'done' && p.url).map((p) => p.url),

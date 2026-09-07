@@ -282,7 +282,7 @@ function buildQuoteCard(p) {
   const head = [
     '🌐 Новый лид с сайта (samedayappliance.repair)',
     'DIAGNOSTIC ' + escape(p.price_display || '') + ' — ' + escape(scope) + ' · ' + via,
-    addressLooksIncomplete(p.address) ? 'ADDRESS INCOMPLETE — check by phone' : null,
+    addressBanner(p),
     '',
   ];
 
@@ -298,6 +298,7 @@ function buildQuoteCard(p) {
     row('Name', p.name || '—'),
     row('Phone', p.phone || '—'),
     row('Address', p.address || '—'),
+    row('Verified', p.address_verified ? 'Google ✓' : 'no'),
     row('ZIP', p.zip || '—'),
     p.out_of_zone ? row('Out of zone', 'yes — confirm before dispatch') : null,
     p.notes ? row('Notes', truncate(p.notes, 300)) : null,
@@ -320,6 +321,17 @@ function buildQuoteCard(p) {
     .concat(head, body, foot)
     .filter((l) => l !== null)
     .join(NEWLINE);
+}
+
+/**
+ * One banner line, in order of how much trouble it will cause dispatch:
+ * an unusable address first, then an address Google never confirmed. A pick that
+ * Google verified needs no warning at all.
+ */
+function addressBanner(p) {
+  if (addressLooksIncomplete(p.address)) return 'ADDRESS INCOMPLETE — check by phone';
+  if (!p.address_verified) return 'ADDRESS NOT VERIFIED — check by phone';
+  return null;
 }
 
 /** No house number at the front, or too short to route a truck to. */

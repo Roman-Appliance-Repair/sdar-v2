@@ -143,10 +143,35 @@ for (const file of SHEET_SOURCES) {
   check('no forbidden marketing phrases in quote-copy.ts', hits.length === 0, hits.join(', '));
 }
 
+// ── 6c. address verification: token, no raw hex, no eager Maps script ────────
+{
+  // The confirmation colour is a palette token, defined once.
+  check('--color-ok is defined in the built page', /--color-ok:\s*#[0-9a-fA-F]{3,8}/.test(html));
+
+  // …and the ok class consumes the token rather than repeating a hex value.
+  const okRule = html.match(/\.qs-ok\s*\{[^}]*\}/);
+  if (!okRule) {
+    check('.qs-ok rule ships', false, 'rule not found in the built page');
+  } else {
+    check('.qs-ok uses var(--color-ok)', okRule[0].includes('var(--color-ok)'), okRule[0]);
+    check('.qs-ok carries no raw hex colour', !/#[0-9a-fA-F]{3,8}/.test(okRule[0]), okRule[0]);
+  }
+
+  // The Maps library must never be a script tag in the initial HTML — the island
+  // appends it, and only once step 6 is on screen.
+  const eager = /<script[^>]*src=["']https:\/\/maps\.googleapis\.com/.test(html);
+  check('Maps library is not a <script src> in the initial HTML', !eager);
+
+  // The loader config (which carries the key) ships exactly once, and only here.
+  const cfgCount = countMatches(html, /data-quote-sheet-maps/g);
+  check('Maps loader config appears exactly once on /book/', cfgCount === 1, `found ${cfgCount}`);
+}
+
 // ── 7. canary containment: the sheet is on /book/ and nowhere else ───────────
 {
   const distDir = path.join(ROOT, 'dist');
   const withSheet = [];
+  const withKey = [];
   async function walk(dir) {
     for (const entry of await readdir(dir)) {
       const full = path.join(dir, entry);
@@ -155,6 +180,7 @@ for (const file of SHEET_SOURCES) {
       else if (entry.endsWith('.html')) {
         const body = await readFile(full, 'utf8');
         if (body.includes('id="quote-sheet"')) withSheet.push(path.relative(distDir, full));
+        if (body.includes('data-quote-sheet-maps')) withKey.push(path.relative(distDir, full));
       }
     }
   }
@@ -164,6 +190,13 @@ for (const file of SHEET_SOURCES) {
     'quote sheet is canaried to /book/ only',
     only,
     `present on ${withSheet.length} page(s): ${withSheet.slice(0, 5).join(', ')}`
+  );
+  const keyOnly =
+    withKey.length === 1 && withKey[0].replace(/\\/g, '/') === 'book/index.html';
+  check(
+    'the Maps key ships on /book/ and nowhere else',
+    keyOnly,
+    `present on ${withKey.length} page(s): ${withKey.slice(0, 5).join(', ')}`
   );
 }
 

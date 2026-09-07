@@ -93,6 +93,33 @@ const CASES = [
   },
 
   {
+    gate: 'static', name: 'ok class hard-codes a hex instead of the token', file: PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('.qs-ok{display:block', '.qs-ok{color:#0F7B3D;display:block'),
+  },
+  {
+    gate: 'static', name: '--color-ok token removed', file: PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replaceAll('--color-ok', '--color-gone'),
+  },
+  {
+    gate: 'static', name: 'Maps loaded eagerly as a script tag', file: PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('<body', '<body><script src="https://maps.googleapis.com/maps/api/js"></script>'),
+  },
+  {
+    gate: 'static', name: 'Maps key leaks onto a second page', file: path.join(ROOT, 'dist', 'contact', 'index.html'), cmd: STATIC_GATE,
+    mutate: (s) => s.replace('<body', '<body><script type="application/json" data-quote-sheet-maps>{}</script>'),
+  },
+  {
+    gate: 'smoke', name: 'verified pick no longer sets address_verified', file: CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('addressVerified=!0', 'addressVerified=!1'),
+  },
+  {
+    gate: 'smoke', name: 'failed lookup paints the note green instead of red', file: CHUNK, cmd: SMOKE_GATE,
+    // Target setNote's ternary specifically. A plain replace of the first '"qs-err"'
+    // hits a field-error template instead and proves nothing — that false pass is
+    // exactly what this harness caught on the first run.
+    mutate: (s) => s.replace(/\?"qs-ok":(\w+)==="err"\?"qs-err"/, '?"qs-ok":$1==="err"?"qs-ok"'),
+  },
+  {
     gate: 'smoke', name: 'tile border removed', file: PAGE, cmd: SMOKE_GATE,
     mutate: (s) => s.replace(/\.qs-tile\{([^}]*?)border:1px solid var\(--border\)/, '.qs-tile{$1border:none'),
   },

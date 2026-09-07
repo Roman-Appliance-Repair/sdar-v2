@@ -78,6 +78,17 @@ export const STEP_COPY = [
 
 export const TOTAL_STEPS = STEP_COPY.length;
 
+/** Address verification, step 6. */
+export const ADDRESS_COPY = {
+  label: 'Address',
+  placeholder: 'Start typing the street address',
+  /** The only place the error style is used: the lookup request itself failed. */
+  lookupFailed:
+    "Address lookup isn't responding — type it in full and we'll confirm by phone.",
+  /** Shown when a suggestion resolved to a street but not a specific building. */
+  streetOnly: 'Add the house or unit number so the tech finds the door.',
+} as const;
+
 /** Out-of-zone ZIP note. A note, never a block — the lead still goes through. */
 export const OUT_OF_ZONE_NOTE =
   "That ZIP is outside our usual routes. Send it anyway — we'll call and tell you straight whether we can get a truck to you.";

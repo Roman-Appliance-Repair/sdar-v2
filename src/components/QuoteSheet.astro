@@ -10,6 +10,8 @@
 // Every string and every number arrives through src/data/quote-copy.ts. This file
 // carries no currency literal of its own — scripts/check-quote-sheet.mjs enforces it.
 
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   DIAGNOSTIC_RES_DISPLAY,
   DIAGNOSTIC_COM_DISPLAY,
@@ -21,6 +23,7 @@ import {
   STEP_COPY,
   TOTAL_STEPS,
   OUT_OF_ZONE_NOTE,
+  ADDRESS_COPY,
   VISIT_TIMES,
   PHOTOS_COPY,
   ERROR_COPY,
@@ -42,7 +45,33 @@ const branchDirectory = Object.fromEntries(
   BRANCHES.filter((b) => b.phoneStatus === 'active').map((b) => [b.slug, { name: b.name, phone: b.phone }])
 );
 
+/**
+ * The Maps key, resolved at BUILD time — the site is output: 'static', so there is no
+ * runtime to read an env var from. Cloudflare Pages exposes plain env vars to the build,
+ * which is why GOOGLE_MAPS_KEY is a plain variable and not a secret (a secret would be
+ * invisible here). The key is a browser key restricted by HTTP referrer, so shipping it
+ * in the page is how it is meant to be used.
+ *
+ * With no key the address field stays an ordinary text input and the flow still submits —
+ * the lead just arrives marked unverified.
+ */
+const mapsKey = (() => {
+  const fromEnv = (process.env.GOOGLE_MAPS_KEY ?? process.env.PUBLIC_GOOGLE_MAPS_KEY ?? '').trim();
+  if (fromEnv) return fromEnv;
+  try {
+    const p = resolve(process.cwd(), 'secrets/google-maps-key.txt');
+    if (existsSync(p)) {
+      const k = readFileSync(p, 'utf8').trim();
+      if (k) return k;
+    }
+  } catch {
+    /* no local key — plain text field, documented behaviour */
+  }
+  return '';
+})();
+
 const payload = {
+  hasMaps: Boolean(mapsKey),
   appliances: buildQuoteData(),
   price: {
     residential: DIAGNOSTIC_RES_DISPLAY,
@@ -57,6 +86,7 @@ const payload = {
     steps: STEP_COPY,
     totalSteps: TOTAL_STEPS,
     outOfZone: OUT_OF_ZONE_NOTE,
+    address: ADDRESS_COPY,
     visitTimes: VISIT_TIMES,
     photos: PHOTOS_COPY,
     errors: ERROR_COPY,
@@ -69,6 +99,17 @@ const payload = {
   phones: { main: phone, mainTel: MAIN_PHONE_TEL, branches: branchDirectory },
 };
 ---
+
+{mapsKey && (
+  <script
+    is:inline
+    type="application/json"
+    data-quote-sheet-maps
+    set:html={JSON.stringify({
+      src: `https://maps.googleapis.com/maps/api/js?key=${mapsKey}&libraries=places&loading=async&callback=__quoteSheetMapsReady`,
+    })}
+  />
+)}
 
 <dialog id="quote-sheet" class="qs" aria-labelledby="qs-heading">
   <div class="qs-shell">
@@ -326,6 +367,47 @@ const payload = {
     font-weight: 600;
     color: var(--red);
   }
+
+  /* Address verification. Green is confirmation, grey is a nudge, red is reserved for
+     the lookup request failing — never for anything the visitor did. */
+  .qs :global(.qs-ok) {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-ok);
+  }
+  .qs :global(.qs-hint) {
+    display: block;
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .qs :global(.qs-addr-wrap) { position: relative; }
+  .qs :global(.qs-addr-list) {
+    list-style: none;
+    margin: 4px 0 0;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--white);
+    max-height: 232px;
+    overflow-y: auto;
+  }
+  .qs :global(.qs-addr-list[hidden]) { display: none; }
+  .qs :global(.qs-addr-item) {
+    padding: 12px 14px;
+    min-height: 48px;
+    font-size: 15px;
+    line-height: 1.35;
+    cursor: pointer;
+    border-bottom: 1px solid var(--border);
+  }
+  .qs :global(.qs-addr-item:last-child) { border-bottom: none; }
+  .qs :global(.qs-addr-item:hover) { background: var(--gray); }
+  .qs :global(.qs-addr-main) { font-weight: 600; color: var(--text); }
+  .qs :global(.qs-addr-sec) { color: var(--muted); }
 
   /* Price step */
   .qs :global(.qs-price) {
