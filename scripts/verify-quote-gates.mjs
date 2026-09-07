@@ -173,7 +173,10 @@ const CASES = [
     gate: 'static', name: 'QS-1.5: an appliance tile loses its provenance', file: APPL_TS, cmd: STATIC_GATE,
     // A tile with no entry in APPLIANCE_SOURCES is a tile for equipment nobody
     // checked we service. That is exactly the invention the gate exists to stop.
-    mutate: (s) => s.replace("  garbage_disposal: ['garbage-disposal-repair'],\n", ''),
+    // \r?\n, not \n: this repo checks .ts files out with CRLF on Windows, and a
+    // mutation anchored on a bare \n silently stops applying — which turns a proven
+    // gate into a SKIP nobody reads. Same for the two cases below.
+    mutate: (s) => s.replace(/ {2}garbage_disposal: \['garbage-disposal-repair'\],\r?\n/, ''),
   },
   {
     gate: 'static', name: 'QS-1.5: a tile cites a service the catalog does not have', file: APPL_TS, cmd: STATIC_GATE,
@@ -181,13 +184,14 @@ const CASES = [
   },
   {
     gate: 'static', name: 'QS-1.5: a symptom list drops below ten', file: APPL_TS, cmd: STATIC_GATE,
-    mutate: (s) => s.replace("      'Splash guard damaged',\n", ''),
+    mutate: (s) => s.replace(/ +'Splash guard damaged',\r?\n/, ''),
   },
   {
     gate: 'static', name: 'QS-1.5: "Something else" stops being last', file: APPL_TS, cmd: STATIC_GATE,
+    // Swap the last real symptom with the ELSE that must follow it.
     mutate: (s) => s.replace(
-      "      'Keeps tripping the reset',\n      'Splash guard damaged',\n      ELSE,",
-      "      'Keeps tripping the reset',\n      ELSE,\n      'Splash guard damaged',"
+      /( +)('Splash guard damaged',)(\r?\n)( +)(ELSE,)/,
+      (_m, i1, sym, nl, i2, els) => `${i1}${els}${nl}${i2}${sym}`
     ),
   },
   {
