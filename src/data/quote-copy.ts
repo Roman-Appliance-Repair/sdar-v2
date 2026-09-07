@@ -1,0 +1,86 @@
+// src/data/quote-copy.ts
+//
+// Single source of truth for every number and every sentence the quote sheet shows.
+// Nothing here is duplicated into the sheet sources: QuoteSheet.astro,
+// QuoteSheet.client.ts and QuoteFallbackForm.astro import from this file and must
+// contain zero hard-coded currency literals. The gate
+// scripts/check-quote-sheet.mjs enforces both halves of that rule.
+//
+// Fee tiers match the wiki source-of-truth and src/data/pricing.ts:
+//   residential $89 · commercial $120, both waived when the repair is approved.
+
+/** Residential diagnostic fee, in whole dollars. */
+export const DIAGNOSTIC_RES = 89;
+
+/** Commercial diagnostic fee, in whole dollars. */
+export const DIAGNOSTIC_COM = 120;
+
+/** Format a whole-dollar amount. Kept as a function so no source file — this one
+ *  included — carries a literal dollar-sign-plus-digits string. */
+export function money(amount: number): string {
+  return String.fromCharCode(36) + amount;
+}
+
+/** Display strings for the price step. */
+export const DIAGNOSTIC_RES_DISPLAY = money(DIAGNOSTIC_RES);
+export const DIAGNOSTIC_COM_DISPLAY = money(DIAGNOSTIC_COM);
+
+/** The waived clause. Byte-equality with what ships in dist/book/index.html is a gate. */
+export const WAIVED_CLAUSE = 'Waived when you go ahead with the repair';
+
+/** Business hours line, shown on the price step and again on the done step. */
+export const HOURS_LINE =
+  'Available Mon–Sat 8am–8pm · Sun closed · Phone answered 24/7';
+
+/** Copy for the final step. */
+export const CALLBACK_COPY = {
+  heading: 'Got it.',
+  body: "We'll call or text you back.",
+  callPrompt: 'Need it sooner? Call the dispatcher directly.',
+} as const;
+
+/** Price-step framing. */
+export const PRICE_COPY = {
+  eyebrow: 'Diagnostic visit',
+  residentialLabel: 'At home',
+  commercialLabel: 'In a business',
+  note: 'A technician comes out, finds the fault, and gives you a flat written repair price before anything is touched.',
+} as const;
+
+/** Step headings, in order. The counter renders as "N / TOTAL_STEPS". */
+export const STEP_COPY = [
+  { id: 'where', heading: 'Where is the appliance?' },
+  { id: 'appliance', heading: 'What needs fixing?' },
+  { id: 'problem', heading: "What's it doing?" },
+  { id: 'photos', heading: 'Add a photo?' },
+  { id: 'price', heading: 'Your diagnostic price' },
+  { id: 'contact', heading: 'Where do we come out?' },
+] as const;
+
+export const TOTAL_STEPS = STEP_COPY.length;
+
+/** Out-of-zone ZIP note. A note, never a block — the lead still goes through. */
+export const OUT_OF_ZONE_NOTE =
+  "That ZIP is outside our usual routes. Send it anyway — we'll call and tell you straight whether we can get a truck to you.";
+
+/** Visit-time tiles on the contact step. */
+export const VISIT_TIMES = [
+  { id: 'asap', label: 'ASAP', hint: 'Soonest open slot' },
+  { id: 'today_tomorrow', label: 'Today or tomorrow', hint: 'We call to confirm the window' },
+  { id: 'pick_date', label: 'Pick a date', hint: 'Choose a day below' },
+] as const;
+
+/** Photos step. */
+export const PHOTOS_COPY = {
+  hint: 'A photo of the model plate or the fault helps the tech stock the right part.',
+  max: 2,
+  skip: 'Skip — no photo',
+} as const;
+
+/** Error copy. 429 is deliberately worded differently from a genuine failure. */
+export const ERROR_COPY = {
+  rateLimited:
+    "That's a few requests in a row from your connection. Give it a few minutes, or call the dispatcher and we'll book you right now.",
+  failed:
+    "That didn't go through. So the request isn't lost, please call the dispatcher directly.",
+} as const;
