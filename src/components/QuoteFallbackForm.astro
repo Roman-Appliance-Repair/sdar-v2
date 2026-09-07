@@ -1,0 +1,165 @@
+---
+// src/components/QuoteFallbackForm.astro
+//
+// The no-JS leg of the quote sheet. A plain <form method="post" action="/api/contact">
+// with a real submit button: it works with JavaScript switched off, blocked, or still
+// downloading. When the sheet's island is alive this form stays on the page as the
+// visible fallback — the sheet is an enhancement layered over it, never a replacement.
+//
+// contact.js parses application/x-www-form-urlencoded for exactly this path and
+// answers with a plain HTML confirmation instead of JSON.
+//
+// The honeypot is LAST in source order and display:none. Real people never fill it;
+// the endpoint answers a silent 200 when it arrives non-empty.
+
+import { HOURS_LINE, DIAGNOSTIC_TERMS, DIAGNOSTIC_RES_DISPLAY, SCOPE_LABELS } from '../data/quote-copy';
+import { MAIN_PHONE, MAIN_PHONE_TEL } from '../data/branches';
+
+export interface Props {
+  phone?: string;
+  phoneTel?: string;
+}
+
+const { phone = MAIN_PHONE, phoneTel = MAIN_PHONE_TEL } = Astro.props;
+---
+
+<form
+  id="qs-fallback-form"
+  class="qsf"
+  method="post"
+  action="/api/contact"
+  enctype="application/x-www-form-urlencoded"
+>
+  <input type="hidden" name="type" value="quote" />
+  <input type="hidden" name="brand_site" value="samedayappliance.repair" />
+  <input type="hidden" name="source" value="fallback-form" />
+  <input type="hidden" name="where" value="residential" />
+  <input type="hidden" name="scope_label" value={SCOPE_LABELS.residential} />
+  <input type="hidden" name="price_display" value={DIAGNOSTIC_RES_DISPLAY} />
+
+  <label class="qsf-field">
+    <span>Your name</span>
+    <input type="text" name="name" required autocomplete="name" placeholder="First name" />
+  </label>
+
+  <label class="qsf-field">
+    <span>Phone</span>
+    <input
+      type="tel"
+      name="phone"
+      required
+      autocomplete="tel"
+      inputmode="numeric"
+      placeholder="(000) 000-0000"
+    />
+  </label>
+
+  <label class="qsf-field">
+    <span>What's wrong?</span>
+    <textarea
+      name="problem_text"
+      rows="3"
+      required
+      placeholder="e.g. Sub-Zero warm on one side"></textarea>
+  </label>
+
+  <button type="submit" class="qsf-submit">Send request</button>
+
+  <p class="qsf-price">{DIAGNOSTIC_RES_DISPLAY} diagnostic visit</p>
+  <ul class="qsf-terms">
+    {DIAGNOSTIC_TERMS.map((term) => <li>{term}</li>)}
+  </ul>
+  <p class="qsf-note">
+    {HOURS_LINE}<br />
+    Prefer to talk it through? <a href={`tel:${phoneTel}`} data-tel>{phone}</a>.
+  </p>
+
+  <!-- Honeypot: last in the DOM, hidden, never focusable. -->
+  <input
+    type="text"
+    name="website"
+    tabindex="-1"
+    autocomplete="off"
+    aria-hidden="true"
+    style="display:none"
+  />
+</form>
+
+<style>
+  .qsf {
+    background: var(--white);
+    padding: 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .qsf-field { display: block; margin-bottom: 14px; }
+  .qsf-field > span {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .qsf input,
+  .qsf textarea {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--white);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 16px;
+  }
+  .qsf textarea { min-height: 84px; resize: vertical; }
+  .qsf input:focus,
+  .qsf textarea:focus {
+    outline: 2px solid var(--red);
+    outline-offset: 1px;
+    border-color: var(--red);
+  }
+  .qsf-submit {
+    display: block;
+    width: 100%;
+    min-height: 56px;
+    padding: 16px 22px;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .qsf-submit:hover { background: var(--red-dark); }
+  .qsf-price {
+    margin-top: 18px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--black);
+  }
+  .qsf-terms { list-style: none; margin: 8px 0 0; padding: 0; }
+  .qsf-terms li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+  }
+  .qsf-terms li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 7px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--red);
+  }
+  .qsf-note { margin-top: 14px; font-size: 13px; line-height: 1.6; color: var(--muted); }
+  .qsf-note a { color: var(--red); font-weight: 600; }
+</style>

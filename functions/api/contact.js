@@ -3,6 +3,7 @@
  *
  * Multi-purpose logger/contact endpoint. Branches on payload.type or payload.name:
  *
+ *   type: 'quote'       → 🧾 Quote Request      → Telegram monospace card + Resend email
  *   type: 'booking'     → 📅 Booking Request    → Telegram + Resend email
  *   type: 'callback'    → 📞 Call Back Request  → Telegram + Resend email
  *   type: 'pdf'         → 📄 PDF Request        → Telegram + Resend email WITH PDF attachment
@@ -18,6 +19,14 @@
  *   RESEND_API_KEY
  *   RESEND_FROM          (optional, default 'noreply@samedayappliance.repair')
  *   RESEND_TO            (optional, default 'info@samedayappliance.repair')
+ *
+ * Bindings (optional):
+ *   SDAR_CHAT            KV — reused for the per-IP submit rate limit when present.
+ *                        Without it the limiter degrades to a per-isolate in-memory map.
+ *
+ * Accepts application/json (the quote sheet + booking form) and
+ * application/x-www-form-urlencoded (the no-JS QuoteFallbackForm, which needs an
+ * HTML answer rather than JSON because the browser navigates to this URL).
  */
 
 // SDAR branch routing — city slug → dispatcher phone
@@ -33,6 +42,65 @@ const SDAR_BRANCH_PHONES = {
   'los-angeles': '(424) 325-0520'
 };
 
+// Rate limit: 5 submits / 10 min per IP. KV when a binding exists, in-memory
+// (per-isolate, best effort) when it does not.
+const NEWLINE = String.fromCharCode(10);
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const memoryHits = new Map();
+
+function clientIp(request) {
+  return (
+    request.headers.get('CF-Connecting-IP') ||
+    request.headers.get('x-forwarded-for') ||
+    'unknown'
+  );
+}
+
+async function isRateLimited(env, ip) {
+  const key = `qsrl:${ip}`;
+  const now = Date.now();
+  const fresh = (arr) => (Array.isArray(arr) ? arr : []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+
+  if (env && env.SDAR_CHAT) {
+    try {
+      const hits = fresh(await env.SDAR_CHAT.get(key, 'json'));
+      if (hits.length >= RATE_LIMIT_MAX) return true;
+      hits.push(now);
+      await env.SDAR_CHAT.put(key, JSON.stringify(hits), { expirationTtl: 900 });
+      return false;
+    } catch (e) {
+      // KV unavailable — fall through to the in-memory path rather than 500.
+    }
+  }
+
+  const hits = fresh(memoryHits.get(key));
+  if (hits.length >= RATE_LIMIT_MAX) {
+    memoryHits.set(key, hits);
+    return true;
+  }
+  hits.push(now);
+  memoryHits.set(key, hits);
+  return false;
+}
+
+/** Read JSON or form-encoded. Returns { payload, isForm }. */
+async function readPayload(request) {
+  const ct = (request.headers.get('content-type') || '').toLowerCase();
+  if (ct.includes('form-urlencoded') || ct.includes('multipart/form-data')) {
+    const fd = await request.formData();
+    const payload = {};
+    for (const [k, v] of fd.entries()) payload[k] = typeof v === 'string' ? v : '';
+    return { payload, isForm: true };
+  }
+  return { payload: await request.json(), isForm: false };
+}
+
+/** Honeypot. Real visitors never fill `website` / `_hp`. */
+function isBot(p) {
+  return Boolean(String(p._hp || p.website || '').trim());
+}
+
 function isSdar(p) {
   return p && p.brand_site === 'samedayappliance.repair';
 }
@@ -47,11 +115,27 @@ function sdarBranch(p) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
+  let isForm = false;
 
   try {
-    const payload = await request.json();
+    const parsed = await readPayload(request);
+    const payload = parsed.payload;
+    isForm = parsed.isForm;
     const type = payload.type || null;
     const isAiLog = payload.name === '🤖 AI Diagnostics' && !type;
+
+    // Honeypot: answer 200 so the bot sees success and does not retry, but do
+    // nothing at all with the submission.
+    if (isBot(payload)) {
+      return isForm ? htmlAck() : json({ ok: true });
+    }
+
+    // Rate limit only the lead types; the AI diagnostic log is not a submit.
+    if (!isAiLog && (await isRateLimited(env, clientIp(request)))) {
+      return isForm
+        ? htmlAck('Give it a few minutes', 'That is a few requests in a row from your connection. Please call the dispatcher and we will book you right now.')
+        : json({ ok: false, error: 'rate_limited' }, 429);
+    }
 
     // Build Telegram text by branch
     const tgText = buildTelegramText(payload);
@@ -68,10 +152,12 @@ export async function onRequestPost(context) {
     // Run in parallel, don't fail the request if one sub-service fails
     await Promise.allSettled([tgPromise, emailPromise]);
 
-    return json({ ok: true });
+    return isForm ? htmlAck() : json({ ok: true });
   } catch (err) {
     console.error('contact.js error:', err);
-    return json({ ok: false, error: 'Internal error' }, 500);
+    return isForm
+      ? htmlAck('That did not go through', 'So the request is not lost, please call the dispatcher directly.', 500)
+      : json({ ok: false, error: 'Internal error' }, 500);
   }
 }
 
@@ -99,6 +185,10 @@ function buildTelegramText(p) {
       '─────────────────────',
       `🤖 AI диагноз: ${escape(p.result || '—')}`,
     ].filter(Boolean).join('\n');
+  }
+
+  if (p.type === 'quote') {
+    return buildQuoteCard(p);
   }
 
   if (p.type === 'pdf') {
@@ -162,6 +252,154 @@ function buildTelegramText(p) {
   return `📬 <b>New form submission</b>\n\n${escape(JSON.stringify(p, null, 2).slice(0, 800))}`;
 }
 
+/**
+ * Quote-sheet card — plain text, no monospace block, so it reads the same on a
+ * phone as on desktop and stays copy-pasteable line by line.
+ *
+ *   line 1  source banner
+ *   line 2  fee + scope + how it arrived
+ *   line 3  address warning, only when the address looks unusable
+ *   then    WHAT THEY WANT / CLIENT / UNIT / PHOTOS, two-space indent
+ *   footer  page + source
+ */
+function buildQuoteCard(p) {
+  const row = (k, v) => (v || v === 0 ? '  ' + k + ': ' + escape(String(v)) : null);
+
+  // The sheet sends a real branch name; the no-JS form has no ZIP field, so say so
+  // plainly rather than printing a slug the dispatcher has to decode.
+  const fallbackBranch = sdarBranch(p);
+  const branchLabel = p.branch_label || 'not set (no ZIP)';
+  const branchPhone = p.branch_phone || fallbackBranch.phone;
+  const scope = p.scope_label || (p.where === 'commercial' ? 'in a business' : 'at home');
+  const via = p.source === 'fallback-form' ? 'via form (no JS)' : 'via sheet';
+
+  const whenMap = {
+    asap: 'ASAP',
+    today_tomorrow: 'Today or tomorrow',
+    pick_date: p.visit_date || 'Specific date',
+  };
+
+  const head = [
+    '🌐 Новый лид с сайта (samedayappliance.repair)',
+    'DIAGNOSTIC ' + escape(p.price_display || '') + ' — ' + escape(scope) + ' · ' + via,
+    addressBanner(p),
+    '',
+  ];
+
+  const symptoms = Array.isArray(p.problems) ? p.problems.join(', ') : p.problems || '';
+
+  const body = [
+    'WHAT THEY WANT',
+    row('Scope', scope),
+    row('When', whenMap[p.visit_time] || p.visit_time || '—'),
+    row('Branch', branchLabel + ' · ' + branchPhone),
+    '',
+    'CLIENT',
+    row('Name', p.name || '—'),
+    row('Phone', p.phone || '—'),
+    row('Address', p.address || '—'),
+    row('Verified', p.address_verified ? 'Google ✓' : 'no'),
+    row('ZIP', zipLine(p)),
+    zipOverridden(p) ? row('ZIP typed', p.zip_typed + ' — visitor typed this, routed on Google') : null,
+    p.out_of_zone ? row('Out of zone', 'yes — confirm before dispatch') : null,
+    p.notes ? row('Notes', truncate(p.notes, 300)) : null,
+    '',
+    'UNIT',
+    row('Appliance', p.appliance_label || p.appliance || '—'),
+    symptoms ? row('Symptom', symptoms) : null,
+    p.problem_text ? row('Detail', truncate(p.problem_text, 400)) : null,
+    '',
+    'PHOTOS',
+    '',
+  ];
+
+  const foot = [
+    'Страница: ' + escape(p.page_url || '—'),
+    'Источник: samedayappliance.repair',
+  ];
+
+  return []
+    .concat(head, body, foot)
+    .filter((l) => l !== null)
+    .join(NEWLINE);
+}
+
+/**
+ * The ZIP line, with where the number came from. Dispatch routes on this one, so
+ * saying whether Google supplied it or the visitor typed it is the difference
+ * between a confident dispatch and a phone call to check.
+ */
+function zipLine(p) {
+  const zip = p.zip || '—';
+  if (!p.zip) return zip;
+  return zip + (p.zip_google ? ' (Google)' : ' (typed)');
+}
+
+/** The visitor typed a ZIP that disagrees with the one Google returned. */
+function zipOverridden(p) {
+  return Boolean(p.zip_google && p.zip_typed && p.zip_typed !== p.zip_google);
+}
+
+/**
+ * One banner line, in order of how much trouble it will cause dispatch:
+ * an unusable address first, then an address Google never confirmed. A pick that
+ * Google verified needs no warning at all.
+ */
+function addressBanner(p) {
+  if (addressLooksIncomplete(p.address)) return 'ADDRESS INCOMPLETE — check by phone';
+  if (!p.address_verified) return 'ADDRESS NOT VERIFIED — check by phone';
+  return null;
+}
+
+/** No house number at the front, or too short to route a truck to. */
+function addressLooksIncomplete(address) {
+  const a = String(address || '').trim();
+  if (a.length < 6) return true;
+  return !/^\d/.test(a);
+}
+
+/** Plain-HTML answer for the no-JS form leg, which navigates here. */
+function htmlAck(
+  heading = 'Request received',
+  body = 'A dispatcher will call or text you back. Phones are answered 24/7.',
+  status = 200
+) {
+  const page = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>${escapeHtml(heading)} — Same Day Appliance Repair</title>
+<style>body{margin:0;padding:48px 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:#f5f5f5;color:#1a1a1a}
+main{max-width:520px;margin:0 auto;background:#fff;border:1px solid #e2e2e2;border-radius:8px;padding:32px;text-align:center}
+h1{font-family:Georgia,serif;font-size:1.6rem;margin:0 0 12px}
+p{color:#6b6b6b;line-height:1.6;margin:0 0 20px}
+a.call{display:inline-block;background:#C8102E;color:#fff;padding:14px 28px;border-radius:4px;text-decoration:none;font-weight:600}
+a.back{display:block;margin-top:20px;color:#6b6b6b;font-size:14px}</style></head>
+<body><main><h1>${escapeHtml(heading)}</h1><p>${escapeHtml(body)}</p>
+<a class="call" href="tel:+14243250520">Call (424) 325-0520</a>
+<a class="back" href="/book/">Back to booking</a></main></body></html>`;
+  return new Response(page, {
+    status,
+    headers: { 'Content-Type': 'text/html; charset=utf-8' },
+  });
+}
+
+// Telegram truncates a photo caption at 1024 characters. The card must never be
+// cut, so anything longer goes out as its own message and the photos reply to it.
+const TG_CAPTION_LIMIT = 1024;
+
+async function tg(env, method, body) {
+  const res = await fetch(`https://api.telegram.org/bot${env.TELEGRAM_BOT_TOKEN}/${method}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ chat_id: env.TELEGRAM_CHAT_ID, ...body }),
+  });
+  try {
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
 async function sendTelegram(env, text, payload) {
   const token = env.TELEGRAM_BOT_TOKEN;
   const chatId = env.TELEGRAM_CHAT_ID;
@@ -170,15 +408,47 @@ async function sendTelegram(env, text, payload) {
     return;
   }
 
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: chatId,
+  const photos = (payload && Array.isArray(payload.photos) ? payload.photos : [])
+    .filter((u) => typeof u === 'string' && /^https?:\/\//.test(u))
+    .slice(0, 10);
+
+  // No photos, or not a quote — one plain message, as before.
+  if (!photos.length) {
+    await tg(env, 'sendMessage', { text, parse_mode: 'HTML', disable_web_page_preview: true });
+    return;
+  }
+
+  // Card too long to ride as a caption: send it whole, hang the photos off it.
+  if (text.length > TG_CAPTION_LIMIT) {
+    const sent = await tg(env, 'sendMessage', {
       text,
       parse_mode: 'HTML',
       disable_web_page_preview: true,
-    }),
+    });
+    const replyTo = sent && sent.result && sent.result.message_id;
+    if (photos.length === 1) {
+      await tg(env, 'sendPhoto', { photo: photos[0], reply_to_message_id: replyTo });
+    } else {
+      await tg(env, 'sendMediaGroup', {
+        media: photos.map((u) => ({ type: 'photo', media: u })),
+        reply_to_message_id: replyTo,
+      });
+    }
+    return;
+  }
+
+  // Card fits: it becomes the caption, so the dispatcher sees photo and details together.
+  if (photos.length === 1) {
+    await tg(env, 'sendPhoto', { photo: photos[0], caption: text, parse_mode: 'HTML' });
+    return;
+  }
+
+  await tg(env, 'sendMediaGroup', {
+    media: photos.map((u, i) =>
+      i === 0
+        ? { type: 'photo', media: u, caption: text, parse_mode: 'HTML' }
+        : { type: 'photo', media: u }
+    ),
   });
 }
 
@@ -223,6 +493,7 @@ async function sendEmail(env, p) {
   const subjectMap = {
     callback: `${sdarPrefix}📞 Call Back — ${p.phone || 'no phone'}${branchTag}`,
     booking: `${sdarPrefix}📅 Booking — ${p.phone || 'no phone'}${branchTag}`,
+    quote: `${sdarPrefix}🧾 Quote — ${p.phone || 'no phone'}${branchTag}`,
   };
   const subject = subjectMap[p.type] || `📬 Form submission`;
 
