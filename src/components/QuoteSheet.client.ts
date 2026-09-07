@@ -82,6 +82,9 @@ interface State {
   lat: number | null;
   lng: number | null;
   cityFromGoogle: string;
+  /** The ZIP Place Details returned, when it answered at all. Empty means the visitor
+   *  is the only source for the ZIP, so typing one cannot contradict anything. */
+  zipFromGoogle: string;
 }
 
 const STORE_KEY = 'sdar_qs_v1';
@@ -127,6 +130,7 @@ function blank(): State {
     lat: null,
     lng: null,
     cityFromGoogle: '',
+    zipFromGoogle: '',
   };
 }
 
@@ -706,8 +710,18 @@ function onBodyInput(ev: Event): void {
   }
 
   (state as unknown as Record<string, string>)[key] = el.value;
-  // Typing a ZIP by hand after Google filled one detaches it from the verified place.
-  if (key === 'zip' && state.addressVerified) state.addressVerified = false;
+  // A hand-typed ZIP only detaches the address from its verified place when it
+  // contradicts a ZIP Google actually gave us. With Place Details unavailable there is
+  // no Google ZIP, the visitor is expected to type it, and doing so must not silently
+  // downgrade an address the autocomplete already matched to a real building.
+  if (
+    key === 'zip' &&
+    state.addressVerified &&
+    state.zipFromGoogle &&
+    digits(el.value) !== state.zipFromGoogle
+  ) {
+    state.addressVerified = false;
+  }
   if (errors[key]) {
     delete errors[key];
     el.removeAttribute('aria-invalid');
@@ -827,6 +841,8 @@ interface Suggestion {
   main: string;
   secondary: string;
   placeId: string;
+  /** Prediction types — 'street_address' / 'premise' mean Google matched a building. */
+  types: string[];
   prediction: any;
 }
 
@@ -850,6 +866,11 @@ async function wireAddress(): Promise<void> {
   let timer: number | undefined;
   let pointerInList = false;
   let suggestions: Suggestion[] = [];
+  /** True while the code itself is writing to the field, so the input listener can
+   *  tell an autofill or IME commit apart from a person typing. */
+  let programmatic = false;
+  /** One pick per tap: a phone fires pointerdown, touchend and click for one tap. */
+  let picking = false;
 
   const g = () => (window as unknown as { google?: any }).google;
   const ready = () => Boolean(g()?.maps?.places?.AutocompleteSuggestion);
@@ -864,6 +885,15 @@ async function wireAddress(): Promise<void> {
   if (state.addressVerified && state.cityFromGoogle) {
     setNote(state.cityFromGoogle + ', CA', 'ok');
   }
+
+  const setValue = (el: HTMLInputElement, value: string) => {
+    programmatic = true;
+    el.value = value;
+    // Cleared on the next task, after any event the assignment might have queued.
+    window.setTimeout(() => {
+      programmatic = false;
+    }, 0);
+  };
 
   const close = () => {
     list.hidden = true;
@@ -899,6 +929,7 @@ async function wireAddress(): Promise<void> {
           main: txt(p.mainText ?? p.structuredFormat?.mainText),
           secondary: txt(p.secondaryText ?? p.structuredFormat?.secondaryText),
           placeId: p.placeId || p.place_id || '',
+          types: Array.isArray(p.types) ? p.types : [],
           prediction: p,
         }))
         .filter((x: Suggestion) => x.text)
@@ -920,13 +951,24 @@ async function wireAddress(): Promise<void> {
           sec.textContent = ', ' + sg.secondary;
           li.append(sec);
         }
-        // pointerdown, not click: on touch the input blurs before a click can land.
-        li.addEventListener('pointerdown', (e) => {
+        // A tap on Android Chrome delivers pointerdown, touchend and click. Bind all
+        // three — pointerdown alone loses the pick when the keyboard hides first —
+        // and let `picking` collapse them into one selection.
+        const fire = (e: Event) => {
           e.preventDefault();
+          if (picking) return;
+          picking = true;
           pointerInList = true;
-          void choose(i);
-          pointerInList = false;
-        });
+          void choose(i).finally(() => {
+            pointerInList = false;
+            window.setTimeout(() => {
+              picking = false;
+            }, 350);
+          });
+        };
+        li.addEventListener('pointerdown', fire);
+        li.addEventListener('touchend', fire);
+        li.addEventListener('click', fire);
         list!.appendChild(li);
       });
       list!.hidden = false;
@@ -942,9 +984,18 @@ async function wireAddress(): Promise<void> {
   async function choose(i: number): Promise<void> {
     const sg = suggestions[i];
     if (!sg) return;
-    input!.value = sg.text;
+    setValue(input!, sg.text);
     state.address = sg.text;
     close();
+
+    // The prediction alone is enough to call an address verified: Google matched what
+    // was typed to a real building. Doing this first means verification never depends
+    // on a second, separately-quotaed API call.
+    applyPrediction(sg);
+
+    // Place Details is an upgrade, not a requirement — it adds the ZIP and the
+    // coordinates. If it is unavailable (quota, network, a key without the SKU) we
+    // keep what the prediction already established and say nothing alarming.
     try {
       const place =
         typeof sg.prediction.toPlace === 'function'
@@ -953,12 +1004,40 @@ async function wireAddress(): Promise<void> {
       await place.fetchFields({ fields: ['formattedAddress', 'addressComponents', 'location'] });
       applyPlace(place, sg.placeId);
     } catch (err) {
-      console.warn('[quote-sheet] place details unavailable:', err);
-      setNote(data.copy.address.lookupFailed, 'err');
+      console.warn('[quote-sheet] place details unavailable, keeping the prediction:', err);
     }
     save();
     // A pick closes the billing session; the next keystroke starts a fresh one.
     token = ready() ? new (g().maps.places.AutocompleteSessionToken)() : null;
+  }
+
+  /** Verification straight from the autocomplete prediction. No second request. */
+  function applyPrediction(sg: Suggestion): void {
+    const parts = sg.secondary
+      .split(',')
+      .map((x) => x.trim())
+      .filter(Boolean);
+    if (parts.length && /^(USA|United States)$/i.test(parts[parts.length - 1])) parts.pop();
+    const region = parts.length >= 2 ? parts[parts.length - 1] : '';
+    const city = parts.length >= 2 ? parts[parts.length - 2] : parts[0] || '';
+
+    state.cityFromGoogle = city;
+    state.placeId = sg.placeId;
+
+    const houseLevel =
+      sg.types.includes('street_address') ||
+      sg.types.includes('premise') ||
+      sg.types.includes('subpremise') ||
+      /^\s*\d/.test(sg.main || sg.text);
+
+    state.addressVerified = houseLevel;
+    if (houseLevel) {
+      setNote(city ? city + ', ' + (region || 'CA') : 'Address confirmed', 'ok');
+    } else {
+      // A street without a number is not dispatchable, but it is not an error either.
+      setNote(data.copy.address.streetOnly, 'hint');
+    }
+    delete errors.address;
   }
 
   function applyPlace(place: any, fallbackId: string): void {
@@ -975,7 +1054,7 @@ async function wireAddress(): Promise<void> {
     const formatted = place.formattedAddress || place.formatted_address || '';
 
     if (formatted) {
-      input!.value = formatted;
+      setValue(input!, formatted);
       state.address = formatted;
     }
     const loc = place.location;
@@ -986,27 +1065,33 @@ async function wireAddress(): Promise<void> {
 
     if (zip) {
       state.zip = zip;
+      state.zipFromGoogle = zip;
       const zipEl = document.getElementById('qs-zip') as HTMLInputElement | null;
-      if (zipEl) zipEl.value = zip;
+      if (zipEl) setValue(zipEl, zip);
       delete errors.zip;
       syncZoneNote();
     }
 
+    // Details can only confirm more than the prediction did — it must never take a
+    // verification away, or a successful pick would be downgraded by a partial answer.
     if (houseNumber) {
       state.addressVerified = true;
       setNote(city ? city + ', CA' : 'Address confirmed', 'ok');
-    } else {
-      // A street without a number is not a dispatchable address, but it is not an error
-      // either — keep it, keep the city, and nudge rather than block.
-      state.addressVerified = false;
-      setNote(data.copy.address.streetOnly, 'hint');
     }
     delete errors.address;
     save();
   }
 
   input.addEventListener('input', () => {
-    state.address = input.value.trim();
+    // Our own assignment, or an autofill/IME commit replaying the same text: neither
+    // is a person editing the address, and neither may drop the verification.
+    if (programmatic) return;
+    const typed = input.value.trim();
+    if (typed === state.address) {
+      schedule();
+      return;
+    }
+    state.address = typed;
     // Hand-editing after a pick invalidates the verification — silently keeping the
     // green tick would tell dispatch an address was confirmed when it no longer is.
     if (state.addressVerified || state.placeId) {
@@ -1015,11 +1100,19 @@ async function wireAddress(): Promise<void> {
       state.lat = null;
       state.lng = null;
       state.cityFromGoogle = '';
+      state.zipFromGoogle = '';
       setNote('', 'hint');
     }
     if (note.className === 'qs-err') setNote('', 'hint');
     save();
     schedule();
+  });
+
+  // Autofill can rewrite a field without an input event on some Android builds.
+  input.addEventListener('change', () => {
+    if (programmatic) return;
+    if (input.value.trim() !== state.address) state.address = input.value.trim();
+    save();
   });
 
   list.addEventListener('pointerdown', () => {

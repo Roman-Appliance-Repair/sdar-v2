@@ -120,6 +120,12 @@ const CASES = [
     mutate: (s) => s.replace(/\?"qs-ok":(\w+)==="err"\?"qs-err"/, '?"qs-ok":$1==="err"?"qs-ok"'),
   },
   {
+    gate: 'smoke', name: 'QS-1.3a regression: verification requires Place Details again', file: CHUNK, cmd: SMOKE_GATE,
+    // Forces the pre-fix behaviour: the prediction stops counting as verification, so
+    // a project with GetPlaceRequest capped at zero ships every lead unverified.
+    mutate: (s) => s.replace(/(\w+)\.addressVerified=(\w+),\2\?/, '$1.addressVerified=!1,$2?'),
+  },
+  {
     gate: 'smoke', name: 'tile border removed', file: PAGE, cmd: SMOKE_GATE,
     mutate: (s) => s.replace(/\.qs-tile\{([^}]*?)border:1px solid var\(--border\)/, '.qs-tile{$1border:none'),
   },

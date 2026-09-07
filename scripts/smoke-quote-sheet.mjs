@@ -258,7 +258,7 @@ async function noJsLeg(browser, base) {
  * `failing: true` makes fetchAutocompleteSuggestions throw, which is the only
  * condition allowed to turn the note red.
  */
-function mapsMock(failing) {
+function mapsMock(failing, detailsFail) {
   return `(() => {
     const PLACE = {
       id: 'mock-place-1',
@@ -271,7 +271,14 @@ function mapsMock(failing) {
         { types: ['postal_code'], longText: '90048' },
       ],
       location: { lat: () => 34.0800742, lng: () => -118.384211 },
-      fetchFields: async () => {},
+      fetchFields: async () => {
+        // Reproduces the live project: GetPlaceRequestPerDayPerProject = 0.
+        if (${detailsFail ? 'true' : 'false'}) {
+          throw new Error(
+            "PLACES_GET_PLACE: RESOURCE_EXHAUSTED: Quota exceeded for quota metric 'GetPlaceRequest'"
+          );
+        }
+      },
     };
     window.google = {
       maps: {
@@ -290,6 +297,7 @@ function mapsMock(failing) {
                       secondaryText: { text: 'West Hollywood, CA, USA' },
                     },
                     placeId: 'mock-place-1',
+                    types: ['street_address', 'geocode'],
                     toPlace: () => PLACE,
                   },
                 }],
@@ -319,7 +327,7 @@ async function addressLeg(browser, base, failing) {
   const label = failing ? 'address (lookup fails)' : 'address (verified)';
   console.log(`\n[${label}]`);
   const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
-  await ctx.addInitScript(mapsMock(failing));
+  await ctx.addInitScript(mapsMock(failing, false));
   const page = await ctx.newPage();
 
   // The real library must never be fetched during the test.
@@ -403,6 +411,84 @@ async function addressLeg(browser, base, failing) {
   await ctx.close();
 }
 
+/**
+ * QS-1.3a regression. On the live project Place Details is capped at zero requests a
+ * day, so fetchFields always throws; the sheet used to treat that as a failed lookup
+ * and shipped the lead marked unverified. Verification now comes from the prediction,
+ * and Details is only an upgrade. Driven on a touch device with the full tap sequence
+ * a phone actually delivers.
+ */
+async function detailsBlockedLeg(browser, base) {
+  const label = 'address (details quota-blocked, touch)';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({
+    viewport: { width: 412, height: 915 },
+    hasTouch: true,
+    isMobile: true,
+    deviceScaleFactor: 2.625,
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+  });
+  await ctx.addInitScript(mapsMock(false, true));
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+
+  const captured = [];
+  await page.route('**/api/contact', async (route) => {
+    captured.push(route.request().postData() || '');
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+  });
+
+  await page.goto(`${base}/book/`, { waitUntil: 'domcontentloaded' });
+  await walkToContact(page);
+
+  await page.fill('#qs-address', '816 Bartlett');
+  await page.waitForTimeout(600);
+  const items = await page.locator('#qs-addr-list .qs-addr-item').count();
+  expect(`${label}: suggestion list opens`, items === 1, `${items} item(s)`);
+
+  // A real tap: touchstart/touchend, then the click the browser synthesises after it.
+  const box = await page.locator('#qs-addr-list .qs-addr-item').first().boundingBox();
+  await page.touchscreen.tap(box.x + box.width / 2, box.y + box.height / 2);
+  await page.waitForTimeout(500);
+
+  const note = await page.locator('#qs-addr-note').evaluate((el) => ({
+    cls: el.className,
+    text: el.textContent.trim(),
+  }));
+  expect(`${label}: note is green, not red`, note.cls === 'qs-ok', JSON.stringify(note));
+  expect(`${label}: note names the city`, note.text === '✓ West Hollywood, CA', note.text);
+
+  const addr = await page.inputValue('#qs-address');
+  expect(
+    `${label}: address kept from the prediction`,
+    addr === '8746 Rangely Ave, West Hollywood, CA, USA',
+    addr
+  );
+
+  // Details never answered, so the ZIP is still the visitor's to enter.
+  await page.fill('#qs-zip', '90048');
+  await page.fill('#qs-name', 'Dana');
+  await page.fill('#qs-phone', '3105550134');
+  await (await tileByText(page, 'ASAP')).click();
+
+  // One tap, one selection: the sheet must not have fired choose() three times.
+  await page.tap('#qs-primary');
+  await page.waitForTimeout(500);
+
+  expect(`${label}: exactly one submit`, captured.length === 1, `${captured.length} request(s)`);
+  if (captured.length) {
+    const p = JSON.parse(captured[0]);
+    expect(`${label}: address_verified is true`, p.address_verified === true, String(p.address_verified));
+    expect(`${label}: place_id survived`, p.place_id === 'mock-place-1', String(p.place_id));
+    expect(`${label}: city from Google`, p.city_display === 'West Hollywood', String(p.city_display));
+    expect(`${label}: lat/lng absent without details`, p.lat === null && p.lng === null, `${p.lat}/${p.lng}`);
+    expect(`${label}: branch routed by the typed ZIP`, p.city === 'west-hollywood', String(p.city));
+  }
+
+  await ctx.close();
+}
+
 // ── run ──────────────────────────────────────────────────────────────────────
 const { server, base } = await serve();
 const browser = await chromium.launch({ headless: !HEADED });
@@ -412,6 +498,7 @@ try {
   await noJsLeg(browser, base);
   await addressLeg(browser, base, false);
   await addressLeg(browser, base, true);
+  await detailsBlockedLeg(browser, base);
 } finally {
   await browser.close();
   server.close();
