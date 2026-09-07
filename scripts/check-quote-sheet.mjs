@@ -167,6 +167,146 @@ for (const file of SHEET_SOURCES) {
   check('Maps loader config appears exactly once on /book/', cfgCount === 1, `found ${cfgCount}`);
 }
 
+// ── 6d. appliance + symptom tiles: shape, counts, provenance ────────────────
+{
+  // Imported rather than regex-scraped: the file is TypeScript with a type
+  // annotation on every export, and a gate that parses its own source with a
+  // regex is a gate that goes quiet the day someone reformats the file.
+  const mod = await import(
+    'file://' + path.join(ROOT, 'src', 'data', 'quote-appliances.ts').split(path.sep).join('/')
+  ).catch(() => null);
+
+  const tiles = mod
+    ? { residential: mod.RESIDENTIAL_APPLIANCES, commercial: mod.COMMERCIAL_APPLIANCES }
+    : null;
+  const sources = mod ? mod.APPLIANCE_SOURCES : null;
+
+  check('quote-appliances.ts is importable', Boolean(tiles), 'import failed');
+
+  if (tiles) {
+    check('16 residential appliance tiles', tiles.residential.length === 16, `${tiles.residential.length}`);
+    check('11 commercial appliance tiles', tiles.commercial.length === 11, `${tiles.commercial.length}`);
+
+    const all = [...tiles.residential, ...tiles.commercial];
+
+    const ids = all.map((a) => a.id);
+    check('every appliance id is unique', new Set(ids).size === ids.length, ids.join(', '));
+
+    // The two ids QS-1.5 retired when their tiles split in two. Reusing either
+    // would silently repoint every lead already filed under it.
+    const retired = ids.filter((id) => id === 'oven_range' || id === 'walk_in_reach_in');
+    check('retired ids stay retired', retired.length === 0, retired.join(', '));
+
+    const badCount = all.filter((a) => a.problems.length < 10 || a.problems.length > 12);
+    check(
+      'every appliance carries 10-12 symptoms',
+      badCount.length === 0,
+      badCount.map((a) => `${a.id}=${a.problems.length}`).join(', ')
+    );
+
+    const notLast = all.filter((a) => a.problems[a.problems.length - 1] !== 'Something else');
+    check(
+      '"Something else" is the last symptom everywhere',
+      notLast.length === 0,
+      notLast.map((a) => a.id).join(', ')
+    );
+
+    const dupSymptoms = all.filter((a) => new Set(a.problems).size !== a.problems.length);
+    check(
+      'no appliance repeats a symptom',
+      dupSymptoms.length === 0,
+      dupSymptoms.map((a) => a.id).join(', ')
+    );
+
+    for (const scope of ['residential', 'commercial']) {
+      const list = tiles[scope];
+      const last = list[list.length - 1];
+      check(
+        `"Something else" is the last ${scope} appliance tile`,
+        last.label === 'Something else',
+        last.label
+      );
+    }
+
+    // Provenance: no tile for equipment the site does not claim to service.
+    const orphans = all.filter((a) => !sources || !Array.isArray(sources[a.id]) || !sources[a.id].length);
+    check(
+      'every appliance tile names its source in APPLIANCE_SOURCES',
+      orphans.length === 0,
+      orphans.map((a) => a.id).join(', ')
+    );
+
+    // …and the catalog slugs it names actually exist in service-catalog.ts.
+    const catalogSrc = await readFile(path.join(ROOT, 'src', 'data', 'service-catalog.ts'), 'utf8');
+    const named = [...new Set(Object.values(sources || {}).flat())].filter((x) => !x.includes(':'));
+    const missing = named.filter((slug) => !catalogSrc.includes(`id: '${slug}'`));
+    check(
+      'every named catalog slug exists in service-catalog.ts',
+      missing.length === 0,
+      missing.join(', ')
+    );
+
+    // The tiles reach the browser: labels ship inside the serialised #qs-data blob.
+    const notShipped = all.filter((a) => !html.includes(`"id":"${a.id}"`));
+    check(
+      'every appliance id ships in the /book/ payload',
+      notShipped.length === 0,
+      notShipped.map((a) => a.id).join(', ')
+    );
+  }
+}
+
+// ── 6e. ZIP from Google: copy present, Details stays Essentials ─────────────
+{
+  check(
+    'ZIP_COPY carries the "from Google" marker',
+    /fromGoogle:\s*'from Google'/.test(copySrc)
+  );
+  check(
+    'the ZIP disagreement note is templated on {zip}',
+    /mismatch:\s*"That ZIP doesn't match the address you picked — we'll go with \{zip\}"/.test(copySrc)
+  );
+
+  const clientSrc = await readFile(
+    path.join(ROOT, 'src', 'components', 'QuoteSheet.client.ts'),
+    'utf8'
+  );
+  const call = clientSrc.match(/fetchFields\(\{\s*fields:\s*\[([^\]]*)\]/);
+  check('Place Details is called with an explicit field list', Boolean(call), 'call not found');
+  if (call) {
+    const fields = call[1]
+      .split(',')
+      .map((f) => f.trim().replace(/^['"]|['"]$/g, ''))
+      .filter(Boolean);
+    check(
+      'Place Details requests formattedAddress + addressComponents only',
+      fields.length === 2 &&
+        fields.includes('formattedAddress') &&
+        fields.includes('addressComponents'),
+      fields.join(', ')
+    );
+  }
+
+  check(
+    'the payload carries zip_google and zip_typed',
+    clientSrc.includes('zip_google: state.zipFromGoogle') &&
+      clientSrc.includes('zip_typed: state.zip'),
+    'one or both missing'
+  );
+  check(
+    'routing runs on the effective ZIP, not the typed field',
+    !/zipToBranch\(state\.zip\)/.test(clientSrc) && clientSrc.includes('zipToBranch(effectiveZip())'),
+    'zipToBranch still reads state.zip'
+  );
+
+  const apiSrc = await readFile(path.join(ROOT, 'functions', 'api', 'contact.js'), 'utf8');
+  check(
+    'the dispatcher card labels the ZIP source',
+    apiSrc.includes("' (Google)'") && apiSrc.includes("' (typed)'"),
+    'card does not distinguish the two'
+  );
+}
+
 // ── 7. canary containment: the sheet is on /book/ and nowhere else ───────────
 {
   const distDir = path.join(ROOT, 'dist');

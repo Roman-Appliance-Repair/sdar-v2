@@ -17,6 +17,7 @@ const ROOT = process.cwd();
 const PAGE = path.join(ROOT, 'dist', 'book', 'index.html');
 const CLIENT_SRC = path.join(ROOT, 'src', 'components', 'QuoteSheet.client.ts');
 const COPY_TS = path.join(ROOT, 'src', 'data', 'quote-copy.ts');
+const APPL_TS = path.join(ROOT, 'src', 'data', 'quote-appliances.ts');
 
 const STATIC_GATE = ['scripts/check-quote-sheet.mjs'];
 const SMOKE_GATE = ['scripts/smoke-quote-sheet.mjs'];
@@ -166,6 +167,72 @@ const CASES = [
     // the desktop override inside the media query is a second, later copy, so a
     // non-global replace hits the mobile one — the one the fold depends on.
     mutate: (s) => s.replace(/(\.book-hero\[[^\]]*\]\{)padding:12px 0 40px/, '$1padding:400px 0 40px'),
+  },
+  // ── QS-1.5: tiles, symptoms, ZIP-from-Google ──────────────────────────────
+  {
+    gate: 'static', name: 'QS-1.5: an appliance tile loses its provenance', file: APPL_TS, cmd: STATIC_GATE,
+    // A tile with no entry in APPLIANCE_SOURCES is a tile for equipment nobody
+    // checked we service. That is exactly the invention the gate exists to stop.
+    mutate: (s) => s.replace("  garbage_disposal: ['garbage-disposal-repair'],\n", ''),
+  },
+  {
+    gate: 'static', name: 'QS-1.5: a tile cites a service the catalog does not have', file: APPL_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("['microwave-repair']", "['air-fryer-repair']"),
+  },
+  {
+    gate: 'static', name: 'QS-1.5: a symptom list drops below ten', file: APPL_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("      'Splash guard damaged',\n", ''),
+  },
+  {
+    gate: 'static', name: 'QS-1.5: "Something else" stops being last', file: APPL_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(
+      "      'Keeps tripping the reset',\n      'Splash guard damaged',\n      ELSE,",
+      "      'Keeps tripping the reset',\n      ELSE,\n      'Splash guard damaged',"
+    ),
+  },
+  {
+    gate: 'static', name: 'QS-1.5: a retired appliance id comes back', file: APPL_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("    id: 'range_stove',", "    id: 'oven_range',"),
+  },
+  {
+    gate: 'static', name: 'QS-1.5: Place Details asks for a Pro-SKU field', file: CLIENT_SRC, cmd: STATIC_GATE,
+    // The whole point of the two-field call is staying inside Essentials. Adding a
+    // Pro field is a silent bill, so the gate has to see it.
+    mutate: (s) => s.replace(
+      "fields: ['formattedAddress', 'addressComponents']",
+      "fields: ['formattedAddress', 'addressComponents', 'displayName']"
+    ),
+  },
+  {
+    gate: 'static', name: 'QS-1.5: routing goes back to the typed ZIP', file: CLIENT_SRC, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('const branch = zipToBranch(effectiveZip());', 'const branch = zipToBranch(state.zip);'),
+  },
+  {
+    gate: 'smoke', name: 'QS-1.5: compact tiles grow and the appliance step scrolls', file: PAGE, cmd: SMOKE_GATE,
+    // Sixteen tiles only clear a 360×740 fold at the compact size; put the 56px
+    // tile back and the last options fall off the bottom of the step.
+    mutate: (s) => s.replace('qs-compact .qs-tile{min-height:44px', 'qs-compact .qs-tile{min-height:76px'),
+  },
+  {
+    gate: 'smoke', name: 'QS-1.5: zip_google stops reaching dispatch', file: CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('zip_google:', 'zipGoogle:'),
+  },
+  {
+    gate: 'smoke', name: 'QS-1.5: the ZIP disagreement note never renders', file: CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replaceAll('qs-zip-mismatch', 'qs-zip-mismatch-gone'),
+  },
+  {
+    gate: 'smoke', name: 'QS-1.5: a typed ZIP silently un-verifies the address', file: CHUNK, cmd: SMOKE_GATE,
+    // The pre-QS-1.5 behaviour: touch the ZIP field and the verified pin is thrown
+    // away, so a confirmed building reaches dispatch marked unverified. The anchor is
+    // the tail of the ZIP branch in onBodyInput: `n==="zip"&&(syncZone(),syncMismatch())`.
+    mutate: (s) => {
+      // The state object's minified name moves between builds, so read it off the
+      // one place it is unmistakable — effectiveZip's `state.zipFromGoogle || state.zip`.
+      const m = s.match(/(\w+)\.zipFromGoogle\|\|\1\.zip/);
+      if (!m) return s;
+      return s.replace(/(==="zip"&&\()/, `$1${m[1]}.addressVerified=!1,`);
+    },
   },
   {
     gate: 'smoke', name: 'resume forgets the saved step', file: CHUNK, cmd: SMOKE_GATE,

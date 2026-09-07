@@ -299,7 +299,8 @@ function buildQuoteCard(p) {
     row('Phone', p.phone || '—'),
     row('Address', p.address || '—'),
     row('Verified', p.address_verified ? 'Google ✓' : 'no'),
-    row('ZIP', p.zip || '—'),
+    row('ZIP', zipLine(p)),
+    zipOverridden(p) ? row('ZIP typed', p.zip_typed + ' — visitor typed this, routed on Google') : null,
     p.out_of_zone ? row('Out of zone', 'yes — confirm before dispatch') : null,
     p.notes ? row('Notes', truncate(p.notes, 300)) : null,
     '',
@@ -321,6 +322,22 @@ function buildQuoteCard(p) {
     .concat(head, body, foot)
     .filter((l) => l !== null)
     .join(NEWLINE);
+}
+
+/**
+ * The ZIP line, with where the number came from. Dispatch routes on this one, so
+ * saying whether Google supplied it or the visitor typed it is the difference
+ * between a confident dispatch and a phone call to check.
+ */
+function zipLine(p) {
+  const zip = p.zip || '—';
+  if (!p.zip) return zip;
+  return zip + (p.zip_google ? ' (Google)' : ' (typed)');
+}
+
+/** The visitor typed a ZIP that disagrees with the one Google returned. */
+function zipOverridden(p) {
+  return Boolean(p.zip_google && p.zip_typed && p.zip_typed !== p.zip_google);
 }
 
 /**

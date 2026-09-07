@@ -14,6 +14,10 @@
 //   · no-JS leg: the fallback form's native POST reaches /api/contact
 //   · fold gate (360×740, 375×812, 1280×800): the "Get your price" button is
 //     fully above the fold without scrolling, the call button at least half so
+//   · step fold (360×740): the 16-tile appliance step fits with Continue and does
+//     not scroll; the symptom step keeps ≤12 tiles with Continue pinned
+//   · ZIP from Google: Place Details stays inside the Essentials SKU, fills the
+//     ZIP, marks it, and a typed override warns instead of losing the verification
 //
 // Usage: node scripts/smoke-quote-sheet.mjs [--headed]
 
@@ -273,7 +277,9 @@ function mapsMock(failing, detailsFail) {
         { types: ['postal_code'], longText: '90048' },
       ],
       location: { lat: () => 34.0800742, lng: () => -118.384211 },
-      fetchFields: async () => {
+      fetchFields: async (req) => {
+        // Recorded so the gate can prove the request stays inside the Essentials SKU.
+        window.__qsDetailsFields = (req && req.fields) || [];
         // Reproduces the live project: GetPlaceRequestPerDayPerProject = 0.
         if (${detailsFail ? 'true' : 'false'}) {
           throw new Error(
@@ -472,9 +478,10 @@ async function addressLeg(browser, base, failing) {
       String(p.address_verified));
     if (!failing) {
       expect(`${label}: place_id in payload`, p.place_id === 'mock-place-1', String(p.place_id));
-      expect(`${label}: lat/lng in payload`,
-        Math.abs(p.lat - 34.0800742) < 1e-6 && Math.abs(p.lng + 118.384211) < 1e-6,
-        `${p.lat}, ${p.lng}`);
+      // QS-1.5: Place Details is asked for formattedAddress + addressComponents only,
+      // so no coordinates arrive even though the mock place carries a location.
+      expect(`${label}: no lat/lng — location was not requested`,
+        p.lat === null && p.lng === null, `${p.lat}, ${p.lng}`);
       expect(`${label}: city from Google in payload`, p.city_display === 'West Hollywood',
         String(p.city_display));
       expect(`${label}: branch still routed by ZIP`, p.city === 'west-hollywood', String(p.city));
@@ -562,6 +569,281 @@ async function detailsBlockedLeg(browser, base) {
   await ctx.close();
 }
 
+
+/**
+ * QS-1.5 step-fold gate. The appliance step grew from 10 tiles to 16, and a step
+ * whose options run off the bottom of a 360×740 phone loses the ones below the
+ * cut. Rule for the APPLIANCE step: the whole grid plus Continue fits with the
+ * sheet body not scrolling at all. Rule for the SYMPTOM step: at most 12 tiles,
+ * the body may scroll, but Continue stays pinned and fully visible.
+ */
+async function stepFoldLeg(browser, base) {
+  const label = 'step fold 360×740';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({
+    viewport: { width: 360, height: 740 },
+    hasTouch: true,
+    isMobile: true,
+    deviceScaleFactor: 3,
+  });
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+  await page.goto(`${base}/book/`, { waitUntil: 'load' });
+  await page.evaluate(() => document.fonts && document.fonts.ready);
+
+  await page.click('[data-quote-source]');
+  await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 5000 });
+
+  // ── residential appliance step ────────────────────────────────────────────
+  await (await tileByText(page, 'At home')).click();
+  await page.waitForTimeout(150);
+
+  const res = await measureStep(page);
+  expect(`${label}: 16 residential appliance tiles`, res.tiles === 16, `${res.tiles}`);
+  expect(`${label}: appliance grid is the compact variant`, res.compact, JSON.stringify(res.style));
+  expect(
+    `${label}: compact tile is 44px min / 10px 12px / 15px`,
+    res.style.minHeight === '44px' && res.style.padding === '10px 12px' && res.style.fontSize === '15px',
+    JSON.stringify(res.style)
+  );
+  expect(`${label}: compact grid gap is 8px`, res.style.gap === '8px', res.style.gap);
+  expect(
+    `${label}: appliance step does not scroll`,
+    res.overflow === 0,
+    `body overflows by ${res.overflow}px`
+  );
+  expect(
+    `${label}: last appliance tile sits above Continue`,
+    res.lastTileBottom <= res.primaryTop,
+    `tile ends ${res.lastTileBottom}, Continue starts ${res.primaryTop}`
+  );
+  expect(
+    `${label}: Continue fully visible on the appliance step`,
+    res.primaryBottom <= res.vh,
+    `${res.primaryBottom} > ${res.vh}`
+  );
+
+  // ── residential symptom step ──────────────────────────────────────────────
+  await (await tileByText(page, 'Refrigerator')).click();
+  await page.waitForTimeout(150);
+  const sym = await measureStep(page);
+  expect(`${label}: symptom step carries 10-12 tiles`, sym.tiles >= 10 && sym.tiles <= 12, `${sym.tiles}`);
+  expect(
+    `${label}: symptom tiles keep the full 56px size`,
+    !sym.compact && sym.style.minHeight === '56px' && sym.style.fontSize === '16px',
+    JSON.stringify(sym.style)
+  );
+  expect(
+    `${label}: Continue stays pinned on the symptom step`,
+    sym.primaryBottom <= sym.vh && sym.primaryTop >= 0,
+    `${sym.primaryTop}-${sym.primaryBottom} vs ${sym.vh}`
+  );
+  expect(`${label}: last symptom tile is "Something else"`, sym.lastTileText === 'Something else', sym.lastTileText);
+
+  // ── commercial appliance step ─────────────────────────────────────────────
+  await page.click('#qs-back');
+  await page.waitForTimeout(120);
+  await page.click('#qs-back');
+  await page.waitForTimeout(120);
+  await (await tileByText(page, 'In a business')).click();
+  await page.waitForTimeout(150);
+  const com = await measureStep(page);
+  expect(`${label}: 11 commercial appliance tiles`, com.tiles === 11, `${com.tiles}`);
+  expect(
+    `${label}: commercial appliance step does not scroll`,
+    com.overflow === 0,
+    `body overflows by ${com.overflow}px`
+  );
+
+  await (await tileByText(page, 'Walk-in')).click();
+  await page.waitForTimeout(150);
+  const comSym = await measureStep(page);
+  expect(
+    `${label}: commercial symptom step carries 10-12 tiles`,
+    comSym.tiles >= 10 && comSym.tiles <= 12,
+    `${comSym.tiles}`
+  );
+  expect(
+    `${label}: Continue stays pinned on the commercial symptom step`,
+    comSym.primaryBottom <= comSym.vh,
+    `${comSym.primaryBottom} > ${comSym.vh}`
+  );
+
+  await ctx.close();
+}
+
+/** Geometry + computed style of the tile grid currently on screen. */
+function measureStep(page) {
+  return page.evaluate(() => {
+    const body = document.getElementById('qs-body');
+    const grid = document.querySelector('#qs-body .qs-tiles');
+    const tiles = [...document.querySelectorAll('#qs-body .qs-tile')];
+    const primary = document.getElementById('qs-primary').getBoundingClientRect();
+    const last = tiles.length ? tiles[tiles.length - 1].getBoundingClientRect() : null;
+    const cs = tiles.length ? getComputedStyle(tiles[0]) : null;
+    const gs = grid ? getComputedStyle(grid) : null;
+    return {
+      tiles: tiles.length,
+      compact: Boolean(grid && grid.classList.contains('qs-compact')),
+      overflow: body.scrollHeight - body.clientHeight,
+      lastTileBottom: last ? +last.bottom.toFixed(1) : 0,
+      lastTileText: tiles.length ? tiles[tiles.length - 1].textContent.trim() : '',
+      primaryTop: +primary.top.toFixed(1),
+      primaryBottom: +primary.bottom.toFixed(1),
+      vh: window.innerHeight,
+      style: cs
+        ? {
+            minHeight: cs.minHeight,
+            padding: cs.padding,
+            fontSize: cs.fontSize,
+            gap: gs ? gs.rowGap : '',
+          }
+        : {},
+    };
+  });
+}
+
+/**
+ * QS-1.5 ZIP-from-Google gate. Place Details fills the ZIP from the building the
+ * visitor picked, the field says so and stays editable, and a ZIP typed over it
+ * is a disagreement to be reported — not a reason to throw away a verified
+ * address. Routing follows Google's ZIP; dispatch gets both numbers.
+ */
+async function zipLeg(browser, base) {
+  const label = 'zip (from Google)';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
+  await ctx.addInitScript(mapsMock(false, false));
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+
+  const captured = [];
+  await page.route('**/api/contact', async (route) => {
+    captured.push(route.request().postData() || '');
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+  });
+
+  await page.goto(`${base}/book/`, { waitUntil: 'domcontentloaded' });
+  await walkToContact(page);
+
+  await page.fill('#qs-address', '8746 Rangely');
+  await page.waitForTimeout(600);
+  await page.locator('#qs-addr-list .qs-addr-item').first().click();
+  await page.waitForTimeout(500);
+
+  // Essentials SKU: the two fields the sheet consumes, and nothing else.
+  const fields = await page.evaluate(() => window.__qsDetailsFields || null);
+  expect(`${label}: Place Details was called`, Array.isArray(fields), String(fields));
+  expect(
+    `${label}: Details asks for formattedAddress + addressComponents only`,
+    Array.isArray(fields) &&
+      fields.length === 2 &&
+      fields.includes('formattedAddress') &&
+      fields.includes('addressComponents'),
+    JSON.stringify(fields)
+  );
+
+  const zipVal = await page.inputValue('#qs-zip');
+  expect(`${label}: ZIP filled from Place Details`, zipVal === '90048', zipVal);
+  const zipLabel = await page.locator('#qs-zip').evaluate(
+    (el) => el.closest('.qs-field').querySelector('span').textContent.trim()
+  );
+  expect(`${label}: field is marked as coming from Google`, /from Google/.test(zipLabel), zipLabel);
+  const editable = await page.locator('#qs-zip').evaluate((el) => !el.readOnly && !el.disabled);
+  expect(`${label}: the ZIP stays editable`, editable);
+  expect(`${label}: no disagreement note yet`, (await page.locator('#qs-zip-mismatch').count()) === 0);
+
+  // The visitor overrides it with a ZIP that belongs to a different city.
+  await page.fill('#qs-zip', '90032');
+  await page.waitForTimeout(200);
+  const warn = await page.locator('#qs-zip-mismatch').innerText();
+  expect(
+    `${label}: disagreement note names Google's ZIP`,
+    warn.trim() === "That ZIP doesn't match the address you picked — we'll go with 90048",
+    JSON.stringify(warn)
+  );
+  const stillGreen = await page.locator('#qs-addr-note').evaluate((el) => el.className);
+  expect(`${label}: the address stays verified`, stillGreen === 'qs-ok', stillGreen);
+
+  await page.fill('#qs-name', 'Dana');
+  await page.fill('#qs-phone', '3105550134');
+  await (await tileByText(page, 'ASAP')).click();
+  await page.click('#qs-primary');
+  await page.waitForTimeout(400);
+
+  expect(`${label}: submit went through`, captured.length === 1, `${captured.length} request(s)`);
+  if (captured.length) {
+    const p = JSON.parse(captured[0]);
+    expect(`${label}: zip is Google's`, p.zip === '90048', String(p.zip));
+    expect(`${label}: zip_google in payload`, p.zip_google === '90048', String(p.zip_google));
+    expect(`${label}: zip_typed keeps what the visitor typed`, p.zip_typed === '90032', String(p.zip_typed));
+    expect(`${label}: routed on the Google ZIP`, p.city === 'west-hollywood', String(p.city));
+    expect(`${label}: address still verified`, p.address_verified === true, String(p.address_verified));
+    expect(`${label}: in zone by the Google ZIP`, p.out_of_zone === false, String(p.out_of_zone));
+  }
+
+  await ctx.close();
+}
+
+/**
+ * The other half: Place Details never answers (the live project's quota), so there
+ * is no Google ZIP at all. The typed ZIP is then the only one, it routes, and it
+ * must not be labelled as Google's.
+ */
+async function zipManualLeg(browser, base) {
+  const label = 'zip (details quota-blocked)';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ viewport: { width: 375, height: 812 } });
+  await ctx.addInitScript(mapsMock(false, true));
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+
+  const captured = [];
+  await page.route('**/api/contact', async (route) => {
+    captured.push(route.request().postData() || '');
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+  });
+
+  await page.goto(`${base}/book/`, { waitUntil: 'domcontentloaded' });
+  await walkToContact(page);
+  await page.fill('#qs-address', '8746 Rangely');
+  await page.waitForTimeout(600);
+  await page.locator('#qs-addr-list .qs-addr-item').first().click();
+  await page.waitForTimeout(500);
+
+  expect(`${label}: ZIP left empty for the visitor`, (await page.inputValue('#qs-zip')) === '');
+  const zipLabel = await page.locator('#qs-zip').evaluate(
+    (el) => el.closest('.qs-field').querySelector('span').textContent.trim()
+  );
+  expect(`${label}: field is NOT marked as coming from Google`, !/from Google/.test(zipLabel), zipLabel);
+
+  await page.fill('#qs-zip', '90032');
+  await page.waitForTimeout(200);
+  expect(
+    `${label}: a typed ZIP raises no disagreement`,
+    (await page.locator('#qs-zip-mismatch').count()) === 0
+  );
+
+  await page.fill('#qs-name', 'Dana');
+  await page.fill('#qs-phone', '3105550134');
+  await (await tileByText(page, 'ASAP')).click();
+  await page.click('#qs-primary');
+  await page.waitForTimeout(400);
+
+  expect(`${label}: submit went through`, captured.length === 1, `${captured.length} request(s)`);
+  if (captured.length) {
+    const p = JSON.parse(captured[0]);
+    expect(`${label}: zip is the typed one`, p.zip === '90032', String(p.zip));
+    expect(`${label}: zip_google is empty`, p.zip_google === '', JSON.stringify(p.zip_google));
+    expect(`${label}: zip_typed matches`, p.zip_typed === '90032', String(p.zip_typed));
+    expect(`${label}: routed on the typed ZIP`, p.city === 'los-angeles', String(p.city));
+    expect(`${label}: address still verified from the prediction`, p.address_verified === true,
+      String(p.address_verified));
+  }
+
+  await ctx.close();
+}
+
 // ── run ──────────────────────────────────────────────────────────────────────
 const { server, base } = await serve();
 const browser = await chromium.launch({ headless: !HEADED });
@@ -575,6 +857,9 @@ try {
   await addressLeg(browser, base, false);
   await addressLeg(browser, base, true);
   await detailsBlockedLeg(browser, base);
+  await stepFoldLeg(browser, base);
+  await zipLeg(browser, base);
+  await zipManualLeg(browser, base);
 } finally {
   await browser.close();
   server.close();

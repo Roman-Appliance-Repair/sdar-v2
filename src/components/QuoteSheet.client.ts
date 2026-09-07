@@ -36,6 +36,7 @@ interface QuoteData {
     totalSteps: number;
     outOfZone: string;
     address: { label: string; placeholder: string; lookupFailed: string; streetOnly: string };
+    zip: { label: string; fromGoogle: string; mismatch: string };
     visitTimes: { id: string; label: string; hint: string }[];
     photos: { hint: string; max: number; skip: string; maxBytes: number; tooBig: string };
     errors: { rateLimited: string; failed: string };
@@ -168,6 +169,23 @@ function telHref(display: string): string {
   return 'tel:+1' + digits(display);
 }
 
+/**
+ * The ZIP everything downstream runs on: routing, the zone check, the branch on
+ * the done screen. Google's ZIP wins when we have one, because it came from the
+ * building the visitor actually picked; the typed field is a fallback for when
+ * Place Details never answered. The typed value is still carried to dispatch —
+ * see zip_typed in the payload — it just does not steer the truck.
+ */
+function effectiveZip(): string {
+  return state.zipFromGoogle || state.zip;
+}
+
+/** True once the visitor has typed a ZIP that contradicts the one Google gave. */
+function zipMismatch(): boolean {
+  const typed = digits(state.zip).slice(0, 5);
+  return Boolean(state.zipFromGoogle && typed.length === 5 && typed !== state.zipFromGoogle);
+}
+
 function zipToBranch(zip: string): string {
   const z = digits(zip).slice(0, 5);
   if (z.length < 5) return data.zone.mainSlug;
@@ -234,6 +252,16 @@ function restore(): void {
       .map((p) => ({ ...p, localUrl: '' }));
     if (typeof state.step !== 'number' || state.step < 0 || state.step >= data.copy.totalSteps) {
       state.step = 0;
+    }
+    // A session saved before QS-1.5 can hold a retired appliance id (oven_range,
+    // walk_in_reach_in). That id matches no tile now, so the symptom step would
+    // resume empty with nothing to pick — send them back to the appliance step
+    // instead of to a dead end.
+    if (state.appliance && !currentAppliance()) {
+      state.appliance = null;
+      state.problems = [];
+      const applianceStep = data.copy.steps.findIndex((s) => s.id === 'appliance');
+      if (applianceStep >= 0 && state.step > applianceStep) state.step = applianceStep;
     }
   } catch {
     state = blank();
@@ -446,7 +474,10 @@ function viewAppliance(): string {
   const list = state.where ? appliancesFor(state.where) : [];
   return (
     `<p class="qs-sub">Pick the closest one.</p>` +
-    `<div class="qs-tiles qs-two">` +
+    // qs-compact: 16 residential tiles have to clear a 360×740 fold with the
+    // Continue button, so this step gets the short tile. The symptom step keeps
+    // the full-size tile — it never carries more than 12.
+    `<div class="qs-tiles qs-two qs-compact">` +
     list
       .map(
         (a) =>
@@ -525,7 +556,7 @@ function viewPrice(): string {
 }
 
 function viewContact(): string {
-  const zoneWarn = state.zip.length === 5 && !inZone(state.zip);
+  const zoneWarn = effectiveZip().length === 5 && !inZone(effectiveZip());
   const showDate = state.visitTime === 'pick_date';
   return (
     `<p class="qs-sub">Last step. A dispatcher calls to confirm the window.</p>` +
@@ -546,12 +577,7 @@ function viewContact(): string {
     `<span class="qs-hint" id="qs-addr-note"></span>` +
     (errors.address ? `<span class="qs-err">${esc(errors.address)}</span>` : '') +
     `</div>` +
-    field('ZIP', 'qs-zip', 'zip', 'text', {
-      autocomplete: 'postal-code',
-      inputmode: 'numeric',
-      placeholder: '90048',
-      maxlength: '5',
-    }) +
+    viewZipField() +
     (zoneWarn ? `<div class="qs-note qs-note-warn" id="qs-zone-note">${esc(data.copy.outOfZone)}</div>` : '') +
     `<div class="qs-field"><span>When works?</span><div class="qs-tiles">` +
     data.copy.visitTimes
@@ -572,6 +598,41 @@ function viewContact(): string {
     `<label class="qs-field"><span>Anything we should know? <em>(optional)</em></span>` +
     `<textarea class="qs-textarea" id="qs-notes" data-field="notes"` +
     ` placeholder="Gate code, parking, best time to call…">${esc(state.notes)}</textarea></label>`
+  );
+}
+
+/**
+ * The ZIP field. Place Details fills it from the building the visitor picked, and
+ * the label then says so — but the input stays editable, because Google is not
+ * always right about a unit and the visitor is standing in the building.
+ *
+ * A typed ZIP that contradicts Google is a note, not an error and not a downgrade:
+ * the address is still the one Google verified. Routing follows Google's ZIP
+ * (see effectiveZip) and dispatch receives both values.
+ */
+function viewZipField(): string {
+  const err = errors.zip;
+  const fromGoogle = Boolean(state.zipFromGoogle);
+  return (
+    `<label class="qs-field"><span>${esc(data.copy.zip.label)}` +
+    (fromGoogle ? ` <em>(${esc(data.copy.zip.fromGoogle)})</em>` : '') +
+    `</span>` +
+    `<input class="qs-input" type="text" id="qs-zip" data-field="zip"` +
+    ` value="${esc(state.zip)}" autocomplete="postal-code" inputmode="numeric"` +
+    ` placeholder="90048" maxlength="5"` +
+    (err ? ` aria-invalid="true"` : '') +
+    ` />` +
+    (err ? `<span class="qs-err">${esc(err)}</span>` : '') +
+    `</label>` +
+    (zipMismatch() ? zipMismatchNote() : '')
+  );
+}
+
+function zipMismatchNote(): string {
+  return (
+    `<div class="qs-note qs-note-warn" id="qs-zip-mismatch">` +
+    esc(data.copy.zip.mismatch.replace('{zip}', state.zipFromGoogle)) +
+    `</div>`
   );
 }
 
@@ -603,7 +664,7 @@ function minDate(): string {
 }
 
 function renderDone(): void {
-  const slug = zipToBranch(state.zip);
+  const slug = zipToBranch(effectiveZip());
   const ph = branchPhone(slug);
   elCounter.textContent = '';
   elBack.hidden = true;
@@ -710,18 +771,10 @@ function onBodyInput(ev: Event): void {
   }
 
   (state as unknown as Record<string, string>)[key] = el.value;
-  // A hand-typed ZIP only detaches the address from its verified place when it
-  // contradicts a ZIP Google actually gave us. With Place Details unavailable there is
-  // no Google ZIP, the visitor is expected to type it, and doing so must not silently
-  // downgrade an address the autocomplete already matched to a real building.
-  if (
-    key === 'zip' &&
-    state.addressVerified &&
-    state.zipFromGoogle &&
-    digits(el.value) !== state.zipFromGoogle
-  ) {
-    state.addressVerified = false;
-  }
+  // A hand-typed ZIP that contradicts Google's used to clear the verification. It no
+  // longer does: the address is still the building Google matched, and throwing that
+  // away over a ZIP typo cost dispatch a verified pin for nothing. The disagreement
+  // surfaces as a note, routing follows Google's ZIP, and both values reach the card.
   if (errors[key]) {
     delete errors[key];
     el.removeAttribute('aria-invalid');
@@ -729,14 +782,48 @@ function onBodyInput(ev: Event): void {
   }
   save();
 
-  // The out-of-zone note appears and disappears live, without a re-render that
-  // would blur the field the visitor is typing in.
-  if (key === 'zip') syncZoneNote();
+  // Both ZIP notes appear and disappear live, without a re-render that would blur
+  // the field the visitor is typing in.
+  if (key === 'zip') {
+    syncZoneNote();
+    syncZipMismatchNote();
+  }
+}
+
+/** Repaint the ZIP label so the "(from Google)" marker appears without a re-render
+ *  that would blur whatever field the visitor is in. */
+function refreshZipField(): void {
+  const label = document.getElementById('qs-zip')?.closest('.qs-field')?.querySelector('span');
+  if (!label) return;
+  label.textContent = data.copy.zip.label;
+  if (state.zipFromGoogle) {
+    const em = document.createElement('em');
+    em.textContent = '(' + data.copy.zip.fromGoogle + ')';
+    label.append(' ', em);
+  }
+}
+
+function syncZipMismatchNote(): void {
+  const existing = document.getElementById('qs-zip-mismatch');
+  const warn = zipMismatch();
+  if (warn && !existing) {
+    const zipField = document.getElementById('qs-zip')?.closest('.qs-field');
+    if (!zipField) return;
+    const note = document.createElement('div');
+    note.className = 'qs-note qs-note-warn';
+    note.id = 'qs-zip-mismatch';
+    note.textContent = data.copy.zip.mismatch.replace('{zip}', state.zipFromGoogle);
+    zipField.after(note);
+  } else if (warn && existing) {
+    existing.textContent = data.copy.zip.mismatch.replace('{zip}', state.zipFromGoogle);
+  } else if (!warn && existing) {
+    existing.remove();
+  }
 }
 
 function syncZoneNote(): void {
   const existing = document.getElementById('qs-zone-note');
-  const warn = state.zip.length === 5 && !inZone(state.zip);
+  const warn = effectiveZip().length === 5 && !inZone(effectiveZip());
   if (warn && !existing) {
     const zipField = document.getElementById('qs-zip')?.closest('.qs-field');
     if (!zipField) return;
@@ -1001,7 +1088,12 @@ async function wireAddress(): Promise<void> {
         typeof sg.prediction.toPlace === 'function'
           ? sg.prediction.toPlace()
           : new (g().maps.places.Place)({ id: sg.placeId });
-      await place.fetchFields({ fields: ['formattedAddress', 'addressComponents', 'location'] });
+      // Essentials SKU only. `location` would also be Essentials, but QS-1.5 asks for
+      // the two fields the sheet actually consumes — the formatted address it writes
+      // back into the input, and the components it reads the ZIP and city out of.
+      // Dropping it means lat/lng no longer arrive from Details; the lead still carries
+      // place_id, which is what a map link needs anyway.
+      await place.fetchFields({ fields: ['formattedAddress', 'addressComponents'] });
       applyPlace(place, sg.placeId);
     } catch (err) {
       console.warn('[quote-sheet] place details unavailable, keeping the prediction:', err);
@@ -1057,19 +1149,30 @@ async function wireAddress(): Promise<void> {
       setValue(input!, formatted);
       state.address = formatted;
     }
-    const loc = place.location;
-    state.lat = typeof loc?.lat === 'function' ? loc.lat() : (loc?.lat ?? null);
-    state.lng = typeof loc?.lng === 'function' ? loc.lng() : (loc?.lng ?? null);
+    // No coordinates: `location` is not among the requested fields, and reading it
+    // off the Place object anyway would be reading an unfetched field.
+    state.lat = null;
+    state.lng = null;
     state.placeId = place.id || place.place_id || fallbackId || '';
     state.cityFromGoogle = city;
 
     if (zip) {
-      state.zip = zip;
       state.zipFromGoogle = zip;
-      const zipEl = document.getElementById('qs-zip') as HTMLInputElement | null;
-      if (zipEl) setValue(zipEl, zip);
+      // Only overwrite what the visitor typed when they had not typed a ZIP yet, or
+      // when theirs already agrees. A ZIP they entered on purpose stays on screen —
+      // it just gets the disagreement note, and routing goes with Google's.
+      const typed = digits(state.zip).slice(0, 5);
+      if (typed.length !== 5 || typed === zip) {
+        state.zip = zip;
+        const zipEl = document.getElementById('qs-zip') as HTMLInputElement | null;
+        if (zipEl) setValue(zipEl, zip);
+      }
       delete errors.zip;
+      // The label gains its "(from Google)" marker and the notes re-evaluate, so this
+      // one field is re-rendered in place rather than blurring the whole step.
+      refreshZipField();
       syncZoneNote();
+      syncZipMismatchNote();
     }
 
     // Details can only confirm more than the prediction did — it must never take a
@@ -1145,7 +1248,7 @@ function validateContact(): boolean {
   if (!state.name.trim()) errors.name = 'Please enter your name.';
   if (digits(state.phone).length < 10) errors.phone = 'Enter a 10-digit phone number.';
   if (!state.address.trim()) errors.address = 'We need the address to route a truck.';
-  if (digits(state.zip).length !== 5) errors.zip = 'Enter your 5-digit ZIP.';
+  if (digits(effectiveZip()).length !== 5) errors.zip = 'Enter your 5-digit ZIP.';
   if (state.visitTime === 'pick_date') {
     if (!state.visitDate) {
       errors.visitDate = 'Pick a day.';
@@ -1201,7 +1304,7 @@ async function submit(): Promise<void> {
   elPrimary.textContent = primaryLabel('contact');
   elFootNote.textContent = '';
 
-  const branch = zipToBranch(state.zip);
+  const branch = zipToBranch(effectiveZip());
   const app = currentAppliance();
 
   try {
@@ -1233,9 +1336,14 @@ async function submit(): Promise<void> {
         name: state.name,
         phone: state.phone,
         address: state.address,
-        zip: state.zip,
+        // zip = the one dispatch should route on. zip_google is what Place Details
+        // returned (empty when Details never answered), zip_typed is what the visitor
+        // left in the field. They differ only when the visitor overrode Google.
+        zip: effectiveZip(),
+        zip_google: state.zipFromGoogle,
+        zip_typed: state.zip,
         city: branch,
-        out_of_zone: !inZone(state.zip),
+        out_of_zone: !inZone(effectiveZip()),
         visit_time: state.visitTime,
         visit_date: state.visitDate,
         notes: state.notes,
@@ -1265,7 +1373,7 @@ async function submit(): Promise<void> {
       where: state.where,
       appliance: state.appliance,
       branch,
-      out_of_zone: !inZone(state.zip),
+      out_of_zone: !inZone(effectiveZip()),
       photos: state.photos.length,
       source: state.source,
     });

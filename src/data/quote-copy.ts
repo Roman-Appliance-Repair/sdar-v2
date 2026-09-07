@@ -89,6 +89,17 @@ export const ADDRESS_COPY = {
   streetOnly: 'Add the house or unit number so the tech finds the door.',
 } as const;
 
+/** ZIP field copy. Place Details fills the ZIP from the picked building; the field
+ *  stays editable, and a typed ZIP that contradicts Google gets the note below —
+ *  a note, not an error. Routing uses Google's, and dispatch sees both. */
+export const ZIP_COPY = {
+  label: 'ZIP',
+  /** Suffix on the field label once Google supplied the value. */
+  fromGoogle: 'from Google',
+  /** `{zip}` is replaced with the ZIP Google returned. */
+  mismatch: "That ZIP doesn't match the address you picked — we'll go with {zip}",
+} as const;
+
 /** Out-of-zone ZIP note. A note, never a block — the lead still goes through. */
 export const OUT_OF_ZONE_NOTE =
   "That ZIP is outside our usual routes. Send it anyway — we'll call and tell you straight whether we can get a truck to you.";
