@@ -12,6 +12,8 @@
 //   · submit reaches /api/contact with type 'quote'
 //   · computed styles: tiles carry a border, the price renders ≥ 28px
 //   · no-JS leg: the fallback form's native POST reaches /api/contact
+//   · fold gate (360×740, 375×812, 1280×800): the "Get your price" button is
+//     fully above the fold without scrolling, the call button at least half so
 //
 // Usage: node scripts/smoke-quote-sheet.mjs [--headed]
 
@@ -310,6 +312,77 @@ function mapsMock(failing, detailsFail) {
   })();`;
 }
 
+/**
+ * QS-1.4 fold gate. On a real 360×800 Android the "Get your price" button sat
+ * below the fold, so the page opened on an empty grey band and an H1. The rule:
+ * with no scrolling at all, the quote button's box is fully inside the viewport
+ * (bottom ≤ height − 8px) and the call button is at least half visible.
+ *
+ * 1280×800 is checked too — on desktop both buttons must be fully visible.
+ */
+async function foldLeg(browser, base, viewport, label, opts = {}) {
+  const { desktop = false } = opts;
+  console.log(`\n[fold ${label}] ${viewport.width}×${viewport.height}`);
+  const ctx = await browser.newContext({
+    viewport,
+    ...(desktop ? {} : { hasTouch: true, isMobile: true, deviceScaleFactor: 3 }),
+  });
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+  await page.goto(`${base}/book/`, { waitUntil: 'load' });
+  // Fonts change line counts, which changes where the buttons land. Wait for the
+  // real metrics rather than gating on a fallback-font layout.
+  await page.evaluate(() => document.fonts && document.fonts.ready);
+
+  const scrolled = await page.evaluate(() => window.scrollY);
+  expect(`fold ${label}: page did not scroll`, scrolled === 0, `scrollY=${scrolled}`);
+
+  const geo = await page.evaluate(() => {
+    const q = document.querySelector('[data-quote-source]');
+    const c = document.getElementById('heroCall');
+    const box = (el) => {
+      const r = el.getBoundingClientRect();
+      return { top: r.top, bottom: r.bottom, height: r.height, left: r.left, right: r.right };
+    };
+    return { vh: window.innerHeight, vw: window.innerWidth, quote: box(q), call: box(c) };
+  });
+
+  const { vh, quote, call } = geo;
+
+  expect(
+    `fold ${label}: quote button fully above the fold`,
+    quote.top >= 0 && quote.bottom <= vh - 8,
+    `top=${quote.top.toFixed(1)} bottom=${quote.bottom.toFixed(1)} vh=${vh}`
+  );
+  expect(
+    `fold ${label}: quote button is ≥ 56px tall`,
+    quote.height >= 56,
+    `${quote.height.toFixed(1)}px`
+  );
+
+  const callVisible = Math.max(0, Math.min(call.bottom, vh) - Math.max(call.top, 0));
+  const callRatio = call.height ? callVisible / call.height : 0;
+  if (desktop) {
+    expect(
+      `fold ${label}: call button fully above the fold`,
+      call.top >= 0 && call.bottom <= vh,
+      `top=${call.top.toFixed(1)} bottom=${call.bottom.toFixed(1)} vh=${vh}`
+    );
+  } else {
+    expect(
+      `fold ${label}: call button at least 50% visible`,
+      callRatio >= 0.5,
+      `${(callRatio * 100).toFixed(0)}% visible (top=${call.top.toFixed(1)} bottom=${call.bottom.toFixed(1)} vh=${vh})`
+    );
+  }
+
+  // The trigger must still be the sheet's trigger, not a plain link.
+  const src = await page.getAttribute('[data-quote-source]', 'data-quote-source');
+  expect(`fold ${label}: trigger still carries data-quote-source`, src === 'book-hero', String(src));
+
+  await ctx.close();
+}
+
 /** Drives steps 1-5 so the caller lands on step 6 with a resumable state. */
 async function walkToContact(page) {
   await page.click('[data-quote-source]');
@@ -493,6 +566,9 @@ async function detailsBlockedLeg(browser, base) {
 const { server, base } = await serve();
 const browser = await chromium.launch({ headless: !HEADED });
 try {
+  await foldLeg(browser, base, { width: 360, height: 740 }, '360');
+  await foldLeg(browser, base, { width: 375, height: 812 }, '375');
+  await foldLeg(browser, base, { width: 1280, height: 800 }, 'desktop', { desktop: true });
   await journey(browser, base, { width: 375, height: 812 }, 'phone');
   await journey(browser, base, { width: 1280, height: 800 }, 'desktop');
   await noJsLeg(browser, base);

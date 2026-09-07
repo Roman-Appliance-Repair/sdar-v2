@@ -157,6 +157,17 @@ const CASES = [
     mutate: (s) => s.replace('action="/api/contact"', 'action="/api/nowhere"'),
   },
   {
+    gate: 'smoke', name: 'QS-1.4: a taller hero pushes the quote button below the fold',
+    file: PAGE, cmd: SMOKE_GATE,
+    // The regression class the fold gate exists for: anything that grows the hero
+    // above the buttons — dead padding, another paragraph, a badge row — pushes
+    // "Get your price" under a 360×740 fold. Padding is the cheapest stand-in.
+    // The rule ships as `.book-hero[data-astro-cid-…]{padding:12px 0 40px;…}`;
+    // the desktop override inside the media query is a second, later copy, so a
+    // non-global replace hits the mobile one — the one the fold depends on.
+    mutate: (s) => s.replace(/(\.book-hero\[[^\]]*\]\{)padding:12px 0 40px/, '$1padding:400px 0 40px'),
+  },
+  {
     gate: 'smoke', name: 'resume forgets the saved step', file: CHUNK, cmd: SMOKE_GATE,
     mutate: (s) => s.replace('sessionStorage.getItem', 'sessionStorage.getItemMissing'),
   },
