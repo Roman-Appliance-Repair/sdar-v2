@@ -19,7 +19,8 @@
 //   · ZIP from Google: Place Details stays inside the Essentials SKU, fills the
 //     ZIP, marks it, and a typed override warns instead of losing the verification
 //
-// Usage: node scripts/smoke-quote-sheet.mjs [--headed]
+// Usage: node scripts/smoke-quote-sheet.mjs [--headed] [--base=https://…]
+//        --base points the suite at a deployed origin (release check) instead of dist/.
 
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
@@ -29,6 +30,7 @@ import { chromium } from 'playwright';
 const ROOT = process.cwd();
 const DIST = path.join(ROOT, 'dist');
 const HEADED = process.argv.includes('--headed');
+const BASE_OVERRIDE = (process.argv.find((a) => a.startsWith('--base=')) || '').slice(7);
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -845,7 +847,13 @@ async function zipManualLeg(browser, base) {
 }
 
 // ── run ──────────────────────────────────────────────────────────────────────
-const { server, base } = await serve();
+// --base=https://… drives the whole suite against a deployed origin instead of the
+// throwaway dist/ server. Used to verify a release: /api/contact is still routed and
+// fulfilled inside the browser, so pointing this at production sends nothing anywhere.
+const { server, base } = BASE_OVERRIDE
+  ? { server: { close() {} }, base: BASE_OVERRIDE.replace(/\/+$/, '') }
+  : await serve();
+if (BASE_OVERRIDE) console.log(`(running against ${base}, not dist/)`);
 const browser = await chromium.launch({ headless: !HEADED });
 try {
   await foldLeg(browser, base, { width: 360, height: 740 }, '360');
