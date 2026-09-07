@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-08-08 (hero branch cards + abbreviation purge — merge 187ddb5f)
+**Последняя синхронизация:** 2026-09-07 (QS-1 quote sheet live на /book/ — merge 1f470d35)
 
 ---
 
@@ -36,6 +36,14 @@
 
 ## Что сейчас в работе
 
+- **QS-2 — раскатка quote sheet за пределы `/book/`.** QS-1 живёт на `/book/` как canary
+  (merge `1f470d35`, 2026-09-07). Следующий шаг — открывать ту же шторку с любой страницы
+  с **предзаполнением типа техники** по контексту страницы (на `/services/dryer-repair/`
+  шаг «что сломалось» должен уже стоять на Dryer). Триггер — тот же `data-quote-source`.
+- **⚠️ GA4 key event надо переключить `booking_submitted` → `quote_submit`.** Старая форма
+  `/book/` слала `booking_submitted`; шторка шлёт `quote_submit`. Пока конверсия не переключена
+  в GA4 Admin → Events, релиз выглядит как обвал лидов до нуля. Таблицу событий в
+  @docs/analytics-stack.md §4–5 тоже надо обновить.
 - **Photo wave подготовка** — стратегия наполнения фото обсуждена 2026-05-06 (5 art-list шаблонов + 3 техника по филиалам). Реализация ещё не начата
 - **CLAUDE.md + docs/ структура** — деплоится 2026-05-06
 
@@ -60,6 +68,33 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-09-07:** **QS-1 — полноэкранная форма расчёта на `/book/` ЖИВЁТ В ПРОДЕ** (merge
+  `1f470d35`, ветка `qs1-quote-sheet` НЕ удалена). Старая форма в четыре поля заменена шторкой
+  из шести шагов: где (дом $89 / бизнес $120) → что сломалось → что именно происходит → фото →
+  цена диагностики → контакты. Работает и без JS (`QuoteFallbackForm`, нативный POST на
+  `/api/contact`). **Canary: только `/book/`** — на остальных 1197 страницах ни шторки, ни ключа
+  Maps, это стережёт гейт. **Плитки выведены из `service-catalog.ts`, не выдуманы:** 16 бытовых
+  (14 услуг catalog-residential + мусорный пресс) и 11 коммерческих (kitchen + cold-storage +
+  ice-machines + охлаждаемый prep table), у каждой записан источник в `APPLIANCE_SOURCES`;
+  10–12 симптомов на тип, «Something else» последним везде. **Адрес через Google Places:**
+  верификация берётся из подсказки Autocomplete, а НЕ из Place Details — у проекта
+  `239431327324` квота `GetPlaceRequestPerDayPerProject` = **0** (живой вызов на релизе:
+  `RESOURCE_EXHAUSTED`), иначе каждый лид уходил бы помеченным «не проверен». Details
+  запрашивает только `formattedAddress` + `addressComponents` (SKU Essentials) и подставит ZIP
+  сам, как только квоту поднимут (решение: 300/день). **ZIP от Google побеждает набранный
+  руками:** расхождение больше не снимает верификацию — показывается заметка, маршрут идёт по
+  гугловскому, в заявку уходят оба (`zip_google` / `zip_typed`), карточка пишет источник.
+  **Фото** — через существующий `/api/chat/upload` в R2 с синтетическим `session_id`
+  (своего эндпоинта у шторки нет). **Голосового ввода нет** — решение, не долг.
+  `oven_range` и `walk_in_reach_in` выведены из обращения, не переименованы (переуказать id
+  значило бы поменять смысл уже поданных заявок). **Гейты: check 42/42, smoke 139/139,
+  verify-quote-gates 37/37 proven** — мутационная самопроверка доказывает, что каждый гейт
+  краснеет, когда ломают то, что он стережёт. Build 1198/0. Прод проверен curl: `/book/` 200
+  text/html, ровно один `<dialog id="quote-sheet">`, одна fallback-форма, Maps-конфиг только на
+  `/book/` (на `/` и `/contact/` — нет), md5 прод == pages.dev, Autocomplete с продакшн-рефером
+  200, загрузка PNG в R2 200 и файл читается, `smoke --base=<prod>` 139/139. Purge Everything
+  OK, IndexNow `/book/` 200. Детали: `session-log/2026-09-07.md`.
 
 - **2026-08-08:** **LuxurySpecialists Wave-1 pilot LIVE + cluster gap fixes** (merge `46eda8af` + `7b17f9fa`, ветка `feat/lux-pm-wave1-pilot`, worktree wt6). Пилот (одобрен Roman): LuxurySpecialists на san-marino / westlake-village / villa-park — SM заменой дублирующей brands-CustomNarrative, WLV/VP добавлением с новыми углами; SSOT сегментации `src/data/luxury-rollout.ts` (42 одобренных города A=15/B=27, группа C физически отсутствует в данных — 44 масс-маркет города пропущены решением Roman, PM-раскатка = 38 городов, estate-города без PM); 3 luxury-repair.webp по реф-кропам Романа (6 генераций, rejects: лого-патчи на кепке, взгляд в камеру, лувр-решётка, надпись на поло). Gap-фиксы: san-marino + CommercialSection (последний из 99; честная институциональная рамка без выдуманного ресторанного ряда), malibu + OutdoorSection компонентом (сырой линк-хаб после FinalCTA поглощён в чипы/прозу), koreatown — inline-нота «OutdoorSection отсутствует намеренно» (плотная многоэтажка — НЕ чинить свипами). **Матрица кластеров: Services 99 · Commercial 99 · Outdoor 98 (koreatown by design) · Lux 16 · PM 13.** Build 1197/0, humanizer 0 флагов. Волны 2-3 (Lux 42→остальные 26 + PM 38) потребляют luxury-rollout.ts. Отчёты: wiki/briefings/lux-pilot-wave1-2026-08-08.md + session-log/2026-08-08.md
 
