@@ -8,7 +8,6 @@
 
 import { BRANCHES } from '../data/branches';
 import { BUSINESS_HOURS } from '../data/business-hours';
-import BranchNAP from './BranchNAP.astro';
 
 function slugFromPath(p: string) { return (p.split('/').pop() ?? '').replace(/\.astro$/, ''); }
 function slugToLabel(slug: string) {
@@ -24,6 +23,19 @@ const countySlugs = Object.keys(import.meta.glob('../pages/*.astro'))
 const counties = countySlugs.map((slug) => ({
   label: slugToLabel(slug),
   href: `/${slug}/`
+}));
+
+/* Footer branch list — city name only, linked to that city's pillar page.
+   Phone numbers deliberately removed from the footer (2026-09-06): ten tel:
+   links on every page split call attribution and diluted the local NAP signal.
+   /contact/ keeps the full phone list via its own markup.
+   San Diego has no city pillar yet, so its branch points at the county page. */
+const BRANCH_PAGE_OVERRIDES: Record<string, string> = {
+  'san-diego': '/san-diego-county/',
+};
+const branchLinks = BRANCHES.map((b) => ({
+  label: b.name,
+  href: BRANCH_PAGE_OVERRIDES[b.slug] ?? `/${b.slug}/`
 }));
 
 const currentYear = new Date().getFullYear();
@@ -80,11 +92,10 @@ const legalLinks = [
       <div class="footer-col footer-branches">
         <h4>Branches</h4>
         <ul>
-          {BRANCHES.map((b) => (
-            <li class="branch-listing">
-              <BranchNAP branch={b} showHeading={true} showEmail={true} showCities={true} />
-            </li>
+          {branchLinks.map((b) => (
+            <li><a href={b.href}>{b.label}</a></li>
           ))}
+          <li><a href="/contact/"><strong>All Branches &amp; Phones &rarr;</strong></a></li>
         </ul>
       </div>
 
@@ -249,14 +260,6 @@ const legalLinks = [
     color: var(--muted-on-dark);
     margin-bottom: 20px;
     max-width: 380px;
-  }
-  .footer-branches li.branch-listing {
-    margin-bottom: 16px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  .footer-branches li.branch-listing:last-child {
-    border-bottom: none;
   }
   .branch-city {
     display: block;

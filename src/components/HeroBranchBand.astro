@@ -5,19 +5,22 @@
  *  read cleanly on any photo. Cards keep the translucent frosted style.
  *  Card order: the page's own branch first (primaryBranchSlug), then SSOT order.
  *
+ *  2026-09-06: branch phone numbers removed from the band — ten tel: links on
+ *  every city page split call attribution. Each card is now a link to that
+ *  branch's own page; the phone lives on the branch page and on /contact/.
+ *
  *  Contrast (computed 2026-08-08, worst case = white photo pixel under the
  *  0.94 scrim + 0.08 card fill → card bg rgb(41,41,41)):
- *    phone #FF5A4E  4.70:1  (brand red #C8102E fails at 2.46:1 — too dark)
  *    city  #D4AF37  6.88:1  (brand gold)
  *    hover: white on #C8102E 5.88:1
- *  All three pass WCAG AA 4.5:1 for normal text. Cards must stay inside the
+ *  Both pass WCAG AA 4.5:1 for normal text. Cards must stay inside the
  *  solid-scrim zone — the gradient fade lives above the content padding.
  *
  *  Mobile: every card is server-rendered (crawlers see all 10); JS adds
  *  `is-collapsed` so only the primary branch shows, with an "All N branches"
  *  toggle. No JS → all cards stay visible.
  */
-import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
+import { BRANCHES } from '../data/branches';
 
 export interface Props {
   /** Slug of the branch shown first — the page's own branch. */
@@ -31,28 +34,25 @@ const ordered = [
   ...BRANCHES.filter((b) => b.slug !== primaryBranchSlug),
 ];
 
-const cards = ordered.map((b) => {
-  // Pending-DID guard (same as BrandBranchesGrid): never dial a placeholder.
-  const isPending = b.phoneStatus === 'pending' || isPlaceholderPhone(b.phone);
-  const phone = isPending ? MAIN_PHONE : b.phone;
-  return {
-    slug: b.slug,
-    city: b.displayCity,
-    phone,
-    href: 'tel:+1' + phone.replace(/\D/g, ''),
-  };
-});
+// San Diego has no city pillar page yet — point that card at the county hub.
+const BRANCH_PAGE_OVERRIDES: Record<string, string> = {
+  'san-diego': '/san-diego-county/',
+};
+const cards = ordered.map((b) => ({
+  slug: b.slug,
+  city: b.displayCity,
+  href: BRANCH_PAGE_OVERRIDES[b.slug] ?? `/${b.slug}/`,
+}));
 const total = cards.length;
 ---
 
 <div class="hbb">
   <div class="hbb__inner">
-    <p class="hbb__label">Call your local branch</p>
+    <p class="hbb__label">Your local branch</p>
     <div class="hbb__grid">
       {cards.map((c, i) => (
         <a href={c.href} class={`hbb__card${i === 0 ? ' hbb__card--primary' : ''}`}>
           <span class="hbb__city">{c.city}</span>
-          <span class="hbb__phone">{c.phone}</span>
         </a>
       ))}
     </div>
@@ -119,21 +119,13 @@ const total = cards.length;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  .hbb__phone {
-    font-size: 16px;
-    font-weight: 800;
-    color: #ff5a4e;
-    white-space: nowrap;
-  }
   .hbb__card:hover,
   .hbb__card:active {
     background: #c8102e;
     border-color: #c8102e;
   }
   .hbb__card:hover .hbb__city,
-  .hbb__card:hover .hbb__phone,
-  .hbb__card:active .hbb__city,
-  .hbb__card:active .hbb__phone {
+  .hbb__card:active .hbb__city {
     color: #ffffff;
   }
   .hbb__toggle {
