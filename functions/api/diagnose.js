@@ -35,6 +35,19 @@ export async function onRequestPost(context) {
   try {
     const payload = await request.json();
 
+    // TEMPORARY (AID-1 diagnosis) — remove before merge. The upstream said the
+    // model id does not exist; rather than guess a replacement, ask the key which
+    // models it can actually reach.
+    if (payload._aid1_probe) {
+      const r = await fetch('https://api.anthropic.com/v1/models?limit=100', {
+        headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+      });
+      const body = await r.text();
+      let ids = null;
+      try { ids = (JSON.parse(body).data || []).map((m) => m.id); } catch { /* raw */ }
+      return json({ status: r.status, ids, raw: ids ? undefined : body.slice(0, 400) }, 200, corsHeaders);
+    }
+
     // Build a description from whatever the client sends. If the explicit
     // `description` field is missing/empty, fall back to `detail`, then to a
     // synthesized "<symptom> on <appliance> <brand>" line. No min-length gate.
