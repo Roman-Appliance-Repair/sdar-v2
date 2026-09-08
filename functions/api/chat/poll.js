@@ -1,9 +1,10 @@
 // GET /api/chat/poll?session_id=X&since=N
 //
 // Return messages added since index N. The widget polls every 3 s while the
-// panel is open to surface dispatcher replies (and on first open to rehydrate
-// history). User-authored messages are still returned so reloads can re-paint
-// the conversation.
+// panel is open — dropping to 15 s after five silent minutes — to surface
+// dispatcher replies, and calls it with since=0 on open to rehydrate history.
+// User-authored messages are still returned so a reload can re-paint the
+// conversation; the live poll skips them because they are already on screen.
 
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
@@ -13,6 +14,8 @@ export async function onRequestGet({ request, env }) {
   if (!sessionId) {
     return json({ error: 'no_session' }, 400);
   }
+
+  if (!env.SDAR_CHAT) return json({ messages: [], last_index: 0 });
 
   const session = await env.SDAR_CHAT.get(`session:${sessionId}`, 'json');
   if (!session) {

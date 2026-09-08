@@ -1,120 +1,126 @@
 // POST /api/chat/send
 //
-// Receive a user message from the chat widget, create (or reuse) a Telegram
-// forum topic in the dispatcher group, forward the message, and append it to
-// the KV-backed session log so subsequent /poll requests return history.
+// A message from the chat widget. The first one of a session posts the lead
+// card into the dispatcher group (TG_GROUP_ID — an ordinary group chat, no
+// forum topics) and answers the client with the auto-reply. Every later message
+// is relayed as a reply to that card, so one conversation stays one thread.
 //
 // Env bindings expected:
-//   CHAT_TG_BOT_TOKEN        Telegram bot token
-//   CHAT_TG_GROUP_ID         Supergroup-with-topics chat ID
-//   SDAR_CHAT                KV namespace (sessions)
+//   CHAT_TG_BOT_TOKEN   Telegram bot token
+//   TG_GROUP_ID         Dispatcher group chat ID (falls back to CHAT_TG_GROUP_ID)
+//   TG_OWNER_ID         Owner's Telegram user ID — gets a DM if the card fails
+//   SDAR_CHAT           KV namespace (sessions + message index)
+
+import {
+  json, escapeHtml, normalizeUsPhone, tg, postToGroup, rememberMessage,
+  getSession, putSession, appendMessage, groupId
+} from './_shared.js';
 
 export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json();
-    const { session_id, message, page_url, page_path, referrer, user_agent } = body || {};
+    const {
+      session_id, message, name, phone,
+      page_url, page_path, branch_city, branch_phone,
+      referrer, user_agent
+    } = body || {};
 
     if (!session_id || typeof message !== 'string' || !message.trim() || message.length > 2000) {
       return json({ error: 'invalid' }, 400);
     }
+    // Without KV there is no session and no reply path — say so instead of
+    // half-delivering a lead the dispatcher can never answer.
+    if (!env.SDAR_CHAT) return json({ error: 'kv_unbound' }, 503);
 
-    const ipCity    = request.headers.get('CF-IPCity')       || 'unknown';
-    const ipPostal  = request.headers.get('CF-IPPostalCode') || '';
-    const ipRegion  = request.headers.get('CF-IPRegion')     || '';
-    const ipCountry = request.headers.get('CF-IPCountry')    || '';
-
-    const sessionKey = `session:${session_id}`;
-    let session = await env.SDAR_CHAT.get(sessionKey, 'json');
+    let session = await getSession(env, session_id);
 
     if (!session) {
-      const topicName = `${ipCity || 'unknown'} · ${ipPostal || '?'} · ${String(session_id).slice(-6)}`;
-      const topicRes = await fetch(`https://api.telegram.org/bot${env.CHAT_TG_BOT_TOKEN}/createForumTopic`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: env.CHAT_TG_GROUP_ID,
-          name: topicName,
-          icon_color: 7322096
-        })
-      });
-      const topicData = await topicRes.json();
-      if (!topicData.ok) {
-        return json({ error: 'topic_failed', detail: topicData }, 500);
+      // Screens 1 and 2 run before any message can be sent, so name and phone
+      // are mandatory here — a session without them would produce a card the
+      // dispatcher cannot act on.
+      const cleanName = String(name || '').trim().slice(0, 80);
+      const e164 = normalizeUsPhone(phone);
+      if (cleanName.length < 2 || !e164) {
+        return json({ error: 'need_contact' }, 400);
       }
 
-      const topicId = topicData.result.message_thread_id;
       session = {
         session_id,
-        topic_id: topicId,
+        name: cleanName,
+        phone: e164,
+        page_path: page_path || '/',
+        page_url: page_url || '',
+        branch_city: String(branch_city || 'West Hollywood').slice(0, 60),
+        branch_phone: String(branch_phone || '(323) 870-4790').slice(0, 20),
+        referrer: referrer || '',
+        user_agent: user_agent || '',
+        card_message_id: null,
         created_at: Date.now(),
-        page_path: page_path || '',
         messages: [],
         last_index: 0
       };
 
-      const contextMsg = formatContextMessage({
-        page_url, page_path, referrer, user_agent,
-        ipCity, ipPostal, ipRegion, ipCountry,
-        session_id
+      const card = [
+        '🟢 <b>New chat</b>',
+        `Name: ${escapeHtml(session.name)}`,
+        // Telegram clients auto-link a bare E.164 number, so it is tappable
+        // without an <a href="tel:"> (which Telegram HTML would reject).
+        `Phone: ${escapeHtml(session.phone)}`,
+        `Page: ${escapeHtml(session.page_path)}`,
+        `Branch: ${escapeHtml(session.branch_city)}`,
+        '─────',
+        escapeHtml(message.trim())
+      ].join('\n');
+
+      const sent = await tg(env, 'sendMessage', {
+        chat_id: groupId(env),
+        text: card,
+        parse_mode: 'HTML',
+        disable_web_page_preview: true
       });
-      await sendTelegramMessage(env, topicId, contextMsg, 'HTML');
+
+      if (!sent || !sent.ok) {
+        await notifyOwner(env, `⚠️ Site chat: card failed — ${sent && sent.description}`);
+        return json({ error: 'card_failed', detail: sent && sent.description }, 502);
+      }
+
+      session.card_message_id = sent.result.message_id;
+      await rememberMessage(env, session.card_message_id, session_id);
+
+      appendMessage(session, 'user', message.trim());
+      appendMessage(
+        session,
+        'bot',
+        `Thanks, ${session.name}! A dispatcher will reply in a couple of minutes. ` +
+        `If it's urgent, call ${session.branch_phone}.`
+      );
+      await putSession(env, session);
+
+      return json({
+        ok: true,
+        last_index: session.last_index,
+        auto_reply: session.messages[session.messages.length - 1].text
+      });
     }
 
-    session.last_index = (session.last_index || 0) + 1;
-    session.messages.push({
-      from: 'user',
-      text: message,
-      ts: Date.now(),
-      index: session.last_index
+    // Follow-up message — relay as a reply on the card.
+    appendMessage(session, 'user', message.trim());
+    await putSession(env, session);
+
+    await postToGroup(env, session, `💬 ${escapeHtml(message.trim())}`, {
+      reply_to_message_id: session.card_message_id
     });
 
-    await env.SDAR_CHAT.put(sessionKey, JSON.stringify(session), { expirationTtl: 7 * 24 * 60 * 60 });
-
-    await sendTelegramMessage(env, session.topic_id, `💬 <b>User:</b>\n${escapeHtml(message)}`, 'HTML');
-
-    return json({ ok: true, index: session.last_index });
+    return json({ ok: true, last_index: session.last_index });
   } catch (err) {
     return json({ error: 'server', detail: String(err) }, 500);
   }
 }
 
-function formatContextMessage(ctx) {
-  const device = ctx.user_agent && /Mobile|Android|iPhone/i.test(ctx.user_agent) ? 'Mobile' : 'Desktop';
-  return [
-    `📋 <b>New Chat Session</b>`,
-    ``,
-    `🗺️ Page: <code>${escapeHtml(ctx.page_path || '/')}</code>`,
-    `📍 IP location: ${escapeHtml(ctx.ipCity)}, ${escapeHtml(ctx.ipRegion)} ${escapeHtml(ctx.ipPostal)}`.trim(),
-    `🌐 Referrer: ${escapeHtml(ctx.referrer || 'direct')}`,
-    `📱 Device: ${device}`,
-    `🆔 Session: <code>${escapeHtml(ctx.session_id)}</code>`,
-    ``,
-    `<i>Reply in this topic to respond to the user.</i>`
-  ].join('\n');
-}
-
-async function sendTelegramMessage(env, topicId, text, parseMode = 'HTML') {
-  return fetch(`https://api.telegram.org/bot${env.CHAT_TG_BOT_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: env.CHAT_TG_GROUP_ID,
-      message_thread_id: topicId,
-      text,
-      parse_mode: parseMode,
-      disable_web_page_preview: true
-    })
-  });
-}
-
-function escapeHtml(s) {
-  if (s === undefined || s === null) return '';
-  return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-}
-
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  });
+/** Best-effort DM to the owner. Never throws: a failed alert must not fail a lead. */
+async function notifyOwner(env, text) {
+  if (!env.TG_OWNER_ID) return;
+  try {
+    await tg(env, 'sendMessage', { chat_id: env.TG_OWNER_ID, text });
+  } catch { /* ignore */ }
 }

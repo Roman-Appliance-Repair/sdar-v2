@@ -8,7 +8,13 @@
 //   {"op":"getme"}        which bot the token belongs to
 //   {"op":"chatinfo"}     can the bot see TG_GROUP_ID, and is it a forum
 //   {"op":"webhookinfo"}  current webhook registration
-//   {"op":"setwebhook"}   register this deployment's /api/chat/webhook
+//   {"op":"setwebhook"}   register this deployment's /api/chat/webhook.
+//                         DO NOT run this against @sdar_dispatch_bot: CUP
+//                         long-polls that token from Railway, and a webhook
+//                         takes the updates away from it (dispatcher buttons,
+//                         /register, availability polls). CUP forwards the
+//                         updates to /api/chat/webhook itself instead. Kept
+//                         only for the day the site chat gets its own bot.
 //   {"op":"deletewebhook"}
 
 import { json, tg, groupId } from './_shared.js';
