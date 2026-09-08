@@ -22,9 +22,10 @@ const CONTEXT_TS = path.join(ROOT, 'src', 'data', 'quote-context.ts');
 // A blog post: proves the mount reaches pages served through BlogLayout, not just
 // the ones that use Layout.astro directly.
 const BLOG_PAGE = path.join(ROOT, 'dist', 'blog', 'index.html');
+// A brand combo page: its appliance comes from the category suffix in its own slug.
+const BRAND_COMBO_PAGE = path.join(ROOT, 'dist', 'brands', 'lg-washer-repair', 'index.html');
 // A /services/ sub-page: its appliance is inherited from the parent hub, so it is
 // the row the coverage floor watches most closely.
-const BRAND_COMBO_PAGE = path.join(ROOT, 'dist', 'brands', 'lg-washer-repair', 'index.html');
 const SERVICE_SUB_PAGE = path.join(
   ROOT, 'dist', 'services', 'refrigerator-repair', 'not-cooling', 'index.html'
 );
