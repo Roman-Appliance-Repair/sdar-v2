@@ -122,6 +122,8 @@ const COMMERCIAL_SERVICE_APPLIANCE: Record<string, string> = {
   'holding-cabinet-repair': 'holding_cabinet',
   'proofer-repair': 'proofer',
   'mixer-repair': 'mixer',
+  'kettle-repair': 'kettle',
+  'food-processor-repair': 'food_processor',
   'slicer-repair': 'slicer',
   'range-hood-repair': 'commercial_range_hood',
   // The commercial tree calls it an exhaust hood; the brand pages call it a hood.

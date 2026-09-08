@@ -374,6 +374,13 @@ const CASES = [
                              'qs-tiles.qs-three{grid-template-columns:1fr 1fr}'),
   },
   {
+    gate: 'static', name: 'QS-3a: a page-tree-only tile loses its source', file: APPL_TS, cmd: STATIC_GATE,
+    // Kettle, food processor and slicer have no catalog slug at all — the page tree
+    // is the only thing that makes them real, so the source entry is the only record
+    // that anyone checked.
+    mutate: (s) => s.replace("  kettle: ['commercial:kettle-repair'],", ''),
+  },
+  {
     gate: 'smoke', name: 'resume forgets the saved step', file: CHUNK, cmd: SMOKE_GATE,
     mutate: (s) => s.replace('sessionStorage.getItem', 'sessionStorage.getItemMissing'),
   },

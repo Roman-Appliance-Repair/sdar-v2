@@ -654,7 +654,7 @@ async function stepFoldLeg(browser, base) {
   await (await tileByText(page, 'In a business')).click();
   await page.waitForTimeout(150);
   const com = await measureStep(page);
-  expect(`${label}: 19 commercial appliance tiles`, com.tiles === 19, `${com.tiles}`);
+  expect(`${label}: 21 commercial appliance tiles`, com.tiles === 21, `${com.tiles}`);
   // QS-3a: 19 tiles need a third column. Two would push the last six off a 360×740
   // screen, and a step that scrolls hides options from anyone who does not think to
   // scroll a list that looks finished.
@@ -910,7 +910,7 @@ const PAGE_TYPE_CASES = [
     firstHeading: 'Is it your Walk-in?',
     primary: "Yes, that's it",
     prefillLabel: 'Walk-in',
-    tiles: 19,
+    tiles: 21,
   },
   {
     url: '/brands/lg-washer-repair/',

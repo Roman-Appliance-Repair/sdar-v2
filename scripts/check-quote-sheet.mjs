@@ -191,7 +191,7 @@ for (const file of SHEET_SOURCES) {
 
   if (tiles) {
     check('16 residential appliance tiles', tiles.residential.length === 16, `${tiles.residential.length}`);
-    check('19 commercial appliance tiles', tiles.commercial.length === 19, `${tiles.commercial.length}`);
+    check('21 commercial appliance tiles', tiles.commercial.length === 21, `${tiles.commercial.length}`);
 
     const all = [...tiles.residential, ...tiles.commercial];
 
@@ -487,6 +487,10 @@ for (const file of SHEET_SOURCES) {
     ['/commercial/charbroiler-repair/', 'grill_charbroiler'],
     ['/commercial/exhaust-hood-repair/', 'commercial_range_hood'],
     ['/commercial/slicer-repair/', 'slicer'],
+    ['/commercial/kettle-repair/', 'kettle'],
+    ['/commercial/kettle-repair/brands/groen/', 'kettle'],
+    ['/commercial/food-processor-repair/', 'food_processor'],
+    ['/commercial/food-processor-repair/brands/robot-coupe/', 'food_processor'],
     ['/brands/rational-combi-oven-repair/', 'steamer'],
     ['/brands/accurex-hood-repair/', 'commercial_range_hood'],
   ];
