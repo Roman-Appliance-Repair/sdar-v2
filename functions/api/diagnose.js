@@ -88,8 +88,21 @@ Be direct, technical, honest. Never say "I recommend" — say "our technicians".
     if (!apiRes.ok) {
       const errText = await apiRes.text();
       console.error('Anthropic API error:', apiRes.status, errText);
+      // TEMPORARY (AID-1 diagnosis) — remove before merge. Cloudflare secrets are
+      // write-only and the function's console is not reachable from here, so the
+      // upstream status has to come back in the response to be seen at all.
+      let parsed = null;
+      try { parsed = JSON.parse(errText); } catch { /* not JSON */ }
       return json({
         result: `Our AI had a hiccup — call (323) 870-4790 for a free phone diagnosis. A real tech can walk through what's wrong in 2 minutes.`,
+        _aid1: {
+          upstreamStatus: apiRes.status,
+          errorType: parsed?.error?.type || null,
+          errorMessage: String(parsed?.error?.message || errText).slice(0, 300),
+          keyPresent: Boolean(env.ANTHROPIC_API_KEY),
+          keyLength: String(env.ANTHROPIC_API_KEY || '').length,
+          modelRequested: 'claude-sonnet-4-20250514',
+        },
       }, 200, corsHeaders);
     }
 
