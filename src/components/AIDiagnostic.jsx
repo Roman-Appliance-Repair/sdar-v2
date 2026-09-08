@@ -1,4 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+
+/**
+ * GA4 via GTM. The diagnostic shipped with no measurement at all, so nobody could
+ * say whether it converted — which is how it ended up shrunk to a strip and then
+ * removed on fold arguments alone. One helper, seven events, no UI change.
+ */
+function track(event, extra) {
+  if (typeof window === "undefined") return;
+  window.dataLayer = window.dataLayer || [];
+  window.dataLayer.push({ event, ...(extra || {}) });
+}
 
 const CATEGORIES = [
   { id: "home",       label: "Home Appliances",     icon: "🏠", sub: "Fridge, washer, oven, dryer, dishwasher" },
@@ -116,7 +127,7 @@ const C_TXT  = "var(--color-text-primary, #1a1a1a)";
 const C_TXT2 = "var(--color-text-secondary, #6b6b6b)";
 const C_BRD  = "var(--color-border-tertiary, #e2e2e2)";
 
-const initialForm = { category: "", appliance: "", brand: "", model: "", symptom: "", age: "", detail: "", name: "", phone: "", email: "" };
+const initialForm = { category: "", appliance: "", brand: "", model: "", symptom: "", age: "", detail: "", name: "", phone: "", email: "", website: "" };
 
 export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
   const [step, setStep] = useState(1);
@@ -125,6 +136,10 @@ export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
   const [loading, setLoading] = useState(false);
   const [callbackRequested, setCallbackRequested] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  // One open event per mount, and one per step the visitor actually reaches.
+  useEffect(() => { track("aid_open"); }, []);
+  useEffect(() => { track("aid_step", { step }); }, [step]);
 
   const appliances = APPLIANCES_BY_CATEGORY[form.category] || [];
   const brands = BRANDS_BY_APPLIANCE[form.appliance] || ["Other"];
@@ -168,6 +183,9 @@ export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
           detail: form.detail,
           serviceUrl: serviceUrl || "https://samedayappliance.repair/services/",
           category: form.category,
+          // Honeypot. Hidden from people, irresistible to form-fillers; the API
+          // answers a filled one with the same fallback a person would see.
+          website: form.website,
         }),
       });
       const data = await res.json();
@@ -178,6 +196,7 @@ export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
     setResult(text);
     setLoading(false);
     setStep(6);
+    track("aid_verdict_shown", { appliance: form.appliance, brand: form.brand, symptom: form.symptom });
 
     fetch("/api/contact", {
       method: "POST",
@@ -204,6 +223,7 @@ export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
   };
 
   const handleCallback = async () => {
+    track("aid_callback_click");
     await fetch("/api/contact", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -409,12 +429,26 @@ export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
             Email address <span style={{ color: "#C8102E" }}>*</span>
           </label>
           <input type="email" placeholder="your@email.com" value={form.email} onChange={e => set("email", e.target.value)} style={{ ...inp, marginBottom: "0.5rem" }} />
+          {/* Honeypot. Off-screen rather than display:none, because some form-fillers
+              skip hidden fields but not positioned ones. tabIndex -1 and
+              aria-hidden keep it out of the keyboard and screen-reader paths, so
+              there is no visible or audible difference for a person. */}
+          <input
+            type="text"
+            name="website"
+            value={form.website}
+            onChange={e => set("website", e.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            style={{ position: "absolute", left: "-9999px", width: 1, height: 1, opacity: 0 }}
+          />
           <p style={{ fontSize: 12, color: C_TXT2, marginBottom: "1.5rem" }}>
             We'll follow up by phone. No spam — just your diagnostic report and a callback if you request one.
           </p>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => setStep(3)} style={btnBack}>← Back</button>
-            <button onClick={() => setStep(5)} disabled={!canAdvance()} style={{ ...btnPrimary(canAdvance()), flex: 2 }}>Continue →</button>
+            <button onClick={() => { track("aid_contact_submitted"); setStep(5); }} disabled={!canAdvance()} style={{ ...btnPrimary(canAdvance()), flex: 2 }}>Continue →</button>
           </div>
         </div>
       )}
@@ -470,6 +504,7 @@ export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             <a
               href="/book/"
+              onClick={() => track("aid_book_click", { appliance: form.appliance })}
               style={{ display: "block", padding: "0.85rem", borderRadius: 8, background: "#C8102E", color: "#fff", border: "none", fontSize: 15, fontWeight: 500, textAlign: "center", textDecoration: "none" }}
             >
               Book Online →
@@ -503,7 +538,7 @@ export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
           <p style={{ fontSize: 12, color: C_TXT2, marginTop: "1rem", marginBottom: 0 }}>
             Diagnostic fee waived when you approve the repair. BHGS #A49573 · CSLB C-20 HVAC · EPA 608 Universal · BBB Accredited Business.{" "}
             Or call{" "}
-            <a href={`tel:+1${phone.replace(/\D/g, "")}`} style={{ color: "#C8102E" }}>{phone}</a>{" "}
+            <a href={`tel:+1${phone.replace(/\D/g, "")}`} onClick={() => track("aid_call_click")} style={{ color: "#C8102E" }}>{phone}</a>{" "}
             directly.
           </p>
           <button

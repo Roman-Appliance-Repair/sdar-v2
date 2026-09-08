@@ -22,6 +22,73 @@
  *   ANTHROPIC_API_KEY
  */
 
+/**
+ * The model this endpoint calls. `claude-sonnet-4-20250514` was retired upstream:
+ * every request came back 404 not_found_error with the message "model:
+ * claude-sonnet-4-20250514", so the page had been serving its own error fallback
+ * to every visitor. A model id is the one string here that expires on someone
+ * else's schedule, so it lives in one named place.
+ */
+const MODEL = 'claude-sonnet-4-6';
+
+// Rate limit: 5 calls / 10 min per IP — the same numbers and the same KV
+// namespace contact.js uses, so one visitor cannot be throttled on one endpoint
+// and wide open on the other. KV when the binding exists, per-isolate memory
+// when it does not, because a missing binding must not 500 a diagnosis.
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+const memoryHits = new Map();
+
+/** Longest description the model is asked to read. Anything past this is noise
+ *  to the diagnosis and cost to us. */
+const MAX_DESCRIPTION = 1500;
+
+function clientIp(request) {
+  return (
+    request.headers.get('CF-Connecting-IP') ||
+    request.headers.get('x-forwarded-for') ||
+    'unknown'
+  );
+}
+
+async function isRateLimited(env, ip) {
+  const key = `aidrl:${ip}`;
+  const now = Date.now();
+  const fresh = (arr) => (Array.isArray(arr) ? arr : []).filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
+
+  if (env && env.SDAR_CHAT) {
+    try {
+      const hits = fresh(await env.SDAR_CHAT.get(key, 'json'));
+      if (hits.length >= RATE_LIMIT_MAX) return true;
+      hits.push(now);
+      await env.SDAR_CHAT.put(key, JSON.stringify(hits), { expirationTtl: 900 });
+      return false;
+    } catch (e) {
+      // KV unavailable — fall through to the in-memory path rather than 500.
+    }
+  }
+
+  const hits = fresh(memoryHits.get(key));
+  if (hits.length >= RATE_LIMIT_MAX) {
+    memoryHits.set(key, hits);
+    return true;
+  }
+  hits.push(now);
+  memoryHits.set(key, hits);
+  return false;
+}
+
+/** Honeypot, same field names contact.js uses. A real visitor never fills these. */
+function isBot(p) {
+  return Boolean(String(p._hp || p.website || '').trim());
+}
+
+/** What a visitor sees when we will not call the model. Deliberately the same
+ *  wording in every case — a bot learns nothing from it, and a person who hit the
+ *  limit still gets a number to call. */
+const FALLBACK =
+  `Our AI is taking a breather — call (323) 870-4790 for a free phone diagnosis. A real tech can walk through what's wrong in 2 minutes.`;
+
 export async function onRequestPost(context) {
   const { request, env } = context;
 
@@ -35,17 +102,14 @@ export async function onRequestPost(context) {
   try {
     const payload = await request.json();
 
-    // TEMPORARY (AID-1 diagnosis) — remove before merge. The upstream said the
-    // model id does not exist; rather than guess a replacement, ask the key which
-    // models it can actually reach.
-    if (payload._aid1_probe) {
-      const r = await fetch('https://api.anthropic.com/v1/models?limit=100', {
-        headers: { 'x-api-key': env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
-      });
-      const body = await r.text();
-      let ids = null;
-      try { ids = (JSON.parse(body).data || []).map((m) => m.id); } catch { /* raw */ }
-      return json({ status: r.status, ids, raw: ids ? undefined : body.slice(0, 400) }, 200, corsHeaders);
+    // A bot gets a 200 and the fallback text. Answering 403 would tell it which
+    // field gave it away; this way it cannot tell success from failure.
+    if (isBot(payload)) {
+      return json({ result: FALLBACK }, 200, corsHeaders);
+    }
+
+    if (await isRateLimited(env, clientIp(request))) {
+      return json({ result: FALLBACK, error: 'rate_limited' }, 429, corsHeaders);
     }
 
     // Build a description from whatever the client sends. If the explicit
@@ -55,7 +119,13 @@ export async function onRequestPost(context) {
       payload.description ||
       payload.detail ||
       `${payload.symptom || ''} on ${payload.appliance || ''} ${payload.brand || ''}`
-    ).trim().slice(0, 1000);
+    ).trim().slice(0, MAX_DESCRIPTION);
+
+    // Nothing to diagnose. The island gates on brand + symptom, so an empty
+    // description here means the request did not come from the island.
+    if (!description) {
+      return json({ result: FALLBACK, error: 'empty' }, 400, corsHeaders);
+    }
 
     const sector = payload.sector === 'commercial' ? 'commercial' : 'residential';
     const equipmentLabel = sanitize(payload.equipmentLabel || payload.equipment || 'appliance');
@@ -76,7 +146,7 @@ The client described a problem with their appliance. Always respond in English o
 
 Structure your response as follows:
 1. List 3-4 most likely causes, ordered from most probable to least probable. For each cause give 1-2 sentences of explanation with specific technical detail (component names, failure patterns, model-specific notes if brand/model provided).
-2. Mention the estimated repair cost range. Always add this exact disclaimer after the number: "Это базовая стоимость работ — цифра приблизительная и не включает стоимость запчастей, материалов и расходников. Точная стоимость определяется только после визита техника на месте."
+2. Mention the estimated repair cost range. Always add this exact disclaimer after the number: "This is a base labor estimate — the figure is approximate and does not include parts."
 3. Final line: call to action to book same-day visit or request callback. Mention ${diagnosticFee} diagnostic fee is waived if repair is approved.
 
 Be direct, technical, honest. Never say "I recommend" — say "our technicians". Max 200 words.`;
@@ -91,7 +161,7 @@ Be direct, technical, honest. Never say "I recommend" — say "our technicians".
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: MODEL,
         max_tokens: 450,
         system: systemPrompt,
         messages: [{ role: 'user', content: userContent }],
@@ -101,21 +171,8 @@ Be direct, technical, honest. Never say "I recommend" — say "our technicians".
     if (!apiRes.ok) {
       const errText = await apiRes.text();
       console.error('Anthropic API error:', apiRes.status, errText);
-      // TEMPORARY (AID-1 diagnosis) — remove before merge. Cloudflare secrets are
-      // write-only and the function's console is not reachable from here, so the
-      // upstream status has to come back in the response to be seen at all.
-      let parsed = null;
-      try { parsed = JSON.parse(errText); } catch { /* not JSON */ }
       return json({
-        result: `Our AI had a hiccup — call (323) 870-4790 for a free phone diagnosis. A real tech can walk through what's wrong in 2 minutes.`,
-        _aid1: {
-          upstreamStatus: apiRes.status,
-          errorType: parsed?.error?.type || null,
-          errorMessage: String(parsed?.error?.message || errText).slice(0, 300),
-          keyPresent: Boolean(env.ANTHROPIC_API_KEY),
-          keyLength: String(env.ANTHROPIC_API_KEY || '').length,
-          modelRequested: 'claude-sonnet-4-20250514',
-        },
+        result: FALLBACK,
       }, 200, corsHeaders);
     }
 

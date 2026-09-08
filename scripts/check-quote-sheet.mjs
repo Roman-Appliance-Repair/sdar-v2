@@ -328,6 +328,52 @@ for (const file of SHEET_SOURCES) {
   );
 }
 
+// ── 6f. /api/diagnose: English-only prompt, honeypot, rate limit ────────────
+// Lives in this gate rather than its own because this is the file `npm run verify`
+// already runs against the built site, and a check nobody runs is not a check.
+{
+  const src = await readFile(path.join(ROOT, 'functions', 'api', 'diagnose.js'), 'utf8');
+
+  // The system prompt used to order a Russian sentence into a reply the same
+  // prompt declares English-only, so every working verdict printed Cyrillic to an
+  // English-speaking customer. Nothing in this file may carry it again.
+  const cyrillic = [...src].filter((c) => c >= 'Ѐ' && c <= 'ӿ');
+  check(
+    'no Cyrillic in the diagnose prompt',
+    cyrillic.length === 0,
+    `${cyrillic.length} character(s), e.g. ${cyrillic.slice(0, 12).join('')}`
+  );
+
+  check('diagnose honeypot is wired', /function isBot\(/.test(src) && /isBot\(payload\)/.test(src));
+  check(
+    'diagnose is rate limited',
+    /isRateLimited\(env, clientIp\(request\)\)/.test(src) && /RATE_LIMIT_MAX = 5/.test(src)
+  );
+  check('diagnose caps the description length', /MAX_DESCRIPTION = \d+/.test(src));
+
+  // The outage this gate exists for: a retired model id served every visitor an
+  // error fallback, and nothing failed loudly. The check reads the CONSTANT, not
+  // the file — the comment above it names the dead id on purpose, so anyone
+  // grepping for the outage lands on the explanation.
+  const m = src.match(/const MODEL = '([^']+)'/);
+  check('the model id is named in one place', Boolean(m), 'no `const MODEL =` found');
+  check(
+    'the model id is not the retired one',
+    Boolean(m) && m[1] !== 'claude-sonnet-4-20250514',
+    m ? `MODEL = ${m[1]}` : ''
+  );
+
+  // The island has to send the field the API checks, or the honeypot guards nothing.
+  const island = await readFile(path.join(ROOT, 'src', 'components', 'AIDiagnostic.jsx'), 'utf8');
+  check('the island sends the honeypot field', /website: form\.website/.test(island));
+  check(
+    'the island reports to GA4',
+    ['aid_open', 'aid_step', 'aid_contact_submitted', 'aid_verdict_shown',
+     'aid_book_click', 'aid_callback_click', 'aid_call_click'].every((e) => island.includes(e)),
+    'one or more aid_* events missing'
+  );
+}
+
 // ── 7. QS-2 site-wide mount: one sheet on every real page, nowhere twice ─────
 {
   const distDir = path.join(ROOT, 'dist');
