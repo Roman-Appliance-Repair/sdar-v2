@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 // scripts/check-quote-sheet.mjs
 //
-// Static gate for the QS-1 quote sheet. Runs against a built dist/ plus the
-// component sources. Exits non-zero with a named failure on the first problem.
+// Static gate for the quote sheet. Runs against a built dist/ plus the component
+// sources. Exits non-zero with a named failure on the first problem.
+//
+// QS-2 changed the shape of section 7: the sheet is no longer a /book/ canary, so
+// the rule flipped from "on one page and nowhere else" to "on every real page,
+// exactly once, with a blob that parses". Redirect emissions are excluded and
+// counted, so the exclusion cannot quietly swallow a real page.
 //
 // Usage:
 //   node scripts/check-quote-sheet.mjs
@@ -18,6 +23,7 @@ const SHEET_SOURCES = [
   path.join(ROOT, 'src', 'components', 'QuoteSheet.astro'),
   path.join(ROOT, 'src', 'components', 'QuoteSheet.client.ts'),
   path.join(ROOT, 'src', 'components', 'QuoteFallbackForm.astro'),
+  path.join(ROOT, 'src', 'data', 'quote-context.ts'),
 ];
 const VERBOSE = process.argv.includes('--verbose');
 
@@ -246,13 +252,28 @@ for (const file of SHEET_SOURCES) {
       missing.join(', ')
     );
 
-    // The tiles reach the browser: labels ship inside the serialised #qs-data blob.
-    const notShipped = all.filter((a) => !html.includes(`"id":"${a.id}"`));
-    check(
-      'every appliance id ships in the /book/ payload',
-      notShipped.length === 0,
-      notShipped.map((a) => a.id).join(', ')
+    // QS-2 moved the tiles out of the per-page blob and into the lazily-loaded
+    // island chunk — 1197 pages do not each need 12 KB of tiles inlined. So the
+    // proof that they reach the browser now lives in the chunk.
+    const chunkDir = path.join(ROOT, 'dist', '_astro');
+    const chunkName = (await readdir(chunkDir)).find(
+      (f) => f.startsWith('QuoteSheet.client.') && f.endsWith('.js')
     );
+    check('the island chunk is built', Boolean(chunkName), 'no QuoteSheet.client.*.js in dist/_astro');
+    if (chunkName) {
+      const chunk = await readFile(path.join(chunkDir, chunkName), 'utf8');
+      const notShipped = all.filter((a) => !chunk.includes(`"${a.id}"`));
+      check(
+        'every appliance id ships in the island chunk',
+        notShipped.length === 0,
+        notShipped.map((a) => a.id).join(', ')
+      );
+      check(
+        'the tiles are NOT inlined into the page blob',
+        !html.includes('"other_residential"'),
+        'appliance ids found in /book/ HTML — the per-page blob grew back'
+      );
+    }
   }
 }
 
@@ -307,11 +328,10 @@ for (const file of SHEET_SOURCES) {
   );
 }
 
-// ── 7. canary containment: the sheet is on /book/ and nowhere else ───────────
+// ── 7. QS-2 site-wide mount: one sheet on every real page, nowhere twice ─────
 {
   const distDir = path.join(ROOT, 'dist');
-  const withSheet = [];
-  const withKey = [];
+  const pages = [];
   async function walk(dir) {
     for (const entry of await readdir(dir)) {
       const full = path.join(dir, entry);
@@ -319,25 +339,145 @@ for (const file of SHEET_SOURCES) {
       if (s.isDirectory()) await walk(full);
       else if (entry.endsWith('.html')) {
         const body = await readFile(full, 'utf8');
-        if (body.includes('id="quote-sheet"')) withSheet.push(path.relative(distDir, full));
-        if (body.includes('data-quote-sheet-maps')) withKey.push(path.relative(distDir, full));
+        const rel = path.relative(distDir, full).split(path.sep).join('/');
+        // Astro's redirect emissions do not use Layout.astro and carry no sheet.
+        // They are not pages a visitor reads — excluded on purpose, and counted so
+        // the exclusion can never quietly swallow a real page.
+        // public/ carries a couple of raw verification files that are .html in name
+        // only — no document, no layout, no sheet. A rendered page has a </body>.
+        if (!/<\/body>/i.test(body)) continue;
+        pages.push({ rel, body, stub: /http-equiv=["']refresh["']/i.test(body) });
       }
     }
   }
   await walk(distDir);
-  const only = withSheet.length === 1 && withSheet[0].replace(/\\/g, '/') === 'book/index.html';
+
+  const real = pages.filter((p) => !p.stub);
+  const stubs = pages.filter((p) => p.stub);
+
+  // 1197 index.html routes + 404.html, which is a real Astro page and carries the
+  // sheet like any other.
+  check('dist contains the expected 1198 rendered pages', real.length === 1198, `found ${real.length}`);
+  check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
+
+  const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
+  const wrong = real.filter((p) => dialogCount(p.body) !== 1);
   check(
-    'quote sheet is canaried to /book/ only',
-    only,
-    `present on ${withSheet.length} page(s): ${withSheet.slice(0, 5).join(', ')}`
+    'every real page carries exactly one quote-sheet dialog',
+    wrong.length === 0,
+    wrong.slice(0, 6).map((p) => `${p.rel}=${dialogCount(p.body)}`).join(', ')
   );
-  const keyOnly =
-    withKey.length === 1 && withKey[0].replace(/\\/g, '/') === 'book/index.html';
+
+  // /book/ used to mount its own alongside the layout's. The dedupe is the single
+  // most likely thing to regress, so it gets its own named check.
+  const book = real.find((p) => p.rel === 'book/index.html');
+  check('/book/ mounts the sheet once, not twice', book ? dialogCount(book.body) === 1 : false,
+    book ? `found ${dialogCount(book.body)}` : '/book/ missing');
+
+  // The loader is the component's own inline <script>, which Astro bundles to a
+  // hashed module under this name. Without it a /book/ link is just a link.
+  const LOADER = /src="\/_astro\/QuoteSheet\.astro_astro_type_script[^"]*\.js"/;
+  const noLoader = real.filter((p) => !LOADER.test(p.body));
   check(
-    'the Maps key ships on /book/ and nowhere else',
-    keyOnly,
-    `present on ${withKey.length} page(s): ${withKey.slice(0, 5).join(', ')}`
+    'every real page ships the trigger loader',
+    noLoader.length === 0,
+    `${noLoader.length} page(s), e.g. ${noLoader.slice(0, 3).map((p) => p.rel).join(', ')}`
   );
+
+  // One JSON blob per page, and it must actually parse — an unparseable blob means
+  // the sheet cannot open at all, and nothing else on the page would show it.
+  let badBlob = [];
+  let noBlob = [];
+  for (const p of real) {
+    const m = p.body.match(/<script type="application\/json" id="qs-data">([\s\S]*?)<\/script>/g) || [];
+    if (m.length !== 1) {
+      noBlob.push(`${p.rel}=${m.length}`);
+      continue;
+    }
+    const inner = m[0].replace(/^[\s\S]*?>/, '').replace(/<\/script>$/, '');
+    try {
+      const parsed = JSON.parse(inner);
+      if (!parsed.context || typeof parsed.context.pageType !== 'string') badBlob.push(p.rel);
+    } catch {
+      badBlob.push(p.rel);
+    }
+  }
+  check('exactly one #qs-data blob per real page', noBlob.length === 0, noBlob.slice(0, 6).join(', '));
+  check('every blob parses and carries a pageType', badBlob.length === 0, badBlob.slice(0, 6).join(', '));
+
+  // QS-2 changed this from a canary rule to a site-wide one: the Maps config now
+  // ships everywhere the sheet does, because step 6 exists on every page.
+  //  at the end, or `data-quote-sheet-maps-gone` counts as the real attribute —
+  // which is exactly how the first version of this check went blind.
+  const MAPS_CFG = /data-quote-sheet-maps(?![\w-])/g;
+  const cfgCount = (b) => (b.match(MAPS_CFG) || []).length;
+  const wrongKey = real.filter((p) => cfgCount(p.body) !== 1);
+  check(
+    'every real page ships exactly one Maps loader config',
+    wrongKey.length === 0,
+    wrongKey.slice(0, 6).map((p) => `${p.rel}=${cfgCount(p.body)}`).join(', ')
+  );
+  const stubsWithKey = stubs.filter((p) => cfgCount(p.body) > 0);
+  check('redirect stubs carry no Maps key', stubsWithKey.length === 0, `${stubsWithKey.length}`);
+
+  const eager = real.filter((p) => /<script[^>]*src=["']https:\/\/maps\.googleapis\.com/.test(p.body));
+  check('no page loads the Maps library eagerly', eager.length === 0,
+    eager.slice(0, 3).map((p) => p.rel).join(', '));
+}
+
+// ── 7b. QS-2 context coverage: the table, and the floor under it ─────────────
+{
+  const { realPages, readBlob } = await import(
+    'file://' + path.join(ROOT, 'scripts', 'quote-context-report.mjs').split(path.sep).join('/')
+  );
+  const pages = await realPages();
+  const byType = new Map();
+  for (const { url, html: body } of pages) {
+    const blob = readBlob(body);
+    const ctx = (blob && blob.context) || {};
+    const t = ctx.pageType || 'unknown';
+    const r = byType.get(t) || { pages: 0, scope: 0, appliance: 0 };
+    r.pages++;
+    if (ctx.scope) r.scope++;
+    if (ctx.appliance) r.appliance++;
+    byType.set(t, r);
+    if (url === '/') check('the homepage resolves to no context', !ctx.scope && !ctx.appliance);
+  }
+
+  const g = (t) => byType.get(t) || { pages: 0, scope: 0, appliance: 0 };
+
+  // Floors, not exact numbers. Page counts move when content ships; a mapping that
+  // silently stops resolving does not, and that is what these catch.
+  check('city_service: every page resolves a scope', g('city_service').scope === g('city_service').pages,
+    `${g('city_service').scope}/${g('city_service').pages}`);
+  check('city_service: every page resolves an appliance',
+    g('city_service').appliance === g('city_service').pages,
+    `${g('city_service').appliance}/${g('city_service').pages}`);
+  check('service_sub: every page resolves an appliance',
+    g('service_sub').appliance === g('service_sub').pages,
+    `${g('service_sub').appliance}/${g('service_sub').pages}`);
+  check('commercial pages all resolve commercial scope',
+    g('commercial_hub').scope === g('commercial_hub').pages &&
+      g('commercial_sub').scope === g('commercial_sub').pages &&
+      g('commercial_brand').scope === g('commercial_brand').pages,
+    'a commercial page resolved no scope');
+  check('outdoor pages all resolve residential scope',
+    g('outdoor').scope === g('outdoor').pages, `${g('outdoor').scope}/${g('outdoor').pages}`);
+  check('city pillars resolve nothing (mixed scope by nature)',
+    g('city').scope === 0 && g('city').appliance === 0);
+  check('blog resolves nothing', g('blog').scope === 0 && g('blog').appliance === 0);
+  check('brand pages resolve a brand on most of the tree',
+    g('brand').pages > 0, `${g('brand').pages} brand page(s)`);
+
+  const total = [...byType.values()].reduce((a, r) => a + r.pages, 0);
+  const scoped = [...byType.values()].reduce((a, r) => a + r.scope, 0);
+  const applianced = [...byType.values()].reduce((a, r) => a + r.appliance, 0);
+  // The site-wide floor. Set just under what this build achieves, so a mapping
+  // regression trips it and ordinary content growth does not.
+  check('site-wide scope coverage is at least 50%', scoped / total >= 0.5,
+    `${((scoped / total) * 100).toFixed(1)}%`);
+  check('site-wide appliance coverage is at least 30%', applianced / total >= 0.3,
+    `${((applianced / total) * 100).toFixed(1)}%`);
 }
 
 // ── report ───────────────────────────────────────────────────────────────────

@@ -78,6 +78,19 @@ export const STEP_COPY = [
 
 export const TOTAL_STEPS = STEP_COPY.length;
 
+/**
+ * QS-2 prefill copy. When the page already tells us what the visitor is looking at,
+ * step 2 asks them to confirm rather than to choose from sixteen tiles. The guess is
+ * always visibly a guess — a soft highlight, every other tile still one tap away —
+ * because a page is evidence of interest, not a statement of what broke.
+ * `{appliance}` is replaced with the tile's own label.
+ */
+export const PREFILL_COPY = {
+  heading: 'Is it your {appliance}?',
+  sub: "That's what this page is about — tap anything else if it's not.",
+  confirm: "Yes, that's it",
+} as const;
+
 /** Address verification, step 6. */
 export const ADDRESS_COPY = {
   label: 'Address',

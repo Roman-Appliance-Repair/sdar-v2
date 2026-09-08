@@ -1,7 +1,11 @@
 ---
 // src/components/QuoteSheet.astro
 //
-// Full-screen quote sheet — one question per screen. QS-1 canary: /book/ only.
+// Full-screen quote sheet — one question per screen.
+//
+// QS-2: mounted once in Layout.astro, so it exists on every page. It reads its own
+// page context from Astro.url (see quote-context.ts) and prefills what that page
+// already tells us — never more than that.
 //
 // Shape: a native <dialog id="quote-sheet"> rendered empty (header + body slot +
 // footer), plus a JSON blob of everything runtime-variable, plus a tiny loader
@@ -28,8 +32,11 @@ import {
   VISIT_TIMES,
   PHOTOS_COPY,
   ERROR_COPY,
+  PREFILL_COPY,
 } from '../data/quote-copy';
-import { buildQuoteData } from '../data/quote-appliances';
+import { APPLIANCES_BY_SCOPE } from '../data/quote-appliances';
+import { getQuoteContext } from '../data/quote-context';
+import { BRAND_PILLAR_MAP } from '../data/brand-pillar-map';
 import { ZIP_EXACT, ZIP_PREFIX3, MAIN_BRANCH_SLUG } from '../data/service-zone';
 import { BRANCHES, MAIN_PHONE, MAIN_PHONE_TEL } from '../data/branches';
 
@@ -39,6 +46,33 @@ export interface Props {
 }
 
 const { phone = MAIN_PHONE } = Astro.props;
+
+/**
+ * QS-2: what this page already tells us. Derived from the URL inside the component
+ * so no page has to opt in and no page can pass a context that contradicts its own
+ * address. `null` everywhere is the normal case, not a failure — see quote-context.ts.
+ */
+const context = getQuoteContext(Astro.url.pathname);
+
+/** Display name for the brand chip. BRAND_PILLAR_MAP is display -> slug, so take the
+ *  shortest display name that maps to this slug ("GE" over "GE Appliances"). */
+const brandLabel = context.brand
+  ? Object.entries(BRAND_PILLAR_MAP)
+      .filter(([, slug]) => slug === context.brand)
+      .map(([display]) => display)
+      .sort((a, b) => a.length - b.length)[0] || null
+  : null;
+
+/** The prefilled tile's own label, so the confirm heading reads "Is it your Dryer?"
+ *  in exactly the words the tile uses. Resolved here; the island never guesses. */
+const applianceLabel = (() => {
+  if (!context.appliance) return null;
+  for (const list of Object.values(APPLIANCES_BY_SCOPE)) {
+    const hit = list.find((a) => a.id === context.appliance);
+    if (hit) return hit.label;
+  }
+  return null;
+})();
 
 // slug -> { name, phone } for the done screen and for the Telegram card, which
 // prints the branch by name, not by slug.
@@ -73,7 +107,10 @@ const mapsKey = (() => {
 
 const payload = {
   hasMaps: Boolean(mapsKey),
-  appliances: buildQuoteData(),
+  // NOTE: the appliance/symptom tables are NOT here. QS-2 puts the sheet on all
+  // 1197 pages, and inlining ~12 KB of tiles into every one of them costs ~3.7 KB
+  // gzipped per page for data no visitor sees until they open the sheet. The island
+  // imports them instead, so they arrive with the chunk, on the first click.
   price: {
     residential: DIAGNOSTIC_RES_DISPLAY,
     commercial: DIAGNOSTIC_COM_DISPLAY,
@@ -92,6 +129,16 @@ const payload = {
     visitTimes: VISIT_TIMES,
     photos: PHOTOS_COPY,
     errors: ERROR_COPY,
+    prefill: PREFILL_COPY,
+  },
+  // Null-heavy by design: most pages tell us nothing, and that is the honest answer.
+  context: {
+    scope: context.scope,
+    appliance: applianceLabel ? context.appliance : null,
+    applianceLabel,
+    brand: context.brand,
+    brandLabel,
+    pageType: context.pageType,
   },
   zone: {
     exact: ZIP_EXACT,
@@ -148,31 +195,62 @@ const payload = {
   // Lazy loader. The state machine is a separate chunk; it is fetched on the first
   // pointerenter/touchstart over any trigger (prefetch) and imported for real on the
   // first click. Nothing of the sheet's logic is in the initial page bundle.
+  //
+  // QS-2: a trigger is now EITHER an explicit [data-quote-source] element OR any
+  // ordinary link to /book/. The href is left alone, so with JS off — or before this
+  // chunk has loaded — the link still navigates to the booking page and the visitor
+  // gets the fallback form. Nothing on the page has to be rewritten to opt in.
   (() => {
-    const SEL = '[data-quote-source]';
+    const EXPLICIT = '[data-quote-source]';
     let mod: Promise<typeof import('./QuoteSheet.client')> | null = null;
 
     const load = () => (mod ??= import('./QuoteSheet.client'));
 
-    const prefetch = () => { load(); };
+    /** The /book/ link this event came from, if any. Compares resolved pathnames, so
+     *  "/book/", "/book/#contact" and an absolute same-origin URL all count, while a
+     *  tel:/mailto: link resolves to neither and is left alone. */
+    const bookLink = (target: EventTarget | null): HTMLAnchorElement | null => {
+      const a = (target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
+      if (!a) return null;
+      if (a.origin !== location.origin) return null;
+      return a.pathname === '/book/' || a.pathname === '/book' ? a : null;
+    };
+
+    const triggerFor = (target: EventTarget | null): HTMLElement | null =>
+      ((target as Element | null)?.closest?.(EXPLICIT) as HTMLElement | null) || bookLink(target);
+
+    const sourceFor = (el: HTMLElement): string => {
+      // An explicit data-quote-source always wins — those are hand-placed and name
+      // the exact slot they sit in. Everything else is labelled by page type and path.
+      const explicit = el.getAttribute('data-quote-source');
+      if (explicit) return explicit;
+      const cfg = document.getElementById('qs-data');
+      let pageType = 'unknown';
+      try {
+        pageType = (JSON.parse(cfg?.textContent || '{}').context || {}).pageType || 'unknown';
+      } catch { /* a malformed blob must not stop the sheet from opening */ }
+      return pageType + ':' + location.pathname;
+    };
 
     const open = async (ev: Event) => {
-      const trigger = (ev.target as Element | null)?.closest?.(SEL) as HTMLElement | null;
+      // Never hijack a modified click — cmd/ctrl/shift/middle open a new tab, and the
+      // href still points at a real page, so let the browser do its job.
+      const m = ev as MouseEvent;
+      if (m.defaultPrevented || m.button > 0 || m.metaKey || m.ctrlKey || m.shiftKey || m.altKey) return;
+      const trigger = triggerFor(ev.target);
       if (!trigger) return;
       // Only hijack when a dialog is actually present and supported.
       const dlg = document.getElementById('quote-sheet') as HTMLDialogElement | null;
       if (!dlg || typeof dlg.showModal !== 'function') return;
       ev.preventDefault();
       const api = await load();
-      api.openSheet(trigger.getAttribute('data-quote-source') || 'unknown');
+      api.openSheet(sourceFor(trigger));
     };
 
-    document.addEventListener('pointerenter', (e) => {
-      if ((e.target as Element | null)?.closest?.(SEL)) prefetch();
-    }, { capture: true, passive: true });
-    document.addEventListener('touchstart', (e) => {
-      if ((e.target as Element | null)?.closest?.(SEL)) prefetch();
-    }, { capture: true, passive: true });
+    const maybePrefetch = (e: Event) => { if (triggerFor(e.target)) load(); };
+
+    document.addEventListener('pointerenter', maybePrefetch, { capture: true, passive: true });
+    document.addEventListener('touchstart', maybePrefetch, { capture: true, passive: true });
     document.addEventListener('click', open);
   })();
 </script>
@@ -329,6 +407,28 @@ const payload = {
   .qs :global(.qs-tile-hint) {
     font-size: 13px;
     font-weight: 400;
+    color: var(--muted);
+  }
+
+  /* QS-2 prefill. The tile the page guessed is marked, but marked as a GUESS:
+     grey ring on grey ground, not the red of a choice the visitor made. The moment
+     they tap any tile — this one included — it becomes a normal red selection. */
+  .qs :global(.qs-tile-prefill[aria-pressed='true']) {
+    border-color: var(--muted);
+    box-shadow: inset 0 0 0 1px var(--muted);
+    background: var(--gray);
+  }
+
+  /* Brand chip — what the page was about, carried to dispatch, never asked about. */
+  .qs :global(.qs-chips) { margin: 0 0 10px; }
+  .qs :global(.qs-chip) {
+    display: inline-block;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--gray);
+    font-size: 13px;
+    font-weight: 600;
     color: var(--muted);
   }
 

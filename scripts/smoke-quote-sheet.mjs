@@ -18,6 +18,9 @@
 //     not scroll; the symptom step keeps ≤12 tiles with Continue pinned
 //   · ZIP from Google: Place Details stays inside the Essentials SKU, fills the
 //     ZIP, marks it, and a typed override warns instead of losing the verification
+//   · QS-2 page types: a plain /book/ link opens the sheet on every page type, the
+//     step count and the prefill match what the URL could know, and the visitor's own
+//     saved answer outranks the next page's guess
 //
 // Usage: node scripts/smoke-quote-sheet.mjs [--headed] [--base=https://…]
 //        --base points the suite at a deployed origin (release check) instead of dist/.
@@ -846,6 +849,323 @@ async function zipManualLeg(browser, base) {
   await ctx.close();
 }
 
+
+/**
+ * QS-2 page-type leg. The sheet is now on every page, opened by any ordinary link
+ * to /book/, and it arrives knowing what the page was about. Each case below is a
+ * different amount of knowledge:
+ *
+ *   home / city pillar  — nothing. Step 1 asks, counter says 6.
+ *   city x service      — scope AND appliance. Step 1 skipped, step 2 asks to confirm.
+ *   service hub         — same, from a different slug vocabulary.
+ *   commercial sub      — commercial scope, commercial tiles, walk-in prefilled.
+ *   brand page          — brand only. Step 1 still asks; the chip carries the brand.
+ */
+const PAGE_TYPE_CASES = [
+  {
+    url: '/',
+    label: 'home',
+    pageType: 'home',
+    counter: '1 / 6',
+    firstHeading: 'Where is the appliance?',
+  },
+  {
+    url: '/pasadena/',
+    label: 'city pillar',
+    pageType: 'city',
+    counter: '1 / 6',
+    firstHeading: 'Where is the appliance?',
+  },
+  {
+    url: '/pasadena/dryer-repair/',
+    label: 'city x service',
+    pageType: 'city_service',
+    counter: '1 / 5',
+    firstHeading: 'Is it your Dryer?',
+    primary: "Yes, that's it",
+    prefillLabel: 'Dryer',
+    tiles: 16,
+  },
+  {
+    url: '/services/refrigerator-repair/',
+    label: 'service hub',
+    pageType: 'service_hub',
+    counter: '1 / 5',
+    firstHeading: 'Is it your Refrigerator?',
+    primary: "Yes, that's it",
+    prefillLabel: 'Refrigerator',
+    tiles: 16,
+  },
+  {
+    url: '/commercial/refrigeration/walk-in-cooler-repair/',
+    label: 'commercial sub',
+    pageType: 'commercial_sub',
+    counter: '1 / 5',
+    firstHeading: 'Is it your Walk-in cooler / freezer?',
+    primary: "Yes, that's it",
+    prefillLabel: 'Walk-in cooler / freezer',
+    tiles: 11,
+  },
+  {
+    url: '/brands/lg-washer-repair/',
+    label: 'brand combo',
+    pageType: 'brand',
+    counter: '1 / 5',
+    firstHeading: 'Is it your Washer?',
+    primary: "Yes, that's it",
+    prefillLabel: 'Washer',
+    tiles: 16,
+    brandChip: 'LG',
+  },
+  {
+    // A pillar names a brand and no appliance — step 2 opens with the chip and an
+    // open question, which is the honest shape when the URL says only "LG".
+    url: '/brands/lg/',
+    label: 'brand pillar',
+    pageType: 'brand',
+    counter: '1 / 5',
+    firstHeading: 'What needs fixing?',
+    tiles: 16,
+    brandChip: 'LG',
+  },
+];
+
+/** Click the first in-body /book/ link — the one a visitor on a phone can reach. */
+async function clickBookLink(page) {
+  const link = page.locator('main a[href="/book/"]').first();
+  await link.scrollIntoViewIfNeeded();
+  await link.click();
+}
+
+async function pageTypeLeg(browser, base, spec) {
+  const label = `page ${spec.label}`;
+  console.log(`\n[${label}] ${spec.url}`);
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+
+  const captured = [];
+  await page.route('**/api/contact', async (route) => {
+    captured.push(route.request().postData() || '');
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+  });
+
+  await page.goto(`${base}${spec.url}`, { waitUntil: 'domcontentloaded' });
+
+  // The page carries a sheet, exactly one, and knows what kind of page it is.
+  const shipped = await page.evaluate(() => {
+    const blob = JSON.parse(document.getElementById('qs-data').textContent);
+    return {
+      dialogs: document.querySelectorAll('dialog#quote-sheet').length,
+      ctx: blob.context,
+    };
+  });
+  expect(`${label}: exactly one dialog`, shipped.dialogs === 1, String(shipped.dialogs));
+  expect(`${label}: pageType is ${spec.pageType}`, shipped.ctx.pageType === spec.pageType, shipped.ctx.pageType);
+
+  // A PLAIN /book/ link — no data-quote-source anywhere on it — opens the sheet.
+  // Scoped to <main>: the header's "Book a visit" lives in a nav panel that is
+  // collapsed on a phone, so it is not something a visitor can click at this width.
+  const link = page.locator('main a[href="/book/"]:not([data-quote-source])').first();
+  expect(`${label}: page carries a plain /book/ link in the body`, (await link.count()) > 0);
+  await link.scrollIntoViewIfNeeded();
+  await link.click();
+  await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 5000 });
+  expect(`${label}: a plain /book/ link opens the sheet`, await dialogOpen(page));
+  expect(`${label}: URL did not navigate`, new URL(page.url()).pathname === spec.url, page.url());
+
+  expect(`${label}: counter reads ${spec.counter}`, (await counter(page)) === spec.counter, await counter(page));
+  const heading = (await page.locator('#qs-heading').innerText()).trim();
+  expect(`${label}: opens on "${spec.firstHeading}"`, heading === spec.firstHeading, heading);
+
+  const backHidden = await page.locator('#qs-back').evaluate((el) => el.hidden);
+  expect(`${label}: Back is hidden on the first visible step`, backHidden === true, String(backHidden));
+
+  if (spec.prefillLabel) {
+    const primaryText = (await page.locator('#qs-primary').innerText()).trim();
+    expect(`${label}: primary button reads "${spec.primary}"`, primaryText === spec.primary, primaryText);
+
+    const tileCount = await page.locator('#qs-body .qs-tile').count();
+    expect(`${label}: ${spec.tiles} tiles for this scope`, tileCount === spec.tiles, String(tileCount));
+
+    const pre = await page.evaluate(() => {
+      const on = [...document.querySelectorAll('#qs-body .qs-tile[aria-pressed="true"]')];
+      return on.map((el) => ({ text: el.textContent.trim(), soft: el.classList.contains('qs-tile-prefill') }));
+    });
+    expect(`${label}: exactly one tile pre-selected`, pre.length === 1, JSON.stringify(pre));
+    expect(`${label}: it is "${spec.prefillLabel}"`, pre[0] && pre[0].text === spec.prefillLabel,
+      JSON.stringify(pre));
+    expect(`${label}: pre-selection is the soft style, not the red one`, pre[0] && pre[0].soft === true,
+      JSON.stringify(pre));
+
+    // Every other tile is still one tap away — the guess is not a lock.
+    const otherEnabled = await page.evaluate(() => {
+      const tiles = [...document.querySelectorAll('#qs-body .qs-tile')];
+      return tiles.every((t) => !t.disabled);
+    });
+    expect(`${label}: every other tile is still tappable`, otherEnabled);
+  } else {
+    const primaryText = (await page.locator('#qs-primary').innerText()).trim();
+    expect(`${label}: primary button is the plain Continue`, primaryText === 'Continue', primaryText);
+    const preselected = await page.locator('#qs-body .qs-tile[aria-pressed="true"]').count();
+    expect(`${label}: nothing is pre-selected`, preselected === 0, String(preselected));
+  }
+
+  // Brand chip: a note on step 2, never a question. Step 2 is the first visible
+  // step on a brand page, so the chip is on screen the moment the sheet opens.
+  if (spec.brandChip) {
+    const chip = await page.locator('#qs-body .qs-chip').first().innerText().catch(() => '');
+    expect(`${label}: brand chip reads "${spec.brandChip}"`, chip.trim() === spec.brandChip, chip);
+  }
+
+  await ctx.close();
+}
+
+/**
+ * The prefill has to survive to the payload, and it has to give way the moment the
+ * visitor disagrees. Both halves on one page: confirm the guess on one run, override
+ * it on the next, and read what dispatch would receive each time.
+ */
+async function prefillPayloadLeg(browser, base, { override }) {
+  const label = override ? 'prefill (overridden)' : 'prefill (confirmed)';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  await ctx.addInitScript(mapsMock(false, true));
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+
+  const captured = [];
+  await page.route('**/api/contact', async (route) => {
+    captured.push(route.request().postData() || '');
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+  });
+
+  await page.goto(`${base}/pasadena/dryer-repair/`, { waitUntil: 'domcontentloaded' });
+  await clickBookLink(page);
+  await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 5000 });
+
+  if (override) {
+    // Tapping any tile picks it AND moves on — that is the sheet's existing
+    // behaviour and the right one, so the state to inspect is on the way back.
+    await (await tileByText(page, 'Dishwasher')).click();
+    await page.waitForTimeout(200);
+    expect(`${label}: a tap advances to the symptom step`, (await counter(page)) === '2 / 5', await counter(page));
+
+    await page.click('#qs-back');
+    await page.waitForTimeout(200);
+    const heading = (await page.locator('#qs-heading').innerText()).trim();
+    expect(`${label}: heading reverts to the open question`, heading === 'What needs fixing?', heading);
+    const primaryText = (await page.locator('#qs-primary').innerText()).trim();
+    expect(`${label}: button reverts to Continue`, primaryText === 'Continue', primaryText);
+    const picked = await page.evaluate(() => {
+      const on = document.querySelector('#qs-body .qs-tile[aria-pressed="true"]');
+      return on ? { text: on.textContent.trim(), soft: on.classList.contains('qs-tile-prefill') } : null;
+    });
+    expect(`${label}: their tile is the selected one`, picked && picked.text === 'Dishwasher', JSON.stringify(picked));
+    expect(`${label}: drawn as a choice, not a guess`, picked && picked.soft === false, JSON.stringify(picked));
+  }
+
+  await page.click('#qs-primary'); // appliance -> problem
+  // A symptom both the dryer and the dishwasher carry, so the same walk works
+  // whether the visitor kept our guess or replaced it.
+  await (await tileByText(page, "Won't start")).click();
+  await page.click('#qs-primary'); // problem -> photos
+  await page.click('#qs-primary'); // photos  -> price
+  await page.click('#qs-primary'); // price   -> contact
+  expect(`${label}: contact is the last visible step`, (await counter(page)) === '5 / 5', await counter(page));
+
+  await page.fill('#qs-name', 'Dana');
+  await page.fill('#qs-phone', '3105550134');
+  await page.fill('#qs-address', '8746 Rangely Ave');
+  await page.fill('#qs-zip', '91101');
+  await (await tileByText(page, 'ASAP')).click();
+  await page.click('#qs-primary');
+  await page.waitForTimeout(400);
+
+  expect(`${label}: submit went through`, captured.length === 1, `${captured.length} request(s)`);
+  if (captured.length) {
+    const p = JSON.parse(captured[0]);
+    expect(`${label}: scope came from the page`, p.where === 'residential', String(p.where));
+    expect(`${label}: page_type in payload`, p.page_type === 'city_service', String(p.page_type));
+    expect(`${label}: appliance_prefilled is true`, p.appliance_prefilled === true, String(p.appliance_prefilled));
+    expect(
+      `${label}: appliance_changed is ${override}`,
+      p.appliance_changed === override,
+      String(p.appliance_changed)
+    );
+    expect(
+      `${label}: appliance is ${override ? 'dishwasher' : 'dryer'}`,
+      p.appliance === (override ? 'dishwasher' : 'dryer'),
+      String(p.appliance)
+    );
+  }
+
+  await ctx.close();
+}
+
+/**
+ * The visitor's own answer outranks the next page's guess. Choose an appliance on
+ * one page, walk to a page that guesses a different one, and the choice must stand —
+ * a saved session is an answer, a URL is only evidence.
+ */
+async function resumeBeatsContextLeg(browser, base) {
+  const label = 'resume beats page context';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+  await page.route('**/api/contact', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }));
+
+  await page.goto(`${base}/pasadena/dryer-repair/`, { waitUntil: 'domcontentloaded' });
+  await clickBookLink(page);
+  await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 5000 });
+  await (await tileByText(page, 'Microwave')).click();
+  await page.waitForTimeout(200);
+
+  // Walk to a page whose context says "Refrigerator".
+  await page.goto(`${base}/services/refrigerator-repair/`, { waitUntil: 'domcontentloaded' });
+  await clickBookLink(page);
+  await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 5000 });
+
+  // Tapping a tile advances, so the sheet resumes on the symptom step — and the
+  // symptoms on screen are the proof: "Sparking inside" belongs to the microwave
+  // and to nothing this page would have guessed.
+  const symptoms = await page.locator('#qs-body .qs-tile').allInnerTexts();
+  expect(
+    `${label}: resumed on the symptoms of THEIR appliance`,
+    symptoms.includes('Sparking inside'),
+    symptoms.slice(0, 4).join(' | ')
+  );
+
+  await page.click('#qs-back');
+  await page.waitForTimeout(200);
+  const picked = await page.evaluate(() => {
+    const on = document.querySelector('#qs-body .qs-tile[aria-pressed="true"]');
+    return on ? { text: on.textContent.trim(), soft: on.classList.contains('qs-tile-prefill') } : null;
+  });
+  expect(`${label}: the visitor's own pick survives`, picked && picked.text === 'Microwave', JSON.stringify(picked));
+  expect(`${label}: it is still their choice, not our guess`, picked && picked.soft === false, JSON.stringify(picked));
+  const heading = (await page.locator('#qs-heading').innerText()).trim();
+  expect(`${label}: no confirm prompt over their answer`, heading === 'What needs fixing?', heading);
+
+  await ctx.close();
+}
+
+/** With JS off a /book/ link is still a link. */
+async function bookLinkNoJsLeg(browser, base) {
+  const label = 'no-JS /book/ link';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
+  await page.goto(`${base}/pasadena/dryer-repair/`, { waitUntil: 'domcontentloaded' });
+  await clickBookLink(page);
+  await page.waitForLoadState('domcontentloaded');
+  expect(`${label}: navigates to /book/`, new URL(page.url()).pathname === '/book/', page.url());
+  const form = await page.locator('#qs-fallback-form').count();
+  expect(`${label}: the fallback form is there`, form === 1, String(form));
+  await ctx.close();
+}
+
 // ── run ──────────────────────────────────────────────────────────────────────
 // --base=https://… drives the whole suite against a deployed origin instead of the
 // throwaway dist/ server. Used to verify a release: /api/contact is still routed and
@@ -866,6 +1186,11 @@ try {
   await addressLeg(browser, base, true);
   await detailsBlockedLeg(browser, base);
   await stepFoldLeg(browser, base);
+  for (const c of PAGE_TYPE_CASES) await pageTypeLeg(browser, base, c);
+  await prefillPayloadLeg(browser, base, { override: false });
+  await prefillPayloadLeg(browser, base, { override: true });
+  await resumeBeatsContextLeg(browser, base);
+  await bookLinkNoJsLeg(browser, base);
   await zipLeg(browser, base);
   await zipManualLeg(browser, base);
 } finally {
