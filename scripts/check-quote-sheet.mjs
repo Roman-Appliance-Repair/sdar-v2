@@ -597,6 +597,10 @@ for (const file of SHEET_SOURCES) {
     `${((applianced / total) * 100).toFixed(1)}%`);
 }
 
+/** Where a top-level `export const X = { … };` literal ends: a `};` in column 0.
+ *  Used to bound the record blocks this section parses out of the map source. */
+const BLOCK_END = String.fromCharCode(10) + '};';
+
 // ── 8. AID-2: the hero card, its sheet, and the handoff map ──────────────────
 {
   const home = await readFile(path.join(ROOT, 'dist', 'index.html'), 'utf8');
@@ -677,8 +681,11 @@ for (const file of SHEET_SOURCES) {
   // -- the island's one new prop, and the attributes the handoff reads --------
   check('the island takes initialDetail', /initialDetail\s*=\s*""/.test(islandSrc));
   check(
-    'initialDetail seeds step 4 detail and nothing else',
-    /\.\.\.initialForm,\s*detail:\s*initialDetail/.test(islandSrc)
+    'initialDetail seeds step 4 detail, next to the page prefill and nothing else',
+    // AID-3 put `...seed` between the two. The rule the check is really making is
+    // that the initial form is the blank form plus EXACTLY these two things —
+    // anything else spliced in here is state nobody asked for.
+    /\.\.\.initialForm,\s*\.\.\.seed,\s*detail:\s*initialDetail\s*\}/.test(islandSrc)
   );
   for (const attr of ['data-aid-category', 'data-aid-appliance', 'data-aid-symptom', 'data-aid-detail']) {
     check(
@@ -766,7 +773,12 @@ for (const file of SHEET_SOURCES) {
 
   // Every alias must land on words the tile actually offers, or the sheet would
   // pre-select a problem that has no tile and the step would render empty.
-  const aliasBlock = mapSrc.split('export const SYMPTOM_ALIASES')[1] || '';
+  // Bounded at BOTH ends. AID-3 appended four more tables to this file, and an
+  // open-ended split ran the alias parser straight through them — every
+  // `category: 'home'` and every brand label came back as a symptom alias that
+  // matched no tile, so a passing gate went red for entries it should never have
+  // been reading. Take the object literal and stop.
+  const aliasBlock = (mapSrc.split('export const SYMPTOM_ALIASES')[1] || '').split(BLOCK_END)[0];
   const badAlias = [];
   let aliasCount = 0;
   {
@@ -793,6 +805,379 @@ for (const file of SHEET_SOURCES) {
   // Guards the parser itself: if the table's shape drifts and the regex stops
   // matching, the check above would pass over an empty set and prove nothing.
   check('the alias table actually parsed', aliasCount >= 40, `${aliasCount} entries read`);
+}
+
+// ── 9. AID-3: the card on service / city-service / brand / commercial pages ──
+//
+// The shape of this section is deliberately NOT "spot-check a few URLs". The whole
+// claim of the wave is a rule about page TYPES — every page of these eight types has
+// a card, no page of any other type does — and a rule you can only test by sampling
+// is a rule nobody is actually holding. So it walks the same real-page set section 7
+// walks, reads each page's own pageType out of the quote sheet's blob, and checks the
+// rule on all 1,197 of them.
+//
+// The prefill is checked against the SOURCE tables rather than against the card that
+// produced it, so this is two independent readings of the same fact meeting in the
+// middle — a card that renders a heading the tables do not imply is caught here even
+// though both came out of the same build.
+{
+  const { realPages, readBlob } = await import(
+    'file://' + path.join(ROOT, 'scripts', 'quote-context-report.mjs').split(path.sep).join('/')
+  );
+  const mapSrc = await readFile(path.join(ROOT, 'src', 'data', 'aid-to-quote-map.ts'), 'utf8');
+  const islandSrc = await readFile(path.join(ROOT, 'src', 'components', 'AIDiagnostic.jsx'), 'utf8');
+  const cardSrc = await readFile(path.join(ROOT, 'src', 'components', 'AIDiagnosticCard.astro'), 'utf8');
+  const clientSrc = await readFile(
+    path.join(ROOT, 'src', 'components', 'AIDiagnosticSheet.client.ts'), 'utf8'
+  );
+  const contactSrc = await readFile(path.join(ROOT, 'functions', 'api', 'contact.js'), 'utf8');
+  const applSrc = await readFile(path.join(ROOT, 'src', 'data', 'quote-appliances.ts'), 'utf8');
+
+  // -- the eight types, read off the source and not retyped here ---------------
+  const cardedBlock = (mapSrc.split('export const AID_CARD_PAGE_TYPES')[1] || '').split('])')[0];
+  const CARDED = new Set([...cardedBlock.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]));
+  check('AID_CARD_PAGE_TYPES parsed', CARDED.size === 8, `${CARDED.size} type(s)`);
+  for (const t of [
+    'service_hub', 'service_sub', 'city_service', 'commercial_hub',
+    'commercial_sub', 'commercial_brand', 'brand', 'outdoor',
+  ]) {
+    check(`${t} is a carded page type`, CARDED.has(t));
+  }
+  // The other side of the same rule, named rather than merely implied by absence.
+  for (const t of ['home', 'city', 'blog', 'legal', 'book', 'contact', 'price_list', 'credentials']) {
+    check(`${t} is NOT a carded page type`, !CARDED.has(t));
+  }
+
+  // -- the reverse tables ------------------------------------------------------
+  const revBlock = (mapSrc.split('export const QUOTE_ID_TO_DIAGNOSTIC')[1] || '').split(BLOCK_END)[0];
+  const reverse = {};
+  for (const m of revBlock.matchAll(
+    /([a-z_]+):\s*\{\s*category:\s*'(\w+)',\s*appliance:\s*(?:'([^']*)'|null),\s*noun:\s*(?:'([^']*)'|null),?\s*\}/g
+  )) {
+    reverse[m[1]] = { category: m[2], appliance: m[3] ?? null, noun: m[4] ?? null };
+  }
+  check('QUOTE_ID_TO_DIAGNOSTIC parsed', Object.keys(reverse).length >= 20,
+    String(Object.keys(reverse).length));
+
+  const brandBlock = (mapSrc.split('export const BRAND_SLUG_TO_DIAGNOSTIC')[1] || '').split(BLOCK_END)[0];
+  const brandMap = {};
+  for (const m of brandBlock.matchAll(/(?:'([^']+)'|([a-z][\w-]*)):\s*'([^']+)'/g)) {
+    brandMap[m[1] || m[2]] = m[3];
+  }
+  check('BRAND_SLUG_TO_DIAGNOSTIC parsed', Object.keys(brandMap).length >= 30,
+    String(Object.keys(brandMap).length));
+
+  // -- every value in them is real -------------------------------------------
+  // The island's own two tables, read from the island, so a rename there breaks this
+  // rather than silently breaking the prefill.
+  const byCategory = {};
+  {
+    const block = islandSrc.split('const APPLIANCES_BY_CATEGORY = {')[1].split('};')[0];
+    for (const m of block.matchAll(/(\w+):\s*\[([^\]]*)\]/g)) {
+      byCategory[m[1]] = [...m[2].matchAll(/"([^"]+)"/g)].map((x) => x[1]);
+    }
+  }
+  check('the island category table parsed', Object.keys(byCategory).length === 5,
+    Object.keys(byCategory).join(', '));
+
+  const islandBrands = new Set();
+  {
+    const block = islandSrc.split('const BRANDS_BY_APPLIANCE = {')[1].split('\n};')[0];
+    for (const m of block.matchAll(/"([^"]+)"/g)) islandBrands.add(m[1]);
+  }
+  check('the island brand table parsed', islandBrands.size >= 100, String(islandBrands.size));
+
+  {
+    const bad = [];
+    for (const [id, e] of Object.entries(reverse)) {
+      if (!byCategory[e.category]) bad.push(`${id}: no category ${e.category}`);
+      else if (e.appliance && !byCategory[e.category].includes(e.appliance)) {
+        bad.push(`${id}: "${e.appliance}" not under ${e.category}`);
+      }
+      // A tile that names an appliance must name the noun the heading uses, and one
+      // that names neither must name neither — a half-filled row would render
+      // "acting up?" with nothing in front of it.
+      if (Boolean(e.appliance) !== Boolean(e.noun)) bad.push(`${id}: appliance/noun disagree`);
+      // Tile labels are written for a grid of choices ("Oven / wall oven"). Dropped
+      // into a sentence, a slashed pair reads as a typo, so the heading nouns are a
+      // separate column and this is what keeps them one.
+      if (e.noun && e.noun.includes('/')) bad.push(`${id}: slashed heading noun "${e.noun}"`);
+    }
+    check('every reverse-mapped appliance is a real label in its category', bad.length === 0,
+      bad.join(' | '));
+  }
+  {
+    const bad = Object.entries(brandMap).filter(([, label]) => !islandBrands.has(label));
+    check('every mapped brand is spelled the way the diagnostic spells it', bad.length === 0,
+      bad.map(([s, l]) => `${s}->${l}`).join(', '));
+  }
+
+  // -- completeness, the same rule AID-2 holds in the other direction ----------
+  const tileIds = [...applSrc.matchAll(/id:\s*'([a-z_]+)'/g)].map((m) => m[1]);
+  const unmappedIds = [
+    ...(mapSrc.split('export const UNMAPPED_QUOTE_IDS')[1] || '').split('];')[0].matchAll(/'([^']+)'/g),
+  ].map((m) => m[1]);
+  {
+    const orphans = tileIds.filter((id) => !reverse[id] && !unmappedIds.includes(id));
+    check('every quote tile is either reverse-mapped or listed as unmapped', orphans.length === 0,
+      orphans.join(', '));
+    const both = tileIds.filter((id) => reverse[id] && unmappedIds.includes(id));
+    check('no tile is both reverse-mapped and declared unmapped', both.length === 0, both.join(', '));
+    const ghosts = unmappedIds.filter((id) => !tileIds.includes(id));
+    check('every declared-unmapped id is a tile that exists', ghosts.length === 0, ghosts.join(', '));
+  }
+
+  // -- the wiring, end to end -------------------------------------------------
+  check('the card reads its own address rather than taking a prop',
+    /getDiagnosticPrefill\(Astro\.url\.pathname\)/.test(cardSrc));
+  for (const attr of ['data-aid-pre-category', 'data-aid-pre-appliance', 'data-aid-pre-brand']) {
+    check(`the card emits ${attr}`, new RegExp(attr + '(?![\\w-])').test(cardSrc));
+  }
+  check('the loader reads the prefill off the card', /cardPrefill\s*\(/.test(clientSrc));
+  for (const prop of ['initialCategory', 'initialAppliance', 'initialBrand']) {
+    check(`the loader hands the island ${prop}`,
+      new RegExp(prop + ':').test(clientSrc) && new RegExp(prop + '\\s*=\\s*""').test(islandSrc));
+  }
+  check('the island only accepts a category the steps actually offer',
+    /APPLIANCES_BY_CATEGORY\[initialCategory\]/.test(islandSrc));
+  check('the island only accepts an appliance that category lists',
+    /APPLIANCES_BY_CATEGORY\[category\]\s*\|\|\s*\[\]\)\.includes\(initialAppliance\)/.test(islandSrc));
+  check('the island only accepts a brand that appliance lists',
+    /BRANDS_BY_APPLIANCE\[appliance\]\s*\|\|\s*\[\]\)\.includes\(initialBrand\)/.test(islandSrc));
+  check('the entry step is the first step still unanswered',
+    /firstOpenStep\(\{\s*\.\.\.initialForm/.test(islandSrc));
+  check('Continue and the entry step ask the same question',
+    /const canAdvance = \(\) => stepAnswered\(step, form\)/.test(islandSrc));
+  check('the back buttons are untouched, so a prefilled step is still reachable',
+    /onClick=\{\(\) => setStep\(1\)\}/.test(islandSrc) && /onClick=\{\(\) => setStep\(2\)\}/.test(islandSrc));
+
+  check('the diagnostic payload says which page it came from', /page_url:/.test(islandSrc));
+  check('the diagnostic payload says whether the page prefilled it', /\bprefilled,/.test(islandSrc));
+  check('the dispatch card prints the page', /Страница: \$\{escape\(p\.page_url/.test(contactSrc));
+  check('the dispatch card prints whether it was prefilled',
+    /Предзаполнение со страницы/.test(contactSrc));
+  check('the handoff carries the brand into the quote seed',
+    /brand:\s*seed\.brandSlug/.test(clientSrc) && /brandLabel:\s*seed\.brandLabel/.test(clientSrc));
+  check('the verdict link carries the brand out of the island',
+    /data-aid-brand(?![A-Za-z0-9_-])/.test(islandSrc));
+
+  // -- and now the site itself -------------------------------------------------
+  const pages = await realPages();
+  const CARD = /data-aid-card(?![\w-])/g;
+  const SHEET = /<dialog[^>]*id="aid-sheet"/g;
+  // Both spellings of every entity: Astro writes `&#38;` inside an attribute and
+  // `&amp;` in text, and "Fisher & Paykel" is a real brand that ships in both
+  // places. Decoding only the named forms made this gate report a mismatch
+  // between two identical strings.
+  const decode = (t) =>
+    t.replace(/&#0*39;/g, "'").replace(/&#0*38;/g, '&').replace(/&#0*34;/g, '"')
+      .replace(/&amp;/g, '&').replace(/&quot;/g, '"')
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+
+  const missing = [];
+  const leaked = [];
+  const mismatched = [];
+  const badHeading = [];
+  const badPrefill = [];
+  const seenTypes = new Set();
+  let carded = 0;
+
+  for (const { url, html: body } of pages) {
+    const ctx = (readBlob(body) || {}).context || {};
+    const type = ctx.pageType || 'unknown';
+    // The homepage carries the AID-2 card and is not one of the eight types; it is
+    // the one page where "has a card" and "is a carded type" legitimately differ.
+    const want = url === '/' ? 1 : CARDED.has(type) ? 1 : 0;
+    const cards = (body.match(CARD) || []).length;
+    const sheets = (body.match(SHEET) || []).length;
+    seenTypes.add(type);
+    if (cards !== want) (want ? missing : leaked).push(`${url} (${type}, ${cards})`);
+    // Card and sheet are emitted together by one component, so this can only fail if
+    // someone splits them apart again — which is the failure that puts a card on a
+    // page with nothing to open.
+    if (cards !== sheets) mismatched.push(`${url} ${cards}/${sheets}`);
+    if (!want) continue;
+    carded++;
+
+    // The heading, derived here from the tables and the page's own resolved
+    // appliance, then compared against what the build actually printed.
+    const e = ctx.appliance ? reverse[ctx.appliance] : null;
+    const noun = type === 'outdoor' ? null : e?.noun ?? null;
+    const brand = ctx.brand ? brandMap[ctx.brand] ?? null : null;
+    const wantHeading = !noun
+      ? "Not sure what's wrong?"
+      : brand
+        ? `${brand} ${noun.toLowerCase()} acting up?`
+        : `${noun} acting up?`;
+    const got = decode((body.match(/class="aid-card-h"[^>]*>([^<]*)</) || [])[1] || '');
+    if (got !== wantHeading) badHeading.push(`${url}: "${got}" ≠ "${wantHeading}"`);
+
+    // And the prefill attributes, same derivation.
+    const wantCat = type === 'outdoor' ? 'outdoor' : e?.category ?? null;
+    const wantAppl = type === 'outdoor' ? null : e?.appliance ?? null;
+    const attr = (n) => {
+      const m = body.match(new RegExp(`data-aid-pre-${n}="([^"]*)"`));
+      return m ? decode(m[1]) : null;
+    };
+    if (attr('category') !== wantCat || attr('appliance') !== wantAppl || attr('brand') !== brand) {
+      badPrefill.push(
+        `${url}: ${attr('category')}/${attr('appliance')}/${attr('brand')} ≠ ${wantCat}/${wantAppl}/${brand}`
+      );
+    }
+  }
+
+  check('every carded page type is present in this build',
+    [...CARDED].every((t) => seenTypes.has(t)),
+    [...CARDED].filter((t) => !seenTypes.has(t)).join(', ') || 'ok');
+  check('no page of a carded type is missing its card', missing.length === 0,
+    missing.slice(0, 8).join(', '));
+  check('no card leaked onto an excluded page type', leaked.length === 0,
+    leaked.slice(0, 8).join(', '));
+  check('card and sheet always ship together, one each', mismatched.length === 0,
+    mismatched.slice(0, 8).join(', '));
+  check('every card heading matches what the page resolves', badHeading.length === 0,
+    badHeading.slice(0, 8).join(' | '));
+  check('every card prefill matches what the page resolves', badPrefill.length === 0,
+    badPrefill.slice(0, 8).join(' | '));
+  check('the card actually reached most of the site', carded > 900, `${carded} carded page(s)`);
+
+  // -- the placeholder follows the page, and its words are the tiles' own -------
+  //
+  // Ten named pages, spelled out in full. A derived expectation would only prove the
+  // gate agrees with itself; these are the strings a person should see in the field,
+  // written down, so changing one is a decision somebody makes on purpose.
+  {
+    const PLACEHOLDERS = [
+      ['/commercial/mixer-repair/', "My mixer: won't start…"],
+      ['/services/refrigerator-repair/', 'My refrigerator: not cooling…'],
+      ['/brands/lg-washer-repair/', 'My LG washer: not spinning…'],
+      ['/pasadena/dryer-repair/', 'My dryer: not heating…'],
+      ['/services/cooktop-repair/', "My cooktop: burner won't light…"],
+      ['/services/oven-repair/', 'My oven: not heating…'],
+      ['/commercial/steamer-repair/', 'My steamer: no steam…'],
+      ['/brands/sub-zero-refrigerator-repair/', 'My Sub-Zero refrigerator: not cooling…'],
+      ['/services/dishwasher-repair/', 'My dishwasher: not draining…'],
+      // The two that must NOT follow the page: /outdoor/ resolves no tile, and the
+      // homepage resolves nothing at all. Both keep AID-2's line.
+      ['/outdoor/grill-repair/', "My dryer runs but doesn't heat…"],
+      ['/', "My dryer runs but doesn't heat…"],
+    ];
+    const byUrl = new Map(pages.map((p) => [p.url, p]));
+    for (const [url, want] of PLACEHOLDERS) {
+      const page = byUrl.get(url);
+      if (!page) {
+        check(`placeholder page still exists: ${url}`, false, 'not in dist');
+        continue;
+      }
+      const m = page.html.match(/id="aid-card-input"[^>]*?placeholder="([^"]*)"/) ||
+        page.html.match(/placeholder="([^"]*)"[^>]*?id="aid-card-input"/);
+      const got = decode(m ? m[1] : '');
+      check(`${url} placeholder reads "${want}"`, got === want, `got "${got}"`);
+    }
+
+    // And site-wide: every placeholder is either the neutral line or a sentence built
+    // from that page's OWN tile — the appliance word and the tile's first symptom,
+    // verbatim. This is what stops a plausible-sounding fault we do not list being
+    // suggested to a thousand visitors.
+    const tileFirstProblem = {};
+    {
+      // The SAME parser shape section 8 uses, not a looser one. Written with a lazy
+      // [\s\S]*? between the id and the problems list, it walked across tile
+      // boundaries and paired `cooktop` with the range hood's symptoms — the gate
+      // then reported the feature broken while the feature was right. Anchoring on
+      // the id/label/problems triple keeps every match inside one tile.
+      const re =
+        /id:\s*'([a-z_]+)',\s*\r?\n\s*label:\s*(?:'[^']*'|ELSE),\s*\r?\n\s*problems:\s*\[([\s\S]*?)\n\s*\],/g;
+      let m;
+      while ((m = re.exec(applSrc))) {
+        const first = m[2].match(/'((?:[^'\\]|\\.)*)'|"([^"]*)"/);
+        if (first) tileFirstProblem[m[1]] = (first[1] ?? first[2]).replace(/\\'/g, "'");
+      }
+    }
+    check('the first-symptom table parsed', Object.keys(tileFirstProblem).length >= 30,
+      String(Object.keys(tileFirstProblem).length));
+
+    const NEUTRAL = "My dryer runs but doesn't heat…";
+    const badPh = [];
+    for (const { url, html: body } of pages) {
+      const ctx = (readBlob(body) || {}).context || {};
+      const type = ctx.pageType || 'unknown';
+      if (!(url === '/' || CARDED.has(type))) continue;
+      const m = body.match(/id="aid-card-input"[^>]*?placeholder="([^"]*)"/) ||
+        body.match(/placeholder="([^"]*)"[^>]*?id="aid-card-input"/);
+      const got = decode(m ? m[1] : '');
+      const e = ctx.appliance ? reverse[ctx.appliance] : null;
+      const noun = type === 'outdoor' ? null : e?.noun ?? null;
+      const symptom = ctx.appliance ? tileFirstProblem[ctx.appliance] : null;
+      if (!noun || !symptom) {
+        if (got !== NEUTRAL) badPh.push(`${url}: "${got}" should be the neutral line`);
+        continue;
+      }
+      const brand = ctx.brand ? brandMap[ctx.brand] ?? null : null;
+      const thing = brand ? `${brand} ${noun.toLowerCase()}` : noun.toLowerCase();
+      const want = `My ${thing}: ${symptom.toLowerCase()}…`;
+      if (got !== want) badPh.push(`${url}: "${got}" ≠ "${want}"`);
+      // A grid label inside a sentence reads as a typo — same rule the heading holds.
+      if (got.includes('/')) badPh.push(`${url}: slashed placeholder "${got}"`);
+    }
+    check('every placeholder is the neutral line or that page’s own tile words',
+      badPh.length === 0, badPh.slice(0, 8).join(' | '));
+
+    // The symptom half must be a symptom the sheet actually offers for that appliance,
+    // not a phrase that merely sounds like one.
+    const invented = [];
+    for (const { url, html: body } of pages) {
+      const ctx = (readBlob(body) || {}).context || {};
+      if (!CARDED.has(ctx.pageType || '')) continue;
+      const m = body.match(/id="aid-card-input"[^>]*?placeholder="([^"]*)"/);
+      const got = decode(m ? m[1] : '');
+      if (got === NEUTRAL) continue;
+      const tail = got.slice(got.indexOf(': ') + 2).replace(/…$/, '');
+      const listed = (tileFirstProblem[ctx.appliance] || '').toLowerCase();
+      if (tail !== listed) invented.push(`${url}: "${tail}" is not that tile's first symptom`);
+    }
+    check('no placeholder suggests a fault the sheet does not list for that appliance',
+      invented.length === 0, invented.slice(0, 6).join(' | '));
+  }
+
+  // The card copy ships on a thousand pages now, so the forbidden-phrase rule is
+  // checked against what was RENDERED as well as against the source. A heading is
+  // built from two tables at build time; a phrase could enter through either.
+  {
+    const FORBIDDEN = [
+      'certified technicians', 'our team of experts', 'look no further', 'hassle-free',
+      'peace of mind', 'second to none', 'top-of-the-line', 'hesitate to call',
+      'we understand the urgency', 'trusted name in the industry',
+      'passionate about delivering', 'your satisfaction is our priority',
+    ];
+    const headings = new Set();
+    for (const { html: body } of pages) {
+      const m = body.match(/class="aid-card-h"[^>]*>([^<]*)</);
+      if (m) headings.add(decode(m[1]).toLowerCase());
+    }
+    const hits = [...headings].filter((h) => FORBIDDEN.some((w) => h.includes(w)));
+    check('no forbidden marketing phrase in any rendered card heading', hits.length === 0,
+      hits.join(' | '));
+    // Not a size limit — a parser guard. One heading per (brand, appliance) pair
+    // is 175 distinct strings in this build, which is correct. What must never
+    // happen is the selector above drifting and this set coming back empty, which
+    // would let the forbidden-phrase check pass over nothing and prove nothing.
+    check('the rendered-heading set actually parsed', headings.size >= 10,
+      `${headings.size} distinct`);
+  }
+
+  // No React anywhere it is not asked for — the promise AID-2 made for one page, now
+  // owed on a thousand.
+  {
+    // /ai-diagnostic/ is the diagnostic's own page and mounts the island with a
+    // client: directive on purpose — it is the one page where React on load is the
+    // point. Everywhere else it is a regression, which is what this catches.
+    const hydrating = pages.filter(
+      (p) => p.url !== '/ai-diagnostic/' && /<astro-island|renderer-url=/.test(p.html)
+    );
+    check('no page hydrates React on load', hydrating.length === 0,
+      hydrating.slice(0, 5).map((p) => p.url).join(', '));
+  }
 }
 
 // ── report ───────────────────────────────────────────────────────────────────

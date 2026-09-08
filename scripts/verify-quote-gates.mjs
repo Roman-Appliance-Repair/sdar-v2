@@ -72,6 +72,15 @@ const SHEET_SRC = path.join(ROOT, 'src', 'components', 'AIDiagnosticSheet.astro'
 const ISLAND_JSX = path.join(ROOT, 'src', 'components', 'AIDiagnostic.jsx');
 const MAP_TS = path.join(ROOT, 'src', 'data', 'aid-to-quote-map.ts');
 const CONTACT_JS = path.join(ROOT, 'functions', 'api', 'contact.js');
+// ── AID-3 ────────────────────────────────────────────────────────────────────
+const CLIENT_TS_AID = path.join(ROOT, 'src', 'components', 'AIDiagnosticSheet.client.ts');
+// A /services/ hub: the page type with the most pages behind it, and the one whose
+// hero component (ServiceHero) also renders brand and outdoor pages — so breaking
+// the card here is breaking it for two thirds of the site.
+const SERVICE_HUB_PAGE = path.join(ROOT, 'dist', 'services', 'refrigerator-repair', 'index.html');
+// The oven hub: one of the three tiles whose label is a slashed pair written for a
+// grid of choices, so it is where a grid label would show up inside a sentence.
+const OVEN_HUB_PAGE = path.join(ROOT, 'dist', 'services', 'oven-repair', 'index.html');
 
 /** The diagnostic sheet's own chunk — same trick as the quote sheet's. */
 async function aidChunk() {
@@ -84,6 +93,26 @@ async function aidChunk() {
 }
 
 const AID_CHUNK = await aidChunk();
+
+/**
+ * The ISLAND's chunk, which is not the sheet's.
+ *
+ * Rollup splits AIDiagnostic.jsx into a chunk of its own — the loader chunk only
+ * imports it. Two AID-3 mutations were written against the loader chunk and reported
+ * SKIP, because the strings they hunt for were never in that file: the checks they
+ * were meant to prove had no coverage at all and nobody would have known. That is
+ * why a SKIP counts as a blind spot here and not as a pass.
+ */
+async function aidIslandChunk() {
+  const dir = path.join(ROOT, 'dist', '_astro');
+  const hit = (await readdir(dir)).find(
+    (f) => f.startsWith('AIDiagnostic.') && f.endsWith('.js')
+  );
+  if (!hit) throw new Error('built AIDiagnostic island chunk not found in dist/_astro');
+  return path.join(dir, hit);
+}
+
+const AID_ISLAND = await aidIslandChunk();
 
 /** Each case: break one thing, expect the named gate to go red. */
 const CASES = [
@@ -427,7 +456,12 @@ const CASES = [
   },
   {
     gate: 'static', name: 'AID-2: a forbidden phrase enters the card copy', file: CARD_SRC, cmd: STATIC_GATE,
-    mutate: (s) => s.replace('Not sure what', 'Peace of mind — not sure what'),
+    // AID-3 moved the neutral heading out of this file and into diagnosticHeading(),
+    // so the old anchor stopped existing here and the case became a silent SKIP. The
+    // sub-line is the card's own copy and stays here — anchor on that. The heading
+    // strings are not left uncovered: the static gate now runs the same forbidden
+    // list over every heading the build actually rendered.
+    mutate: (s) => s.replace('Describe it in your own words', 'Peace of mind — describe it'),
   },
   {
     gate: 'static', name: 'AID-2: the loader stops prefetching the chunk', file: SHEET_SRC, cmd: STATIC_GATE,
@@ -439,7 +473,11 @@ const CASES = [
   },
   {
     gate: 'static', name: 'AID-2: initialDetail stops seeding step 4', file: ISLAND_JSX, cmd: STATIC_GATE,
-    mutate: (s) => s.replace('...initialForm, detail: initialDetail', '...initialForm'),
+    // AID-3 spliced `...seed` between the two halves of this anchor, so the string
+    // stopped existing and the case silently became a SKIP — a check that proves
+    // nothing while still printing a line. Anchor on the tail instead: dropping
+    // `detail: initialDetail` is exactly the regression this was always proving.
+    mutate: (s) => s.replace(/,\s*detail: initialDetail/g, ''),
   },
   {
     gate: 'static', name: 'AID-2: the verdict link loses its appliance attribute', file: ISLAND_JSX, cmd: STATIC_GATE,
@@ -493,6 +531,233 @@ const CASES = [
     gate: 'smoke', name: 'AID-2: the handoff writes no session for the quote sheet',
     file: AID_CHUNK, cmd: SMOKE_GATE,
     mutate: (s) => s.replace('sdar_qs_v1', 'sdar_qs_v0'),
+  },
+  // ── AID-3: the card everywhere else, and the prefill it carries ───────────
+  {
+    // The headline failure: a page type quietly loses its card. One page of a type
+    // is enough — the rule is "every page of these eight", not "most of them".
+    gate: 'static', name: 'AID-3: the card falls off a whole page type',
+    file: SERVICE_HUB_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(/data-aid-card(?![\w-])/, 'data-aid-card-gone'),
+  },
+  {
+    // The opposite failure, and the one a page-type rule exists to catch: the card
+    // turns up somewhere it was never meant to be. /blog/ has no hero and no card.
+    gate: 'static', name: 'AID-3: a card leaks onto an excluded page type',
+    file: BLOG_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('<body', '<body><div data-aid-card></div>'),
+  },
+  {
+    gate: 'static', name: 'AID-3: a sheet leaks onto an excluded page type',
+    file: BLOG_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('<body', '<body><dialog id="aid-sheet"></dialog>'),
+  },
+  {
+    // Card without a sheet: the input opens nothing, and the button silently becomes
+    // a page navigation. Looks fine in a screenshot, dead to a visitor.
+    gate: 'static', name: 'AID-3: a card is left with no sheet to open',
+    file: BRAND_COMBO_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(/<dialog[^>]*\bid="aid-sheet"/, '<dialog id="aid-sheet-gone"'),
+  },
+  {
+    gate: 'static', name: 'AID-3: the prefill attributes stop shipping',
+    file: BRAND_COMBO_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(/data-aid-pre-appliance="[^"]*"/, ''),
+  },
+  {
+    // A prefill that is WRONG rather than absent — the one failure mode the whole
+    // "unmapped resolves to nothing" doctrine exists to prevent.
+    gate: 'static', name: 'AID-3: a page prefills an appliance it does not have',
+    file: BRAND_COMBO_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('data-aid-pre-appliance="Washer"', 'data-aid-pre-appliance="Dryer"'),
+  },
+  {
+    gate: 'static', name: 'AID-3: the heading stops matching the page',
+    file: BRAND_COMBO_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('LG washer acting up?', 'Something is wrong?'),
+  },
+  {
+    gate: 'static', name: 'AID-3: the brand drops out of the heading',
+    file: BRAND_COMBO_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('LG washer acting up?', 'Washer acting up?'),
+  },
+  {
+    gate: 'static', name: 'AID-3: a reverse-mapped label is not in that category',
+    file: MAP_TS, cmd: STATIC_GATE,
+    // "Commercial Fryer" is a restaurant label; filing it under `home` would open the
+    // island on a step whose tile grid does not contain it.
+    mutate: (s) => s.replace(
+      "dryer: { category: 'home', appliance: 'Dryer', noun: 'Dryer' },",
+      "dryer: { category: 'home', appliance: 'Commercial Fryer', noun: 'Dryer' },"
+    ),
+  },
+  {
+    gate: 'static', name: 'AID-3: a heading noun goes back to being a tile label',
+    file: MAP_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("noun: 'Wine cooler'", "noun: 'Wine Cooler / Cellar'"),
+  },
+  {
+    gate: 'static', name: 'AID-3: a tile falls through the reverse map', file: MAP_TS,
+    cmd: STATIC_GATE,
+    // Neither translated nor declared untranslatable — the silent case, the one a
+    // pair of hand-kept tables always drifts into.
+    mutate: (s) => s.replace("  'garbage_disposal',\r\n", '').replace("  'garbage_disposal',\n", ''),
+  },
+  {
+    gate: 'static', name: 'AID-3: a brand is spelled a way the diagnostic has never heard',
+    file: MAP_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("  lg: 'LG',", "  lg: 'L.G.',"),
+  },
+  {
+    gate: 'static', name: 'AID-3: a page type is dropped from the carded list',
+    file: MAP_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("  'outdoor',\r\n]);", "]);").replace("  'outdoor',\n]);", "]);"),
+  },
+  {
+    gate: 'static', name: 'AID-3: the city pillar is added to the carded list',
+    file: MAP_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("  'service_hub',", "  'city',\n  'service_hub',"),
+  },
+  {
+    gate: 'static', name: 'AID-3: the island stops taking the page prefill',
+    file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('initialAppliance = ""', 'initialApplianceUnused = ""'),
+  },
+  {
+    gate: 'static', name: 'AID-3: the island accepts a brand the appliance does not list',
+    file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(
+      '(BRANDS_BY_APPLIANCE[appliance] || []).includes(initialBrand)',
+      'true'
+    ),
+  },
+  {
+    gate: 'static', name: 'AID-3: the entry step stops following the answers',
+    file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(
+      'useState(() =>\n    firstOpenStep(',
+      'useState(() =>\n    (() => 1)('
+    ).replace(
+      'useState(() =>\r\n    firstOpenStep(',
+      'useState(() =>\r\n    (() => 1)('
+    ),
+  },
+  {
+    gate: 'static', name: 'AID-3: Continue and the entry step stop agreeing',
+    file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(
+      'const canAdvance = () => stepAnswered(step, form);',
+      'const canAdvance = () => !!form.category;'
+    ),
+  },
+  {
+    gate: 'static', name: 'AID-3: the loader stops handing the prefill over',
+    file: CLIENT_TS_AID, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('initialAppliance: pre.appliance', 'initialApplianceIgnored: pre.appliance'),
+  },
+  {
+    gate: 'static', name: 'AID-3: the brand stops travelling into the quote seed',
+    file: CLIENT_TS_AID, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('brand: seed.brandSlug', 'brandIgnored: seed.brandSlug'),
+  },
+  {
+    gate: 'static', name: 'AID-3: the verdict link stops carrying the brand',
+    file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('data-aid-brand', 'data-aid-brand-gone'),
+  },
+  {
+    gate: 'static', name: 'AID-3: the payload stops saying which page it came from',
+    file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(/page_url: pageUrl/g, 'pageUrlDropped: pageUrl'),
+  },
+  {
+    gate: 'static', name: 'AID-3: the dispatch card stops printing the page',
+    file: CONTACT_JS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('Страница: ${escape(p.page_url', 'Page: ${escape(p.page_url'),
+  },
+  {
+    gate: 'static', name: 'AID-3: React starts hydrating on a service page',
+    file: SERVICE_HUB_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('<body', '<body><astro-island renderer-url="/x.js"></astro-island>'),
+  },
+  {
+    gate: 'smoke', name: 'AID-3: the island stops opening past the answered steps',
+    file: AID_ISLAND, cmd: SMOKE_GATE,
+    // firstOpenStep is what turns "step 1 of 5 with two answers already made" into
+    // "step 3 of 5". Pinning it to 1 puts the dead steps back in front of everyone.
+    // Anchored on the loop header, which the minifier keeps verbatim. Short-circuit
+    // it and every visitor is back on step 1 with two answers already made.
+    // No backreference in this pattern on purpose: written with one, the `\1`s were
+    // lost on the way into this file and the regex silently became unmatchable, which
+    // is how the case reported SKIP twice. Three bare \w+ cannot drift that way.
+    mutate: (s) =>
+      s.replace(
+        /for\(let \w+=1;\w+<=4;\w+\+=1\)/,
+        'if(1)return 1;for(let n=1;n<=4;n+=1)'
+      ),
+  },
+  {
+    gate: 'smoke', name: 'AID-3: the prefilled chip stops looking chosen',
+    file: AID_ISLAND, cmd: SMOKE_GATE,
+    // The red is how a visitor knows the step is already answered. Without it the
+    // step opens looking blank and they answer it again — or bounce.
+    mutate: (s) => s.replaceAll('#C8102E', '#333333'),
+  },
+  {
+    gate: 'smoke', name: 'AID-3: the card stops reading the page prefill',
+    file: AID_CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('aidPreAppliance', 'aidPreApplianceGone'),
+  },
+  {
+    gate: 'smoke', name: 'AID-3: the brand is not carried through the handoff',
+    file: AID_CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace(/brandLabel:(\w+)\.brandLabel\|\|""/, 'brandLabel:""'),
+  },
+  {
+    gate: 'smoke', name: 'AID-3: a card sinks past a screen and a half',
+    file: SERVICE_HUB_PAGE, cmd: SMOKE_GATE,
+    // The regression class the 1.5vh rule exists for: anything that grows the hero
+    // above the card — another paragraph, a badge row, dead padding — pushes it far
+    // enough down that nobody scrolling normally ever meets it.
+    // BOTH rules, not the first one. `.hero-aid` ships twice — the base 22px and an
+    // 18px override inside `@media (max-width: 768px)` — and this leg runs at 360px
+    // wide, where the override wins. Mutating only the first left the phone layout
+    // untouched and the gate green over a broken rule: the exact false pass this
+    // harness exists to find.
+    mutate: (s) =>
+      s.replace(/(\.hero-aid\[[^\]]*\]\{)margin-top:22px/g, '$1margin-top:1400px')
+        .replace(/(\.hero-aid\[[^\]]*\]\{)margin-top:18px/g, '$1margin-top:1400px'),
+  },
+  {
+    // The placeholder stops following the page and every card is back to talking
+    // about a dryer — including the mixer pages and the walk-in pages.
+    gate: 'static', name: 'AID-3: the placeholder stops following the page',
+    file: BRAND_COMBO_PAGE, cmd: STATIC_GATE,
+    mutate: (s) =>
+      s.replace('My LG washer: not spinning…', 'My dryer runs but doesn\'t heat…'),
+  },
+  {
+    // Worse than not following it: following it to a fault the sheet does not list
+    // for that appliance. The words have to be the tile's own, which is the whole
+    // reason they are read out of quote-appliances.ts instead of written.
+    gate: 'static', name: 'AID-3: the placeholder suggests a fault the tile does not list',
+    file: BRAND_COMBO_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('not spinning…', 'smells like burning…'),
+  },
+  {
+    // Reaching for the tile label instead of the heading noun would put
+    // "My oven / wall oven: not heating…" in the field, which reads as a typo. The
+    // gate reads dist, not the resolver, so the break has to be in dist: mutating the
+    // source here would change nothing the gate looks at and prove nothing.
+    gate: 'static', name: 'AID-3: a grid label leaks into the placeholder sentence',
+    file: OVEN_HUB_PAGE, cmd: STATIC_GATE,
+    mutate: (s) =>
+      s.replace('My oven: not heating…', 'My oven / wall oven: not heating…'),
+  },
+  {
+    gate: 'smoke', name: 'AID-3: the placeholder a visitor sees stops matching the page',
+    file: SERVICE_HUB_PAGE, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('My refrigerator: not cooling…', 'My dryer runs but doesn\'t heat…'),
   },
   {
     gate: 'smoke', name: 'resume forgets the saved step', file: CHUNK, cmd: SMOKE_GATE,

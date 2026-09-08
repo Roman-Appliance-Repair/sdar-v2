@@ -10,6 +10,7 @@ const heroPhoto = existsSync(`public/images/commercial/${heroSlug}/hero.webp`) &
 const heroBase = `/images/commercial/${heroSlug}`;
 import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../../data/branches';
 import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+import AIDiagnosticCard from '../../../components/AIDiagnosticCard.astro';
 
 const phone = MAIN_PHONE;
 const phoneRaw = MAIN_PHONE_TEL;
@@ -114,6 +115,11 @@ const schemaJsons = [
     ]
   }
 ];
+// AID-3. This page writes its own hero instead of calling ServiceHero, so the card
+// is placed here by hand — same slot as everywhere else: straight after the CTA row,
+// still inside the hero block, above the first content section. Nothing else about
+// the hero moves.
+const aidTone = heroPhoto ? 'frame' : 'light';
 ---
 
 <Layout title={title} description={description} canonical={canonical}>
@@ -142,6 +148,9 @@ const schemaJsons = [
     <div class="hero-ctas">
       <a href={phoneHref} class="btn btn-primary">☎ Call {phone}</a>
       <a href="/book/" class="btn btn-outline">Book Online</a>
+    </div>
+    <div class="hero-aid">
+      <AIDiagnosticCard variant="compact" tone={aidTone} phone={phone} />
     </div>
   </div>
 </section>
@@ -340,6 +349,9 @@ const schemaJsons = [
   .btn-primary { background: var(--red); color: #fff; }
   .btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.4); }
   .btn-secondary { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.4); }
+  /* AID-3: the diagnostic card, straight after the CTA row and still in the
+     hero. The card carries its own frame and padding; this only places it. */
+  .hero-aid { margin-top: 22px; max-width: 460px; }
 </style>
 </content>
 </invoke>

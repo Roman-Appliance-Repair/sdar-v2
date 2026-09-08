@@ -22,6 +22,8 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import BranchesBlock from './BranchesBlock.astro';
 import { MAIN_PHONE } from '../data/branches';
+import AIDiagnosticCard from './AIDiagnosticCard.astro';
+import { getDiagnosticPrefill } from '../data/aid-to-quote-map';
 
 const MAIN_PHONE_HREF = 'tel:+1' + MAIN_PHONE.replace(/\D/g, '');
 
@@ -87,6 +89,22 @@ const photoMobileWebp = slugMobileExists ? `/images/commercial/${slug}/hero-mobi
 const photoMobileJpg = slugMobileExists ? `/images/commercial/${slug}/hero-mobile.jpg` : null;
 const photoAlt = imageAlt ?? `${heroImageTitle || title || 'Commercial appliance repair'} ${heroImageLocation || ''}`.trim();
 const photoMode = !!photoJpg;
+
+/**
+ * AID-3. The diagnostic card, at the end of the hero block and after the CTA row.
+ *
+ * `aidCarded` is read from the address, not from a prop: this hero renders for
+ * several page types (a /services/ hub, a brand combo, an /outdoor/ page), and the
+ * one that must NOT carry a card is a page type, not a call site. Reading the URL
+ * means no caller can forget the flag and none can set it wrongly.
+ *
+ * `aidTone` follows the render mode rather than the page: MODE A puts the card on a
+ * photograph, where the frame variant borrows the hero's own overlay for contrast;
+ * MODE B has no photograph at all, so the card takes the light surface instead.
+ * Never a dark fill inside a dark hero.
+ */
+const aidCarded = getDiagnosticPrefill(Astro.url.pathname).carded;
+const aidTone = photoMode ? 'frame' : 'light';
 ---
 
 {photoMode ? (
@@ -126,6 +144,11 @@ const photoMode = !!photoJpg;
           </a>
           <a href={requestUrl} class="v2-btn-secondary">{requestLabel}</a>
         </div>
+        {aidCarded && (
+          <div class="hero-aid">
+            <AIDiagnosticCard variant="compact" tone={aidTone} phone={phone} />
+          </div>
+        )}
         {showBranches && (
           <div class="hero-photo__branches">
             <BranchesBlock title="Our Branches" layout="grid" showCount={true} />
@@ -145,6 +168,11 @@ const photoMode = !!photoJpg;
           <a href={phoneHref} class="btn-primary">☎ {phone}</a>
           <a href={requestUrl} class="btn-outline">{requestLabel}</a>
         </div>
+        {aidCarded && (
+          <div class="hero-aid">
+            <AIDiagnosticCard variant="compact" tone={aidTone} phone={phone} />
+          </div>
+        )}
         {showBranches && (
           <div class="hero-branches-wrap">
             <BranchesBlock title="Our Branches" layout="grid" showCount={true} />
@@ -248,6 +276,16 @@ const photoMode = !!photoJpg;
     gap: 12px;
     flex-wrap: wrap;
   }
+  /* AID-3. The card's slot in the hero: it follows the CTA row, so it needs air
+     above it and nothing else — the card owns its own padding, border and width
+     cap. Sitting above the branches block rather than below it is deliberate: on a
+     360x740 phone the eight-branch grid is roughly a screen tall on its own, and a
+     card underneath it would open the page at two and a half screens down. */
+  .hero-aid { margin-top: 22px; }
+  @media (max-width: 768px) {
+    .hero-aid { margin-top: 18px; }
+  }
+
   .hero-photo__branches {
     margin-top: 24px;
     padding-top: 20px;

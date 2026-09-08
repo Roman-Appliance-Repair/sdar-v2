@@ -20,6 +20,7 @@ import { getBrandPillarSlug } from '../../data/brand-pillar-map';
 import { getCommercialCrossLink } from '../../data/commercial-cross-link-map';
 import { getComboOverride } from '../../data/combo-overrides';
 import { isCollapsedCombo } from '../../data/combo-collapse';
+import AIDiagnosticCard from '../../components/AIDiagnosticCard.astro';
 
 export async function getStaticPaths() {
   return CITY_SERVICE_MATRIX.map(combo => ({
@@ -62,6 +63,11 @@ const hasComboPhoto = existsSync(nodePath.join('public', 'images', 'city-service
 const comboMobileExists = existsSync(nodePath.join('public', 'images', 'city-service', citySlug, serviceSlug, 'hero-mobile.webp'));
 
 const brandPool = getBrandPool(cityDesc.tier, serviceDesc);
+
+// AID-3. Every combo page is a city_service page, which is one of the carded
+// types, so there is nothing to decide here — the only choice is the tone, and it
+// follows the same photo flag the hero itself does.
+const aidTone = hasComboPhoto ? 'frame' : 'light';
 
 // Wave 71-ext Batch 60 — AI-First answer-first content helpers.
 // Strips "(year 6-10)" parentheticals + trailing period from failure-pattern
@@ -197,6 +203,9 @@ const schemaJsons = [
     <div class="cta-row">
       <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
       <a href="/book/" class="btn-secondary">Book Online</a>
+    </div>
+    <div class="hero-aid">
+      <AIDiagnosticCard variant="compact" tone={aidTone} phone={phone} />
     </div>
   </div>
 </section>
@@ -359,6 +368,9 @@ const schemaJsons = [
   .hero .eyebrow { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin: 0 0 10px; }
   .hero .lede { font-size: 1.05rem; color: #d7d7d7; max-width: 720px; line-height: 1.7; margin-bottom: 22px; }
   .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  /* AID-3: the diagnostic card, straight after the CTA row and still inside the
+     hero. Width-capped so it does not run the full column on a desktop. */
+  .hero-aid { margin-top: 22px; max-width: 460px; }
   .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
   .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
   .trust-bar { background: var(--red); color: #fff; padding: 14px 24px; }

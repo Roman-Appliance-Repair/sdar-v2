@@ -130,21 +130,92 @@ const C_BRD  = "var(--color-border-tertiary, #e2e2e2)";
 const initialForm = { category: "", appliance: "", brand: "", model: "", symptom: "", age: "", detail: "", name: "", phone: "", email: "", website: "" };
 
 /**
- * AID-2 adds ONE optional prop, `initialDetail`. When the visitor already typed a
- * sentence into the homepage hero card, it arrives here as step 4's free-text
- * detail so nobody is asked to describe the same fault twice. Everything else —
- * the steps, the gating, the copy, the order — is untouched.
+ * Whether `f` already answers step `n`.
+ *
+ * AID-3 lifted this out of the component body. The Continue button and the card's
+ * prefill are asking exactly the same question — "is this step answered?" — and the
+ * moment they answer it in two places they start disagreeing, which shows up as a
+ * step that opens with its own Continue already lit, or one that is skipped past
+ * with the answer still missing. One function, both callers.
  */
-export default function AIDiagnostic({ phone = "(323) 870-4790", initialDetail = "" }) {
-  const [step, setStep] = useState(1);
-  const [form, setForm] = useState(() => ({ ...initialForm, detail: initialDetail }));
+function stepAnswered(n, f) {
+  if (n === 1) return !!f.category;
+  if (n === 2) return !!f.appliance;
+  if (n === 3) return !!f.brand && !!f.symptom;
+  if (n === 4)
+    return (
+      !!f.name &&
+      !!f.phone &&
+      f.phone.replace(/\D/g, "").length >= 10 &&
+      /\S+@\S+\.\S+/.test(f.email)
+    );
+  return false;
+}
+
+/**
+ * The first step that still needs an answer. With nothing prefilled this is 1, which
+ * is what every visitor has always got; with an appliance and a category already
+ * known it is 3, because step 3 also wants a symptom and no page can know that.
+ *
+ * Started past, never skipped past: the Back buttons are untouched, so the steps
+ * above the entry point are all still reachable and every prefilled answer can be
+ * changed by the person it was filled in for.
+ */
+function firstOpenStep(f) {
+  for (let n = 1; n <= 4; n += 1) if (!stepAnswered(n, f)) return n;
+  return 5;
+}
+
+/**
+ * AID-2 added ONE optional prop, `initialDetail`: the sentence typed into the hero
+ * card, arriving as step 4's free-text detail so nobody describes the same fault
+ * twice.
+ *
+ * AID-3 adds three more — `initialCategory`, `initialAppliance`, `initialBrand` —
+ * carrying what the page the card sits on already knows. They are prefill and
+ * nothing else: every one of them sets a value the visitor could have set by tapping
+ * the same tile, and each is accepted ONLY if it names something the steps actually
+ * offer (the category has an appliance list, the appliance is in that list, the
+ * brand is in that appliance's chip row). A value that does not survive those three
+ * tests is dropped, and the step opens unanswered exactly as it always did.
+ *
+ * Everything else — the steps, the gating, the copy, the order — is untouched.
+ */
+export default function AIDiagnostic({
+  phone = "(323) 870-4790",
+  initialDetail = "",
+  initialCategory = "",
+  initialAppliance = "",
+  initialBrand = "",
+  pageUrl = "",
+}) {
+  // The three tests, in order, each one gated on the last: a brand is only real
+  // relative to an appliance, and an appliance only relative to a category.
+  const seed = (() => {
+    const category = APPLIANCES_BY_CATEGORY[initialCategory] ? initialCategory : "";
+    const appliance =
+      category && (APPLIANCES_BY_CATEGORY[category] || []).includes(initialAppliance)
+        ? initialAppliance
+        : "";
+    const brand =
+      appliance && (BRANDS_BY_APPLIANCE[appliance] || []).includes(initialBrand)
+        ? initialBrand
+        : "";
+    return { category, appliance, brand };
+  })();
+  const prefilled = !!(seed.category || seed.appliance || seed.brand);
+
+  const [form, setForm] = useState(() => ({ ...initialForm, ...seed, detail: initialDetail }));
+  const [step, setStep] = useState(() =>
+    firstOpenStep({ ...initialForm, ...seed, detail: initialDetail })
+  );
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [callbackRequested, setCallbackRequested] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   // One open event per mount, and one per step the visitor actually reaches.
-  useEffect(() => { track("aid_open"); }, []);
+  useEffect(() => { track("aid_open", { prefilled, entry_step: step }); }, []);
   useEffect(() => { track("aid_step", { step }); }, [step]);
 
   const appliances = APPLIANCES_BY_CATEGORY[form.category] || [];
@@ -156,19 +227,7 @@ export default function AIDiagnostic({ phone = "(323) 870-4790", initialDetail =
   const totalSteps = 5;
   const pct = `${(step / totalSteps) * 100}%`;
 
-  const canAdvance = () => {
-    if (step === 1) return !!form.category;
-    if (step === 2) return !!form.appliance;
-    if (step === 3) return !!form.brand && !!form.symptom;
-    if (step === 4)
-      return (
-        !!form.name &&
-        !!form.phone &&
-        form.phone.replace(/\D/g, "").length >= 10 &&
-        /\S+@\S+\.\S+/.test(form.email)
-      );
-    return false;
-  };
+  const canAdvance = () => stepAnswered(step, form);
 
   const runDiagnosis = async () => {
     setLoading(true);
@@ -224,6 +283,12 @@ export default function AIDiagnostic({ phone = "(323) 870-4790", initialDetail =
         equipment: form.appliance,
         equipmentLabel: form.appliance,
         description: form.detail,
+        // AID-3. Where the lead came from and whether the page filled anything in
+        // for them. The Telegram card prints both, so a diagnostic that arrived off
+        // /brands/lg-washer-repair/ is not indistinguishable from one off the
+        // homepage — which is exactly what it was until now.
+        page_url: pageUrl || (typeof location !== "undefined" ? location.href : ""),
+        prefilled,
       }),
     }).catch(() => {});
   };
@@ -244,6 +309,8 @@ export default function AIDiagnostic({ phone = "(323) 870-4790", initialDetail =
         result,
         source: "ai-diagnostic",
         brand_site: "samedayappliance.repair",
+        page_url: pageUrl || (typeof location !== "undefined" ? location.href : ""),
+        prefilled,
       }),
     }).catch(() => {});
     setCallbackRequested(true);
@@ -517,6 +584,7 @@ export default function AIDiagnostic({ phone = "(323) 870-4790", initialDetail =
               data-aid-category={form.category}
               data-aid-appliance={form.appliance}
               data-aid-symptom={form.symptom}
+              data-aid-brand={form.brand}
               data-aid-detail={form.detail}
               onClick={() => track("aid_book_click", { appliance: form.appliance })}
               style={{ display: "block", padding: "0.85rem", borderRadius: 8, background: "#C8102E", color: "#fff", border: "none", fontSize: 15, fontWeight: 500, textAlign: "center", textDecoration: "none" }}

@@ -64,6 +64,7 @@ function onVerdictClick(ev: Event): void {
     appliance: a.dataset.aidAppliance,
     symptom: a.dataset.aidSymptom,
     detail: a.dataset.aidDetail,
+    brand: a.dataset.aidBrand,
   });
 
   try {
@@ -75,6 +76,13 @@ function onVerdictClick(ev: Event): void {
         appliance: seed.appliance,
         problems: seed.problems,
         problemText: seed.detail,
+        // AID-3. The brand the visitor picked in the diagnostic, carried across so
+        // the sheet's chip says what they answered rather than what the page was
+        // about. The sheet only ever fills a BLANK brand from its own page context,
+        // so writing it here means the answer wins and the page still covers for a
+        // diagnosis that carried none.
+        brand: seed.brandSlug || '',
+        brandLabel: seed.brandLabel || '',
         source: 'ai-diagnostic',
         aidHandoff: true,
       })
@@ -87,6 +95,7 @@ function onVerdictClick(ev: Event): void {
     where: seed.where,
     appliance: seed.appliance,
     problem: seed.problems[0] || '',
+    brand: seed.brandLabel || '',
     appliance_mapped: Boolean(seed.appliance),
     problem_mapped: seed.problems.length > 0,
   });
@@ -100,11 +109,38 @@ function onPopState(): void {
   if (open) closeAidSheet('back');
 }
 
+/**
+ * AID-3. What the page already knows, read straight off the card it is printed on.
+ *
+ * The card computes this at build time from its own URL (see getDiagnosticPrefill),
+ * so there is no second classifier in the browser and no way for the two to
+ * disagree. Missing attributes mean an unmapped page — the island then opens at
+ * step 1, exactly as it does on the homepage.
+ */
+function cardPrefill(): { category: string; appliance: string; brand: string } {
+  const el = document.querySelector('[data-aid-card]') as HTMLElement | null;
+  return {
+    category: el?.dataset.aidPreCategory || '',
+    appliance: el?.dataset.aidPreAppliance || '',
+    brand: el?.dataset.aidPreBrand || '',
+  };
+}
+
 function mount(initialDetail: string): void {
   const host = document.getElementById('aid-body');
   if (!host) return;
   if (!root) root = createRoot(host);
-  root.render(createElement(AIDiagnostic as never, { phone: phone(), initialDetail }));
+  const pre = cardPrefill();
+  root.render(
+    createElement(AIDiagnostic as never, {
+      phone: phone(),
+      initialDetail,
+      initialCategory: pre.category,
+      initialAppliance: pre.appliance,
+      initialBrand: pre.brand,
+      pageUrl: location.href,
+    })
+  );
 }
 
 export function openAidSheet(initialDetail: string, source: string): void {
@@ -137,7 +173,13 @@ export function openAidSheet(initialDetail: string, source: string): void {
   if (!dlg.open) dlg.showModal();
   history.pushState({ aidSheet: true }, '');
 
-  track('aid_card_open', { source, prefilled: initialDetail.length > 0 });
+  const pre = cardPrefill();
+  track('aid_card_open', {
+    source,
+    prefilled: initialDetail.length > 0,
+    page_prefilled: Boolean(pre.category || pre.appliance || pre.brand),
+    page_url: location.pathname,
+  });
 }
 
 export function closeAidSheet(reason: string): void {

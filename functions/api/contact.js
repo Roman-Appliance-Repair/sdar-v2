@@ -184,6 +184,14 @@ function buildTelegramText(p) {
       p.detail ? `📝 Детали: ${escape(truncate(p.detail, 300))}` : null,
       '─────────────────────',
       `🤖 AI диагноз: ${escape(p.result || '—')}`,
+      '─────────────────────',
+      // AID-3. Which page the card was on, and whether that page had already
+      // answered the first steps for them. Until this wave every diagnostic lead
+      // looked like it came from /ai-diagnostic/, because that is the only place
+      // the form existed; now it can come from any of ~1000 pages, and the
+      // dispatcher opening the card needs to see which one.
+      `🌐 Страница: ${escape(p.page_url || '—')}`,
+      `✍️ Предзаполнение со страницы: ${p.prefilled ? 'да' : 'нет'}`,
     ].filter(Boolean).join('\n');
   }
 
