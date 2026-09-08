@@ -137,6 +137,7 @@ const SERVICE_SUB_PAGE = path.join(
 
 const STATIC_GATE = ['scripts/check-quote-sheet.mjs'];
 const SMOKE_GATE = ['scripts/smoke-quote-sheet.mjs'];
+const FOLD_GATE = ['scripts/check-hero-fold.mjs'];
 
 function run(args) {
   const r = spawnSync(process.execPath, args, { encoding: 'utf8' });
@@ -184,6 +185,9 @@ const SERVICE_HUB_PAGE = path.join(ROOT, 'dist', 'services', 'refrigerator-repai
 // The oven hub: one of the three tiles whose label is a slashed pair written for a
 // grid of choices, so it is where a grid label would show up inside a sentence.
 const OVEN_HUB_PAGE = path.join(ROOT, 'dist', 'services', 'oven-repair', 'index.html');
+// A city-service combo: the type QS-4 found at 0% above the fold, and the one
+// whose lede ran to 17 lines on a phone. Its stylesheet is where the clamp lives.
+const COMBO_PAGE = path.join(ROOT, 'dist', 'pasadena', 'dryer-repair', 'index.html');
 
 /** The diagnostic sheet's own chunk — same trick as the quote sheet's. */
 async function aidChunk() {
@@ -861,6 +865,20 @@ const CASES = [
     gate: 'smoke', name: 'AID-3: the placeholder a visitor sees stops matching the page',
     file: SERVICE_HUB_PAGE, cmd: SMOKE_GATE,
     mutate: (s) => s.replace('My refrigerator: not cooling…', 'My dryer runs but doesn\'t heat…'),
+  },
+  // ── QS-4: the phone fold ─────────────────────────────────────────────────
+  {
+    // The regression this whole wave exists to prevent: the hero's mobile lede
+    // goes back to its old rhythm — full font, full line-height, 22px margin and
+    // no clamp — and the CTA row sinks under a 360x740 fold again. Before QS-4
+    // that was 100% of city-service pages.
+    gate: 'fold', name: 'QS-4: the old lede rhythm comes back and sinks the CTA row',
+    file: COMBO_PAGE, cmd: FOLD_GATE,
+    mutate: (s) =>
+      s.replace(
+        /(\.lede\[data-astro-cid-\w+\]\{)font-size:\.95rem;line-height:1\.5;margin-bottom:14px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden(\})/,
+        '$1font-size:1.05rem;line-height:1.7;margin-bottom:22px$2'
+      ),
   },
   {
     gate: 'smoke', name: 'resume forgets the saved step', file: CHUNK, cmd: SMOKE_GATE,

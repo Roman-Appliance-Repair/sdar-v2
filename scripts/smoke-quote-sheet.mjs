@@ -1479,6 +1479,16 @@ async function aid3FoldLeg(browser, base, c) {
       btnHeight: btn ? btn.height : null,
       inputFont: input ? parseFloat(getComputedStyle(input).fontSize) : 0,
       placeholder: input ? input.placeholder : '',
+      ledeLines: (() => {
+        const el = document.querySelector('.lede, .hero-photo__sub, .hero-sub, .hub-lede');
+        if (!el) return 0;
+        const lh = parseFloat(getComputedStyle(el).lineHeight) || 0;
+        return lh ? Math.round(el.getBoundingClientRect().height / lh) : 0;
+      })(),
+      ledeChars: (() => {
+        const el = document.querySelector('.lede, .hero-photo__sub, .hero-sub, .hub-lede');
+        return el ? el.textContent.trim().length : 0;
+      })(),
       heading: (document.querySelector('.aid-card-h') || {}).textContent || '',
       compact: !!document.querySelector('.aid-card--compact'),
       // The card must never be a dark filled rectangle. Either it is the frame
@@ -1489,26 +1499,31 @@ async function aid3FoldLeg(browser, base, c) {
 
   expect(`${label}: nothing scrolled to get here`, m.scrolled === 0, String(m.scrolled));
   expect(`${label}: the card is there`, m.cardTop !== null, 'no .aid-card');
-  // What the card owes the CTAs is that it did not move them, and the way it keeps
-  // that promise is structural: it is emitted AFTER the CTA row and never before it,
-  // so its own box cannot push theirs down. That is what these two assert together —
-  // the row starts on the first screen, and the card begins at or below where the row
-  // ends. Measured against a build of main, the CTA rectangles on all five of these
-  // pages are identical to the pixel with the card added.
+  // AID-3 measured that the card does not move the CTA row; QS-4 then made the row
+  // clear the fold on its own. Both are asserted, because they fail differently:
+  // the first breaks if the card is ever emitted before the CTAs, the second if the
+  // hero's mobile rhythm regresses.
   //
-  // Deliberately NOT asserted: that the CTA row ENDS above the fold. It already does
-  // not on /pasadena/dryer-repair/ (704..827 in a 740 viewport) or
-  // /brands/lg-washer-repair/ (692..813 in 757) — long ledes push the second button
-  // under on those two templates, and both did so before this wave. Asserting it here
-  // would make AID-3 red for something AID-3 neither caused nor can fix without
-  // rewriting page copy. It is reported instead of hidden.
+  // The full-row assertion was OFF before QS-4, with a comment explaining that
+  // /pasadena/dryer-repair/ (704‥827 in a 740 viewport) and
+  // /brands/lg-washer-repair/ (692‥813 in 757) had run past the fold since long
+  // before AID-3. That is fixed, so it is on — and if a long lede ever comes back
+  // unclamped, these five pages say so first.
   expect(`${label}: the CTA row still starts above the fold`,
     m.ctaTop !== null && m.ctaTop < m.vh, `${m.ctaTop} >= ${m.vh}`);
+  expect(`${label}: the CTA row is FULLY above the fold`,
+    m.ctaBottom !== null && m.ctaBottom <= 732, `${m.ctaBottom} > 732`);
   expect(`${label}: the card sits after the CTA row, so it moved nothing`,
     m.cardTop !== null && m.ctaBottom !== null && m.cardTop >= m.ctaBottom - 1,
     `card ${Math.round(m.cardTop)} vs cta bottom ${Math.round(m.ctaBottom)}`);
   expect(`${label}: the card top is within 1.5 viewport heights`,
     m.cardTop !== null && m.cardTop <= m.vh * 1.5, `${Math.round(m.cardTop)} > ${m.vh * 1.5}`);
+  // The lede is clamped, never deleted: two visible lines on the phone, the whole
+  // sentence still in the DOM. Both halves matter, so both are measured.
+  expect(`${label}: the hero lede is clamped to two lines`,
+    m.ledeLines > 0 && m.ledeLines <= 2, `${m.ledeLines} line(s)`);
+  expect(`${label}: the full lede text is still in the DOM`,
+    m.ledeChars > 120, `${m.ledeChars} chars`);
   expect(`${label}: it is the compact variant`, m.compact);
   expect(`${label}: the heading matches the page`, m.heading.trim() === c.heading, m.heading);
   // The example in the field follows the page too — and on /outdoor/, which resolves
