@@ -1,0 +1,303 @@
+---
+// src/pages/about.astro
+// E-E-A-T page — the company and the person behind it.
+// Reason it exists: ~1198 pages, not one human name on any of them. Manufacturer
+// reps reviewing our authorization applications land here to see who they are
+// dealing with.
+//
+// Hard rules honoured on this page (CLAUDE.md §5, docs/factual-accuracy.md):
+//   - No streetAddress. Only physical_pin pages carry one; this is not one.
+//   - No manufacturer-authorization claims, no "factory-trained" / "certified
+//     technicians", no "BBB A+" (real grade is A — "BBB Accredited Business").
+//   - No aggregateRating, no star counts, in text or in markup.
+//   - No superlatives (best / top-rated / premier / leading).
+//   - Legal name (HVAC 777 LLC) stays in JSON-LD only, never in visible copy.
+//   - Breadcrumbs are NOT declared here: Layout.astro mounts Breadcrumbs.astro
+//     site-wide, which emits both the visible trail and the BreadcrumbList
+//     JSON-LD. A second copy here would be a duplicate.
+//
+// Owner photo: .owner-photo is a typographic placeholder ("RA") because there is
+// no picture of Roman in public/images/ yet. Replacing it with an <img> is a
+// one-line change — the slot is already sized 88x88. This note lives in the
+// frontmatter on purpose: HTML comments ship to the browser, frontmatter does not.
+
+import Layout from '../layouts/Layout.astro';
+import { mergeCredentials, CANONICAL_CREDENTIALS } from '../data/credentials-schema';
+import { BUSINESS_HOURS, OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { BRANCHES } from '../data/branches';
+
+const canonical = 'https://samedayappliance.repair/about/';
+
+const title = 'About Same Day Appliance Repair — Owner Roman Abysov, BHGS #A49573';
+const description =
+  'Who we are: founded 2019, ten service territories across seven Southern California counties, 14 technicians. Owner Roman Abysov. BHGS #A49573, EPA 608, CSLB C-20.';
+
+// Territory count comes from the branches SSOT rather than a typed number, so a
+// new branch updates this sentence on its own.
+const territoryCount = BRANCHES.length;
+
+const COUNTIES = [
+  'Los Angeles',
+  'Orange',
+  'Ventura',
+  'Santa Barbara',
+  'San Bernardino',
+  'Riverside',
+  'San Diego'
+];
+
+// Visible credential lines are derived from the JSON-LD SSOT (credentials-schema.ts)
+// so the page text can never drift from the markup. One override is needed:
+// CANONICAL_CREDENTIALS stores the CSLB classification without its number, while
+// CLAUDE.md §5 requires the visible label to carry "#1138898".
+const CRED_LABEL_OVERRIDES: Record<string, string> = {
+  'CSLB C-20 HVAC': 'CSLB C-20 HVAC license #1138898'
+};
+
+const credentials = CANONICAL_CREDENTIALS.map((c) => ({
+  label: CRED_LABEL_OVERRIDES[c.credentialCategory] ?? c.credentialCategory,
+  issuer: c.recognizedBy.name
+}));
+
+// Insurance and association membership are not EducationalOccupationalCredentials —
+// they have no issuing body in the schema sense — so they are listed separately
+// here and stay out of hasCredential.
+const standing = [
+  '$1,000,000 general liability insurance',
+  'Member, United Appliance Servicers Association'
+];
+
+const businessId = canonical + '#business';
+const personId = canonical + '#roman';
+
+// LocalBusiness. mergeCredentials() injects legalName + the canonical
+// hasCredential array, and — because no address is passed — a city-level
+// PostalAddress with no streetAddress, which is exactly the NAP policy here.
+const businessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  '@id': businessId,
+  name: 'Same Day Appliance Repair',
+  url: canonical,
+  telephone: '+13238704790',
+  email: 'support@samedayappliance.repair',
+  priceRange: '$$',
+  foundingDate: '2019',
+  founder: { '@id': personId },
+  numberOfEmployees: { '@type': 'QuantitativeValue', value: 14 },
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: COUNTIES.map((c) => ({
+    '@type': 'AdministrativeArea',
+    name: c + ' County'
+  }))
+});
+
+// Person. The licences belong to the company, not to Roman personally, so
+// hasCredential stays on the business node and is not repeated here — claiming
+// an EPA 608 card for a named individual would be a fact we have not verified.
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  '@id': personId,
+  name: 'Roman Abysov',
+  jobTitle: 'Owner',
+  url: canonical,
+  worksFor: { '@id': businessId }
+};
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
+    <script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
+  </Fragment>
+
+  <section class="hub">
+    <div class="container">
+      <p class="hub-eyebrow">About · The Company</p>
+      <h1 class="hub-title">About Same Day Appliance Repair</h1>
+      <p class="hub-intro">
+        We've been repairing appliances in Southern California since 2019. Today that's
+        {territoryCount} service territories across seven counties — {COUNTIES.slice(0, -1).join(', ')},
+        and {COUNTIES[COUNTIES.length - 1]} — with 14 technicians and 12 trucks on the road.
+      </p>
+
+      <div class="about-block">
+        <h2>{territoryCount} territories, not one van</h2>
+        <p>
+          One van covers the neighborhood it lives in. Seven counties is a different
+          problem — a call in Santa Barbara and a call in San Diego are hours apart on a
+          good traffic day. So we staffed {territoryCount} territories instead of
+          stretching one crew across the map. The tech who takes your job is already
+          working your end of the freeway.
+        </p>
+      </div>
+
+      <div class="about-block">
+        <h2>Commercial and residential, same company</h2>
+        <p>
+          We work high-end home kitchens and restaurant equipment both. A panel-front
+          dishwasher in a private kitchen in the morning, a restaurant's cooking line that
+          afternoon. Those two jobs need different parts and different scheduling — a
+          restaurant can't wait until Thursday — and we keep technicians who handle either
+          one.
+        </p>
+      </div>
+
+      <div class="about-block">
+        <h2>We'll tell you when not to repair it</h2>
+        <p>
+          Sometimes the honest answer is that the part costs more than the machine is
+          worth. We say that during the visit, not after the invoice. A diagnostic that
+          ends in "replace it" is still worth what you paid for it.
+        </p>
+      </div>
+
+      <div class="owner">
+        <div class="owner-photo" aria-hidden="true">RA</div>
+        <div class="owner-text">
+          <h2 class="owner-name">Roman Abysov</h2>
+          <p class="owner-role">Owner</p>
+          <p>
+            Roman founded the company in 2019 and runs all {territoryCount} territories.
+            He still goes out on the hard calls himself — the ones a tech phones in about
+            from the driveway, where the machine isn't failing the way the manual says it
+            should.
+          </p>
+        </div>
+      </div>
+
+      <div class="about-block">
+        <h2>Licenses and standing</h2>
+        <p class="block-lede">
+          Every line below is verifiable with the body that issued it, and each one has
+          its own page with the lookup steps.
+        </p>
+        <ul class="cred-list">
+          {credentials.map((c) => (
+            <li>
+              <strong>{c.label}</strong>
+              <span>{c.issuer}</span>
+            </li>
+          ))}
+          {standing.map((s) => (
+            <li><strong>{s}</strong></li>
+          ))}
+        </ul>
+        <a href="/credentials/" class="inline-cta">How to verify each one →</a>
+      </div>
+
+      <div class="about-block">
+        <h2>How we work</h2>
+        <dl class="terms">
+          <div class="term">
+            <dt>Residential diagnostic</dt>
+            <dd>$89 — waived when you approve the repair.</dd>
+          </div>
+          <div class="term">
+            <dt>Commercial diagnostic</dt>
+            <dd>$120 — waived when you approve the repair.</dd>
+          </div>
+          <div class="term">
+            <dt>Warranty</dt>
+            <dd>90 days on parts and labor.</dd>
+          </div>
+          <div class="term">
+            <dt>Hours</dt>
+            <dd>{BUSINESS_HOURS.display}</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hub { padding: 80px 0; }
+  .hub-eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--red); margin-bottom: 12px;
+  }
+  .hub-title { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; }
+  .hub-intro {
+    max-width: 680px; font-size: 17px; line-height: 1.6; color: var(--muted);
+    margin-bottom: 48px;
+  }
+
+  .about-block { max-width: 680px; margin-bottom: 40px; }
+  .about-block h2 {
+    font-size: 22px; font-weight: 600;
+    font-family: var(--font-body); letter-spacing: -0.01em;
+    margin: 0 0 12px; color: var(--black);
+  }
+  .about-block p { font-size: 16px; line-height: 1.7; color: var(--text); margin: 0; }
+  .block-lede { color: var(--muted); margin-bottom: 20px !important; }
+
+  /* Owner */
+  .owner {
+    display: flex; gap: 24px; align-items: flex-start;
+    max-width: 680px;
+    padding: 28px;
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--red);
+    border-radius: 6px;
+    margin: 8px 0 48px;
+  }
+  .owner-photo {
+    flex: 0 0 88px; width: 88px; height: 88px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--black); color: var(--white);
+    border-radius: 6px;
+    font-family: var(--font-display);
+    font-size: 28px; font-weight: 700; letter-spacing: 0.02em;
+  }
+  .owner-text { min-width: 0; }
+  .owner-name {
+    font-size: 22px; font-weight: 700;
+    font-family: var(--font-display); letter-spacing: -0.01em;
+    margin: 0; color: var(--black);
+  }
+  .owner-role {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--red);
+    margin: 4px 0 14px;
+  }
+  .owner-text p { font-size: 16px; line-height: 1.7; color: var(--text); margin: 0; }
+
+  /* Credentials */
+  .cred-list { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 12px; }
+  .cred-list li {
+    display: flex; flex-direction: column; gap: 2px;
+    padding: 14px 16px;
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .cred-list strong { font-size: 15px; font-weight: 600; color: var(--black); }
+  .cred-list span { font-size: 13px; color: var(--muted); }
+
+  .inline-cta {
+    display: inline-block;
+    font-size: 14px; font-weight: 600; color: var(--red);
+    text-decoration: none; letter-spacing: 0.02em;
+  }
+  .inline-cta:hover { text-decoration: underline; }
+
+  /* Terms */
+  .terms { margin: 0; display: grid; gap: 12px; }
+  .term {
+    display: grid; grid-template-columns: 200px 1fr; gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .term:last-child { border-bottom: none; padding-bottom: 0; }
+  .terms dt { font-size: 15px; font-weight: 600; color: var(--black); }
+  .terms dd { margin: 0; font-size: 15px; line-height: 1.6; color: var(--text); }
+
+  @media (max-width: 640px) {
+    .hub { padding: 48px 0; }
+    .owner { flex-direction: column; gap: 18px; padding: 22px; }
+    .term { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
