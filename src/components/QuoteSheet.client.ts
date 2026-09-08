@@ -105,6 +105,10 @@ interface State {
   /** Brand slug from the page, carried to dispatch. Never asked for in the sheet. */
   brand: string;
   brandLabel: string;
+  /** AID-2. True when this session was seeded by the AI diagnostic's verdict rather
+   *  than started from a page. Dispatch reads it on the card: a lead that arrives
+   *  already knowing its own fault is a different conversation from a cold one. */
+  aidHandoff: boolean;
 }
 
 const STORE_KEY = 'sdar_qs_v1';
@@ -156,6 +160,7 @@ function blank(): State {
     applianceChanged: false,
     brand: '',
     brandLabel: '',
+    aidHandoff: false,
   };
 }
 
@@ -415,7 +420,10 @@ export function openSheet(source: string): void {
   restore();
   applyContext();
   if (state.step < firstStep()) state.step = firstStep();
-  state.source = source || state.source || 'unknown';
+  // A diagnostic handoff names its own source. The site-wide /book/ handler passes
+  // the page type it saw, which for the homepage card would bury where the lead
+  // actually came from — so the seed wins over the click.
+  state.source = state.aidHandoff ? 'ai-diagnostic' : source || state.source || 'unknown';
   doneView = false;
   submitting = false;
   priceSeen = false;
@@ -1476,6 +1484,7 @@ async function submit(): Promise<void> {
         visit_date: state.visitDate,
         notes: state.notes,
         source: state.source,
+        aid_handoff: state.aidHandoff,
         page_url: location.href,
         _hp: '',
       }),
@@ -1507,6 +1516,7 @@ async function submit(): Promise<void> {
       out_of_zone: !inZone(effectiveZip()),
       photos: state.photos.length,
       source: state.source,
+      aid_handoff: state.aidHandoff,
     });
     doneView = true;
     clearSaved();

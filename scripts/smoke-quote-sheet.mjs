@@ -1172,6 +1172,204 @@ async function bookLinkNoJsLeg(browser, base) {
   await ctx.close();
 }
 
+// ── AID-2: the hero card ─────────────────────────────────────────────────────
+
+/**
+ * Fold rule for the homepage hero. The CTA row has to survive the card being added
+ * to it, and the card itself has to be visibly there — not "reachable by scrolling",
+ * which is exactly how the diagnostic disappeared the first time.
+ */
+async function aidFoldLeg(browser, base, viewport, label, opts = {}) {
+  console.log(`\n[aid fold ${label}] ${viewport.width}×${viewport.height}`);
+  const ctx = await browser.newContext({
+    viewport,
+    isMobile: !opts.desktop,
+    hasTouch: !opts.desktop,
+    deviceScaleFactor: opts.desktop ? 1 : 3,
+  });
+  const page = await ctx.newPage();
+  await page.route('**maps.googleapis.com/**', (r) => r.abort());
+  await page.goto(`${base}/`, { waitUntil: 'load' });
+  await page.evaluate(() => document.fonts && document.fonts.ready);
+  await page.waitForTimeout(250);
+
+  const m = await page.evaluate(() => {
+    const box = (s) => {
+      const el = document.querySelector(s);
+      return el ? el.getBoundingClientRect() : null;
+    };
+    const cta = box('.hp-cta-row');
+    const card = box('.aid-card');
+    const btn = box('.aid-card-btn');
+    return {
+      vh: window.innerHeight,
+      scrolled: window.scrollY,
+      ctaBottom: cta ? cta.bottom : null,
+      cardTop: card ? card.top : null,
+      cardBottom: card ? card.bottom : null,
+      btnHeight: btn ? btn.height : null,
+      inputFont: parseFloat(getComputedStyle(document.querySelector('.aid-card-input')).fontSize),
+    };
+  });
+
+  expect(`${label}: nothing scrolled to get here`, m.scrolled === 0, String(m.scrolled));
+  expect(`${label}: the CTA row is fully above the fold`, m.ctaBottom !== null && m.ctaBottom <= m.vh, `${m.ctaBottom} > ${m.vh}`);
+  if (opts.desktop) {
+    expect(`${label}: the whole card is visible`, m.cardBottom !== null && m.cardBottom <= m.vh, `${m.cardBottom} > ${m.vh}`);
+  } else {
+    const inside = m.vh - m.cardTop;
+    expect(`${label}: the card starts at least 96px inside the viewport`, inside >= 96, `${Math.round(inside)}px`);
+  }
+  expect(`${label}: the card button is a 52px target`, m.btnHeight >= 52, String(m.btnHeight));
+  expect(`${label}: the card input is 16px (no iOS zoom)`, m.inputFont >= 16, String(m.inputFont));
+  await ctx.close();
+}
+
+/**
+ * The whole journey: nothing React on load, the card opens the sheet carrying what
+ * was typed, and the verdict's Book Online lands in the quote sheet with the answers
+ * already given. /api/diagnose is mocked — no request leaves the machine.
+ */
+async function aidCardLeg(browser, base) {
+  const label = 'aid card';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+
+  const scripts = [];
+  page.on('request', (r) => {
+    if (r.resourceType() === 'script') scripts.push(new URL(r.url()).pathname);
+  });
+  await page.route('**/api/diagnose', (r) =>
+    r.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ result: 'Likely cause: thermal fuse. Repair range shown on site.' }),
+    })
+  );
+  const posted = [];
+  await page.route('**/api/contact', async (route) => {
+    try { posted.push(JSON.parse(route.request().postData() || '{}')); } catch { /* not ours */ }
+    await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
+  });
+
+  await page.goto(`${base}/`, { waitUntil: 'load' });
+  await page.waitForTimeout(300);
+
+  const reactBefore = scripts.filter((p) => /client\.[\w-]+\.js$|AIDiagnostic\.[\w-]+\.js$/.test(p));
+  expect(`${label}: no React chunk before the card is used`, reactBefore.length === 0, reactBefore.join(', '));
+  expect(`${label}: the sheet is closed on load`, (await page.locator('dialog#aid-sheet[open]').count()) === 0);
+
+  // Typing is intent — the sheet takes over and keeps the words.
+  await page.fill('#aid-card-input', 'my dryer runs but no heat');
+  await page.waitForSelector('dialog#aid-sheet[open]', { timeout: 6000 });
+  ok(`${label}: typing opens the sheet`);
+  await page.waitForSelector('#aid-body button', { timeout: 6000 });
+  ok(`${label}: the island mounted inside the sheet`);
+  const reactAfter = scripts.filter((p) => /client\.[\w-]+\.js$|AIDiagnostic\.[\w-]+\.js$/.test(p));
+  expect(`${label}: the React chunk arrives only now`, reactAfter.length > 0, 'no chunk requested');
+
+  const sheet = page.locator('#aid-body');
+  const cont = () => sheet.getByRole('button', { name: /Continue/ }).click();
+  await sheet.getByText('Home Appliances').click();
+  await cont();
+  await page.waitForTimeout(150);
+  await sheet.getByRole('button', { name: 'Dryer', exact: true }).click();
+  await cont();
+  await page.waitForTimeout(150);
+  await sheet.getByRole('button', { name: 'LG', exact: true }).click();
+  await sheet.getByRole('button', { name: 'Not heating', exact: true }).click();
+  await cont();
+  await page.waitForTimeout(250);
+
+  const carried = await sheet.locator('textarea').inputValue();
+  expect(`${label}: what they typed is waiting at step 4`, carried === 'my dryer runs but no heat', carried);
+
+  await sheet.locator('input[type=text]').first().fill('Dana');
+  await sheet.locator('input[type=tel]').fill('3105550134');
+  await sheet.locator('input[type=email]').fill('dana@example.com');
+  await cont();
+  await page.waitForTimeout(200);
+  await sheet.getByRole('button', { name: /Get my diagnosis/i }).click();
+  await page.waitForSelector('#aid-body a[href="/book/"]', { timeout: 10000 });
+  ok(`${label}: the verdict rendered`);
+
+  // The handoff.
+  await page.click('#aid-body a[href="/book/"]');
+  await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 6000 });
+  ok(`${label}: Book Online opens the quote sheet in place`);
+  expect(
+    `${label}: the diagnostic sheet got out of the way`,
+    (await page.locator('dialog#aid-sheet[open]').count()) === 0,
+    'still open on top of the quote sheet'
+  );
+
+  const heading = (await page.locator('#qs-heading').innerText()).trim();
+  expect(`${label}: it lands on the price step`, heading === 'Diagnostic visit', heading);
+
+  const seed = JSON.parse(await page.evaluate(() => sessionStorage.getItem('sdar_qs_v1')));
+  expect(`${label}: where = residential`, seed.where === 'residential', String(seed.where));
+  expect(`${label}: appliance = dryer`, seed.appliance === 'dryer', String(seed.appliance));
+  expect(`${label}: problem = Not heating`, seed.problems[0] === 'Not heating', JSON.stringify(seed.problems));
+  expect(`${label}: the typed words travelled too`, seed.problemText.includes('no heat'), seed.problemText);
+  expect(`${label}: the lead is marked as a handoff`, seed.aidHandoff === true, String(seed.aidHandoff));
+
+  const events = await page.evaluate(() =>
+    (window.dataLayer || []).map((e) => String(e.event)).filter((e) => e.startsWith('aid_'))
+  );
+  for (const e of ['aid_card_open', 'aid_handoff_to_quote', 'aid_open', 'aid_verdict_shown']) {
+    expect(`${label}: reports ${e}`, events.includes(e), events.join(', '));
+  }
+
+  // Finish the booking so the payload can be read: the source and the handoff flag
+  // are what tell dispatch this lead already knows its own fault.
+  await page.click('#qs-primary'); // price → contact
+  await page.fill('#qs-name', 'Dana');
+  await page.fill('#qs-phone', '3105550134');
+  await page.fill('#qs-address', '8746 Rangely Ave');
+  await page.fill('#qs-zip', '90048');
+  await (await tileByText(page, 'ASAP')).click();
+  await page.click('#qs-primary');
+  await page.waitForTimeout(500);
+  const quote = posted.find((p) => p && p.type === 'quote');
+  expect(`${label}: the quote reached /api/contact`, Boolean(quote), 'no quote payload');
+  if (quote) {
+    expect(`${label}: source is ai-diagnostic`, quote.source === 'ai-diagnostic', String(quote.source));
+    expect(`${label}: aid_handoff is true in the payload`, quote.aid_handoff === true, String(quote.aid_handoff));
+    expect(`${label}: the appliance survived the handoff`, quote.appliance === 'dryer', String(quote.appliance));
+  }
+  await ctx.close();
+}
+
+/** Phone Back closes the diagnostic sheet, it does not leave the homepage. */
+async function aidBackLeg(browser, base) {
+  const label = 'aid back';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+  const page = await ctx.newPage();
+  await page.goto(`${base}/`, { waitUntil: 'load' });
+  await page.click('.aid-card-btn');
+  await page.waitForSelector('dialog#aid-sheet[open]', { timeout: 6000 });
+  await page.goBack();
+  await page.waitForTimeout(300);
+  expect(`${label}: Back closes the sheet`, (await page.locator('dialog#aid-sheet[open]').count()) === 0);
+  expect(`${label}: and stays on the homepage`, new URL(page.url()).pathname === '/', page.url());
+  await ctx.close();
+}
+
+/** With JS off the card is a link to the diagnostic page, not a dead input. */
+async function aidNoJsLeg(browser, base) {
+  const label = 'aid no-JS';
+  console.log(`\n[${label}]`);
+  const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+  const page = await ctx.newPage();
+  await page.goto(`${base}/`, { waitUntil: 'domcontentloaded' });
+  await page.locator('.aid-card-btn').click({ force: true });
+  await page.waitForLoadState('domcontentloaded');
+  expect(`${label}: navigates to /ai-diagnostic/`, new URL(page.url()).pathname === '/ai-diagnostic/', page.url());
+  await ctx.close();
+}
+
 // ── run ──────────────────────────────────────────────────────────────────────
 // --base=https://… drives the whole suite against a deployed origin instead of the
 // throwaway dist/ server. Used to verify a release: /api/contact is still routed and
@@ -1199,6 +1397,12 @@ try {
   await bookLinkNoJsLeg(browser, base);
   await zipLeg(browser, base);
   await zipManualLeg(browser, base);
+  await aidFoldLeg(browser, base, { width: 360, height: 740 }, 'aid 360');
+  await aidFoldLeg(browser, base, { width: 375, height: 812 }, 'aid 375');
+  await aidFoldLeg(browser, base, { width: 1280, height: 800 }, 'aid desktop', { desktop: true });
+  await aidCardLeg(browser, base);
+  await aidBackLeg(browser, base);
+  await aidNoJsLeg(browser, base);
 } finally {
   await browser.close();
   server.close();
