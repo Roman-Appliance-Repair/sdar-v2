@@ -8,6 +8,7 @@
 
 import Layout from '../../layouts/Layout.astro';
 import { MAIN_PHONE, toE164 } from '../../data/branches';
+import AIDiagnosticCard from '../../components/AIDiagnosticCard.astro';
 
 const phone = MAIN_PHONE;
 const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
@@ -142,6 +143,11 @@ const schemaJsons = [
     ]
   }
 ];
+// AID-3. This page writes its own hero instead of calling ServiceHero, so the card
+// is placed here by hand — same slot as everywhere else: straight after the CTA row,
+// still inside the hero block, above the first content section. Nothing else about
+// the hero moves.
+const aidTone = 'light';
 ---
 
 <Layout title={title} description={description}>
@@ -159,6 +165,9 @@ const schemaJsons = [
     <div class="hero-cta">
       <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
       <a href="/book/" class="btn-secondary">Book Online</a>
+    </div>
+    <div class="hero-aid">
+      <AIDiagnosticCard variant="compact" tone={aidTone} phone={phone} />
     </div>
   </div>
 </section>
@@ -389,4 +398,7 @@ const schemaJsons = [
   .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
   .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
   .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+  /* AID-3: the diagnostic card, straight after the CTA row and still in the
+     hero. The card carries its own frame and padding; this only places it. */
+  .hero-aid { margin-top: 22px; max-width: 460px; }
 </style>

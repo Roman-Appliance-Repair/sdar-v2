@@ -12,6 +12,7 @@ const heroPhoto = existsSync(`public/images/commercial/${heroSlug}/hero.webp`) &
 const heroBase = `/images/commercial/${heroSlug}`;
 import { MAIN_PHONE, MAIN_PHONE_TEL } from '../../../../data/branches';
 import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../../lib/build-location-array';
+import AIDiagnosticCard from '../../../../components/AIDiagnosticCard.astro';
 
 const phone = MAIN_PHONE;
 const phoneRaw = MAIN_PHONE_TEL;
@@ -192,6 +193,11 @@ const schemaJsons = [
     ]
   }
 ];
+// AID-3. This page writes its own hero instead of calling ServiceHero, so the card
+// is placed here by hand — same slot as everywhere else: straight after the CTA row,
+// still inside the hero block, above the first content section. Nothing else about
+// the hero moves.
+const aidTone = heroPhoto ? 'frame' : 'light';
 ---
 
 <Layout title={title} description={description} canonical={canonical}>
@@ -223,6 +229,9 @@ const schemaJsons = [
         <div class="hero-ctas">
           <a href={`tel:${phoneRaw}`} class="btn btn-primary btn-lg">{phone}</a>
           <a href={`tel:${phoneRaw}`} class="btn btn-outline btn-lg">Request Service</a>
+        </div>
+        <div class="hero-aid">
+          <AIDiagnosticCard variant="compact" tone={aidTone} phone={phone} />
         </div>
         <div class="hero-trust">
           <span>BHGS #A49573 · EPA 608 + R-290</span>
@@ -511,6 +520,9 @@ h1{font-size:clamp(2rem,4vw,3rem);font-weight:800;line-height:1.1;margin-bottom:
 @media(max-width:768px){.related-grid{grid-template-columns:1fr}}
 @media(max-width:1024px){.hero-inner{grid-template-columns:1fr}.hero-badge{display:none}.intro-section{grid-template-columns:1fr}.sticky-cta-box{position:static}}
 @media(max-width:768px){.failure-list ul{grid-template-columns:1fr}.repairs-grid{grid-template-columns:1fr}.line-card{grid-template-columns:1fr}}
+  /* AID-3: the diagnostic card, straight after the CTA row and still in the
+     hero. The card carries its own frame and padding; this only places it. */
+  .hero-aid { margin-top: 22px; max-width: 460px; }
 </style>
 </content>
 </invoke>

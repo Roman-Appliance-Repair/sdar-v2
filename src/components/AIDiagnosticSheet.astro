@@ -15,6 +15,17 @@
 // The React island is NOT in this file. It is imported by the loader below, on the
 // first real intent, so the homepage's initial load requests no React at all.
 
+//
+// A note on the <style> blocks below, because the obvious change is the wrong one:
+// they are ordinary SCOPED styles, and Astro therefore bundles them through Vite into
+// the stylesheet every page inlines (this project builds with inlineStylesheets
+// 'always'). That means the ~190 pages with no card — /blog/, /book/, /contact/, the
+// 99 city pillars, /price-list/ — carry about 0.8KB gz of rules they never use.
+// `is:inline` removes exactly that, and was measured: it also removes Astro's CSS
+// minifier, which costs the 1,006 pages that DO render a card about 1.7KB gz each.
+// Trading 1.7KB on a thousand pages to save 0.8KB on two hundred is the wrong way
+// round, so the rules stay scoped and the small leak stays. Re-measure before
+// changing this; do not change it on principle.
 import { MAIN_PHONE } from '../data/branches';
 
 export interface Props {

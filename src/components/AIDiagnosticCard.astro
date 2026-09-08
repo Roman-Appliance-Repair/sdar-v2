@@ -2,22 +2,96 @@
 // src/components/AIDiagnosticCard.astro
 //
 // AID-2. The diagnostic's front door, in the homepage hero.
+// AID-3. The same front door in every service, city-service, brand, commercial and
+//        outdoor hero — compact, and carrying what the page already knows.
 //
 // The feature converted when it had a page of its own and stopped when it was shrunk
-// to a strip. This card is the compromise: it costs the hero one dark rectangle, it
-// asks for nothing, and the thing a visitor types into it is carried straight into
-// the diagnostic rather than thrown away and asked for again.
+// to a strip. This card is the compromise: it costs the hero one rectangle, it asks
+// for nothing, and the thing a visitor types into it is carried straight into the
+// diagnostic rather than thrown away and asked for again.
 //
 // The card is deliberately NOT a form that posts anywhere. The <input> is a doorway:
 // focusing it, typing in it, or pressing the button opens the sheet and hands the
 // text over as the initial free-text detail. With JS off, the button is an ordinary
 // link to /ai-diagnostic/ and the input does nothing — no broken submit, no dead end.
+//
+// ── AID-3, two things and only two ──────────────────────────────────────────────
+//
+// 1. `variant`. 'hero' is the homepage card, unchanged to the pixel. 'compact' drops
+//    the 26px display title (the eyebrow already says what this is) and tightens the
+//    vertical rhythm, because these heroes already carry an H1, a subtitle, a CTA row
+//    and — on most of them — an eight-branch block underneath.
+//
+// 2. `tone`. 'frame' is the AID-2 look: no fill at all, white text, a hairline border,
+//    legibility from the hero's own photo overlay. 'light' is for the heroes with no
+//    photograph behind them, where a white-on-nothing card would be white text on a
+//    flat colour with no overlay to sit on: there the card takes var(--gray) with a
+//    var(--border) hairline and dark text. There is deliberately no third option and
+//    no dark fill — a dark rectangle inside a dark hero is the panel this design was
+//    written to avoid.
+//
+// The PREFILL is not a prop either. The card reads its own address through
+// getDiagnosticPrefill(), the same pure function the gate reads, so a page cannot
+// describe itself wrongly and 830 page files need no edits. What it emits is three
+// data attributes the sheet loader hands to the island — nothing more. The island's
+// flow, copy and step order are untouched: the prefill only sets state a visitor
+// could have set themselves by tapping the same tiles.
+
+//
+// A note on the <style> blocks below, because the obvious change is the wrong one:
+// they are ordinary SCOPED styles, and Astro therefore bundles them through Vite into
+// the stylesheet every page inlines (this project builds with inlineStylesheets
+// 'always'). That means the ~190 pages with no card — /blog/, /book/, /contact/, the
+// 99 city pillars, /price-list/ — carry about 0.8KB gz of rules they never use.
+// `is:inline` removes exactly that, and was measured: it also removes Astro's CSS
+// minifier, which costs the 1,006 pages that DO render a card about 1.7KB gz each.
+// Trading 1.7KB on a thousand pages to save 0.8KB on two hundred is the wrong way
+// round, so the rules stay scoped and the small leak stays. Re-measure before
+// changing this; do not change it on principle.
+import {
+  getDiagnosticPrefill,
+  diagnosticHeading,
+  diagnosticPlaceholder,
+} from '../data/aid-to-quote-map';
+import AIDiagnosticSheet from './AIDiagnosticSheet.astro';
+import { MAIN_PHONE } from '../data/branches';
+
+export interface Props {
+  /** 'hero' = the homepage card. 'compact' = the AID-3 one, no display title. */
+  variant?: 'hero' | 'compact';
+  /** 'frame' over a photo, 'light' over a hero that has none. Never a dark fill. */
+  tone?: 'frame' | 'light';
+  /** The number the diagnostic's verdict offers as the alternative to booking.
+   *  Pass the hero's own, so the sheet and the call button agree. */
+  phone?: string;
+}
+
+const { variant = 'hero', tone = 'frame', phone = MAIN_PHONE } = Astro.props;
+
+const pre = getDiagnosticPrefill(Astro.url.pathname);
+const heading = diagnosticHeading(Astro.url.pathname);
+// The example in the field follows the page too. On the homepage and on any page
+// that resolves nothing this is AID-2's dryer line, unchanged.
+const placeholder = diagnosticPlaceholder(Astro.url.pathname);
+const compact = variant === 'compact';
 ---
 
-<div class="aid-card" data-aid-card>
-  <h2 class="aid-card-title">AI Diagnostic</h2>
-  <p class="aid-card-eyebrow">Free · about a minute</p>
-  <p class="aid-card-h">Not sure what's wrong?</p>
+<div
+  class:list={['aid-card', compact && 'aid-card--compact', tone === 'light' && 'aid-card--light']}
+  data-aid-card
+  data-aid-pre-category={pre.category ?? undefined}
+  data-aid-pre-appliance={pre.appliance ?? undefined}
+  data-aid-pre-brand={pre.brand ?? undefined}
+>
+  {compact ? (
+    <p class="aid-card-eyebrow">AI Diagnostic · free · about a minute</p>
+  ) : (
+    <Fragment>
+      <h2 class="aid-card-title">AI Diagnostic</h2>
+      <p class="aid-card-eyebrow">Free · about a minute</p>
+    </Fragment>
+  )}
+  <p class="aid-card-h">{heading}</p>
   <p class="aid-card-sub">
     Describe it in your own words — get the likely causes and a repair cost range before you book.
   </p>
@@ -27,13 +101,28 @@
       id="aid-card-input"
       class="aid-card-input"
       aria-label="Describe what your appliance is doing"
-      placeholder="My dryer runs but doesn't heat…"
+      placeholder={placeholder}
       autocomplete="off"
       data-aid-open
     />
     <a href="/ai-diagnostic/" class="aid-card-btn" data-aid-open data-aid-submit>Diagnose it free</a>
   </div>
 </div>
+
+<!-- The sheet the card opens, emitted BY the card.
+     AID-2 mounted it beside the hero and AID-3 first tried to mount it once in the
+     layout. Both cost every page in the site the diagnostic's CSS: this project
+     builds with inlineStylesheets 'always', so a component merely IMPORTED by
+     Layout.astro has its styles inlined into all 1,198 pages — /blog/ and /book/
+     were carrying 6.4KB of markup rules for a card and a dialog neither of them
+     renders. Emitting it here ties the two together the only way that cannot
+     drift: one card, one sheet, on exactly the pages that have a card, and not a
+     byte on the pages that do not.
+     The dialog is opened with showModal(), so it is painted in the browser's top
+     layer and neither the hero's overflow:hidden nor the glass panel's
+     backdrop-filter can clip it — the loader falls back to a plain link to
+     /ai-diagnostic/ on anything without showModal. -->
+<AIDiagnosticSheet phone={phone} />
 
 <style>
   /* A frame on the photograph, not a panel over it. The card adds no backdrop of
@@ -152,5 +241,50 @@
     .aid-card { padding: 24px; }
     .aid-card-title { font-size: 30px; }
     .aid-card-h { font-size: 18px; }
+  }
+
+  /* ── AID-3: compact ──────────────────────────────────────────────────────────
+     Same frame, same 52px targets, same 16px input — the two things that are
+     actually load-bearing on a phone. What goes is the display title and about
+     20px of vertical air, because on a service hero this card follows an H1, a
+     subtitle and a CTA row instead of opening the page. */
+  .aid-card--compact {
+    padding: 16px;
+    max-width: 460px;
+  }
+  .aid-card--compact .aid-card-eyebrow { margin: 0 0 8px; }
+  .aid-card--compact .aid-card-h { font-size: 18px; margin: 0 0 6px; }
+  .aid-card--compact .aid-card-sub { margin: 0 0 12px; }
+  @media (min-width: 1024px) {
+    .aid-card--compact { padding: 18px; }
+    .aid-card--compact .aid-card-h { font-size: 19px; }
+    /* Wide enough for the input and the button to sit side by side, which saves
+       another row of height on the heroes that have the least to spare. */
+    .aid-card--compact .aid-card-row { flex-direction: row; align-items: stretch; }
+    .aid-card--compact .aid-card-input { flex: 1 1 auto; }
+    .aid-card--compact .aid-card-btn { flex: 0 0 auto; white-space: nowrap; }
+  }
+
+  /* ── AID-3: light ────────────────────────────────────────────────────────────
+     For heroes with no photograph. The frame variant's legibility comes from the
+     photo overlay; with no photo there is nothing to sit on, so the card takes the
+     site's own surface tokens and dark text. Not a dark fill: a dark rectangle
+     inside a dark hero is the panel this whole design avoids. */
+  .aid-card--light {
+    background: var(--gray, #f5f5f5);
+    border: 1.5px solid var(--border, #e2e2e2);
+    color: var(--text, #1a1a1a);
+  }
+  .aid-card--light .aid-card-title,
+  .aid-card--light .aid-card-eyebrow,
+  .aid-card--light .aid-card-h,
+  .aid-card--light .aid-card-sub {
+    color: var(--text, #1a1a1a);
+    text-shadow: none;
+  }
+  .aid-card--light .aid-card-sub { color: var(--muted, #5a5a5a); }
+  .aid-card--light .aid-card-input {
+    border: 1px solid var(--border, #d4d4d4);
+    background: var(--white, #fff);
   }
 </style>

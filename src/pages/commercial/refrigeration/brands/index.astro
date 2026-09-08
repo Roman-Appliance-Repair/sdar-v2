@@ -5,6 +5,7 @@
 // $120 commercial diagnostic only (no $89 — commercial scope per factual-accuracy.md §9).
 import Layout from '../../../../layouts/Layout.astro';
 import { MAIN_PHONE } from '../../../../data/branches';
+import AIDiagnosticCard from '../../../../components/AIDiagnosticCard.astro';
 
 const phone = MAIN_PHONE;
 const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
@@ -14,6 +15,11 @@ const title = "Commercial Refrigeration Brands Repair LA — Same Day";
 const description = "Commercial refrigeration repair in LA — True, Hoshizaki, Turbo Air, Traulsen, Beverage-Air and more. Walk-ins, reach-ins, prep tables. $120 diagnostic.";
 
 const breadcrumbSchema = {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/"}, {"@type": "ListItem", "position": 2, "name": "Commercial", "item": "https://samedayappliance.repair/commercial/"}, {"@type": "ListItem", "position": 3, "name": "Commercial Refrigeration", "item": "https://samedayappliance.repair/commercial/refrigeration/"}, {"@type": "ListItem", "position": 4, "name": "Brands", "item": "https://samedayappliance.repair/commercial/refrigeration/brands/"}]};
+// AID-3. This page writes its own hero instead of calling ServiceHero, so the card
+// is placed here by hand — same slot as everywhere else: straight after the CTA row,
+// still inside the hero block, above the first content section. Nothing else about
+// the hero moves.
+const aidTone = 'light';
 ---
 
 <Layout title={title} description={description}>
@@ -27,6 +33,9 @@ const breadcrumbSchema = {"@context": "https://schema.org", "@type": "Breadcrumb
       <div class="cta-row">
         <a href={phoneHref} class="btn-primary">Call {phone}</a>
         <a href="/book/" class="btn-secondary">Book Online</a>
+      </div>
+      <div class="hero-aid">
+        <AIDiagnosticCard variant="compact" tone={aidTone} phone={phone} />
       </div>
       <p class="hub-foot">$120 commercial diagnostic · Applied to repair · BHGS #A49573 · EPA 608 Universal #1346255700410 · BBB Accredited</p>
     </div>
@@ -159,4 +168,11 @@ const breadcrumbSchema = {"@context": "https://schema.org", "@type": "Breadcrumb
   .bottom-cta h2 { font-size: clamp(1.5rem, 2.4vw, 1.9rem); font-weight: 800; margin: 0 0 14px; color: #fff; }
   .bottom-cta p { color: #aaa; max-width: 720px; margin: 0 auto 28px; font-size: 0.95rem; line-height: 1.7; }
   .bottom-cta .cta-row { justify-content: center; }
+  /* AID-3: the diagnostic card, straight after the CTA row and still in the
+     hero. The card carries its own frame and padding; this only places it. */
+  .hero-aid { margin-top: 22px; max-width: 460px; }
+  /* This hero centres its column, so the card centres with it — but its own
+     text stays left-aligned, because a left-aligned input under centred
+     labels reads as a mistake. */
+  .hero-aid { margin-left: auto; margin-right: auto; text-align: left; }
 </style>
