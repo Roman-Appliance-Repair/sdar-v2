@@ -9,6 +9,8 @@
 // contains no currency literal; scripts/check-quote-sheet.mjs fails the build if
 // one appears.
 
+import { buildQuoteData } from '../data/quote-appliances';
+
 type Scope = 'residential' | 'commercial';
 
 interface Appliance {
@@ -19,7 +21,6 @@ interface Appliance {
 
 interface QuoteData {
   hasMaps: boolean;
-  appliances: Record<Scope, Appliance[]>;
   price: Record<Scope, string>;
   copy: {
     terms: string[];
@@ -40,6 +41,16 @@ interface QuoteData {
     visitTimes: { id: string; label: string; hint: string }[];
     photos: { hint: string; max: number; skip: string; maxBytes: number; tooBig: string };
     errors: { rateLimited: string; failed: string };
+    prefill: { heading: string; sub: string; confirm: string };
+  };
+  /** QS-2 page context, all nullable — see src/data/quote-context.ts. */
+  context: {
+    scope: Scope | null;
+    appliance: string | null;
+    applianceLabel: string | null;
+    brand: string | null;
+    brandLabel: string | null;
+    pageType: string;
   };
   zone: {
     exact: Record<string, string>;
@@ -86,6 +97,14 @@ interface State {
   /** The ZIP Place Details returned, when it answered at all. Empty means the visitor
    *  is the only source for the ZIP, so typing one cannot contradict anything. */
   zipFromGoogle: string;
+  /** QS-2 prefill bookkeeping. `scopePrefilled` decides whether step 1 is skipped;
+   *  the appliance pair is reported to dispatch so a guess can be told from a choice. */
+  scopePrefilled: boolean;
+  appliancePrefilled: boolean;
+  applianceChanged: boolean;
+  /** Brand slug from the page, carried to dispatch. Never asked for in the sheet. */
+  brand: string;
+  brandLabel: string;
 }
 
 const STORE_KEY = 'sdar_qs_v1';
@@ -132,6 +151,11 @@ function blank(): State {
     lng: null,
     cityFromGoogle: '',
     zipFromGoogle: '',
+    scopePrefilled: false,
+    appliancePrefilled: false,
+    applianceChanged: false,
+    brand: '',
+    brandLabel: '',
   };
 }
 
@@ -206,8 +230,68 @@ function branchName(slug: string): string {
   return data.phones.branches[slug]?.name || slug;
 }
 
+/**
+ * QS-2. Fold what the page knows into a state the visitor may already have started.
+ *
+ * The visitor always wins. A saved session is their own answers; page context is a
+ * guess from a URL. So context only ever fills a blank — it never overwrites a scope
+ * or an appliance already sitting in sessionStorage, even when the two disagree,
+ * because disagreeing usually means they walked from one page to another and the
+ * first page is the one they actually answered on.
+ */
+function applyContext(): void {
+  const ctx = data.context;
+  if (!ctx) return;
+
+  if (!state.where && ctx.scope) {
+    state.where = ctx.scope;
+    state.scopePrefilled = true;
+  }
+
+  // Only prefill an appliance that exists in the scope we are actually in — a
+  // commercial page must never pre-select a residential tile that is not rendered.
+  if (
+    ctx.appliance &&
+    !state.appliance &&
+    state.where &&
+    appliancesFor(state.where).some((a) => a.id === ctx.appliance)
+  ) {
+    state.appliance = ctx.appliance;
+    state.appliancePrefilled = true;
+    state.applianceChanged = false;
+  }
+
+  // The brand is never asked for and never overrides a brand already carried in from
+  // an earlier page — it is a note for dispatch, not an answer.
+  if (ctx.brand && !state.brand) {
+    state.brand = ctx.brand;
+    state.brandLabel = ctx.brandLabel || '';
+  }
+}
+
+/**
+ * The first step the visitor actually sees. When the page already told us the scope,
+ * step 1 has nothing left to ask, so the sheet starts at step 2 and the counter
+ * counts from there — "1 / 5", not "2 / 6" with an unreachable first page.
+ */
+function firstStep(): number {
+  return state.scopePrefilled && state.where ? 1 : 0;
+}
+
+function visibleTotal(): number {
+  return data.copy.totalSteps - firstStep();
+}
+
+/** True while the prefilled appliance is still the visitor's standing answer. */
+function prefillPending(): boolean {
+  return Boolean(state.appliancePrefilled && !state.applianceChanged && state.appliance);
+}
+
+/** Shipped with this chunk, not with the page — see the note in QuoteSheet.astro. */
+const APPLIANCES: Record<Scope, Appliance[]> = buildQuoteData();
+
 function appliancesFor(scope: Scope): Appliance[] {
-  return data.appliances[scope] || [];
+  return APPLIANCES[scope] || [];
 }
 
 function currentAppliance(): Appliance | null {
@@ -216,9 +300,13 @@ function currentAppliance(): Appliance | null {
 }
 
 function isDirty(): boolean {
+  // A prefilled scope/appliance is our guess, not their work — closing a sheet they
+  // have not touched must not ask "are you sure you want to leave?".
+  const ownScope = state.where && !state.scopePrefilled;
+  const ownAppliance = state.appliance && (!state.appliancePrefilled || state.applianceChanged);
   return Boolean(
-    state.where ||
-      state.appliance ||
+    ownScope ||
+      ownAppliance ||
       state.problems.length ||
       state.problemText ||
       state.photos.length ||
@@ -298,7 +386,7 @@ function boot(): boolean {
   elFootNote = document.getElementById('qs-foot-note') as HTMLElement;
 
   elBack.addEventListener('click', () => {
-    if (state.step > 0) history.back();
+    if (state.step > firstStep()) history.back();
   });
   elClose.addEventListener('click', requestClose);
   elPrimary.addEventListener('click', onPrimary);
@@ -325,6 +413,8 @@ export function openSheet(source: string): void {
   if (open) return;
 
   restore();
+  applyContext();
+  if (state.step < firstStep()) state.step = firstStep();
   state.source = source || state.source || 'unknown';
   doneView = false;
   submitting = false;
@@ -334,7 +424,11 @@ export function openSheet(source: string): void {
   open = true;
   document.documentElement.classList.add('qs-open');
   if (!dlg.open) dlg.showModal();
-  history.pushState({ qsStep: state.step }, '');
+  // One history entry per step already behind us. A resumed sheet used to open with
+  // a single entry, so Back had nothing to pop and did nothing until the visitor had
+  // moved forward once — barely visible when the sheet only lived on /book/, and a
+  // dead end now that it resumes across pages.
+  for (let i = firstStep(); i <= state.step; i++) history.pushState({ qsStep: i }, '');
   track('quote_open', { source: state.source, step: state.step });
   render();
 }
@@ -376,7 +470,7 @@ function requestClose(): void {
 // ── history ──────────────────────────────────────────────────────────────────
 
 function go(next: number): void {
-  const clamped = Math.max(0, Math.min(next, data.copy.totalSteps - 1));
+  const clamped = Math.max(firstStep(), Math.min(next, data.copy.totalSteps - 1));
   if (clamped === state.step) return;
   state.step = clamped;
   save();
@@ -389,7 +483,7 @@ function onPopState(ev: PopStateEvent): void {
   if (!open) return;
   const target = (ev.state as { qsStep?: number } | null)?.qsStep;
   if (typeof target === 'number') {
-    state.step = Math.max(0, Math.min(target, data.copy.totalSteps - 1));
+    state.step = Math.max(firstStep(), Math.min(target, data.copy.totalSteps - 1));
     save();
     render();
     return;
@@ -406,12 +500,13 @@ function render(): void {
   if (doneView) return renderDone();
 
   const step = data.copy.steps[state.step];
-  elHeading.textContent = step.heading;
-  elCounter.textContent = `${state.step + 1} / ${data.copy.totalSteps}`;
-  elBack.hidden = state.step === 0;
+  const heading = headingFor(step.id, step.heading);
+  elHeading.textContent = heading;
+  elCounter.textContent = `${state.step + 1 - firstStep()} / ${visibleTotal()}`;
+  elBack.hidden = state.step === firstStep();
   elFootNote.textContent = '';
 
-  const parts: string[] = [`<h2 id="qs-heading" class="qs-h">${esc(step.heading)}</h2>`];
+  const parts: string[] = [`<h2 id="qs-heading" class="qs-h">${esc(heading)}</h2>`];
   switch (step.id) {
     case 'where': parts.push(viewWhere()); break;
     case 'appliance': parts.push(viewAppliance()); break;
@@ -443,7 +538,17 @@ function render(): void {
   }
 }
 
+/** Step 2 asks a different question when we arrived with a guess to confirm. */
+function headingFor(stepId: string, fallback: string): string {
+  if (stepId === 'appliance' && prefillPending()) {
+    const app = currentAppliance();
+    if (app) return data.copy.prefill.heading.replace('{appliance}', app.label);
+  }
+  return fallback;
+}
+
 function primaryLabel(stepId: string): string {
+  if (stepId === 'appliance' && prefillPending()) return data.copy.prefill.confirm;
   if (stepId === 'photos') return 'Continue';
   if (stepId === 'price') return 'Continue';
   if (stepId === 'contact') return submitting ? 'Sending…' : 'Send request';
@@ -472,18 +577,26 @@ function viewWhere(): string {
 
 function viewAppliance(): string {
   const list = state.where ? appliancesFor(state.where) : [];
+  const prefilled = prefillPending();
   return (
-    `<p class="qs-sub">Pick the closest one.</p>` +
+    // The brand is a note, not a question — a chip that says what the page was about.
+    (state.brandLabel ? `<p class="qs-chips"><span class="qs-chip">${esc(state.brandLabel)}</span></p>` : '') +
+    `<p class="qs-sub">${esc(prefilled ? data.copy.prefill.sub : 'Pick the closest one.')}</p>` +
     // qs-compact: 16 residential tiles have to clear a 360×740 fold with the
     // Continue button, so this step gets the short tile. The symptom step keeps
     // the full-size tile — it never carries more than 12.
     `<div class="qs-tiles qs-two qs-compact">` +
     list
-      .map(
-        (a) =>
-          `<button type="button" class="qs-tile" data-act="appliance" data-val="${esc(a.id)}"` +
-          ` aria-pressed="${state.appliance === a.id}">${esc(a.label)}</button>`
-      )
+      .map((a) => {
+        const on = state.appliance === a.id;
+        // A guess is drawn as a guess: soft grey while it is still only ours, red
+        // once the visitor has confirmed or chosen for themselves.
+        const cls = 'qs-tile' + (on && prefilled ? ' qs-tile-prefill' : '');
+        return (
+          `<button type="button" class="${cls}" data-act="appliance" data-val="${esc(a.id)}"` +
+          ` aria-pressed="${on}">${esc(a.label)}</button>`
+        );
+      })
       .join('') +
     `</div>` +
     (errors.appliance ? `<span class="qs-err">${esc(errors.appliance)}</span>` : '')
@@ -706,6 +819,9 @@ function onBodyClick(ev: Event): void {
 
     case 'appliance':
       if (state.appliance !== val) state.problems = [];
+      // Tapping a different tile turns our guess into their answer — recorded, so
+      // dispatch can tell a confirmed appliance from a corrected one.
+      if (state.appliancePrefilled && val !== state.appliance) state.applianceChanged = true;
       state.appliance = val;
       delete errors.appliance;
       save();
@@ -1317,6 +1433,13 @@ async function submit(): Promise<void> {
         where: state.where,
         appliance: state.appliance,
         appliance_label: app ? app.label : '',
+        // QS-2. `prefilled` says the page guessed for them; `changed` says they
+        // overrode the guess. Both false = they answered from a blank step 2.
+        appliance_prefilled: state.appliancePrefilled,
+        appliance_changed: state.applianceChanged,
+        brand: state.brand,
+        brand_label: state.brandLabel,
+        page_type: data.context ? data.context.pageType : '',
         // Rendered by the sheet from quote-copy.ts so the Telegram card prints the
         // same fee and the same wording the visitor just read.
         price_display: state.where ? data.price[state.where] : '',
@@ -1372,6 +1495,9 @@ async function submit(): Promise<void> {
     track('quote_submit', {
       where: state.where,
       appliance: state.appliance,
+      appliance_prefilled: state.appliancePrefilled,
+      appliance_changed: state.applianceChanged,
+      page_type: data.context ? data.context.pageType : '',
       branch,
       out_of_zone: !inZone(effectiveZip()),
       photos: state.photos.length,

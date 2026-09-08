@@ -306,6 +306,12 @@ function buildQuoteCard(p) {
     '',
     'UNIT',
     row('Appliance', p.appliance_label || p.appliance || '—'),
+    p.brand_label || p.brand ? row('Brand', p.brand_label || p.brand) : null,
+    // Only when the page guessed for them. "changed" means the guess was wrong and
+    // they corrected it — worth knowing before the van is stocked.
+    p.appliance_prefilled
+      ? row('Prefilled', p.appliance_changed ? 'yes — visitor changed it' : 'yes')
+      : null,
     symptoms ? row('Symptom', symptoms) : null,
     p.problem_text ? row('Detail', truncate(p.problem_text, 400)) : null,
     '',

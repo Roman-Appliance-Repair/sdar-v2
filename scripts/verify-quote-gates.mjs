@@ -18,6 +18,16 @@ const PAGE = path.join(ROOT, 'dist', 'book', 'index.html');
 const CLIENT_SRC = path.join(ROOT, 'src', 'components', 'QuoteSheet.client.ts');
 const COPY_TS = path.join(ROOT, 'src', 'data', 'quote-copy.ts');
 const APPL_TS = path.join(ROOT, 'src', 'data', 'quote-appliances.ts');
+const CONTEXT_TS = path.join(ROOT, 'src', 'data', 'quote-context.ts');
+// A blog post: proves the mount reaches pages served through BlogLayout, not just
+// the ones that use Layout.astro directly.
+const BLOG_PAGE = path.join(ROOT, 'dist', 'blog', 'index.html');
+// A /services/ sub-page: its appliance is inherited from the parent hub, so it is
+// the row the coverage floor watches most closely.
+const BRAND_COMBO_PAGE = path.join(ROOT, 'dist', 'brands', 'lg-washer-repair', 'index.html');
+const SERVICE_SUB_PAGE = path.join(
+  ROOT, 'dist', 'services', 'refrigerator-repair', 'not-cooling', 'index.html'
+);
 
 const STATIC_GATE = ['scripts/check-quote-sheet.mjs'];
 const SMOKE_GATE = ['scripts/smoke-quote-sheet.mjs'];
@@ -39,6 +49,18 @@ async function distChunk() {
 }
 
 const CHUNK = await distChunk();
+
+/** The loader's own bundled module — where the /book/ link trigger lives. */
+async function loaderScript() {
+  const dir = path.join(ROOT, 'dist', '_astro');
+  const hit = (await readdir(dir)).find(
+    (f) => f.startsWith('QuoteSheet.astro_astro_type_script') && f.endsWith('.js')
+  );
+  if (!hit) throw new Error('built QuoteSheet loader script not found in dist/_astro');
+  return path.join(dir, hit);
+}
+
+const PAGE_SCRIPT = await loaderScript();
 
 /** Each case: break one thing, expect the named gate to go red. */
 const CASES = [
@@ -106,7 +128,10 @@ const CASES = [
     mutate: (s) => s.replace('<body', '<body><script src="https://maps.googleapis.com/maps/api/js"></script>'),
   },
   {
-    gate: 'static', name: 'Maps key leaks onto a second page', file: path.join(ROOT, 'dist', 'contact', 'index.html'), cmd: STATIC_GATE,
+    // QS-2 retired the old "key only on /book/" rule — the key now ships wherever
+    // the sheet does, which is everywhere. What is still wrong is TWO configs on one
+    // page: a second mount, loading Maps twice and billing twice.
+    gate: 'static', name: 'Maps config duplicated on a page', file: path.join(ROOT, 'dist', 'contact', 'index.html'), cmd: STATIC_GATE,
     mutate: (s) => s.replace('<body', '<body><script type="application/json" data-quote-sheet-maps>{}</script>'),
   },
   {
@@ -237,6 +262,86 @@ const CASES = [
       if (!m) return s;
       return s.replace(/(==="zip"&&\()/, `$1${m[1]}.addressVerified=!1,`);
     },
+  },
+  // ── QS-2: site-wide mount, page context, prefill ──────────────────────────
+  {
+    gate: 'static', name: 'QS-2: a layout stops carrying the sheet', file: BLOG_PAGE, cmd: STATIC_GATE,
+    // BlogLayout wraps Layout.astro, so a blog post proves the mount reaches every
+    // layout. Strip the dialog from one and the site-wide rule has to notice.
+    mutate: (s) => s.replace(/<dialog\b[^>]*\bid="quote-sheet"/, '<dialog id="quote-sheet-gone"'),
+  },
+  {
+    gate: 'static', name: 'QS-2: /book/ mounts the sheet twice again', file: PAGE, cmd: STATIC_GATE,
+    // The exact regression the dedupe exists for: /book/ kept its own mount after
+    // the layout gained one, and every visitor got two dialogs stacked.
+    mutate: (s) => s.replace(/(<dialog\b[^>]*\bid="quote-sheet"[^>]*>)/, '$1</dialog>$1'),
+  },
+  {
+    gate: 'static', name: 'QS-2: a page ships a malformed context blob', file: BLOG_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('"context":{', '"context":{,'),
+  },
+  {
+    gate: 'static', name: 'QS-2: the Maps config stops shipping site-wide', file: BLOG_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('data-quote-sheet-maps', 'data-quote-sheet-maps-gone'),
+  },
+  {
+    gate: 'static', name: 'QS-2: a page stops resolving its appliance', file: SERVICE_SUB_PAGE, cmd: STATIC_GATE,
+    // Coverage is a floor, not a decoration. Mutating the SOURCE map would prove
+    // nothing — the gate reads dist, and nothing rebuilds between the two — so this
+    // breaks the shipped answer, which is what the floor actually measures.
+    mutate: (s) => s.replace('"appliance":"refrigerator"', '"appliance":null'),
+  },
+  {
+    gate: 'static', name: 'QS-2: a currency literal creeps into quote-context.ts', file: CONTEXT_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('const EMPTY:', "const FEE = '" + String.fromCharCode(36) + "89';\nconst EMPTY:"),
+  },
+  {
+    gate: 'smoke', name: 'QS-2: step 1 is no longer skipped when the page knows the scope',
+    file: CHUNK, cmd: SMOKE_GATE,
+    // firstStep() is what turns "2 / 6 with an unreachable page 1" into "1 / 5".
+    // Never flagging the scope as prefilled puts the dead step back in front of
+    // every commercial and every city-service visitor.
+    mutate: (s) => s.replace('scopePrefilled=!0', 'scopePrefilled=!1'),
+  },
+  {
+    gate: 'smoke', name: 'QS-2: the appliance prefill is lost', file: CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('appliancePrefilled=!0', 'appliancePrefilled=!1'),
+  },
+  {
+    gate: 'smoke', name: 'QS-2: a guess is drawn as a confirmed choice', file: CHUNK, cmd: SMOKE_GATE,
+    // The soft grey is the whole honesty of the prefill — it says "we guessed".
+    // Painting it like a selection tells the visitor they already answered.
+    mutate: (s) => s.replace('qs-tile-prefill', 'qs-tile-prefill-gone'),
+  },
+  {
+    gate: 'smoke', name: 'QS-2: an override stops being reported to dispatch', file: CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('applianceChanged=!0', 'applianceChanged=!1'),
+  },
+  {
+    gate: 'smoke', name: 'QS-2: the page guess overwrites the visitor’s saved answer',
+    file: CHUNK, cmd: SMOKE_GATE,
+    // Drop the "only fill a blank" guard on the appliance, and walking from one page
+    // to the next silently replaces what they already chose.
+    mutate: (s) => {
+      const m = s.match(/(\w+)\.appliance&&!\1\.appliance/);
+      if (m) return s.replace(m[0], `${m[1]}.appliance&&!!${m[1]}.appliance`);
+      // Minifier shape drifted; fall back to the readable guard if it survived.
+      return s.replace('&&!e.appliance&&', '&&!!e.appliance&&');
+    },
+  },
+  {
+    gate: 'smoke', name: 'QS-2: a brand page stops naming its appliance', file: BRAND_COMBO_PAGE, cmd: SMOKE_GATE,
+    // 413 brand pages carry the appliance in their own slug. Losing it puts the
+    // largest page group back on an open sixteen-tile question.
+    mutate: (s) => s.replace('"appliance":"washer"', '"appliance":null'),
+  },
+  {
+    gate: 'smoke', name: 'QS-2: the brand chip stops reaching the sheet', file: BRAND_COMBO_PAGE, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('"brandLabel":"LG"', '"brandLabel":null'),
+  },
+  {
+    gate: 'smoke', name: 'QS-2: a plain /book/ link stops opening the sheet', file: PAGE_SCRIPT, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('"/book/"', '"/book-never/"'),
   },
   {
     gate: 'smoke', name: 'resume forgets the saved step', file: CHUNK, cmd: SMOKE_GATE,
