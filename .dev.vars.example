@@ -29,10 +29,11 @@ RESEND_FROM="Same Day Appliance Repair <noreply@samedayappliance.repair>"
 RESEND_TO=abysov@gmail.com
 
 # ── Live chat (chat-v2) ─────────────────────────────────────────────────────
-# The chat widget talks to its OWN bot, not @sdar_dispatch_bot: that token is
-# long-polled by CUP on Railway, and a webhook on it would break the dispatcher
-# buttons there (one getUpdates consumer per token, and CUP deletes webhooks on
-# every boot).
+# The chat bot IS @sdar_dispatch_bot (checked on production 2026-09-07 via
+# /api/chat/admin getme). CUP long-polls that same token from Railway, so this
+# site must NOT set a webhook on it — one getUpdates consumer per token, and CUP
+# deletes webhooks on every boot. CUP forwards the group's replies to
+# /api/chat/webhook instead, signed with CHAT_WEBHOOK_SECRET.
 CHAT_TG_BOT_TOKEN=
 # Dispatcher group — LSA Call Bot. Ordinary supergroup, NOT a forum.
 TG_GROUP_ID=
@@ -41,6 +42,9 @@ TG_OWNER_ID=
 # Guards POST /api/chat/admin (getme / chatinfo / setwebhook). Any long random
 # string; without it the endpoint refuses every request.
 CHAT_ADMIN_TOKEN=
+# Shared with CUP (same value in Railway). /api/chat/webhook rejects every
+# request whose x-chat-secret does not match, and 503s if this is unset.
+CHAT_WEBHOOK_SECRET=
 
 # R2 (photo uploads) — bucket sdar-chat-uploads, reached over the S3 API.
 R2_ACCOUNT_ID=

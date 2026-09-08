@@ -8,12 +8,27 @@
 // Anything else in the group — a reply to a human, a reply to a message from
 // another session that has expired, plain chatter — is ignored on purpose.
 //
-// Registration is done once via POST /api/chat/admin {op:"setwebhook"}.
+// This endpoint is NOT registered as a Telegram webhook. The bot behind the
+// site chat is @sdar_dispatch_bot, and CUP already long-polls that token from
+// Railway — a webhook would take the updates away from it (and CUP deletes
+// webhooks on every boot anyway). CUP forwards the relevant updates here
+// instead, verbatim, signed with CHAT_WEBHOOK_SECRET.
+//
+// The secret is mandatory once configured: without it anyone who knows the URL
+// could put words in a dispatcher's mouth.
 
 import { json, groupId, tg, getSession, putSession, appendMessage } from './_shared.js';
 
 export async function onRequestPost({ request, env }) {
   try {
+    // Constant-time-ish equality is overkill here (the secret is compared once
+    // per update, not brute-forced through a timing oracle at Telegram's rate).
+    const expected = env.CHAT_WEBHOOK_SECRET;
+    if (!expected) return new Response('not_configured', { status: 503 });
+    if (request.headers.get('x-chat-secret') !== expected) {
+      return new Response('forbidden', { status: 403 });
+    }
+
     const update = await request.json();
     const msg = update && update.message;
     if (!msg) return new Response('ok');
