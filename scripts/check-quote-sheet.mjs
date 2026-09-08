@@ -620,10 +620,13 @@ for (const file of SHEET_SOURCES) {
     countMatches(home, /<dialog[^>]*id="quote-sheet"/g) === 1,
     String(countMatches(home, /<dialog[^>]*id="quote-sheet"/g))
   );
+  // (?![\w-]) matters: data-aid-card-gone still CONTAINS data-aid-card, so a bare
+  // match counts a renamed-away attribute as present. The quote sheet learned this
+  // the hard way with data-quote-sheet-maps; the gate self-check caught it here.
   check(
     'homepage has exactly one diagnostic card',
-    countMatches(home, /data-aid-card/g) === 1,
-    String(countMatches(home, /data-aid-card/g))
+    countMatches(home, /data-aid-card(?![\w-])/g) === 1,
+    String(countMatches(home, /data-aid-card(?![\w-])/g))
   );
   check('the card carries a real input', /id="aid-card-input"/.test(home));
   check(
@@ -644,7 +647,7 @@ for (const file of SHEET_SOURCES) {
   );
   check(
     'the sheet chunk is prefetched on pointerenter and touchstart',
-    /pointerenter/.test(sheetSrc) && /touchstart/.test(sheetSrc)
+    /pointerenter(?![\w-])/.test(sheetSrc) && /touchstart(?![\w-])/.test(sheetSrc)
   );
   check('the island is mounted with createRoot, not a client: directive', /createRoot/.test(clientSrc));
   check(
@@ -678,7 +681,10 @@ for (const file of SHEET_SOURCES) {
     /\.\.\.initialForm,\s*detail:\s*initialDetail/.test(islandSrc)
   );
   for (const attr of ['data-aid-category', 'data-aid-appliance', 'data-aid-symptom', 'data-aid-detail']) {
-    check(`the verdict's Book Online link carries ${attr}`, islandSrc.includes(attr));
+    check(
+      `the verdict's Book Online link carries ${attr}`,
+      new RegExp(attr + '(?![A-Za-z0-9_-])').test(islandSrc)
+    );
   }
   check('the verdict link is still a real link to /book/', /href="\/book\/"/.test(islandSrc));
 
@@ -762,19 +768,31 @@ for (const file of SHEET_SOURCES) {
   // pre-select a problem that has no tile and the step would render empty.
   const aliasBlock = mapSrc.split('export const SYMPTOM_ALIASES')[1] || '';
   const badAlias = [];
+  let aliasCount = 0;
   {
     const perTile = aliasBlock.split(/\n  ([a-z_]+):\s*\{/);
     for (let i = 1; i < perTile.length; i += 2) {
       const id = perTile[i];
       const body = perTile[i + 1].split('\n  }')[0];
-      for (const m of body.matchAll(/(?:'([^']+)'|([A-Za-z][\w]*)):\s*(?:'((?:[^'\\]|\\.)*)'|"([^"]*)")/g)) {
-        const value = (m[3] ?? m[4]).replace(/\\'/g, "'");
+      // The KEY alternation has to accept a double-quoted key too. Half of these
+      // phrases carry an apostrophe ("Drum won't spin"), so they are written with
+      // double quotes — and a key pattern that knew only single quotes and bare
+      // identifiers skipped every one of them, validating nothing. Breaking such a
+      // value changed no outcome, because the value was never being read. The gate
+      // self-check is what surfaced it.
+      const entry = /(?:'([^']+)'|"([^"]+)"|([A-Za-z][\w]*)):\s*(?:'((?:[^'\\]|\\.)*)'|"([^"]*)")/g;
+      for (const m of body.matchAll(entry)) {
+        const value = (m[4] ?? m[5]).replace(/\\'/g, "'");
+        aliasCount++;
         if (!tiles[id]) badAlias.push(`${id}: no such tile`);
         else if (!tiles[id].includes(value)) badAlias.push(`${id}: "${value}"`);
       }
     }
   }
   check('every symptom alias exists verbatim in its tile', badAlias.length === 0, badAlias.join(' | '));
+  // Guards the parser itself: if the table's shape drifts and the regex stops
+  // matching, the check above would pass over an empty set and prove nothing.
+  check('the alias table actually parsed', aliasCount >= 40, `${aliasCount} entries read`);
 }
 
 // ── report ───────────────────────────────────────────────────────────────────
