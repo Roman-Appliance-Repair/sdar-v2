@@ -55,12 +55,20 @@ export async function onRequestPost({ request, env }) {
     appendMessage(session, 'dispatcher', text);
     await putSession(env, session);
 
-    // ✅ on the dispatcher's own message = "delivered to the site".
-    await tg(env, 'setMessageReaction', {
+    // A reaction on the dispatcher's own message = "this reached the site".
+    //
+    // 👍 and not ✅: Telegram only accepts reactions from its own fixed emoji
+    // set, and the check mark is not in it — setMessageReaction answers
+    // REACTION_INVALID. That failure was invisible until it was tested against
+    // the real group, because nothing looked at the result. Now it is logged.
+    const reacted = await tg(env, 'setMessageReaction', {
       chat_id: msg.chat.id,
       message_id: msg.message_id,
-      reaction: [{ type: 'emoji', emoji: '✅' }]
+      reaction: [{ type: 'emoji', emoji: '👍' }]
     });
+    if (!reacted || !reacted.ok) {
+      console.warn('chat: reaction failed', reacted && reacted.description);
+    }
 
     return new Response('ok');
   } catch (err) {
