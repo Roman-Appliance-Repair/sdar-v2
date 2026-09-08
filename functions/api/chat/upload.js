@@ -4,9 +4,13 @@
 // (aws4fetch handles request signing), then echoes the public URL back to the
 // widget and forwards the image to the Telegram dispatcher topic.
 //
+// The photo is posted into the dispatcher group as a REPLY on the session's
+// lead card, so it lands under the conversation it belongs to.
+//
 // Fields: file, session_id, page_path
 
 import { AwsClient } from 'aws4fetch';
+import { json, groupId, getSession, putSession, appendMessage, rememberMessage, tg } from './_shared.js';
 
 export async function onRequestPost({ request, env }) {
   try {
@@ -56,28 +60,20 @@ export async function onRequestPost({ request, env }) {
     // The quote sheet uploads with a synthetic `quote-…` session id and has no chat
     // session, and Preview environments may not bind the KV namespace at all. The
     // file is already in R2 by this point — never fail the upload over the log.
-    const sessionKey = `session:${sessionId}`;
-    const session = env.SDAR_CHAT ? await env.SDAR_CHAT.get(sessionKey, 'json') : null;
+    const session = await getSession(env, sessionId);
     if (session) {
-      session.last_index = (session.last_index || 0) + 1;
-      session.messages.push({
-        from: 'photo',
-        text: publicUrl,
-        ts: Date.now(),
-        index: session.last_index
-      });
-      await env.SDAR_CHAT.put(sessionKey, JSON.stringify(session), { expirationTtl: 7 * 24 * 60 * 60 });
+      appendMessage(session, 'photo', publicUrl);
+      await putSession(env, session);
 
-      await fetch(`https://api.telegram.org/bot${env.CHAT_TG_BOT_TOKEN}/sendPhoto`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: env.CHAT_TG_GROUP_ID,
-          message_thread_id: session.topic_id,
-          photo: publicUrl,
-          caption: `📷 User uploaded photo${pagePath ? ' from ' + pagePath : ''}`
-        })
+      const sent = await tg(env, 'sendPhoto', {
+        chat_id: groupId(env),
+        reply_to_message_id: session.card_message_id,
+        photo: publicUrl,
+        caption: `\u{1F4F7} Photo from ${session.name || 'client'}${pagePath ? ' · ' + pagePath : ''}`
       });
+      if (sent && sent.ok && sent.result) {
+        await rememberMessage(env, sent.result.message_id, sessionId);
+      }
     }
 
     return json({ public_url: publicUrl });
@@ -86,9 +82,3 @@ export async function onRequestPost({ request, env }) {
   }
 }
 
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  });
-}
