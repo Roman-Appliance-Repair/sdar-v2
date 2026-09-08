@@ -424,9 +424,11 @@ for (const file of SHEET_SOURCES) {
   const real = pages.filter((p) => !p.stub);
   const stubs = pages.filter((p) => p.stub);
 
-  // 1197 index.html routes + 404.html, which is a real Astro page and carries the
-  // sheet like any other.
-  check('dist contains the expected 1198 rendered pages', real.length === 1198, `found ${real.length}`);
+  // 1198 index.html routes + 404.html, which is a real Astro page and carries the
+  // sheet like any other. Bumped from 1198 to 1199 when /about/ shipped on main
+  // (e55f5276); this number is meant to be edited deliberately when a page is
+  // added or removed, which is the point of pinning it rather than deriving it.
+  check('dist contains the expected 1199 rendered pages', real.length === 1199, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
