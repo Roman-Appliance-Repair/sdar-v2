@@ -47,6 +47,22 @@ export async function onRequestPost({ request, env }) {
     });
   }
 
+  // Which SDAR_CHAT namespace this environment actually binds. Pages keeps a
+  // separate preview namespace unless one is bound to both, and a chat that
+  // silently writes into the wrong one looks exactly like a broken webhook.
+  if (op === 'kvprobe') {
+    if (!env.SDAR_CHAT) return json({ kv_bound: false });
+    const probe = `probe:${Date.now()}`;
+    await env.SDAR_CHAT.put(probe, 'ok', { expirationTtl: 60 });
+    const back = await env.SDAR_CHAT.get(probe);
+    const list = await env.SDAR_CHAT.list({ limit: 10 });
+    return json({
+      kv_bound: true,
+      roundtrip: back === 'ok',
+      keys: list.keys.map((k) => k.name)
+    });
+  }
+
   if (op === 'webhookinfo') {
     const info = await tg(env, 'getWebhookInfo', {});
     return json(info);
