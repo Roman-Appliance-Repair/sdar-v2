@@ -10,10 +10,113 @@
 // Usage: node scripts/verify-quote-gates.mjs
 
 import { readFile, writeFile, copyFile, unlink, readdir } from 'node:fs/promises';
+import { unlinkSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 
 const ROOT = process.cwd();
+
+// ── one run at a time ────────────────────────────────────────────────────────
+//
+// This harness edits REAL source and dist files in place and puts them back in a
+// `finally`. Two runs at once therefore corrupt each other: the second takes its
+// "original" backup from a file the first has already mutated, and when they unwind
+// the mutation is written back as if it were the original. It is not theoretical —
+// it happened twice while AID-3 was being written, once leaving
+// `MARKETING_SLIP = 'peace of mind'` injected in src/data/quote-copy.ts and once
+// killing a run mid-case with a missing .gatebak. Both times the damage was silent
+// until something else noticed.
+//
+// So: one run at a time, enforced rather than remembered.
+//
+// The lock is taken with 'wx', which fails if the file already exists — an atomic
+// create, not a check-then-write that two processes can both win. A lock older than
+// STALE_MS is assumed to belong to a run that was killed rather than one that is
+// working, and is taken over with a warning on stderr; anything younger is a refusal.
+const LOCK = path.join(ROOT, '.verify-gates.lock');
+const STALE_MS = 3 * 60 * 60 * 1000; // 3h — comfortably longer than a full run
+
+async function takeLock() {
+  const mine = JSON.stringify({ pid: process.pid, started: new Date().toISOString() });
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    try {
+      await writeFile(LOCK, mine, { flag: 'wx' });
+      return;
+    } catch (err) {
+      if (err.code !== 'EEXIST') throw err;
+      let held = {};
+      let ageMs = Infinity;
+      try {
+        held = JSON.parse(await readFile(LOCK, 'utf8'));
+        ageMs = Date.now() - Date.parse(held.started);
+      } catch {
+        // Unreadable or truncated: a run that died mid-write. Treat as stale.
+        ageMs = Infinity;
+      }
+      // Is the holder actually alive? Signal 0 tests for the process without
+      // touching it. This matters most on Windows, where a killed run never gets to
+      // run its exit handler and always leaves the file behind — without this the
+      // next run would sit out the full three hours for nothing. PID reuse could in
+      // principle make a dead holder look alive; the age rule is the backstop.
+      let holderAlive = false;
+      if (Number.isInteger(held.pid) && held.pid > 0 && held.pid !== process.pid) {
+        try {
+          process.kill(held.pid, 0);
+          holderAlive = true;
+        } catch (e) {
+          // EPERM: it exists but belongs to another user — alive enough to respect.
+          holderAlive = e.code === 'EPERM';
+        }
+      }
+      if (holderAlive && !(ageMs > STALE_MS)) {
+        console.error(
+          `verify-quote-gates: another run is already going (pid ${held.pid || '?'}, ` +
+            `started ${held.started || 'unknown'}).\n` +
+            'Two runs mutate the same files and corrupt each other — refusing to start.\n' +
+            `If that run is dead, delete ${LOCK} and try again.`
+        );
+        process.exit(2);
+      }
+      console.error(
+        `verify-quote-gates: ignoring a stale lock from pid ${held.pid || '?'} ` +
+          `(${Math.round(ageMs / 60000)} min old, limit ${STALE_MS / 60000} min; ` +
+          `holder ${holderAlive ? 'still running' : 'no longer running'}).
+` +
+          'If that run is somehow still alive, stop it now — this one will fight it.\n' +
+          'Check for leftover .gatebak files before trusting the result.'
+      );
+      await unlink(LOCK).catch(() => {});
+    }
+  }
+  throw new Error('verify-quote-gates: could not take the lock');
+}
+
+/** Released on every exit path, including Ctrl-C — a lock left behind by a killed
+ *  run blocks the next one for three hours, which is its own kind of breakage. */
+let lockHeld = false;
+function releaseLock() {
+  if (!lockHeld) return;
+  lockHeld = false;
+  try {
+    unlinkSync(LOCK);
+  } catch {
+    /* already gone */
+  }
+}
+
+await takeLock();
+lockHeld = true;
+process.on('exit', releaseLock);
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) {
+  process.on(sig, () => {
+    releaseLock();
+    process.exit(130);
+  });
+}
+process.on('uncaughtException', (err) => {
+  releaseLock();
+  throw err;
+});
 const PAGE = path.join(ROOT, 'dist', 'book', 'index.html');
 const CLIENT_SRC = path.join(ROOT, 'src', 'components', 'QuoteSheet.client.ts');
 const COPY_TS = path.join(ROOT, 'src', 'data', 'quote-copy.ts');
