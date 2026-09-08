@@ -115,10 +115,17 @@ export async function onRequestPost(context) {
     // Build a description from whatever the client sends. If the explicit
     // `description` field is missing/empty, fall back to `detail`, then to a
     // synthesized "<symptom> on <appliance> <brand>" line. No min-length gate.
+    // Build the line only out of parts that exist. The previous version always
+    // produced at least " on  ", which trims to "on" — so a request with no fields
+    // at all looked like a description and was sent to the model, which replied
+    // asking what "on" meant. Filtering first is what makes the empty check below
+    // able to fire at all.
+    const trim = (v) => String(v || '').trim();
+    const unit = [trim(payload.appliance), trim(payload.brand)].filter(Boolean).join(' ');
+    const synthesized = [trim(payload.symptom), unit].filter(Boolean).join(' on ');
+
     const description = String(
-      payload.description ||
-      payload.detail ||
-      `${payload.symptom || ''} on ${payload.appliance || ''} ${payload.brand || ''}`
+      trim(payload.description) || trim(payload.detail) || synthesized
     ).trim().slice(0, MAX_DESCRIPTION);
 
     // Nothing to diagnose. The island gates on brand + symptom, so an empty
