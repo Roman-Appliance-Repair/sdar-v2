@@ -65,6 +65,26 @@ async function loaderScript() {
 
 const PAGE_SCRIPT = await loaderScript();
 
+// ── AID-2 ────────────────────────────────────────────────────────────────────
+const HOME_PAGE = path.join(ROOT, 'dist', 'index.html');
+const CARD_SRC = path.join(ROOT, 'src', 'components', 'AIDiagnosticCard.astro');
+const SHEET_SRC = path.join(ROOT, 'src', 'components', 'AIDiagnosticSheet.astro');
+const ISLAND_JSX = path.join(ROOT, 'src', 'components', 'AIDiagnostic.jsx');
+const MAP_TS = path.join(ROOT, 'src', 'data', 'aid-to-quote-map.ts');
+const CONTACT_JS = path.join(ROOT, 'functions', 'api', 'contact.js');
+
+/** The diagnostic sheet's own chunk — same trick as the quote sheet's. */
+async function aidChunk() {
+  const dir = path.join(ROOT, 'dist', '_astro');
+  const hit = (await readdir(dir)).find(
+    (f) => f.startsWith('AIDiagnosticSheet.client.') && f.endsWith('.js')
+  );
+  if (!hit) throw new Error('built AIDiagnosticSheet.client chunk not found in dist/_astro');
+  return path.join(dir, hit);
+}
+
+const AID_CHUNK = await aidChunk();
+
 /** Each case: break one thing, expect the named gate to go red. */
 const CASES = [
   // ── static gate ───────────────────────────────────────────────────────────
@@ -379,6 +399,100 @@ const CASES = [
     // is the only thing that makes them real, so the source entry is the only record
     // that anyone checked.
     mutate: (s) => s.replace("  kettle: ['commercial:kettle-repair'],", ''),
+  },
+  // ── AID-2: the hero card, its sheet, and the handoff ──────────────────────
+  {
+    gate: 'static', name: 'AID-2: duplicate aid-sheet dialog', file: HOME_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('<dialog id="aid-sheet"', '<dialog id="aid-sheet"></dialog><dialog id="aid-sheet"'),
+  },
+  {
+    gate: 'static', name: 'AID-2: the card falls off the homepage', file: HOME_PAGE, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('data-aid-card', 'data-aid-card-gone'),
+  },
+  {
+    gate: 'static', name: 'AID-2: React starts hydrating on the homepage', file: HOME_PAGE, cmd: STATIC_GATE,
+    // What a `client:load` on the island would emit. The whole point of the manual
+    // mount is that the homepage pays nothing until the card is used.
+    mutate: (s) => s.replace('<dialog id="aid-sheet"', '<astro-island renderer-url="/x.js"></astro-island><dialog id="aid-sheet"'),
+  },
+  {
+    gate: 'static', name: 'AID-2: card button below a 52px tap target', file: CARD_SRC, cmd: STATIC_GATE,
+    // Both the input and the button carry it; a mutation that changed only the
+    // first would leave the gate's own pattern satisfied by the second.
+    mutate: (s) => s.replace(/min-height: 52px/g, 'min-height: 40px'),
+  },
+  {
+    gate: 'static', name: 'AID-2: card input drops under 16px (iOS zooms)', file: CARD_SRC, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(/font-size: 16px/g, 'font-size: 14px'),
+  },
+  {
+    gate: 'static', name: 'AID-2: a forbidden phrase enters the card copy', file: CARD_SRC, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('Not sure what', 'Peace of mind — not sure what'),
+  },
+  {
+    gate: 'static', name: 'AID-2: the loader stops prefetching the chunk', file: SHEET_SRC, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("'pointerenter'", "'pointerenterX'"),
+  },
+  {
+    gate: 'static', name: 'AID-2: the island loses initialDetail', file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('initialDetail = ""', 'initialDetailUnused = ""'),
+  },
+  {
+    gate: 'static', name: 'AID-2: initialDetail stops seeding step 4', file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('...initialForm, detail: initialDetail', '...initialForm'),
+  },
+  {
+    gate: 'static', name: 'AID-2: the verdict link loses its appliance attribute', file: ISLAND_JSX, cmd: STATIC_GATE,
+    mutate: (s) => s.replace('data-aid-appliance', 'data-aid-appliance-gone'),
+  },
+  {
+    gate: 'static', name: 'AID-2: a symptom alias names words no tile has', file: MAP_TS, cmd: STATIC_GATE,
+    // "Drum stopped" is not on the dryer tile, so the sheet would resume a symptom
+    // step with a selection that matches nothing on screen.
+    mutate: (s) => s.replace("'Not tumbling'", "'Drum stopped'"),
+  },
+  {
+    gate: 'static', name: 'AID-2: a mapped appliance points at no tile', file: MAP_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("Refrigerator: 'refrigerator',", "Refrigerator: 'fridge',"),
+  },
+  {
+    gate: 'static', name: 'AID-2: a diagnostic appliance falls through the map', file: MAP_TS, cmd: STATIC_GATE,
+    // Neither translated nor declared untranslatable — the silent case, the one a
+    // pair of hand-kept tables always drifts into.
+    mutate: (s) => s.replace("  'Pizza Oven',", ''),
+  },
+  {
+    gate: 'static', name: 'AID-2: a label is both mapped and declared unmapped', file: MAP_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("  'Ice Dispenser',", "  'Ice Dispenser',\n  'Dryer',"),
+  },
+  {
+    gate: 'static', name: 'AID-2: the quote payload drops aid_handoff', file: CLIENT_SRC, cmd: STATIC_GATE,
+    mutate: (s) => s.replace(/aid_handoff: state\.aidHandoff,/g, ''),
+  },
+  {
+    gate: 'static', name: 'AID-2: a handoff stops naming its own source', file: CLIENT_SRC, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("state.aidHandoff ? 'ai-diagnostic' :", ''),
+  },
+  {
+    gate: 'static', name: 'AID-2: the dispatch card stops saying where the lead came from',
+    file: CONTACT_JS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("row('From AI diagnostic', 'yes')", "null"),
+  },
+  {
+    gate: 'smoke', name: 'AID-2: the card is above the fold no longer', file: HOME_PAGE, cmd: SMOKE_GATE,
+    // 400px of extra top padding on the hero pushes the card past a 740px screen —
+    // the exact failure the diagnostic died of the first time round.
+    mutate: (s) => s.replace('padding:72px 24px 40px', 'padding:472px 24px 40px'),
+  },
+  {
+    gate: 'smoke', name: 'AID-2: the typed sentence is dropped on the way in',
+    file: AID_CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('initialDetail:', 'initialDetailIgnored:'),
+  },
+  {
+    gate: 'smoke', name: 'AID-2: the handoff writes no session for the quote sheet',
+    file: AID_CHUNK, cmd: SMOKE_GATE,
+    mutate: (s) => s.replace('sdar_qs_v1', 'sdar_qs_v0'),
   },
   {
     gate: 'smoke', name: 'resume forgets the saved step', file: CHUNK, cmd: SMOKE_GATE,

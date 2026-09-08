@@ -261,7 +261,30 @@ for (const file of SHEET_SOURCES) {
     );
     check('the island chunk is built', Boolean(chunkName), 'no QuoteSheet.client.*.js in dist/_astro');
     if (chunkName) {
-      const chunk = await readFile(path.join(chunkDir, chunkName), 'utf8');
+      // Follow the chunk's own imports. AID-2 gave quote-appliances a second
+      // importer, so Rollup split the tiles into a shared chunk — the ids still
+      // reach the browser on the first click, one file further along. Reading the
+      // entry chunk alone would have called that a regression; reading the graph
+      // asks the question that actually matters, which is whether they ship.
+      const seen = new Set();
+      const parts = [];
+      const walk = async (name) => {
+        if (!name || seen.has(name)) return;
+        seen.add(name);
+        let text;
+        try {
+          text = await readFile(path.join(chunkDir, name), 'utf8');
+        } catch {
+          return;
+        }
+        parts.push(text);
+        for (const m of text.matchAll(/from"\.\/([\w.-]+\.js)"|import"\.\/([\w.-]+\.js)"/g)) {
+          await walk(m[1] || m[2]);
+        }
+      };
+      await walk(chunkName);
+      const chunk = parts.join(String.fromCharCode(10));
+      check('the island chunk graph resolved', seen.size >= 1, String(seen.size));
       const notShipped = all.filter((a) => !chunk.includes(`"${a.id}"`));
       check(
         'every appliance id ships in the island chunk',
@@ -572,6 +595,204 @@ for (const file of SHEET_SOURCES) {
     `${((scoped / total) * 100).toFixed(1)}%`);
   check('site-wide appliance coverage is at least 30%', applianced / total >= 0.3,
     `${((applianced / total) * 100).toFixed(1)}%`);
+}
+
+// ── 8. AID-2: the hero card, its sheet, and the handoff map ──────────────────
+{
+  const home = await readFile(path.join(ROOT, 'dist', 'index.html'), 'utf8');
+  const cardSrc = await readFile(path.join(ROOT, 'src', 'components', 'AIDiagnosticCard.astro'), 'utf8');
+  const sheetSrc = await readFile(path.join(ROOT, 'src', 'components', 'AIDiagnosticSheet.astro'), 'utf8');
+  const clientSrc = await readFile(path.join(ROOT, 'src', 'components', 'AIDiagnosticSheet.client.ts'), 'utf8');
+  const mapSrc = await readFile(path.join(ROOT, 'src', 'data', 'aid-to-quote-map.ts'), 'utf8');
+  const islandSrc = await readFile(path.join(ROOT, 'src', 'components', 'AIDiagnostic.jsx'), 'utf8');
+  const applSrc = await readFile(path.join(ROOT, 'src', 'data', 'quote-appliances.ts'), 'utf8');
+  const qsClient = await readFile(path.join(ROOT, 'src', 'components', 'QuoteSheet.client.ts'), 'utf8');
+  const contactSrc = await readFile(path.join(ROOT, 'functions', 'api', 'contact.js'), 'utf8');
+
+  // -- the homepage carries one of each sheet, and one card -------------------
+  check(
+    'homepage has exactly one aid-sheet dialog',
+    countMatches(home, /<dialog[^>]*id="aid-sheet"/g) === 1,
+    String(countMatches(home, /<dialog[^>]*id="aid-sheet"/g))
+  );
+  check(
+    'homepage still has exactly one quote-sheet dialog',
+    countMatches(home, /<dialog[^>]*id="quote-sheet"/g) === 1,
+    String(countMatches(home, /<dialog[^>]*id="quote-sheet"/g))
+  );
+  // (?![\w-]) matters: data-aid-card-gone still CONTAINS data-aid-card, so a bare
+  // match counts a renamed-away attribute as present. The quote sheet learned this
+  // the hard way with data-quote-sheet-maps; the gate self-check caught it here.
+  check(
+    'homepage has exactly one diagnostic card',
+    countMatches(home, /data-aid-card(?![\w-])/g) === 1,
+    String(countMatches(home, /data-aid-card(?![\w-])/g))
+  );
+  check('the card carries a real input', /id="aid-card-input"/.test(home));
+  check(
+    'the card button is a link to /ai-diagnostic/ with JS off',
+    /<a[^>]+href="\/ai-diagnostic\/"[^>]*class="aid-card-btn"/.test(home) ||
+      /<a[^>]+class="aid-card-btn"[^>]*href="\/ai-diagnostic\/"/.test(home)
+  );
+
+  // -- no React on the homepage until the card is used ------------------------
+  // The island is mounted by hand from a dynamically imported chunk. If anyone
+  // wires it as a client: directive instead, Astro emits <astro-island> with a
+  // renderer-url and the homepage starts paying for React on every visit.
+  check('homepage ships no astro-island', !/<astro-island/.test(home), 'an island is hydrating on load');
+  check('homepage ships no renderer-url', !/renderer-url=/.test(home));
+  check(
+    'the sheet loader imports its chunk dynamically',
+    /import\(\s*['"]\.\/AIDiagnosticSheet\.client['"]\s*\)/.test(sheetSrc)
+  );
+  check(
+    'the sheet chunk is prefetched on pointerenter and touchstart',
+    /pointerenter(?![\w-])/.test(sheetSrc) && /touchstart(?![\w-])/.test(sheetSrc)
+  );
+  check('the island is mounted with createRoot, not a client: directive', /createRoot/.test(clientSrc));
+  check(
+    'no client: directive on AIDiagnostic outside its own page',
+    !/AIDiagnostic[^\n]*client:/.test(
+      await readFile(path.join(ROOT, 'src', 'pages', 'index.astro'), 'utf8')
+    )
+  );
+
+  // -- tap targets and the iOS zoom rule --------------------------------------
+  check('the card button is at least 52px tall', /min-height:\s*52px/.test(cardSrc));
+  check('the card input is 16px, so iOS does not zoom the hero', /font-size:\s*16px/.test(cardSrc));
+
+  // -- copy ------------------------------------------------------------------
+  {
+    const FORBIDDEN = [
+      'certified technicians', 'our team of experts', 'look no further', 'hassle-free',
+      'peace of mind', 'second to none', 'top-of-the-line', 'hesitate to call',
+      'we understand the urgency', 'trusted name in the industry',
+      'passionate about delivering', 'your satisfaction is our priority',
+    ];
+    const lower = cardSrc.toLowerCase();
+    const hits = FORBIDDEN.filter((w) => lower.includes(w));
+    check('no forbidden marketing phrases in the card copy', hits.length === 0, hits.join(', '));
+  }
+
+  // -- the island's one new prop, and the attributes the handoff reads --------
+  check('the island takes initialDetail', /initialDetail\s*=\s*""/.test(islandSrc));
+  check(
+    'initialDetail seeds step 4 detail and nothing else',
+    /\.\.\.initialForm,\s*detail:\s*initialDetail/.test(islandSrc)
+  );
+  for (const attr of ['data-aid-category', 'data-aid-appliance', 'data-aid-symptom', 'data-aid-detail']) {
+    check(
+      `the verdict's Book Online link carries ${attr}`,
+      new RegExp(attr + '(?![A-Za-z0-9_-])').test(islandSrc)
+    );
+  }
+  check('the verdict link is still a real link to /book/', /href="\/book\/"/.test(islandSrc));
+
+  // -- the handoff is wired end to end ---------------------------------------
+  check('the handoff writes the quote sheet session key', /sdar_qs_v1/.test(clientSrc));
+  check('the handoff marks the lead as ai-diagnostic', /'ai-diagnostic'/.test(clientSrc));
+  check('the handoff reports aid_handoff_to_quote', /aid_handoff_to_quote/.test(clientSrc));
+  check('the card reports aid_card_open', /aid_card_open/.test(clientSrc));
+  check('the quote sheet lets a handoff name its own source', /aidHandoff\s*\?\s*'ai-diagnostic'/.test(qsClient));
+  check('the quote payload carries aid_handoff', /aid_handoff:\s*state\.aidHandoff/.test(qsClient));
+  check("the dispatch card prints 'From AI diagnostic'", /From AI diagnostic/.test(contactSrc));
+
+  // -- the map itself: every pair has to be real ------------------------------
+  const tiles = {};
+  {
+    const re = /id:\s*'([a-z_]+)',\s*\r?\n\s*label:\s*(?:'([^']*)'|ELSE),\s*\r?\n\s*problems:\s*\[([\s\S]*?)\n\s*\],/g;
+    let m;
+    while ((m = re.exec(applSrc))) {
+      const probs = [...m[3].matchAll(/'((?:[^'\\]|\\.)*)'|"([^"]*)"/g)].map((x) =>
+        (x[1] ?? x[2]).replace(/\\'/g, "'")
+      );
+      tiles[m[1]] = probs;
+    }
+  }
+  check('the tile table parsed', Object.keys(tiles).length >= 30, String(Object.keys(tiles).length));
+
+  /** Pull a `label: 'value'` style record literal out of the map source. */
+  function recordBlock(src, name) {
+    const at = src.indexOf(name);
+    if (at === -1) return null;
+    const open = src.indexOf('{', at);
+    const close = src.indexOf('\n};', open);
+    return close === -1 ? null : src.slice(open + 1, close);
+  }
+  const applBlock = recordBlock(mapSrc, 'export const APPLIANCE_TO_QUOTE_ID');
+  const mapped = {};
+  for (const m of (applBlock || '').matchAll(/(?:'([^']+)'|([A-Za-z_][\w]*)):\s*'([a-z_]+)'/g)) {
+    mapped[m[1] || m[2]] = m[3];
+  }
+  check('APPLIANCE_TO_QUOTE_ID parsed', Object.keys(mapped).length >= 20, String(Object.keys(mapped).length));
+
+  const badIds = Object.entries(mapped).filter(([, id]) => !tiles[id]);
+  check(
+    'every mapped appliance points at a tile that exists',
+    badIds.length === 0,
+    badIds.map(([l, i]) => `${l}->${i}`).join(', ')
+  );
+
+  // The diagnostic's own appliance list, from the island.
+  const diagLabels = new Set();
+  {
+    const block = islandSrc.split('const APPLIANCES_BY_CATEGORY = {')[1].split('};')[0];
+    for (const m of block.matchAll(/"([^"]+)"/g)) diagLabels.add(m[1]);
+  }
+  check('the diagnostic appliance list parsed', diagLabels.size >= 30, String(diagLabels.size));
+
+  const ghosts = Object.keys(mapped).filter((l) => !diagLabels.has(l));
+  check(
+    'no mapped label is missing from the diagnostic itself',
+    ghosts.length === 0,
+    ghosts.join(', ')
+  );
+
+  const unmapped = [...(mapSrc.split('UNMAPPED_APPLIANCES')[1] || '').split('];')[0].matchAll(/'([^']+)'/g)].map(
+    (m) => m[1]
+  );
+  const both = unmapped.filter((l) => mapped[l]);
+  check('nothing is both mapped and declared unmapped', both.length === 0, both.join(', '));
+
+  // Completeness. This is the one that catches a new appliance being added to the
+  // diagnostic and silently falling through the handoff — it must be mapped or
+  // named as deliberately unmapped, never merely absent.
+  const orphans = [...diagLabels].filter((l) => !mapped[l] && !unmapped.includes(l));
+  check(
+    'every diagnostic appliance is either mapped or listed as unmapped',
+    orphans.length === 0,
+    orphans.join(', ')
+  );
+
+  // Every alias must land on words the tile actually offers, or the sheet would
+  // pre-select a problem that has no tile and the step would render empty.
+  const aliasBlock = mapSrc.split('export const SYMPTOM_ALIASES')[1] || '';
+  const badAlias = [];
+  let aliasCount = 0;
+  {
+    const perTile = aliasBlock.split(/\n  ([a-z_]+):\s*\{/);
+    for (let i = 1; i < perTile.length; i += 2) {
+      const id = perTile[i];
+      const body = perTile[i + 1].split('\n  }')[0];
+      // The KEY alternation has to accept a double-quoted key too. Half of these
+      // phrases carry an apostrophe ("Drum won't spin"), so they are written with
+      // double quotes — and a key pattern that knew only single quotes and bare
+      // identifiers skipped every one of them, validating nothing. Breaking such a
+      // value changed no outcome, because the value was never being read. The gate
+      // self-check is what surfaced it.
+      const entry = /(?:'([^']+)'|"([^"]+)"|([A-Za-z][\w]*)):\s*(?:'((?:[^'\\]|\\.)*)'|"([^"]*)")/g;
+      for (const m of body.matchAll(entry)) {
+        const value = (m[4] ?? m[5]).replace(/\\'/g, "'");
+        aliasCount++;
+        if (!tiles[id]) badAlias.push(`${id}: no such tile`);
+        else if (!tiles[id].includes(value)) badAlias.push(`${id}: "${value}"`);
+      }
+    }
+  }
+  check('every symptom alias exists verbatim in its tile', badAlias.length === 0, badAlias.join(' | '));
+  // Guards the parser itself: if the table's shape drifts and the regex stops
+  // matching, the check above would pass over an empty set and prove nothing.
+  check('the alias table actually parsed', aliasCount >= 40, `${aliasCount} entries read`);
 }
 
 // ── report ───────────────────────────────────────────────────────────────────

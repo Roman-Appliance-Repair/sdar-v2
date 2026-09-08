@@ -129,9 +129,15 @@ const C_BRD  = "var(--color-border-tertiary, #e2e2e2)";
 
 const initialForm = { category: "", appliance: "", brand: "", model: "", symptom: "", age: "", detail: "", name: "", phone: "", email: "", website: "" };
 
-export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
+/**
+ * AID-2 adds ONE optional prop, `initialDetail`. When the visitor already typed a
+ * sentence into the homepage hero card, it arrives here as step 4's free-text
+ * detail so nobody is asked to describe the same fault twice. Everything else —
+ * the steps, the gating, the copy, the order — is untouched.
+ */
+export default function AIDiagnostic({ phone = "(323) 870-4790", initialDetail = "" }) {
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(() => ({ ...initialForm, detail: initialDetail }));
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [callbackRequested, setCallbackRequested] = useState(false);
@@ -502,8 +508,16 @@ export default function AIDiagnostic({ phone = "(323) 870-4790" }) {
             </p>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {/* AID-2: the data-* below is what the hero sheet reads on the way out —
+                it maps these answers onto the quote sheet so the booking flow does
+                not re-ask them. Attributes only; the link, its href and its label
+                are the ones this page has always shipped. */}
             <a
               href="/book/"
+              data-aid-category={form.category}
+              data-aid-appliance={form.appliance}
+              data-aid-symptom={form.symptom}
+              data-aid-detail={form.detail}
               onClick={() => track("aid_book_click", { appliance: form.appliance })}
               style={{ display: "block", padding: "0.85rem", borderRadius: 8, background: "#C8102E", color: "#fff", border: "none", fontSize: 15, fontWeight: 500, textAlign: "center", textDecoration: "none" }}
             >

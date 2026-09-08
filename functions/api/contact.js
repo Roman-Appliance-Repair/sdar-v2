@@ -312,6 +312,9 @@ function buildQuoteCard(p) {
     p.appliance_prefilled
       ? row('Prefilled', p.appliance_changed ? 'yes — visitor changed it' : 'yes')
       : null,
+    // AID-2. This lead came out of the AI diagnostic's verdict, so they have already
+    // read the likely causes and a cost range before they asked for a truck.
+    p.aid_handoff ? row('From AI diagnostic', 'yes') : null,
     symptoms ? row('Symptom', symptoms) : null,
     p.problem_text ? row('Detail', truncate(p.problem_text, 400)) : null,
     '',

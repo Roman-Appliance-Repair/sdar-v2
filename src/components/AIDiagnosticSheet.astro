@@ -1,0 +1,207 @@
+---
+// src/components/AIDiagnosticSheet.astro
+//
+// AID-2. A second full-screen sheet, next to the quote sheet, holding the AI
+// diagnostic island. Same shape as the quote sheet — header with a close button, a
+// scrolling body, 100dvh on a phone and a centred 560px card on a desktop — and
+// deliberately its OWN CSS under an `aid-` prefix rather than a shared stylesheet.
+//
+// Why duplicated and not shared: the quote sheet's shell selectors are named in
+// scripts/check-quote-sheet.mjs, and every `qs-*` id there is load-bearing for a
+// gate. Extracting them into a common file to save ~40 lines would put the site's
+// most-tested component on the far side of a refactor for no visitor-visible gain.
+// The two shells are allowed to drift; the sheets are not the same thing.
+//
+// The React island is NOT in this file. It is imported by the loader below, on the
+// first real intent, so the homepage's initial load requests no React at all.
+
+import { MAIN_PHONE } from '../data/branches';
+
+export interface Props {
+  phone?: string;
+}
+const { phone = MAIN_PHONE } = Astro.props;
+---
+
+<dialog id="aid-sheet" class="aid" aria-label="Free AI appliance diagnostic">
+  <div class="aid-shell">
+    <header class="aid-head">
+      <span class="aid-head-title">Free diagnostic</span>
+      <button type="button" id="aid-close" class="aid-icon" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false">
+          <path d="M6 6l12 12M18 6L6 18" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" />
+        </svg>
+      </button>
+    </header>
+    <div id="aid-body" class="aid-body"></div>
+  </div>
+</dialog>
+
+<script type="application/json" id="aid-data" set:html={JSON.stringify({ phone })}></script>
+
+<script>
+  // Lazy loader. Everything the diagnostic needs — React, the island, the handoff
+  // map — lives in one chunk that is fetched on the first hover/touch of the card
+  // and imported for real on the first genuine intent (focus, typing, or the button).
+  (() => {
+    const CARD = '[data-aid-open]';
+    let mod: Promise<typeof import('./AIDiagnosticSheet.client')> | null = null;
+    const load = () => (mod ??= import('./AIDiagnosticSheet.client'));
+
+    const trigger = (t: EventTarget | null): HTMLElement | null =>
+      ((t as Element | null)?.closest?.(CARD) as HTMLElement | null) || null;
+
+    /** Whatever they had typed when they reached for the sheet. */
+    const typed = (): string => {
+      const el = document.getElementById('aid-card-input') as HTMLInputElement | null;
+      return (el?.value || '').trim();
+    };
+
+    // The sheet stamps data-closed-at on itself as it closes (synchronously — the
+    // native `close` event is a task too late). Within that window the card stops
+    // being a trigger, so a stray focus cannot bounce the sheet straight back open.
+    const dialog = () => document.getElementById('aid-sheet') as HTMLDialogElement | null;
+    const closedAt = () => Number(dialog()?.dataset.closedAt || 0);
+
+    let opening = false;
+    /** `deliberate` = they pressed the button. A press is always intent, even one
+     *  second after a close; a focus event right after a close is the browser. */
+    const open = async (source: string, deliberate = false) => {
+      const dlg = dialog();
+      if (!dlg || typeof dlg.showModal !== 'function' || opening) return false;
+      if (dlg.open) return false;
+      if (!deliberate && Date.now() - closedAt() < 800) return false;
+      opening = true;
+      try {
+        const api = await load();
+        api.openAidSheet(typed(), source);
+      } finally {
+        opening = false;
+      }
+      return true;
+    };
+
+    // Click — the button is a real link to /ai-diagnostic/, so a modified click and
+    // a JS-less browser both still get a page.
+    document.addEventListener('click', (ev) => {
+      const m = ev as MouseEvent;
+      if (m.defaultPrevented || m.button > 0 || m.metaKey || m.ctrlKey || m.shiftKey || m.altKey) return;
+      const el = trigger(ev.target);
+      if (!el) return;
+      const dlg = dialog();
+      if (!dlg || typeof dlg.showModal !== 'function') return;
+      ev.preventDefault();
+      void open('hero-card', true);
+    });
+
+    // Focusing or typing in the field is intent too — the sheet takes over before
+    // they have written the sentence twice.
+    document.addEventListener('focusin', (ev) => {
+      if ((ev.target as Element | null)?.id === 'aid-card-input') void open('hero-card-focus');
+    });
+    document.addEventListener('input', (ev) => {
+      if ((ev.target as Element | null)?.id === 'aid-card-input') void open('hero-card-typing');
+    });
+
+    const prefetch = (e: Event) => { if (trigger(e.target)) load(); };
+    document.addEventListener('pointerenter', prefetch, { capture: true, passive: true });
+    document.addEventListener('touchstart', prefetch, { capture: true, passive: true });
+  })();
+</script>
+
+<style>
+  /* The island renders itself into #aid-body at runtime and never carries Astro's
+     scope attribute, so anything aimed at its nodes goes through :global(). */
+  .aid {
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-body);
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+  }
+  .aid::backdrop { background: rgba(10, 10, 10, 0.62); }
+  .aid:not([open]) { display: none; }
+
+  .aid-shell {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    width: 100%;
+    /* dvh, never vh — vh is wrong under the mobile URL bar. */
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+
+  .aid-head {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 44px;
+    align-items: center;
+    gap: 8px;
+    padding: max(8px, env(safe-area-inset-top)) 8px 8px 16px;
+    border-bottom: 1px solid var(--border);
+    background: var(--white);
+  }
+  .aid-head-title {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .aid-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .aid-icon:hover { background: var(--gray); }
+  .aid-icon:focus-visible { outline: 2px solid var(--red); outline-offset: -2px; }
+
+  .aid-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 0 max(12px, env(safe-area-inset-bottom));
+  }
+
+  @media (min-width: 768px) {
+    .aid {
+      margin: auto;
+      width: min(560px, calc(100vw - 48px));
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .aid-shell {
+      height: auto;
+      max-height: 90vh;
+      border-radius: 8px;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .aid[open] .aid-shell { animation: aid-in 0.18s ease; }
+    @keyframes aid-in {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: none; }
+    }
+  }
+</style>
+
+<style is:global>
+  /* Scroll-lock, on <html> so iOS keeps the dialog put. Same idea as the quote
+     sheet's, a separate class so closing one never unlocks the other. */
+  html.aid-open,
+  html.aid-open body { overflow: hidden; }
+</style>
