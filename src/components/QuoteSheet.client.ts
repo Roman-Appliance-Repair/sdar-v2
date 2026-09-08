@@ -582,10 +582,15 @@ function viewAppliance(): string {
     // The brand is a note, not a question — a chip that says what the page was about.
     (state.brandLabel ? `<p class="qs-chips"><span class="qs-chip">${esc(state.brandLabel)}</span></p>` : '') +
     `<p class="qs-sub">${esc(prefilled ? data.copy.prefill.sub : 'Pick the closest one.')}</p>` +
-    // qs-compact: 16 residential tiles have to clear a 360×740 fold with the
-    // Continue button, so this step gets the short tile. The symptom step keeps
-    // the full-size tile — it never carries more than 12.
-    `<div class="qs-tiles qs-two qs-compact">` +
+    // qs-compact: the tiles on this step have to clear a 360×740 fold together
+    // with the Continue button, so it gets the short tile. The symptom step keeps
+    // the full-size one — it never carries more than 12.
+    //
+    // Three columns once the list passes what two will hold. The commercial list is
+    // 19 tiles and overflowed a 360×740 body by 154px at two columns; the
+    // residential 16 fit, and widening them for the sake of symmetry would only
+    // make them harder to hit.
+    `<div class="qs-tiles ${list.length > 16 ? 'qs-three' : 'qs-two'} qs-compact">` +
     list
       .map((a) => {
         const on = state.appliance === a.id;

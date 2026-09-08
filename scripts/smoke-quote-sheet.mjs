@@ -606,6 +606,7 @@ async function stepFoldLeg(browser, base) {
   const res = await measureStep(page);
   expect(`${label}: 16 residential appliance tiles`, res.tiles === 16, `${res.tiles}`);
   expect(`${label}: appliance grid is the compact variant`, res.compact, JSON.stringify(res.style));
+  expect(`${label}: residential appliance step stays two columns`, res.columns === 2, String(res.columns));
   expect(
     `${label}: compact tile is 44px min / 10px 12px / 15px`,
     res.style.minHeight === '44px' && res.style.padding === '10px 12px' && res.style.fontSize === '15px',
@@ -653,7 +654,11 @@ async function stepFoldLeg(browser, base) {
   await (await tileByText(page, 'In a business')).click();
   await page.waitForTimeout(150);
   const com = await measureStep(page);
-  expect(`${label}: 11 commercial appliance tiles`, com.tiles === 11, `${com.tiles}`);
+  expect(`${label}: 21 commercial appliance tiles`, com.tiles === 21, `${com.tiles}`);
+  // QS-3a: 19 tiles need a third column. Two would push the last six off a 360×740
+  // screen, and a step that scrolls hides options from anyone who does not think to
+  // scroll a list that looks finished.
+  expect(`${label}: commercial appliance step uses three columns`, com.columns === 3, String(com.columns));
   expect(
     `${label}: commercial appliance step does not scroll`,
     com.overflow === 0,
@@ -690,6 +695,7 @@ function measureStep(page) {
     return {
       tiles: tiles.length,
       compact: Boolean(grid && grid.classList.contains('qs-compact')),
+      columns: gs ? gs.gridTemplateColumns.split(' ').filter(Boolean).length : 0,
       overflow: body.scrollHeight - body.clientHeight,
       lastTileBottom: last ? +last.bottom.toFixed(1) : 0,
       lastTileText: tiles.length ? tiles[tiles.length - 1].textContent.trim() : '',
@@ -901,10 +907,10 @@ const PAGE_TYPE_CASES = [
     label: 'commercial sub',
     pageType: 'commercial_sub',
     counter: '1 / 5',
-    firstHeading: 'Is it your Walk-in cooler / freezer?',
+    firstHeading: 'Is it your Walk-in?',
     primary: "Yes, that's it",
-    prefillLabel: 'Walk-in cooler / freezer',
-    tiles: 11,
+    prefillLabel: 'Walk-in',
+    tiles: 21,
   },
   {
     url: '/brands/lg-washer-repair/',

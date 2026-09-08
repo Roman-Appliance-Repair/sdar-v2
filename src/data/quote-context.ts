@@ -113,6 +113,23 @@ const COMMERCIAL_SERVICE_APPLIANCE: Record<string, string> = {
   'refrigerator-repair': 'reach_in',
   'freezer-repair': 'reach_in',
   'showcase-refrigerator-repair': 'display_case',
+  'bar-refrigerator-repair': 'bar_fridge',
+  'steamer-repair': 'steamer',
+  // A combi is a steamer that also bakes — same tile, same crew, same parts van.
+  'combi-oven-repair': 'steamer',
+  'grill-repair': 'grill_charbroiler',
+  'charbroiler-repair': 'grill_charbroiler',
+  'holding-cabinet-repair': 'holding_cabinet',
+  'proofer-repair': 'proofer',
+  'mixer-repair': 'mixer',
+  'kettle-repair': 'kettle',
+  'food-processor-repair': 'food_processor',
+  'slicer-repair': 'slicer',
+  'range-hood-repair': 'commercial_range_hood',
+  // The commercial tree calls it an exhaust hood; the brand pages call it a hood.
+  // Both are the same equipment as the catalog's Commercial Range Hood Repair.
+  'exhaust-hood-repair': 'commercial_range_hood',
+  'hood-repair': 'commercial_range_hood',
   'walk-in-cooler-repair': 'walk_in',
   'walk-in-freezer-repair': 'walk_in',
   // Brand slugs say it plainly: kolpak-walk-in-repair, nor-lake-walk-in-repair.
@@ -120,10 +137,18 @@ const COMMERCIAL_SERVICE_APPLIANCE: Record<string, string> = {
   'walk-in-repair': 'walk_in',
 };
 
-/** /commercial/refrigeration/{slug}/ and /commercial/ice-machines/{slug}/ — the
- *  two subtrees where the appliance is named by the CHILD, not the parent hub. */
+/**
+ * Children that name their equipment more precisely than the hub they sit under, so
+ * the child wins the lookup. Mostly /commercial/refrigeration/ and
+ * /commercial/ice-machines/, whose hubs cover several machines at once — plus the
+ * combi oven, which lives under the oven hub but is a combi, and combis are what the
+ * Steamer / combi tile is for.
+ */
 const COMMERCIAL_SUBTREE_APPLIANCE: Record<string, string> = {
+  // oven-repair/
+  'combi-oven-repair': 'steamer',
   // refrigeration/
+  'bar-refrigerator-repair': 'bar_fridge',
   'walk-in-cooler-repair': 'walk_in',
   'walk-in-freezer-repair': 'walk_in',
   'walk-in-door-repair': 'walk_in',

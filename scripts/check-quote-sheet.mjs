@@ -191,7 +191,7 @@ for (const file of SHEET_SOURCES) {
 
   if (tiles) {
     check('16 residential appliance tiles', tiles.residential.length === 16, `${tiles.residential.length}`);
-    check('11 commercial appliance tiles', tiles.commercial.length === 11, `${tiles.commercial.length}`);
+    check('21 commercial appliance tiles', tiles.commercial.length === 21, `${tiles.commercial.length}`);
 
     const all = [...tiles.residential, ...tiles.commercial];
 
@@ -461,6 +461,54 @@ for (const file of SHEET_SOURCES) {
       g('commercial_sub').scope === g('commercial_sub').pages &&
       g('commercial_brand').scope === g('commercial_brand').pages,
     'a commercial page resolved no scope');
+  // QS-3a floors. Set just under what this build reaches, so a mapping regression
+  // trips them and ordinary content growth does not.
+  const floor = (t, pctWanted) =>
+    check(
+      `${t}: at least ${pctWanted}% of pages resolve an appliance`,
+      g(t).pages === 0 || g(t).appliance / g(t).pages >= pctWanted / 100,
+      `${g(t).appliance}/${g(t).pages}`
+    );
+  floor('commercial_sub', 80);
+  floor('commercial_brand', 65);
+  floor('commercial_hub', 70);
+
+  // A floor is a mass-regression alarm: one page out of twenty-four moves it by 4%,
+  // so it cannot see a single slug stop resolving. These name the pages the QS-3a
+  // tiles were added FOR, one assertion each, so losing any single mapping is loud.
+  // Bar fridge and proofer are absent on purpose — both are real catalog services
+  // with no page of their own, so there is nothing here to assert against.
+  const QS3A_PAGES = [
+    ['/commercial/mixer-repair/', 'mixer'],
+    ['/commercial/steamer-repair/', 'steamer'],
+    ['/commercial/oven-repair/combi-oven-repair/', 'steamer'],
+    ['/commercial/holding-cabinet-repair/', 'holding_cabinet'],
+    ['/commercial/grill-repair/', 'grill_charbroiler'],
+    ['/commercial/charbroiler-repair/', 'grill_charbroiler'],
+    ['/commercial/exhaust-hood-repair/', 'commercial_range_hood'],
+    ['/commercial/slicer-repair/', 'slicer'],
+    ['/commercial/kettle-repair/', 'kettle'],
+    ['/commercial/kettle-repair/brands/groen/', 'kettle'],
+    ['/commercial/food-processor-repair/', 'food_processor'],
+    ['/commercial/food-processor-repair/brands/robot-coupe/', 'food_processor'],
+    ['/brands/rational-combi-oven-repair/', 'steamer'],
+    ['/brands/accurex-hood-repair/', 'commercial_range_hood'],
+  ];
+  const byUrl = new Map(pages.map((p) => [p.url, p]));
+  for (const [url, want] of QS3A_PAGES) {
+    const page = byUrl.get(url);
+    if (!page) {
+      check(`QS-3a page still exists: ${url}`, false, 'not in dist');
+      continue;
+    }
+    const ctx = (readBlob(page.html) || {}).context || {};
+    check(
+      `${url} prefills ${want}`,
+      ctx.appliance === want && ctx.scope === 'commercial',
+      `got ${ctx.scope} / ${ctx.appliance}`
+    );
+  }
+
   check('outdoor pages all resolve residential scope',
     g('outdoor').scope === g('outdoor').pages, `${g('outdoor').scope}/${g('outdoor').pages}`);
   check('city pillars resolve nothing (mixed scope by nature)',

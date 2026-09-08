@@ -24,6 +24,8 @@ const CONTEXT_TS = path.join(ROOT, 'src', 'data', 'quote-context.ts');
 const BLOG_PAGE = path.join(ROOT, 'dist', 'blog', 'index.html');
 // A brand combo page: its appliance comes from the category suffix in its own slug.
 const BRAND_COMBO_PAGE = path.join(ROOT, 'dist', 'brands', 'lg-washer-repair', 'index.html');
+// A QS-3a page: /commercial/mixer-repair/ had no tile at all before this wave.
+const COMMERCIAL_HUB_PAGE = path.join(ROOT, 'dist', 'commercial', 'mixer-repair', 'index.html');
 // A /services/ sub-page: its appliance is inherited from the parent hub, so it is
 // the row the coverage floor watches most closely.
 const SERVICE_SUB_PAGE = path.join(
@@ -343,6 +345,40 @@ const CASES = [
   {
     gate: 'smoke', name: 'QS-2: a plain /book/ link stops opening the sheet', file: PAGE_SCRIPT, cmd: SMOKE_GATE,
     mutate: (s) => s.replace('"/book/"', '"/book-never/"'),
+  },
+  // ── QS-3a: the eight new commercial tiles ─────────────────────────────────
+  {
+    gate: 'static', name: 'QS-3a: a new tile ships with no provenance', file: APPL_TS, cmd: STATIC_GATE,
+    // Every tile has to name the catalog slug or the page tree that makes it
+    // something we actually repair. A tile for equipment nobody checked we service
+    // is exactly the invention APPLIANCE_SOURCES exists to stop.
+    mutate: (s) => s.replace("  mixer: ['commercial-mixer-repair'],", ''),
+  },
+  {
+    gate: 'static', name: 'QS-3a: a new tile cites a catalog slug that does not exist',
+    file: APPL_TS, cmd: STATIC_GATE,
+    mutate: (s) => s.replace("['commercial-steamer-repair']", "['commercial-sous-vide-repair']"),
+  },
+  {
+    gate: 'static', name: 'QS-3a: a commercial slug loses its mapping', file: COMMERCIAL_HUB_PAGE, cmd: STATIC_GATE,
+    // The commercial coverage floors are the point of this wave. Break the shipped
+    // answer on one hub and commercial_hub drops below its floor.
+    mutate: (s) => s.replaceAll('"appliance":"mixer"', '"appliance":null'),
+  },
+  {
+    gate: 'smoke', name: 'QS-3a: the commercial step falls back to two columns',
+    file: PAGE, cmd: SMOKE_GATE,
+    // Nineteen tiles two-wide overflow a 360x740 body by 154px, so the last six
+    // options sit below a fold on a step that looks complete.
+    mutate: (s) => s.replace('qs-tiles.qs-three{grid-template-columns:1fr 1fr 1fr}',
+                             'qs-tiles.qs-three{grid-template-columns:1fr 1fr}'),
+  },
+  {
+    gate: 'static', name: 'QS-3a: a page-tree-only tile loses its source', file: APPL_TS, cmd: STATIC_GATE,
+    // Kettle, food processor and slicer have no catalog slug at all — the page tree
+    // is the only thing that makes them real, so the source entry is the only record
+    // that anyone checked.
+    mutate: (s) => s.replace("  kettle: ['commercial:kettle-repair'],", ''),
   },
   {
     gate: 'smoke', name: 'resume forgets the saved step', file: CHUNK, cmd: SMOKE_GATE,
