@@ -16,11 +16,16 @@
 //     site-wide, which emits both the visible trail and the BreadcrumbList
 //     JSON-LD. A second copy here would be a duplicate.
 //
-// Owner photo: .owner-photo is a typographic placeholder ("RA") because there is
-// no picture of Roman in public/images/ yet. Replacing it with an <img> is a
-// one-line change — the slot is already sized 88x88. This note lives in the
-// frontmatter on purpose: HTML comments ship to the browser, frontmatter does not.
+// Owner photo: detected at build time, same pattern as ServiceHero MODE A. Drop
+// the file at the path below and the next build renders it — no code change. Until
+// then the slot falls back to a typographic placeholder rather than a broken image.
+// The photo is pre-processed (WebP, EXIF stripped, 1200x1600); it is served as-is,
+// never re-encoded or re-cropped by the build.
+// This note lives in the frontmatter on purpose: HTML comments ship to the browser,
+// frontmatter does not.
 
+import { existsSync } from 'node:fs';
+import path from 'node:path';
 import Layout from '../layouts/Layout.astro';
 import { mergeCredentials, CANONICAL_CREDENTIALS } from '../data/credentials-schema';
 import { BUSINESS_HOURS, OPENING_HOURS_SCHEMA } from '../data/business-hours';
@@ -70,6 +75,11 @@ const standing = [
 const businessId = canonical + '#business';
 const personId = canonical + '#roman';
 
+const OWNER_PHOTO = '/images/about/roman-abysov-appliance-repair-los-angeles.webp';
+const ownerPhotoExists = existsSync(path.join('public', OWNER_PHOTO.replace(/^\//, '')));
+const OWNER_PHOTO_ALT =
+  'Roman Abysov, owner of Same Day Appliance Repair, diagnosing a refrigerator sealed system in Los Angeles';
+
 // LocalBusiness. mergeCredentials() injects legalName + the canonical
 // hasCredential array, and — because no address is passed — a city-level
 // PostalAddress with no streetAddress, which is exactly the NAP policy here.
@@ -102,6 +112,9 @@ const personSchema = {
   name: 'Roman Abysov',
   jobTitle: 'Owner',
   url: canonical,
+  // Only claimed when the file is actually on disk — a schema `image` pointing at
+  // a 404 is a validation error in Search Console.
+  ...(ownerPhotoExists ? { image: 'https://samedayappliance.repair' + OWNER_PHOTO } : {}),
   worksFor: { '@id': businessId }
 };
 ---
@@ -154,7 +167,19 @@ const personSchema = {
       </div>
 
       <div class="owner">
-        <div class="owner-photo" aria-hidden="true">RA</div>
+        {ownerPhotoExists ? (
+          <img
+            class="owner-photo"
+            src={OWNER_PHOTO}
+            alt={OWNER_PHOTO_ALT}
+            width="1200"
+            height="1600"
+            loading="lazy"
+            decoding="async"
+          />
+        ) : (
+          <div class="owner-photo owner-photo-placeholder" aria-hidden="true">RA</div>
+        )}
         <div class="owner-text">
           <h2 class="owner-name">Roman Abysov</h2>
           <p class="owner-role">Owner</p>
@@ -233,10 +258,16 @@ const personSchema = {
   .about-block p { font-size: 16px; line-height: 1.7; color: var(--text); margin: 0; }
   .block-lede { color: var(--muted); margin-bottom: 20px !important; }
 
-  /* Owner */
+  /* Owner. The photo is a real 3:4 portrait, not an avatar chip — the whole frame
+     (fridge, gauges, the man) has to stay readable, so it gets a proper column
+     beside the text instead of a cropped circle. object-fit is deliberately NOT
+     `cover` at a different ratio: the slot is 3:4, the file is 3:4, nothing is cut. */
   .owner {
-    display: flex; gap: 24px; align-items: flex-start;
-    max-width: 680px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 28px;
+    align-items: start;
+    max-width: 760px;
     padding: 28px;
     background: var(--gray);
     border: 1px solid var(--border);
@@ -245,12 +276,19 @@ const personSchema = {
     margin: 8px 0 48px;
   }
   .owner-photo {
-    flex: 0 0 88px; width: 88px; height: 88px;
-    display: flex; align-items: center; justify-content: center;
-    background: var(--black); color: var(--white);
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    height: auto;
+    display: block;
+    object-fit: cover;
     border-radius: 6px;
+    background: var(--black);
+  }
+  .owner-photo-placeholder {
+    display: flex; align-items: center; justify-content: center;
+    color: var(--white);
     font-family: var(--font-display);
-    font-size: 28px; font-weight: 700; letter-spacing: 0.02em;
+    font-size: 56px; font-weight: 700; letter-spacing: 0.02em;
   }
   .owner-text { min-width: 0; }
   .owner-name {
@@ -295,9 +333,13 @@ const personSchema = {
   .terms dt { font-size: 15px; font-weight: 600; color: var(--black); }
   .terms dd { margin: 0; font-size: 15px; line-height: 1.6; color: var(--text); }
 
-  @media (max-width: 640px) {
+  @media (max-width: 720px) {
     .hub { padding: 48px 0; }
-    .owner { flex-direction: column; gap: 18px; padding: 22px; }
+    /* Photo stacks above the text and stops stretching full-bleed — a 3:4 portrait
+       at full phone width is taller than the viewport and pushes the name off screen. */
+    .owner { grid-template-columns: 1fr; gap: 20px; padding: 22px; }
+    .owner-photo { max-width: 240px; }
+    .owner-photo-placeholder { font-size: 44px; }
     .term { grid-template-columns: 1fr; gap: 4px; }
   }
 </style>
