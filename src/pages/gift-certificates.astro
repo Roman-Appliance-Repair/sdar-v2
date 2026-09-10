@@ -1,0 +1,393 @@
+---
+// src/pages/gift-certificates.astro
+// Buyable gift certificates for appliance repair. Three denominations, each a
+// Stripe payment link.
+//
+// Why the page exists: the product is bought by someone who does not live near
+// the person who will use it. Copy is written to that buyer, not to a homeowner
+// with a broken machine — this is the one page on the site whose reader has no
+// appliance problem of their own.
+//
+// Hard rules honoured here (CLAUDE.md §5, docs/factual-accuracy.md,
+// docs/voice-and-style.md):
+//   - No streetAddress. This is not a physical_pin page.
+//   - No manufacturer-authorization claims, no "factory-trained", no "BBB A+".
+//   - No aggregateRating and no star counts, in copy or in markup.
+//   - No superlatives — the certificate is useful, not "the perfect gift".
+//   - Hours come from the BUSINESS_HOURS SSOT, never retyped.
+//
+// The second-unit-free line is not a promotion invented for this page: it is the
+// standing policy already published in src/data/pricing.ts (PRICING_FOOTNOTE) and
+// src/data/faq.ts. Change it there, not here.
+//
+// Breadcrumbs are NOT declared here: Layout.astro mounts Breadcrumbs.astro
+// site-wide, which emits both the visible trail and the BreadcrumbList JSON-LD.
+
+import Layout from '../layouts/Layout.astro';
+import { BUSINESS_HOURS, OPENING_HOURS_SCHEMA } from '../data/business-hours';
+
+const canonical = 'https://samedayappliance.repair/gift-certificates/';
+
+const title = 'Appliance Repair Gift Certificates — $89, $150, $250';
+const description =
+  'Gift certificates for appliance repair across seven Southern California counties. $89 diagnostic, $150 and $250 with repair credit. Valid 12 months, emailed within one business day.';
+
+// Site-wide Organization node, same @id the homepage graph publishes, so the
+// three Offers below attach to the company entity rather than to a page-local
+// duplicate.
+const ORG_ID = 'https://samedayappliance.repair/#organization';
+
+const COUNTIES = [
+  'Los Angeles',
+  'Orange',
+  'Ventura',
+  'Santa Barbara',
+  'San Bernardino',
+  'Riverside',
+  'San Diego'
+];
+
+// Denominations. `price` is the string form the Offer needs; the card and the
+// markup both read from this array so a price can never drift between them.
+const CERTIFICATES = [
+  {
+    price: '89',
+    name: 'Diagnostic',
+    blurb:
+      'A full in-home diagnostic by a licensed technician. They find what failed and tell you what the repair costs before anything is ordered.',
+    detail: 'Covers the visit and the diagnosis.',
+    url: 'https://buy.stripe.com/8x24gs4FWaUla2k9gH8Zq02',
+    featured: false
+  },
+  {
+    price: '150',
+    name: 'Diagnostic + repair credit',
+    blurb:
+      'The diagnostic plus credit toward the repair itself. This is the one most people buy — it covers the visit and a common fix like an igniter, a drain pump, or a door gasket.',
+    detail: 'Covers the visit and most small parts jobs.',
+    url: 'https://buy.stripe.com/fZucMYegwd2t4I08cD8Zq03',
+    featured: true
+  },
+  {
+    price: '250',
+    name: 'Larger repair',
+    blurb:
+      'The diagnostic plus a substantial credit toward parts and labor. Sized for the jobs that actually cost money — a control board, an evaporator fan, a washer bearing.',
+    detail: 'Covers the visit and a real parts-and-labor repair.',
+    url: 'https://buy.stripe.com/3cI5kwfkAfaB7Uc64v8Zq04',
+    featured: false
+  }
+];
+
+const INCLUDED = [
+  'An in-home diagnostic by a licensed technician',
+  'A second appliance looked at free on the same visit — including outdoor equipment: grills, outdoor refrigerators, ice makers',
+  'The face value of the certificate applied against the repair'
+];
+
+const STEPS = [
+  {
+    heading: 'Pick an amount and pay',
+    body: 'Checkout takes a recipient name and a message if you want one on the certificate.'
+  },
+  {
+    heading: 'The certificate arrives by email',
+    body: 'It carries a code and goes out within one business day of the payment clearing.'
+  },
+  {
+    heading: 'They call and give the code',
+    body: 'The code goes on the job when the visit is booked — before the technician is dispatched, not after.'
+  },
+  {
+    heading: 'It comes off the invoice',
+    body: 'The face value is subtracted from what the visit costs. Nothing to mail in, nothing to claim afterwards.'
+  }
+];
+
+const TERMS = [
+  {
+    term: 'Second appliance',
+    def: 'Free diagnostic on the second unit, same visit and same address only.'
+  },
+  { term: 'Valid for', def: '12 months from the date of purchase.' },
+  {
+    term: 'Where it works',
+    def:
+      COUNTIES.slice(0, -1).join(', ') +
+      ', and ' +
+      COUNTIES[COUNTIES.length - 1] +
+      ' counties — every area we service.'
+  },
+  {
+    term: 'If the repair costs more',
+    def: 'The difference is paid at the visit. The certificate covers its face value, not the whole invoice.'
+  },
+  { term: 'Not redeemable for cash', def: 'It applies to repair work only.' },
+  { term: 'Hours', def: BUSINESS_HOURS.display }
+];
+
+// Organization node. Deliberately thin — the homepage graph is the authoritative
+// description of this entity; what is needed here is a valid target for `seller`
+// plus the facts a buyer checks before paying: who we are, when we answer, and
+// where the certificate is good.
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  '@id': ORG_ID,
+  name: 'Same Day Appliance Repair',
+  url: 'https://samedayappliance.repair/',
+  telephone: '+13238704790',
+  email: 'support@samedayappliance.repair',
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  areaServed: COUNTIES.map((c) => ({
+    '@type': 'AdministrativeArea',
+    name: c + ' County'
+  }))
+};
+
+// Three Offers, one per denomination, each sold by the Organization above.
+// Modelled on the Offer/PriceSpecification pattern already used on the brand
+// pages (src/pages/brands/traulsen.astro). No aggregateRating anywhere.
+const offerSchemas = CERTIFICATES.map((c) => ({
+  '@context': 'https://schema.org',
+  '@type': 'Offer',
+  '@id': canonical + '#offer-' + c.price,
+  name: 'Appliance Repair Gift Certificate — $' + c.price + ' ' + c.name,
+  description: c.blurb,
+  url: canonical,
+  category: 'Gift certificate',
+  seller: { '@id': ORG_ID },
+  availability: 'https://schema.org/InStock',
+  areaServed: COUNTIES.map((n) => ({
+    '@type': 'AdministrativeArea',
+    name: n + ' County'
+  })),
+  priceSpecification: {
+    '@type': 'PriceSpecification',
+    price: c.price + '.00',
+    priceCurrency: 'USD',
+    description: 'Gift certificate face value, applied toward an appliance repair visit'
+  }
+}));
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+  <Fragment slot="head-scripts">
+    <script type="application/ld+json" set:html={JSON.stringify(organizationSchema)} />
+    {offerSchemas.map((s) => (
+      <script type="application/ld+json" set:html={JSON.stringify(s)} />
+    ))}
+  </Fragment>
+
+  <section class="hub">
+    <div class="container">
+      <p class="hub-eyebrow">Gift Certificates</p>
+      <h1 class="hub-title">Appliance Repair Gift Certificates</h1>
+      <p class="hub-intro">
+        If your parents are in Encino and you're in Chicago, you can't be there when the
+        refrigerator starts running warm. This is the thing you can send instead — not
+        another object for the house, but a technician at the door and the bill already
+        paid.
+      </p>
+
+      <div class="about-block">
+        <h2>Who this is actually for</h2>
+        <p>
+          Most of these get bought by someone a few time zones away from the person who'll
+          use it. The pattern is familiar to us: an adult child calls to book a visit for a
+          parent, reads out a credit card, and asks us to phone them afterwards with what
+          the tech found. The certificate does the same job without the phone call. It sits
+          in an inbox until something breaks, and then it covers the visit.
+        </p>
+        <p>
+          It also works as the practical version of a housewarming gift. A new owner of an
+          older house will need somebody to look at the machines that came with it, usually
+          sooner than they expect.
+        </p>
+      </div>
+
+      <div class="certs">
+        {CERTIFICATES.map((c) => (
+          <div class={c.featured ? 'cert cert-featured' : 'cert'}>
+            {c.featured && <span class="cert-flag">Most common</span>}
+            <p class="cert-price">${c.price}</p>
+            <h2 class="cert-name">{c.name}</h2>
+            <p class="cert-blurb">{c.blurb}</p>
+            <p class="cert-detail">{c.detail}</p>
+            <a href={c.url} target="_blank" rel="noopener" class="btn btn-red cert-btn">
+              Buy the ${c.price} certificate ↗
+            </a>
+          </div>
+        ))}
+      </div>
+      <p class="certs-note">
+        Checkout is handled by Stripe. We never see the card number.
+      </p>
+
+      <div class="about-block">
+        <h2>What the certificate covers</h2>
+        <ul class="cred-list">
+          {INCLUDED.map((i) => (
+            <li><strong>{i}</strong></li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="about-block">
+        <h2>How it works</h2>
+        <ol class="steps">
+          {STEPS.map((s) => (
+            <li class="step">
+              <h3 class="step-heading">{s.heading}</h3>
+              <p class="step-body">{s.body}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      <div class="about-block">
+        <h2>Terms</h2>
+        <dl class="terms">
+          {TERMS.map((t) => (
+            <div class="term">
+              <dt>{t.term}</dt>
+              <dd>{t.def}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
+      <div class="about-block">
+        <h2>Buying one for a household we haven't been to</h2>
+        <p>
+          You don't need to know the brand, the model, or what's wrong. The technician
+          works that out on the visit — that's what the diagnostic is. If you're not sure
+          which amount to pick, the $150 covers the visit plus the kind of part that fails
+          first on most machines.
+        </p>
+        <a href="/price-list/" class="inline-cta">What repairs typically cost →</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .hub { padding: 80px 0; }
+  .hub-eyebrow {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--red); margin-bottom: 12px;
+  }
+  .hub-title { font-size: clamp(2rem, 5vw, 3.5rem); margin-bottom: 20px; }
+  .hub-intro {
+    max-width: 680px; font-size: 17px; line-height: 1.6; color: var(--muted);
+    margin-bottom: 48px;
+  }
+
+  .about-block { max-width: 680px; margin-bottom: 40px; }
+  .about-block h2 {
+    font-size: 22px; font-weight: 600;
+    font-family: var(--font-body); letter-spacing: -0.01em;
+    margin: 0 0 12px; color: var(--black);
+  }
+  .about-block p { font-size: 16px; line-height: 1.7; color: var(--text); margin: 0 0 14px; }
+  .about-block p:last-of-type { margin-bottom: 0; }
+
+  /* Cards. Three equal columns that collapse to one on a phone; the featured card
+     is marked with a border, not with a size change, so the row stays even. */
+  .certs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin: 8px 0 12px;
+  }
+  .cert {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 28px 24px;
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .cert-featured { border-color: var(--red); border-width: 2px; padding: 27px 23px; }
+  .cert-flag {
+    position: absolute; top: -11px; left: 24px;
+    background: var(--red); color: var(--white);
+    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 4px 10px; border-radius: 3px;
+  }
+  .cert-price {
+    font-family: var(--font-display);
+    font-size: 40px; font-weight: 700; letter-spacing: -0.02em;
+    color: var(--black); margin: 0;
+  }
+  .cert-name {
+    font-size: 17px; font-weight: 600;
+    font-family: var(--font-body); letter-spacing: -0.01em;
+    color: var(--black); margin: 2px 0 12px;
+  }
+  .cert-blurb { font-size: 15px; line-height: 1.65; color: var(--text); margin: 0 0 12px; }
+  .cert-detail { font-size: 13px; color: var(--muted); margin: 0 0 20px; }
+  /* Pushes every button to the same baseline regardless of blurb length. */
+  .cert-btn { margin-top: auto; width: 100%; }
+
+  .certs-note { font-size: 13px; color: var(--muted); margin: 0 0 48px; max-width: 680px; }
+
+  /* Reused from the about page: a flat card list, one fact per row. */
+  .cred-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+  .cred-list li {
+    padding: 14px 16px;
+    background: var(--gray);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+  }
+  .cred-list strong { font-size: 15px; font-weight: 600; color: var(--black); }
+
+  /* Steps. Numbers come from a counter rather than the list marker so they can be
+     styled red and sit level with the heading. */
+  .steps { list-style: none; padding: 0; margin: 0; counter-reset: step; display: grid; gap: 22px; }
+  .step { counter-increment: step; padding-left: 44px; position: relative; }
+  .step::before {
+    content: counter(step);
+    position: absolute; left: 0; top: 0;
+    width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--red); color: var(--white);
+    font-family: var(--font-display);
+    font-size: 14px; font-weight: 700;
+    border-radius: 50%;
+  }
+  .step-heading {
+    font-size: 16px; font-weight: 600;
+    font-family: var(--font-body); letter-spacing: -0.01em;
+    color: var(--black); margin: 3px 0 5px;
+  }
+  .step-body { font-size: 15px; line-height: 1.65; color: var(--text); margin: 0; }
+
+  /* Terms */
+  .terms { margin: 0; display: grid; gap: 12px; }
+  .term {
+    display: grid; grid-template-columns: 200px 1fr; gap: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .term:last-child { border-bottom: none; padding-bottom: 0; }
+  .terms dt { font-size: 15px; font-weight: 600; color: var(--black); }
+  .terms dd { margin: 0; font-size: 15px; line-height: 1.6; color: var(--text); }
+
+  .inline-cta {
+    display: inline-block;
+    font-size: 14px; font-weight: 600; color: var(--red);
+    text-decoration: none; letter-spacing: 0.02em;
+  }
+  .inline-cta:hover { text-decoration: underline; }
+
+  @media (max-width: 900px) {
+    .certs { grid-template-columns: 1fr; gap: 24px; }
+  }
+  @media (max-width: 720px) {
+    .hub { padding: 48px 0; }
+    .term { grid-template-columns: 1fr; gap: 4px; }
+  }
+</style>
