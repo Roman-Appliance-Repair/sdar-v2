@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-09-08 (QS-4 в проде — merge 64afb0a1)
+**Последняя синхронизация:** 2026-09-14 (food truck раздел в проде — 7ab352f4)
 
 ---
 
@@ -56,6 +56,10 @@
   `/book/` слала `booking_submitted`; шторка шлёт `quote_submit`. Пока конверсия не переключена
   в GA4 Admin → Events, релиз выглядит как обвал лидов до нуля. Таблицу событий в
   @docs/analytics-stack.md §4–5 тоже надо обновить.
+- **Food truck раздел — хвосты:** (1) hero-фото для 5 страниц в работе (ветка
+  `feat/food-truck-equipment-repair`); `generator-vs-battery-power` пока без фото;
+  (2) Recent repairs на всех 6 страницах — пустые TODO-слоты, скрыты в проде, наполнить
+  только реальными job'ами из HCP.
 - **Photo wave подготовка** — стратегия наполнения фото обсуждена 2026-05-06 (5 art-list шаблонов + 3 техника по филиалам). Реализация ещё не начата
 - **CLAUDE.md + docs/ структура** — деплоится 2026-05-06
 
@@ -80,6 +84,20 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-09-14:** **Food truck equipment repair — новый вертикальный раздел, 6 страниц, В ПРОДЕ**
+  (`b5b9b126` + `4cf7abbe` + `7ab352f4`, ветка `feat/food-truck-equipment-repair`).
+  Хаб `/commercial/food-truck-equipment-repair/` с секцией «What we service / What we don't
+  touch» (баллоны/регуляторы → propane contractor, fire suppression → fire protection
+  contractor, генератор → generator shop, plan check → LA County Environmental Health) +
+  griddle-wont-light / refrigeration-not-cooling / fryer-not-heating /
+  ice-machine-not-making-ice + информационная generator-vs-battery-power. Цена $120
+  (commercial), schema через `mergeCredentials()` + `BRANCHES.map(buildBranchLocation)` +
+  `OPENING_HOURS_SCHEMA`, aggregateRating 0. Входящие ссылки с 5 существующих страниц.
+  Попутно: docs/seo-policies (9→10 филиалов, правило не хардкодить число),
+  factual-accuracy §11, CLAUDE.md (10 филиалов / 7 каунти / 99 городов). Гейты 197/53/431,
+  build 1206/0; прод 6/6 URL 200, live sitemap 6/6, IndexNow 200.
+  Детали: `session-log/2026-09-14.md`.
 
 - **2026-09-08:** **QS-4 — ряд CTA героя над сгибом 360×740 на всех 954 страницах, В ПРОДЕ**
   (merge `64afb0a1`, ветка `qs4-hero-fold` + бэкап `backup/main-pre-qs4-20260908` сохранены).
