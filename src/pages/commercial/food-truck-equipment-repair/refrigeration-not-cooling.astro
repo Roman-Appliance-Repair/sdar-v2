@@ -1,0 +1,276 @@
+---
+// src/pages/commercial/food-truck-equipment-repair/refrigeration-not-cooling.astro
+// Food truck failure-mode sub: undercounter fridge / prep table not cooling.
+// $120 commercial diagnostic, waived with repair. $200-$500 range reused from /commercial/.
+// Schema per docs/seo-policies.md (mergeCredentials + buildBranchLocation + OPENING_HOURS_SCHEMA). NO aggregateRating.
+import Layout from '../../../layouts/Layout.astro';
+import CommercialHero from '../../../components/CommercialHero.astro';
+import { BRANCHES, MAIN_PHONE, MAIN_PHONE_TEL } from '../../../data/branches';
+import { buildBranchLocation } from '../../../lib/build-location-array';
+import { mergeCredentials } from '../../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA, BUSINESS_HOURS } from '../../../data/business-hours';
+
+const phone = MAIN_PHONE;
+const phoneHref = `tel:${MAIN_PHONE_TEL}`;
+const hub = "https://samedayappliance.repair/commercial/food-truck-equipment-repair/";
+const canonical = hub + "refrigeration-not-cooling/";
+
+const title = "Food Truck Fridge Not Cooling LA — Same Day";
+const description = "Food truck fridge or prep table not cooling? Generator voltage, greasy condensers, vibration leaks, EPA 608 leak repair. $120 diagnostic, waived with repair.";
+
+const AREA_SERVED = [
+  "Los Angeles County", "Orange County", "Ventura County", "Santa Barbara County",
+  "San Bernardino County", "Riverside County", "San Diego County"
+].map((name) => ({ "@type": "AdministrativeArea", name }));
+
+const faqs = [
+  {
+    q: "Why does my truck fridge work at the commissary but not at events?",
+    a: "Because the power changes. At the commissary the fridge runs on steady shore power; at an event it shares a generator with everything else on the truck. When the compressor starts, it pulls several times its running current, and an undersized generator or a long, thin cord lets the voltage sag until the compressor struggles and trips. We measure voltage at the receptacle under real load and show you the numbers."
+  },
+  {
+    q: "What size generator does my truck refrigeration need?",
+    a: "It depends on everything that can start at the same moment, and starting load matters more than running load. We don't size generators, but we can measure what your equipment does to the voltage when it starts and write those readings down, so the generator shop is working from real numbers instead of nameplate guesses."
+  },
+  {
+    q: "How often should the condenser be cleaned on a food truck?",
+    a: "Every two to three months. With a griddle and fryer a few feet away, grease vapor and street dust pack the condenser far faster than in a restaurant, where once a year is typical. A clogged condenser makes the compressor run hot and long, which is the worst possible load for a generator."
+  },
+  {
+    q: "Can you just add refrigerant to get me through the weekend?",
+    a: "Not as a fix. If a system is low, it has a leak, and on a truck that's often a line vibration has rubbed through. Refrigerant work requires EPA 608 certification, and ours is Universal #1346255700410. We find the leak, repair it, pull a vacuum and charge to spec, so the fridge doesn't die again mid-event."
+  },
+  {
+    q: "How much is the diagnostic, and how soon can you come?",
+    a: "The diagnostic is $120 and it's waived when you approve the repair. Same-day service is available across Los Angeles, usually at your commissary, and phones are answered 24/7. You get a written quote before any part is ordered."
+  }
+];
+
+// TODO(recent-repairs): fill from REAL HouseCall Pro jobs only — never invent a case.
+const recentRepairs: { title: string; body: string; area: string }[] = [];
+const showRepairsSlot = recentRepairs.length > 0 || import.meta.env.DEV;
+
+const schemaJsons = [
+  mergeCredentials({
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$$",
+    "areaServed": AREA_SERVED,
+    "openingHoursSpecification": OPENING_HOURS_SCHEMA,
+    "location": BRANCHES.map(buildBranchLocation)
+  }),
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Food Truck Refrigeration Repair",
+    "name": "Food Truck Refrigerator Not Cooling Diagnostic and Repair",
+    "url": canonical,
+    "description": "Diagnosis and repair of food truck undercounter refrigerators and refrigerated prep tables that won't cool: generator voltage under load, condenser cleaning, vibration-related refrigerant leaks under EPA 608 Universal, fans, controls, gaskets and defrost.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": AREA_SERVED,
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Commercial diagnostic fee, waived with repair." } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  // BreadcrumbList: emitted once for every page by Layout → Breadcrumbs.astro
+  // (visible trail + matching JSON-LD), so it is not duplicated here.
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<CommercialHero
+  slug="food-truck-equipment-repair/refrigeration-not-cooling"
+  eyebrow="Food Trucks · Fridge & Prep Table Not Cooling · Generator Power"
+  title="Food Truck Fridge Not Cooling"
+  subtitle="Undercounter fridge or prep table warming up on the truck? We start with the power, then the condenser, then the refrigeration itself. $120 diagnostic, waived with repair."
+  heroImageTitle="Food Truck Refrigeration Repair"
+  showBranches={true}
+/>
+
+<!-- 01 POWER -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 · Start with the power</p>
+    <h2 class="section-title">About half the time, the fridge isn't the problem.</h2>
+
+    <p>About half the "not cooling" calls we get from trucks turn out to be power, not refrigeration. So our diagnostic starts with a voltmeter. We measure at the receptacle the fridge actually plugs into, with the generator loaded the way it runs during service, and we watch the reading at the moment the compressor starts. That's part of how we approach all <a href="/commercial/food-truck-equipment-repair/">food truck equipment repair</a>.</p>
+
+    <p>Here's why it matters. A compressor pulls several times its running current for the first second of every start. On utility power nobody notices. On a generator that's already carrying a fryer, lights and a second fridge, the voltage sags hard at that moment. The compressor struggles, trips its overload, cools off and tries again. A long, thin extension cord makes the sag worse. And many open-frame generators put out a rough waveform that electronic controls and modern fan motors don't handle well.</p>
+
+    <p>The giveaway is the pattern: a fridge that holds temperature all night at the commissary and warms up by mid-afternoon at an event. We write the readings down and show them to you. If the generator can't carry the start, that goes to a generator shop, and we're not going to sell you a compressor to fix a power problem. One catch: weeks of hard starts can cook the start relay and overload even after the power is sorted, so we test those too.</p>
+  </div>
+</section>
+
+<!-- 02 CONDENSER -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">02 · Then the condenser</p>
+    <h2 class="section-title">On a truck, the condenser clogs in months, not years.</h2>
+
+    <p>The condenser is the coil that dumps the heat the fridge pulls out of the cabinet. In a restaurant we'd expect to clean it about once a year. On a truck it needs cleaning every two to three months. The griddle and fryer sit a few feet away in a closed space, and grease vapor plus street dust packs the fins into a felt mat.</p>
+
+    <p>Signs you're there: the compressor runs almost nonstop, the cabinet creeps up a few degrees through the afternoon, and the area around the grille feels hot. The truck makes it harder still. A steel box on a summer afternoon is hotter than a restaurant kitchen, so the condenser has less temperature difference to work with before it's dirty at all. Boxes stacked against a front-breathing grille finish the job. Keep that grille clear.</p>
+  </div>
+</section>
+
+<!-- 03 VIBRATION -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 · Vibration</p>
+    <h2 class="section-title">Leaks and loose parts from the road.</h2>
+
+    <p>Every drive shakes the refrigeration system. A compressor that's lost a mounting bolt rattles a copper line against something until it rubs through, and the fridge loses cooling slowly over days or weeks. That's a sealed-system repair. It requires EPA 608 certification, and ours is Universal #1346255700410. We find the leak, repair it, pull a vacuum and charge the system to spec. Topping off a leaking system just schedules the next breakdown.</p>
+
+    <p>Vibration also loosens fan blades and motor mounts (you'll hear it before you feel it) and knocks drain lines off their fittings, so water pools under the unit or freezes on the evaporator. We check mounts, lines and drains on every truck visit, not only the part that failed.</p>
+  </div>
+</section>
+
+<!-- 04 ORDINARY FAILURES -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">04 · The ordinary failures</p>
+    <h2 class="section-title">And sometimes it's the same failure a restaurant fridge gets.</h2>
+
+    <ul class="bullet-list">
+      <li><strong>Evaporator fan motor.</strong> Compressor runs, but cold air doesn't move through the cabinet.</li>
+      <li><strong>Iced-over evaporator</strong> from a defrost problem or a door that didn't latch after a busy window.</li>
+      <li><strong>Door gaskets</strong> torn by nonstop opening during service.</li>
+      <li><strong>Thermostat or controller</strong> reading wrong or stuck.</li>
+      <li><strong>Prep table cold rail</strong> struggling because the lids stay open all rush, or pans are filled above the fill line and block the airflow over the rail.</li>
+    </ul>
+    <p>Prep tables share most of these failure patterns with undercounter units; for the restaurant side of the same equipment, see <a href="/commercial/refrigeration/prep-table-repair/">refrigerated prep table repair</a>. If your ice machine is also slowing down at events, the cause is often the same heat and power; see <a href="/commercial/food-truck-equipment-repair/ice-machine-not-making-ice/">food truck ice machine not making ice</a>.</p>
+  </div>
+</section>
+
+<!-- 05 FOOD SAFETY -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 · While you wait</p>
+    <h2 class="section-title">Protect the food first.</h2>
+
+    <div class="callout">
+      <p>Cold-holding food has to stay at 41°F or below. Check product temperature with a probe thermometer in the food, not the air. If the unit is above 41°F, move product to a working unit or iced storage before we arrive, and note the temperatures and times.</p>
+    </div>
+
+    <p>Before you call, check the easy things: the unit is plugged in and the breaker hasn't tripped, the grille isn't blocked, the door closes and seals, and the generator isn't overloaded with something that just got added. Leave the panels on. Anything behind them is our job.</p>
+  </div>
+</section>
+
+<!-- 06 PRICING -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">06 · Pricing</p>
+    <h2 class="section-title">What it costs.</h2>
+    <p>The diagnostic is $120, and it's waived when you approve the repair. Most fan motor, relay and control repairs on commercial refrigeration land in the $200 to $500 range. Sealed-system work gets quoted in writing after we've found the leak, because the leak location decides the job. Repairs carry our 90-day labor warranty.</p>
+    <p>After the repair we don't leave on a cold reading from the first ten minutes. We let the unit pull down, check the temperature where the product sits, and when power was part of the story, we watch the compressor start on the same generator setup you run at events. If a start relay or overload took damage from weeks of hard starts, you hear about it now, not at your next festival. We also write the voltage readings on the invoice, so you have a baseline to compare against the next time something feels off.</p>
+  </div>
+</section>
+
+<!-- 07 RECENT REPAIRS (hidden in production until real HCP cases are filled in) -->
+{showRepairsSlot && (
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">07 · Recent refrigeration calls</p>
+    <h2 class="section-title">Recent food truck refrigeration repairs.</h2>
+    {recentRepairs.length > 0 ? recentRepairs.map((r) => (
+      <div class="story">
+        <h3>"{r.title}"</h3>
+        <p>{r.body}</p>
+        <p class="story-area">{r.area}</p>
+      </div>
+    )) : [1, 2].map((n) => (
+      <div class="story story-todo">
+        <h3>TODO: refrigeration case {n} from a real HCP job</h3>
+        <p>Title as the customer said it, the model, what we found, what we did, one human detail. Never invented. This placeholder renders only in dev.</p>
+      </div>
+    ))}
+  </div>
+</section>
+)}
+
+<!-- 08 FAQ -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">08 · FAQ</p>
+    <h2 class="section-title">Food truck refrigeration questions.</h2>
+    <div class="faq-list">
+      {faqs.map((f) => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- 09 RELATED -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">09 · Related</p>
+    <h2 class="section-title">More food truck service.</h2>
+    <ul class="related-list">
+      <li><a href="/commercial/food-truck-equipment-repair/">Food truck equipment repair (all equipment)</a></li>
+      <li><a href="/commercial/food-truck-equipment-repair/ice-machine-not-making-ice/">Food truck ice machine not making ice</a></li>
+      <li><a href="/commercial/refrigeration/undercounter-refrigerator-repair/">Commercial undercounter refrigerator repair</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Fridge warming up on the truck? Call now.</h2>
+    <p>$120 diagnostic, waived with repair. {BUSINESS_HOURS.display}.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/book/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 20px; line-height: 1.2; color: var(--text); letter-spacing: -0.01em; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 8px; }
+  .related-list { padding-left: 22px; margin: 14px 0 0; }
+  .related-list li { font-size: 0.98rem; line-height: 1.7; margin-bottom: 8px; }
+  .callout { background: #fff5f7; border: 1px solid #e8a0a0; border-radius: 8px; padding: 16px 20px; margin: 0 0 20px; }
+  .callout p { margin: 0; }
+  .story { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px 26px; margin-bottom: 14px; }
+  .story h3 { font-size: 1rem; font-weight: 800; margin: 0 0 10px; color: var(--text); line-height: 1.35; }
+  .story p { font-size: 0.95rem; margin: 0; line-height: 1.7; }
+  .story .story-area { margin-top: 8px; font-size: 0.85rem; color: var(--muted); }
+  .story-todo { border: 2px dashed #e0a800; background: #fff8e7; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px 22px; margin-bottom: 10px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 0.98rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.93rem; color: var(--text); line-height: 1.7; margin: 12px 0 0; }
+  .bottom-cta { background: var(--black); padding: 64px 24px; text-align: center; color: #fff; }
+  .bottom-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 14px; color: #fff; }
+  .bottom-cta p { color: rgba(255,255,255,0.85); margin: 0 0 26px; font-size: 1.05rem; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.5); font-weight: 600; text-decoration: none; }
+</style>

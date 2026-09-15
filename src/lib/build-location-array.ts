@@ -25,7 +25,7 @@ function phoneE164(phone: string): string {
   return '+1' + phone.replace(/\D/g, '');
 }
 
-function buildBranchLocation(branch: Branch): Record<string, unknown> {
+export function buildBranchLocation(branch: Branch): Record<string, unknown> {
   return {
     '@type': 'LocalBusiness',
     name: branch.gbpName,

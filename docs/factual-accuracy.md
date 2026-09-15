@@ -179,7 +179,7 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 - David K. → Irvine, Rancho Cucamonga, Temecula
 - **San Diego: техник НЕ закреплён (2026-08-07).** В текстах — только generic «our San Diego technicians», никаких имён, пока Roman не назначит.
 
-## 11. Branch phones (10 филиалов)
+## 11. Branch phones
 
 | Branch | Phone | Email | Status |
 |---|---|---|---|

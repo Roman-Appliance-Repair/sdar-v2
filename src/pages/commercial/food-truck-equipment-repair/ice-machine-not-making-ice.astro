@@ -1,0 +1,266 @@
+---
+// src/pages/commercial/food-truck-equipment-repair/ice-machine-not-making-ice.astro
+// Food truck failure-mode sub: ice machine not making ice (heat, onboard water, power, level).
+// $120 commercial diagnostic, waived with repair. No invented repair price ranges.
+// Schema per docs/seo-policies.md (mergeCredentials + buildBranchLocation + OPENING_HOURS_SCHEMA). NO aggregateRating.
+import Layout from '../../../layouts/Layout.astro';
+import CommercialHero from '../../../components/CommercialHero.astro';
+import { BRANCHES, MAIN_PHONE, MAIN_PHONE_TEL } from '../../../data/branches';
+import { buildBranchLocation } from '../../../lib/build-location-array';
+import { mergeCredentials } from '../../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA, BUSINESS_HOURS } from '../../../data/business-hours';
+
+const phone = MAIN_PHONE;
+const phoneHref = `tel:${MAIN_PHONE_TEL}`;
+const hub = "https://samedayappliance.repair/commercial/food-truck-equipment-repair/";
+const canonical = hub + "ice-machine-not-making-ice/";
+
+const title = "Food Truck Ice Machine Repair LA — Same Day";
+const description = "Food truck ice machine not making ice? Truck heat, onboard water pressure, generator voltage, level, scale and cleaning. $120 diagnostic, waived with repair.";
+
+const AREA_SERVED = [
+  "Los Angeles County", "Orange County", "Ventura County", "Santa Barbara County",
+  "San Bernardino County", "Riverside County", "San Diego County"
+].map((name) => ({ "@type": "AdministrativeArea", name }));
+
+const faqs = [
+  {
+    q: "Why does my ice machine make less ice at events than at the commissary?",
+    a: "Heat and power. Ice production ratings are measured at mild air and water temperatures, and a closed truck on a summer afternoon is anything but mild, so an air-cooled machine makes less ice per cycle and runs longer. Add a generator that sags when the compressor starts and a condenser coated in fryer grease, and output drops again. We measure all three before touching refrigeration parts."
+  },
+  {
+    q: "Why are the cubes thin, or only forming on one side?",
+    a: "On a truck, two causes lead the list. Water: a weak onboard pump, a low fresh water tank, air in the line or a clogged filter keeps the machine from filling fully. Level: cube machines need to sit level so water runs evenly over the evaporator, and a truck parked on a crowned street tilts it. We check pressure during fill and the level of the unit as parked."
+  },
+  {
+    q: "How often should a food truck ice machine be cleaned?",
+    a: "Follow the manufacturer's cleaning and sanitizing schedule as the minimum, and expect a truck to need it more often than a restaurant machine, because heat, grease and hard commissary water build scale and slime faster. Ice is food, so a dirty machine is a health problem before it's a production problem."
+  },
+  {
+    q: "Can a weak water pump really stop an ice machine?",
+    a: "Yes. Every cycle expects enough water in a set amount of time. A tired 12-volt pump or a nearly empty tank leaves the machine short, which shows up as partial cubes, long cycles or a water fault. It's one of the first things we test on a truck, because it's cheaper to fix than anything inside the machine."
+  },
+  {
+    q: "What does the diagnostic cost, and how soon can you come?",
+    a: "The diagnostic is $120 and it's waived when you approve the repair. Same-day service is available across Los Angeles, usually at your commissary, with phones answered 24/7. Cleaning, descaling and parts are quoted in writing after we look at the machine."
+  }
+];
+
+// TODO(recent-repairs): fill from REAL HouseCall Pro jobs only — never invent a case.
+const recentRepairs: { title: string; body: string; area: string }[] = [];
+const showRepairsSlot = recentRepairs.length > 0 || import.meta.env.DEV;
+
+const schemaJsons = [
+  mergeCredentials({
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$$",
+    "areaServed": AREA_SERVED,
+    "openingHoursSpecification": OPENING_HOURS_SCHEMA,
+    "location": BRANCHES.map(buildBranchLocation)
+  }),
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Food Truck Ice Machine Repair",
+    "name": "Food Truck Ice Machine Not Making Ice Diagnostic and Repair",
+    "url": canonical,
+    "description": "Diagnosis and repair of food truck ice machines that make little or no ice: ambient heat and condenser cleaning, onboard water pressure and filters, generator voltage, unit level, water distribution and bin controls, cleaning and descaling, EPA 608 Universal refrigerant work.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": AREA_SERVED,
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Commercial diagnostic fee, waived with repair." } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  // BreadcrumbList: emitted once for every page by Layout → Breadcrumbs.astro
+  // (visible trail + matching JSON-LD), so it is not duplicated here.
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<CommercialHero
+  slug="food-truck-equipment-repair/ice-machine-not-making-ice"
+  eyebrow="Food Trucks · Ice Machine Not Making Ice · Water, Heat, Power"
+  title="Food Truck Ice Machine Not Making Ice"
+  subtitle="Thin cubes, half a bin by lunch, or no ice at all? On a truck it's usually heat, water pressure, power or a machine parked off level. $120 diagnostic, waived with repair."
+  heroImageTitle="Food Truck Ice Machine Repair"
+  showBranches={true}
+/>
+
+<!-- 01 WHY -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 · Why it struggles</p>
+    <h2 class="section-title">An ice machine on a truck gets the opposite of everything it was built for.</h2>
+
+    <p>An undercounter ice machine is designed to sit in a still, ventilated back bar with steady water pressure and steady power. A truck gives it heat, a 12-volt pump, a generator and a floor that's rarely level. Our techs check those four things before they open the refrigeration side, because on a truck they're behind most low-ice calls. It's part of our <a href="/commercial/food-truck-equipment-repair/">food truck equipment repair</a> work.</p>
+
+    <h3 class="series-h3">Heat</h3>
+    <p>Ice production ratings are measured at mild air and water temperatures. Inside a closed truck on a summer afternoon, an air-cooled machine pulls hot air across its condenser and freezes warmer water, so each cycle runs longer and the bin fills slower. Put the fryer a few feet away and the condenser collects grease on top of dust, which cuts output again and can push the machine into a fault. On a truck we clean condensers every two to three months, not once a year.</p>
+
+    <h3 class="series-h3">Water</h3>
+    <p>Truck water comes from an onboard fresh water tank and a pump, not a city main. When the pump is weak, the tank is low or air gets into the line, the machine doesn't fill the way it expects in the time it expects. You get thin or partial cubes, long cycles, sometimes a water fault on the display. A clogged filter makes it worse, and hard water from the commissary fill scales the evaporator over time.</p>
+
+    <h3 class="series-h3">Power</h3>
+    <p>An ice machine starts its compressor over and over through the day, and every start pulls several times running current. On a loaded generator, that sag can make the machine stumble through harvest or trip off entirely. We measure voltage at the receptacle during a start, the same way we do on truck refrigeration.</p>
+
+    <h3 class="series-h3">Level and vibration</h3>
+    <p>Cube machines need to sit level so water runs evenly across the evaporator. A truck parked on a crowned street tilts the machine, and cubes form thick on one side and thin or not at all on the other. Driving also shakes water distribution parts, curtains and bin sensors out of place, and pops drain lines loose.</p>
+  </div>
+</section>
+
+<!-- 02 DIAGNOSIS -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">02 · How we diagnose it</p>
+    <h2 class="section-title">Cheapest causes first, sealed system last.</h2>
+
+    <ol class="num-list">
+      <li><strong>Water in:</strong> pump output and pressure during fill, tank level, filter condition, air in the line.</li>
+      <li><strong>Air and heat:</strong> condenser condition, clearance around the air intake, temperature where the machine breathes.</li>
+      <li><strong>Power:</strong> voltage at the receptacle during compressor start and harvest.</li>
+      <li><strong>Level and mechanics:</strong> the machine's level as the truck is parked, water distribution, curtain, bin control, drain.</li>
+      <li><strong>Scale and cleanliness:</strong> evaporator and water system condition.</li>
+      <li><strong>Refrigeration last:</strong> if all of the above check out, we test the refrigeration side. Opening a sealed system takes EPA 608 certification, and ours is Universal #1346255700410. If vibration has caused a leak, we find it and repair it rather than topping off.</li>
+    </ol>
+
+    <p>When we finish, we don't judge the machine by its first harvest. We let it run a full cycle or two, check that the cubes come out complete and even across the evaporator with the truck parked the way it usually parks, and confirm the bin control shuts production off when the bin is full. If water supply was the problem, we tell you in plain terms what the machine needs from the pump, so an upgrade gets done right the first time. Anything we cleaned or sanitized gets flushed per the manufacturer before the ice goes back into drinks.</p>
+
+    <p>If your undercounter fridge is also warming up at events, the heat and power story is usually the same; see <a href="/commercial/food-truck-equipment-repair/refrigeration-not-cooling/">food truck fridge not cooling</a>. For brand-specific error codes and troubleshooting on Hoshizaki, Manitowoc and Scotsman machines, see our <a href="/commercial/ice-machines/">commercial ice machine repair</a> section.</p>
+  </div>
+</section>
+
+<!-- 03 CLEANING -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 · Clean ice</p>
+    <h2 class="section-title">Cleaning is part of the repair, not an extra.</h2>
+
+    <div class="callout">
+      <p>Ice is food. A machine with scale, slime or grease inside is a health problem before it's a production problem, and an inspector will treat it that way.</p>
+    </div>
+
+    <p>We clean and sanitize using the manufacturer's procedure and approved cleaners, and we descale the evaporator and water system when scale is building. Scale insulates the evaporator, so a descaled machine often gets a good share of its lost production back with no parts at all. On a truck, heat, grease and hard water mean cleaning comes around more often than the manual's restaurant schedule suggests.</p>
+
+    <p>What you can check before calling: the pump runs and the fresh water tank has water, the filter isn't overdue, nothing is stacked against the air intake, and the truck is parked as level as the spot allows. Leave the panels and the refrigeration side to us.</p>
+  </div>
+</section>
+
+<!-- 04 PRICING -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">04 · Pricing</p>
+    <h2 class="section-title">What it costs.</h2>
+    <p>The diagnostic is $120, and it's waived when you approve the repair. Cleaning and descaling depend on the machine's size and condition, and parts depend on the model, so we quote both in writing after we've looked at the machine. What we quote is what you pay. When the fix turns out to be the water pump, the filter or leveling the unit, we tell you that plainly. Repairs carry our 90-day labor warranty.</p>
+  </div>
+</section>
+
+<!-- 05 RECENT REPAIRS (hidden in production until real HCP cases are filled in) -->
+{showRepairsSlot && (
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 · Recent ice machine calls</p>
+    <h2 class="section-title">Recent food truck ice machine repairs.</h2>
+    {recentRepairs.length > 0 ? recentRepairs.map((r) => (
+      <div class="story">
+        <h3>"{r.title}"</h3>
+        <p>{r.body}</p>
+        <p class="story-area">{r.area}</p>
+      </div>
+    )) : [1, 2].map((n) => (
+      <div class="story story-todo">
+        <h3>TODO: ice machine case {n} from a real HCP job</h3>
+        <p>Title as the customer said it, the model, what we found, what we did, one human detail. Never invented. This placeholder renders only in dev.</p>
+      </div>
+    ))}
+  </div>
+</section>
+)}
+
+<!-- 06 FAQ -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">06 · FAQ</p>
+    <h2 class="section-title">Food truck ice machine questions.</h2>
+    <div class="faq-list">
+      {faqs.map((f) => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- 07 RELATED -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">07 · Related</p>
+    <h2 class="section-title">More food truck service.</h2>
+    <ul class="related-list">
+      <li><a href="/commercial/food-truck-equipment-repair/">Food truck equipment repair (all equipment)</a></li>
+      <li><a href="/commercial/food-truck-equipment-repair/refrigeration-not-cooling/">Food truck fridge not cooling</a></li>
+      <li><a href="/commercial/ice-machines/not-making-ice/">Commercial ice machine not making ice (restaurant side)</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Out of ice before the event? Call now.</h2>
+    <p>$120 diagnostic, waived with repair. {BUSINESS_HOURS.display}.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/book/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 20px; line-height: 1.2; color: var(--text); letter-spacing: -0.01em; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .series-h3 { font-size: 1.1rem; font-weight: 800; margin: 28px 0 10px; color: var(--text); border-left: 4px solid var(--red); padding-left: 12px; }
+  .num-list { padding-left: 22px; margin: 14px 0 18px; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 12px; }
+  .related-list { padding-left: 22px; margin: 14px 0 0; }
+  .related-list li { font-size: 0.98rem; line-height: 1.7; margin-bottom: 8px; }
+  .callout { background: #fff5f7; border: 1px solid #e8a0a0; border-radius: 8px; padding: 16px 20px; margin: 0 0 20px; }
+  .callout p { margin: 0; }
+  .story { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px 26px; margin-bottom: 14px; }
+  .story h3 { font-size: 1rem; font-weight: 800; margin: 0 0 10px; color: var(--text); line-height: 1.35; }
+  .story p { font-size: 0.95rem; margin: 0; line-height: 1.7; }
+  .story .story-area { margin-top: 8px; font-size: 0.85rem; color: var(--muted); }
+  .story-todo { border: 2px dashed #e0a800; background: #fff8e7; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px 22px; margin-bottom: 10px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 0.98rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.93rem; color: var(--text); line-height: 1.7; margin: 12px 0 0; }
+  .bottom-cta { background: var(--black); padding: 64px 24px; text-align: center; color: #fff; }
+  .bottom-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 14px; color: #fff; }
+  .bottom-cta p { color: rgba(255,255,255,0.85); margin: 0 0 26px; font-size: 1.05rem; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.5); font-weight: 600; text-decoration: none; }
+</style>

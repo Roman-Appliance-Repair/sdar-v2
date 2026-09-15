@@ -1,0 +1,268 @@
+---
+// src/pages/commercial/food-truck-equipment-repair/griddle-wont-light.astro
+// Food truck failure-mode sub: griddle won't light / won't stay lit (LP).
+// $120 commercial diagnostic, waived with repair. Price ranges reused from /commercial/griddle-repair/.
+// Schema per docs/seo-policies.md (mergeCredentials + buildBranchLocation + OPENING_HOURS_SCHEMA). NO aggregateRating.
+import Layout from '../../../layouts/Layout.astro';
+import CommercialHero from '../../../components/CommercialHero.astro';
+import { BRANCHES, MAIN_PHONE, MAIN_PHONE_TEL } from '../../../data/branches';
+import { buildBranchLocation } from '../../../lib/build-location-array';
+import { mergeCredentials } from '../../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA, BUSINESS_HOURS } from '../../../data/business-hours';
+
+const phone = MAIN_PHONE;
+const phoneHref = `tel:${MAIN_PHONE_TEL}`;
+const hub = "https://samedayappliance.repair/commercial/food-truck-equipment-repair/";
+const canonical = hub + "griddle-wont-light/";
+
+const title = "Food Truck Griddle Won't Light LA — Same Day";
+const description = "Food truck griddle won't light or stay lit? We check LP supply, pilot, thermocouple, safety valve and gas conversion. $120 diagnostic, waived with repair.";
+
+const AREA_SERVED = [
+  "Los Angeles County", "Orange County", "Ventura County", "Santa Barbara County",
+  "San Bernardino County", "Riverside County", "San Diego County"
+].map((name) => ({ "@type": "AdministrativeArea", name }));
+
+const faqs = [
+  {
+    q: "Why does my griddle pilot light but go out when I let go of the knob?",
+    a: "The pilot heats a thermocouple, and the thermocouple's small voltage holds the safety valve open. When the pilot dies on release, the thermocouple isn't making enough voltage, the flame isn't wrapping its tip, or the safety valve magnet is weak. We read the thermocouple with a meter, open-circuit with the pilot lit. Below 25 mV we replace it rather than clean it."
+  },
+  {
+    q: "Can I run a natural gas griddle on propane?",
+    a: "Not without converting it. Propane needs smaller orifices and higher manifold pressure than natural gas, so an unconverted griddle burns an oversized, yellow, sooty flame and can overheat. The right fix is the manufacturer's LP conversion kit for that model. We don't drill or swap orifices by guesswork, and if no factory kit exists, we'll tell you."
+  },
+  {
+    q: "The griddle lights, but the flame is yellow and leaves soot. What's wrong?",
+    a: "On a truck the usual causes are a griddle that was never converted from natural gas, burner ports clogged with grease and carbon, or wrong supply pressure. We check the data plate and orifices against the gas you run, clean the burners, and put a manometer on the griddle inlet to confirm pressure before replacing anything."
+  },
+  {
+    q: "Do you fix the propane regulator or the tank on the truck?",
+    a: "No. Cylinders, regulators and the LP line outside the appliance are work for a licensed propane contractor. We measure pressure at the griddle inlet with the other burners running, and if the griddle is being starved, we tell you it's a supply problem instead of selling you griddle parts."
+  },
+  {
+    q: "How fast can you get to the truck, and what does it cost?",
+    a: "Same-day service is available across Los Angeles, usually at your commissary. The diagnostic is $120 and it's waived when you approve the repair. You get a written quote before we order parts, and phones are answered 24/7."
+  }
+];
+
+// TODO(recent-repairs): fill from REAL HouseCall Pro jobs only — never invent a case.
+const recentRepairs: { title: string; body: string; area: string }[] = [];
+const showRepairsSlot = recentRepairs.length > 0 || import.meta.env.DEV;
+
+const schemaJsons = [
+  mergeCredentials({
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$$",
+    "areaServed": AREA_SERVED,
+    "openingHoursSpecification": OPENING_HOURS_SCHEMA,
+    "location": BRANCHES.map(buildBranchLocation)
+  }),
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Food Truck Griddle Repair",
+    "name": "Food Truck Griddle Won't Light Diagnostic and Repair",
+    "url": canonical,
+    "description": "Diagnosis and repair of food truck griddles that won't light or won't stay lit: LP supply pressure at the appliance inlet, pilot orifice and tubing, thermocouple, safety valve, thermostat, and factory LP conversion of natural gas griddles.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": AREA_SERVED,
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Commercial diagnostic fee, waived with repair." } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  // BreadcrumbList: emitted once for every page by Layout → Breadcrumbs.astro
+  // (visible trail + matching JSON-LD), so it is not duplicated here.
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<CommercialHero
+  slug="food-truck-equipment-repair/griddle-wont-light"
+  eyebrow="Food Trucks · Griddle Won't Light · LP Diagnostic"
+  title="Food Truck Griddle Won't Light"
+  subtitle="No flame, a pilot that dies when you let go of the knob, or a lazy yellow fire on propane. We test the gas supply, pilot and thermocouple right at the truck. $120 diagnostic, waived with repair."
+  heroImageTitle="Food Truck Griddle Repair"
+  showBranches={true}
+/>
+
+<!-- 01 CAUSES -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 · What's usually wrong</p>
+    <h2 class="section-title">It's usually one of five things, and we check them in this order.</h2>
+
+    <p>Griddle calls from trucks tend to come at two moments: first thing in the morning, when the cook fires up for prep and nothing happens, or right after a drive, when a griddle that worked yesterday won't hold a pilot. Our techs work it from the gas supply inward. Replacing a thermocouple on a griddle that isn't getting gas fixes nothing and costs you a part. This page is one piece of our <a href="/commercial/food-truck-equipment-repair/">food truck equipment repair</a> service.</p>
+
+    <ol class="num-list">
+      <li><strong>No gas reaching the griddle.</strong> An empty or closed cylinder. A cylinder valve opened too fast, which can trip the excess-flow protection built into many valves and hoses and choke the flow to a trickle. Air in the line after a cylinder swap. A manual shutoff left closed. And one that's specific to trucks: if the hood fire suppression system's gas shutoff has tripped, nothing under the hood will light. Resetting that belongs to your fire protection contractor.</li>
+      <li><strong>A pilot that won't light or won't stay lit.</strong> Grease and carbon plug the tiny pilot orifice. The open service window pulls a draft straight across the cook line. Vibration loosens the pilot tubing fitting, so the flame comes out small and wanders off the thermocouple tip.</li>
+      <li><strong>A tired thermocouple.</strong> The pilot heats the thermocouple, which makes a small voltage that holds the safety valve open. We read it with a meter, open-circuit, pilot lit, tip fully in the flame. Below 25 mV we replace it, not clean it. Sanding a weak thermocouple might buy a week, and on a truck that week ends in the middle of a lunch rush.</li>
+      <li><strong>The safety valve or thermostat.</strong> If the pilot is strong and the thermocouple reads well but the valve still won't hold, the magnet in the safety valve is weak. On thermostatic griddles, a thermostat with a kinked or damaged capillary bulb can keep the main burner off even with a perfect pilot.</li>
+      <li><strong>A natural gas griddle that was never converted.</strong> A lot of truck griddles were bought used from restaurants. Run on propane without conversion, they throw an oversized, yellow, sooty flame, overheat the plate, and never settle into a clean pilot. The fix is the manufacturer's LP conversion kit, with correct orifices and the valve or regulator set for LP. We don't drill orifices out, ever.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 02 DIAGNOSIS -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">02 · How we diagnose it</p>
+    <h2 class="section-title">What we measure before we replace anything.</h2>
+
+    <ul class="bullet-list">
+      <li><strong>Pressure at the griddle inlet</strong>, with a manometer, while the fryer and other burners are running. Supply problems hide when only one burner is lit.</li>
+      <li><strong>The pilot flame itself.</strong> It should be steady, blue and wrapped around the thermocouple tip. Small, yellow or wandering points to the orifice, a draft or a loose fitting.</li>
+      <li><strong>Thermocouple output</strong> in millivolts, with the pilot lit.</li>
+      <li><strong>Gas type</strong>: the data plate and the orifices checked against the gas the truck actually runs.</li>
+      <li><strong>A leak test</strong> with leak detector solution on every fitting we opened, before we leave.</li>
+    </ul>
+
+    <p>If the manometer says the griddle is starved, we stop there and tell you. Low pressure at the inlet with full cylinders usually points to the regulator or the line, and that's your propane contractor's work, not ours. The same supply problem tends to show up on the fryer too; if yours is also slow, see <a href="/commercial/food-truck-equipment-repair/fryer-not-heating/">food truck fryer not heating</a>. You shouldn't pay us to replace parts on a griddle that was never the problem.</p>
+
+    <p>Because trucks shake loose, our techs also look past the part we came for. A pilot fitting that backed off on this drive has neighbors that are next.</p>
+
+    <p>Before we leave, the griddle runs the way your cook runs it: every burner on, the fryer lit alongside it, the pilot relit from cold, and the plate checked with a surface probe at the setting you actually cook at. A griddle that lights once in the lot and quits at 11:30 isn't fixed. If we replaced one thermocouple, we also read the ones on the neighboring burners, because they've spent the same hours in the same flame, and we tell you whether they're close to the line instead of quietly selling you three.</p>
+  </div>
+</section>
+
+<!-- 03 BEFORE YOU CALL -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 · Before you call</p>
+    <h2 class="section-title">What you can safely check yourself.</h2>
+
+    <div class="callout">
+      <p><strong>If you smell gas:</strong> close the cylinder valve, don't light anything or flip switches, get everyone out of the truck, and call your propane supplier or 911 from a safe distance. Don't call us first.</p>
+    </div>
+
+    <ul class="bullet-list">
+      <li>Confirm the cylinder isn't empty, and open the valve slowly, all the way.</li>
+      <li>Look at the hood suppression system. If it has discharged or its gas shutoff has tripped, call your fire protection contractor to reset it.</li>
+      <li>Close the service window while you light the pilot, so the draft isn't blowing it out.</li>
+      <li>Follow the lighting instructions on the griddle. If the pilot won't hold after a couple of honest tries, stop.</li>
+      <li>Don't drill, swap or file orifices, and don't bypass a safety valve. Those turn a service call into a hazard.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 04 PRICING -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">04 · Pricing</p>
+    <h2 class="section-title">What it costs.</h2>
+    <p>The diagnostic is $120, and it's waived when you approve the repair. On our commercial griddle work, a thermocouple replacement typically runs $220 to $340, and burner cleaning $180 to $290 per burner. Safety valves, thermostats and LP conversion kits vary a lot by model, so we quote those in writing after the diagnostic. What we quote is what you pay. Repairs carry our 90-day labor warranty.</p>
+  </div>
+</section>
+
+<!-- 05 RECENT REPAIRS (hidden in production until real HCP cases are filled in) -->
+{showRepairsSlot && (
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 · Recent griddle calls</p>
+    <h2 class="section-title">Recent food truck griddle repairs.</h2>
+    {recentRepairs.length > 0 ? recentRepairs.map((r) => (
+      <div class="story">
+        <h3>"{r.title}"</h3>
+        <p>{r.body}</p>
+        <p class="story-area">{r.area}</p>
+      </div>
+    )) : [1, 2].map((n) => (
+      <div class="story story-todo">
+        <h3>TODO: griddle case {n} from a real HCP job</h3>
+        <p>Title as the customer said it, the model, what we found, what we did, one human detail. Never invented. This placeholder renders only in dev.</p>
+      </div>
+    ))}
+  </div>
+</section>
+)}
+
+<!-- 06 FAQ -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">06 · FAQ</p>
+    <h2 class="section-title">Food truck griddle questions.</h2>
+    <div class="faq-list">
+      {faqs.map((f) => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- 07 RELATED -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">07 · Related</p>
+    <h2 class="section-title">More food truck service.</h2>
+    <ul class="related-list">
+      <li><a href="/commercial/food-truck-equipment-repair/">Food truck equipment repair (all equipment)</a></li>
+      <li><a href="/commercial/food-truck-equipment-repair/fryer-not-heating/">Food truck fryer not heating</a></li>
+      <li><a href="/commercial/griddle-repair/">Commercial griddle repair (restaurant side)</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Griddle cold before prep? Call now.</h2>
+    <p>$120 diagnostic, waived with repair. {BUSINESS_HOURS.display}.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/book/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 20px; line-height: 1.2; color: var(--text); letter-spacing: -0.01em; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .num-list { padding-left: 22px; margin: 14px 0 0; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 12px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 8px; }
+  .related-list { padding-left: 22px; margin: 14px 0 0; }
+  .related-list li { font-size: 0.98rem; line-height: 1.7; margin-bottom: 8px; }
+  .callout { background: #fff5f7; border: 1px solid #e8a0a0; border-radius: 8px; padding: 16px 20px; margin: 0 0 20px; }
+  .callout p { margin: 0; }
+  .story { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px 26px; margin-bottom: 14px; }
+  .story h3 { font-size: 1rem; font-weight: 800; margin: 0 0 10px; color: var(--text); line-height: 1.35; }
+  .story p { font-size: 0.95rem; margin: 0; line-height: 1.7; }
+  .story .story-area { margin-top: 8px; font-size: 0.85rem; color: var(--muted); }
+  .story-todo { border: 2px dashed #e0a800; background: #fff8e7; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px 22px; margin-bottom: 10px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 0.98rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.93rem; color: var(--text); line-height: 1.7; margin: 12px 0 0; }
+  .bottom-cta { background: var(--black); padding: 64px 24px; text-align: center; color: #fff; }
+  .bottom-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 14px; color: #fff; }
+  .bottom-cta p { color: rgba(255,255,255,0.85); margin: 0 0 26px; font-size: 1.05rem; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.5); font-weight: 600; text-decoration: none; }
+</style>
