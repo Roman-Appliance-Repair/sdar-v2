@@ -585,6 +585,9 @@ for (const file of SHEET_SOURCES) {
 
   check('outdoor pages all resolve residential scope',
     g('outdoor').scope === g('outdoor').pages, `${g('outdoor').scope}/${g('outdoor').pages}`);
+  // factual-accuracy §9: every /marine/ page is on the $120 tier, i.e. commercial scope.
+  check('marine pages all resolve commercial scope',
+    g('marine').scope === g('marine').pages, `${g('marine').scope}/${g('marine').pages}`);
   check('city pillars resolve nothing (mixed scope by nature)',
     g('city').scope === 0 && g('city').appliance === 0);
   check('blog resolves nothing', g('blog').scope === 0 && g('blog').appliance === 0);

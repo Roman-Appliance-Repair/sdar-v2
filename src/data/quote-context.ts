@@ -37,6 +37,7 @@ export type PageType =
   | 'commercial_sub'
   | 'commercial_brand'
   | 'outdoor'
+  | 'marine'
   | 'county'
   | 'areas'
   | 'blog'
@@ -341,6 +342,14 @@ export function getQuoteContext(pathname: string): QuoteContext {
       brand: brandSlug ? brandFromSlug(brandSlug) : null,
       pageType: 'outdoor',
     };
+  }
+
+  // ── /marine/… — marine fee tier. factual-accuracy §9 puts every /marine/ page on
+  //    the commercial diagnostic, which the sheet expresses as the commercial scope. Boat fridges, marine
+  //    AC and galley gear have no tile of their own, so the appliance stays null —
+  //    a guessed tile would be worse than none. ─────────────────────────────────
+  if (a === 'marine') {
+    return { scope: 'commercial', appliance: null, brand: null, pageType: 'marine' };
   }
 
   // ── /brands/… ─────────────────────────────────────────────────────────────

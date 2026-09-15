@@ -117,7 +117,7 @@ const SERVICE_URLS = {
   "Outdoor Refrigerator":    "https://samedayappliance.repair/outdoor/outdoor-refrigerator-repair/",
 };
 
-const DIAGNOSTIC_FEE = { home: "$89", restaurant: "$120", cold: "$120", ice: "$120", outdoor: "$89" };
+const DIAGNOSTIC_FEE = { home: "$89", restaurant: "$120", cold: "$120", ice: "$120", outdoor: "$89", marine: "$120" };
 
 // CSS-var fallbacks so the component renders correctly even if the design tokens
 // aren't defined in the global stylesheet.

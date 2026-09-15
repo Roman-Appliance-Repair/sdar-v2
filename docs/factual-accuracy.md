@@ -160,6 +160,7 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 |---|---|---|
 | Residential diagnostic | **$89** | Все `residential` pages — refrigerator, washer, dryer, oven, etc. **И ВСЕ `/outdoor/` страницы** (grills, patio heaters, pizza ovens, smokers, fireplaces, wine cellars, outdoor kitchens — включая brand-страницы premium/commercial-grade оборудования). |
 | Commercial diagnostic | **$120** | Только `/commercial/` pages — walk-in cooler, ice machines, commercial refrigeration, и пр. коммерческая кухня |
+| Marine diagnostic | **$120** | Все `/marine/` страницы (судовые холодильники, кондиционеры, камбуз; хаб, сервисные и гео-страницы марин). В шторке расчёта — commercial-тир через `quote-context.ts` (pageType `marine`) |
 | Both waived с repair | да | Упоминать явно: "fee waived when you approve the repair" |
 
 **Mixed-scope pages (city pillars): базовая цена страницы = по основной аудитории ($89 residential). Секционные цены допустимы:** $120 показывается ВНУТРИ коммерческой секции, $89 внутри outdoor/residential секций. **Никогда не ставить два ценника рядом в одном блоке** (hero, pricing cards, FAQ) — только внутри своих секций. Решение Roman 2026-07-15.

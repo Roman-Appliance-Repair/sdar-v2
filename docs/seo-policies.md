@@ -382,8 +382,10 @@ Phase 2 — manual rewrite, не sweep. Фокус: brand pages (largest cluster
 - `/[county]-county/` — county hub
 - `/commercial/[type]/` — commercial pillar
 - `/outdoor/[type]/` — outdoor living pillar
+- `/marine/[type]/` — marine pillar (судовое оборудование; гео-нейтральная, `location` array всех филиалов)
 
 **Sub-pages:**
+- `/marine/[marina]/` — marine гео-страница по гавани (например `/marine/marina-del-rey/`): single LocalBusiness своего `primaryBranch` из `cities.ts`, БЕЗ `location` array (§1 п.6). Не путать с city pillar `/[city]/`.
 - `/[city]/[service]/` — city × service combo (parametric)
 - `/services/[service]/[failure-mode]/` — sub-service (failure modes: not-draining, not-heating, error-codes)
 - `/brands/[brand]-[category]-repair/` — brand × category (e.g. `lg-washer-repair`)
