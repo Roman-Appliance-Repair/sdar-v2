@@ -429,8 +429,9 @@ for (const file of SHEET_SOURCES) {
   // (e55f5276); this number is meant to be edited deliberately when a page is
   // added or removed, which is the point of pinning it rather than deriving it.
   // 1199 → 1200 for /gift-certificates/ (b18fd2cd), → 1205 for the five
-  // /commercial/food-truck-equipment-repair/ pages.
-  check('dist contains the expected 1205 rendered pages', real.length === 1205, `found ${real.length}`);
+  // /commercial/food-truck-equipment-repair/ pages, → 1206 for its
+  // generator-vs-battery-power page.
+  check('dist contains the expected 1206 rendered pages', real.length === 1206, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
