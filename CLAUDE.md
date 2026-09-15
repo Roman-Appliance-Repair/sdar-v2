@@ -3,7 +3,7 @@
 > **Точка входа в любой новый чат или сессию Claude Code.**
 > Прочти этот файл первым. Он компактный — детали подгружай через @-ссылки внизу под конкретную задачу.
 
-**Последняя синхронизация:** 2026-08-07 (Notion purge + консистентность после Santa Barbara expansion; main = 9 филиалов / 6 каунти / 93 города / 1190 страниц)
+**Последняя синхронизация:** 2026-09-14 (счётчики сверены с `src/data/` после San Diego expansion; main = 10 филиалов / 7 каунти / 99 городов / 1206 страниц). Числа в этом файле — снимок на дату; SSOT всегда `src/data/*.ts` (`BRANCHES.length`, `TOTAL_CITY_COUNT`), не этот файл.
 
 ---
 
@@ -11,7 +11,7 @@
 
 - **Домен:** samedayappliance.repair
 - **Юр. лицо:** HVAC 777 LLC dba Same Day Appliance Repair (в visible UI только в footer copyright line; в JSON-LD `legalName` во всех LocalBusiness schemas site-wide через `src/data/credentials-schema.ts` → `mergeCredentials()` helper)
-- **Зоны:** 6 каунти SoCal — LA, Orange, Ventura, Santa Barbara, San Bernardino, Riverside (Santa Barbara добавлен 2026-08-06, ветка feat/santa-barbara)
+- **Зоны:** 7 каунти SoCal — LA, Orange, Ventura, Santa Barbara, San Bernardino, Riverside, San Diego (Santa Barbara добавлен 2026-08-06, San Diego — 2026-08-07)
 - **Часы:** Пн–Сб 8:00–20:00, Вс закрыто. Звонки принимаются 24/7
 - **Цены:** $89 residential / $120 commercial (waived с repair). На mixed-scope страницах — базовая по основной аудитории, секционные цены внутри своих секций; два ценника рядом в одном блоке — никогда. См. §5 + @docs/factual-accuracy.md §9
 - **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, ровно в этой форме, без «Ste» (сверено с карточкой GBP 2026-09-02). Эмитится в schema на **14 страницах**: 6 собственных pin-страниц (`/`, `/west-hollywood/`, `/contact/`, `/book/`, `/privacy-policy/`, `/terms/`) плюс 8, где тот же адрес приходит внутри массива филиалов — 7 county-хабов и `/credentials/` (county-хабы строят массив `location` сами, а не через `src/lib/build-location-array.ts`). Все 15 сущностей с адресом — одна запись West Hollywood; у остальных филиалов адреса нет нигде (см. seo-policies §1)
@@ -71,12 +71,12 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 
 | Файл `src/data/` | Содержит |
 |---|---|
-| `branches.ts` | 9 филиалов: slug, name, phone, address, county, cities[] |
-| `cities.ts` | 93 города: flat slug→branch→county lookup (без tier) |
-| `city-service-content.ts` | `CITY_DESCRIPTORS` — tier города (9 значений на main, 10 с feat/san-diego), brand pool, climate notes |
+| `branches.ts` | 10 филиалов (West Hollywood, Beverly Hills, Los Angeles, Pasadena, Thousand Oaks, Irvine, Rancho Cucamonga, Riverside, Santa Barbara, San Diego): slug, name, phone, address, county, cities[]. **Число филиалов не хардкодить — читать `BRANCHES.length`** |
+| `cities.ts` | 99 городов: flat slug→branch→county lookup (без tier); число — `TOTAL_CITY_COUNT` |
+| `city-service-content.ts` | `CITY_DESCRIPTORS` — tier города (10 значений, включая PREMIUM-SD), brand pool, climate notes |
 | `services.ts` | 31 услуга: slug, name, commercial flag, **service tier** (tier1/2/3 — приоритет контента) |
 | `city-service-matrix.ts` | Какие city × service комбинации генерятся (hubs × 15, non-hub × 5) |
-| `counties.ts` + `county-boundaries.ts` | 6 county hubs + Leaflet polygon data (boundaries: полигоны только 5 legacy-каунти) |
+| `counties.ts` + `county-boundaries.ts` | 7 county hubs + Leaflet polygon data (boundaries: полигоны только 5 legacy-каунти) |
 | `pricing.ts` + `repair-estimates.ts` | Pricing tiers (residential/commercial) |
 | `business-hours.ts` | Часы работы |
 | `credentials.ts` | Лицензии и сертификации |
