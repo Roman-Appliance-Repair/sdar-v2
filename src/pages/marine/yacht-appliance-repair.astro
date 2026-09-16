@@ -1,0 +1,335 @@
+---
+// src/pages/marine/yacht-appliance-repair.astro
+// Yacht pillar (wave 2). Core angle: boats 60 ft+ carry ordinary premium HOUSEHOLD appliances
+// (Sub-Zero, Miele, Bosch, Gaggenau, Wolf cooking, wine columns) — the same boxes our techs
+// work on ashore. Marine shops don't service them; appliance companies don't drive to the slip.
+// $120 marine diagnostic, no repair prices. NO ABYC claim, NO factory-authorized claim.
+// U-Line / Marvel = Composition Brands, never "Middleby" (factual-accuracy §1.1).
+// Geo-neutral schema per docs/seo-policies.md. BreadcrumbList from Breadcrumbs.astro. NO aggregateRating.
+import Layout from '../../layouts/Layout.astro';
+import ServiceHero from '../../components/ServiceHero.astro';
+import { BRANCHES, MAIN_PHONE, MAIN_PHONE_TEL } from '../../data/branches';
+import { buildBranchLocation } from '../../lib/build-location-array';
+import { mergeCredentials } from '../../data/credentials-schema';
+import { OPENING_HOURS_SCHEMA, BUSINESS_HOURS } from '../../data/business-hours';
+
+const phone = MAIN_PHONE;
+const phoneHref = `tel:${MAIN_PHONE_TEL}`;
+const canonical = "https://samedayappliance.repair/marine/yacht-appliance-repair/";
+
+const title = "Yacht Appliance Repair Los Angeles — Same Day";
+const description = "Yacht galley appliance repair at the slip: Sub-Zero, Miele, Bosch, Gaggenau and wine columns on boats 60 feet and up. $120 diagnostic.";
+
+const AREA_SERVED = [
+  "Los Angeles County", "Orange County", "Ventura County", "Santa Barbara County",
+  "San Bernardino County", "Riverside County", "San Diego County"
+].map((name) => ({ "@type": "AdministrativeArea", name }));
+
+const TRUST = [
+  '🏅 BHGS #A49573',
+  '❄️ EPA 608 Universal',
+  '🍷 Sub-Zero · Miele · Bosch · Gaggenau',
+  '⚓ We Come to the Slip',
+  '💬 $120 Diagnostic — Waived With Repair'
+];
+
+const faqs = [
+  {
+    q: "Why would a household appliance company work on a yacht?",
+    a: "Because on a boat this size the appliances are household appliances. A 70-foot motoryacht galley typically holds Sub-Zero refrigerator drawers, a Miele or Bosch dishwasher, a built-in oven and a wine column — the same models we service in Westside kitchens. The marine trades work on engines, systems and the vessel itself; the boxes in the galley were built for a house and fail the way they do in a house. What changes is the power feeding them, the salt around them and how they were installed."
+  },
+  {
+    q: "Do you hold ABYC certification or a factory authorization for yacht brands?",
+    a: "No to both, and we say so before we quote anything. We don't work on the boat's electrical system, which is where ABYC certification matters, and we're an independent service rather than a factory-authorized one for Sub-Zero, Miele, Bosch, Gaggenau or anyone else. What we do hold: BHGS #A49573, EPA 608 Universal #1346255700410 and a CSLB C-20 HVAC license."
+  },
+  {
+    q: "My Sub-Zero works fine at the dock and struggles underway. What's going on?",
+    a: "Nine times out of ten that's power, not refrigeration. At the dock you're on a stable 30 or 50 amp shore feed. Underway you're on the generator or an inverter, and voltage sags when a compressor starts or when another large load kicks in. Controls and compressors both misbehave on a sagging supply. Our first measurement is voltage at the appliance while it's actually running, not a reading at the panel with everything idle."
+  },
+  {
+    q: "The appliance is built into the joinery. Can you even get to it?",
+    a: "Usually, but it takes longer than it would ashore, and sometimes it means taking apart cabinetry to reach the back of a unit. We tell you before we start if a job needs joinery removed, and we work with the boat's carpenter or yard when panels have to come out properly rather than be forced."
+  },
+  {
+    q: "How much does a yacht appliance repair cost?",
+    a: "The diagnostic is $120 and it's waived when you approve the repair. After that you get a written estimate before any part is ordered. We don't publish repair prices for boats, because access changes everything: the same failed control board is an hour in a kitchen and half a day when it lives behind a bulkhead."
+  },
+  {
+    q: "Can you work on the yacht's air conditioning and its refrigeration on the same visit?",
+    a: "Yes, and often the seawater loop is the shared cause. Marine air conditioning rejects heat into seawater, and water-cooled refrigeration does the same, so one clogged strainer or one tired raw-water pump can put two systems on the fault list. Refrigerant work on either side is covered by our EPA 608 Universal certification."
+  },
+  {
+    q: "What do you need from us to make the visit work?",
+    a: "The marina and slip number, the gate code or someone to meet the tech at the gate, and the owner, captain or a crew member aboard for the visit. A photo of the appliance data plate helps us carry the right parts down the dock. We don't board an unattended vessel."
+  }
+];
+
+const schemaJsons = [
+  mergeCredentials({
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "@id": canonical + "#business",
+    "name": "Same Day Appliance Repair",
+    "url": canonical,
+    "telephone": phone,
+    "priceRange": "$$$",
+    "areaServed": AREA_SERVED,
+    "openingHoursSpecification": OPENING_HOURS_SCHEMA,
+    "location": BRANCHES.map(buildBranchLocation)
+  }),
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "@id": canonical + "#service",
+    "serviceType": "Yacht Appliance Repair",
+    "name": "Yacht Galley Appliance Repair",
+    "url": canonical,
+    "description": "At-the-slip repair of the household-grade appliances installed aboard yachts: Sub-Zero refrigeration and refrigerator drawers, wine columns, Miele and Bosch dishwashers, built-in ovens and cooktops, microwaves, washer-dryer combos, ice makers and marine air conditioning, including power diagnosis on shore power, generator and inverter supplies.",
+    "provider": { "@id": canonical + "#business" },
+    "areaServed": AREA_SERVED,
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Marine diagnostic fee, waived with repair." } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map((f) => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) }
+  // BreadcrumbList: emitted once for every page by Layout → Breadcrumbs.astro.
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<ServiceHero
+  section="marine"
+  slug="yacht-appliance-repair"
+  eyebrow="Marine · Yachts 60 ft and Up · Galley Appliances · Same Day"
+  title="Yacht Appliance Repair Los Angeles"
+  subtitle="The Sub-Zero, the Miele dishwasher, the wine column: household appliances that happen to live on a boat. We service them at the slip. $120 diagnostic, waived with repair."
+  heroImageTitle="Yacht Appliance Repair"
+  trustBarItems={TRUST}
+  showBranches={true}
+/>
+
+<!-- 01 BETWEEN TWO TRADES -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">01 · Between two trades</p>
+    <h2 class="section-title">Above about 60 feet, the galley stops being marine equipment and starts being a kitchen.</h2>
+
+    <p>Open the galley on a 65 or 80 foot yacht and you won't find much that was designed for boats. You'll find a Sub-Zero, refrigerator and freezer drawers under the counter, a Miele or Bosch dishwasher, a built-in oven, sometimes Gaggenau, a Wolf cooktop or range, and a wine column holding bottles at two temperatures. These are the same appliances that go into houses in Beverly Hills and Newport Coast. The builder specified them because owners wanted their kitchen at sea, and the boat was designed around the boxes rather than the other way around.</p>
+
+    <p>That creates an odd gap in service. The marine trades — riggers, mechanics, marine electricians, boatyards — work on the vessel and its systems, and a Sub-Zero control board isn't their trade. Appliance companies know those boxes cold and never leave the street: they're not walking a parts bag down a finger pier, and a lot of them won't take the job at all once they hear "boat". Owners end up calling four numbers and getting four polite refusals.</p>
+
+    <p>We sit between those two trades on purpose. Our techs service Sub-Zero, Miele, Bosch, Gaggenau and wine storage ashore every working day, and we come to the slip to do it. This page is part of our <a href="/marine/">marine appliance repair</a> service, which also covers purpose-built marine equipment on smaller boats.</p>
+
+    <p>What actually changes on a boat isn't the appliance. It's four things around it: the power feeding it, the salt and humidity working on it, the way it was installed, and the plain problem of getting a tech and a part to a vessel behind a locked gate. The rest of this page is those four things, because that's where yacht calls are won or lost.</p>
+  </div>
+</section>
+
+<!-- 02 SCOPE -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">02 · Scope</p>
+    <h2 class="section-title">What we service aboard, and what belongs to another trade.</h2>
+
+    <p>We'd rather be plain about the line than have a tech walk down the dock to a job that was never ours. Here it is.</p>
+
+    <div class="scope-grid">
+      <div class="scope-card scope-yes">
+        <h3>What we service</h3>
+        <ul class="scope-list">
+          <li><strong>Refrigerators and freezers</strong>, including Sub-Zero units and under-counter refrigerator and freezer drawers.</li>
+          <li><strong>Wine storage</strong> — columns and under-counter wine coolers, dual-zone included.</li>
+          <li><strong>Ice makers</strong>, both household-style and marine units. See <a href="/marine/ice-maker-repair/">marine ice maker repair</a>.</li>
+          <li><strong>Dishwashers</strong> — full size and the 18-inch units common in galleys.</li>
+          <li><strong>Washer-dryer combos</strong> and compact laundry. See <a href="/marine/washer-dryer-repair/">boat washer dryer repair</a>.</li>
+          <li><strong>Cooking</strong> — ranges, cooktops, built-in ovens and microwaves.</li>
+          <li><strong>Air conditioning and chillers</strong>, including the seawater loop that feeds them.</li>
+        </ul>
+      </div>
+      <div class="scope-card scope-no">
+        <h3>What we don't touch</h3>
+        <ul class="scope-list">
+          <li><strong>Through-hull fittings and seacocks.</strong> That's a boatyard or marine mechanic.</li>
+          <li><strong>The boat's wiring, the AC distribution panel and the shore power inlet.</strong> That's a marine electrician working to ABYC standards.</li>
+          <li><strong>The main engine and the generator.</strong> That's a marine mechanic or generator service.</li>
+          <li><strong>Anything that needs the boat hauled out of the water.</strong> That's a boatyard.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p>We don't hold ABYC certification, and the work we take on doesn't call for it: we stay on the appliance side and hand the boat's electrical system to the electrician. We're not factory-authorized for any of the brands above either. We repair them as an independent service, and we'll say so if a job genuinely needs the manufacturer's own network.</p>
+  </div>
+</section>
+
+<!-- 03 POWER -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">03 · Power</p>
+    <h2 class="section-title">The first measurement is voltage under load, not a look at the appliance.</h2>
+
+    <p>A kitchen appliance ashore lives on a supply that barely moves. Aboard, the same appliance may be fed by a 30 or 50 amp shore cord, by the generator, by an inverter running off the battery bank, or through an isolation transformer — and it can move between them in a single afternoon. Each of those sources behaves differently when a compressor starts or a heating element comes on.</p>
+
+    <p>That matters because a sagging supply doesn't announce itself as a power problem. It shows up as an appliance acting strange. A refrigerator that runs at the dock and quits underway. A dishwasher that stops mid-cycle and throws a code that means nothing on its own. A control board that resets. An inverter that clips when the compressor draws its start current. Owners describe a broken appliance, and the appliance is usually fine.</p>
+
+    <p>So our diagnostic starts with a meter at the appliance while it's actually working. Voltage at the panel with the boat idle tells you very little; voltage at the unit during a compressor start tells you almost everything. It's the same discipline we use on food trucks running off a generator: measure the supply under real load before condemning anything.</p>
+
+    <div class="callout">
+      <p>If the readings point at the boat's electrical system — the inlet, the panel, the wiring, the transformer — that's where we stop and hand the numbers to your marine electrician. We're not going to open the boat's electrical system, and a tech who does isn't doing you a favor.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 SALT AND HUMIDITY -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">04 · Salt and humidity</p>
+    <h2 class="section-title">Salt air is patient, and it works on the parts nobody looks at.</h2>
+
+    <p>An appliance built for a house in Encino expects dry air and clean connections. The same unit on a slip breathes damp salt air every hour of its life, and the damage is slow enough that nothing looks wrong until something intermittent starts happening.</p>
+
+    <ul class="bullet-list">
+      <li><strong>Terminals and connectors</strong> corrode. Resistance climbs, voltage drops across the joint, and the appliance sees a weaker supply than the boat is actually delivering. This is behind a lot of faults that come and go with no pattern.</li>
+      <li><strong>Aluminum evaporators</strong> pit over time, and a pit eventually becomes a refrigerant leak.</li>
+      <li><strong>Electrolysis</strong> attacks metals where dissimilar materials meet in seawater circuits, which is why water-cooled equipment ages differently than the air-cooled unit next to it.</li>
+      <li><strong>Boards and displays</strong> collect moisture in ways they never would ashore, especially in lockers with no airflow.</li>
+    </ul>
+
+    <p>Our techs check connections on every marine call for that reason. When a sealed system has genuinely lost refrigerant, we find the leak and repair it before recharging — opening the circuit is covered by our EPA 608 Universal certification, #1346255700410. Topping off a leaking system just books the next visit.</p>
+  </div>
+</section>
+
+<!-- 05 INSTALLATION -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">05 · How it was installed</p>
+    <h2 class="section-title">Built into the joinery, with no service access designed in.</h2>
+
+    <p>Ashore, a built-in refrigerator slides out. Aboard, the same unit was set into custom cabinetry while the interior was being built, and the joinery was finished around it. There's often no service gap behind, no room to roll the unit forward, and no clearance to reach the back panel where the board and the terminals live.</p>
+
+    <p>Sometimes that means a job takes twice as long as the identical repair in a house. Sometimes it means taking apart cabinetry to get to the unit at all, and on a finished interior that's not something to improvise. We tell you before we start when a repair needs panels removed, and where the joinery is delicate or structural we'd rather coordinate with the boat's carpenter or the yard than force it.</p>
+
+    <p>It also changes what a replacement looks like: a unit swapped in an afternoon ashore can become a cabinetry project afloat. We'll give you the honest version of that trade-off in the written estimate.</p>
+  </div>
+</section>
+
+<!-- 06 DOCK LOGISTICS -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">06 · Down the dock</p>
+    <h2 class="section-title">Everything arrives by hand, so the first trip has to be planned.</h2>
+
+    <p>There's no service elevator on a finger pier. Meters, gauges, tools, parts and sometimes a recovery machine go down the dock by hand, along a gangway that moves with the tide, and back again. A forgotten part isn't a walk to the van; it can be a second appointment.</p>
+
+    <p>That's why we ask questions that sound fussy and aren't: the model off the data plate, what the appliance does and when, whether it behaves differently on shore power than on the generator. Each answer changes what the tech carries down the dock.</p>
+  </div>
+</section>
+
+<!-- 07 ACCESS -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">07 · Getting aboard</p>
+    <h2 class="section-title">Gate codes, slip numbers and someone on the boat.</h2>
+
+    <p>This is the part owners find most annoying, and we'd rather set it out plainly than have a tech standing at a locked gate burning an appointment window. Marina docks are secured. A vessel is not a house with a lockbox, and nobody boards it without the owner's people present.</p>
+
+    <ol class="num-list">
+      <li><strong>Where exactly.</strong> Marina name, dock and slip number. Big harbors have a lot of docks, and walking the wrong one costs the appointment.</li>
+      <li><strong>How the tech gets through the gate.</strong> A gate code, or a name and a time for someone to meet them.</li>
+      <li><strong>Someone aboard.</strong> The owner, the captain or a crew member has to be on the boat for the whole visit. We don't board an unattended vessel.</li>
+      <li><strong>What we're walking into.</strong> The data plate photo, the fault code if there's a display, and anything the crew has already tried.</li>
+    </ol>
+
+    <p>Get those four right and a yacht call runs about as smoothly as a house call. The diagnostic is $120 and it's waived when you approve the repair; the written estimate comes before any part is ordered.</p>
+  </div>
+</section>
+
+<!-- 08 FAQ -->
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">08 · FAQ</p>
+    <h2 class="section-title">Yacht appliance questions.</h2>
+    <div class="faq-list">
+      {faqs.map((f) => (
+        <details class="faq-item">
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </div>
+</section>
+
+<!-- 09 RELATED -->
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">09 · Related</p>
+    <h2 class="section-title">More marine service.</h2>
+    <ul class="related-list">
+      <li><a href="/marine/">Marine appliance repair (all equipment)</a></li>
+      <li><a href="/marine/refrigeration-repair/">Marine refrigeration repair</a></li>
+      <li><a href="/marine/air-conditioning-repair/">Marine air conditioning repair</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Galley appliance down? Call now.</h2>
+    <p>$120 diagnostic, waived with repair. {BUSINESS_HOURS.display}.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/book/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  h2.section-title { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 20px; line-height: 1.2; color: var(--text); letter-spacing: -0.01em; }
+  .section p { margin: 0 0 18px; font-size: 1rem; line-height: 1.75; color: var(--text); }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .series-h3 { font-size: 1.1rem; font-weight: 800; margin: 28px 0 10px; color: var(--text); border-left: 4px solid var(--red); padding-left: 12px; }
+  .scope-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin: 24px 0; }
+  @media (max-width: 720px) { .scope-grid { grid-template-columns: 1fr; } }
+  .scope-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px 22px 8px; }
+  .scope-yes { border-top: 4px solid #2e7d32; }
+  .scope-no { border-top: 4px solid var(--red); }
+  .scope-card h3 { font-size: 1.05rem; font-weight: 800; margin: 0 0 12px; color: var(--text); }
+  .scope-list { padding-left: 18px; margin: 0 0 14px; }
+  .scope-list li { font-size: 0.95rem; line-height: 1.6; color: var(--text); margin-bottom: 10px; }
+  .num-list { padding-left: 22px; margin: 14px 0 18px; }
+  .num-list li { font-size: 0.98rem; line-height: 1.7; color: var(--text); margin-bottom: 12px; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 8px; }
+  .related-list { padding-left: 22px; margin: 14px 0 0; }
+  .related-list li { font-size: 0.98rem; line-height: 1.7; margin-bottom: 8px; }
+  .callout { background: #f0f7ff; border: 1px solid #b8d4f0; border-radius: 8px; padding: 16px 20px; margin: 0 0 20px; }
+  .callout p { margin: 0; }
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  .code-table { width: 100%; border-collapse: collapse; font-size: 0.95rem; background: #fff; }
+  .code-table th { text-align: left; background: var(--black); color: #fff; padding: 12px 16px; font-weight: 700; font-size: 0.85rem; }
+  .code-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  .code-table tr:nth-child(even) td { background: #fafafa; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 16px 22px; margin-bottom: 10px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 0.98rem; color: var(--text); list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.93rem; color: var(--text); line-height: 1.7; margin: 12px 0 0; }
+  .bottom-cta { background: var(--black); padding: 64px 24px; text-align: center; color: #fff; }
+  .bottom-cta h2 { font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 800; margin: 0 0 14px; color: #fff; }
+  .bottom-cta p { color: rgba(255,255,255,0.85); margin: 0 0 26px; font-size: 1.05rem; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.5); font-weight: 600; text-decoration: none; }
+</style>

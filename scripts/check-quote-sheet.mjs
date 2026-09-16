@@ -430,8 +430,9 @@ for (const file of SHEET_SOURCES) {
   // added or removed, which is the point of pinning it rather than deriving it.
   // 1199 → 1200 for /gift-certificates/ (b18fd2cd), → 1205 for the five
   // /commercial/food-truck-equipment-repair/ pages, → 1206 for its
-  // generator-vs-battery-power page, → 1211 for the five /marine/ pages.
-  check('dist contains the expected 1211 rendered pages', real.length === 1211, `found ${real.length}`);
+  // generator-vs-battery-power page, → 1211 for the five /marine/ pages,
+  // → 1217 for the six /marine/ wave-2 pages.
+  check('dist contains the expected 1217 rendered pages', real.length === 1217, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
