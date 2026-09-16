@@ -183,12 +183,18 @@ Ref crops in use: `ref-01.jpg` (frontal, sharpest), `ref-02.jpg` (three-quarter)
 | Параметр | Target |
 |---|---|
 | Format | WebP |
-| File size | 80-150 KB (после `sharp` compression) |
+| File size | 80-200 KB для полноразмерного hero (после `sharp` compression) — см. пометку под таблицей |
 | Hero dimensions | 1600×900 (16:9) или 1600×1200 (4:3) |
 | Inline | 800×600 |
 | Alt tag template | `[appliance/scene] repair in [city] CA — [character or context]` |
 | Naming | `[city-slug]-[type]-[N].webp`, e.g. `west-hollywood-hero-1.webp` |
 | Lazy load | Все, кроме hero (eager на hero для LCP) |
+
+**Вес hero (2026-09-16).** Hero — это LCP-картинка. Нижняя граница 80 КБ нужна, чтобы не
+оставить пересжатый кадр. Верхняя смягчена со 150 до 200 КБ: на широких детальных панорамах
+(гавани `/marine/`) удержание 150 КБ требует q48–q50 и даёт видимую деградацию на воде и небе.
+Адаптивы `hero-960` и `hero-640` под это правило не подпадают — мобильные грузят их, а не
+полноразмерный файл.
 
 ---
 
