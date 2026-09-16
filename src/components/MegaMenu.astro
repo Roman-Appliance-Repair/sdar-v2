@@ -56,8 +56,13 @@ const services    = [
   { label: 'Marine Ice Maker Repair', href: '/marine/ice-maker-repair/' },
   { label: 'Boat Washer Dryer Repair', href: '/marine/washer-dryer-repair/' },
 ];
-const commercial  = toLinks(import.meta.glob('../pages/commercial/*.astro'),  '/commercial/')
-  .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
+// The food-truck section lives in a folder (commercial/food-truck-equipment-repair/index.astro),
+// which the flat glob can't see; it is added by hand and the panel stays alphabetical.
+const commercial  = [
+  ...toLinks(import.meta.glob('../pages/commercial/*.astro'),  '/commercial/')
+    .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href)),
+  { label: 'Food Truck Equipment Repair', href: '/commercial/food-truck-equipment-repair/' },
+].sort((a, b) => a.label.localeCompare(b.label));
 const credentials = toLinks(import.meta.glob('../pages/credentials/*.astro'), '/credentials/')
   .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
 const forBusiness = toLinks(import.meta.glob('../pages/for-business/*.astro'),'/for-business/')
