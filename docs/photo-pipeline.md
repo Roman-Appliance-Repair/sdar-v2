@@ -184,7 +184,7 @@ Ref crops in use: `ref-01.jpg` (frontal, sharpest), `ref-02.jpg` (three-quarter)
 |---|---|
 | Format | WebP |
 | File size | 80-200 KB для полноразмерного hero (после `sharp` compression) — см. пометку под таблицей |
-| Hero dimensions | 1600×900 (16:9) или 1600×1200 (4:3) |
+| Hero dimensions | 1920×840 (21:9) для hero в ServiceHero MODE A; 1600×1200 (4:3) остаётся для inline и neighborhood-кадров — см. пометку под таблицей |
 | Inline | 800×600 |
 | Alt tag template | `[appliance/scene] repair in [city] CA — [character or context]` |
 | Naming | `[city-slug]-[type]-[N].webp`, e.g. `west-hollywood-hero-1.webp` |
@@ -195,6 +195,11 @@ Ref crops in use: `ref-01.jpg` (frontal, sharpest), `ref-02.jpg` (three-quarter)
 (гавани `/marine/`) удержание 150 КБ требует q48–q50 и даёт видимую деградацию на воде и небе.
 Адаптивы `hero-960` и `hero-640` под это правило не подпадают — мобильные грузят их, а не
 полноразмерный файл.
+
+**Размер hero (2026-09-16).** 16:9 в этой строке устарел. MODE A рендерит full-bleed фон
+~21:9 с текстовой карточкой поверх левых 40%, композиция задана в §8.1. Картинка вписывается
+через `object-fit: cover` по центру, поэтому кадр другой пропорции обрезается: 16:9 на десктопе
+теряет верх и низ, и субъект, выставленный не по §8.1, уходит за край или под карточку.
 
 ---
 
