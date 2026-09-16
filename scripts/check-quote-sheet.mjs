@@ -430,8 +430,8 @@ for (const file of SHEET_SOURCES) {
   // added or removed, which is the point of pinning it rather than deriving it.
   // 1199 → 1200 for /gift-certificates/ (b18fd2cd), → 1205 for the five
   // /commercial/food-truck-equipment-repair/ pages, → 1206 for its
-  // generator-vs-battery-power page.
-  check('dist contains the expected 1206 rendered pages', real.length === 1206, `found ${real.length}`);
+  // generator-vs-battery-power page, → 1211 for the five /marine/ pages.
+  check('dist contains the expected 1211 rendered pages', real.length === 1211, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
@@ -844,10 +844,10 @@ const BLOCK_END = String.fromCharCode(10) + '};';
   // -- the eight types, read off the source and not retyped here ---------------
   const cardedBlock = (mapSrc.split('export const AID_CARD_PAGE_TYPES')[1] || '').split('])')[0];
   const CARDED = new Set([...cardedBlock.matchAll(/'([a-z_]+)'/g)].map((m) => m[1]));
-  check('AID_CARD_PAGE_TYPES parsed', CARDED.size === 8, `${CARDED.size} type(s)`);
+  check('AID_CARD_PAGE_TYPES parsed', CARDED.size === 9, `${CARDED.size} type(s)`);
   for (const t of [
     'service_hub', 'service_sub', 'city_service', 'commercial_hub',
-    'commercial_sub', 'commercial_brand', 'brand', 'outdoor',
+    'commercial_sub', 'commercial_brand', 'brand', 'outdoor', 'marine',
   ]) {
     check(`${t} is a carded page type`, CARDED.has(t));
   }

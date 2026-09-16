@@ -46,8 +46,13 @@ function toLinks(glob: Record<string, unknown>, hrefPrefix: string) {
 // with 0 inbound. Set is currently empty but kept as architectural hook.
 const REDIRECTED_URLS_EXCLUDE_FROM_NAV = new Set<string>([]);
 
-const services    = toLinks(import.meta.glob('../pages/services/*.astro'),    '/services/')
-  .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
+// /marine/ is its own top-level section (like /outdoor/), so the glob above can't see it;
+// it is listed by hand at the end of the Services panel.
+const services    = [
+  ...toLinks(import.meta.glob('../pages/services/*.astro'), '/services/')
+    .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href)),
+  { label: 'Marine Appliance Repair', href: '/marine/' },
+];
 const commercial  = toLinks(import.meta.glob('../pages/commercial/*.astro'),  '/commercial/')
   .filter((l) => !REDIRECTED_URLS_EXCLUDE_FROM_NAV.has(l.href));
 const credentials = toLinks(import.meta.glob('../pages/credentials/*.astro'), '/credentials/')
@@ -131,11 +136,12 @@ const mainPhoneTel = `+1${MAIN_PHONE.replace(/\D/g, '')}`;
 
 // Header promo diagnostic fee follows page scope: commercial pages = $120, everything
 // else (residential, outdoor, residential brand pages) = $89. $120 zones: the canonical
-// /commercial/* tree, plus the allowlist of commercial-grade /brands/ pages (foodservice
+// /commercial/* tree, the /marine/ section (marine diagnostic tier, see pricing.ts),
+// plus the allowlist of commercial-grade /brands/ pages (foodservice
 // equipment) that carry a $120 fee on the page itself (see commercial-brand-slugs.ts).
 const _path = Astro.url.pathname;
 const _brandSlug = _path.startsWith('/brands/') ? _path.replace(/^\/brands\//, '').replace(/\/$/, '') : null;
-const isCommercialFee = _path.startsWith('/commercial/') || (_brandSlug !== null && COMMERCIAL_BRAND_SLUGS.has(_brandSlug));
+const isCommercialFee = _path.startsWith('/commercial/') || _path.startsWith('/marine/') || (_brandSlug !== null && COMMERCIAL_BRAND_SLUGS.has(_brandSlug));
 const diagnosticFee = isCommercialFee ? '$120' : '$89';
 
 type Link = { label: string; href: string };

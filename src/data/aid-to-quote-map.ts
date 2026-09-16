@@ -359,6 +359,7 @@ export const AID_CARD_PAGE_TYPES: ReadonlySet<PageType> = new Set<PageType>([
   'commercial_brand',
   'brand',
   'outdoor',
+  'marine',
 ]);
 
 export type DiagnosticCategory = 'home' | 'restaurant' | 'cold' | 'ice' | 'outdoor';
