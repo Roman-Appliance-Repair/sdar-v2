@@ -134,8 +134,27 @@ curl -sI "https://samedayappliance.repair/images/brands/<slug>/hero.webp"   # 20
   `samedayappliance.repair` (шаблон "Purge cache"). Setup-инструкция — в шапке `scripts/cf-purge.py`.
 - **Верификация — обязательна**, потому что `cf-cache-status: HIT` сам по себе не гарантирует
   свежий байт; сверяем `md5` prod-картинки с `dist/`-файлом.
-- Text-only merge (только .astro/.md, без новых картинок) purge **не требует** — новые HTML-роуты
-  Cloudflare Pages отдаёт штатно.
+- Text-only merge (только .astro/.md, без новых картинок): **новые HTML-роуты** Cloudflare Pages
+  отдаёт штатно, но это не значит, что purge не нужен — см. ниже.
+
+**Purge нужен не только при новых картинках.** Файлы, которые перезаписываются по
+**неизменному пути** при каждой сборке — `sitemap-0.xml`, `sitemap-index.xml`, `robots.txt`, —
+кэшируются на edge и после текстового деплоя отдают **старую версию даже с истёкшим TTL**
+(`cf-cache-status: HIT`, `Age` > `max-age`, ревалидации нет). Кейс 2026-09-15: marine wave 2
+(раздел вырос до 11 страниц) — в `dist` было 1160 URL и 11 marine-адресов, живой sitemap отдавал
+1154 и 4.
+
+**Правило:** после **любого** деплоя, который добавляет или удаляет страницы, — `python
+scripts/cf-purge.py` (Purge Everything) и проверка числа URL в **ЖИВОМ** sitemap, а не в `dist`:
+
+```bash
+curl -s4 -D - -o /tmp/sm.xml https://samedayappliance.repair/sitemap-0.xml | grep -iE "^(http|cf-cache|age)"
+grep -o '<loc>' /tmp/sm.xml | wc -l                     # == ожидаемому числу из свежего dist
+grep -o '<loc>[^<]*/<section>/[^<]*' /tmp/sm.xml        # новые адреса на месте
+```
+
+Первый запрос после purge должен дать `cf-cache-status: MISS`. Локальный `dist` сверять только
+после пересборки на актуальном `main`, иначе число будет от старой сборки.
 
 ---
 
