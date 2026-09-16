@@ -87,6 +87,8 @@ const photoJpg960 = slugPhotoExists ? `/images/commercial/${slug}/hero-960.jpg` 
 const slugMobileExists = slug ? existsSync(path.join('public', 'images', 'commercial', slug, 'hero-mobile.webp')) : false;
 const photoMobileWebp = slugMobileExists ? `/images/commercial/${slug}/hero-mobile.webp` : null;
 const photoMobileJpg = slugMobileExists ? `/images/commercial/${slug}/hero-mobile.jpg` : null;
+// Phones get the largest landscape file (see the <picture> note); desktop sizes by viewport.
+const HERO_SIZES = '(max-width: 768px) 1920px, 100vw';
 const photoAlt = imageAlt ?? `${heroImageTitle || title || 'Commercial appliance repair'} ${heroImageLocation || ''}`.trim();
 const photoMode = !!photoJpg;
 
@@ -113,12 +115,19 @@ const aidTone = photoMode ? 'frame' : 'light';
       <picture>
         {photoMobileWebp && <source type="image/webp" media="(max-width: 768px)" srcset={photoMobileWebp} />}
         {photoMobileJpg && <source type="image/jpeg" media="(max-width: 768px)" srcset={photoMobileJpg} />}
-        {photoWebp640 && <source media="(max-width: 640px)" type="image/webp" srcset={photoWebp640} />}
-        {photoJpg640 && <source media="(max-width: 640px)" type="image/jpeg" srcset={photoJpg640} />}
-        {photoWebp960 && <source media="(max-width: 960px)" type="image/webp" srcset={photoWebp960} />}
-        {photoJpg960 && <source media="(max-width: 960px)" type="image/jpeg" srcset={photoJpg960} />}
-        {photoWebp && <source srcset={photoWebp} type="image/webp" />}
-        <source srcset={photoJpg} type="image/jpeg" />
+        {/* Landscape 21:9 frame, picked by width + screen density (2026-09-16).
+            The hero box is taller than 21:9 at every width (390x1097 on a phone, 1440x1059 on
+            desktop), so object-fit: cover renders this frame much wider than the viewport. On a
+            phone it is ~2500 CSS px wide, so the 640 file gave 0.26 image px per CSS px and looked
+            soft; with sizes below the phone fallback always gets the full 1920 file. Desktop keeps
+            100vw, which picks the same files as the old media-query sources did. Phones normally
+            never reach this: the hero-mobile source above wins first when the file exists. */}
+        {photoWebp && photoWebp640 && photoWebp960
+          ? <source type="image/webp" sizes={HERO_SIZES} srcset={`${photoWebp640} 640w, ${photoWebp960} 960w, ${photoWebp} 1920w`} />
+          : photoWebp && <source srcset={photoWebp} type="image/webp" />}
+        {photoJpg640 && photoJpg960
+          ? <source type="image/jpeg" sizes={HERO_SIZES} srcset={`${photoJpg640} 640w, ${photoJpg960} 960w, ${photoJpg} 1920w`} />
+          : <source srcset={photoJpg} type="image/jpeg" />}
         <img
           src={photoJpg}
           alt={photoAlt}
