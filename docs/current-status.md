@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-09-14 (food truck раздел в проде — 7ab352f4)
+**Последняя синхронизация:** 2026-09-15 (marine раздел в проде — 5a6f595a)
 
 ---
 
@@ -60,6 +60,9 @@
   `feat/food-truck-equipment-repair`); `generator-vs-battery-power` пока без фото;
   (2) Recent repairs на всех 6 страницах — пустые TODO-слоты, скрыты в проде, наполнить
   только реальными job'ами из HCP.
+- **Marine раздел — хвосты:** (1) hero-фото для 5 страниц — сейчас герой текстовый,
+  `public/images/marine/` не существует; (2) Recent repairs — наполнять только реальными
+  job'ами из HCP.
 - **Photo wave подготовка** — стратегия наполнения фото обсуждена 2026-05-06 (5 art-list шаблонов + 3 техника по филиалам). Реализация ещё не начата
 - **CLAUDE.md + docs/ структура** — деплоится 2026-05-06
 
@@ -84,6 +87,20 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-09-15:** **Marine appliance repair — новый вертикальный раздел, 5 страниц, В ПРОДЕ**
+  (`4a2f7b30` + `5ae42c59` + `5a6f595a`, ветка `feat/marine-vertical`).
+  Хаб `/marine/` с секцией «What we service / What we don't touch» (электрика и shore power
+  → marine electrician по ABYC, through-hull и seacocks → boatyard, двигатель и генератор
+  → marine mechanic) + сервисные `refrigeration-repair` (Secop BD35F/BD50F, low-voltage
+  cut-out, seawater/keel cooling) и `air-conditioning-repair` (self-contained и
+  chilled-water, high-pressure trips) + гео по гаваням `marina-del-rey` и `newport-beach`.
+  Цена $120 (marine tier), aggregateRating 0, ABYC/factory-authorized не заявляем нигде.
+  Schema: хаб и сервисные — `mergeCredentials()` + `BRANCHES.map(buildBranchLocation)`
+  (10 филиалов); гео — ОДИН `LocalBusiness` своего филиала без `location` (MDR → LA,
+  Newport → Irvine), per seo-policies §1 п.6. Входящие ссылки с 3 существующих страниц.
+  Гейты 199/53/431, build 1211/0; прод 5/5 URL 200, live sitemap 5/5, IndexNow 200,
+  CF Purge Everything exit 0. Детали: `session-log/2026-09-15.md`.
 
 - **2026-09-14:** **Food truck equipment repair — новый вертикальный раздел, 6 страниц, В ПРОДЕ**
   (`b5b9b126` + `4cf7abbe` + `7ab352f4`, ветка `feat/food-truck-equipment-repair`).
