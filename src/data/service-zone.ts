@@ -30,8 +30,7 @@ export const ZIP_EXACT: Record<string, string> = {
   // San Diego branch — Wave 1 North County Coastal + La Jolla (2026-08-07).
   // Wave 2 (2026-09-17). Every ZIP below was checked one by one against the USPS
   // city-by-ZIP lookup (tools.usps.com), cross-checked with GeoNames. Exact ZIPs,
-  // not the 921 prefix: the block also holds Coronado (92118, 92178), a separate
-  // city, and ZIPs USPS does not recognise.
+  // not the 921 prefix: the block also holds ZIPs USPS does not recognise.
   '92037': 'san-diego',
   '92008': 'san-diego', '92009': 'san-diego', '92010': 'san-diego', '92011': 'san-diego',
   '92014': 'san-diego', '92067': 'san-diego', '92091': 'san-diego',
@@ -54,6 +53,9 @@ export const ZIP_EXACT: Record<string, string> = {
   '92179': 'san-diego', '92182': 'san-diego', '92186': 'san-diego', '92187': 'san-diego', '92191': 'san-diego',
   '92192': 'san-diego', '92193': 'san-diego', '92195': 'san-diego', '92196': 'san-diego', '92197': 'san-diego',
   '92198': 'san-diego', '92199': 'san-diego',
+  // Coronado (both ZIPs: USPS default city Coronado). Added
+  // 2026-09-17: /marine/san-diego/ names Coronado among the places we work.
+  '92118': 'san-diego', '92178': 'san-diego',
   // Nearby South Bay / East County cities, 15-25 min from central San Diego.
   // Back country (Alpine, Jamul, Campo, Boulevard, Jacumba) stays unmapped on purpose.
   // Chula Vista
