@@ -150,7 +150,9 @@ const ogImage = new URL(image, siteUrl).toString();
     <!-- Google Tag Manager — early idle load + resilient tel: tracking -->
     <script>
       (function() {
-        window.dataLayer = window.dataLayer || [];
+        // Typed like QuoteSheet.client.ts. Assigned on the next line, so defined below.
+        var w = window as unknown as { dataLayer: unknown[] };
+        w.dataLayer = w.dataLayer || [];
 
         // Resilient phone-tap signal — fires on EVERY tel: click in the capture
         // phase, independent of GTM load timing, and queues in dataLayer so it
@@ -160,9 +162,10 @@ const ogImage = new URL(image, siteUrl).toString();
         // two never double-count. Until that swap, this push is inert (no matching
         // trigger) and click_phone_number keeps firing via Just Links below.
         document.addEventListener('click', function(e) {
-          var a = e.target && e.target.closest ? e.target.closest('a[href^="tel:"]') : null;
+          var target = e.target as Element | null;
+          var a = target && target.closest ? target.closest('a[href^="tel:"]') : null;
           if (!a) return;
-          window.dataLayer.push({
+          w.dataLayer.push({
             event: 'phone_call_click',
             link_url: a.getAttribute('href'),
             page_path: location.pathname
@@ -177,7 +180,7 @@ const ogImage = new URL(image, siteUrl).toString();
         function loadGTM() {
           if (loaded) return;
           loaded = true;
-          window.dataLayer.push({'gtm.start': Date.now(), event: 'gtm.js'});
+          w.dataLayer.push({'gtm.start': Date.now(), event: 'gtm.js'});
           var s = document.createElement('script');
           s.async = true;
           s.src = 'https://www.googletagmanager.com/gtm.js?id=GTM-M43LT47K';

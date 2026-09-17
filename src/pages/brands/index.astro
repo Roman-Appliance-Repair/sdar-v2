@@ -87,7 +87,7 @@ const commercialBrandFiles = [
   ...Object.keys(import.meta.glob('./kratos-oven-repair.astro', { eager: false })),
   // Cluster 04 Commercial Slushie / Frozen Beverage (1)
   ...Object.keys(import.meta.glob('./bunn-slushie-machine-repair.astro', { eager: false }))
-].map(p => p.split('/').pop().replace('.astro', ''));
+].map(p => (p.split('/').pop() ?? '').replace('.astro', ''));
 
 // Recursive glob — includes subdirectories (refrigeration/, ice-machines/, etc.).
 // For index.astro files, slug = parent directory name (so /commercial/ice-machines/
@@ -110,10 +110,21 @@ const commercialCategoryFiles = (() => {
   return Array.from(slugs);
 })();
 
-const has = (slug, list) => list.includes(slug);
+const has = (slug: string, list: string[]) => list.includes(slug);
+
+// Brand tag: links to /brands/{slug}/ unless an explicit href overrides it.
+type BrandItem = { slug: string; label: string; href?: string };
+type BrandSection = {
+  icon: string;
+  title: string;
+  count: string;
+  tiers: { label: string; items: BrandItem[] }[];
+  future?: string[];
+  footer?: string;
+};
 
 // ── Residential section data ──
-const residentialSections = [
+const residentialSections: BrandSection[] = [
   {
     icon: '🧊',
     title: 'Refrigerators',
@@ -353,7 +364,7 @@ const rangesOvensCooktops = {
   future: []
 };
 
-const residentialSectionsTail = [
+const residentialSectionsTail: BrandSection[] = [
   {
     icon: '🔥',
     title: 'Wall Ovens',
