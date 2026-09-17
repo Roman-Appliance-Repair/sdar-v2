@@ -593,9 +593,11 @@ export const BRANCHES: Branch[] = [
     phoneStatus: 'active',
     email: 'sandiego@samedayappliance.repair',
     geo: {
-      cityCenterLat: 32.8669,
-      cityCenterLng: -117.2531,
-      serviceRadius: 20
+      // Kearny Mesa, the city's geographic centre (2026-09-17). A 28-mile circle
+      // keeps the Wave 1 coast (Carlsbad 26.8 mi) and reaches San Ysidro (18.8 mi).
+      cityCenterLat: 32.8153,
+      cityCenterLng: -117.1350,
+      serviceRadius: 28
     },
     hours: { days: 'Mon-Sat', open: '08:00', close: '20:00' },
     primaryCounty: 'san-diego',
