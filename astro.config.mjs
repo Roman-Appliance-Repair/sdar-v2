@@ -17,6 +17,7 @@ const PAGES_DIR = path.join(__dirname, 'src', 'pages');
 //      always present on Cloudflare Pages (shallow clone) builds.
 //   2. live `git log` invocation — used locally when JSON is missing/empty.
 // fs.statSync mtime and today's date are tertiary fallbacks per-URL.
+/** @type {Map<string, string> | null} */
 let _gitMtimeMap = null;
 function getGitMtimeMap() {
   if (_gitMtimeMap) return _gitMtimeMap;
@@ -33,7 +34,7 @@ function getGitMtimeMap() {
       }
     }
   } catch (e) {
-    console.warn('[sitemap] failed to read git-mtime-map.json:', e.message);
+    console.warn('[sitemap] failed to read git-mtime-map.json:', /** @type {Error} */ (e).message);
   }
 
   try {
@@ -57,6 +58,7 @@ function getGitMtimeMap() {
   return _gitMtimeMap;
 }
 
+/** @param {string} urlPath */
 function findFileForUrl(urlPath) {
   const trimmed = urlPath.replace(/^\/+|\/+$/g, '');
   if (trimmed === '') return path.join(PAGES_DIR, 'index.astro');
@@ -102,6 +104,7 @@ function findFileForUrl(urlPath) {
   return null;
 }
 
+/** @param {string} itemUrl */
 function getLastmodForUrl(itemUrl) {
   try {
     const urlPath = new URL(itemUrl).pathname;
