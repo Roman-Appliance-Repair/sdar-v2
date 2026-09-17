@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-09-17 (списки округов + зашитые числа в проде — 9adec69e)
+**Последняя синхронизация:** 2026-09-17 (San Diego Wave 2: маршрутизация + /credentials/same-day-service/ в проде — b23b5c2a)
 
 ---
 
@@ -38,10 +38,9 @@
 
 - **Списки округов — хвосты после 2026-09-17:** (1) **556 трёхокружных фраз** «across LA, OC,
   Ventura» в 322 файлах (первый скан их не видел; 58 рядом с «next-day») — ждут решения Roman,
-  файл `audit-output/county-lists-3county-2026-09-16.md`; (2) ZIP самого San Diego (919xx/921xx)
-  не привязаны в `service-zone.ts`, а `/book/` уже обещает San Diego; (3) названия надзорных
-  ведомств Santa Barbara и San Diego — сверить, потом дописать; (4) `/credentials/same-day-service/`
-  молчит про Santa Barbara и San Diego.
+  файл `audit-output/county-lists-3county-2026-09-16.md`; ~~(2) ZIP самого San Diego~~ — ✅
+  2026-09-17; (3) названия надзорных ведомств Santa Barbara и San Diego — сверить, потом
+  дописать; ~~(4) `/credentials/same-day-service/`~~ — ✅ 2026-09-17.
 - **QS-3 — что осталось после QS-3a:**
   1. **Тариф для HVAC.** 6 хабов (`air-conditioner`, `furnace`, `heat-pump`, `hvac`,
      `wall-heater`, `water-heater`) осознанно не дают шторке ничего: шаг 1 обещает $89 или
@@ -108,6 +107,17 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-09-17:** **San Diego Wave 2 — маршрутизация заявок и страница same-day, В ПРОДЕ**
+  (merge `b23b5c2a`, ветка `feat/san-diego-routing`). `service-zone.ts`: префикс 921 заменён
+  77 поимёнными ZIP города (каждый сверен по USPS city-by-ZIP + GeoNames; выброшены Coronado
+  и 20 несуществующих, включая 92190) + 24 ZIP ближних городов (Chula Vista, National City,
+  Imperial Beach, Bonita, La Mesa, Lemon Grove, Spring Valley); дальние East County не
+  привязаны. Центр филиала → Kearny Mesa 32.8153/−117.1350, радиус 28 mi.
+  `/credentials/same-day-service/`: семь округов отдельно от обещания same-day (ядро / по
+  маршруту). Гейты 199/53/431 + types 0, build 1217/0; прод после Purge — страница, таблица
+  `/book/`, круг на главной; живая форма: San Diego и Chula Vista без пометки «вне зоны»,
+  Coronado/Alpine/Jacumba — с пометкой. Детали: `session-log/2026-09-17.md`.
 
 - **2026-09-17:** **Списки округов и зашитые числа, В ПРОДЕ** (merge `9adec69e`, ветка
   `feat/county-lists`). Списки покрытия из аудита приведены к семи округам (616 замен, 459
