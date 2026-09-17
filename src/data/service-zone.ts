@@ -56,6 +56,10 @@ export const ZIP_EXACT: Record<string, string> = {
   // Coronado (both ZIPs: USPS default city Coronado). Added
   // 2026-09-17: /marine/san-diego/ names Coronado among the places we work.
   '92118': 'san-diego', '92178': 'san-diego',
+  // Oceanside, north of Carlsbad (2026-09-17). USPS: 92054/92056/92057/92058 are
+  // Oceanside, record type STANDARD. 92055 is left out: USPS default city Camp
+  // Pendleton (Marine Corps base), record type PO BOX.
+  '92054': 'san-diego', '92056': 'san-diego', '92057': 'san-diego', '92058': 'san-diego',
   // Nearby South Bay / East County cities, 15-25 min from central San Diego.
   // Back country (Alpine, Jamul, Campo, Boulevard, Jacumba) stays unmapped on purpose.
   // Chula Vista
