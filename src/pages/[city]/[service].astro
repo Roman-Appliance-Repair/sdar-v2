@@ -43,7 +43,7 @@ const cityName = cityData?.name || citySlug;
 const linkBudget = newLinkBudget(Astro.url.pathname);
 const serviceName = serviceDesc.name;
 const ov = getComboOverride(citySlug, serviceSlug);
-const branchDisplay = branch?.displayName || 'Los Angeles';
+const branchDisplay = branch?.displayCity || 'Los Angeles';
 const h1Suffix = branchDisplay !== cityName ? `, Same-Day from ${branchDisplay}` : ', Same-Day Service';
 const canonical = `https://samedayappliance.repair/${citySlug}/${serviceSlug}/`;
 // Zero-demand combos (briefing "Аудит мёртвого хвоста", list A) canonicalize to the
@@ -106,7 +106,7 @@ const description = `Same-day ${serviceName} in ${cityName}. ${brandPool.slice(0
 const faqs = [
   {
     q: `Do you service ${cityName} for ${serviceDesc.shortName} repair?`,
-    a: `Yes, daily. ${cityName} is dispatched from our ${branch?.displayName || 'Los Angeles'} branch (${phone}). ${cityDesc.serviceContext} Same-day service available across ${cityName} including ${cityDesc.neighborhoods.slice(0, 3).join(', ')}.`
+    a: `Yes, daily. ${cityName} is dispatched from our ${branchDisplay} branch (${phone}). ${cityDesc.serviceContext} Same-day service available across ${cityName} including ${cityDesc.neighborhoods.slice(0, 3).join(', ')}.`
   },
   {
     q: `What ${serviceDesc.shortName} brands do you service in ${cityName}?`,
@@ -156,7 +156,7 @@ const schemaJsons = [
     "serviceType": serviceDesc.serviceTypeSchema + " in " + cityName,
     "name": `${serviceName} in ${cityName}`,
     "url": canonical,
-    "description": `${serviceName} service in ${cityName} from our ${branch?.displayName || 'Los Angeles'} branch. ${cityDesc.serviceContext} Standard failure patterns: ${serviceDesc.failurePatterns.slice(0, 3).map(f => f.title).join('; ')}. Brand pool: ${brandPool.slice(0, 6).join(', ')}. $89 residential diagnostic, applied toward repair. BHGS #A49573${serviceDesc.epaCertRequired ? ', EPA 608 Universal certified #1346255700410' : ''}.`,
+    "description": `${serviceName} service in ${cityName} from our ${branchDisplay} branch. ${cityDesc.serviceContext} Standard failure patterns: ${serviceDesc.failurePatterns.slice(0, 3).map(f => f.title).join('; ')}. Brand pool: ${brandPool.slice(0, 6).join(', ')}. $89 residential diagnostic, applied toward repair. BHGS #A49573${serviceDesc.epaCertRequired ? ', EPA 608 Universal certified #1346255700410' : ''}.`,
     "provider": { "@id": canonical + "#business" },
     "areaServed": [{ "@type": "City", "name": cityName }],
     "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "89.00", "priceCurrency": "USD", "description": "Residential diagnostic fee, applied toward repair" } }
@@ -236,7 +236,7 @@ const schemaJsons = [
     ) : (
       <Fragment>
         <h2>How {cityName} differs from a generic LA service call.</h2>
-        <p set:html={linkifyInternal(`<strong>When a ${serviceDesc.shortName} fails in ${cityName}, our techs at Same Day Appliance Repair trace it to a handful of patterns: ${topPatterns.join(', ')}. We dispatch same-day from the ${branch?.displayName || 'Los Angeles'} branch across ${cityName} — ${cityDesc.neighborhoods.slice(0, 3).join(', ')} — carrying ${brandPool.slice(0, 3).join(', ')} parts on the truck. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>`, linkBudget)}></p>
+        <p set:html={linkifyInternal(`<strong>When a ${serviceDesc.shortName} fails in ${cityName}, our techs at Same Day Appliance Repair trace it to a handful of patterns: ${topPatterns.join(', ')}. We dispatch same-day from the ${branchDisplay} branch across ${cityName} — ${cityDesc.neighborhoods.slice(0, 3).join(', ')} — carrying ${brandPool.slice(0, 3).join(', ')} parts on the truck. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410), BBB Accredited.</strong>`, linkBudget)}></p>
         <p set:html={linkifyInternal(cityDesc.homeStock, linkBudget)}></p>
         <p><strong>Climate:</strong> {cityDesc.climateNote}</p>
         <p><strong>Water:</strong> {cityDesc.waterNote}</p>
@@ -307,7 +307,7 @@ const schemaJsons = [
   <div class="container narrow">
     <p class="section-number">{cityName} neighborhoods we cover</p>
     <h2>Same-day dispatch across {cityName}.</h2>
-    <p>Our {branch?.displayName || 'Los Angeles'} branch dispatches across {cityName} including:</p>
+    <p>Our {branchDisplay} branch dispatches across {cityName} including:</p>
     <ul class="bullet-list">
       {cityDesc.neighborhoods.map(n => (<li>{n}</li>))}
     </ul>
@@ -333,7 +333,7 @@ const schemaJsons = [
       <li><a href={`/services/${serviceSlug}/`}>{serviceName} (service pillar — all cities)</a></li>
       {siblings.length > 0 && (
         <li>
-          Sibling cities served from our {branch?.displayName || 'Los Angeles'} branch: {siblings.map((s, i) => (
+          Sibling cities served from our {branchDisplay} branch: {siblings.map((s, i) => (
             <span><a href={`/${s.slug}/${serviceSlug}/`}>{s.name}</a>{i < siblings.length - 1 ? ', ' : ''}</span>
           ))}
         </li>
@@ -350,7 +350,7 @@ const schemaJsons = [
 <section class="bottom-cta">
   <div class="container">
     <h2>{cityName} {serviceDesc.shortName} repair, same-day priority.</h2>
-    <p>{branch?.displayName || 'Los Angeles'} branch · {phone} · $89 residential diagnostic. BHGS #A49573{serviceDesc.epaCertRequired ? ', EPA 608 Universal #1346255700410' : ''}. BBB Accredited.</p>
+    <p>{branchDisplay} branch · {phone} · $89 residential diagnostic. BHGS #A49573{serviceDesc.epaCertRequired ? ', EPA 608 Universal #1346255700410' : ''}. BBB Accredited.</p>
     <div class="cta-row">
       <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
       <a href="/book/" class="btn-secondary">Book Online</a>
