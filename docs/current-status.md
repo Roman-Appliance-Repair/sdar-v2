@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-09-16 (служебные пометки + логистика §1.2 в проде — 35f41633)
+**Последняя синхронизация:** 2026-09-16 (проверка типов — четвёртый гейт, в проде — 94ca1c07)
 
 ---
 
@@ -36,6 +36,12 @@
 
 ## Что сейчас в работе
 
+- **Неполные списки округов (разведка 2026-09-16, не правилось):** 541 место в 437 файлах
+  `src/pages` перечисляют 3–6 округов из семи (brands 299, commercial 123, outdoor 53,
+  services 46). Топ: «in Los Angeles, Orange County, Ventura County.» ×81, «in LA, Orange
+  County, Ventura, San Bernardino, and Riverside.» ×53. Устаревшее число — 4, в
+  title/description — 19 (лимит 160). Файл: `audit-output/county-lists-incomplete-2026-09-16.md`
+  (локально). Ждёт решения Roman.
 - **QS-3 — что осталось после QS-3a:**
   1. **Тариф для HVAC.** 6 хабов (`air-conditioner`, `furnace`, `heat-pump`, `hvac`,
      `wall-heater`, `water-heater`) осознанно не дают шторке ничего: шаг 1 обещает $89 или
@@ -99,10 +105,21 @@
 | 87 city pages нуждаются в фото (5 слотов каждая) | ~435 photo slots | P2 — Photo Pipeline wave |
 | ~~Rancho Cucamonga + Temecula real DID phones~~ | ~~2 placeholder в branches.ts~~ | ✅ Закрыто 2026-05-06 — реальные DID активны: RC (909) 457-1030, Temecula (951) 577-3877 |
 | ~~`audit-output/` directory~~ | ~~untracked, нужно в .gitignore~~ | ✅ Закрыто 2026-05-14 — commit `f2fd8e9` добавил `audit-results/` в .gitignore (`audit-output/` уже был там) |
-| Нет проверки типов в сборке/гейтах | `astro check`: 447 ошибок / 122 файла, ~100 с (181 — хвосты `</content></invoke>` в 61 исходнике, 172 — samsung-stackable, 50 — `_incoming-zips/`) | P2 — решение Roman; из-за этого 200 связок жили с чужим филиалом |
+| ~~Нет проверки типов в сборке/гейтах~~ | ~~`astro check`: 447 ошибок / 122 файла~~ | ✅ Закрыто 2026-09-16 — `astro check` четвёртый гейт `npm run verify`, 0 ошибок (merge `43017d9c` + `94ca1c07`) |
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-09-16:** **Проверка типов — четвёртый гейт, В ПРОДЕ** (merge `43017d9c`, ветка
+  `feat/typecheck-cleanup`; `94ca1c07`, ветка `fix/typecheck-exclude-underscore`).
+  `npm run verify` теперь заканчивается `astro check` (было 447 ошибок → 0); `typescript` и
+  `@astrojs/check` в devDependencies. **`/services/dryer-repair/` была свёрстана криво с 5 мая**
+  (Wave 23): три незакрытых тега, вся нижняя половина страницы жила внутри пустой чёрной
+  секции — нашли только проверкой типов. Убраны хвосты `</content></invoke>` из 61 исходника,
+  закрыт `div` на samsung-stackable (+ семь округов в CTA), типы в Layout/TrustBar/MegaMenu/
+  brands/index и др. `tsconfig` исключает `_*`. Гейты 199/53/431 + types 0; build 1217/0;
+  гейт краснеет на возврате `displayName`. Прод после Purge: dryer-repair — 15 секций прямо
+  в `<main>`, samsung — семь округов. Детали: `session-log/2026-09-16.md`.
 
 - **2026-09-16:** **Служебные пометки, логистика §1.2 и сырой HTML в FAQ — В ПРОДЕ** (merge
   `35f41633`, ветка `feat/clean-internal-notes`). Шаблон связок: «city/service pillar» →
