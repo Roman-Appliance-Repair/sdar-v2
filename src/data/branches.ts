@@ -573,7 +573,8 @@ export const BRANCHES: Branch[] = [
   // Added 2026-08-07 (feat/san-diego Stage A — 10th branch, 7th county).
   //   WAVE 1 footprint = North County Coastal + La Jolla only (recon
   //   wiki/briefings/san-diego-recon-2026-08-06.md: KD 0-13 openings).
-  //   City of San Diego proper + inland = Wave 2; do NOT claim it yet.
+  //   City of San Diego proper = Wave 2, announced 2026-09-17 (921xx routed
+  //   in service-zone.ts). South Bay / East County (919xx) not claimed yet.
   //   SAB — NO public street address. No assigned technician name yet —
   //   content must use generic "our San Diego technicians" framing
   //   (factual-accuracy §10 has no SD row on purpose).

@@ -27,8 +27,10 @@ export const ZIP_EXACT: Record<string, string> = {
   '91319': 'thousand-oaks', '91320': 'thousand-oaks', '91358': 'thousand-oaks',
   '91359': 'thousand-oaks', '91360': 'thousand-oaks', '91361': 'thousand-oaks',
   '91362': 'thousand-oaks', '91377': 'thousand-oaks', '91301': 'thousand-oaks',
-  // San Diego branch — Wave 1 North County Coastal + La Jolla ONLY (2026-08-07).
-  // City-of-SD prefixes 919xx/921xx stay UNMAPPED on purpose until Wave 2 pages exist.
+  // San Diego branch — Wave 1 North County Coastal + La Jolla (2026-08-07).
+  // Wave 2 (2026-09-17): the city of San Diego itself is the 921xx prefix below.
+  // 919xx is NOT the city (Chula Vista, National City, La Mesa, East County
+  // back country) and stays unmapped until Roman decides that footprint.
   '92037': 'san-diego',
   '92008': 'san-diego', '92009': 'san-diego', '92010': 'san-diego', '92011': 'san-diego',
   '92014': 'san-diego', '92067': 'san-diego', '92091': 'san-diego',
@@ -62,6 +64,8 @@ export const ZIP_PREFIX3: Record<string, string> = {
   '926': 'irvine', '927': 'irvine', '928': 'irvine',
   // Ventura county
   '930': 'thousand-oaks', '931': 'thousand-oaks',
+  // City of San Diego (plus Coronado 92118, which shares the block) — Wave 2
+  '921': 'san-diego',
 };
 
 /** Strip to at most 5 leading digits. */
