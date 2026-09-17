@@ -225,7 +225,7 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 | Rancho Cucamonga | (909) 457-1030 | ranchocucamonga@samedayappliance.repair | Live (real DID, GBP pending) |
 | Temecula | (951) 577-3877 | temecula@samedayappliance.repair | Live (real DID, GBP pending) |
 | Santa Barbara | (805) 500-0855 | santabarbara@samedayappliance.repair | Live (service_area, GBP pending; добавлен 2026-08-06, 6-й каунти) |
-| San Diego | (858) 667-7237 | sandiego@samedayappliance.repair | Live (service_area, GBP pending; добавлен 2026-08-07, 7-й каунти, Wave 1 = North County Coastal + La Jolla; Wave 2 с 2026-09-17 = город San Diego + Chula Vista, National City, Imperial Beach, Bonita, La Mesa, Lemon Grove, Spring Valley; восемь техников) |
+| San Diego | (858) 667-7237 | sandiego@samedayappliance.repair | Live (service_area, GBP pending; добавлен 2026-08-07, 7-й каунти, Wave 1 = North County Coastal + La Jolla; Wave 2 с 2026-09-17 = город San Diego + Coronado, Chula Vista, National City, Imperial Beach, Bonita, La Mesa, Lemon Grove, Spring Valley; восемь техников) |
 
 **Источник правды:** `src/data/branches.ts` — не дублировать здесь при изменениях.
 

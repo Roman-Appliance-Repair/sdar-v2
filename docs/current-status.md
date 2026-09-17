@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-09-17 (San Diego Wave 2: маршрутизация + /credentials/same-day-service/ в проде — b23b5c2a)
+**Последняя синхронизация:** 2026-09-17 (Coronado в маршрутизации San Diego — 86ad1031)
 
 ---
 
@@ -107,6 +107,14 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-09-17:** **Coronado → филиал San Diego, В ПРОДЕ** (merge `86ad1031`, ветка
+  `fix/marine-zone-routing`). `/marine/san-diego/` называет Coronado, а форма `/book/` ставила
+  ему «вне зоны». 92118 и 92178 (USPS: Coronado) привязаны. Сверка всех мест на `/marine/` и
+  гео-страницах раздела с маршрутизацией: других расхождений нет. Не названный, но лежащий в
+  «from Ventura down to the South Bay of San Diego» Oceanside (92054) — вне зоны, ждёт решения
+  Roman. Гейты 199/53/431 + types 0, build 1217/0; прод после Purge — живая форма без пометки
+  для Coronado. Детали: `session-log/2026-09-17.md`.
 
 - **2026-09-17:** **San Diego Wave 2 — маршрутизация заявок и страница same-day, В ПРОДЕ**
   (merge `b23b5c2a`, ветка `feat/san-diego-routing`). `service-zone.ts`: префикс 921 заменён
