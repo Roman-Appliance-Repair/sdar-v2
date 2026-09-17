@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-09-16 (телефон Viking убран, гейт типов падает без пакета — 645a04cd)
+**Последняя синхронизация:** 2026-09-17 (списки округов + зашитые числа в проде — 9adec69e)
 
 ---
 
@@ -36,12 +36,12 @@
 
 ## Что сейчас в работе
 
-- **Неполные списки округов (разведка 2026-09-16, не правилось):** 541 место в 437 файлах
-  `src/pages` перечисляют 3–6 округов из семи (brands 299, commercial 123, outdoor 53,
-  services 46). Топ: «in Los Angeles, Orange County, Ventura County.» ×81, «in LA, Orange
-  County, Ventura, San Bernardino, and Riverside.» ×53. Устаревшее число — 4, в
-  title/description — 19 (лимит 160). Файл: `audit-output/county-lists-incomplete-2026-09-16.md`
-  (локально). Ждёт решения Roman.
+- **Списки округов — хвосты после 2026-09-17:** (1) **556 трёхокружных фраз** «across LA, OC,
+  Ventura» в 322 файлах (первый скан их не видел; 58 рядом с «next-day») — ждут решения Roman,
+  файл `audit-output/county-lists-3county-2026-09-16.md`; (2) ZIP самого San Diego (919xx/921xx)
+  не привязаны в `service-zone.ts`, а `/book/` уже обещает San Diego; (3) названия надзорных
+  ведомств Santa Barbara и San Diego — сверить, потом дописать; (4) `/credentials/same-day-service/`
+  молчит про Santa Barbara и San Diego.
 - **QS-3 — что осталось после QS-3a:**
   1. **Тариф для HVAC.** 6 хабов (`air-conditioner`, `furnace`, `heat-pump`, `hvac`,
      `wall-heater`, `water-heater`) осознанно не дают шторке ничего: шаг 1 обещает $89 или
@@ -108,6 +108,17 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-09-17:** **Списки округов и зашитые числа, В ПРОДЕ** (merge `9adec69e`, ветка
+  `feat/county-lists`). Списки покрытия из аудита приведены к семи округам (616 замен, 459
+  файлов; подзаголовки и длинные meta — «across 7 Southern California counties»). Схема Roman:
+  список округов — все семь, обещание same-day — с оговоркой «Next-day for Rancho Cucamonga and
+  Temecula» (30 хвостов сохранены). Уровни same-day на commercial/refrigeration, continental,
+  slushie, cellarpro, whisperkool, pizza-oven не тронуты. Устаревшие «5 counties» ×4 → 7.
+  209 неверных чисел: «5-county» → «seven-county», «8 branches/territories» → без числа;
+  `/services/` список филиалов 8 → 10. `/book/` + San Diego; same-day FAQ без старого списка
+  хабов. Гейты 199/53/431 + types 0, build 1217/0; прод после Purge — 6/6 страниц.
+  Детали: `session-log/2026-09-17.md`.
 
 - **2026-09-16:** **Телефон Viking убран, гейт типов больше не зеленеет без пакета — В ПРОДЕ** (merge
   `645a04cd`, ветка `fix/viking-phone-types-gate`). 1-888-845-4641 → «contact Viking's service first»
