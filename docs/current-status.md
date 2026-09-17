@@ -97,10 +97,18 @@
 | 87 city pages нуждаются в фото (5 слотов каждая) | ~435 photo slots | P2 — Photo Pipeline wave |
 | ~~Rancho Cucamonga + Temecula real DID phones~~ | ~~2 placeholder в branches.ts~~ | ✅ Закрыто 2026-05-06 — реальные DID активны: RC (909) 457-1030, Temecula (951) 577-3877 |
 | ~~`audit-output/` directory~~ | ~~untracked, нужно в .gitignore~~ | ✅ Закрыто 2026-05-14 — commit `f2fd8e9` добавил `audit-results/` в .gitignore (`audit-output/` уже был там) |
+| Нет проверки типов в сборке/гейтах | `astro check`: 447 ошибок / 122 файла, ~100 с (181 — хвосты `</content></invoke>` в 61 исходнике, 172 — samsung-stackable, 50 — `_incoming-zips/`) | P2 — решение Roman; из-за этого 200 связок жили с чужим филиалом |
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
 
+- **2026-09-16:** **Имя филиала на 200 связках «город × услуга», В ПРОДЕ** (merge `3a0322c2`,
+  ветка `feat/fix-combo-branch-name`, `1831eba0`). Шаблон `[city]/[service].astro` читал
+  несуществующее `branch.displayName` → везде «Los Angeles branch» и H1 «Same-Day from Los
+  Angeles». Теперь `displayCity` (как BranchNAP/MegaMenu), 7 мест. Баг жил, потому что в проекте
+  нет проверки типов. Гейты 199/53/431, build 1217/0; прод после Purge: Pasadena → Pasadena
+  branch, Irvine → Irvine branch, Temecula → Riverside branch («Same-Day from Riverside»).
+  Детали: `session-log/2026-09-16.md`.
 - **2026-09-16:** **Волна §1.1, партия 2 — шесть дочерних страниц Viking, В ПРОДЕ** (merge
   `fe7914c5`, ветка `feat/cb-wave-2`). Владелец → Composition Brands, год покупки 2002 →
   январь 2013, логистика Middleby/Greenwood убрана (сроки оставлены), «одна сеть запчастей»
