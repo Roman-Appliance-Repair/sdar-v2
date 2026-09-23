@@ -16,9 +16,9 @@
  * therefore identical to the GMB-registered legal name (post-2026-05-07
  * canonical: "Same Day Appliance Repair[, City], CA Location").
  *
- * Service-area branches (7 of 8): WeHo is physical_pin + has address, others
- * render a disclaimer "We are a service-area business..." instead of street
- * address per Google SAB rules.
+ * Service-area branches render a disclaimer "We are a service-area business..."
+ * instead of a street address per Google SAB rules. WeHo (primary branch) shows
+ * city + ZIP and a "we come to you" line — no street address since 2026-09-23.
  */
 
 import type { Branch } from '../data/branches';
@@ -47,6 +47,11 @@ const {
 const NameTag = nameTag;
 
 const phoneRaw = '+1' + branch.phone.replace(/\D/g, '');
+
+const hoods = branch.serviceNeighborhoods ?? [];
+const hoodList = hoods.length > 1
+  ? `${hoods.slice(0, -1).join(', ')} and ${hoods[hoods.length - 1]}`
+  : hoods.join('');
 ---
 
 {showHeading && (
@@ -81,9 +86,16 @@ const phoneRaw = '+1' + branch.phone.replace(/\D/g, '');
     </p>
   ) : (
     branch.address && (
-      <address class="branch-address">
-        {branch.address.street}, {branch.address.city}, {branch.address.state} {branch.address.zip}
-      </address>
+      <>
+        <address class="branch-address">
+          {branch.address.street && `${branch.address.street}, `}{branch.address.city}, {branch.address.state} {branch.address.zip}
+        </address>
+        {!branch.address.street && branch.serviceNeighborhoods && (
+          <p class="service-area-note">
+            <span>We come to you. Our techs work on-site across {hoodList}.</span>
+          </p>
+        )}
+      </>
     )
   )}
 

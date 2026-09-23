@@ -14,7 +14,7 @@
 - **Зоны:** 7 каунти SoCal — LA, Orange, Ventura, Santa Barbara, San Bernardino, Riverside, San Diego (Santa Barbara добавлен 2026-08-06, San Diego — 2026-08-07)
 - **Часы:** Пн–Сб 8:00–20:00, Вс закрыто. Звонки принимаются 24/7
 - **Цены:** $89 residential / $120 commercial (waived с repair). На mixed-scope страницах — базовая по основной аудитории, секционные цены внутри своих секций; два ценника рядом в одном блоке — никогда. См. §5 + @docs/factual-accuracy.md §9
-- **NAP (физический пин):** 8746 Rangely Ave, West Hollywood, CA 90048 — единственный public streetAddress на сайте, ровно в этой форме, без «Ste» (сверено с карточкой GBP 2026-09-02). Эмитится в schema на **14 страницах**: 6 собственных pin-страниц (`/`, `/west-hollywood/`, `/contact/`, `/book/`, `/privacy-policy/`, `/terms/`) плюс 8, где тот же адрес приходит внутри массива филиалов — 7 county-хабов и `/credentials/` (county-хабы строят массив `location` сами, а не через `src/lib/build-location-array.ts`). Все 15 сущностей с адресом — одна запись West Hollywood; у остальных филиалов адреса нет нигде (см. seo-policies §1)
+- **NAP:** публичного street address на сайте **нет** (с 2026-09-23). West Hollywood переведён в service-area business (GBP заблокирован как «Business Profile doesn't exist», адрес в GBP скрыт) — на сайте только «West Hollywood, CA 90048», без улицы, без `geo`, районы выезда в `serviceNeighborhoods`. Каталоги (Yelp/BBB/BrightLocal) со старым адресом пока не трогаем. См. seo-policies §1 п.2
 - **Aggregate Rating:** не используется нигде (ни в JSON-LD, ни в visible UI). Google берёт rating напрямую из GMB. См. @docs/factual-accuracy.md §6
 - **Технари в текстах:** Mikhail V., Artur S., David K.
 
@@ -98,7 +98,7 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 
 Кратко (без подгрузки):
 - Голос: «our techs», «we», «our guys» — никогда «I», никогда корпоративно
-- Видимый UI: никаких `aggregateRating`, `4.6 / 37 reviews`, `BBB A+`, `HVAC 777 LLC` (кроме footer copyright), `streetAddress` (кроме WeHo pin pages)
+- Видимый UI: никаких `aggregateRating`, `4.6 / 37 reviews`, `BBB A+`, `HVAC 777 LLC` (кроме footer copyright), `streetAddress` (нигде, с 2026-09-23), «storefront / visit us / walk-in» про наш бизнес
 - BBB: только «BBB Accredited» / «BBB Accredited Business», никогда «BBB A+» (false claim — real grade = A)
 - Cred labeling: «BHGS #A49573», «EPA 608 Universal», «CSLB C-20 HVAC #1138898». Никогда: «BHGS Licensed», «CSLB License #A49573», «CA BHGS»
 - Цены: базовая цена страницы — по основной аудитории ($89 residential на city pillars). Секционные цены ОК: $120 внутри коммерческой секции, $89 внутри outdoor/residential. Два ценника рядом в одном блоке (hero, pricing cards, FAQ) — никогда. См. @docs/factual-accuracy.md §9

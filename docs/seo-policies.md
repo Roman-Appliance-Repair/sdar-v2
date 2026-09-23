@@ -10,33 +10,20 @@
 
 1. **AggregateRating НЕ используется нигде** — ни в JSON-LD, ни в visible UI. Google берёт rating напрямую из GMB. Schema rating brittle и создаёт mismatch risk. Никаких «★ 4.6», «37 reviews», звёзд, чисел.
 
-2. **streetAddress `8746 Rangely Ave, West Hollywood, CA 90048`** — ровно одна форма записи,
-   без хвоста «Ste». Сверено с карточкой GBP (Local Falcon, `gbp_linked`, place_id
-   `ChIJ9ysncSy_woARe44arhSyTOY`): карточка отдаёт `8746 Rangely Ave, West Hollywood, CA 90048`.
-   SSOT — `src/data/branches.ts` (`street: '8746 Rangely Ave'`). «Ste» без номера юнита адрес
-   не уточняет, а строковую сверку NAP ломает. Исправлено 2026-09-02.
+2. **Публичного streetAddress на сайте НЕТ (с 2026-09-23).** West Hollywood переведён из
+   «витрины с адресом» в service-area business: GBP WeHo заблокирован как «Business Profile
+   doesn't exist», адрес в GBP скрыт, сайт обязан совпадать. Бывший адрес (улица + дом на
+   Rangely) и координаты двери удалены из `src/data/branches.ts`, из всех schema и из видимого
+   текста; в `dist` проверяется grep'ом (0 совпадений).
 
-   Адрес эмитится **на 14 страницах**, и все 15 сущностей с ним — это одна и та же запись
-   West Hollywood (`addressLocality: West Hollywood`, телефон `(323) 870-4790`). Ни один
-   другой филиал адреса не несёт нигде.
-
-   **6 собственных pin-страниц** (адрес у главной сущности страницы):
-   - `/` (homepage primary LocalBusiness)
-   - `/west-hollywood/` (WeHo city pillar)
-   - `/contact/` (WeHo entry в location array)
-   - `/book/`
-   - `/privacy-policy/`
-   - `/terms/`
-
-   **+8 страниц, где адрес приходит внутри массива филиалов:** 7 county-хабов
-   (`los-angeles-county`, `orange-county`, `riverside-county`, `san-bernardino-county`,
-   `san-diego-county`, `santa-barbara-county`, `ventura-county`) и `/credentials/`.
-   Причина — два разных билдера массива `location`: общий
-   `src/lib/build-location-array.ts` намеренно отдаёт только city-level адрес по SAB-правилу,
-   а county-хабы строят массив сами (`src/pages/orange-county.astro` и аналоги) и для
-   `type === 'physical_pin'` подставляют настоящий адрес филиала. Для WeHo это корректно —
-   это GBP-подтверждённый физический пин, скрывать его адрес не требуется. Расхождение
-   зафиксировано намеренно; при сведении county-хабов к общему билдеру этот список вернётся к 6.
+   WeHo-сущность несёт только `addressLocality: West Hollywood`, `addressRegion: CA`,
+   `postalCode: 90048`, `addressCountry: US` — **без `streetAddress` и без `geo`** — плюс
+   `areaServed` районов выезда (`branch.serviceNeighborhoods`: West Hollywood, Hollywood,
+   Fairfax, Hancock Park, Mid-City, Mid-Wilshire, Beverly Grove). `@type` не менялся.
+   Видимо: «West Hollywood, CA 90048» + «We come to you…» в `BranchNAP`. Никаких «storefront /
+   visit us / walk-in» про наш бизнес. Код county-хабов и `/contact/` оставлен с условным
+   `streetAddress` (выводится только если улица когда-нибудь снова появится в данных) — **не
+   возвращать улицу без решения Романа и без адреса в GBP.**
 
 3. **`legalName: "HVAC 777 LLC"`** → во всех LocalBusiness schema на всех 1009 страницах (не только pin pages, не только legal). В visible UI — только в footer copyright line `© 2026 HVAC 777 LLC dba Same Day Appliance Repair`.
 
@@ -72,8 +59,7 @@ grep -c "BHGS Licensed\|CA BHGS"  <page>  # = 0
 - CSLB C-20 возвращён site-wide (был удалён в Wave 35; нужен для NAP/LSA match).
 - legalName policy расширен на все 1009 страниц (был на legal pages only).
 - location array (все branches из `branches.ts`: 9 c 2026-08-06, 10 c 2026-08-07 — San Diego) policy сформулирован для гео-нейтральных страниц.
-- streetAddress pin pages =  6 (homepage + WeHo + contact + book + privacy + terms; больше не Hollywood pillar).
-- streetAddress canonical form: «8746 Rangely Ave, West Hollywood, CA 90048». (В мае 2026 сюда ошибочно добавили хвост «Ste»; снят 2026-09-02 после сверки с карточкой GBP.)
+- streetAddress pin pages = 0 с 2026-09-23 (WeHo → SAB; до этого было 6 + 8 через массивы филиалов).
 
 Текущий статус (2026-05-07): **policy переписана, code/schema sync — отдельный P0 commit** (см. current-status.md).
 
@@ -178,14 +164,13 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 
 `name` берётся из `branches.ts` per-branch и не модифицируется. WeHo и LA = `Same Day Appliance Repair, CA Location` (без города в имени, потому что они корпоративные хабы); остальные 6 веток = `Same Day Appliance Repair [City], CA Location` с городом.
 
-### Pin pages добавляют `address` (6 страниц):
+### WeHo-страницы (`/`, `/west-hollywood/`, `/contact/`, `/book/`, `/privacy-policy/`, `/terms/`)
 
-`/`, `/west-hollywood/`, `/contact/`, `/book/`, `/privacy-policy/`, `/terms/`
+С 2026-09-23 — city + ZIP, без `streetAddress` и без `geo`:
 
 ```json
 "address": {
   "@type": "PostalAddress",
-  "streetAddress": "8746 Rangely Ave",
   "addressLocality": "West Hollywood",
   "addressRegion": "CA",
   "postalCode": "90048",
@@ -197,7 +182,7 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 
 Google Rich Results требует поле `address` на каждом `LocalBusiness`/`HomeAndConstructionBusiness`.
 Раньше его не было на ~776 непин-объектах → ~863 ошибки. **Теперь каждый LB несёт city-level
-`PostalAddress` БЕЗ `streetAddress`** (SAB-safe — публичный street только на 6 pin pages, см. выше):
+`PostalAddress` БЕЗ `streetAddress`** (SAB-safe; публичного street на сайте нет с 2026-09-23):
 
 ```json
 "address": {
@@ -211,7 +196,7 @@ Google Rich Results требует поле `address` на каждом `LocalBu
 - **`addressLocality`** = город страницы, если у объекта есть `areaServed` типа `City`
   (city pillars + city×service combos → их город); иначе **`West Hollywood`** (pin-город, гео-нейтральные:
   brand/service/price-list/commercial/outdoor/credentials).
-- **Pin pages (6)** сохраняют ПОЛНЫЙ `address` со `streetAddress` (`8746 Rangely Ave`) — НЕ перезаписывается. Ещё 8 страниц получают тот же адрес внутри массива `location` — см. §1 п.2.
+- **WeHo-страницы (6)** несут `address` c `postalCode: 90048`, без `streetAddress` — см. §1 п.2.
 - **`location` array entries** — каждая запись несёт `addressLocality = branch.displayCity` (per-branch город).
 
 **SSOT инъекции (не трогать руками per-page):**
@@ -219,7 +204,7 @@ Google Rich Results требует поле `address` на каждом `LocalBu
 2. `src/lib/build-location-array.ts` → `buildBranchLocation()` ставит `branch.displayCity` в каждую location-запись.
 3. Raw-inline schemaJson страницы — инъектированы скриптовым sweep'ом (2026-06-09); новые такие страницы должны звать `mergeCredentials()` ИЛИ нести address вручную.
 
-**НЕ удалять `address` при будущих sweep'ах** — это required Google-поле. streetAddress остаётся pin-only.
+**НЕ удалять `address` при будущих sweep'ах** — это required Google-поле. `streetAddress` не выводится нигде (с 2026-09-23).
 
 ### Гео-нейтральные страницы добавляют `location` (все 10 филиалов)
 
