@@ -23,12 +23,12 @@
 |---|---|
 | BHGS Registration #A49573 | Site-wide (schema + visible footer) — главная appliance registration |
 | EPA 608 Universal #1346255700410 | Site-wide — federal refrigerant cert |
-| CSLB C-20 HVAC | Site-wide — нужен для NAP/LSA match |
+| ~~CSLB C-20 HVAC~~ | **INACTIVE с 2026-08-22, скрыт флагом `CSLB_ACTIVE = false`** (`credentials-schema.ts`) — вернуть после реактивации, см. factual-accuracy §3 |
 | BBB Accredited Business | Site-wide — БЕЗ буквы рейтинга (real BBB grade = A, не A+; «BBB A+» — false claim) |
 
 SSOT: `src/data/credentials-schema.ts` экспортирует `CANONICAL_CREDENTIALS` array (4 entries c `recognizedBy`) + `LEGAL_NAME` + `mergeCredentials(schema)` helper. Применяется в HomepageSchema + 89 city pillars + contact + book + credentials/licensed (Phase 2b-1, commit `39042c7`). Phase 2b-2 deferred — 580 schemaJsons sub-pages через AST-aware modifier.
 
-CSLB C-38 (Refrigeration) более не используется (отменено в FINAL 2026-05-07 policy). CSLB C-20 HVAC #1138898 — **active** (per Roman 2026-05-07), используется в `src/components/Footer.astro` + `hasCredential` schema на 1009 страницах.
+CSLB C-38 (Refrigeration) более не используется (отменено в FINAL 2026-05-07 policy). CSLB C-20 HVAC #1138898 — **INACTIVE с 2026-08-22** (отменены бонды и workers' comp). С 2026-09-23 скрыт на сайте флагом `CSLB_ACTIVE = false`; в новых текстах CSLB/C-20/1138898 не писать. Возврат — factual-accuracy §3.
 
 ---
 
@@ -100,7 +100,7 @@ CSLB C-38 (Refrigeration) более не используется (отмене
 - Голос: «our techs», «we», «our guys» — никогда «I», никогда корпоративно
 - Видимый UI: никаких `aggregateRating`, `4.6 / 37 reviews`, `BBB A+`, `HVAC 777 LLC` (кроме footer copyright), `streetAddress` (нигде, с 2026-09-23), «storefront / visit us / walk-in» про наш бизнес
 - BBB: только «BBB Accredited» / «BBB Accredited Business», никогда «BBB A+» (false claim — real grade = A)
-- Cred labeling: «BHGS #A49573», «EPA 608 Universal», «CSLB C-20 HVAC #1138898». Никогда: «BHGS Licensed», «CSLB License #A49573», «CA BHGS»
+- Cred labeling: «BHGS #A49573», «EPA 608 Universal» (CSLB C-20 не упоминать, пока `CSLB_ACTIVE = false`). Никогда: «BHGS Licensed», «CSLB License #A49573», «CA BHGS»
 - Цены: базовая цена страницы — по основной аудитории ($89 residential на city pillars). Секционные цены ОК: $120 внутри коммерческой секции, $89 внутри outdoor/residential. Два ценника рядом в одном блоке (hero, pricing cards, FAQ) — никогда. См. @docs/factual-accuracy.md §9
 - Wood-burning fireplaces исключены (SCAQMD restrictions) — only gas
 - Wolf не делает residential refrigerators / dishwashers; Sub-Zero не делает dishwashers; KitchenAid и JennAir не продают washers/dryers в США

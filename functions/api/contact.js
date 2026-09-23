@@ -565,7 +565,7 @@ function buildPdfUserEmail(p) {
       </p>
       <p style="font-size:12px;color:#6b6b6b;text-align:center;margin-top:24px;line-height:1.6;">
         West Hollywood · Los Angeles · Thousand Oaks · Pasadena · Irvine<br>
-        BHGS #A49573 · EPA 608 Universal #1346255700410 · CSLB C-20 HVAC · BBB Accredited Business
+        BHGS #A49573 · EPA 608 Universal #1346255700410 · BBB Accredited Business
       </p>
     </div>
   </div>

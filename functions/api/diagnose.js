@@ -147,7 +147,7 @@ export async function onRequestPost(context) {
       : 'Residential repairs: refrigerators $200–$450 ($300–$700+ for Sub-Zero/Wolf/Thermador built-ins), washers/dryers $150–$350 ($200–$450 Miele/Bosch), ovens/ranges $175–$420 ($250–$500+ Wolf/Viking/Thermador), dishwashers $150–$320 ($200–$450 Miele). Diagnostic $89 — waived with repair.';
 
     const systemPrompt = `You are a senior appliance repair technician at Same Day Appliance Repair, Los Angeles.
-BHGS #A49573, CSLB C-20, EPA 608 Universal certified.
+BHGS #A49573, EPA 608 Universal certified.
 
 The client described a problem with their appliance. Always respond in English only.
 
