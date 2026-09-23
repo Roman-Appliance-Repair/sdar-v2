@@ -121,23 +121,19 @@ True, Perlick, Kalamazoo, Bull) **оставляем осознанно** (ре�
 - **В visible UI:** упоминается ТОЛЬКО в footer copyright line `© 2026 HVAC 777 LLC dba Same Day Appliance Repair`
 - **Адрес юр. лица (PMB на Wilshire) больше нигде не рендерится** — только legal entity name остался для copyright
 
-## 5. NAP — physical pin
+## 5. NAP — адреса на сайте нет (service-area business с 2026-09-23)
 
-- **Единственный публичный адрес сайта:** **8746 Rangely Ave, West Hollywood, CA 90048** (без «Ste» — форма сверена с карточкой GBP 2026-09-02)
-- Это `address` поле у WeHo branch в `branches.ts` (type: `physical_pin`)
-- **GMB-verified** — этот адрес показывается в Google Maps для WeHo profile.
+- **Публичного street address на сайте нет.** West Hollywood переведён в SAB: GBP WeHo
+  заблокирован как «Business Profile doesn't exist», адрес в GBP скрыт — сайт совпадает.
+- Видимо и в schema: **West Hollywood, CA 90048** (city + ZIP), без улицы, без `geo`-координат,
+  без карты с пином. Районы выезда: West Hollywood, Hollywood, Fairfax, Hancock Park, Mid-City,
+  Mid-Wilshire, Beverly Grove (`serviceNeighborhoods` в `branches.ts`).
+- Бывший адрес на Rangely остаётся в каталогах (Yelp, BBB, BrightLocal и т.д.) — **их пока
+  не трогаем**, массовая смена данных до восстановления профиля может сбить Google.
+- Внутренний `type: 'physical_pin'` у WeHo оставлен только ради `HEADQUARTERS`-lookup; к
+  публичному адресу он больше не относится.
 
-**Pin pages (6 страниц рендерят streetAddress в schema):**
-1. `/` — homepage primary LocalBusiness
-2. `/west-hollywood/` — WeHo city pillar
-3. `/contact/` — WeHo entry в location array
-4. `/book/` — booking schema
-5. `/privacy-policy/` — legal page schema
-6. `/terms/` — legal page schema
-
-Все остальные ~1003 страницы (city pages, brand pages, services, commercial, outdoor) — без `streetAddress` в schema. Все non-WeHo branches = `service_area` type.
-
-**6230 Wilshire / PMB 2267** — mailing address юр. лица (PMB), нигде на сайте не светим. BBB профиль HVAC 777 LLC в LA указывает 6230 Wilshire — это normal для multi-location LLC, на сайте/в schema отражаем только WeHo physical pin (8746 Rangely).
+**6230 Wilshire / PMB 2267** — mailing address юр. лица (PMB), нигде на сайте не светим. BBB профиль HVAC 777 LLC в LA указывает 6230 Wilshire — это normal для multi-location LLC, на сайте/в schema street address не отражаем вообще (с 2026-09-23).
 
 **HVAC 777 LLC имеет 3 BBB профиля** (LA Wilshire / WeHo Rangely / Pasadena Columbia) — multi-location LLC, sync с сайтом не нужен. Сайт показывает только GMB-verified WeHo address.
 
@@ -216,7 +212,7 @@ Sunday questions отвечаем «closed for in-person, but phones 24/7». Н�
 
 | Branch | Phone | Email | Status |
 |---|---|---|---|
-| West Hollywood | (323) 870-4790 | support@samedayappliance.repair | Live (physical_pin, GBP verified) |
+| West Hollywood | (323) 870-4790 | support@samedayappliance.repair | Live (SAB с 2026-09-23; GBP заблокирован, адрес скрыт) |
 | Beverly Hills | (424) 248-1199 | beverlyhills@samedayappliance.repair | Live (service_area, GBP unverified) |
 | Los Angeles | (424) 325-0520 | info@samedayappliance.repair | Live (service_area, GBP verified SAB) |
 | Pasadena | (626) 376-4458 | pasadena@samedayappliance.repair | Live |
