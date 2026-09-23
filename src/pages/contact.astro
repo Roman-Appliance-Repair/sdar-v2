@@ -45,22 +45,20 @@ const localBusinessSchema = mergeCredentials({
   legalName: 'HVAC 777 LLC',
   alternateName: 'SDAR',
   url: 'https://samedayappliance.repair/',
-  // NAP: this entity carries the West Hollywood pin address below, so it must
-  // carry the West Hollywood line too — the GBP card for 8746 Rangely Ave lists
-  // (323) 870-4790. The general LA number stays everywhere it is a general
-  // number; it just cannot sit on the entity that claims the pin address.
+  // NAP: this entity carries the West Hollywood address below (city + ZIP only —
+  // service-area business since 2026-09-23), so it must carry the West Hollywood
+  // line too: the WeHo GBP lists (323) 870-4790. The general LA number stays
+  // everywhere it is a general number; it just cannot sit on the WeHo entity.
   telephone: wehoPhone,
   email: generalEmail,
   priceRange: '$89 diagnostic · OEM parts · 90-day warranty',
   address: {
     '@type': 'PostalAddress',
-    streetAddress: '8746 Rangely Ave',
     addressLocality: 'West Hollywood',
     addressRegion: 'CA',
     postalCode: '90048',
     addressCountry: 'US'
   },
-  geo: { '@type': 'GeoCoordinates', latitude: 34.0800742, longitude: -118.384211 },
   areaServed: [
     { '@type': 'AdministrativeArea', name: 'Los Angeles County' },
     { '@type': 'AdministrativeArea', name: 'Orange County' },
@@ -89,7 +87,7 @@ const localBusinessSchema = mergeCredentials({
     if (b.type === 'physical_pin' && b.address) {
       entry.address = {
         '@type': 'PostalAddress',
-        streetAddress: b.address.street,
+        ...(b.address.street ? { streetAddress: b.address.street } : {}),
         addressLocality: b.address.city,
         addressRegion: b.address.state,
         postalCode: b.address.zip,

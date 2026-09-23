@@ -14,7 +14,7 @@
 // All entities cross-reference via @id URIs.
 //
 // NAP rules (per wiki/decisions/branch-types-and-public-nap-rules.md):
-//   - Only physical_pin (West Hollywood) renders address + root geo + hasMap
+//   - physical_pin (West Hollywood) renders city+ZIP address + hasMap; no street/geo since 2026-09-23 (SAB)
 //   - service_area locations: NO address, NO root geo, ONLY serviceArea (GeoCircle)
 //   - schema `name` = branch.gbpName (matches verified GBP listing word-for-word)
 //   - HVAC 777 LLC NEVER appears in schema (only in footer legal compliance line)
@@ -98,11 +98,13 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
     hasCredential: [...CANONICAL_CREDENTIALS]
   };
 
-  // physical_pin: full PostalAddress (with streetAddress) + root geo
+  // physical_pin (WeHo, primary branch): PostalAddress. Since 2026-09-23 the
+  // branch runs as a service-area business — no street line and no door `geo`
+  // exist in branches.ts, so both are emitted only if ever set again.
   if (branch.type === 'physical_pin' && branch.address) {
     base.address = {
       '@type': 'PostalAddress',
-      streetAddress: branch.address.street,
+      ...(branch.address.street ? { streetAddress: branch.address.street } : {}),
       addressLocality: branch.address.city,
       addressRegion: branch.address.state,
       postalCode: branch.address.zip,
@@ -114,6 +116,14 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
         latitude: branch.address.lat,
         longitude: branch.address.lng
       };
+    }
+    // Named neighborhoods the branch drives to (City for WeHo, Place for the rest).
+    if (branch.serviceNeighborhoods?.length) {
+      base.areaServed = branch.serviceNeighborhoods.map(name =>
+        name === branch.address!.city
+          ? { '@type': 'City', name, containedInPlace: { '@type': 'AdministrativeArea', name: countyTitle(branch.primaryCounty) } }
+          : { '@type': 'Place', name }
+      );
     }
   }
 

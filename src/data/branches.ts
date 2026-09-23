@@ -3,7 +3,10 @@
 // SINGLE SOURCE OF TRUTH for all 10 service locations.
 //
 // CRITICAL RULE — DO NOT VIOLATE:
-//   Only `physical_pin` type renders public street address.
+//   Only `physical_pin` type may render a public street address — and since
+//   2026-09-23 NO branch carries one: West Hollywood runs as a service-area
+//   business too (GBP address hidden after the "Business Profile doesn't
+//   exist" suspension; the site must match the GBP). WeHo keeps city + ZIP only.
 //   `service_area` type MUST NEVER expose street address publicly anywhere
 //   (homepage, footer, branch page, schema, hero, anywhere).
 //   Violations risk GBP suspension under Google SAB guidelines.
@@ -32,7 +35,8 @@ export interface BranchGeo {
 }
 
 export interface BranchAddress {
-  street: string;
+  /** Public street line. Currently unset on every branch (SAB-only site since 2026-09-23). */
+  street?: string;
   city: string;
   state: 'CA';
   zip: string;
@@ -99,6 +103,10 @@ export interface Branch {
    *  overlap with adjacent branches (e.g. WeHo doesn't display Beverly Hills
    *  since BH has its own branch). */
   displayAreas: string[];
+  /** Neighborhoods the branch drives to, for the "we come to you" NAP line and
+   *  the branch's JSON-LD areaServed. Set only where a branch has no public
+   *  street address but still renders its own NAP block (West Hollywood). */
+  serviceNeighborhoods?: string[];
   /** Branch-level sameAs URLs for LocalBusiness JSON-LD (per-branch entity
    *  cross-link signals). Verified GBPs use the maps.google place_id form
    *  (canonical). Branch-specific socials go here; org-wide socials (FB, YT)
@@ -109,7 +117,8 @@ export interface Branch {
 
 export const BRANCHES: Branch[] = [
   // ─────────────────────────────────────────────────
-  // 1. WEST HOLLYWOOD — Physical pin (THE ONLY ONE)
+  // 1. WEST HOLLYWOOD — primary branch (type kept as physical_pin for
+  //    HEADQUARTERS lookup; no public street address since 2026-09-23)
   // ─────────────────────────────────────────────────
   {
     slug: 'west-hollywood',
@@ -125,16 +134,12 @@ export const BRANCHES: Branch[] = [
     phone: '(323) 870-4790',
     phoneStatus: 'active',
     email: 'support@samedayappliance.repair',
+    // Service-area business since 2026-09-23: no street line and no door
+    // coordinate anywhere on the site (GBP address hidden). City + ZIP only.
     address: {
-      street: '8746 Rangely Ave',
       city: 'West Hollywood',
       state: 'CA',
-      zip: '90048',
-      // Coordinate of 8746 Rangely Ave exactly as the verified GBP card reports it
-      // (Local Falcon, place_id ChIJ9ysncSy_woARe44arhSyTOY). Was 34.0894/-118.3895,
-      // roughly a kilometre off the door. Only consumed by LocalBusiness `geo`.
-      lat: 34.0800742,
-      lng: -118.384211
+      zip: '90048'
     },
     geo: {
       cityCenterLat: 34.0900,
@@ -151,6 +156,7 @@ export const BRANCHES: Branch[] = [
       'hancock-park'
     ],
     displayAreas: ['West Hollywood', 'Hollywood', 'Hancock Park', 'Mid-Wilshire', 'Fairfax'],
+    serviceNeighborhoods: ['West Hollywood', 'Hollywood', 'Fairfax', 'Hancock Park', 'Mid-City', 'Mid-Wilshire', 'Beverly Grove'],
     sameAs: [
       'https://www.google.com/maps/place/?q=place_id:0x80c2bf2c71272bf7:0xe64cb214ae1a8e7b',
       'https://www.facebook.com/profile.php?id=61577069941613',
@@ -643,8 +649,8 @@ export function toE164(phone: string): string {
 /** Legal entity name — used in copyright line only.
  *  NAP/SSOT 2026-05-06: legal-entity STREET ADDRESS is no longer rendered
  *  anywhere on the site (it was the PMB mailing address, not a service
- *  address — caused NAP confusion). The only public street address is
- *  WeHo's `address` field below (8746 Rangely Ave). */
+ *  address — caused NAP confusion). Since 2026-09-23 there is no public street
+ *  address at all: WeHo's `address` is city + ZIP only (service-area business). */
 export const LEGAL_ENTITY = 'HVAC 777 LLC';
 
 /** The single physical pin — for primary LocalBusiness schema */
