@@ -24,9 +24,29 @@ export interface EducationalOccupationalCredential {
   };
 }
 
-/** 4-credential canonical array applied to every LocalBusiness schema site-wide.
- *  Order: BHGS (state license) → EPA 608 (federal cert) → CSLB C-20 (state license)
- *  → BBB Accredited Business (business accreditation, never "A+"). */
+/** CSLB C-20 HVAC #1138898 — INACTIVE since 2026-08-22 (bonds and workers' comp
+ *  cancelled). While false, CSLB is left out of every hasCredential array, the
+ *  footer, the marine trust bars, the /credentials/licensed/ comparison block and
+ *  the legal pages. Flip to true after the license is reactivated (prose sentences
+ *  were rewritten separately — see docs/factual-accuracy.md §3). */
+export const CSLB_ACTIVE = false;
+export const CSLB_LICENSE_NUMBER = '1138898';
+
+const CSLB_CREDENTIAL: EducationalOccupationalCredential = {
+  '@type': 'EducationalOccupationalCredential',
+  credentialCategory: 'CSLB C-20 HVAC',
+  recognizedBy: {
+    '@type': 'GovernmentOrganization',
+    name: 'California Contractors State License Board'
+  }
+};
+
+/** Spread into any hand-written hasCredential array: `...CSLB_CREDENTIALS`. */
+export const CSLB_CREDENTIALS: EducationalOccupationalCredential[] = CSLB_ACTIVE ? [CSLB_CREDENTIAL] : [];
+
+/** Canonical array applied to every LocalBusiness schema site-wide.
+ *  Order: BHGS (state license) → EPA 608 (federal cert) → CSLB C-20 (state license,
+ *  only while CSLB_ACTIVE) → BBB Accredited Business (never "A+"). */
 export const CANONICAL_CREDENTIALS: EducationalOccupationalCredential[] = [
   {
     '@type': 'EducationalOccupationalCredential',
@@ -44,14 +64,7 @@ export const CANONICAL_CREDENTIALS: EducationalOccupationalCredential[] = [
       name: 'U.S. Environmental Protection Agency'
     }
   },
-  {
-    '@type': 'EducationalOccupationalCredential',
-    credentialCategory: 'CSLB C-20 HVAC',
-    recognizedBy: {
-      '@type': 'GovernmentOrganization',
-      name: 'California Contractors State License Board'
-    }
-  },
+  ...CSLB_CREDENTIALS,
   {
     '@type': 'EducationalOccupationalCredential',
     credentialCategory: 'BBB Accredited Business',
