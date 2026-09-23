@@ -94,13 +94,15 @@ True, Perlick, Kalamazoo, Bull) **оставляем осознанно** (ре�
 
 ## 3. Лицензии — где упоминать
 
+**⚠️ CSLB C-20 HVAC #1138898 — INACTIVE с 2026-08-22** (отменены бонды и workers' comp). Пока лицензию не восстановят, сайт её не заявляет: переключатель `CSLB_ACTIVE = false` в `src/data/credentials-schema.ts` убирает CSLB из всех `hasCredential` (440 записей + `CANONICAL_CREDENTIALS`), футера, морских плашек, AI-диагностики, блока BHGS-vs-CSLB на `/credentials/licensed/` и юр. страниц. Тексты страниц переписаны отдельным коммитом (fix(copy): CSLB-neutral prose). **Вернуть после реактивации:** `CSLB_ACTIVE = true` + `git revert` коммита с текстами + `public/llms.txt` и `functions/api/{contact,diagnose}.js` руками. Пока флаг выключен — CSLB/C-20/1138898 в новых текстах не писать.
+
 **FINAL policy (2026-05-07):** все 4 credentials рендерятся site-wide — schema (`hasCredential` array) на каждой LocalBusiness + visible footer. Это нужно для NAP/credential match с LSA и для trust restoration.
 
 | Credential | Применение | Никогда |
 |---|---|---|
 | **BHGS #A49573** | Везде (все 1009 страниц, schema + visible footer) | — |
 | **EPA 608 Universal #1346255700410** | Везде | — |
-| **CSLB C-20 HVAC** | Везде (зарегистрирована и заявлена в LSA, нужна для NAP match) | Не подписывать как BHGS — это разные регуляторы |
+| **CSLB C-20 HVAC** | **СКРЫТА с 2026-09-23** (inactive с 2026-08-22, флаг `CSLB_ACTIVE`). Когда активна — везде (заявлена в LSA, нужна для NAP match) | Не заявлять, пока `CSLB_ACTIVE = false`; не подписывать как BHGS — это разные регуляторы |
 | **BBB Accredited Business** | Везде (БЕЗ буквы рейтинга — на BBB реально A, не A+) | "BBB A+" — false claim, никогда |
 
 **BBB rating note:** на bbb.org реальный grade = **A** (не A+). Писать "A+" в visible UI или schema = false-advertising claim. Только "BBB Accredited Business" без буквы. Сам grade Google и так не подтянет в SERP — accreditation status сам по себе trust signal.
