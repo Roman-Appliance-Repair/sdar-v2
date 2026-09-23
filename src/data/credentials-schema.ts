@@ -44,6 +44,10 @@ const CSLB_CREDENTIAL: EducationalOccupationalCredential = {
 /** Spread into any hand-written hasCredential array: `...CSLB_CREDENTIALS`. */
 export const CSLB_CREDENTIALS: EducationalOccupationalCredential[] = CSLB_ACTIVE ? [CSLB_CREDENTIAL] : [];
 
+/** Same switch for pages whose JSON-LD is a hand-written template string:
+ *  interpolate `${CSLB_CREDENTIALS_JSON}` right before the BBB entry. */
+export const CSLB_CREDENTIALS_JSON: string = CSLB_ACTIVE ? JSON.stringify(CSLB_CREDENTIAL) + ', ' : '';
+
 /** Canonical array applied to every LocalBusiness schema site-wide.
  *  Order: BHGS (state license) → EPA 608 (federal cert) → CSLB C-20 (state license,
  *  only while CSLB_ACTIVE) → BBB Accredited Business (never "A+"). */

@@ -144,9 +144,9 @@ export const SUB_CATALOGS: SubCatalog[] = [
     id: 'catalog-hvac',
     name: 'HVAC',
     services: [
-      { id: 'central-ac-repair',             name: 'Central AC Repair',             description: 'Compressor, condenser, evaporator coil, refrigerant, and electrical repair on residential and light commercial systems. CSLB C-20 licensed, EPA 608 certified.', priceTier: 'quote' },
-      { id: 'furnace-repair',                name: 'Furnace Repair',                description: 'Igniter, flame sensor, gas valve, blower motor, and heat exchanger inspection on gas and electric furnaces. CSLB C-20 licensed.', priceTier: 'quote' },
-      { id: 'heat-pump-repair',              name: 'Heat Pump Repair',              description: 'Reversing valve, compressor, defrost board, expansion valve, and refrigerant repair on split-system and packaged heat pumps. CSLB C-20 + EPA 608.', priceTier: 'quote' },
+      { id: 'central-ac-repair',             name: 'Central AC Repair',             description: 'Compressor, condenser, evaporator coil, refrigerant, and electrical repair on residential and light commercial systems. EPA 608 certified technicians.', priceTier: 'quote' },
+      { id: 'furnace-repair',                name: 'Furnace Repair',                description: 'Igniter, flame sensor, gas valve, blower motor, and heat exchanger inspection on gas and electric furnaces.', priceTier: 'quote' },
+      { id: 'heat-pump-repair',              name: 'Heat Pump Repair',              description: 'Reversing valve, compressor, defrost board, expansion valve, and refrigerant repair on split-system and packaged heat pumps. EPA 608 certified technicians.', priceTier: 'quote' },
       { id: 'ductless-mini-split-repair',    name: 'Ductless Mini-Split Repair',    description: 'Indoor unit, outdoor unit, refrigerant line, control board, and condensate pump repair on single and multi-zone ductless systems.', priceTier: 'quote' },
       { id: 'hvac-system-maintenance',       name: 'HVAC System Maintenance',       description: 'Coil cleaning, refrigerant check, capacitor test, blower service, and filter replacement on residential and light commercial HVAC.', priceTier: 'quote' }
     ]
