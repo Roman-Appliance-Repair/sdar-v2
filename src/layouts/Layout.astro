@@ -107,13 +107,12 @@ const ogImage = new URL(image, siteUrl).toString();
     <link rel="preload" href="/fonts/dm-sans-400.woff2" as="font" type="font/woff2" crossorigin />
 
     <!-- Warm up connections for the tracking stack that loads after HTML
-         parse (GTM chain: gtag/Clarity/FB/Nextdoor). DNS+TCP+TLS done early
+         parse (GTM chain: gtag/Clarity/FB). DNS+TCP+TLS done early
          costs nothing on the main thread but shaves the first request RTTs. -->
     <link rel="preconnect" href="https://www.googletagmanager.com" />
     <link rel="preconnect" href="https://www.clarity.ms" />
     <link rel="preconnect" href="https://scripts.clarity.ms" />
     <link rel="preconnect" href="https://connect.facebook.net" />
-    <link rel="preconnect" href="https://ads.nextdoor.com" />
 
     <!-- Page-specific head content (JSON-LD schema, etc.) -->
     <slot name="head-scripts" />
@@ -124,6 +123,10 @@ const ogImage = new URL(image, siteUrl).toString();
          in window.clarity.q exactly as with the stock async snippet. -->
     <script type="text/javascript">
       (function() {
+        // Production host only. Local test runs (127.0.0.1) and *.pages.dev
+        // previews loaded the real tags and wrote 426 fake quote_submit into
+        // GA4, Meta and Nextdoor between 22.07 and 22.09.2026.
+        if (location.hostname !== 'samedayappliance.repair') return;
         var c = window;
         c.clarity = c.clarity || function() { (c.clarity.q = c.clarity.q || []).push(arguments); };
         var loaded = false;
@@ -157,10 +160,8 @@ const ogImage = new URL(image, siteUrl).toString();
         // Resilient phone-tap signal — fires on EVERY tel: click in the capture
         // phase, independent of GTM load timing, and queues in dataLayer so it
         // survives even if a fast tap happens before GTM finishes loading.
-        // GTM setup: wire a "Custom Event = phone_call_click" trigger to the GA4
-        // click_phone_number tag AND retire the old "Just Links" trigger so the
-        // two never double-count. Until that swap, this push is inert (no matching
-        // trigger) and click_phone_number keeps firing via Just Links below.
+        // GTM: "Custom Event = phone_call_click" fires the GA4 click_phone_number
+        // tag (since container v12, 15.07.2026).
         document.addEventListener('click', function(e) {
           var target = e.target as Element | null;
           var a = target && target.closest ? target.closest('a[href^="tel:"]') : null;
@@ -171,6 +172,10 @@ const ogImage = new URL(image, siteUrl).toString();
             page_path: location.pathname
           });
         }, true);
+
+        // Production host only — same rule as Clarity above. dataLayer still fills
+        // everywhere, so the quote-sheet checks keep reading it; nothing is sent.
+        if (location.hostname !== 'samedayappliance.repair') return;
 
         // Load GTM as soon as the browser is idle — NOT gated behind a first user
         // interaction. The old gate lost ~99% of phone taps: on mobile the tap that

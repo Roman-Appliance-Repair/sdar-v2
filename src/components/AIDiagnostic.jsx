@@ -291,7 +291,12 @@ export default function AIDiagnostic({
         page_url: pageUrl || (typeof location !== "undefined" ? location.href : ""),
         prefilled,
       }),
-    }).catch(() => {});
+    })
+      // The lead is this POST, so the key event fires only when it lands. It used
+      // to fire on the step-4 "Continue" button, before anything was sent — GA4,
+      // Meta and Nextdoor counted leads that never reached dispatch.
+      .then((res) => { if (res.ok) track("aid_contact_submitted", { appliance: form.appliance }); })
+      .catch(() => {});
   };
 
   const handleCallback = async () => {
@@ -522,7 +527,7 @@ export default function AIDiagnostic({
           </p>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => setStep(3)} style={btnBack}>← Back</button>
-            <button onClick={() => { track("aid_contact_submitted"); setStep(5); }} disabled={!canAdvance()} style={{ ...btnPrimary(canAdvance()), flex: 2 }}>Continue →</button>
+            <button onClick={() => setStep(5)} disabled={!canAdvance()} style={{ ...btnPrimary(canAdvance()), flex: 2 }}>Continue →</button>
           </div>
         </div>
       )}
