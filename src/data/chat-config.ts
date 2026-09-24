@@ -10,12 +10,11 @@
 import { BRANCHES } from './branches';
 
 export const CHAT_CONFIG = {
-  /** Dispatcher working hours (LA time, 24h format). These are DISPATCH hours
-   *  — when someone is on the other end of the chat — not the crew's service
-   *  hours in business-hours.ts, which are a different and narrower window. */
+  /** Chat hours (LA time, 24h format). Owner, 2026-09-23: the chat states the
+   *  same hours as the technicians, Mon–Sat 8am–6pm (business-hours.ts). */
   WORKING_HOURS: {
-    start: 6,
-    end: 22,
+    start: 8,
+    end: 18,
     timezone: 'America/Los_Angeles' as const
   },
 
@@ -53,7 +52,7 @@ export const CHAT_CONFIG = {
  *  cannot drift away from the config it is supposed to describe. */
 export const DISPATCH_HOURS_LINE = (() => {
   const h = (n: number) => (n % 12 === 0 ? 12 : n % 12) + (n < 12 ? 'am' : 'pm');
-  return `Mon–Sat ${h(CHAT_CONFIG.WORKING_HOURS.start)}–${h(CHAT_CONFIG.WORKING_HOURS.end)}`;
+  return `Mon–Sat ${h(CHAT_CONFIG.WORKING_HOURS.start)}–${h(CHAT_CONFIG.WORKING_HOURS.end)} · Phone answered 24/7`;
 })();
 
 /** Branch the widget attributes a page to: full city name + local DID.

@@ -18,7 +18,7 @@ export const HOMEPAGE_FAQ: FAQItem[] = [
   {
     question: 'How quickly can you repair my appliance?',
     answer:
-      `We offer same-day service across all ${COUNTY_COUNT} Southern California counties when you call before 2 PM. Most repairs are completed in a single visit — our technicians stock 200+ OEM parts on every truck.`
+      `We offer same-day service across all ${COUNTY_COUNT} Southern California counties when a technician is available — call early for the best chance. Most repairs are completed in a single visit — our technicians stock 200+ OEM parts on every truck.`
   },
   {
     question: "What's your diagnostic fee?",

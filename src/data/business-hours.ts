@@ -4,24 +4,26 @@
 // service pages, brand pages, commercial pages, and homepage.
 //
 // Per T11-FIX contract rule (active 2026-04-28 evening):
-//   Display string everywhere: "Mon–Sat 8am–8pm · Sun closed · Phone answered 24/7"
+//   Display string everywhere: "Mon–Sat 8am–6pm · Sun closed · Phone answered 24/7"
+//   Owner, 2026-09-23: technicians Mon–Sat 8:00–18:00, Sunday closed, the phone is
+//   answered 24/7, bookings are taken for working hours. No night or Sunday visits.
 //   No other variations on any page or component.
 //
 // Schema JSON-LD openingHoursSpecification — derived from `schedule`.
 
 export const BUSINESS_HOURS = {
   /** Display string used on visible UI — BookingCard, PropertyManagers, FinalCTA, etc. */
-  display: 'Mon–Sat 8am–8pm · Sun closed · Phone answered 24/7',
+  display: 'Mon–Sat 8am–6pm · Sun closed · Phone answered 24/7',
   /** Compact display when "Phone answered 24/7" line is conveyed elsewhere. */
-  displayShort: 'Mon–Sat 8am–8pm · Sun closed',
+  displayShort: 'Mon–Sat 8am–6pm · Sun closed',
   /** Per-day schedule — used to generate openingHoursSpecification in JSON-LD. */
   schedule: {
-    monday: { opens: '08:00', closes: '20:00' },
-    tuesday: { opens: '08:00', closes: '20:00' },
-    wednesday: { opens: '08:00', closes: '20:00' },
-    thursday: { opens: '08:00', closes: '20:00' },
-    friday: { opens: '08:00', closes: '20:00' },
-    saturday: { opens: '08:00', closes: '20:00' },
+    monday: { opens: '08:00', closes: '18:00' },
+    tuesday: { opens: '08:00', closes: '18:00' },
+    wednesday: { opens: '08:00', closes: '18:00' },
+    thursday: { opens: '08:00', closes: '18:00' },
+    friday: { opens: '08:00', closes: '18:00' },
+    saturday: { opens: '08:00', closes: '18:00' },
     sunday: 'closed' as const
   },
   /** True — phone calls answered 24/7 even when in-person service hours are closed. */
@@ -35,7 +37,7 @@ export const OPENING_HOURS_SCHEMA = [
     '@type': 'OpeningHoursSpecification',
     dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
     opens: '08:00',
-    closes: '20:00'
+    closes: '18:00'
   },
   {
     '@type': 'OpeningHoursSpecification',

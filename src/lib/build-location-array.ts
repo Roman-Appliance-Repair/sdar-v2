@@ -9,7 +9,7 @@
 //
 // SSOT inputs:
 //   - src/data/branches.ts (per-branch slug/phone/email/county/displayCity)
-//   - src/data/business-hours.ts (canonical Mon-Sat 08:00-20:00 + Sun closed)
+//   - src/data/business-hours.ts (canonical Mon-Sat 08:00–18:00 + Sun closed)
 //   - src/data/credentials-schema.ts (4-credential array per FINAL 2026-05-07)
 //
 // Important: this is the GEO-NEUTRAL variant — no streetAddress, no GeoCircle,

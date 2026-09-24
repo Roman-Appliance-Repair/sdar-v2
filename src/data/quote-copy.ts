@@ -9,6 +9,8 @@
 // Fee tiers match the wiki source-of-truth and src/data/pricing.ts:
 //   residential $89 · commercial $120, both waived when the repair is approved.
 
+import { BUSINESS_HOURS } from './business-hours';
+
 /** Residential diagnostic fee, in whole dollars. */
 export const DIAGNOSTIC_RES = 89;
 
@@ -41,8 +43,7 @@ export const DIAGNOSTIC_TERMS = [
 export const WAIVED_CLAUSE = DIAGNOSTIC_TERMS[0];
 
 /** Business hours line, shown on the price step and again on the done step. */
-export const HOURS_LINE =
-  'Available Mon–Sat 8am–8pm · Sun closed · Phone answered 24/7';
+export const HOURS_LINE = `Available ${BUSINESS_HOURS.display}`;
 
 /** Copy for the final step. */
 export const CALLBACK_COPY = {

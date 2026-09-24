@@ -52,14 +52,6 @@ function slugToTitle(slug: string): string {
     .join(' ');
 }
 
-function hoursDaysToArray(days: string): string[] {
-  const all = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  if (days === 'Mon-Sun') return all;
-  if (days === 'Mon-Sat') return all.slice(0, 6);
-  if (days === 'Mon-Fri') return all.slice(0, 5);
-  return all;
-}
-
 function countyTitle(slug: Branch['primaryCounty']): string {
   // primaryCounty values are 'los-angeles' | 'orange' | 'ventura' |
   // 'san-bernardino' | 'riverside' — Title-Case + " County" suffix.
@@ -210,7 +202,15 @@ const graph: Array<Record<string, unknown>> = [
       telephone: phoneE164(MAIN_PHONE),
       contactType: 'customer service',
       areaServed: 'US-CA',
-      availableLanguage: ['en']
+      availableLanguage: ['en'],
+      // Phone is answered 24/7 (technicians work Mon–Sat 8–6; see
+      // OPENING_HOURS_SCHEMA on the LocalBusiness nodes).
+      hoursAvailable: {
+        '@type': 'OpeningHoursSpecification',
+        dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+        opens: '00:00',
+        closes: '23:59'
+      }
     }],
     hasCredential: [...CANONICAL_CREDENTIALS],
     // hasOfferCatalog — @id ref to the canonical OfferCatalog node below.
