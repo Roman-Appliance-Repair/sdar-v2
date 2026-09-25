@@ -30,6 +30,10 @@ export interface ServiceCard {
   issues?: string;
   /** Optional — omit for 2-tier. */
   brands?: string;
+  /** Optional link override, used as-is instead of the /services/ hub (the route guard below
+   *  cannot see dynamic [city]/[service] pages, so the page passing it must check the combo
+   *  exists and is not collapsed). Added 2026-09-24 for the /los-angeles/ combo links. */
+  href?: string;
 }
 
 /** Explicit fallback — a wrench. Visible and obviously generic, never a blank card. */
@@ -187,7 +191,7 @@ const toHref = (slug: string): string | null => {
     <p class="v2-section-sub">{subhead}</p>
     <div class="v2-services__grid">
       {services.map((s) => {
-        const href = toHref(s.slug);
+        const href = s.href ?? toHref(s.slug);
         const body = (
           <>
             <svg

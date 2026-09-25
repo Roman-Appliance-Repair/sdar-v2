@@ -44,6 +44,8 @@ import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
 import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
 import FinalCTA from '../components/cities/v2/FinalCTA.astro';
 import { CITIES } from '../data/cities';
+import { CITY_SERVICE_MATRIX } from '../data/city-service-matrix';
+import { isCollapsedCombo } from '../data/combo-collapse';
 import { BRANCHES } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 
@@ -148,12 +150,20 @@ const outdoorLinks = [
   { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
 ];
 
+// 2026-09-24 (owner, cannibalization roles): "{service} repair los angeles" belongs to the
+// /los-angeles/{service}-repair/ combo, so the five main cards link there instead of the
+// generic /services/ hub. Only combos that exist and are NOT collapsed (combo-collapse.ts).
+const laCombo = (service: string): string | undefined =>
+  CITY_SERVICE_MATRIX.some((c) => c.city === citySlug && c.service === service) && !isCollapsedCombo(citySlug, service)
+    ? `/${citySlug}/${service}/`
+    : undefined;
+
 const services = [
-  { icon: '🧊', name: 'Refrigerator Repair', slug: 'refrigerator', issues: 'Not cooling, ice maker failures, compressor, fan motor.', brands: 'Viking · Sub-Zero · Samsung · LG · GE' },
-  { icon: '🌀', name: 'Washer Repair', slug: 'washer', issues: 'Not draining, not spinning, error codes. Multi-unit buildings and single homes.', brands: 'LG · Samsung · Whirlpool · Bosch · Miele' },
-  { icon: '💨', name: 'Dryer Repair', slug: 'dryer', issues: 'Not heating, weak heat, long drying times. Dryer vent cleaning included with service.', brands: 'LG · Samsung · GE · Maytag · Whirlpool' },
-  { icon: '🔥', name: 'Oven, Stove & Range Repair', slug: 'oven', issues: 'Burner ignition, control board, oven not heating.', brands: 'Wolf · Viking · Thermador · GE · Bosch' },
-  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher', issues: 'Not cleaning, not draining, door latch, control panel.', brands: 'Bosch · Miele · KitchenAid · Samsung · LG' },
+  { icon: '🧊', name: 'Refrigerator Repair in Los Angeles', slug: 'refrigerator', href: laCombo('refrigerator-repair'), issues: 'Not cooling, ice maker failures, compressor, fan motor.', brands: 'Viking · Sub-Zero · Samsung · LG · GE' },
+  { icon: '🌀', name: 'Washer Repair in Los Angeles', slug: 'washer', href: laCombo('washer-repair'), issues: 'Not draining, not spinning, error codes. Multi-unit buildings and single homes.', brands: 'LG · Samsung · Whirlpool · Bosch · Miele' },
+  { icon: '💨', name: 'Dryer Repair in Los Angeles', slug: 'dryer', href: laCombo('dryer-repair'), issues: 'Not heating, weak heat, long drying times. Dryer vent cleaning included with service.', brands: 'LG · Samsung · GE · Maytag · Whirlpool' },
+  { icon: '🔥', name: 'Oven Repair in Los Angeles', slug: 'oven', href: laCombo('oven-repair'), issues: 'Burner ignition, control board, oven not heating.', brands: 'Wolf · Viking · Thermador · GE · Bosch' },
+  { icon: '🍽️', name: 'Dishwasher Repair in Los Angeles', slug: 'dishwasher', href: laCombo('dishwasher-repair'), issues: 'Not cleaning, not draining, door latch, control panel.', brands: 'Bosch · Miele · KitchenAid · Samsung · LG' },
   { icon: '🍷', name: 'Wine Cellar Cooling Units', slug: 'wine-cooler', issues: 'WhisperKool, CellarPro, Wine Guardian, US Cellar Systems. Same-day in West LA.', brands: 'WhisperKool · CellarPro · Wine Guardian · US Cellar Systems' },
   { icon: '🏢', name: 'Commercial Appliances', slug: 'commercial-refrigerator', issues: 'Walk-in coolers, commercial refrigeration, ovens. Restaurant and property management.', brands: 'True · Traulsen · Hoshizaki · Manitowoc' },
   { icon: '❄️', name: 'Freezer Repair', slug: 'freezer', issues: 'Not freezing, icing over, temperature fluctuations.', brands: 'Sub-Zero · True · GE · Samsung · Whirlpool' },

@@ -330,7 +330,7 @@ Curated dictionaries: 28 SERVICE_DISPLAY entries (Refrigerator, Wall Oven, Wine 
 | Тип | Path | Template |
 |---|---|---|
 | **City pillar** | `pages/{city}.astro` | `Appliance Repair {City} CA — Same Day Service` |
-| **County hub** | `pages/{county}-county.astro` | `Appliance Repair {County} County CA — Same Day` |
+| **County hub** | `pages/{county}-county.astro` | `{County} County Appliance Repair — {N} Cities, Same Day` (N — число городов в сетке хаба; не ясно — `{County} County Appliance Repair — Same Day Service`). Решение владельца 2026-09-24 (каннибализация с городами-тёзками): title не начинается с «Appliance Repair {City}». Применено к Riverside, San Bernardino, Los Angeles; остальные хабы пока на старом шаблоне `Appliance Repair {County} County CA — Same Day` |
 | **City × service combo** | `pages/[city]/[service].astro` (parametric, 200+ pages) | `${serviceName} ${cityName} — Same Day` |
 
 `{City}` resolved from `src/data/cities.ts` (89 entries). City × service template is a single-line fix in the parametric source — affects ALL combo pages site-wide, not file-per-file.
