@@ -6,54 +6,28 @@ import react from '@astrojs/react';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { execSync } from 'node:child_process';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PAGES_DIR = path.join(__dirname, 'src', 'pages');
 
-// Git lastmod map: POSIX-relative path → ISO commit date.
-// Source priority:
-//   1. scripts/git-mtime-map.json — pre-built snapshot committed to repo;
-//      always present on Cloudflare Pages (shallow clone) builds.
-//   2. live `git log` invocation — used locally when JSON is missing/empty.
-// fs.statSync mtime and today's date are tertiary fallbacks per-URL.
+// Git lastmod map: POSIX-relative page path → ISO date of its last commit.
+// Read ONLY from scripts/git-mtime-map.json, which is committed and refreshed
+// by `prebuild` (scripts/build-git-mtime-map.mjs) wherever full history exists.
+// No live `git log` here and no build-time/mtime fallback: on Cloudflare Pages
+// (shallow clone) both stamp every URL with the deploy time. A URL without a
+// mapping gets no <lastmod> at all rather than an invented one.
 /** @type {Map<string, string> | null} */
 let _gitMtimeMap = null;
 function getGitMtimeMap() {
   if (_gitMtimeMap) return _gitMtimeMap;
   _gitMtimeMap = new Map();
-
   const jsonPath = path.join(__dirname, 'scripts', 'git-mtime-map.json');
   try {
-    if (fs.existsSync(jsonPath)) {
-      const obj = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
-      for (const [k, v] of Object.entries(obj)) _gitMtimeMap.set(k, v);
-      if (_gitMtimeMap.size > 0) {
-        console.log(`[sitemap] git lastmod map: ${_gitMtimeMap.size} files (from scripts/git-mtime-map.json)`);
-        return _gitMtimeMap;
-      }
-    }
+    const obj = JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
+    for (const [k, v] of Object.entries(obj)) _gitMtimeMap.set(k, v);
+    console.log(`[sitemap] git lastmod map: ${_gitMtimeMap.size} files (from scripts/git-mtime-map.json)`);
   } catch (e) {
-    console.warn('[sitemap] failed to read git-mtime-map.json:', /** @type {Error} */ (e).message);
-  }
-
-  try {
-    const out = execSync('git log --name-only --pretty=format:__SDAR_DATE__%cI', {
-      encoding: 'utf8',
-      maxBuffer: 200 * 1024 * 1024,
-      cwd: __dirname,
-    });
-    let currentDate = null;
-    for (const line of out.split('\n')) {
-      if (line.startsWith('__SDAR_DATE__')) {
-        currentDate = line.slice('__SDAR_DATE__'.length);
-      } else if (line && currentDate && !_gitMtimeMap.has(line)) {
-        _gitMtimeMap.set(line, currentDate);
-      }
-    }
-    console.log(`[sitemap] git lastmod map: ${_gitMtimeMap.size} files (from live git log)`);
-  } catch (e) {
-    console.warn('[sitemap] git lastmod unavailable, using fs.statSync fallback');
+    console.warn('[sitemap] scripts/git-mtime-map.json unreadable — sitemap will carry no <lastmod>:', /** @type {Error} */ (e).message);
   }
   return _gitMtimeMap;
 }
@@ -104,20 +78,18 @@ function findFileForUrl(urlPath) {
   return null;
 }
 
-/** @param {string} itemUrl */
+/**
+ * @param {string} itemUrl
+ * @returns {string | undefined}
+ */
 function getLastmodForUrl(itemUrl) {
   try {
-    const urlPath = new URL(itemUrl).pathname;
-    const filePath = findFileForUrl(urlPath);
-    if (!filePath) return new Date().toISOString();
-
+    const filePath = findFileForUrl(new URL(itemUrl).pathname);
+    if (!filePath) return undefined;
     const relPath = path.relative(__dirname, filePath).replace(/\\/g, '/');
-    const gitDate = getGitMtimeMap().get(relPath);
-    if (gitDate) return gitDate;
-
-    return fs.statSync(filePath).mtime.toISOString();
+    return getGitMtimeMap().get(relPath);
   } catch {
-    return new Date().toISOString();
+    return undefined;
   }
 }
 
@@ -150,7 +122,9 @@ export default defineConfig({
         return !COLLAPSED_COMBOS.has(key);
       },
       serialize(item) {
-        item.lastmod = getLastmodForUrl(item.url);
+        const lastmod = getLastmodForUrl(item.url);
+        if (lastmod) item.lastmod = lastmod;
+        else delete item.lastmod;
         return item;
       },
     }),

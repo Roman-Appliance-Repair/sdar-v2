@@ -27,7 +27,7 @@
 
 3. **`legalName: "HVAC 777 LLC"`** → во всех LocalBusiness schema на всех 1009 страницах (не только pin pages, не только legal). В visible UI — только в footer copyright line `© 2026 HVAC 777 LLC dba Same Day Appliance Repair`.
 
-4. **`hasCredential` array (4 entries) site-wide** — на каждом LocalBusiness schema:
+4. **`hasCredential` array site-wide** — ОДИН раз на странице, на главном узле бизнеса (`mergeCredentials`) и на организации главной. С 2026-09-24 узлы филиалов в `location` (build-location-array.ts, HomepageSchema) credentials НЕ несут, а ссылаются на организацию через `parentOrganization: {"@id": "https://samedayappliance.repair/#organization"}` — раньше каждый из 10 филиалов повторял весь список (~33 узла на страницу). Состав:
    - BHGS Registration #A49573
    - EPA 608 Universal #1346255700410
    - CSLB C-20 HVAC
@@ -158,7 +158,7 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
 
 **`legalName: "HVAC 777 LLC"` рендерится во ВСЕХ schema** (не только legal/pin pages). Закон обновлён 2026-05-07.
 
-**`hasCredential` (4 entries) рендерится во ВСЕХ schema** site-wide. BBB — БЕЗ буквы рейтинга (на BBB реально A, не A+).
+**`hasCredential` рендерится на каждой странице один раз** (главный узел бизнеса), не на каждом филиале. BBB — БЕЗ буквы рейтинга (на BBB реально A, не A+).
 
 ### Name field — буквально из таблицы (8 строк зафиксированы)
 

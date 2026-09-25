@@ -19,7 +19,9 @@
 
 import { BRANCHES, type Branch } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
-import { CANONICAL_CREDENTIALS, LEGAL_NAME } from '../data/credentials-schema';
+import { LEGAL_NAME } from '../data/credentials-schema';
+
+const ORG_ID = 'https://samedayappliance.repair/#organization';
 
 function phoneE164(phone: string): string {
   return '+1' + phone.replace(/\D/g, '');
@@ -50,7 +52,13 @@ export function buildBranchLocation(branch: Branch): Record<string, unknown> {
       '@type': 'City',
       name: branch.displayCity
     },
-    hasCredential: [...CANONICAL_CREDENTIALS]
+    // Credentials live ONCE, on the parent business node that embeds this
+    // entry via `location` (mergeCredentials) and on the site Organization.
+    // Repeating the full hasCredential array on every branch put ~30
+    // credential + ~20 GovernmentOrganization nodes on each geo-neutral page.
+    // The branch points at the organization instead (same @id as the
+    // homepage graph, whose branch nodes do the same).
+    parentOrganization: { '@id': ORG_ID }
   };
 }
 
