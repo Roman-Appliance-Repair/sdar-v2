@@ -87,7 +87,7 @@ grep -c "BHGS Licensed\|CA BHGS"  <page>  # = 0
 
 **Visible UI string** (use everywhere via `BUSINESS_HOURS.display`):
 ```
-Mon–Sat 8am–8pm · Sun closed · Phone answered 24/7
+Mon–Sat 8am–6pm · Sun by arrangement · Phone answered 24/7
 ```
 
 **Schema JSON-LD** (use everywhere via `OPENING_HOURS_SCHEMA` import — array of two objects):

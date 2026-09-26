@@ -716,7 +716,7 @@ function viewContact(): string {
       .join('') +
     `</div></div>` +
     (showDate
-      ? `<label class="qs-field"><span>Which day? <em>(we're closed Sundays)</em></span>` +
+      ? `<label class="qs-field"><span>Which day? <em>(Sunday by arrangement — we'll confirm)</em></span>` +
         `<input class="qs-input" type="date" id="qs-date" data-field="visitDate"` +
         ` min="${esc(minDate())}" value="${esc(state.visitDate)}" /></label>` +
         (errors.visitDate ? `<span class="qs-err">${esc(errors.visitDate)}</span>` : '')
@@ -1381,8 +1381,6 @@ function validateContact(): boolean {
   if (state.visitTime === 'pick_date') {
     if (!state.visitDate) {
       errors.visitDate = 'Pick a day.';
-    } else if (new Date(state.visitDate + 'T12:00:00').getDay() === 0) {
-      errors.visitDate = "We're closed Sundays — pick another day.";
     }
   }
   return Object.keys(errors).length === 0;

@@ -4,18 +4,22 @@
 // service pages, brand pages, commercial pages, and homepage.
 //
 // Per T11-FIX contract rule (active 2026-04-28 evening):
-//   Display string everywhere: "Mon–Sat 8am–6pm · Sun closed · Phone answered 24/7"
-//   Owner, 2026-09-23: technicians Mon–Sat 8:00–18:00, Sunday closed, the phone is
-//   answered 24/7, bookings are taken for working hours. No night or Sunday visits.
+//   Display string everywhere: "Mon–Sat 8am–6pm · Sun by arrangement · Phone answered 24/7"
+//   Owner, 2026-09-23: technicians Mon–Sat 8:00–18:00, the phone is answered 24/7,
+//   bookings are taken for working hours. No night or evening visits.
+//   Owner, 2026-09-25: Sunday visits happen often but not on a schedule — say
+//   "Sun by arrangement", never "Sun closed". The quote form accepts Sunday dates.
+//   JSON-LD keeps Sunday out of regular opening hours (00:00–00:00): arrangement
+//   is not opening hours.
 //   No other variations on any page or component.
 //
 // Schema JSON-LD openingHoursSpecification — derived from `schedule`.
 
 export const BUSINESS_HOURS = {
   /** Display string used on visible UI — BookingCard, PropertyManagers, FinalCTA, etc. */
-  display: 'Mon–Sat 8am–6pm · Sun closed · Phone answered 24/7',
+  display: 'Mon–Sat 8am–6pm · Sun by arrangement · Phone answered 24/7',
   /** Compact display when "Phone answered 24/7" line is conveyed elsewhere. */
-  displayShort: 'Mon–Sat 8am–6pm · Sun closed',
+  displayShort: 'Mon–Sat 8am–6pm · Sun by arrangement',
   /** Per-day schedule — used to generate openingHoursSpecification in JSON-LD. */
   schedule: {
     monday: { opens: '08:00', closes: '18:00' },
@@ -31,7 +35,7 @@ export const BUSINESS_HOURS = {
 } as const;
 
 /** openingHoursSpecification block for LocalBusiness JSON-LD.
- *  Sunday closed is encoded as opens=closes=00:00 per Google's documented pattern. */
+ *  Sunday by arrangement is encoded as opens=closes=00:00 per Google's documented pattern. */
 export const OPENING_HOURS_SCHEMA = [
   {
     '@type': 'OpeningHoursSpecification',
