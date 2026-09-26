@@ -611,7 +611,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
   'comm-fridge': {
     id: 'comm-fridge',
     label: 'Refrigerator Repair',
-    href: '/commercial/refrigerator-repair/',
+    href: '/commercial/refrigeration/',
     category: 'commercial',
     pageRange: r(180, 550),
     issues: [

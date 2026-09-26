@@ -257,7 +257,7 @@ export default defineConfig({
     // legacy URL was a wrong-category mislocation. Activated with C03 writer
     // deployment per wiki/decisions/legacy-migration-301-manifest.md.
     // Target verified deployed: /brands/scotsman-ice-machine-repair/.)
-    '/scotsman-dishwasher-repair/': '/brands/scotsman-ice-machine-repair/',
+    '/scotsman-dishwasher-repair/': '/commercial/ice-machines/brands/scotsman/',
 
     // ====================================================================
     // Residential cluster 301s — Cluster 07 Stove Tier 1 legacy equity

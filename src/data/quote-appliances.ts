@@ -11,7 +11,7 @@
 // src/data/repair-estimates.ts rather than the JSON-LD catalog. The commercial
 // list is drawn from catalog-commercial-kitchen, catalog-cold-storage and
 // catalog-ice-machines, plus the refrigerated prep table that
-// /commercial/refrigerator-repair/ sells by name. Nothing here is invented; see
+// /commercial/refrigeration/ sells by name. Nothing here is invented; see
 // APPLIANCE_SOURCES below for the per-tile provenance the gate checks.
 //
 // QS-1.5 id note: `oven_range` and `walk_in_reach_in` are RETIRED, not renamed.
@@ -707,7 +707,7 @@ export const APPLIANCE_SOURCES: Record<string, string[]> = {
   commercial_dishwasher: ['commercial-dishwasher-repair'],
   // services.ts commercial scope: laundry-repair / washer-repair / dryer-repair.
   commercial_laundry: ['services:laundry-repair'],
-  // Sold by name on /commercial/refrigerator-repair/ ("Refrigerated Prep Tables").
+  // Sold by name on /commercial/refrigeration/ ("Refrigerated Prep Tables").
   prep_table: ['commercial-refrigerator-repair'],
   display_case: ['showcase-refrigerator-repair'],
   bar_fridge: ['bar-refrigerator-repair'],

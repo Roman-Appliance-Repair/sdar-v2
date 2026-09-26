@@ -5,7 +5,7 @@
 // the fee printed on the page itself. Derived from each page's diagnostic-fee phrasing
 // ("$120 commercial diagnostic" vs "$89 diagnostic"); 9 mixed-signal pages resolved by
 // dominant own-fee. Regenerate via scripts/classify-brands.mjs if brand pages change.
-// Count: 85.
+// Count: 81.
 export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'accurex-hood-repair',
   'adc-commercial-dryer-repair',
@@ -28,7 +28,6 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'electrolux-professional-dishwasher-repair',
   'fagor-commercial-laundry-repair',
   'fagor-dishwasher-repair',
-  'follett-ice-machine-repair',
   'forno-bravo-pizza-oven-repair',
   'frymaster',
   'frymaster-fryer-repair',
@@ -42,7 +41,6 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'hobart',
   'hobart-dishwasher-repair',
   'hoshizaki',
-  'hoshizaki-ice-machine-repair',
   'huebsch-commercial-laundry-repair',
   'imperial',
   'imperial-oven-repair',
@@ -57,7 +55,6 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'lincoln-pizza-oven-repair',
   'mainstreet-equipment-oven-repair',
   'manitowoc',
-  'manitowoc-ice-machine-repair',
   'master-bilt-walk-in-repair',
   'maytag-commercial-laundry-repair',
   'meiko-dishwasher-repair',
@@ -73,7 +70,6 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'rational',
   'rational-combi-oven-repair',
   'scotsman',
-  'scotsman-ice-machine-repair',
   'southbend-oven-repair',
   'speed-queen-commercial-laundry-repair',
   'streivor-hood-repair',

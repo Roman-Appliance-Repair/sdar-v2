@@ -87,6 +87,19 @@ function titleCaseSlug(slug: string): string {
     .join(' ');
 }
 
+// Hub merges: an intermediate URL segment whose index page was merged into another
+// hub (and now 301s there). Sub-pages keep their URLs, but the crumb must name and
+// link the hub that actually exists. 2026-09-26: /commercial/range-repair/ → stove hub.
+const MERGED_PARENTS: Record<string, { name: string; href: string }> = {
+  '/commercial/range-repair/': { name: 'Commercial Range & Stove Repair', href: '/commercial/stove-repair/' },
+  '/commercial/stove-repair/': { name: 'Commercial Range & Stove Repair', href: '/commercial/stove-repair/' }
+};
+
+// Label overrides for specific pages, applied to the current (leaf) crumb.
+const PAGE_LABELS: Record<string, string> = {
+  '/commercial/stove-repair/': 'Commercial Range & Stove Repair'
+};
+
 interface Crumb {
   name: string;
   href: string;
@@ -168,6 +181,11 @@ if (segments.length > 0) {
     for (let i = 1; i < segments.length - 1; i++) {
       const seg = segments[i];
       const href = '/' + segments.slice(0, i + 1).join('/') + '/';
+      const merged = MERGED_PARENTS[href];
+      if (merged) {
+        crumbs.push({ name: merged.name, href: merged.href, isCurrent: false, hasPage: routeExists(merged.href) });
+        continue;
+      }
       crumbs.push({
         name: titleCaseSlug(seg),
         href,
@@ -178,7 +196,7 @@ if (segments.length > 0) {
     const leafSlug = segments[segments.length - 1];
     const leafHref = '/' + segments.join('/') + '/';
     crumbs.push({
-      name: resolveLeafLabel(section, leafSlug),
+      name: PAGE_LABELS[leafHref] ?? resolveLeafLabel(section, leafSlug),
       href: leafHref,
       isCurrent: true,
       hasPage: true
