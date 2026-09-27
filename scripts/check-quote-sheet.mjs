@@ -432,8 +432,9 @@ for (const file of SHEET_SOURCES) {
   // /commercial/food-truck-equipment-repair/ pages, → 1206 for its
   // generator-vs-battery-power page, → 1211 for the five /marine/ pages,
   // → 1217 for the six /marine/ wave-2 pages,
-  // → 1211 after the 2026-09-26 commercial merge (6 duplicate hubs → 301).
-  check('dist contains the expected 1211 rendered pages', real.length === 1211, `found ${real.length}`);
+  // → 1211 after the 2026-09-26 commercial merge (6 duplicate hubs → 301),
+  // → 1210 wood-fired pizza oven page removed (we do not repair wood-burning).
+  check('dist contains the expected 1210 rendered pages', real.length === 1210, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
