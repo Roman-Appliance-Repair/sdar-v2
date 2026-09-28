@@ -103,9 +103,10 @@ True, Perlick, Kalamazoo, Bull) **оставляем осознанно** (ре�
 | **BHGS #A49573** | Везде (все 1009 страниц, schema + visible footer) | — |
 | **EPA 608 Universal #1346255700410** | Везде | — |
 | **CSLB C-20 HVAC** | **СКРЫТА с 2026-09-23** (inactive с 2026-08-22, флаг `CSLB_ACTIVE`). Когда активна — везде (заявлена в LSA, нужна для NAP match) | Не заявлять, пока `CSLB_ACTIVE = false`; не подписывать как BHGS — это разные регуляторы |
-| **BBB Accredited Business** | Везде (БЕЗ буквы рейтинга — на BBB реально A, не A+) | "BBB A+" — false claim, никогда |
+| ~~BBB Accredited Business~~ | **Нигде** — удалён с сайта 2026-09-28 | BBB / Better Business Bureau / bbb.org / «Accredited» — не писать ни в UI, ни в schema |
+| **Member · UASA** / **Member · Rancho Cucamonga Chamber of Commerce** | Значки `<MembershipBadges />` + `Organization.memberOf` (SSOT `src/data/memberships.ts`) | Только «Member». Никогда «Accredited», «Certified», «Approved», «Verified» |
 
-**BBB rating note:** на bbb.org реальный grade = **A** (не A+). Писать "A+" в visible UI или schema = false-advertising claim. Только "BBB Accredited Business" без буквы. Сам grade Google и так не подтянет в SERP — accreditation status сам по себе trust signal.
+**BBB (история, до 2026-09-28):** на bbb.org реальный grade = **A** (не A+). Писать "A+" в visible UI или schema = false-advertising claim. Только "BBB Accredited Business" без буквы. Сам grade Google и так не подтянет в SERP — accreditation status сам по себе trust signal.
 
 **HVAC 777 LLC имеет 3 BBB профиля** (LA Wilshire / WeHo Rangely / Pasadena Columbia) — это нормально для multi-location LLC и не требует sync с сайтом. На сайте отражаем только GMB-verified WeHo physical pin.
 

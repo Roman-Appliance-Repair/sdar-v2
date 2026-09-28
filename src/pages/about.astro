@@ -8,7 +8,7 @@
 // Hard rules honoured on this page (CLAUDE.md §5, docs/factual-accuracy.md):
 //   - No streetAddress. Only physical_pin pages carry one; this is not one.
 //   - No manufacturer-authorization claims, no "factory-trained" / "certified
-//     technicians", no "BBB A+" (real grade is A — "BBB Accredited Business").
+//     technicians".
 //   - No aggregateRating, no star counts, in text or in markup.
 //   - No superlatives (best / top-rated / premier / leading).
 //   - Legal name (HVAC 777 LLC) stays in JSON-LD only, never in visible copy.
@@ -27,6 +27,7 @@
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 import Layout from '../layouts/Layout.astro';
+import MembershipBadges from '../components/MembershipBadges.astro';
 import { mergeCredentials, CANONICAL_CREDENTIALS } from '../data/credentials-schema';
 import { BUSINESS_HOURS, OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { BRANCHES } from '../data/branches';
@@ -64,12 +65,11 @@ const credentials = CANONICAL_CREDENTIALS.map((c) => ({
   issuer: c.recognizedBy.name
 }));
 
-// Insurance and association membership are not EducationalOccupationalCredentials —
-// they have no issuing body in the schema sense — so they are listed separately
-// here and stay out of hasCredential.
+// Insurance is not an EducationalOccupationalCredential — it has no issuing body
+// in the schema sense — so it is listed separately and stays out of hasCredential.
+// Association memberships render below the list from memberships.ts.
 const standing = [
-  '$1,000,000 general liability insurance',
-  'Member, United Appliance Servicers Association'
+  '$1,000,000 general liability insurance'
 ];
 
 const businessId = canonical + '#business';
@@ -209,6 +209,7 @@ const personSchema = {
             <li><strong>{s}</strong></li>
           ))}
         </ul>
+        <MembershipBadges title="Memberships" />
         <a href="/credentials/" class="inline-cta">How to verify each one →</a>
       </div>
 

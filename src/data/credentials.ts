@@ -36,16 +36,6 @@ export const CREDENTIALS: Credential[] = [
 </svg>`
   },
   {
-    id: 'bbb-accredited',
-    title: 'BBB Accredited',
-    description: 'BBB Accredited Business — publicly verifiable at bbb.org.',
-    preferredSlug: 'bbb-accredited',
-    iconSvg: `<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect x="12" y="16" width="40" height="32" rx="4" stroke="#D4AF37" stroke-width="2"/>
-  <text x="32" y="38" text-anchor="middle" font-family="Cinzel" font-size="16" font-weight="700" fill="#D4AF37">BBB</text>
-</svg>`
-  },
-  {
     id: 'epa-certified',
     title: 'EPA Certified',
     description: 'EPA 608 Universal certified (#1346255700410) for safe refrigerant handling.',

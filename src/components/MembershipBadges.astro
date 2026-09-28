@@ -1,0 +1,71 @@
+---
+/** MembershipBadges — "Member · <association>" badges from src/data/memberships.ts.
+ *  Text badges until official logos exist; set `logo` in memberships.ts and the
+ *  badge switches to the image automatically (alt text keeps the "Member" wording).
+ *  tone: 'light' on white/grey sections, 'dark' on the black footer / red bars. */
+import { MEMBERSHIPS, membershipLabel } from '../data/memberships';
+
+export interface Props {
+  tone?: 'light' | 'dark';
+  title?: string;
+  id?: string;
+}
+const { tone = 'light', title, id } = Astro.props;
+---
+
+<div class:list={['mb', `mb--${tone}`]} id={id}>
+  {title && <p class="mb__title">{title}</p>}
+  <ul class="mb__list">
+    {MEMBERSHIPS.map((m) => (
+      <li>
+        <a class="mb__badge" href={m.url} target="_blank" rel="noopener">
+          {m.logo ? (
+            <img src={m.logo} width={m.logoWidth} height={m.logoHeight} alt={`Member · ${membershipLabel(m)}`} loading="lazy" decoding="async" />
+          ) : (
+            <>
+              <span class="mb__member">Member</span>
+              <span class="mb__name">{membershipLabel(m)}</span>
+            </>
+          )}
+        </a>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .mb { --mb-fg: var(--text); --mb-muted: var(--muted); --mb-line: var(--border); --mb-bg: var(--white); --mb-accent: var(--red); }
+  .mb--dark { --mb-fg: var(--text-on-dark); --mb-muted: var(--muted-on-dark); --mb-line: var(--border-on-dark); --mb-bg: transparent; --mb-accent: var(--text-on-dark); }
+  .mb__title {
+    margin: 0 0 12px;
+    font-size: 12px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mb-muted);
+  }
+  .mb__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 12px; }
+  .mb__badge {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 10px 16px;
+    min-height: 44px;
+    border: 1px solid var(--mb-line);
+    border-left: 3px solid var(--red);
+    border-radius: 6px;
+    background: var(--mb-bg);
+    color: var(--mb-fg);
+    text-decoration: none;
+    font-family: var(--font-body);
+    transition: border-color 0.15s var(--ease);
+  }
+  .mb__badge:hover { border-color: var(--mb-fg); border-left-color: var(--red); }
+  .mb__member {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--mb-accent);
+    white-space: nowrap;
+  }
+  .mb__member::after { content: '·'; margin-left: 10px; color: var(--mb-muted); }
+  .mb__name { font-size: 14px; font-weight: 600; line-height: 1.3; }
+  .mb__badge img { display: block; height: 40px; width: auto; }
+  @media (max-width: 480px) {
+    .mb__list { flex-direction: column; }
+    .mb__badge { width: 100%; box-sizing: border-box; }
+  }
+</style>

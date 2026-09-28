@@ -624,7 +624,7 @@ export default function AIDiagnostic({
             )}
           </div>
           <p style={{ fontSize: 12, color: C_TXT2, marginTop: "1rem", marginBottom: 0 }}>
-            Diagnostic fee waived when you approve the repair. BHGS #A49573 · {CSLB_ACTIVE ? "CSLB C-20 HVAC · " : ""}EPA 608 Universal · BBB Accredited Business.{" "}
+            Diagnostic fee waived when you approve the repair. BHGS #A49573 · {CSLB_ACTIVE ? "CSLB C-20 HVAC · " : ""}EPA 608 Universal.{" "}
             Or call{" "}
             <a href={`tel:+1${phone.replace(/\D/g, "")}`} onClick={() => track("aid_call_click")} style={{ color: "#C8102E" }}>{phone}</a>{" "}
             directly.

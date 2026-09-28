@@ -45,12 +45,14 @@ const CSLB_CREDENTIAL: EducationalOccupationalCredential = {
 export const CSLB_CREDENTIALS: EducationalOccupationalCredential[] = CSLB_ACTIVE ? [CSLB_CREDENTIAL] : [];
 
 /** Same switch for pages whose JSON-LD is a hand-written template string:
- *  interpolate `${CSLB_CREDENTIALS_JSON}` right before the BBB entry. */
-export const CSLB_CREDENTIALS_JSON: string = CSLB_ACTIVE ? JSON.stringify(CSLB_CREDENTIAL) + ', ' : '';
+ *  interpolate `${CSLB_CREDENTIALS_JSON}` directly after the last entry of the
+ *  hasCredential array (no comma before it — the leading comma is included). */
+export const CSLB_CREDENTIALS_JSON: string = CSLB_ACTIVE ? ', ' + JSON.stringify(CSLB_CREDENTIAL) : '';
 
 /** Canonical array applied to every LocalBusiness schema site-wide.
  *  Order: BHGS (state license) → EPA 608 (federal cert) → CSLB C-20 (state license,
- *  only while CSLB_ACTIVE) → BBB Accredited Business (never "A+"). */
+ *  only while CSLB_ACTIVE). Association memberships are not credentials — they
+ *  live in memberships.ts and are emitted as Organization.memberOf. */
 export const CANONICAL_CREDENTIALS: EducationalOccupationalCredential[] = [
   {
     '@type': 'EducationalOccupationalCredential',
@@ -68,15 +70,7 @@ export const CANONICAL_CREDENTIALS: EducationalOccupationalCredential[] = [
       name: 'U.S. Environmental Protection Agency'
     }
   },
-  ...CSLB_CREDENTIALS,
-  {
-    '@type': 'EducationalOccupationalCredential',
-    credentialCategory: 'BBB Accredited Business',
-    recognizedBy: {
-      '@type': 'Organization',
-      name: 'Better Business Bureau'
-    }
-  }
+  ...CSLB_CREDENTIALS
 ];
 
 /** Idempotently injects legalName + hasCredential into a LocalBusiness schema object.

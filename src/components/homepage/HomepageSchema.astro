@@ -28,6 +28,7 @@ import {
 } from '../../data/branches';
 import { HOMEPAGE_FAQ } from '../../data/faq';
 import { CANONICAL_CREDENTIALS, LEGAL_NAME } from '../../data/credentials-schema';
+import { MEMBER_OF_SCHEMA } from '../../data/memberships';
 import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 import { buildServiceCatalogSchema, SERVICE_CATALOG_REF } from '../../lib/build-service-catalog';
 
@@ -82,7 +83,7 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
         name: countyTitle(branch.primaryCounty)
       }
     })),
-    // Credentials (BHGS / EPA 608 / CSLB while active / BBB) are carried ONCE,
+    // Credentials (BHGS / EPA 608 / CSLB while active) are carried ONCE,
     // by the Organization node in this same @graph; each branch inherits them
     // through parentOrganization instead of repeating the array.
     parentOrganization: { '@id': ORG_ID }
@@ -211,6 +212,8 @@ const graph: Array<Record<string, unknown>> = [
       }
     }],
     hasCredential: [...CANONICAL_CREDENTIALS],
+    // Association memberships (memberships.ts SSOT) — "Member", never a credential.
+    memberOf: MEMBER_OF_SCHEMA,
     // hasOfferCatalog — @id ref to the canonical OfferCatalog node below.
     // Same anchor that all 8 LocalBusiness point at (single SSOT, no payload
     // duplication across entities in this graph).
@@ -234,7 +237,7 @@ const graph: Array<Record<string, unknown>> = [
     url: SITE_URL + '/',
     name: 'Same Day Appliance Repair — Los Angeles & Southern California',
     description:
-      'Same-day appliance repair across 7 Southern California counties. Residential, commercial kitchen, cold storage, outdoor. BHGS #A49573, BBB Accredited, EPA 608.',
+      'Same-day appliance repair across 7 Southern California counties. Residential, commercial kitchen, cold storage, outdoor. BHGS #A49573, EPA 608.',
     inLanguage: 'en-US',
     isPartOf: { '@id': WEBSITE_ID },
     about: { '@id': ORG_ID },

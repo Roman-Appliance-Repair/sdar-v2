@@ -30,8 +30,8 @@
 4. **`hasCredential` array site-wide** — ОДИН раз на странице, на главном узле бизнеса (`mergeCredentials`) и на организации главной. С 2026-09-24 узлы филиалов в `location` (build-location-array.ts, HomepageSchema) credentials НЕ несут, а ссылаются на организацию через `parentOrganization: {"@id": "https://samedayappliance.repair/#organization"}` — раньше каждый из 10 филиалов повторял весь список (~33 узла на страницу). Состав:
    - BHGS Registration #A49573
    - EPA 608 Universal #1346255700410
-   - CSLB C-20 HVAC
-   - BBB Accredited Business (БЕЗ буквы рейтинга — на BBB реально A, не A+)
+   - CSLB C-20 HVAC (только при `CSLB_ACTIVE = true`)
+   - ~~BBB Accredited Business~~ — удалён 2026-09-28. Членства идут в `Organization.memberOf` (memberships.ts), не в hasCredential
 
 5. **`location` array (все 10 филиалов)** → на гео-нейтральных страницах: `/`, `/contact/`, `/book/`, и ~700 страниц без city anchor (services hubs, brand pages, commercial, outdoor, sub-services, price list, credentials). Все 10 — `LocalBusiness` entries с branch phone + service_area.
 
@@ -43,7 +43,7 @@
 
 8. **License labeling** — везде «BHGS #A49573» или «BHGS Registration #A49573». Не «BHGS Licensed», не «CSLB License #A49573», не «CA BHGS». CSLB C-20 не подписывать как BHGS — это разные регуляторы (CSLB issues C-20, BHGS issues registration).
 
-9. **«BBB A+»** — никогда. Реальный grade на bbb.org = A. False-advertising risk. Только «BBB Accredited Business» без буквы.
+9. **BBB** — не упоминать вообще (удалён 2026-09-28): ни «BBB A+», ни «BBB Accredited», ни ссылок на bbb.org. Членства — только «Member · …».
 
 **Verification (post-deploy на любую dist page):**
 ```bash
@@ -149,16 +149,14 @@ Sunday is encoded as `opens=closes=00:00` per Google's documented "closed day" p
     { "@type": "EducationalOccupationalCredential", "credentialCategory": "certification",
       "name": "EPA 608 Universal", "identifier": "1346255700410" },
     { "@type": "EducationalOccupationalCredential", "credentialCategory": "license",
-      "name": "CSLB C-20 HVAC" },
-    { "@type": "EducationalOccupationalCredential", "credentialCategory": "membership",
-      "name": "BBB Accredited Business" }
+      "name": "CSLB C-20 HVAC" }
   ]
 }
 ```
 
 **`legalName: "HVAC 777 LLC"` рендерится во ВСЕХ schema** (не только legal/pin pages). Закон обновлён 2026-05-07.
 
-**`hasCredential` рендерится на каждой странице один раз** (главный узел бизнеса), не на каждом филиале. BBB — БЕЗ буквы рейтинга (на BBB реально A, не A+).
+**`hasCredential` рендерится на каждой странице один раз** (главный узел бизнеса), не на каждом филиале. BBB в schema нет (удалён 2026-09-28); членства — `memberOf` на Organization.
 
 ### Name field — буквально из таблицы (8 строк зафиксированы)
 

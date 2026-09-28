@@ -836,7 +836,6 @@ export default defineConfig({
 
     // === Wave 32 :: L_credentials_old_slug | /credentials/{X}-appliance-repair/ → /credentials/{X}/ (6) ===
     '/credentials/background-checked-appliance-repair/': '/credentials/background-checked/',
-    '/credentials/bbb-accredited-appliance-repair/': '/credentials/bbb-accredited/',
     '/credentials/epa-certified-appliance-repair/': '/credentials/epa-certified/',
     '/credentials/insured-appliance-repair/': '/credentials/insured/',
     '/credentials/licensed-appliance-repair/': '/credentials/licensed/',
