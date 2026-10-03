@@ -153,6 +153,7 @@ const COMMERCIAL_SUBTREE_APPLIANCE: Record<string, string> = {
   'bar-refrigerator-repair': 'bar_fridge',
   'walk-in-cooler-repair': 'walk_in',
   'walk-in-freezer-repair': 'walk_in',
+  'walk-in-cooler-installation': 'walk_in',
   'walk-in-door-repair': 'walk_in',
   'walk-in-cooler-not-cooling': 'walk_in',
   'walk-in-freezer-troubleshooting': 'walk_in',
