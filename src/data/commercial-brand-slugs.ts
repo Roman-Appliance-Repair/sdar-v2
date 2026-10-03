@@ -68,7 +68,6 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'pitco',
   'pitco-fryer-repair',
   'rational',
-  'rational-combi-oven-repair',
   'scotsman',
   'southbend-oven-repair',
   'speed-queen-commercial-laundry-repair',

@@ -221,7 +221,7 @@ export default defineConfig({
     '/bki-commercial-ovens-repair/': '/brands/bki-rotisserie-repair/',
     '/imperial-commercial-ovens-repair/': '/brands/imperial-oven-repair/',
     '/blodgett-commercial-ovens-repair/': '/brands/blodgett-oven-repair/',
-    '/rational-commercial-ovens-repair/': '/brands/rational-combi-oven-repair/',
+    '/rational-commercial-ovens-repair/': '/brands/rational/',
     '/kratos-commercial-ovens-repair/': '/brands/kratos-oven-repair/',
     '/vulcan-commercial-ovens-repair/': '/brands/vulcan-oven-repair/',
     '/southbend-commercial-ovens-repair/': '/brands/southbend-oven-repair/',

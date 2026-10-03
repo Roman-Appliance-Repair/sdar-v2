@@ -148,6 +148,7 @@ const COMMERCIAL_SERVICE_APPLIANCE: Record<string, string> = {
 const COMMERCIAL_SUBTREE_APPLIANCE: Record<string, string> = {
   // oven-repair/
   'combi-oven-repair': 'steamer',
+  'rational-error-codes': 'steamer',
   // refrigeration/
   'bar-refrigerator-repair': 'bar_fridge',
   'walk-in-cooler-repair': 'walk_in',
@@ -246,6 +247,15 @@ function applianceFromBrandSlug(slug: string, scope: QuoteScope): string | null 
   }
   return null;
 }
+
+/**
+ * Brand pillars whose slug names no category but whose brand is one machine in
+ * practice. /brands/rational/ absorbed /brands/rational-combi-oven-repair/
+ * (2026-10-03) and must keep prefilling the combi tile that page prefilled.
+ */
+const SINGLE_CATEGORY_BRAND_APPLIANCE: Record<string, string> = {
+  rational: 'steamer',
+};
 
 function brandFromSlug(slug: string): string | null {
   for (const pillar of PILLAR_SLUGS) {
@@ -362,7 +372,8 @@ export function getQuoteContext(pathname: string): QuoteContext {
     const scope: QuoteScope = COMMERCIAL_BRAND_SLUGS.has(b) ? 'commercial' : 'residential';
     return {
       scope,
-      appliance: applianceFromBrandSlug(b, scope),
+      appliance: applianceFromBrandSlug(b, scope)
+        ?? (scope === 'commercial' ? SINGLE_CATEGORY_BRAND_APPLIANCE[b] ?? null : null),
       brand: brandFromSlug(b),
       pageType: 'brand',
     };

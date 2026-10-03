@@ -1,0 +1,253 @@
+---
+import { CSLB_CREDENTIALS } from '../../../data/credentials-schema';
+// src/pages/commercial/oven-repair/rational-error-codes.astro
+// 2026-10-03 — Rational combi "Service" error code reference.
+// Demand (Ahrefs US): "rational oven error codes" 30, "rational service 10" 30,
+// "rational service 25" 20; GSC showed us at pos 30–57 for these via the brand page.
+// Zero-invention: code meanings ONLY from the SCC whitefficiency service-code table
+// (techtownforum knowledge base, cross-checked with Parts Town guide: 10, 20.x,
+// 31.x, 40 match word for word). iCombi Pro / Classic use a different message
+// system — the page says so instead of guessing. Prices = /brands/rational/ table.
+
+import Layout from '../../../layouts/Layout.astro';
+import CommercialHero from '../../../components/CommercialHero.astro';
+import { MAIN_PHONE, toE164 } from '../../../data/branches';
+import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../../../lib/build-location-array';
+
+const phone = MAIN_PHONE;
+const phoneHref = `tel:+1${MAIN_PHONE.replace(/\D/g, '')}`;
+const canonical = "https://samedayappliance.repair/commercial/oven-repair/rational-error-codes/";
+
+const title = "Rational Oven Error Codes: Service 10, 25, 34 — LA";
+const description = "Rational SelfCookingCenter Service codes explained: Service 10, 13, 14, 25, 28, 29, 34, 40 and more. What each means, what you can check, when to call. Same-day LA.";
+
+// One row per code. `op` = what the kitchen can safely do; `tech` = what we do.
+const codes = [
+  { code: "Service 10", id: "service-10", meaning: "Steam-generator (SC) pump reports a high water level.", op: "Check that the SC pump drain hose is not kinked or blocked and that the unit drain flows freely.", tech: "Clear or replace the pump hose, test the SC pump and level electrode. Frequent on scaled units." },
+  { code: "Service 11", id: "service-11", meaning: "CDS (water flow) sensor sending too many pulses.", op: "Look for water leaking under or behind the unit.", tech: "Check the level electrode and the water path for leaks, replace the sensor if needed." },
+  { code: "Service 12", id: "service-12", meaning: "CDS (water flow) sensor sends no signal.", op: "Make sure the water supply valve is fully open.", tech: "Check water pressure and the sensor signal path." },
+  { code: "Service 13", id: "service-13", meaning: "Steam generator is not refilling during steam mode.", op: "Confirm water supply is on and the inlet filter is not clogged.", tech: "Check the level electrode signal to the board, inlet valve and scale in the generator." },
+  { code: "Service 14", id: "service-14", meaning: "Level electrode does not recognize water.", op: "Nothing safe beyond confirming water supply. Very soft or reverse-osmosis water can cause this.", tech: "Clean or replace the electrode, check water treatment. Scale on the electrode is the usual cause in LA." },
+  { code: "Service 20.x", id: "service-20", meaning: "Defective thermocouple (the number after the dot tells which sensor).", op: "Cooking may be limited. Note the full number shown.", tech: "Replace the named thermocouple." },
+  { code: "Service 23 / 24", id: "service-23", meaning: "Solid-state relay short circuit: 23 on the steam heating, 24 on the hot-air heating.", op: "Turn the unit off. Do not keep running it.", tech: "Replace the relay and check the heating element it feeds." },
+  { code: "Service 25", id: "service-25", meaning: "Water flow during CleanJet cleaning is not right.", op: "Check the water supply is fully open, then run the cleaning again. Cooking is usually still possible.", tech: "Check water pressure, inlet valve, cleaning nozzle and flow sensor." },
+  { code: "Service 26 / 27", id: "service-26", meaning: "Drain valve problem: 26 permanently closed, 27 will not close during start-up.", op: "For 27, run a rinse or abort program once.", tech: "Replace the drain valve assembly if it repeats." },
+  { code: "Service 28", id: "service-28", meaning: "Steam generator is over-temperature (above 356°F).", op: "Let it cool. The message clears when the generator drops below 230°F.", tech: "If it repeats, the generator is usually scaled or not refilling: descale and check the fill." },
+  { code: "Service 29", id: "service-29", meaning: "Control board is over-temperature (above 185°F).", op: "Clean the air filter under the control panel and make sure nothing blocks the vents.", tech: "Check the cooling fan and control-panel gasket." },
+  { code: "Service 30", id: "service-30", meaning: "Unit is running in emergency humidity control.", op: "You can keep cooking, but results may be uneven.", tech: "Repair or replace the humidity measurement." },
+  { code: "Service 31.x", id: "service-31", meaning: "Faulty core temperature probe.", op: "Cook without the probe if you must; HACCP core-temp logging will be missing.", tech: "Repair or replace the probe." },
+  { code: "Service 32 / 33", id: "service-32", meaning: "Gas units: ignition box fault.", op: "Check the gas supply valve is open. Do not keep resetting a gas fault.", tech: "Check ignition box, wiring and gas valve." },
+  { code: "Service 34.xx", id: "service-34", meaning: "Internal bus (communication) signal problem between boards.", op: "Power the unit off and on once.", tech: "Inspect bus cables, plugs and connections, then the boards." },
+  { code: "Service 36 / 37", id: "service-36", meaning: "Differential pressure sensor P1 defective (36) or out of range (37).", op: "Nothing safe to do yourself.", tech: "Check the sensor hoses, replace the sensor if needed." },
+  { code: "Service 40", id: "service-40", meaning: "Care pump broken or care container underfilled.", op: "Check the Care tablet/container and outlet hose, then complete a successful rinse.", tech: "Replace the care pump if the message returns." },
+  { code: "Service 41 / 42 / 43", id: "service-41", meaning: "Cleaning solenoid valves blocked, defective or passing water continuously.", op: "Run the abort / rinse program once.", tech: "Clear or replace the solenoid valve and hoses." },
+  { code: "Service 100", id: "service-100", meaning: "Defective SC pump or calcified level electrode.", op: "Run the abort program.", tech: "Descale, clean the electrode, replace the pump if needed." },
+];
+
+const faqs = [
+  {
+    q: "What does Service 10 mean on a Rational oven?",
+    a: "On a Rational SelfCookingCenter, Service 10 means the steam-generator (SC) pump reports a high water level. Start with the free check: make sure the SC pump drain hose is not kinked or blocked and the drain flows. If Service 10 comes back, the pump or the level electrode needs a technician, and in Los Angeles hard water the usual root cause is scale. Our techs come same-day; the $120 commercial diagnostic is waived when you approve the repair."
+  },
+  {
+    q: "What does Service 25 mean on a Rational oven?",
+    a: "Service 25 means the water flow during CleanJet cleaning was not right, so the cleaning did not finish properly. Check that the water supply valve is fully open and run the cleaning again. If it repeats, a technician checks water pressure, the inlet valve, the cleaning nozzle and the flow sensor. Cooking is usually still possible while you wait for service."
+  },
+  {
+    q: "What does Service 34 mean on a Rational oven?",
+    a: "Service 34 (shown as 34 plus a number) is an internal communication fault between the boards inside the oven. Turn the unit off and on once. If it returns, the bus cables and plugs need inspection, and if they are fine, one of the boards. It is not something to fix with the panel open in a working kitchen."
+  },
+  {
+    q: "My iCombi Pro shows a message but not these numbers. Does this list apply?",
+    a: "Not exactly. The numbers on this page are from the SelfCookingCenter (SCC and SCC WE) generation, which is still the largest group of Rational ovens in Los Angeles kitchens. iCombi Pro and iCombi Classic use a newer message system and describe the fault in words on the screen. Take a photo of the message and the model plate and text it to us or read it to us on the phone; we tell you whether it is safe to keep cooking before the tech arrives."
+  },
+  {
+    q: "Can I keep cooking with a Rational service message on?",
+    a: "Often yes. Many service messages limit one function (steam, cleaning, the core probe) and let the oven keep working in other modes. Turn the oven off and call if you see a relay short circuit (Service 23 or 24), a gas ignition fault, a smell of burning, or water on the floor."
+  },
+  {
+    q: "How much does it cost to fix a Rational error code?",
+    a: "$120 commercial diagnostic, waived when you approve the repair. Typical ranges from our Rational work: water inlet valve $300 to $480, steam-generator descaling $320 to $520, temperature probe $240 to $400, steam-generator heating element $420 to $680, control board $850 to $1,500. Most Rational calls land between $400 and $850. Repairs carry our 90-day warranty on parts and labor."
+  },
+];
+
+const schemaJsons = [
+  {
+    "@context": "https://schema.org", "@type": "LocalBusiness", "@id": canonical + "#business",
+    "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
+    "name": "Same Day Appliance Repair", "url": canonical, "telephone": toE164(phone), "priceRange": "$$",
+    "openingHoursSpecification": [
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"], "opens": "08:00", "closes": "18:00" },
+      { "@type": "OpeningHoursSpecification", "dayOfWeek": "Sunday", "opens": "00:00", "closes": "00:00" }
+    ],
+    "areaServed": [
+      { "@type": "AdministrativeArea", "name": "Los Angeles County" },
+      { "@type": "AdministrativeArea", "name": "Orange County" },
+      { "@type": "AdministrativeArea", "name": "Ventura County" },
+      { "@type": "AdministrativeArea", "name": "Santa Barbara County" }, { "@type": "AdministrativeArea", "name": "San Bernardino County" },
+      { "@type": "AdministrativeArea", "name": "Riverside County" }, { "@type": "AdministrativeArea", "name": "San Diego County" }
+    ],
+    "legalName": "HVAC 777 LLC",
+    "hasCredential": [ { "@type": "EducationalOccupationalCredential", "credentialCategory": "BHGS Registration #A49573", "recognizedBy": { "@type": "GovernmentOrganization", "name": "California Bureau of Household Goods and Services" } }, { "@type": "EducationalOccupationalCredential", "credentialCategory": "EPA 608 Universal Certification #1346255700410", "recognizedBy": { "@type": "GovernmentOrganization", "name": "U.S. Environmental Protection Agency" } }, ...CSLB_CREDENTIALS ],
+    "location": BRANCH_LOCATIONS_GEO_NEUTRAL
+  },
+  {
+    "@context": "https://schema.org", "@type": "Service", "@id": canonical + "#service",
+    "serviceType": "Rational Combi Oven Error Code Diagnosis and Repair",
+    "name": "Rational Oven Error Codes Reference and Repair",
+    "url": canonical,
+    "description": "Rational SelfCookingCenter Service message reference (Service 10 through 100) and same-day Rational combi oven repair across Southern California. $120 commercial diagnostic, waived with repair.",
+    "provider": { "@id": canonical + "#business" },
+    "offers": { "@type": "Offer", "priceSpecification": { "@type": "PriceSpecification", "price": "120.00", "priceCurrency": "USD", "description": "Commercial diagnostic fee, applied toward repair" } }
+  },
+  { "@context": "https://schema.org", "@type": "FAQPage", "mainEntity": faqs.map(f => ({ "@type": "Question", "name": f.q, "acceptedAnswer": { "@type": "Answer", "text": f.a } })) },
+  {
+    "@context": "https://schema.org", "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://samedayappliance.repair/" },
+      { "@type": "ListItem", "position": 2, "name": "Commercial", "item": "https://samedayappliance.repair/commercial/" },
+      { "@type": "ListItem", "position": 3, "name": "Commercial Oven Repair", "item": "https://samedayappliance.repair/commercial/oven-repair/" },
+      { "@type": "ListItem", "position": 4, "name": "Rational Error Codes", "item": canonical }
+    ]
+  }
+];
+---
+
+<Layout title={title} description={description} canonical={canonical}>
+
+<Fragment slot="head-scripts">
+  {schemaJsons.map((schema) => (<script type="application/ld+json" set:html={JSON.stringify(schema)} />))}
+</Fragment>
+
+<CommercialHero
+  slug="oven-repair"
+  eyebrow="Rational Combi Oven · Service Message Reference"
+  title="Rational Oven Error Codes — What Service 10, 25 and 34 Mean"
+  subtitle={`Your Rational shows "Service" and a number? Find it below: what it means, what you can safely check, and when to call. Same-day Rational repair across Southern California. ${phone}`}
+  heroImageTitle="Rational Oven Error Codes"
+  showBranches={true}
+/>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">Read this first</p>
+    <h2>A Rational "Service" message names the part that failed, not just "something is wrong."</h2>
+    <p><strong>Write down the full number, including anything after the dot (Service 20.3, Service 34.12), and take a photo of the model plate.</strong> That is what a technician needs to bring the right part on the first visit. Many messages let the oven keep cooking in other modes, so a message during service does not always mean the night is over.</p>
+    <p>The numbers below are the SelfCookingCenter (SCC and SCC WE) generation, still the most common Rational ovens in Los Angeles kitchens. iCombi Pro and iCombi Classic describe faults in words on the screen instead; for those, send us a photo of the screen and we tell you what it means.</p>
+    <p>In Los Angeles, a large share of Rational messages (Service 10, 13, 14, 28, 100) trace back to one thing: scale in the steam generator from hard water. Regular descaling prevents most of them. See <a href="/brands/rational/">Rational oven repair</a> for the descaling schedule we recommend.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container">
+    <p class="section-number">Code table</p>
+    <h2>Rational SelfCookingCenter Service messages</h2>
+    <div class="table-wrap">
+      <table class="price-table">
+        <thead><tr><th>Message</th><th>What it means</th><th>What you can check</th><th>What the tech does</th></tr></thead>
+        <tbody>
+          {codes.map(c => (
+            <tr id={c.id}><td><strong>{c.code}</strong></td><td>{c.meaning}</td><td>{c.op}</td><td>{c.tech}</td></tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Source: Rational SCC whitefficiency service message list. If your number is not here, or it keeps coming back after the check, call us.</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container narrow">
+    <p class="section-number">When to stop</p>
+    <h2>Turn the oven off and call if you see any of these</h2>
+    <ul class="bullet-list">
+      <li><strong>Service 23 or 24</strong> — a heating relay is shorted. Running on means risking the heating element too.</li>
+      <li><strong>Service 32 or 33 on a gas unit</strong> — ignition fault. Do not keep resetting it.</li>
+      <li>Any message together with a burning smell, water on the floor, or the breaker tripping.</li>
+    </ul>
+    <p>For everything else, one power cycle and the check in the table is fine. If the same message returns, resetting it again only hides the fault.</p>
+  </div>
+</section>
+
+<section class="section section-gray">
+  <div class="container narrow">
+    <p class="section-number">FAQ</p>
+    <h2>Rational error code questions</h2>
+    <div class="faq-list">
+      {faqs.map(f => (<details class="faq-item"><summary>{f.q}</summary><p set:html={f.a}></p></details>))}
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <p class="section-number">Related</p>
+    <h2>More on Rational and combi ovens</h2>
+    <div class="related-grid">
+      <a href="/brands/rational/" class="related-card">
+        <h3>Rational Oven Repair</h3>
+        <p>iCombi Pro, iCombi Classic, SCC, iVario. Prices, descaling, same-day service.</p>
+      </a>
+      <a href="/commercial/oven-repair/combi-oven-repair/" class="related-card">
+        <h3>Combi Oven Repair</h3>
+        <p>All combi brands: Rational, Alto-Shaam, Convotherm, Unox.</p>
+      </a>
+      <a href="/commercial/oven-repair/" class="related-card">
+        <h3>Commercial Oven Repair</h3>
+        <p>Convection, deck, combi, rotisserie and rapid-cook ovens.</p>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <div class="container">
+    <h2>Rational showing a Service message? We come same-day.</h2>
+    <p>Read us the number or text a photo of the screen. $120 commercial diagnostic, waived with repair. Phones answered 24/7.</p>
+    <div class="cta-row">
+      <a href={phoneHref} class="btn-primary">☎ Call {phone}</a>
+      <a href="/contact/" class="btn-secondary">Book Online</a>
+    </div>
+  </div>
+</section>
+
+</Layout>
+
+<style>
+  .section { padding: 72px 24px; }
+  .section-gray { background: var(--gray); }
+  .container { max-width: 1100px; margin: 0 auto; }
+  .container.narrow { max-width: 820px; }
+  .section-number { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--red); margin-bottom: 10px; }
+  .section h2 { font-size: clamp(1.5rem, 3vw, 2.1rem); font-weight: 800; margin: 0 0 18px; line-height: 1.2; }
+  .section p { font-size: 1rem; line-height: 1.75; margin: 0 0 16px; }
+  .section a { color: var(--red); font-weight: 600; text-decoration: none; }
+  .section a:hover { text-decoration: underline; }
+  .bullet-list { padding-left: 22px; margin: 14px 0 18px; }
+  .bullet-list li { font-size: 1rem; line-height: 1.65; color: var(--text); margin-bottom: 10px; }
+  .table-wrap { overflow-x: auto; }
+  .price-table { width: 100%; border-collapse: collapse; margin-top: 22px; background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .price-table th, .price-table td { padding: 12px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); font-size: 0.92rem; line-height: 1.55; }
+  .price-table th { background: var(--gray); font-weight: 700; }
+  .price-table td:first-child { white-space: nowrap; }
+  .price-table tr:last-child td { border-bottom: none; }
+  .note { font-size: 0.85rem !important; color: var(--muted); margin-top: 14px !important; }
+  .faq-list { margin-top: 24px; }
+  .faq-item { background: #fff; border: 1px solid var(--border); border-radius: 6px; padding: 18px 22px; margin-bottom: 12px; }
+  .faq-item summary { font-weight: 700; cursor: pointer; font-size: 1rem; list-style: none; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::before { content: "+ "; color: var(--red); font-weight: 800; margin-right: 6px; }
+  .faq-item[open] summary::before { content: "− "; }
+  .faq-item p { font-size: 0.95rem; line-height: 1.75; margin: 14px 0 0; }
+  .related-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 22px; }
+  .related-card { display: block; background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 22px; text-decoration: none; color: var(--text); transition: all 0.2s; }
+  .related-card:hover { border-color: var(--red); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.06); }
+  .related-card h3 { font-size: 1rem; font-weight: 800; margin: 0 0 8px; }
+  .related-card p { font-size: 0.85rem; color: var(--muted); margin: 0; line-height: 1.6; }
+  .bottom-cta { background: var(--black); color: #fff; padding: 64px 24px; text-align: center; }
+  .bottom-cta h2 { color: #fff; margin: 0 0 14px; font-size: 1.7rem; }
+  .bottom-cta p { color: #c9c9c9; margin: 0 0 26px; max-width: 720px; margin-left: auto; margin-right: auto; }
+  .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+  .btn-primary { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 5px; font-weight: 700; text-decoration: none; }
+  .btn-secondary { background: transparent; color: #fff; padding: 14px 28px; border-radius: 5px; border: 2px solid rgba(255,255,255,0.35); font-weight: 600; text-decoration: none; }
+</style>

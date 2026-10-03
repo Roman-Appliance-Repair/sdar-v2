@@ -433,8 +433,10 @@ for (const file of SHEET_SOURCES) {
   // generator-vs-battery-power page, → 1211 for the five /marine/ pages,
   // → 1217 for the six /marine/ wave-2 pages,
   // → 1211 after the 2026-09-26 commercial merge (6 duplicate hubs → 301),
-  // → 1210 wood-fired pizza oven page removed (we do not repair wood-burning).
-  check('dist contains the expected 1210 rendered pages', real.length === 1210, `found ${real.length}`);
+  // → 1210 wood-fired pizza oven page removed (we do not repair wood-burning),
+  // → 1209 /credentials/bbb-accredited/ removed (bbee038f); the 2026-10-03
+  // Rational merge (-1) and Rational error-codes page (+1) net to zero.
+  check('dist contains the expected 1209 rendered pages', real.length === 1209, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
@@ -568,7 +570,9 @@ for (const file of SHEET_SOURCES) {
     ['/commercial/kettle-repair/brands/groen/', 'kettle'],
     ['/commercial/food-processor-repair/', 'food_processor'],
     ['/commercial/food-processor-repair/brands/robot-coupe/', 'food_processor'],
-    ['/brands/rational-combi-oven-repair/', 'steamer'],
+    // rational-combi-oven-repair merged into the pillar 2026-10-03 (301).
+    ['/brands/rational/', 'steamer'],
+    ['/commercial/oven-repair/rational-error-codes/', 'steamer'],
     ['/brands/accurex-hood-repair/', 'commercial_range_hood'],
   ];
   const byUrl = new Map(pages.map((p) => [p.url, p]));
