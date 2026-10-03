@@ -21,7 +21,7 @@ interface Appliance {
 
 interface QuoteData {
   hasMaps: boolean;
-  price: Record<Scope, string>;
+  price: Record<Scope, string> & { walkIn: string };
   copy: {
     terms: string[];
     scopeLabels: Record<Scope, string>;
@@ -541,7 +541,7 @@ function render(): void {
     priceSeen = true;
     track('quote_price_shown', {
       where: state.where,
-      price: state.where ? data.price[state.where] : '',
+      price: priceShown(),
     });
   }
 }
@@ -663,9 +663,16 @@ function viewPhotos(): string {
   );
 }
 
+/** The fee the visitor is quoted. A walk-in has its own commercial tier. */
+function priceShown(): string {
+  if (!state.where) return '';
+  if (state.where === 'commercial' && state.appliance === 'walk_in') return data.price.walkIn;
+  return data.price[state.where];
+}
+
 function viewPrice(): string {
   const scope: Scope = state.where === 'commercial' ? 'commercial' : 'residential';
-  const amount = data.price[scope];
+  const amount = priceShown() || data.price[scope];
   const label =
     scope === 'commercial' ? data.copy.price.commercialLabel : data.copy.price.residentialLabel;
   return (
@@ -1453,7 +1460,7 @@ async function submit(): Promise<void> {
         page_type: data.context ? data.context.pageType : '',
         // Rendered by the sheet from quote-copy.ts so the Telegram card prints the
         // same fee and the same wording the visitor just read.
-        price_display: state.where ? data.price[state.where] : '',
+        price_display: priceShown(),
         scope_label: state.where ? data.copy.scopeLabels[state.where] : '',
         branch_label: branchName(branch),
         branch_phone: branchPhone(branch),

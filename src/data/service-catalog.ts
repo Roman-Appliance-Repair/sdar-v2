@@ -13,6 +13,7 @@
 // Pricing tiers (per CLAUDE.md §1):
 //   - $89  residential  (waived with repair)
 //   - $120 commercial   (waived with repair)
+//   - $199 walk-in coolers and freezers (owner, 2026-10-03; waived with repair)
 //   - null              quote-based (HVAC); no priceSpecification emitted
 //
 // HVAC scope note: CSLB C-20 HVAC license #1138898 is active and used in
@@ -21,7 +22,7 @@
 
 export const SERVICE_CATALOG_ID = 'https://samedayappliance.repair/#service-catalog';
 
-export type PriceTier = '$89' | '$120' | 'quote';
+export type PriceTier = '$89' | '$120' | '$199' | 'quote';
 
 export interface CatalogService {
   /** Kebab-case service slug; powers Offer @id and Service @id anchors. */
@@ -90,14 +91,14 @@ export const SUB_CATALOGS: SubCatalog[] = [
   },
 
   // ─────────────────────────────────────────────────
-  // 3. Cold Storage Commercial Refrigeration — 7 services, $120 diagnostic
+  // 3. Cold Storage Commercial Refrigeration — 7 services, $120 diagnostic ($199 walk-ins)
   // ─────────────────────────────────────────────────
   {
     id: 'catalog-cold-storage',
     name: 'Cold Storage Commercial Refrigeration',
     services: [
-      { id: 'walk-in-cooler-repair',          name: 'Walk-in Cooler Repair',                description: 'Compressor, condenser, evaporator coil, defrost system, and thermostat repair for restaurant and grocery walk-ins. EPA 608 certified.', priceTier: '$120' },
-      { id: 'walk-in-freezer-repair',         name: 'Walk-in Freezer Repair',               description: 'Compressor, defrost timer, evaporator fan, door heater, and thermostat repair on low-temp walk-in freezers. EPA 608 certified.', priceTier: '$120' },
+      { id: 'walk-in-cooler-repair',          name: 'Walk-in Cooler Repair',                description: 'Compressor, condenser, evaporator coil, defrost system, and thermostat repair for restaurant and grocery walk-ins. EPA 608 certified.', priceTier: '$199' },
+      { id: 'walk-in-freezer-repair',         name: 'Walk-in Freezer Repair',               description: 'Compressor, defrost timer, evaporator fan, door heater, and thermostat repair on low-temp walk-in freezers. EPA 608 certified.', priceTier: '$199' },
       { id: 'commercial-refrigerator-repair', name: 'Commercial Refrigerator Repair',       description: 'Compressor, condenser fan, evaporator, thermostat, and door gasket repair on reach-in and undercounter commercial refrigerators.', priceTier: '$120' },
       { id: 'commercial-freezer-repair',      name: 'Commercial Freezer Repair',            description: 'Compressor, defrost system, evaporator, fan motor, and door seal repair on reach-in and chest commercial freezers.', priceTier: '$120' },
       { id: 'showcase-refrigerator-repair',   name: 'Showcase/Display Refrigerator Repair', description: 'Compressor, condenser, fan motor, thermostat, and lighting repair on glass-door display and grab-and-go cases.', priceTier: '$120' },
@@ -161,6 +162,7 @@ export const TOTAL_SERVICES = SUB_CATALOGS.reduce((sum, c) => sum + c.services.l
 export function priceTierToPrice(tier: PriceTier): string | null {
   if (tier === '$89') return '89.00';
   if (tier === '$120') return '120.00';
+  if (tier === '$199') return '199.00';
   return null;
 }
 

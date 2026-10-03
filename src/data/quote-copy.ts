@@ -7,7 +7,8 @@
 // scripts/check-quote-sheet.mjs enforces both halves of that rule.
 //
 // Fee tiers match the wiki source-of-truth and src/data/pricing.ts:
-//   residential $89 · commercial $120, both waived when the repair is approved.
+//   residential $89 · commercial $120 · walk-in coolers and freezers $199 (owner,
+//   2026-10-03), all waived when the repair is approved.
 
 import { BUSINESS_HOURS } from './business-hours';
 
@@ -16,6 +17,10 @@ export const DIAGNOSTIC_RES = 89;
 
 /** Commercial diagnostic fee, in whole dollars. */
 export const DIAGNOSTIC_COM = 120;
+
+/** Walk-in cooler / freezer diagnostic fee, in whole dollars. A walk-in is a
+ *  refrigeration system, not a box: the visit is longer and needs gauges and EPA 608. */
+export const DIAGNOSTIC_WALKIN = 199;
 
 /** Format a whole-dollar amount. Kept as a function so no source file — this one
  *  included — carries a literal dollar-sign-plus-digits string. */
@@ -26,6 +31,7 @@ export function money(amount: number): string {
 /** Display strings for the price step. */
 export const DIAGNOSTIC_RES_DISPLAY = money(DIAGNOSTIC_RES);
 export const DIAGNOSTIC_COM_DISPLAY = money(DIAGNOSTIC_COM);
+export const DIAGNOSTIC_WALKIN_DISPLAY = money(DIAGNOSTIC_WALKIN);
 
 /**
  * What the diagnostic fee actually buys. Three plain lines instead of one clause —
