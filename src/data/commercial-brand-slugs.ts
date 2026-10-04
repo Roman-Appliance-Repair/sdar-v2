@@ -5,7 +5,7 @@
 // the fee printed on the page itself. Derived from each page's diagnostic-fee phrasing
 // ("$120 commercial diagnostic" vs "$89 diagnostic"); 9 mixed-signal pages resolved by
 // dominant own-fee. Regenerate via scripts/classify-brands.mjs if brand pages change.
-// Count: 81.
+// Count: 83.
 export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'accurex-hood-repair',
   'adc-commercial-dryer-repair',
@@ -55,6 +55,7 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'lincoln-pizza-oven-repair',
   'mainstreet-equipment-oven-repair',
   'manitowoc',
+  'marsal-pizza-oven-repair',
   'master-bilt-walk-in-repair',
   'maytag-commercial-laundry-repair',
   'meiko-dishwasher-repair',
@@ -63,6 +64,7 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'milnor-commercial-laundry-repair',
   'montague-oven-repair',
   'nor-lake-walk-in-repair',
+  'peerless-pizza-oven-repair',
   'perlick-commercial',
   'perlick-draft-beer-system-repair',
   'pitco',

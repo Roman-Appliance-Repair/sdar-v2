@@ -438,7 +438,8 @@ for (const file of SHEET_SOURCES) {
   // Rational merge (-1) and Rational error-codes page (+1) net to zero.
   // → 1210 /commercial/refrigeration/walk-in-cooler-installation/ added.
   // → 1209 outdoor wood-to-gas fireplace conversion page removed (no wood-burning work).
-  check('dist contains the expected 1209 rendered pages', real.length === 1209, `found ${real.length}`);
+  // → 1211 Marsal and Peerless pizza oven brand pages added.
+  check('dist contains the expected 1211 rendered pages', real.length === 1211, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;

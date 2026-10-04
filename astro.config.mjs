@@ -237,7 +237,7 @@ export default defineConfig({
     '/equipex-commercial-ovens-repair/': '/commercial/oven-repair/',
     '/merrychef-commercial-ovens-repair/': '/commercial/oven-repair/',
     '/fwe-commercial-ovens-repair/': '/commercial/oven-repair/',
-    '/peerless-commercial-ovens-repair/': '/commercial/pizza-oven-repair/',
+    '/peerless-commercial-ovens-repair/': '/brands/peerless-pizza-oven-repair/',
 
     // Cluster 07 service-hub rename (1)
     '/services/commercial-oven-repair-los-angeles/': '/commercial/oven-repair/',
@@ -818,7 +818,7 @@ export default defineConfig({
     '/hoshizaki-refrigeration-repair/': '/commercial/refrigeration/',
     '/huebsch-commercial-dryer-repair/': '/commercial/washer-repair/',
     '/jla-dishwasher-repair/': '/commercial/dishwasher-repair/',
-    '/marsal-pizza-ovens-repair/': '/commercial/pizza-oven-repair/',
+    '/marsal-pizza-ovens-repair/': '/brands/marsal-pizza-oven-repair/',
     '/maxx-cold-refrigeration-repair/': '/commercial/refrigeration/',
     '/maytag-commercial-dryer-repair/': '/commercial/washer-repair/',
     '/migali-refrigeration-repair/': '/commercial/refrigeration/',
