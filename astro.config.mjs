@@ -202,11 +202,11 @@ export default defineConfig({
 
     // Cluster 05 Commercial Dishwashers (7 — Fagor washing-machine deferred to C10;
     // Beko + SMEG residential-track managed by T1/T2)
-    '/jackson-dishwasher-repair/': '/brands/jackson-dishwasher-repair/',
+    '/jackson-dishwasher-repair/': '/brands/jackson/',
     '/fagor-dishwasher-repair/': '/brands/fagor-dishwasher-repair/',
     '/cma-dishmachines-repair/': '/brands/cma-dishmachines-repair/',
     '/winterhalter-dishwasher-repair/': '/brands/winterhalter-dishwasher-repair/',
-    '/champion-dishwasher-repair/': '/brands/champion-dishwasher-repair/',
+    '/champion-dishwasher-repair/': '/brands/champion/',
     '/meiko-dishwasher-repair/': '/brands/meiko-dishwasher-repair/',
     '/hobart-dishwasher-repair/': '/brands/hobart-dishwasher-repair/',
 
@@ -317,6 +317,9 @@ export default defineConfig({
     // 2026-10-04 hood cleaning: own page
     '/commercial/exhaust-hood-repair/hood-cleaning-service/': '/commercial/hood-cleaning/',
     '/commercial/exhaust-hood-repair/grease-buildup/': '/commercial/hood-cleaning/',
+    // 2026-10-04 dishwasher brand merges
+    '/brands/jackson-dishwasher-repair/': '/brands/jackson/',
+    '/brands/champion-dishwasher-repair/': '/brands/champion/',
 
     // ====================================================================
     // Wave 16 — Fagor washing machine activated 2026-05-04

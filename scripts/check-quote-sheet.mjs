@@ -441,7 +441,8 @@ for (const file of SHEET_SOURCES) {
   // → 1211 Marsal and Peerless pizza oven brand pages added.
   // → 1208 Traeger, Traeger error codes and Memphis pellet pages removed (no pellet/wood work).
   // → 1207 hood-cleaning-service and grease-buildup folded into /commercial/hood-cleaning/ (+1 new, -2).
-  check('dist contains the expected 1207 rendered pages', real.length === 1207, `found ${real.length}`);
+  // → 1205 jackson- and champion-dishwasher-repair merged into /brands/jackson/ and /brands/champion/ (301, -2).
+  check('dist contains the expected 1205 rendered pages', real.length === 1205, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
@@ -578,6 +579,9 @@ for (const file of SHEET_SOURCES) {
     // rational-combi-oven-repair merged into the pillar 2026-10-03 (301).
     ['/brands/rational/', 'steamer'],
     ['/commercial/oven-repair/rational-error-codes/', 'steamer'],
+    // jackson- and champion-dishwasher-repair merged into the pillars 2026-10-04 (301).
+    ['/brands/jackson/', 'commercial_dishwasher'],
+    ['/brands/champion/', 'commercial_dishwasher'],
     ['/brands/accurex-hood-repair/', 'commercial_range_hood'],
   ];
   const byUrl = new Map(pages.map((p) => [p.url, p]));

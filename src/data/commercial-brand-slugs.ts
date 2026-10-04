@@ -5,7 +5,7 @@
 // the fee printed on the page itself. Derived from each page's diagnostic-fee phrasing
 // ("$120 commercial diagnostic" vs "$89 diagnostic"); 9 mixed-signal pages resolved by
 // dominant own-fee. Regenerate via scripts/classify-brands.mjs if brand pages change.
-// Count: 83.
+// Count: 81 (jackson- and champion-dishwasher-repair merged into their pillars 2026-10-04).
 export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'accurex-hood-repair',
   'adc-commercial-dryer-repair',
@@ -21,7 +21,6 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'captiveaire',
   'captiveaire-hood-repair',
   'champion',
-  'champion-dishwasher-repair',
   'cma-dishmachines-repair',
   'delfield',
   'dexter-commercial-laundry-repair',
@@ -46,7 +45,6 @@ export const COMMERCIAL_BRAND_SLUGS = new Set<string>([
   'imperial-oven-repair',
   'imperial-range-repair',
   'jackson',
-  'jackson-dishwasher-repair',
   'kold-draft-ice-machine-repair',
   'kolpak-walk-in-repair',
   'kratos-oven-repair',

@@ -255,9 +255,13 @@ function applianceFromBrandSlug(slug: string, scope: QuoteScope): string | null 
  * Brand pillars whose slug names no category but whose brand is one machine in
  * practice. /brands/rational/ absorbed /brands/rational-combi-oven-repair/
  * (2026-10-03) and must keep prefilling the combi tile that page prefilled.
+ * Jackson and Champion make warewashing only; their pillars absorbed the
+ * -dishwasher-repair pages (2026-10-04) and keep the dishwasher tile.
  */
 const SINGLE_CATEGORY_BRAND_APPLIANCE: Record<string, string> = {
   rational: 'steamer',
+  jackson: 'commercial_dishwasher',
+  champion: 'commercial_dishwasher',
 };
 
 function brandFromSlug(slug: string): string | null {
