@@ -314,6 +314,9 @@ export default defineConfig({
     '/outdoor/smoker-repair/brands/traeger/': '/outdoor/smoker-repair/',
     '/outdoor/smoker-repair/traeger-error-codes/': '/outdoor/smoker-repair/',
     '/outdoor/smoker-repair/brands/memphis/': '/outdoor/smoker-repair/brands/',
+    // 2026-10-04 hood cleaning: own page
+    '/commercial/exhaust-hood-repair/hood-cleaning-service/': '/commercial/hood-cleaning/',
+    '/commercial/exhaust-hood-repair/grease-buildup/': '/commercial/hood-cleaning/',
 
     // ====================================================================
     // Wave 16 — Fagor washing machine activated 2026-05-04

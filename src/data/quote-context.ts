@@ -131,6 +131,8 @@ const COMMERCIAL_SERVICE_APPLIANCE: Record<string, string> = {
   // Both are the same equipment as the catalog's Commercial Range Hood Repair.
   'exhaust-hood-repair': 'commercial_range_hood',
   'hood-repair': 'commercial_range_hood',
+  // /commercial/hood-cleaning/ cleans the same equipment.
+  'hood-cleaning': 'commercial_range_hood',
   'walk-in-cooler-repair': 'walk_in',
   'walk-in-freezer-repair': 'walk_in',
   // Brand slugs say it plainly: kolpak-walk-in-repair, nor-lake-walk-in-repair.

@@ -440,7 +440,8 @@ for (const file of SHEET_SOURCES) {
   // → 1209 outdoor wood-to-gas fireplace conversion page removed (no wood-burning work).
   // → 1211 Marsal and Peerless pizza oven brand pages added.
   // → 1208 Traeger, Traeger error codes and Memphis pellet pages removed (no pellet/wood work).
-  check('dist contains the expected 1208 rendered pages', real.length === 1208, `found ${real.length}`);
+  // → 1207 hood-cleaning-service and grease-buildup folded into /commercial/hood-cleaning/ (+1 new, -2).
+  check('dist contains the expected 1207 rendered pages', real.length === 1207, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
