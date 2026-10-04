@@ -437,7 +437,8 @@ for (const file of SHEET_SOURCES) {
   // → 1209 /credentials/bbb-accredited/ removed (bbee038f); the 2026-10-03
   // Rational merge (-1) and Rational error-codes page (+1) net to zero.
   // → 1210 /commercial/refrigeration/walk-in-cooler-installation/ added.
-  check('dist contains the expected 1210 rendered pages', real.length === 1210, `found ${real.length}`);
+  // → 1209 outdoor wood-to-gas fireplace conversion page removed (no wood-burning work).
+  check('dist contains the expected 1209 rendered pages', real.length === 1209, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;

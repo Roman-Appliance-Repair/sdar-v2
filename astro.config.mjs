@@ -771,7 +771,7 @@ export default defineConfig({
     '/services/cooktop-repair-los-angeles/': '/services/cooktop-repair/',
     '/services/dishwasher-repair-los-angeles/': '/services/dishwasher-repair/',
     '/services/dryer-repair-los-angeles/': '/services/dryer-repair/',
-    '/services/fireplace-repair-los-angeles/': '/services/',
+    '/services/fireplace-repair-los-angeles/': '/services/fireplace-repair/',
     '/services/freezer-repair-los-angeles/': '/services/freezer-repair/',
     '/services/furnace-repair-los-angeles/': '/services/',
     '/services/heat-pump-repair-los-angeles/': '/services/',
