@@ -25,7 +25,7 @@ const APPLIANCES_BY_CATEGORY = {
   restaurant: ["Commercial Oven","Commercial Range","Commercial Fryer","Commercial Dishwasher","Commercial Refrigerator","Commercial Freezer","Commercial Steamer","Commercial Mixer"],
   cold:       ["Walk-in Cooler","Walk-in Freezer","Reach-in Refrigerator","Reach-in Freezer","Display Case","Prep Table","Undercounter Refrigerator"],
   ice:        ["Ice Machine (Cuber)","Ice Machine (Flaker)","Ice Machine (Nugget)","Ice Dispenser","Ice Storage Bin"],
-  outdoor:    ["Gas Grill","Pellet Grill","Patio Heater","Gas Fireplace","Outdoor Refrigerator","Outdoor Ice Maker","Pizza Oven"],
+  outdoor:    ["Gas Grill","Patio Heater","Gas Fireplace","Outdoor Refrigerator","Outdoor Ice Maker","Pizza Oven"],
 };
 
 const BRANDS_BY_APPLIANCE = {
@@ -61,7 +61,6 @@ const BRANDS_BY_APPLIANCE = {
   "Ice Dispenser":            ["Follett","Hoshizaki","Manitowoc","Other"],
   "Ice Storage Bin":          ["Hoshizaki","Manitowoc","Scotsman","Other"],
   "Gas Grill":                ["Viking","Wolf Outdoor","DCS","Lynx","Fire Magic","Hestan Outdoor","Kalamazoo","Capital","Coyote","Bull","Napoleon","Weber","Other"],
-  "Pellet Grill":             ["Traeger","Weber","Other"],
   "Patio Heater":             ["Bromic","Infratech","Fire Sense","AEI / Sunpak","Sunglo","Other"],
   "Gas Fireplace":            ["Valor","Napoleon","Regency","Heat & Glo","Majestic","SL","Other"],
   "Outdoor Refrigerator":     ["Sub-Zero","Viking","U-Line","Perlick","Hestan Outdoor","Other"],

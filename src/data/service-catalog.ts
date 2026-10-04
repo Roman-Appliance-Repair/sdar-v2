@@ -134,7 +134,7 @@ export const SUB_CATALOGS: SubCatalog[] = [
       { id: 'outdoor-refrigerator-repair', name: 'Outdoor Refrigerator Repair', description: 'Compressor, condenser, fan motor, thermostat, and door gasket repair on outdoor-rated UL-listed refrigerators.', priceTier: '$89' },
       { id: 'patio-heater-repair',        name: 'Patio Heater Repair',          description: 'Pilot light, thermocouple, gas valve, igniter, and tilt safety repair on free-standing, mounted, and tabletop heaters.', priceTier: '$89' },
       { id: 'outdoor-pizza-oven-repair',  name: 'Outdoor Pizza Oven Repair',    description: 'Burner, igniter, gas line, thermostat, and stone replacement on gas, wood, and dual-fuel outdoor pizza ovens.', priceTier: '$89' },
-      { id: 'fireplace-repair',           name: 'Fireplace Repair',             description: 'Pilot, thermocouple, gas valve, blower fan, and remote control repair on gas fireplaces and electric fireplaces; gas-only per SCAQMD.', priceTier: '$89' }
+      { id: 'fireplace-repair',           name: 'Fireplace Repair',             description: 'Pilot, thermocouple, gas valve, blower fan, and remote control repair on gas fireplaces and electric fireplaces; we do not work on wood-burning fireplaces.', priceTier: '$89' }
     ]
   },
 

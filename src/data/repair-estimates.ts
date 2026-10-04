@@ -67,8 +67,7 @@ export const REPAIR_ESTIMATES: Record<string, UnitEstimate> = {
       { id: 'burner-wont-ignite',                label: "Burner Won't Ignite",         priceRange: r(120, 250) },
       { id: 'uneven-heat-hot-and-cold-spots',    label: 'Uneven Heat / Hot and Cold Spots', priceRange: r(180, 330) },
       { id: 'weak-flame-low-heat-output',        label: 'Weak Flame / Low Heat Output', priceRange: r(180, 330) },
-      { id: 'excessive-flare-ups',               label: 'Excessive Flare-Ups',          priceRange: r(120, 250) },
-      { id: 'pellet-grill-not-heating',          label: 'Pellet Grill Not Heating',     priceRange: r(230, 400) }
+      { id: 'excessive-flare-ups',               label: 'Excessive Flare-Ups',          priceRange: r(120, 250) }
     ]
   },
 

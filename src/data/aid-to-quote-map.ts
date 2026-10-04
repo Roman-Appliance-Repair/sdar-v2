@@ -26,7 +26,7 @@
 //   · "Undercounter Refrigerator" — could be a bar fridge or an undercounter reach-in.
 //   · "Ice Dispenser" / "Ice Storage Bin" — the sheet's `ice_machine` tile is the
 //                                 machine, not its bin; the symptom lists differ.
-//   · "Gas Grill" / "Pellet Grill" / "Patio Heater" / "Gas Fireplace" / "Pizza Oven"
+//   · "Gas Grill" / "Patio Heater" / "Gas Fireplace" / "Pizza Oven"
 //                               — outdoor equipment the residential tile set has no
 //                                 tile for at all. `grill_charbroiler` is the
 //                                 COMMERCIAL charbroiler and would put a homeowner
@@ -107,7 +107,6 @@ export const UNMAPPED_APPLIANCES: readonly string[] = [
   'Ice Dispenser',
   'Ice Storage Bin',
   'Gas Grill',
-  'Pellet Grill',
   'Patio Heater',
   'Gas Fireplace',
   'Pizza Oven',
