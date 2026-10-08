@@ -6,8 +6,20 @@ import CountyMap from '../components/CountyMap.astro';
 import { BRANCHES, type Branch, toE164 } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { mergeCredentials } from '../data/credentials-schema';
+import { CITIES } from '../data/cities';
+import { cityDisplayName } from '../lib/nearby';
 
-const title = "Riverside County Appliance Repair — 8 Cities, Same Day";
+// City stage 1 (2026-10-08): the city grid, the counts and the FAQ city list come from
+// cities.ts — the hand-written grid had drifted (missing cities, a neighbouring county's
+// city). The main city hub (Riverside) is listed first and linked from the hero so this
+// county page stops competing with it for the city's own searches.
+const countyCities = CITIES.filter((c) => c.county === 'riverside')
+  .map((c) => ({ slug: c.slug, name: cityDisplayName(c) }))
+  .sort((a, b) => (a.slug === 'riverside' ? -1 : b.slug === 'riverside' ? 1 : a.name.localeCompare(b.name)));
+const cityCount = countyCities.length;
+const cityListText = countyCities.map((c) => c.name).join(', ');
+
+const title = `Appliance Repair in Riverside County, CA | ${cityCount} Cities`;
 const description = "Appliance repair across Riverside County — Temecula, Murrieta, Corona, Menifee and more. $89 diagnostic, same day available. (951) 577-3877.";
 
 const activeBranches = BRANCHES.filter((b) => b.phoneStatus === 'active');
@@ -66,9 +78,9 @@ const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
-    { '@type': 'Question', name: 'Do you offer same day appliance repair across Riverside County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. We cover 8 cities across Riverside County. Call (951) 577-3877 for availability.' } },
+    { '@type': 'Question', name: 'Do you offer same day appliance repair across Riverside County?', acceptedAnswer: { '@type': 'Answer', text: `Yes. We cover ${cityCount} cities across Riverside County. Call (951) 577-3877 for availability.` } },
     { '@type': 'Question', name: 'What is the diagnostic fee for appliance repair in Riverside County?', acceptedAnswer: { '@type': 'Answer', text: '$89 for residential — applied to the repair. $120 for commercial. Quote before we start.' } },
-    { '@type': 'Question', name: 'Which cities do you cover in Riverside County?', acceptedAnswer: { '@type': 'Answer', text: 'Temecula, Murrieta, Corona, Menifee, Lake Elsinore, Riverside, Moreno Valley, Hemet.' } },
+    { '@type': 'Question', name: 'Which cities do you cover in Riverside County?', acceptedAnswer: { '@type': 'Answer', text: `${cityListText}.` } },
     { '@type': 'Question', name: 'How fast can you reach my city in Riverside County?', acceptedAnswer: { '@type': 'Answer', text: 'Same day for the western cities. Our techs at Same Day Appliance Repair dispatch from a Temecula branch for coverage across Temecula, Murrieta, Corona, and Menifee, and we are honest about drive times for Hemet and the eastern communities. $89 residential diagnostic, waived with repair.' } },
     { '@type': 'Question', name: 'What appliance brands do your Riverside County techs service most?', acceptedAnswer: { '@type': 'Answer', text: 'The Temecula–Murrieta corridor is mostly 2010–2020 homes with Samsung, LG, and GE hitting their first repair cycle, while Temecula wine country estates run Sub-Zero, Wolf, and Thermador — our techs at Same Day Appliance Repair carry OEM parts for those luxury brands. $89 residential diagnostic, waived with repair.' } }
   ]
@@ -94,6 +106,8 @@ const faqSchema = {
     .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
     .hero h1 { font-size: clamp(30px, 4vw, 50px); font-weight: 700; line-height: 1.1; margin-bottom: 18px; letter-spacing: -.02em; max-width: 760px; color: #fff; }
     .hero-sub { font-size: 18px; color: rgba(255,255,255,.85); margin-bottom: 32px; max-width: 620px; line-height: 1.65; }
+    .hero-city { font-size: 16px; color: rgba(255,255,255,.85); margin: -18px 0 28px; }
+    .hero-city a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
     .btn-red { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; }
     .btn-outline { border: 1.5px solid rgba(255,255,255,.3); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; }
@@ -178,14 +192,15 @@ const faqSchema = {
   <div class="hero-overlay"></div>
   <div class="hero-inner">
     <p class="hero-eyebrow">Riverside County · Appliance Repair Coverage · Residential + Commercial · Same Day</p>
-    <h1>Appliance Repair Across Riverside County</h1>
+    <h1>Appliance Repair in Riverside County, CA</h1>
     <p class="hero-sub">From Corona and Riverside to Temecula wine country — we cover western Riverside County. Same day available in most cities. $89 diagnostic applied to repair.</p>
+    <p class="hero-city">Live in the city of Riverside? <a href="/riverside/">Riverside appliance repair →</a></p>
     <div class="hero-ctas">
       <a href="tel:+19515773877" class="btn-red">☎ (951) 577-3877</a>
       <a href="/book/" class="btn-outline">Book Online</a>
     </div>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-num">8</div><div class="hero-stat-label">Cities in Riverside County</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">{cityCount}</div><div class="hero-stat-label">Cities in Riverside County</div></div>
       <div class="hero-stat"><div class="hero-stat-num">$89</div><div class="hero-stat-label">Diagnostic · Waived With Repair</div></div>
     </div>
   </div>
@@ -205,7 +220,7 @@ const faqSchema = {
   <div class="container">
     <p class="sl">Riverside County Service</p>
     <h2>Riverside County spans from LA exurbs to wine country — each area is different</h2>
-    <p><strong>When an appliance fails anywhere in Riverside County, our techs at Same Day Appliance Repair dispatch same-day across Temecula, Murrieta, and Corona and the rest of the county's 8 cities. If you live in the city itself, see our page on <a href="/riverside/">appliance repair in Riverside</a>. Temecula's wine country estates run Sub-Zero, Wolf, and Thermador comparable to Newport Beach, while the western pass wind through Cajon carries debris that clogs condenser coils faster around Corona and Norco — so we check coil condition early on any refrigeration call here. We carry common parts on the truck and quote labor and parts before any work. $89 residential diagnostic, waived with repair. Our techs at Same Day Appliance Repair are BHGS #A49573, EPA 608 Universal certified (#1346255700410).</strong></p>
+    <p><strong>When an appliance fails anywhere in Riverside County, our techs at Same Day Appliance Repair dispatch same-day across Temecula, Murrieta, and Corona and the rest of the county's {cityCount} cities. If you live in the city itself, see our page on <a href="/riverside/">appliance repair in Riverside</a>. Temecula's wine country estates run Sub-Zero, Wolf, and Thermador comparable to Newport Beach, while the western pass wind through Cajon carries debris that clogs condenser coils faster around Corona and Norco — so we check coil condition early on any refrigeration call here. We carry common parts on the truck and quote labor and parts before any work. $89 residential diagnostic, waived with repair. Our techs at Same Day Appliance Repair are BHGS #A49573, EPA 608 Universal certified (#1346255700410).</strong></p>
     <div class="body-text"><p>Riverside County's western cities — Corona, Murrieta, Temecula, and Menifee — have grown dramatically over the past 15 years. Large suburban housing developments built between 2005 and 2020 mean a significant concentration of Samsung, LG, and GE appliances now entering the 10–15 year repair window. These communities are where repair almost always makes more economic sense than replacement.</p>
         <p>Temecula is different from the rest of the county. The wine country estates around the Temecula Valley run appliances comparable to Newport Beach — Sub-Zero, Wolf, Thermador in the larger properties. The elevation (around 1,500 feet) gives Temecula a slightly cooler climate than the flatland Inland Empire cities, but summer afternoons still hit 95°F+.</p>
         <p>Corona and Riverside city face similar heat challenges to San Bernardino County — extreme summer temperatures that stress refrigeration systems. Same day appliance repair in Riverside County is something we've built coverage for specifically in the western cities; for Hemet and eastern communities, we're honest about drive times.</p></div>
@@ -224,17 +239,12 @@ const faqSchema = {
 <section class="section section-gray">
   <div class="container">
     <p class="sl">Service Areas</p>
-    <h2>8 cities across Riverside County</h2>
+    <h2>{cityCount} cities across Riverside County</h2>
     <p class="lead">Click any city for specific service information, neighborhoods, recent repairs, and local pricing.</p>
     <div class="cities-grid">
-      <a href="/temecula/" class="city-link">Temecula <span class="city-arrow">→</span></a>
-      <a href="/murrieta/" class="city-link">Murrieta <span class="city-arrow">→</span></a>
-      <a href="/corona/" class="city-link">Corona <span class="city-arrow">→</span></a>
-      <a href="/menifee/" class="city-link">Menifee <span class="city-arrow">→</span></a>
-      <a href="/lake-elsinore/" class="city-link">Lake Elsinore <span class="city-arrow">→</span></a>
-      <a href="/riverside/" class="city-link">Riverside <span class="city-arrow">→</span></a>
-      <a href="/moreno-valley/" class="city-link">Moreno Valley <span class="city-arrow">→</span></a>
-      <a href="/hemet/" class="city-link">Hemet <span class="city-arrow">→</span></a>
+      {countyCities.map((c) => (
+        <a href={`/${c.slug}/`} class="city-link">{c.name} <span class="city-arrow">→</span></a>
+      ))}
     </div>
   </div>
 </section>
@@ -322,7 +332,7 @@ const faqSchema = {
         <tr><td>Diagnostic fee</td><td class="price-val">$89</td><td>Applied to repair</td></tr>
       </tbody>
     </table>
-    <p class="pricing-note">Quote before we start. Invoice matches the quote. OEM parts. 90-day warranty.</p>
+    <p class="pricing-note">Quote before we start. Invoice matches the quote. OEM parts. 90-day warranty on parts and labor.</p>
   </div>
 </section>
 
@@ -332,13 +342,13 @@ const faqSchema = {
     <h2>Questions about appliance repair in Riverside County</h2>
     <div class="faq-list">
       
-      <div class="faq-item"><div class="faq-q">Do you offer same day appliance repair across Riverside County?</div><div class="faq-a">Yes. We cover 8 cities across Riverside County. Call (951) 577-3877 for availability in your city.</div></div>
+      <div class="faq-item"><div class="faq-q">Do you offer same day appliance repair across Riverside County?</div><div class="faq-a">Yes. We cover {cityCount} cities across Riverside County. Call (951) 577-3877 for availability in your city.</div></div>
       <div class="faq-item"><div class="faq-q">What is the diagnostic fee for appliance repair in Riverside County?</div><div class="faq-a">$89 for residential appliances — applied to the repair the moment you approve the work. For commercial it's $120. Quote before we start.</div></div>
       <div class="faq-item"><div class="faq-q">Do you repair Sub-Zero, Wolf, and Thermador in Riverside County?</div><div class="faq-a">Yes. We service all luxury appliance brands with OEM parts. These brands are common in the higher-income communities of Riverside County.</div></div>
-      <div class="faq-item"><div class="faq-q">Which cities do you cover in Riverside County?</div><div class="faq-a">Temecula, Murrieta, Corona, Menifee, Lake Elsinore, Riverside, Moreno Valley, Hemet.</div></div>
+      <div class="faq-item"><div class="faq-q">Which cities do you cover in Riverside County?</div><div class="faq-a">{cityListText}.</div></div>
       <div class="faq-item"><div class="faq-q">Do you offer commercial appliance repair in Riverside County?</div><div class="faq-a">Yes. Restaurants, hotels, property managers — $120 commercial diagnostic, same day available, COI on request. Call (951) 577-3877.</div></div>
       <div class="faq-item"><div class="faq-q">What appliance brands do you repair in Riverside County?</div><div class="faq-a">All brands: Samsung, LG, GE, Whirlpool, Frigidaire, Maytag, KitchenAid, Bosch, Electrolux, and all luxury brands including Sub-Zero, Wolf, Thermador, Miele, Viking, Gaggenau, JennAir, and Dacor.</div></div>
-      <div class="faq-item"><div class="faq-q">What warranty do you provide on appliance repairs in Riverside County?</div><div class="faq-a">90 days on parts and labor. OEM parts used wherever available. We use your manufacturer warranty rather than voiding it.</div></div>
+      <div class="faq-item"><div class="faq-q">What warranty do you provide on appliance repairs in Riverside County?</div><div class="faq-a">A 90-day warranty on parts and labor. OEM parts used wherever available. We use your manufacturer warranty rather than voiding it.</div></div>
       <div class="faq-item"><div class="faq-q">How fast can you reach my city in Riverside County?</div><div class="faq-a">Same day for the western cities. Our techs at Same Day Appliance Repair dispatch from a Temecula branch for coverage across Temecula, Murrieta, Corona, and Menifee, and we are honest about drive times for Hemet and the eastern communities. $89 residential diagnostic, waived with repair.</div></div>
       <div class="faq-item"><div class="faq-q">What appliance brands do your Riverside County techs service most?</div><div class="faq-a">The Temecula–Murrieta corridor is mostly 2010–2020 homes with Samsung, LG, and GE hitting their first repair cycle, while Temecula wine country estates run Sub-Zero, Wolf, and Thermador — our techs at Same Day Appliance Repair carry OEM parts for those luxury brands. $89 residential diagnostic, waived with repair.</div></div>
 
@@ -364,7 +374,7 @@ const faqSchema = {
 <section class="bottom-cta">
   <div class="container">
     <h2>Appliance repair anywhere in Riverside County</h2>
-    <p>8 cities. Same day available. $89 diagnostic applied to repair.</p>
+    <p>{cityCount} cities. Same day available. $89 diagnostic applied to repair.</p>
     <div class="bottom-ctas">
       <a href="tel:+19515773877" class="btn-red">☎ Call (951) 577-3877</a>
       <a href="/contact/" class="btn-outline">Book Online</a>

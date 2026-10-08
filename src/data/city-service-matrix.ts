@@ -1,5 +1,6 @@
 // src/data/city-service-matrix.ts
 // Wave 23 MVP: 8 hub cities × 5 highest-volume residential services = 40 combos.
+// 2026-10-08: only 12 combos still render — see LIVE_COMBOS at the bottom.
 // Extensible: add entries here as new combos ship.
 //
 // Architecture:
@@ -75,7 +76,9 @@ const NON_HUB_TIER1_ONLY_CITIES = [
   'hollywood'
 ];
 
-export const CITY_SERVICE_MATRIX: CityServiceCombo[] = [
+// The full 200-combo plan the waves above generated. Kept as the record of what was
+// built — NOT what renders any more (see LIVE_COMBOS below).
+export const GENERATED_CITY_SERVICE_MATRIX: CityServiceCombo[] = [
   // 8 hubs × 15 services (Tier 1 + Tier 2 + Tier 3) = 120 combos
   ...HUBS.flatMap(city => ALL_SERVICES.map(service => ({ city, service }))),
   // 5 non-hub priority × 5 Tier 1 services = 25 combos
@@ -87,5 +90,41 @@ export const CITY_SERVICE_MATRIX: CityServiceCombo[] = [
   // Wave 27b — Hollywood × 5 Tier 1 services = 5 combos (200/200 target)
   ...NON_HUB_TIER1_ONLY_CITIES.flatMap(city => TIER1_SERVICES.map(service => ({ city, service })))
 ];
+
+// City stage 1 (2026-10-08): dead city × service pages retired.
+// Rule (owner): a combo survives only with >= 20 GSC impressions OR >= 1 click in the
+// 90 days to 2026-10-07 (scratchpad demand-map/combos.csv). 188 of 200 did not; they
+// no longer build and each one 301s to its city hub (astro.config.mjs + public/_redirects,
+// block "2026-10-08 city stage 1"). The 56 combos that were canonicalized to the hub
+// (combo-collapse.ts) were part of the same cut: 54 are retired, the 2 that meet the
+// threshold (los-angeles/wall-oven-repair 81 imp / 1 click, burbank/wall-oven-repair
+// 20 imp) are kept and are self-canonical again.
+// Adding a combo back = add its key here AND delete its redirect line in both files.
+export const LIVE_COMBOS = new Set<string>([
+  'anaheim/cooktop-repair',            // 23 imp
+  'anaheim/wine-cooler-repair',        // 30 imp
+  'burbank/cooktop-repair',            // 26 imp
+  'burbank/wall-oven-repair',          // 20 imp (was canonicalized)
+  'glendale/range-hood-repair',        // 1 click
+  'irvine/range-hood-repair',          // 1 click
+  'los-angeles/refrigerator-repair',   // 1 click
+  'los-angeles/wall-oven-repair',      // 81 imp, 1 click (was canonicalized)
+  'rancho-cucamonga/refrigerator-repair', // 1 click
+  'rancho-cucamonga/wine-cooler-repair',  // 19 imp, 1 click
+  'rancho-cucamonga/ice-maker-repair',    // 33 imp
+  'temecula/wine-cooler-repair'        // 17 imp, 2 clicks
+]);
+
+export const CITY_SERVICE_MATRIX: CityServiceCombo[] =
+  GENERATED_CITY_SERVICE_MATRIX.filter(c => LIVE_COMBOS.has(`${c.city}/${c.service}`));
+
+/** Retired combos — each 301s to `/${city}/`. */
+export const RETIRED_CITY_SERVICE_COMBOS: CityServiceCombo[] =
+  GENERATED_CITY_SERVICE_MATRIX.filter(c => !LIVE_COMBOS.has(`${c.city}/${c.service}`));
+
+/** True when /{city}/{service}/ is a live page. */
+export function isLiveCombo(city: string, service: string): boolean {
+  return LIVE_COMBOS.has(`${city}/${service}`);
+}
 
 export const TOTAL_CITY_SERVICE_COMBOS = CITY_SERVICE_MATRIX.length;

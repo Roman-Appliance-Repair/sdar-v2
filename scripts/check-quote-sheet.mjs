@@ -442,7 +442,8 @@ for (const file of SHEET_SOURCES) {
   // → 1208 Traeger, Traeger error codes and Memphis pellet pages removed (no pellet/wood work).
   // → 1207 hood-cleaning-service and grease-buildup folded into /commercial/hood-cleaning/ (+1 new, -2).
   // → 1205 jackson- and champion-dishwasher-repair merged into /brands/jackson/ and /brands/champion/ (301, -2).
-  check('dist contains the expected 1205 rendered pages', real.length === 1205, `found ${real.length}`);
+  // → 1017 city stage 1 (2026-10-08): 188 dead city × service combos retired (301 to their city hub, -188).
+  check('dist contains the expected 1017 rendered pages', real.length === 1017, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;
@@ -1063,7 +1064,8 @@ const BLOCK_END = String.fromCharCode(10) + '};';
     badHeading.slice(0, 8).join(' | '));
   check('every card prefill matches what the page resolves', badPrefill.length === 0,
     badPrefill.slice(0, 8).join(' | '));
-  check('the card actually reached most of the site', carded > 900, `${carded} carded page(s)`);
+  // 900 → 800 on 2026-10-08: 188 carded city × service pages were retired (city stage 1).
+  check('the card actually reached most of the site', carded > 800, `${carded} carded page(s)`);
 
   // -- the placeholder follows the page, and its words are the tiles' own -------
   //
@@ -1075,7 +1077,8 @@ const BLOCK_END = String.fromCharCode(10) + '};';
       ['/commercial/mixer-repair/', "My mixer: won't start…"],
       ['/services/refrigerator-repair/', 'My refrigerator: not cooling…'],
       ['/brands/lg-washer-repair/', 'My LG washer: not spinning…'],
-      ['/pasadena/dryer-repair/', 'My dryer: not heating…'],
+      // 2026-10-08 city stage 1: /pasadena/dryer-repair/ and /hollywood/dishwasher-repair/ were retired (301 to the city hub) with 186 other dead city × service pages; the city_service samples moved to surviving combos.
+      ['/los-angeles/refrigerator-repair/', 'My refrigerator: not cooling…'],
       ['/services/cooktop-repair/', "My cooktop: burner won't light…"],
       ['/services/oven-repair/', 'My oven: not heating…'],
       ['/commercial/steamer-repair/', 'My steamer: no steam…'],

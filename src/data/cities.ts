@@ -23,9 +23,10 @@
 // San Diego Wave 1 (2026-08-07, feat/san-diego Stage A): 6 san-diego-county
 // cities (la-jolla, carlsbad, del-mar, rancho-santa-fe, encinitas,
 // solana-beach) registered BEFORE their .astro pillars exist. All six sit in
-// CITIES_WITHOUT_PAGES (branches.ts); nav/areas COUNTY_ORDER lists do not yet
-// include 'san-diego', so no clickable 404 links are emitted. City of San
-// Diego proper is Wave 2 — deliberately absent here.
+// CITIES_WITHOUT_PAGES (branches.ts) until their pillars shipped (2026-08-07).
+// 2026-10-08 (city stage 1): 'san-diego' added to the MegaMenu COUNTY_ORDER, so
+// the six hubs now sit in the site menu like every other county's cities (/areas/
+// already listed them). City of San Diego proper is Wave 2 — deliberately absent here.
 
 import { BRANCHES, getBranchForCity } from './branches';
 

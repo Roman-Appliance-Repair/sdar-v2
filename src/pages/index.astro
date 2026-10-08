@@ -8,7 +8,8 @@ import HomepageSchema from '../components/homepage/HomepageSchema.astro';
 import HeroBranchBand from '../components/HeroBranchBand.astro';
 import AIDiagnosticCard from '../components/AIDiagnosticCard.astro';
 import { BRANCHES, MAIN_PHONE, isPlaceholderPhone } from '../data/branches';
-import { TOTAL_CITY_COUNT } from '../data/cities';
+import { TOTAL_CITY_COUNT, CITIES, COUNTIES, type CountySlug } from '../data/cities';
+import WhereWeWork from '../components/WhereWeWork.astro';
 
 const phone = MAIN_PHONE;
 const phoneRaw = MAIN_PHONE.replace(/\D/g, '');
@@ -45,15 +46,15 @@ const BADGE_STYLES: Record<string, { bg: string; fg: string }> = {
   'Outdoor':     { bg: '#FAEEDA', fg: '#633806' }
 };
 
-// Service areas — by county
-const COUNTY_CITIES = [
-  { county: 'Los Angeles County',    href: '/los-angeles-county/',    cities: ['Los Angeles','West Hollywood','Beverly Hills','Santa Monica','Pasadena','Glendale','Burbank','Malibu'] },
-  { county: 'Orange County',         href: '/orange-county/',         cities: ['Newport Beach','Irvine','Anaheim','Huntington Beach'] },
-  { county: 'Ventura County',        href: '/ventura-county/',        cities: ['Thousand Oaks','Westlake Village','Camarillo'] },
-  { county: 'Santa Barbara County',  href: '/santa-barbara-county/',  cities: ['Santa Barbara','Montecito','Goleta','Carpinteria'] },
-  { county: 'Riverside County',      href: '/riverside-county/',      cities: ['Temecula','Corona','Riverside'] },
-  { county: 'San Bernardino County', href: '/san-bernardino-county/', cities: ['Rancho Cucamonga','Ontario'] }
-];
+// Service areas — by county. City stage 1 (2026-10-08): counts come from cities.ts
+// (they were hardcoded and stale — "26 cities" for a county with 46 hubs), San Diego
+// County is listed, and every city hub is linked below via <WhereWeWork />.
+const COUNTY_ORDER: CountySlug[] = ['los-angeles', 'orange', 'ventura', 'santa-barbara', 'san-bernardino', 'riverside', 'san-diego'];
+const COUNTY_LINKS = COUNTY_ORDER.map((c) => ({
+  name: COUNTIES[c].name,
+  href: COUNTIES[c].hubUrl,
+  count: CITIES.filter((city) => city.county === c).length
+}));
 
 // Branches bar — all 10 from BRANCHES SSOT
 function countyTitle(slug: string): string {
@@ -119,7 +120,7 @@ const BRANCH_DISPLAY = BRANCHES.map(b => ({
       <span class="hp-trust-sep">·</span>
       <span>90-Day Warranty</span>
       <span class="hp-trust-sep">·</span>
-      <span>Licensed &amp; Insured</span>
+      <span>Fully Insured</span>
       <span class="hp-trust-sep">·</span>
       <span>UASA Member</span>
       <span class="hp-trust-sep">·</span>
@@ -135,8 +136,8 @@ const BRANCH_DISPLAY = BRANCHES.map(b => ({
       <h2 class="hp-section-title">Same-Day Appliance Repair — Residential, Commercial, Outdoor</h2>
       <div class="hp-intro-body">
         <p>From Beverly Hills to Pasadena to Brentwood, our technicians cover the Los Angeles market end-to-end. Same Day Appliance Repair runs {BRANCHES.length} branches across Los Angeles, Orange, Ventura, Santa Barbara, San Bernardino, Riverside, and San Diego counties — but the bulk of our work happens in greater Los Angeles. We service <a href="/brands/sub-zero/" class="brand-inline-link">Sub-Zero</a>, <a href="/brands/wolf/" class="brand-inline-link">Wolf</a>, <a href="/brands/thermador/" class="brand-inline-link">Thermador</a>, <a href="/brands/viking/" class="brand-inline-link">Viking</a>, <a href="/brands/miele/" class="brand-inline-link">Miele</a> on Westside estates; <a href="/brands/lg/" class="brand-inline-link">LG</a>, <a href="/brands/samsung/" class="brand-inline-link">Samsung</a>, <a href="/brands/whirlpool/" class="brand-inline-link">Whirlpool</a>, <a href="/brands/bosch/" class="brand-inline-link">Bosch</a>, <a href="/brands/ge/" class="brand-inline-link">GE</a> in standard residential; <a href="/brands/true/" class="brand-inline-link">True</a>, <a href="/brands/hoshizaki/" class="brand-inline-link">Hoshizaki</a>, <a href="/brands/vulcan/" class="brand-inline-link">Vulcan</a>, Garland in restaurant kitchens.</p>
-        <p>The $89 residential diagnostic applies to the repair the moment you approve the work. Commercial calls are $120 — waived the same way. Phones answer 24/7; technicians dispatch Mon–Sat 8am–6pm. Licensed by BHGS (#A49573), EPA 608 Universal Certified.</p>
-        <p>Most calls in Los Angeles County route from West Hollywood, Pasadena, or our central LA branch — whichever is closest to your zip. The Westside cluster (West Hollywood, Beverly Hills, Brentwood, Santa Monica) sees the most calls per week. Pasadena handles Glendale, Burbank, the San Gabriel foothills. Orange County dispatches from Irvine; Ventura County from Thousand Oaks. Each branch carries OEM parts for brands common to its territory.</p>
+        <p>The $89 residential diagnostic applies to the repair the moment you approve the work. Commercial calls are $120 — waived the same way. Phones answer 24/7; technicians dispatch Mon–Sat 8am–6pm. BHGS #A49573, EPA 608 Universal Certified.</p>
+        <p>Most calls in Los Angeles County route from West Hollywood, Pasadena, or our central LA branch — whichever is closest to your zip. The Westside cluster (West Hollywood, Beverly Hills, Brentwood, Santa Monica) sees the most calls per week. Pasadena handles Glendale, Burbank, the San Gabriel foothills. Orange County dispatches from Irvine; Ventura County from Thousand Oaks. Each branch carries OEM parts for brands common to its territory. Inside the city itself, our <a href="/los-angeles/">Los Angeles appliance repair</a> page covers the neighborhoods, ZIPs and typical repairs from Downtown to the Westside.</p>
         <p style="margin-top: 18px;"><strong>Commercial brand guides</strong> for restaurant, hotel, hospital, school, and stadium kitchens:
           <a href="/brands/scotsman/" class="brand-inline-link">Scotsman</a>,
           <a href="/brands/hoshizaki/" class="brand-inline-link">Hoshizaki</a>, and
@@ -259,25 +260,13 @@ const BRANCH_DISPLAY = BRANCHES.map(b => ({
       <div class="hp-county-anchors">
         <h3 class="hp-county-anchors-h">Browse appliance repair by county</h3>
         <ul class="hp-county-list">
-          <li><a href="/los-angeles-county/">Appliance Repair Los Angeles County → 26 cities</a></li>
-          <li><a href="/orange-county/">Appliance Repair Orange County → 14 cities</a></li>
-          <li><a href="/ventura-county/">Appliance Repair Ventura County → 9 cities</a></li>
-          <li><a href="/santa-barbara-county/">Appliance Repair Santa Barbara County → 6 cities</a></li>
-          <li><a href="/san-bernardino-county/">Appliance Repair San Bernardino County → 8 cities</a></li>
-          <li><a href="/riverside-county/">Appliance Repair Riverside County → 8 cities</a></li>
+          {COUNTY_LINKS.map((c) => (
+            <li><a href={c.href}>Appliance Repair {c.name} → {c.count} {c.count === 1 ? 'city' : 'cities'}</a></li>
+          ))}
         </ul>
+        <p class="hp-la-city">Looking for the city of Los Angeles? <a href="/los-angeles/">Los Angeles appliance repair →</a></p>
       </div>
-      <div class="hp-chip-rows">
-        {COUNTY_CITIES.map(c => (
-          <div class="hp-chip-row">
-            <a href={c.href} class="hp-chip hp-chip-county">{c.county} →</a>
-            {c.cities.map(city => (
-              <a href={`/${city.toLowerCase().replace(/\s+/g,'-')}/`} class="hp-chip">{city}</a>
-            ))}
-          </div>
-        ))}
-        <p class="hp-areas-more"><a href="/areas/">→ + 67 more cities</a></p>
-      </div>
+      <WhereWeWork bare headline="Every city we serve" intro="Pick your city for local neighborhoods, ZIP codes and the repairs we see most there." />
     </div>
   </section>
 
@@ -362,6 +351,8 @@ const BRANCH_DISPLAY = BRANCHES.map(b => ({
   .hp-county-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 8px; }
   .hp-county-list a { color: var(--red); font-weight: 600; font-size: 15px; text-decoration: none; }
   .hp-county-list a:hover { text-decoration: underline; }
+  .hp-la-city { margin: 14px 0 0; font-size: 15px; color: #444; }
+  .hp-la-city a { color: var(--red); font-weight: 700; text-decoration: none; }
 
   /* trust bar */
   .hp-trust { background: var(--red); padding: 14px 24px; }
@@ -431,14 +422,6 @@ const BRANCH_DISPLAY = BRANCHES.map(b => ({
   /* areas */
   .hp-areas { background: var(--gray); padding: 80px 24px; }
   .hp-areas-inner { max-width: 1100px; margin: 0 auto; }
-  .hp-chip-rows { display: flex; flex-direction: column; gap: 16px; margin-top: 12px; }
-  .hp-chip-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-  .hp-chip { display: inline-block; padding: 6px 14px; background: #fff; border: 1px solid #d9d9d9; border-radius: 16px; font-size: 13px; font-weight: 500; color: #555; text-decoration: none; transition: border-color .15s, color .15s; }
-  .hp-chip:hover { border-color: #888; color: var(--black); }
-  .hp-chip-county { background: #fff; border-color: var(--red); color: var(--red); font-weight: 700; }
-  .hp-chip-county:hover { background: var(--red); color: #fff; }
-  .hp-areas-more { font-size: 14px; margin: 12px 0 0; }
-  .hp-areas-more a { color: var(--red); font-weight: 700; text-decoration: none; }
 
   /* bottom cta */
   .hp-bottom-cta { background: var(--red); padding: 72px 24px; text-align: center; color: #fff; }

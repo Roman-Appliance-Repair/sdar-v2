@@ -1,14 +1,21 @@
 ---
-/** v2 AlsoServingNearby — horizontal pill links to nearby cities. */
+/** v2 AlsoServingNearby — horizontal pill links to nearby cities.
+ *
+ *  City stage 1 (2026-10-08): the list is no longer passed in by hand. Each page
+ *  passes its own `citySlug` and the neighbours are computed by straight-line
+ *  distance between city centroids (src/lib/nearby.ts — rule: 6–8 nearest cities
+ *  with a page, same county preferred, nothing past 40 miles unless fewer than 4
+ *  cities sit inside 40). */
+import { getNearbyCities } from '../../../lib/nearby';
 
-export interface NearbyCity { name: string; slug: string; }
 export interface Props {
-  nearbyCities: NearbyCity[];
+  citySlug: string;
   /** Optional override of the default H2 ("Also Serving Nearby Areas"). */
   headline?: string;
 }
 
-const { nearbyCities, headline = 'Also Serving Nearby Areas' } = Astro.props;
+const { citySlug, headline = 'Also Serving Nearby Areas' } = Astro.props;
+const nearbyCities = getNearbyCities(citySlug);
 ---
 
 <section class="v2-nearby">

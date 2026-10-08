@@ -45,14 +45,17 @@ const FLOOR_360 = 0.95;
  * These are the five smoke samples plus the pages that measured worst before QS-4,
  * so the regressions this wave actually fixed each have a check with their name on
  * it.
+ *
+ * 2026-10-08 city stage 1: /pasadena/dryer-repair/ and /hollywood/dishwasher-repair/ were retired (301 to the city hub) with 186 other dead city × service pages; the city_service samples moved to surviving combos
+ * (/los-angeles/refrigerator-repair/, /burbank/cooktop-repair/).
  */
 const FOLD_ANCHORS = [
-  '/pasadena/dryer-repair/',
+  '/los-angeles/refrigerator-repair/',
   '/brands/lg-washer-repair/',
   '/services/refrigerator-repair/',
   '/commercial/mixer-repair/',
   '/outdoor/grill-repair/',
-  '/hollywood/dishwasher-repair/',
+  '/burbank/cooktop-repair/',
   '/commercial/refrigeration/brands/continental/',
   '/commercial/refrigeration/brands/perlick/',
   '/outdoor/smoker-repair/brands/',

@@ -12,8 +12,20 @@ import CountyMap from '../components/CountyMap.astro';
 import { BRANCHES, type Branch, toE164 } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { mergeCredentials } from '../data/credentials-schema';
+import { CITIES } from '../data/cities';
+import { cityDisplayName } from '../lib/nearby';
 
-const title = "Appliance Repair San Diego County CA | Same Day";
+// City stage 1 (2026-10-08): the city grid, the counts and the FAQ city list come from
+// cities.ts — the hand-written grid had drifted (missing cities, a neighbouring county's
+// city). The main city hub (La Jolla) is listed first and linked from the hero so this
+// county page stops competing with it for the city's own searches.
+const countyCities = CITIES.filter((c) => c.county === 'san-diego')
+  .map((c) => ({ slug: c.slug, name: cityDisplayName(c) }))
+  .sort((a, b) => (a.slug === 'la-jolla' ? -1 : b.slug === 'la-jolla' ? 1 : a.name.localeCompare(b.name)));
+const cityCount = countyCities.length;
+const cityListText = countyCities.map((c) => c.name).join(', ');
+
+const title = `Appliance Repair in San Diego County, CA | ${cityCount} Cities`;
 const description = "Appliance repair on San Diego's North Coastal corridor — La Jolla, Carlsbad, Del Mar, Rancho Santa Fe. $89 diagnostic. (858) 667-7237.";
 
 const activeBranches = BRANCHES.filter((b) => b.phoneStatus === 'active');
@@ -98,6 +110,8 @@ const faqSchema = {
     .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
     .hero h1 { font-size: clamp(30px, 4vw, 50px); font-weight: 700; line-height: 1.1; margin-bottom: 18px; letter-spacing: -.02em; max-width: 760px; color: #fff; }
     .hero-sub { font-size: 18px; color: rgba(255,255,255,.85); margin-bottom: 32px; max-width: 620px; line-height: 1.65; }
+    .hero-city { font-size: 16px; color: rgba(255,255,255,.85); margin: -18px 0 28px; }
+    .hero-city a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
     .btn-red { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; }
     .btn-outline { border: 1.5px solid rgba(255,255,255,.3); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; }
@@ -180,14 +194,15 @@ const faqSchema = {
   <div class="hero-overlay"></div>
   <div class="hero-inner">
     <p class="hero-eyebrow">San Diego County · North Coastal Corridor · Residential + Commercial · Same Day</p>
-    <h1>Appliance Repair on San Diego's North Coast</h1>
+    <h1>Appliance Repair in San Diego County, CA</h1>
     <p class="hero-sub">La Jolla to Carlsbad — the coastal corridor and the Rancho Santa Fe estate belt. A dedicated San Diego branch, not a truck sent down from LA.</p>
+    <p class="hero-city">Looking for La Jolla? <a href="/la-jolla/">La Jolla appliance repair →</a></p>
     <div class="hero-ctas">
       <a href="tel:+18586677237" class="btn-red">☎ (858) 667-7237</a>
       <a href="/book/" class="btn-outline">Book Online</a>
     </div>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">Coastal Communities</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">{cityCount}</div><div class="hero-stat-label">Coastal Communities</div></div>
       <div class="hero-stat"><div class="hero-stat-num">$89</div><div class="hero-stat-label">Diagnostic · Waived With Repair</div></div>
     </div>
   </div>
@@ -228,15 +243,12 @@ const faqSchema = {
 <section class="section section-gray">
   <div class="container">
     <p class="sl">Service Areas</p>
-    <h2>6 communities on the corridor</h2>
+    <h2>{cityCount} communities on the corridor</h2>
     <p class="lead">City pages for La Jolla, Rancho Santa Fe, and Carlsbad are live — the rest of the corridor is covered by the same branch.</p>
     <div class="cities-grid">
-      <a href="/la-jolla/" class="city-link">La Jolla <span class="city-arrow">→</span></a>
-      <a href="/rancho-santa-fe/" class="city-link">Rancho Santa Fe <span class="city-arrow">→</span></a>
-      <a href="/carlsbad/" class="city-link">Carlsbad <span class="city-arrow">→</span></a>
-      <a href="/del-mar/" class="city-link">Del Mar <span class="city-arrow">→</span></a>
-      <a href="/encinitas/" class="city-link">Encinitas &amp; Cardiff <span class="city-arrow">→</span></a>
-      <a href="/solana-beach/" class="city-link">Solana Beach <span class="city-arrow">→</span></a>
+      {countyCities.map((c) => (
+        <a href={`/${c.slug}/`} class="city-link">{c.name} <span class="city-arrow">→</span></a>
+      ))}
     </div>
   </div>
 </section>
@@ -322,7 +334,7 @@ const faqSchema = {
         <tr><td>Commercial diagnostic</td><td class="price-val">$120</td><td>Applied to repair</td></tr>
       </tbody>
     </table>
-    <p class="pricing-note">Written estimate before we start. Invoice matches the estimate. OEM parts. 90-day warranty.</p>
+    <p class="pricing-note">Written estimate before we start. Invoice matches the estimate. OEM parts. 90-day warranty on parts and labor.</p>
   </div>
 </section>
 

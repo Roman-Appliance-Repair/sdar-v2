@@ -2,10 +2,23 @@
 /** CityLayoutV2 — Layout for v2 city pages.
  *  Reuses existing Layout.astro for Notification bar, MainNav, Breadcrumbs, Footer
  *  (all 87 city pages share the same site chrome).
- *  This layout adds v2 design tokens + a slot for the page body. */
+ *  This layout adds v2 design tokens + a slot for the page body.
+ *
+ *  City stage 1 (2026-10-08) — JSON-LD for every city hub is finalised HERE, once,
+ *  instead of by hand in 99 pages:
+ *   - the business is a service-area business FOR THIS CITY: areaServed carries the
+ *     city as a `City`, and `address` is city-level only (no street, and never
+ *     another city's locality). 18 neighborhood pages used `Place` for their own
+ *     name, so mergeCredentials() fell back to the West Hollywood locality + ZIP —
+ *     the guard below makes that impossible for any page, whatever it passes in;
+ *   - a `Service` node (serviceType "Appliance repair", provider = the business,
+ *     areaServed = the city) is emitted next to it.
+ *  No Review / AggregateRating markup is added (owner rule). */
 
 import '../styles/v2-tokens.css';
 import Layout from './Layout.astro';
+import { CITIES, COUNTIES } from '../data/cities';
+import { cityDisplayName } from '../lib/nearby';
 
 export interface Props {
   title: string;
@@ -23,12 +36,65 @@ const telDigits = rawTel.replace(/\D/g, '').replace(/^1/, '');
 const stickyPhone = telDigits.length === 10
   ? `(${telDigits.slice(0, 3)}) ${telDigits.slice(3, 6)}-${telDigits.slice(6)}`
   : undefined;
+
+type Node = Record<string, unknown>;
+const citySlug = new URL(canonical).pathname.replace(/^\/|\/$/g, '');
+const city = CITIES.find((c) => c.slug === citySlug);
+
+let businessSchema: Node | undefined = localBusinessSchema ? { ...localBusinessSchema } : undefined;
+let serviceSchema: Node | undefined;
+
+if (businessSchema && city) {
+  const served = businessSchema['areaServed'];
+  const servedArr: Node[] = Array.isArray(served) ? [...(served as Node[])] : served ? [served as Node] : [];
+  const cityEntry = servedArr.find((x) => x && x['@type'] === 'City' && x['name']);
+  const cityName = cityEntry ? String(cityEntry['name']) : cityDisplayName(city);
+  if (!cityEntry) servedArr.unshift({ '@type': 'City', name: cityName });
+  businessSchema['areaServed'] = servedArr;
+
+  // Service-area business: city-level address of THIS city, never a street line and
+  // never a borrowed locality. A page that already carries exactly that keeps it.
+  const addr = businessSchema['address'] as Node | undefined;
+  if (!addr || addr['streetAddress'] || addr['addressLocality'] !== cityName) {
+    businessSchema['address'] = {
+      '@type': 'PostalAddress',
+      addressLocality: cityName,
+      addressRegion: 'CA',
+      addressCountry: 'US'
+    };
+  }
+  if (!businessSchema['@id']) businessSchema['@id'] = `${canonical}#business`;
+
+  serviceSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${canonical}#service`,
+    serviceType: 'Appliance repair',
+    name: `Appliance repair in ${cityName}, CA`,
+    url: canonical,
+    provider: {
+      '@type': businessSchema['@type'],
+      '@id': businessSchema['@id'],
+      name: businessSchema['name'],
+      telephone: businessSchema['telephone'],
+      url: canonical
+    },
+    areaServed: {
+      '@type': 'City',
+      name: cityName,
+      containedInPlace: { '@type': 'AdministrativeArea', name: `${COUNTIES[city.county].name}, CA` }
+    }
+  };
+}
 ---
 
 <Layout title={title} description={description} canonical={canonical} stickyPhone={stickyPhone}>
   <Fragment slot="head-scripts">
-    {localBusinessSchema && (
-      <script type="application/ld+json" set:html={JSON.stringify(localBusinessSchema)} />
+    {businessSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(businessSchema)} />
+    )}
+    {serviceSchema && (
+      <script type="application/ld+json" set:html={JSON.stringify(serviceSchema)} />
     )}
   </Fragment>
   <slot />

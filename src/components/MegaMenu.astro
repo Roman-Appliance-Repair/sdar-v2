@@ -102,7 +102,10 @@ const COUNTY_ORDER = [
   'ventura',
   'santa-barbara',
   'san-bernardino',
-  'riverside'
+  'riverside',
+  // 2026-10-08 city stage 1: San Diego County's six city hubs (Carlsbad, Del Mar,
+  // Encinitas, La Jolla, Rancho Santa Fe, Solana Beach) were live but absent here.
+  'san-diego'
 ] as const;
 
 const countiesWithBranches = COUNTY_ORDER.map((countySlug) => {
@@ -111,6 +114,10 @@ const countiesWithBranches = COUNTY_ORDER.map((countySlug) => {
     .filter((b) => b.primaryCounty === countySlug)
     .map((b) => ({
       slug: b.slug,
+      // Branch header link: the branch city's own hub when it has one; San Diego's
+      // branch has no /san-diego/ page (city of San Diego is not served yet), so its
+      // header points at the county hub instead of a 404.
+      href: existingSlugs.has(b.slug) ? `/${b.slug}/` : county.hubUrl,
       displayCity: b.displayCity,
       phone: b.phone,
       cities: CITIES
@@ -156,7 +163,7 @@ const diagnosticFee = isCommercialFee ? '$120' : '$89';
 type Link = { label: string; href: string };
 type Column = { title?: string; links?: Link[]; html?: string };
 type AreasCity = { slug: string; name: string };
-type AreasBranch = { slug: string; displayCity: string; phone: string; cities: AreasCity[] };
+type AreasBranch = { slug: string; href: string; displayCity: string; phone: string; cities: AreasCity[] };
 type AreasCounty = { name: string; hubUrl: string; branches: AreasBranch[] };
 type PriceCell = { label: string; href: string; exists: boolean };
 type Panel =
@@ -426,7 +433,7 @@ const menu: Array<{ label: string; href: string; panel: Panel }> = [
                   {county.branches.map((branch) => (
                     <div class="branch-block">
                       <div class="branch-header">
-                        <a href={`/${branch.slug}/`} class="branch-name">{branch.displayCity} Branch</a>
+                        <a href={branch.href} class="branch-name">{branch.displayCity} Branch</a>
                         <a href={`tel:+1${branch.phone.replace(/\D/g, '')}`} class="branch-phone">{branch.phone}</a>
                       </div>
                       {branch.cities.length > 0 && (

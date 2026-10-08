@@ -6,8 +6,20 @@ import CountyMap from '../components/CountyMap.astro';
 import { BRANCHES, type Branch, toE164 } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { mergeCredentials } from '../data/credentials-schema';
+import { CITIES } from '../data/cities';
+import { cityDisplayName } from '../lib/nearby';
 
-const title = "Appliance Repair Ventura County CA | Same Day Service";
+// City stage 1 (2026-10-08): the city grid, the counts and the FAQ city list come from
+// cities.ts — the hand-written grid had drifted (missing cities, a neighbouring county's
+// city). The main city hub (Ventura) is listed first and linked from the hero so this
+// county page stops competing with it for the city's own searches.
+const countyCities = CITIES.filter((c) => c.county === 'ventura')
+  .map((c) => ({ slug: c.slug, name: cityDisplayName(c) }))
+  .sort((a, b) => (a.slug === 'ventura' ? -1 : b.slug === 'ventura' ? 1 : a.name.localeCompare(b.name)));
+const cityCount = countyCities.length;
+const cityListText = countyCities.map((c) => c.name).join(', ');
+
+const title = `Appliance Repair in Ventura County, CA | ${cityCount} Cities`;
 const description = "Appliance repair across Ventura County — Thousand Oaks, Westlake Village, Camarillo, Simi Valley and more. $89 diagnostic. (424) 208-0228.";
 
 const activeBranches = BRANCHES.filter((b) => b.phoneStatus === 'active');
@@ -66,9 +78,9 @@ const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
-    { '@type': 'Question', name: 'Do you offer same day appliance repair across Ventura County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. We cover 9 cities across Ventura County. Call (424) 208-0228 for availability.' } },
+    { '@type': 'Question', name: 'Do you offer same day appliance repair across Ventura County?', acceptedAnswer: { '@type': 'Answer', text: `Yes. We cover ${cityCount} cities across Ventura County. Call (424) 208-0228 for availability.` } },
     { '@type': 'Question', name: 'What is the diagnostic fee for appliance repair in Ventura County?', acceptedAnswer: { '@type': 'Answer', text: '$89 for residential — applied to the repair. $120 for commercial. Quote before we start.' } },
-    { '@type': 'Question', name: 'Which cities do you cover in Ventura County?', acceptedAnswer: { '@type': 'Answer', text: 'Thousand Oaks, Westlake Village, Agoura Hills, Camarillo, Simi Valley, Moorpark, Ventura, Newbury Park, Oak Park.' } },
+    { '@type': 'Question', name: 'Which cities do you cover in Ventura County?', acceptedAnswer: { '@type': 'Answer', text: `${cityListText}.` } },
     { '@type': 'Question', name: 'How fast can you reach my city in Ventura County?', acceptedAnswer: { '@type': 'Answer', text: 'Same day in most cases. Our techs at Same Day Appliance Repair work out of a dedicated Thousand Oaks branch — not a Los Angeles technician driving an hour to reach you — so response across Thousand Oaks, Westlake Village, Camarillo, and Simi Valley is faster than LA-based dispatch. $89 residential diagnostic, waived with repair.' } },
     { '@type': 'Question', name: 'What appliance brands do your Ventura County techs service most?', acceptedAnswer: { '@type': 'Answer', text: 'Westlake Village and Hidden Hills run full Sub-Zero, Wolf, and Thermador kitchens, and our techs at Same Day Appliance Repair carry OEM parts for those; older Thousand Oaks and Newbury Park stock is heavy Whirlpool and GE, while newer homes lean Samsung and LG. $89 residential diagnostic, waived with repair.' } }
   ]
@@ -94,6 +106,8 @@ const faqSchema = {
     .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
     .hero h1 { font-size: clamp(30px, 4vw, 50px); font-weight: 700; line-height: 1.1; margin-bottom: 18px; letter-spacing: -.02em; max-width: 760px; color: #fff; }
     .hero-sub { font-size: 18px; color: rgba(255,255,255,.85); margin-bottom: 32px; max-width: 620px; line-height: 1.65; }
+    .hero-city { font-size: 16px; color: rgba(255,255,255,.85); margin: -18px 0 28px; }
+    .hero-city a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
     .btn-red { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; }
     .btn-outline { border: 1.5px solid rgba(255,255,255,.3); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; }
@@ -178,14 +192,15 @@ const faqSchema = {
   <div class="hero-overlay"></div>
   <div class="hero-inner">
     <p class="hero-eyebrow">Ventura County · Appliance Repair Coverage · Residential + Commercial · Same Day</p>
-    <h1>Appliance Repair Across Ventura County</h1>
+    <h1>Appliance Repair in Ventura County, CA</h1>
     <p class="hero-sub">From Thousand Oaks to Ventura, Westlake Village to Simi Valley — we cover all of Ventura County. Dedicated Thousand Oaks branch. Same day available.</p>
+    <p class="hero-city">Live in the city of Ventura? <a href="/ventura/">Ventura appliance repair →</a></p>
     <div class="hero-ctas">
       <a href="tel:+14242080228" class="btn-red">☎ (424) 208-0228</a>
       <a href="/book/" class="btn-outline">Book Online</a>
     </div>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-num">9</div><div class="hero-stat-label">Cities in Ventura County</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">{cityCount}</div><div class="hero-stat-label">Cities in Ventura County</div></div>
       <div class="hero-stat"><div class="hero-stat-num">$89</div><div class="hero-stat-label">Diagnostic · Waived With Repair</div></div>
     </div>
   </div>
@@ -205,7 +220,7 @@ const faqSchema = {
   <div class="container">
     <p class="sl">Ventura County Service</p>
     <h2>Ventura County is affluent, suburban, and underserved by most appliance companies</h2>
-    <p><strong>When an appliance fails anywhere in Ventura County, our techs at Same Day Appliance Repair dispatch same-day across Thousand Oaks, Westlake Village, and Camarillo and the rest of the county's 9 cities. Our Thousand Oaks branch is dedicated to Ventura County — not a Los Angeles technician driving an hour to reach you — and we factor in the marine layer near Camarillo and Ventura against the dry heat inland. We carry common parts on the truck and quote labor and parts before any work. $89 residential diagnostic, waived with repair. Our techs at Same Day Appliance Repair are BHGS #A49573, EPA 608 Universal certified (#1346255700410).</strong></p>
+    <p><strong>When an appliance fails anywhere in Ventura County, our techs at Same Day Appliance Repair dispatch same-day across Thousand Oaks, Westlake Village, and Camarillo and the rest of the county's {cityCount} cities. Our Thousand Oaks branch is dedicated to Ventura County — not a Los Angeles technician driving an hour to reach you — and we factor in the marine layer near Camarillo and Ventura against the dry heat inland. We carry common parts on the truck and quote labor and parts before any work. $89 residential diagnostic, waived with repair. Our techs at Same Day Appliance Repair are BHGS #A49573, EPA 608 Universal certified (#1346255700410).</strong></p>
     <div class="body-text"><p>Ventura County doesn't always get the same service coverage as LA County or Orange County, despite having one of the highest median household incomes in California. Thousand Oaks and Westlake Village have a concentration of luxury appliances — Sub-Zero, Wolf, Thermador, Viking — that many appliance repair companies either can't service or won't travel to service.</p>
         <p>Our Thousand Oaks branch at (424) 208-0228 is dedicated to Ventura County. This isn't a Los Angeles technician driving an hour to reach you — it's a branch that operates specifically in this market. Same day appliance repair in Ventura County is our core offering here, not an afterthought.</p>
         <p>The county's housing stock is predominantly single-family suburban — Thousand Oaks and Newbury Park built heavily through the 1980s and 1990s, Camarillo with a mix of older and newer construction, Simi Valley with large family homes. Significant Whirlpool and GE in older stock, Samsung and LG in newer. And in Westlake Village and Hidden Hills, full Sub-Zero and Wolf kitchens are common.</p></div>
@@ -224,18 +239,12 @@ const faqSchema = {
 <section class="section section-gray">
   <div class="container">
     <p class="sl">Service Areas</p>
-    <h2>9 cities across Ventura County</h2>
+    <h2>{cityCount} cities across Ventura County</h2>
     <p class="lead">Click any city for specific service information, neighborhoods, recent repairs, and local pricing.</p>
     <div class="cities-grid">
-      <a href="/thousand-oaks/" class="city-link">Thousand Oaks <span class="city-arrow">→</span></a>
-      <a href="/westlake-village/" class="city-link">Westlake Village <span class="city-arrow">→</span></a>
-      <a href="/agoura-hills/" class="city-link">Agoura Hills <span class="city-arrow">→</span></a>
-      <a href="/camarillo/" class="city-link">Camarillo <span class="city-arrow">→</span></a>
-      <a href="/simi-valley/" class="city-link">Simi Valley <span class="city-arrow">→</span></a>
-      <a href="/moorpark/" class="city-link">Moorpark <span class="city-arrow">→</span></a>
-      <a href="/ventura/" class="city-link">Ventura <span class="city-arrow">→</span></a>
-      <a href="/newbury-park/" class="city-link">Newbury Park <span class="city-arrow">→</span></a>
-      <a href="/oak-park/" class="city-link">Oak Park <span class="city-arrow">→</span></a>
+      {countyCities.map((c) => (
+        <a href={`/${c.slug}/`} class="city-link">{c.name} <span class="city-arrow">→</span></a>
+      ))}
     </div>
   </div>
 </section>
@@ -323,7 +332,7 @@ const faqSchema = {
         <tr><td>Diagnostic fee</td><td class="price-val">$89</td><td>Applied to repair</td></tr>
       </tbody>
     </table>
-    <p class="pricing-note">Quote before we start. Invoice matches the quote. OEM parts. 90-day warranty.</p>
+    <p class="pricing-note">Quote before we start. Invoice matches the quote. OEM parts. 90-day warranty on parts and labor.</p>
   </div>
 </section>
 
@@ -333,13 +342,13 @@ const faqSchema = {
     <h2>Questions about appliance repair in Ventura County</h2>
     <div class="faq-list">
       
-      <div class="faq-item"><div class="faq-q">Do you offer same day appliance repair across Ventura County?</div><div class="faq-a">Yes. We cover 9 cities across Ventura County. Call (424) 208-0228 for availability in your city.</div></div>
+      <div class="faq-item"><div class="faq-q">Do you offer same day appliance repair across Ventura County?</div><div class="faq-a">Yes. We cover {cityCount} cities across Ventura County. Call (424) 208-0228 for availability in your city.</div></div>
       <div class="faq-item"><div class="faq-q">What is the diagnostic fee for appliance repair in Ventura County?</div><div class="faq-a">$89 for residential appliances — applied to the repair the moment you approve the work. For commercial it's $120. Quote before we start.</div></div>
       <div class="faq-item"><div class="faq-q">Do you repair Sub-Zero, Wolf, and Thermador in Ventura County?</div><div class="faq-a">Yes. We service all luxury appliance brands with OEM parts. These brands are common in the higher-income communities of Ventura County.</div></div>
-      <div class="faq-item"><div class="faq-q">Which cities do you cover in Ventura County?</div><div class="faq-a">Thousand Oaks, Westlake Village, Agoura Hills, Camarillo, Simi Valley, Moorpark, Ventura, Newbury Park, Oak Park.</div></div>
+      <div class="faq-item"><div class="faq-q">Which cities do you cover in Ventura County?</div><div class="faq-a">{cityListText}.</div></div>
       <div class="faq-item"><div class="faq-q">Do you offer commercial appliance repair in Ventura County?</div><div class="faq-a">Yes. Restaurants, hotels, property managers — $120 commercial diagnostic, same day available, COI on request. Call (424) 208-0228.</div></div>
       <div class="faq-item"><div class="faq-q">What appliance brands do you repair in Ventura County?</div><div class="faq-a">All brands: Samsung, LG, GE, Whirlpool, Frigidaire, Maytag, KitchenAid, Bosch, Electrolux, and all luxury brands including Sub-Zero, Wolf, Thermador, Miele, Viking, Gaggenau, JennAir, and Dacor.</div></div>
-      <div class="faq-item"><div class="faq-q">What warranty do you provide on appliance repairs in Ventura County?</div><div class="faq-a">90 days on parts and labor. OEM parts used wherever available. We use your manufacturer warranty rather than voiding it.</div></div>
+      <div class="faq-item"><div class="faq-q">What warranty do you provide on appliance repairs in Ventura County?</div><div class="faq-a">A 90-day warranty on parts and labor. OEM parts used wherever available. We use your manufacturer warranty rather than voiding it.</div></div>
       <div class="faq-item"><div class="faq-q">How fast can you reach my city in Ventura County?</div><div class="faq-a">Same day in most cases. Our techs at Same Day Appliance Repair work out of a dedicated Thousand Oaks branch — not a Los Angeles technician driving an hour to reach you — so response across Thousand Oaks, Westlake Village, Camarillo, and Simi Valley is faster than LA-based dispatch. $89 residential diagnostic, waived with repair.</div></div>
       <div class="faq-item"><div class="faq-q">What appliance brands do your Ventura County techs service most?</div><div class="faq-a">Westlake Village and Hidden Hills run full Sub-Zero, Wolf, and Thermador kitchens, and our techs at Same Day Appliance Repair carry OEM parts for those; older Thousand Oaks and Newbury Park stock is heavy Whirlpool and GE, while newer homes lean Samsung and LG. $89 residential diagnostic, waived with repair.</div></div>
 
@@ -366,7 +375,7 @@ const faqSchema = {
 <section class="bottom-cta">
   <div class="container">
     <h2>Appliance repair anywhere in Ventura County</h2>
-    <p>9 cities. Same day available. $89 diagnostic applied to repair.</p>
+    <p>{cityCount} cities. Same day available. $89 diagnostic applied to repair.</p>
     <div class="bottom-ctas">
       <a href="tel:+14242080228" class="btn-red">☎ Call (424) 208-0228</a>
       <a href="/contact/" class="btn-outline">Book Online</a>

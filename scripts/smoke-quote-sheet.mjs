@@ -883,13 +883,14 @@ const PAGE_TYPE_CASES = [
     firstHeading: 'Where is the appliance?',
   },
   {
-    url: '/pasadena/dryer-repair/',
+    // 2026-10-08 city stage 1: /pasadena/dryer-repair/ and /hollywood/dishwasher-repair/ were retired (301 to the city hub) with 186 other dead city × service pages; the city_service samples moved to surviving combos.
+    url: '/los-angeles/refrigerator-repair/',
     label: 'city x service',
     pageType: 'city_service',
     counter: '1 / 5',
-    firstHeading: 'Is it your Dryer?',
+    firstHeading: 'Is it your Refrigerator?',
     primary: "Yes, that's it",
-    prefillLabel: 'Dryer',
+    prefillLabel: 'Refrigerator',
     tiles: 16,
   },
   {
@@ -1046,7 +1047,7 @@ async function prefillPayloadLeg(browser, base, { override }) {
     await route.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' });
   });
 
-  await page.goto(`${base}/pasadena/dryer-repair/`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${base}/los-angeles/refrigerator-repair/`, { waitUntil: 'domcontentloaded' });
   await clickBookLink(page);
   await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 5000 });
 
@@ -1072,9 +1073,10 @@ async function prefillPayloadLeg(browser, base, { override }) {
   }
 
   await page.click('#qs-primary'); // appliance -> problem
-  // A symptom both the dryer and the dishwasher carry, so the same walk works
-  // whether the visitor kept our guess or replaced it.
-  await (await tileByText(page, "Won't start")).click();
+  // A symptom both the refrigerator and the dishwasher carry, so the same walk works
+  // whether the visitor kept our guess or replaced it. (Was "Won't start" while the
+  // sample page was the retired /pasadena/dryer-repair/; the refrigerator has no such tile.)
+  await (await tileByText(page, 'Noisy')).click();
   await page.click('#qs-primary'); // problem -> photos
   await page.click('#qs-primary'); // photos  -> price
   await page.click('#qs-primary'); // price   -> contact
@@ -1100,8 +1102,8 @@ async function prefillPayloadLeg(browser, base, { override }) {
       String(p.appliance_changed)
     );
     expect(
-      `${label}: appliance is ${override ? 'dishwasher' : 'dryer'}`,
-      p.appliance === (override ? 'dishwasher' : 'dryer'),
+      `${label}: appliance is ${override ? 'dishwasher' : 'refrigerator'}`,
+      p.appliance === (override ? 'dishwasher' : 'refrigerator'),
       String(p.appliance)
     );
   }
@@ -1122,7 +1124,7 @@ async function resumeBeatsContextLeg(browser, base) {
   await page.route('**maps.googleapis.com/**', (r) => r.abort());
   await page.route('**/api/contact', (r) => r.fulfill({ status: 200, contentType: 'application/json', body: '{"ok":true}' }));
 
-  await page.goto(`${base}/pasadena/dryer-repair/`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${base}/los-angeles/refrigerator-repair/`, { waitUntil: 'domcontentloaded' });
   await clickBookLink(page);
   await page.waitForSelector('dialog#quote-sheet[open]', { timeout: 5000 });
   await (await tileByText(page, 'Microwave')).click();
@@ -1163,7 +1165,7 @@ async function bookLinkNoJsLeg(browser, base) {
   console.log(`\n[${label}]`);
   const ctx = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
   const page = await ctx.newPage();
-  await page.goto(`${base}/pasadena/dryer-repair/`, { waitUntil: 'domcontentloaded' });
+  await page.goto(`${base}/los-angeles/refrigerator-repair/`, { waitUntil: 'domcontentloaded' });
   await clickBookLink(page);
   await page.waitForLoadState('domcontentloaded');
   expect(`${label}: navigates to /book/`, new URL(page.url()).pathname === '/book/', page.url());
@@ -1388,12 +1390,12 @@ const AID3_CASES = [
     step: 3,
   },
   {
-    url: '/pasadena/dryer-repair/',
+    url: '/los-angeles/refrigerator-repair/',
     label: 'city service',
-    placeholder: 'My dryer: not heating…',
-    heading: 'Dryer acting up?',
+    placeholder: 'My refrigerator: not cooling…',
+    heading: 'Refrigerator acting up?',
     category: 'Home Appliances',
-    appliance: 'Dryer',
+    appliance: 'Refrigerator',
     brand: null,
     step: 3,
   },

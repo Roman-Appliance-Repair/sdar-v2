@@ -1,40 +1,88 @@
 ---
-/** v2 ReviewsBlock — 3 testimonials. No ratings of any kind: no aggregateRating,
- *  and no per-review star glyphs either (removed 2026-09-02). `stars` stays on the
- *  Testimonial interface only so the existing page data keeps type-checking. */
+/** v2 ReviewsBlock — REAL customer reviews only (city stage 1, 2026-10-08).
+ *
+ *  Every review comes from src/data/reviews-hcp.ts (Housecall Pro review e-mails,
+ *  matched to the customer record). Pages no longer pass testimonials in: the 246
+ *  unsourced, undated quotes that used to live in the city pages were removed.
+ *
+ *  Two ways to call it:
+ *   - city hub: `citySlug` + `cityName` — selection by src/lib/reviews.ts (own city
+ *     first, then nearby customers whose city has no page; with none of its own the
+ *     page shows up to 3 reviews from the nearest customers under a "nearby" heading).
+ *     Nothing within 40 miles → the section is not rendered.
+ *   - county hub: `reviews` + `headline` (+ `sub`) passed explicitly.
+ *  Each card: verbatim quote, then "— Name, Real city · Month YYYY · Housecall Pro
+ *  review". The city printed is always the customer's real city.
+ *
+ *  No ratings of any kind: no stars, no aggregateRating, no Review markup.
+ *  Colours fall back to literals so the block also renders on the county hubs, which
+ *  do not load v2-tokens.css. */
+import type { HcpReview } from '../../../data/reviews-hcp';
+import { reviewMonth } from '../../../data/reviews-hcp';
+import { reviewsForCity } from '../../../lib/reviews';
 
-export interface Testimonial { stars?: number; text: string; author: string; }
 export interface Props {
-  cityName: string;
-  testimonials: Testimonial[];
-  /** Optional override of the default H2 ("What People in {cityName} Say About Us"). */
+  citySlug?: string;
+  cityName?: string;
+  reviews?: HcpReview[];
   headline?: string;
+  sub?: string;
 }
 
-const { cityName, testimonials, headline } = Astro.props;
-const finalHeadline = headline ?? `What People in ${cityName} Say About Us`;
+const props = Astro.props;
+let reviews: HcpReview[] = props.reviews ?? [];
+let headline = props.headline ?? '';
+let sub = props.sub ?? '';
+
+if (props.citySlug) {
+  const picked = reviewsForCity(props.citySlug);
+  reviews = picked.reviews;
+  const city = props.cityName ?? '';
+  if (picked.mode === 'own') {
+    headline = `What ${city} customers say`;
+    sub = 'Quoted word for word from the reviews customers left on Housecall Pro after the job.';
+  } else if (picked.mode === 'mixed') {
+    headline = `What customers in and around ${city} say`;
+    sub = 'Quoted word for word from Housecall Pro reviews. Each one is labelled with the city the customer lives in.';
+  } else {
+    headline = 'What customers nearby say';
+    sub = `These reviews come from customers in nearby cities, not from ${city} — each is labelled with its real city and quoted word for word from Housecall Pro.`;
+  }
+}
 ---
 
-<section class="v2-reviews">
-  <div class="v2-container">
-    <h2 class="v2-section-title">{finalHeadline}</h2>
-    <div class="v2-reviews__grid">
-      {testimonials.map((t) => (
-        <article class="v2-reviews__card">
-          <p class="v2-reviews__text" set:html={t.text}></p>
-          <div class="v2-reviews__author">{t.author}</div>
-        </article>
-      ))}
+{reviews.length > 0 && (
+  <section class="v2-reviews">
+    <div class="v2-reviews__inner">
+      <h2 class="v2-reviews__title">{headline}</h2>
+      {sub && <p class="v2-reviews__sub">{sub}</p>}
+      <div class="v2-reviews__grid">
+        {reviews.map((r) => (
+          <figure class="v2-reviews__card">
+            <blockquote class="v2-reviews__text">“{r.text}”</blockquote>
+            <figcaption class="v2-reviews__author">
+              {r.appliance && <span class="v2-reviews__appliance">{r.appliance}</span>}
+              — {r.name}, {r.place} · {reviewMonth(r)} · Housecall Pro review
+            </figcaption>
+          </figure>
+        ))}
+      </div>
     </div>
-  </div>
-</section>
+  </section>
+)}
 
 <style>
-  .v2-reviews { padding: 72px 0; background: var(--v2-gray); }
-  .v2-section-title {
-    font-family: var(--v2-font-display);
-    font-size: 30px; font-weight: 700; color: var(--v2-black);
-    margin: 0 0 40px; text-align: center;
+  .v2-reviews { padding: 72px 0; background: var(--v2-gray, #f5f5f5); }
+  .v2-reviews__inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+  .v2-reviews__title {
+    font-family: var(--v2-font-display, Georgia, serif);
+    font-size: 30px; font-weight: 700; color: var(--v2-black, #0a0a0a);
+    margin: 0 0 10px; text-align: center;
+  }
+  .v2-reviews__sub {
+    font-family: var(--v2-font-body, -apple-system, sans-serif);
+    font-size: 14px; color: var(--v2-muted, #6b6b6b);
+    text-align: center; max-width: 680px; margin: 0 auto 36px; line-height: 1.6;
   }
   .v2-reviews__grid {
     display: grid;
@@ -42,16 +90,22 @@ const finalHeadline = headline ?? `What People in ${cityName} Say About Us`;
     gap: 20px;
   }
   .v2-reviews__card {
-    background: var(--v2-white);
-    border: 1px solid var(--v2-border);
+    margin: 0;
+    background: var(--v2-white, #fff);
+    border: 1px solid var(--v2-border, #e2e2e2);
     border-radius: 12px;
     padding: 28px;
-    font-family: var(--v2-font-body);
+    font-family: var(--v2-font-body, -apple-system, sans-serif);
+    display: flex; flex-direction: column; justify-content: space-between;
   }
   .v2-reviews__text {
-    font-size: 14px; color: var(--v2-text); line-height: 1.7;
+    font-size: 14px; color: var(--v2-text, #1a1a1a); line-height: 1.7;
     margin: 0 0 16px; font-style: italic;
   }
-  .v2-reviews__author { font-size: 13px; color: var(--v2-muted); font-weight: 500; }
+  .v2-reviews__author { font-size: 13px; color: var(--v2-muted, #6b6b6b); font-weight: 500; line-height: 1.5; }
+  .v2-reviews__appliance {
+    display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--v2-red, #c8102e); margin-bottom: 4px;
+  }
   @media (max-width: 1024px) { .v2-reviews__grid { grid-template-columns: 1fr; } }
 </style>

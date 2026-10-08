@@ -1,0 +1,76 @@
+---
+/** WhereWeWork — every city hub, grouped by county (city stage 1, 2026-10-08).
+ *
+ *  ONE component, fed only from src/data/cities.ts, so a city added there shows up on
+ *  every page that carries the block. Used on the residential /services/<x>/ hubs
+ *  (near the bottom, above the FAQ) and on the homepage. Anchor = the city name.
+ *  The county name heads each group and links to its county hub.
+ *  Self-contained styles: the host pages do not share a stylesheet. */
+import { CITIES, COUNTIES, type CountySlug } from '../data/cities';
+import { cityDisplayName } from '../lib/nearby';
+
+export interface Props {
+  headline?: string;
+  intro?: string;
+  /** Render inside a host section (homepage): no own padding/background, H3 title. */
+  bare?: boolean;
+}
+
+const {
+  headline = 'Where we work',
+  intro = 'Same-day appliance repair across seven Southern California counties. Pick your city for local details.',
+  bare = false
+} = Astro.props;
+const Title = bare ? 'h3' : 'h2';
+
+const ORDER: CountySlug[] = ['los-angeles', 'orange', 'ventura', 'santa-barbara', 'san-bernardino', 'riverside', 'san-diego'];
+const groups = ORDER.map((county) => ({
+  county,
+  name: COUNTIES[county].name,
+  hubUrl: COUNTIES[county].hubUrl,
+  cities: CITIES
+    .filter((c) => c.county === county)
+    .map((c) => ({ slug: c.slug, name: cityDisplayName(c) }))
+    .sort((a, b) => a.name.localeCompare(b.name))
+}));
+---
+
+<section class:list={['www', { 'www--bare': bare }]} aria-labelledby="www-title">
+  <div class="www__inner">
+    <Title class="www__title" id="www-title">{headline}</Title>
+    <p class="www__intro">{intro}</p>
+    <div class="www__grid">
+      {groups.map((g) => (
+        <div class:list={["www__county", { "www__county--wide": g.cities.length > 20 }]}>
+          <h3 class="www__county-name"><a href={g.hubUrl}>{g.name}</a></h3>
+          <ul class="www__list">
+            {g.cities.map((c) => (
+              <li><a href={`/${c.slug}/`}>{c.name}</a></li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .www { padding: 56px 24px; background: #fafafa; border-top: 1px solid #e2e2e2; }
+  .www__inner { max-width: 1100px; margin: 0 auto; }
+  .www--bare { padding: 0; background: transparent; border-top: 0; margin-top: 28px; }
+  .www--bare .www__title { font-size: 18px; }
+  .www__title { font-size: clamp(22px, 2.8vw, 30px); font-weight: 700; line-height: 1.2; margin: 0 0 8px; color: #0a0a0a; }
+  .www__intro { font-size: 15px; line-height: 1.6; color: #6b6b6b; margin: 0 0 28px; max-width: 680px; }
+  .www__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 28px 32px; }
+  .www__county-name { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; margin: 0 0 10px; padding-bottom: 6px; border-bottom: 2px solid #C8102E; }
+  .www__county-name a { color: #0a0a0a; text-decoration: none; }
+  .www__county-name a:hover { color: #C8102E; }
+  .www__list { list-style: none; margin: 0; padding: 0; columns: 2; column-gap: 16px; }
+  .www__list li { font-size: 14px; line-height: 1.5; margin: 0 0 6px; break-inside: avoid; }
+  .www__list a { color: #1a1a1a; text-decoration: none; }
+  .www__list a:hover { color: #C8102E; text-decoration: underline; }
+  .www__county--wide { grid-column: 1 / -1; }
+  .www__county--wide .www__list { columns: 4; }
+  @media (max-width: 900px) { .www__county--wide .www__list { columns: 3; } }
+  @media (max-width: 560px) { .www__county--wide .www__list { columns: 2; } }
+</style>

@@ -1,28 +1,57 @@
 ---
-/** v2 ServiceLinksGrid — the city's service-specific pages as one compact grid.
+/** v2 ServiceLinksGrid — the city hub's "by service" links as one compact grid.
  *
- *  Replaces the legacy pattern of three near-identical "Tier 1 / Tier 2 / Tier 3"
- *  sections, each with its own intro paragraph and a bulleted list, stacked with
- *  ~48px of padding apiece. Same links, one section, no dead whitespace.
+ *  City stage 1 (2026-10-08): the links are no longer passed in by hand. 188 of the
+ *  200 city × service pages were retired (301 → city hub, see LIVE_COMBOS in
+ *  src/data/city-service-matrix.ts), so a hand-written list of 15 combo URLs would
+ *  now be 15 links into redirects. For each of the 15 residential services the grid
+ *  links the city's own page when it is still live ("Wall oven repair in Burbank"),
+ *  otherwise the general service guide ("Wall oven repair" → /services/…/). The copy
+ *  only claims city-specific pages when at least one is actually linked.
  *
- *  Link preservation is the whole point — callers pass every link the old sections
- *  carried, in the same order. Nothing here filters.
+ *  Anything passed as children renders under the grid (e.g. a short note).
  */
+import { isLiveCombo } from '../../../data/city-service-matrix';
+
 export interface Props {
+  citySlug: string;
   cityName: string;
-  links: Array<{ name: string; href: string }>;
-  eyebrow?: string;
-  headline?: string;
-  intro?: string;
 }
 
-const {
-  cityName,
-  links,
-  eyebrow = `Service-specific pages for ${cityName}`,
-  headline = `${cityName} Appliance Repair by Service`,
-  intro = `Each page covers the brand pool, failure patterns, and pricing that actually apply to ${cityName} home stock and local conditions.`
-} = Astro.props;
+const { citySlug, cityName } = Astro.props;
+
+const SERVICES: Array<[string, string]> = [
+  ['refrigerator-repair', 'Refrigerator repair'],
+  ['washer-repair', 'Washer repair'],
+  ['dryer-repair', 'Dryer repair'],
+  ['dishwasher-repair', 'Dishwasher repair'],
+  ['oven-repair', 'Oven repair'],
+  ['wall-oven-repair', 'Wall oven repair'],
+  ['range-repair', 'Range repair'],
+  ['stove-repair', 'Stove repair'],
+  ['cooktop-repair', 'Cooktop repair'],
+  ['range-hood-repair', 'Range hood repair'],
+  ['microwave-repair', 'Microwave repair'],
+  ['freezer-repair', 'Freezer repair'],
+  ['ice-maker-repair', 'Ice maker repair'],
+  ['wine-cooler-repair', 'Wine cooler repair'],
+  ['garbage-disposal-repair', 'Garbage disposal repair']
+];
+
+const links = SERVICES.map(([slug, label]) =>
+  isLiveCombo(citySlug, slug)
+    ? { name: `${label} in ${cityName}`, href: `/${citySlug}/${slug}/`, local: true }
+    : { name: label, href: `/services/${slug}/`, local: false }
+);
+// City pages first, then the general guides — the city ones are the reason to look here.
+links.sort((a, b) => Number(b.local) - Number(a.local));
+const hasLocal = links.some((l) => l.local);
+
+const eyebrow = hasLocal ? `Service pages for ${cityName}` : 'Appliance repair guides';
+const headline = `${cityName} Appliance Repair by Service`;
+const intro = hasLocal
+  ? `Pages named for ${cityName} cover the brands and failure patterns we see here most. The rest open our general guide for that appliance — the same techs handle all of them in ${cityName}.`
+  : `Each guide covers how the appliance fails, the brands we work on and typical repair costs. The same techs who cover ${cityName} handle every one of them.`;
 ---
 
 <section class="v2-svc">
@@ -32,12 +61,13 @@ const {
     <p class="v2-svc__intro">{intro}</p>
     <div class="v2-svc__grid">
       {links.map((s) => (
-        <a class="v2-svc__card" href={s.href}>
+        <a class:list={['v2-svc__card', { 'is-local': s.local }]} href={s.href}>
           <span>{s.name}</span>
           <span class="v2-svc__arrow">→</span>
         </a>
       ))}
     </div>
+    <slot />
   </div>
 </section>
 
@@ -73,6 +103,7 @@ const {
     color: var(--v2-text); text-decoration: none;
     transition: border-color 150ms var(--ease), transform 150ms var(--ease);
   }
+  .v2-svc__card.is-local { border-color: var(--v2-red); }
   .v2-svc__card:hover { border-color: var(--v2-red); transform: translateY(-1px); }
   .v2-svc__arrow { color: var(--v2-red); font-weight: 700; }
 

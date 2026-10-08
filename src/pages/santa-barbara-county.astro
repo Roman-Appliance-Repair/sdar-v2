@@ -6,8 +6,20 @@ import CountyMap from '../components/CountyMap.astro';
 import { BRANCHES, type Branch, toE164 } from '../data/branches';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { mergeCredentials } from '../data/credentials-schema';
+import { CITIES } from '../data/cities';
+import { cityDisplayName } from '../lib/nearby';
 
-const title = "Appliance Repair Santa Barbara County CA | Same Day";
+// City stage 1 (2026-10-08): the city grid, the counts and the FAQ city list come from
+// cities.ts — the hand-written grid had drifted (missing cities, a neighbouring county's
+// city). The main city hub (Santa Barbara) is listed first and linked from the hero so this
+// county page stops competing with it for the city's own searches.
+const countyCities = CITIES.filter((c) => c.county === 'santa-barbara')
+  .map((c) => ({ slug: c.slug, name: cityDisplayName(c) }))
+  .sort((a, b) => (a.slug === 'santa-barbara' ? -1 : b.slug === 'santa-barbara' ? 1 : a.name.localeCompare(b.name)));
+const cityCount = countyCities.length;
+const cityListText = countyCities.map((c) => c.name).join(', ');
+
+const title = `Appliance Repair in Santa Barbara County, CA | ${cityCount} Cities`;
 const description = "Appliance repair across Santa Barbara County — Santa Barbara, Montecito, Goleta, Carpinteria. $89 diagnostic. (805) 500-0855.";
 
 const activeBranches = BRANCHES.filter((b) => b.phoneStatus === 'active');
@@ -68,7 +80,7 @@ const faqSchema = {
   mainEntity: [
     { '@type': 'Question', name: 'Do you offer same day appliance repair across Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. We cover the South Coast corridor — Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch. Call (805) 500-0855 for availability.' } },
     { '@type': 'Question', name: 'What is the diagnostic fee for appliance repair in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: '$89 for residential — applied to the repair. $120 for commercial. Quote before we start.' } },
-    { '@type': 'Question', name: 'Which communities do you cover in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch — the South Coast corridor from the Carpinteria line to western Goleta.' } },
+    { '@type': 'Question', name: 'Which communities do you cover in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: `${cityListText}.` } },
     { '@type': 'Question', name: 'Do you repair Sub-Zero, Wolf, and Viking in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. The Montecito and Hope Ranch estate belt runs on built-in Sub-Zero refrigeration, Wolf and Viking ranges, and wine cellar cooling — our techs at Same Day Appliance Repair service all of it with OEM parts. $89 residential diagnostic, waived with repair.' } },
     { '@type': 'Question', name: 'Does salt air affect appliances in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Homes on the Mesa, near the harbor, and along the Carpinteria and Summerland coast see condenser coil corrosion faster than inland properties. We inspect coils on every refrigerator call as standard.' } },
     { '@type': 'Question', name: 'Do you offer commercial appliance repair in Santa Barbara County?', acceptedAnswer: { '@type': 'Answer', text: 'Yes. Restaurants, tasting rooms, hotels, property managers — $120 commercial diagnostic, waived with repair, COI on request. Call (805) 500-0855.' } }
@@ -95,6 +107,8 @@ const faqSchema = {
     .hero-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
     .hero h1 { font-size: clamp(30px, 4vw, 50px); font-weight: 700; line-height: 1.1; margin-bottom: 18px; letter-spacing: -.02em; max-width: 760px; color: #fff; }
     .hero-sub { font-size: 18px; color: rgba(255,255,255,.85); margin-bottom: 32px; max-width: 620px; line-height: 1.65; }
+    .hero-city { font-size: 16px; color: rgba(255,255,255,.85); margin: -18px 0 28px; }
+    .hero-city a { color: #fff; font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
     .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
     .btn-red { background: var(--red); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; font-weight: 600; }
     .btn-outline { border: 1.5px solid rgba(255,255,255,.3); color: #fff; padding: 14px 28px; border-radius: 6px; font-size: 15px; }
@@ -178,14 +192,15 @@ const faqSchema = {
   <div class="hero-overlay"></div>
   <div class="hero-inner">
     <p class="hero-eyebrow">Santa Barbara County · Appliance Repair Coverage · Residential + Commercial · Same Day</p>
-    <h1>Appliance Repair Across Santa Barbara County</h1>
+    <h1>Appliance Repair in Santa Barbara County, CA</h1>
     <p class="hero-sub">From Carpinteria through Montecito and Santa Barbara to Goleta — the whole South Coast corridor. Dedicated Santa Barbara branch. Same day available.</p>
+    <p class="hero-city">Live in the city of Santa Barbara? <a href="/santa-barbara/">Santa Barbara appliance repair →</a></p>
     <div class="hero-ctas">
       <a href="tel:+18055000855" class="btn-red">☎ (805) 500-0855</a>
       <a href="/book/" class="btn-outline">Book Online</a>
     </div>
     <div class="hero-stats">
-      <div class="hero-stat"><div class="hero-stat-num">6</div><div class="hero-stat-label">South Coast Communities</div></div>
+      <div class="hero-stat"><div class="hero-stat-num">{cityCount}</div><div class="hero-stat-label">South Coast Communities</div></div>
       <div class="hero-stat"><div class="hero-stat-num">$89</div><div class="hero-stat-label">Diagnostic · Waived With Repair</div></div>
     </div>
   </div>
@@ -226,15 +241,12 @@ const faqSchema = {
 <section class="section section-gray">
   <div class="container">
     <p class="sl">Service Areas</p>
-    <h2>6 communities across the South Coast</h2>
+    <h2>{cityCount} communities across the South Coast</h2>
     <p class="lead">Click any community for specific service information, neighborhoods, recent repairs, and local pricing.</p>
     <div class="cities-grid">
-      <a href="/santa-barbara/" class="city-link">Santa Barbara <span class="city-arrow">→</span></a>
-      <a href="/montecito/" class="city-link">Montecito <span class="city-arrow">→</span></a>
-      <a href="/goleta/" class="city-link">Goleta <span class="city-arrow">→</span></a>
-      <a href="/carpinteria/" class="city-link">Carpinteria <span class="city-arrow">→</span></a>
-      <a href="/summerland/" class="city-link">Summerland <span class="city-arrow">→</span></a>
-      <a href="/hope-ranch/" class="city-link">Hope Ranch <span class="city-arrow">→</span></a>
+      {countyCities.map((c) => (
+        <a href={`/${c.slug}/`} class="city-link">{c.name} <span class="city-arrow">→</span></a>
+      ))}
     </div>
   </div>
 </section>
@@ -322,7 +334,7 @@ const faqSchema = {
         <tr><td>Commercial diagnostic</td><td class="price-val">$120</td><td>Applied to repair</td></tr>
       </tbody>
     </table>
-    <p class="pricing-note">Quote before we start. Invoice matches the quote. OEM parts. 90-day warranty.</p>
+    <p class="pricing-note">Quote before we start. Invoice matches the quote. OEM parts. 90-day warranty on parts and labor.</p>
   </div>
 </section>
 
@@ -334,11 +346,11 @@ const faqSchema = {
       <div class="faq-item"><div class="faq-q">Do you offer same day appliance repair across Santa Barbara County?</div><div class="faq-a">Yes. We cover the South Coast corridor — Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch. Call (805) 500-0855 for availability in your community.</div></div>
       <div class="faq-item"><div class="faq-q">What is the diagnostic fee for appliance repair in Santa Barbara County?</div><div class="faq-a">$89 for residential appliances — applied to the repair the moment you approve the work. For commercial it's $120. Quote before we start. We publish these numbers because almost nobody else on the South Coast does.</div></div>
       <div class="faq-item"><div class="faq-q">Do you repair Sub-Zero, Wolf, and Viking in Santa Barbara County?</div><div class="faq-a">Yes. The Montecito and Hope Ranch estate belt runs on built-in Sub-Zero refrigeration, Wolf and Viking ranges, and wine cellar cooling — our techs service all of it with OEM parts.</div></div>
-      <div class="faq-item"><div class="faq-q">Which communities do you cover in Santa Barbara County?</div><div class="faq-a">Santa Barbara, Montecito, Goleta, Carpinteria, Summerland, and Hope Ranch — the corridor from the Carpinteria line to western Goleta.</div></div>
+      <div class="faq-item"><div class="faq-q">Which communities do you cover in Santa Barbara County?</div><div class="faq-a">{cityListText}.</div></div>
       <div class="faq-item"><div class="faq-q">Does salt air affect appliances in Santa Barbara County?</div><div class="faq-a">Yes. The Mesa, the harbor area, Summerland, and coastal Carpinteria see condenser coil corrosion measurably faster than inland homes. We inspect coils on every refrigerator call as a standard part of diagnostics, not an add-on.</div></div>
       <div class="faq-item"><div class="faq-q">Is the water in Santa Barbara County hard on appliances?</div><div class="faq-a">Yes. The supply blends Cachuma Lake, groundwater, State Water, and desalination, and runs moderately hard to hard. Dishwashers, washers, and ice makers scale at year 3–5 without maintenance. Descaling is cheaper than a new pump.</div></div>
       <div class="faq-item"><div class="faq-q">Do you offer commercial appliance repair in Santa Barbara County?</div><div class="faq-a">Yes. Restaurants, tasting rooms, hotels, property managers — $120 commercial diagnostic, waived with repair, COI on request. Call (805) 500-0855.</div></div>
-      <div class="faq-item"><div class="faq-q">What warranty do you provide on appliance repairs in Santa Barbara County?</div><div class="faq-a">90 days on parts and labor. OEM parts wherever available — which matters more on coastal units, where aftermarket parts corrode faster.</div></div>
+      <div class="faq-item"><div class="faq-q">What warranty do you provide on appliance repairs in Santa Barbara County?</div><div class="faq-a">A 90-day warranty on parts and labor. OEM parts wherever available — which matters more on coastal units, where aftermarket parts corrode faster.</div></div>
     </div>
   </div>
 </section>
