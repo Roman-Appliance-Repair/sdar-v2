@@ -125,7 +125,17 @@ export const CITY_GEO: Record<string, LatLng> = {
   'encinitas':            { lat: 33.0370, lng: -117.2920 },
   'la-jolla':             { lat: 32.8328, lng: -117.2713 },
   'rancho-santa-fe':      { lat: 33.0203, lng: -117.2028 },
-  'solana-beach':         { lat: 32.9912, lng: -117.2711 }
+  'solana-beach':         { lat: 32.9912, lng: -117.2711 },
+
+  // ── City stage 2 (2026-10-08): new hubs, mixed counties ────────────
+  'cypress':              { lat: 33.8170, lng: -118.0373 },
+  'garden-grove':         { lat: 33.7743, lng: -117.9380 },
+  'lakewood':             { lat: 33.8536, lng: -118.1340 },
+  'norwalk':              { lat: 33.9022, lng: -118.0817 },
+  'pico-rivera':          { lat: 33.9831, lng: -118.0967 },
+  'rialto':               { lat: 34.1064, lng: -117.3703 },
+  'santa-clarita':        { lat: 34.3917, lng: -118.5426 },
+  'whittier':             { lat: 33.9792, lng: -118.0328 }
 };
 
 /** Great-circle distance in miles (haversine). */

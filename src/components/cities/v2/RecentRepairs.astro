@@ -1,55 +1,85 @@
 ---
-/** v2 RecentRepairs — 4 job cards with appliance + location + quote + body + outcome.
- *  There used to be a decorative photo slot wedged between cards 2 and 3. It had no
- *  image path and no way to accept one — a permanently empty dark square that also
- *  left the 4 cards on an odd 5-item grid. Removed; the cards now fill 2x2. */
-
-export interface RecentJob {
-  appliance: string;
-  location: string;
-  quote: string;
-  description: string;
-  outcome: string;
-}
+/** v2 RecentRepairs — REAL completed jobs from our service records (city stage 2,
+ *  2026-10-08). The cards used to be hand-written per page (391 of them, no dates,
+ *  nothing to check them against); they are gone. The jobs now live in ONE file,
+ *  src/data/recent-repairs.ts, and src/lib/recent-repairs.ts decides what a page
+ *  shows: the city's own jobs, or — when there is none on record — the nearest
+ *  cities' jobs under a "nearby" heading, each labelled with its real city.
+ *  No job within reach → the section is not rendered.
+ *
+ *  Never rendered: the Fixar job number, customer names, addresses, phones. */
+import { repairsForCity, monthLabel } from '../../../lib/recent-repairs';
+import { CITIES } from '../../../data/cities';
+import { cityDisplayName } from '../../../lib/nearby';
 
 export interface Props {
   citySlug: string;
   cityName: string;
-  jobs: RecentJob[];
-  /** Optional override of the default H2 ("Jobs Our Team Did in {cityName} — Real Repairs"). */
+  /** Optional override of the H2 for the city's OWN jobs. The nearby heading is fixed. */
   headline?: string;
-  subhead?: string;
 }
 
-const {
-  citySlug,
-  cityName,
-  jobs,
-  headline,
-  subhead = 'Actual calls our technicians handled in the last few weeks.'
-} = Astro.props;
-const finalHeadline = headline ?? `Jobs Our Team Did in ${cityName} — Real Repairs`;
+const { citySlug, cityName, headline } = Astro.props;
+const { mode, repairs } = repairsForCity(citySlug);
+
+const finalHeadline = mode === 'nearby'
+  ? 'Recent Repairs Nearby'
+  : (headline ?? `Recent Repairs in ${cityName}`);
+const subhead = mode === 'nearby'
+  ? `We don't have a completed job on record in ${cityName} yet, so these are recent ones from the nearest cities we serve — each marked with the city it was in.`
+  : 'Completed jobs from our service records: the appliance, what the technician found and what was done. Customer details are left out.';
+
+const OUTCOME: Record<string, string> = {
+  repaired: '✓ Repaired',
+  'part-ordered': 'Diagnosed · part ordered',
+  diagnosed: 'Diagnosed'
+};
+
+const nameOf = (slug: string) => {
+  const c = CITIES.find((x) => x.slug === slug);
+  return c ? cityDisplayName(c) : slug;
+};
+
+const cards = repairs.map((r) => {
+  const unit = [r.brand, r.appliance].filter(Boolean).join(' ');
+  return {
+    badge: r.commercial ? 'Commercial' : r.appliance,
+    when: `${monthLabel(r.date)} · ${r.area}`,
+    title: r.model ? `${unit} (${r.model})` : unit,
+    symptom: r.symptom,
+    body: `${r.finding} ${r.work}`.trim(),
+    outcome: OUTCOME[r.outcome],
+    repaired: r.outcome === 'repaired',
+    cityLink: mode === 'nearby' ? { href: `/${r.citySlug}/`, name: nameOf(r.citySlug) } : null
+  };
+});
 ---
 
-<section class="v2-recent">
+{cards.length > 0 && (
+<section class="v2-recent" data-recent-mode={mode}>
   <div class="v2-container">
     <h2 class="v2-section-title">{finalHeadline}</h2>
     <p class="v2-section-sub">{subhead}</p>
-    <div class="v2-recent__grid">
-      {jobs.map((j) => (
+    <div class={`v2-recent__grid ${cards.length === 3 ? 'v2-recent__grid--3' : ''}`}>
+      {cards.map((c) => (
         <article class="v2-recent__card">
           <header class="v2-recent__head">
-            <span class="v2-recent__badge">{j.appliance}</span>
-            <span class="v2-recent__loc">{j.location}</span>
+            <span class="v2-recent__badge">{c.badge}</span>
+            <span class="v2-recent__loc">{c.when}</span>
           </header>
-          <h3 class="v2-recent__title">"{j.quote}"</h3>
-          <p class="v2-recent__body" set:html={j.description}></p>
-          <div class="v2-recent__outcome">{j.outcome}</div>
+          <h3 class="v2-recent__title">{c.title}</h3>
+          <p class="v2-recent__symptom"><strong>Problem:</strong>{' '}{c.symptom}</p>
+          <p class="v2-recent__body">{c.body}</p>
+          <div class={`v2-recent__outcome ${c.repaired ? '' : 'v2-recent__outcome--open'}`}>{c.outcome}</div>
+          {c.cityLink && (
+            <a class="v2-recent__city" href={c.cityLink.href}>Appliance repair in {c.cityLink.name} →</a>
+          )}
         </article>
       ))}
     </div>
   </div>
 </section>
+)}
 
 <style>
   .v2-recent { padding: 72px 0; background: var(--v2-white); }
@@ -60,13 +90,14 @@ const finalHeadline = headline ?? `Jobs Our Team Did in ${cityName} — Real Rep
   }
   .v2-section-sub {
     font-size: 16px; color: var(--v2-muted); text-align: center;
-    margin: 0 0 40px; font-family: var(--v2-font-body);
+    margin: 0 auto 40px; max-width: 760px; font-family: var(--v2-font-body);
   }
   .v2-recent__grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
   }
+  .v2-recent__grid--3 { grid-template-columns: repeat(3, 1fr); }
   .v2-recent__card {
     background: var(--v2-gray);
     border: 1px solid var(--v2-border);
@@ -87,9 +118,13 @@ const finalHeadline = headline ?? `Jobs Our Team Did in ${cityName} — Real Rep
   .v2-recent__title {
     font-family: var(--v2-font-display);
     font-size: 16px; font-weight: 600; color: var(--v2-black);
-    margin: 0 0 10px; font-style: italic;
+    margin: 0 0 10px;
   }
+  .v2-recent__symptom { font-size: 14px; color: var(--v2-text); line-height: 1.6; margin: 0 0 8px; }
   .v2-recent__body { font-size: 14px; color: var(--v2-text); line-height: 1.6; margin: 0 0 12px; }
   .v2-recent__outcome { font-size: 13px; color: #2a7a2a; font-weight: 500; }
-  @media (max-width: 1024px) { .v2-recent__grid { grid-template-columns: 1fr; } }
+  .v2-recent__outcome--open { color: var(--v2-muted); }
+  .v2-recent__city { display: inline-block; margin-top: 10px; font-size: 13px; color: var(--v2-red); text-decoration: none; }
+  .v2-recent__city:hover { text-decoration: underline; }
+  @media (max-width: 1024px) { .v2-recent__grid, .v2-recent__grid--3 { grid-template-columns: 1fr; } }
 </style>

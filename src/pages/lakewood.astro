@@ -1,0 +1,291 @@
+---
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+
+import { mergeCredentials } from '../data/credentials-schema';
+
+// City stage 2 (2026-10-08): new hub — Lakewood is a city we do real work in
+// (Fixar jobs since July 2026) but had no page. Content is specific to this city;
+// facts we could not confirm (named water supplier, hardness figures) are left out.
+// Recent repairs and reviews are REAL and selected by src/lib/recent-repairs.ts and
+// src/lib/reviews.ts — nothing on this page is hand-written as a customer story.
+const citySlug = 'lakewood';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = "Lakewood";
+const zips = ["90712", "90713", "90715"];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Lakewood CA — Same Day Service`;
+const description = "Same-day appliance repair in Lakewood, CA — refrigerators, washers, dryers, ovens. $89 diagnostic, waived with repair. BHGS #A49573, EPA 608.";
+const canonical = 'https://samedayappliance.repair/lakewood/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.gbpName,
+  image: 'https://samedayappliance.repair/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: "Lakewood", sameAs: "https://en.wikipedia.org/wiki/Lakewood,_California" },
+    { '@type': 'Place', name: "Lakewood Park" },
+    { '@type': 'Place', name: "Mayfair" }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+});
+
+const introParagraphs = [
+  "<strong>Same Day Appliance Repair covers all of Lakewood — ZIP codes 90712, 90713 and 90715 — from our Los Angeles branch, the same branch that serves Long Beach next door. A Lakewood customer's review is on this page. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410).</strong>",
+  "Lakewood is one of the best-known planned communities in the country: thousands of homes went up here in the early 1950s on a regular grid of streets, and most of the city is still those single-family houses, expanded and remodelled over seventy years. Kitchens are usually the most-changed room, so appliance ages vary widely from one house to the next — a new French-door refrigerator next to a range that has been there for decades.",
+  "We see the full residential list here: refrigerators that stop cooling or ice makers that stop making ice, washers that will not drain or spin, dryers that do not heat, ovens and cooktops that will not light. The technician diagnoses first and gives you a written estimate before any part is replaced.",
+  `Lakewood is served by our Los Angeles branch together with Long Beach and Norwalk. Same $89 residential diagnostic as anywhere we work, no distance surcharge, and the fee is waived when you go ahead with the repair. Call <a href="tel:${phoneRaw}">${branch.phone}</a>.`
+];
+
+const commercialParagraphs = [
+  "Lakewood Boulevard, Del Amo Boulevard, South Street and Carson Street carry most of the city's restaurants and food service. For those kitchens we repair reach-in and walk-in refrigeration, ice machines, ovens, ranges, fryers and commercial dishwashers. The commercial diagnostic is $120, waived when you approve the repair, with a written estimate before any work starts."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (snowflake, pizza-oven, fryer,
+// oven, droplet, laundry) — a wrong key renders an empty <path> silently.
+const commercialEquipment = [
+  { name: 'Commercial refrigeration', href: '/commercial/refrigeration/', icon: 'snowflake' },
+  { name: 'Ice machines', href: '/commercial/ice-machines/', icon: 'snowflake' },
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Ranges & stoves', href: '/commercial/stove-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// No outdoor brand pills: nothing in our records for this city names an outdoor brand.
+const outdoorParagraphs = [
+  "Lakewood's 1950s lots usually came with a garage and a back patio, and many homes now have a gas grill outside and a spare refrigerator or freezer in the garage. Outdoor grills come to us with igniter and low-flame problems; garage units with the strain of summer heat and dust on the condenser. We check the gas supply and regulator before replacing burners, and airflow before condemning a compressor."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
+];
+
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍳', name: 'Stove Repair', slug: 'stove' },
+  { icon: '📻', name: 'Microwave Repair', slug: 'microwave' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🗑️', name: 'Garbage Disposal Repair', slug: 'garbage-disposal' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' }
+];
+
+const neighborhoods = [
+  { name: "North Lakewood", zip: "90712" },
+  { name: "Lakewood Park", zip: "90712" },
+  { name: "Mayfair", zip: "90712" },
+  { name: "East Lakewood", zip: "90713" },
+  { name: "South-west Lakewood", zip: "90715" }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: "Same branch as Long Beach",
+    body: "Lakewood is served by our Los Angeles branch, the same one that covers Long Beach — so it is on the routes we already run, not a special trip."
+  },
+  {
+    iconKey: 'shield' as const,
+    title: "Diagnosis before parts",
+    body: "We test the part before we replace it, and we tell you when an older appliance is not worth repairing."
+  },
+  {
+    iconKey: 'parts' as const,
+    title: "Every age of appliance",
+    body: "Lakewood kitchens mix decades-old ranges with brand-new refrigerators. Our technicians work on both, gas and electric, all major brands."
+  },
+  {
+    iconKey: 'clock' as const,
+    title: "All three ZIP codes",
+    body: "90712, 90713 and 90715 — same dispatch, $89 diagnostic and 90-day warranty on parts and labor."
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Residential · Waived with repair · Written estimate' },
+  { appliance: 'Commercial Diagnostic', range: '$120', note: 'Restaurants & businesses · Waived with repair' },
+  { appliance: 'Standard Repair', range: '$150–$350', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true }
+];
+
+const faqs = [
+  {
+    question: "Do you offer same-day appliance repair in Lakewood?",
+    answer: "Yes. Lakewood is served by our Los Angeles branch alongside Long Beach, and same-day visits are possible when a technician is free — call early in the day for the best chance. We cover 90712, 90713 and 90715."
+  },
+  {
+    question: "Which appliances do you repair in Lakewood?",
+    answer: "Refrigerators, freezers and ice makers, washers and dryers, dishwashers, ovens, ranges, cooktops and microwaves — all major brands, gas and electric."
+  },
+  {
+    question: "How much is the service call in Lakewood?",
+    answer: "$89 for residential and $120 for commercial, waived when you approve the repair. The estimate is written before any work begins, and there is no distance surcharge."
+  },
+  {
+    question: "Do you have repair examples from Lakewood?",
+    answer: "We don't have a completed Lakewood job in our current records yet, so the repairs shown on this page come from the nearest cities we serve, each marked with its real city. The review on this page is from a Lakewood customer."
+  },
+  {
+    question: "What is your warranty on Lakewood repairs?",
+    answer: "Every repair carries a 90-day warranty on parts and labor. If the same problem returns within 90 days, we come back at no charge."
+  },
+  {
+    question: "Are your Lakewood appliance repairs licensed and insured?",
+    answer: "Yes. Same Day Appliance Repair is BHGS #A49573, EPA 608 Universal certified (#1346255700410), licensed and insured, with a 90-day warranty on parts and labor on every Lakewood repair. $89 residential diagnostic, waived with repair."
+  }
+];
+
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Lakewood, CA"
+    subheadline="Same-day service across Lakewood — 90712, 90713 and 90715. Refrigerators, washers, dryers, ovens — all major brands. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={3}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Lakewood — the planned postwar city next to Long Beach"
+    paragraphs={introParagraphs}
+    bookingTitle="Lakewood Service"
+    bookingSub="Available Today"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Lakewood"
+    services={services}
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Lakewood Restaurants and Commercial Kitchens"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Lakewood Patios and Garage Refrigerators"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Lakewood Neighborhoods We Service"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={["Lakewood Blvd", "Del Amo Blvd", "South St", "Carson St", "Bellflower Blvd", "Woodruff Ave"]}
+  />
+
+  <RecentRepairs citySlug={citySlug} cityName={cityName} headline="Recent Repairs in Lakewood" />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Lakewood Calls Us"
+    reasons={whyReasons}
+  />
+
+  <ReviewsBlock citySlug={citySlug} cityName={cityName} />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Lakewood"
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Lakewood"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    citySlug={citySlug}
+    headline="Also Serving Nearby Cities"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Lakewood Repair Today"
+    body="Same-day service across 90712, 90713 and 90715. Refrigerators, laundry, cooking — all major brands."
+  />
+</CityLayoutV2>

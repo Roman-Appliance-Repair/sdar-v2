@@ -443,7 +443,9 @@ for (const file of SHEET_SOURCES) {
   // → 1207 hood-cleaning-service and grease-buildup folded into /commercial/hood-cleaning/ (+1 new, -2).
   // → 1205 jackson- and champion-dishwasher-repair merged into /brands/jackson/ and /brands/champion/ (301, -2).
   // → 1017 city stage 1 (2026-10-08): 188 dead city × service combos retired (301 to their city hub, -188).
-  check('dist contains the expected 1017 rendered pages', real.length === 1017, `found ${real.length}`);
+  // → 1025 city stage 2 (2026-10-08): 8 new city hubs — whittier, pico-rivera, norwalk,
+  // lakewood, santa-clarita, rialto, garden-grove, cypress (+8).
+  check('dist contains the expected 1025 rendered pages', real.length === 1025, `found ${real.length}`);
   check('redirect stubs are still emitted', stubs.length > 0, `${stubs.length}`);
 
   const dialogCount = (b) => (b.match(/<dialog\b[^>]*\bid="quote-sheet"/g) || []).length;

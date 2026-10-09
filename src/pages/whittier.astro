@@ -1,0 +1,294 @@
+---
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+
+import { mergeCredentials } from '../data/credentials-schema';
+
+// City stage 2 (2026-10-08): new hub — Whittier is a city we do real work in
+// (Fixar jobs since July 2026) but had no page. Content is specific to this city;
+// facts we could not confirm (named water supplier, hardness figures) are left out.
+// Recent repairs and reviews are REAL and selected by src/lib/recent-repairs.ts and
+// src/lib/reviews.ts — nothing on this page is hand-written as a customer story.
+const citySlug = 'whittier';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = "Whittier";
+const zips = ["90601", "90602", "90603", "90604", "90605", "90606"];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Whittier CA — Same Day Service`;
+const description = "Same-day appliance repair in Whittier, CA: refrigerators, washers, dryers, ovens. $89 diagnostic, waived with repair. BHGS #A49573, EPA 608.";
+const canonical = 'https://samedayappliance.repair/whittier/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.gbpName,
+  image: 'https://samedayappliance.repair/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: "Whittier", sameAs: "https://en.wikipedia.org/wiki/Whittier,_California" },
+    { '@type': 'Place', name: "Uptown Whittier" },
+    { '@type': 'Place', name: "Friendly Hills" },
+    { '@type': 'Place', name: "East Whittier" },
+    { '@type': 'Place', name: "South Whittier" }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+});
+
+const introParagraphs = [
+  "<strong>Whittier is one of the cities we are called to most in southeast LA County: since July 2026 our technicians at Same Day Appliance Repair have logged more Whittier jobs than in most cities that already had a page on this site. About half of them were refrigerators, then dryers and washers. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410).</strong>",
+  "Whittier runs from the Puente Hills down to the flats along the San Gabriel River corridor, and the housing changes with it. Around Uptown Whittier and the college the streets are lined with older Craftsman and Spanish Revival homes; East and South Whittier are mostly postwar single-family tracts; Friendly Hills and the hillside streets above it have larger homes from the 1960s on. Six ZIP codes cover it — 90601 through 90606 — including the unincorporated parts that share the Whittier name.",
+  "What we see here is what you would expect from a city of family homes with appliances that work every day. Side-by-side and French-door refrigerators that stop cooling or start leaking, dryers that will not start or will not heat, front-loaders that will not drain, ranges that will not light. Recent Whittier jobs have included a cracked refrigerator water supply hose, a failed freezer evaporator fan motor, a washer drain pump and an oven ignition repair — all listed below with the month they happened.",
+  `Whittier is covered by our Pasadena branch together with Pico Rivera and Monterey Park. Same $89 residential diagnostic as anywhere we work, no distance surcharge, and the fee is waived when you go ahead with the repair. Call <a href="tel:${phoneRaw}">${branch.phone}</a>.`
+];
+
+const commercialParagraphs = [
+  "Whittier Boulevard and the Uptown blocks around Greenleaf Avenue carry a long run of restaurants, cafés, bakeries and markets, and their equipment fails the same way it does anywhere: reach-in and undercounter refrigeration that stops holding temperature, ice machines that stop harvesting, fryers and ranges that will not light. We have worked on commercial undercounter refrigeration in Whittier this year. Commercial calls carry a $120 diagnostic, waived when you approve the repair, and we give a written estimate before any work starts."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (snowflake, pizza-oven, fryer,
+// oven, droplet, laundry) — a wrong key renders an empty <path> silently.
+const commercialEquipment = [
+  { name: 'Commercial refrigeration', href: '/commercial/refrigeration/', icon: 'snowflake' },
+  { name: 'Ice machines', href: '/commercial/ice-machines/', icon: 'snowflake' },
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Ranges & stoves', href: '/commercial/stove-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// No outdoor brand pills: nothing in our records for this city names an outdoor brand.
+const outdoorParagraphs = [
+  "Plenty of Whittier homes have a gas grill on the patio and a second refrigerator or freezer in the garage, and both live a harder life than the kitchen units. A garage refrigerator in an inland summer runs almost without stopping, and a grill that sits outside year-round collects grease, corrosion and spider webs in the burner tubes and venturis. When a grill will not light or burns low, we check the gas supply and regulator before replacing burners; when a garage refrigerator struggles, we check the condenser and the fans first."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
+];
+
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍳', name: 'Stove Repair', slug: 'stove' },
+  { icon: '📻', name: 'Microwave Repair', slug: 'microwave' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🗑️', name: 'Garbage Disposal Repair', slug: 'garbage-disposal' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' }
+];
+
+const neighborhoods = [
+  { name: "Uptown Whittier", zip: "90602" },
+  { name: "Friendly Hills", zip: "90601" },
+  { name: "North Whittier hills", zip: "90603" },
+  { name: "East Whittier", zip: "90604" },
+  { name: "South Whittier", zip: "90605" },
+  { name: "West Whittier", zip: "90606" }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: "We already work here",
+    body: "Whittier is not a stretch of our map — it is one of our most frequent cities in southeast LA County, and the jobs on this page are real Whittier visits with the month they happened."
+  },
+  {
+    iconKey: 'shield' as const,
+    title: "Diagnosis before parts",
+    body: "The technician tests the actual part before replacing it. Several Whittier calls this year turned out to be a hose, a fan motor or an igniter rather than the expensive part the symptom suggested."
+  },
+  {
+    iconKey: 'parts' as const,
+    title: "Honest when it is not worth it",
+    body: "When a repair would cost close to a new appliance, we say so. A Whittier dryer this year got exactly that answer — the diagnostic fee and a clear picture, not a repair the owner did not need."
+  },
+  {
+    iconKey: 'clock' as const,
+    title: "All six ZIP codes",
+    body: "90601 through 90606, Uptown to South Whittier — the same dispatch, the same $89 diagnostic and the same 90-day warranty on parts and labor."
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Residential · Waived with repair · Written estimate' },
+  { appliance: 'Commercial Diagnostic', range: '$120', note: 'Restaurants & businesses · Waived with repair' },
+  { appliance: 'Standard Repair', range: '$150–$350', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true }
+];
+
+const faqs = [
+  {
+    question: "Do you offer same-day appliance repair in Whittier?",
+    answer: "Yes. Whittier is covered by our Pasadena branch, and same-day visits are possible when a technician is free — calling early in the day gives the best chance. We cover all six Whittier ZIP codes, 90601 through 90606, including East and South Whittier."
+  },
+  {
+    question: "What appliances do you repair most often in Whittier?",
+    answer: "Refrigerators — about half of our Whittier calls since July 2026 — followed by dryers and washers, with the occasional range or oven. Recent jobs include a cracked refrigerator water supply hose, a failed freezer evaporator fan motor, a washer drain pump and an oven ignition repair."
+  },
+  {
+    question: "How much is a service call in Whittier?",
+    answer: "The residential diagnostic is $89 and commercial is $120. Either one is waived when you approve the repair, and you get a written estimate before any work starts. There is no extra charge for coming to Whittier."
+  },
+  {
+    question: "Do you work on commercial kitchen equipment in Whittier?",
+    answer: "Yes — reach-in and undercounter refrigeration, ice machines, ovens, ranges, fryers and commercial dishwashers. The commercial diagnostic is $120, waived with repair."
+  },
+  {
+    question: "What is your warranty on Whittier repairs?",
+    answer: "Every repair carries a 90-day warranty on parts and labor. If the same problem comes back within 90 days, we return at no charge."
+  },
+  {
+    question: "Are your Whittier appliance repairs licensed and insured?",
+    answer: "Yes. Same Day Appliance Repair is BHGS #A49573, EPA 608 Universal certified (#1346255700410), licensed and insured, with a 90-day warranty on parts and labor on every Whittier repair. $89 residential diagnostic, waived with repair."
+  }
+];
+
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Whittier, CA"
+    subheadline="Same-day service across Uptown, Friendly Hills, East Whittier and South Whittier. Refrigerators, washers, dryers, ranges — all major brands. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={3}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Whittier — our busiest city without a page, until now"
+    paragraphs={introParagraphs}
+    bookingTitle="Whittier Service"
+    bookingSub="Available Today"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Whittier"
+    services={services}
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Whittier Restaurants and Commercial Kitchens"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Whittier Backyards: Grills and Garage Refrigerators"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Whittier Neighborhoods We Service"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={["Whittier Blvd", "Greenleaf Ave", "Painter Ave", "Colima Rd", "Lambert Rd", "Mills Ave"]}
+  />
+
+  <RecentRepairs citySlug={citySlug} cityName={cityName} headline="Recent Repairs in Whittier" />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Whittier Calls Us"
+    reasons={whyReasons}
+  />
+
+  <ReviewsBlock citySlug={citySlug} cityName={cityName} />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Whittier"
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Whittier"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    citySlug={citySlug}
+    headline="Also Serving Nearby Southeast LA County Cities"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Whittier Repair Today"
+    body="Same-day service across all six Whittier ZIP codes. Refrigerators, laundry, cooking — all major brands."
+  />
+</CityLayoutV2>

@@ -27,6 +27,14 @@
 // 2026-10-08 (city stage 1): 'san-diego' added to the MegaMenu COUNTY_ORDER, so
 // the six hubs now sit in the site menu like every other county's cities (/areas/
 // already listed them). City of San Diego proper is Wave 2 — deliberately absent here.
+//
+// City stage 2 (2026-10-08): 8 cities where we do real work but had no page —
+// whittier, pico-rivera, norwalk, lakewood, santa-clarita (LA County), rialto (San
+// Bernardino County), garden-grove, cypress (Orange County). Branch = the branch of
+// their nearest existing neighbours: Whittier / Pico Rivera with Monterey Park → Pasadena;
+// Lakewood / Norwalk with Long Beach → Los Angeles; Santa Clarita → Los Angeles (the
+// San Fernando Valley side); Rialto with Fontana / San Bernardino → Rancho Cucamonga;
+// Garden Grove / Cypress with Anaheim / Huntington Beach → Irvine.
 
 import { BRANCHES, getBranchForCity } from './branches';
 
@@ -76,6 +84,7 @@ export const CITIES: City[] = [
   { slug: 'corona',               name: 'Corona',               county: 'riverside',      primaryBranch: 'riverside' },
   { slug: 'costa-mesa',           name: 'Costa Mesa',           county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'culver-city',          name: 'Culver City',          county: 'los-angeles',    primaryBranch: 'los-angeles' },
+  { slug: 'cypress',              name: 'Cypress',              county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'dana-point',           name: 'Dana Point',           county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'del-mar',              name: 'Del Mar',              county: 'san-diego',      primaryBranch: 'san-diego' },
   { slug: 'eagle-rock',           name: 'Eagle Rock',           county: 'los-angeles',    primaryBranch: 'los-angeles' },
@@ -84,6 +93,7 @@ export const CITIES: City[] = [
   { slug: 'encino',               name: 'Encino',               county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'fontana',              name: 'Fontana',              county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'fullerton',            name: 'Fullerton',            county: 'orange',         primaryBranch: 'irvine' },
+  { slug: 'garden-grove',         name: 'Garden Grove',         county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'glassell-park',        name: 'Glassell Park',        county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'glendale',             name: 'Glendale',             county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'goleta',               name: 'Goleta',               county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
@@ -99,6 +109,7 @@ export const CITIES: City[] = [
   { slug: 'laguna-beach',         name: 'Laguna Beach',         county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'laguna-niguel',        name: 'Laguna Niguel',        county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'lake-elsinore',        name: 'Lake Elsinore',        county: 'riverside',      primaryBranch: 'riverside' },
+  { slug: 'lakewood',             name: 'Lakewood',             county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'loma-linda',           name: 'Loma Linda',           county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'long-beach',           name: 'Long Beach',           county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'los-angeles',          name: 'Los Angeles',          county: 'los-angeles',    primaryBranch: 'los-angeles' },
@@ -117,16 +128,19 @@ export const CITIES: City[] = [
   { slug: 'newbury-park',         name: 'Newbury Park',         county: 'ventura',        primaryBranch: 'thousand-oaks' },
   { slug: 'newport-beach',        name: 'Newport Beach',        county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'north-hollywood',      name: 'North Hollywood',      county: 'los-angeles',    primaryBranch: 'los-angeles' },
+  { slug: 'norwalk',              name: 'Norwalk',              county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'oak-park',             name: 'Oak Park',             county: 'ventura',        primaryBranch: 'thousand-oaks' },
   { slug: 'ojai',                 name: 'Ojai',                 county: 'ventura',        primaryBranch: 'thousand-oaks' },
   { slug: 'ontario',              name: 'Ontario',              county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'oxnard',               name: 'Oxnard',               county: 'ventura',        primaryBranch: 'thousand-oaks' },
   { slug: 'pacific-palisades',    name: 'Pacific Palisades',    county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'pasadena',             name: 'Pasadena',             county: 'los-angeles',    primaryBranch: 'pasadena' },
+  { slug: 'pico-rivera',          name: 'Pico Rivera',          county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'rancho-cucamonga',     name: 'Rancho Cucamonga',     county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'rancho-santa-fe',      name: 'Rancho Santa Fe',      county: 'san-diego',      primaryBranch: 'san-diego' },
   { slug: 'redlands',             name: 'Redlands',             county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'redondo-beach',        name: 'Redondo Beach',        county: 'los-angeles',    primaryBranch: 'los-angeles' },
+  { slug: 'rialto',               name: 'Rialto',               county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'riverside',            name: 'Riverside',            county: 'riverside',      primaryBranch: 'riverside' },
   { slug: 'san-bernardino',       name: 'San Bernardino',       county: 'san-bernardino', primaryBranch: 'rancho-cucamonga' },
   { slug: 'san-clemente',         name: 'San Clemente',         county: 'orange',         primaryBranch: 'irvine' },
@@ -134,6 +148,7 @@ export const CITIES: City[] = [
   { slug: 'san-marino',           name: 'San Marino',           county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'santa-ana',            name: 'Santa Ana',            county: 'orange',         primaryBranch: 'irvine' },
   { slug: 'santa-barbara',        name: 'Santa Barbara',        county: 'santa-barbara',  primaryBranch: 'santa-barbara' },
+  { slug: 'santa-clarita',        name: 'Santa Clarita',        county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'santa-monica',         name: 'Santa Monica',         county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'sherman-oaks',         name: 'Sherman Oaks',         county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'silver-lake',          name: 'Silver Lake',          county: 'los-angeles',    primaryBranch: 'pasadena' },
@@ -156,6 +171,7 @@ export const CITIES: City[] = [
   { slug: 'west-los-angeles',     name: 'West Los Angeles',     county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'westlake-village',     name: 'Westlake Village',     county: 'ventura',        primaryBranch: 'thousand-oaks' },
   { slug: 'westwood',             name: 'Westwood',             county: 'los-angeles',    primaryBranch: 'los-angeles' },
+  { slug: 'whittier',             name: 'Whittier',             county: 'los-angeles',    primaryBranch: 'pasadena' },
   { slug: 'woodland-hills',       name: 'Woodland Hills',       county: 'los-angeles',    primaryBranch: 'los-angeles' },
   { slug: 'yorba-linda',          name: 'Yorba Linda',          county: 'orange',         primaryBranch: 'irvine' }
 ];

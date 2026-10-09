@@ -269,7 +269,10 @@ export const BRANCHES: Branch[] = [
       'toluca-lake',
       'torrance',
       'woodland-hills',
-      'koreatown'
+      'koreatown',
+      'lakewood',
+      'norwalk',
+      'santa-clarita'
     ],
     displayAreas: ['Brentwood', 'Bel Air', 'Pacific Palisades', 'Santa Monica', 'Westwood', 'Century City', 'Culver City', 'Westside', 'Long Beach'],
     sameAs: [
@@ -322,7 +325,9 @@ export const BRANCHES: Branch[] = [
       'silver-lake',
       'atwater-village',
       'altadena',
-      'temple-city'
+      'temple-city',
+      'pico-rivera',
+      'whittier'
     ],
     displayAreas: ['Pasadena', 'Arcadia', 'South Pasadena', 'San Marino', 'Glendale', 'Burbank'],
     sameAs: [
@@ -422,7 +427,9 @@ export const BRANCHES: Branch[] = [
       'santa-ana',
       'tustin',
       'villa-park',
-      'yorba-linda'
+      'yorba-linda',
+      'garden-grove',
+      'cypress'
     ],
     displayAreas: ['Irvine', 'Newport Beach', 'Costa Mesa', 'Tustin', 'Orange County'],
     sameAs: [
@@ -469,7 +476,8 @@ export const BRANCHES: Branch[] = [
       'ontario',
       'redlands',
       'san-bernardino',
-      'upland'
+      'upland',
+      'rialto'
     ],
     displayAreas: ['Rancho Cucamonga', 'Upland', 'Ontario', 'Fontana'],
     sameAs: [

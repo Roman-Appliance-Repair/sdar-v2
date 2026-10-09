@@ -1,0 +1,291 @@
+---
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+
+import { mergeCredentials } from '../data/credentials-schema';
+
+// City stage 2 (2026-10-08): new hub — Pico Rivera is a city we do real work in
+// (Fixar jobs since July 2026) but had no page. Content is specific to this city;
+// facts we could not confirm (named water supplier, hardness figures) are left out.
+// Recent repairs and reviews are REAL and selected by src/lib/recent-repairs.ts and
+// src/lib/reviews.ts — nothing on this page is hand-written as a customer story.
+const citySlug = 'pico-rivera';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = "Pico Rivera";
+const zips = ["90660"];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Pico Rivera CA — Same Day Service`;
+const description = "Same-day appliance repair in Pico Rivera, CA — refrigerators, washers, dryers, ranges. $89 diagnostic, waived with repair. BHGS #A49573, EPA 608.";
+const canonical = 'https://samedayappliance.repair/pico-rivera/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.gbpName,
+  image: 'https://samedayappliance.repair/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: "Pico Rivera", sameAs: "https://en.wikipedia.org/wiki/Pico_Rivera,_California" },
+    { '@type': 'Place', name: "North Pico Rivera" },
+    { '@type': 'Place', name: "South Pico Rivera" }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+});
+
+const introParagraphs = [
+  "<strong>Pico Rivera customers have been calling Same Day Appliance Repair for refrigerators and dryers since at least January 2026 — two of them left the reviews on this page. Our technicians cover the whole city, ZIP 90660, from the Rio Hondo side to the San Gabriel River. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410).</strong>",
+  "Pico Rivera was formed in 1958 from the communities of Pico and Rivera, and most of the city still looks like the 1950s and 1960s that built it: single-story family homes on regular lots, many with original or enlarged kitchens and a laundry in the garage. That layout matters for repairs — a garage laundry sees heat and dust, and a refrigerator squeezed into an older kitchen opening often has very little room to breathe at the back.",
+  "The calls we get here are the everyday ones: a refrigerator that stops getting cold, a dryer that runs but does not heat, a washer that will not drain, a burner that will not light. Our most recent Pico Rivera visit was a four-year-old Samsung French-door refrigerator that was warm top and bottom; the technician found the compressor was not running and gave the owner a written quote before anything else.",
+  `Pico Rivera is covered by our Pasadena branch together with Whittier and Monterey Park. The $89 residential diagnostic is the same here as anywhere we work, with no distance surcharge, and it is waived when you go ahead with the repair. Call <a href="tel:${phoneRaw}">${branch.phone}</a>.`
+];
+
+const commercialParagraphs = [
+  "Whittier Boulevard, Rosemead Boulevard and Washington Boulevard carry most of Pico Rivera's restaurants, taquerias, bakeries and markets, along with industrial and warehouse space toward the edges of the city. For those kitchens we repair reach-in and walk-in refrigeration, ice machines, ranges, griddles, fryers and commercial dishwashers. Commercial calls carry a $120 diagnostic, waived when you approve the repair, and the estimate is written before any work starts."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (snowflake, pizza-oven, fryer,
+// oven, droplet, laundry) — a wrong key renders an empty <path> silently.
+const commercialEquipment = [
+  { name: 'Commercial refrigeration', href: '/commercial/refrigeration/', icon: 'snowflake' },
+  { name: 'Ice machines', href: '/commercial/ice-machines/', icon: 'snowflake' },
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Ranges & stoves', href: '/commercial/stove-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// No outdoor brand pills: nothing in our records for this city names an outdoor brand.
+const outdoorParagraphs = [
+  "A lot of Pico Rivera backyards are built around the grill — a gas grill or a griddle on the patio, often a second refrigerator or freezer in the garage. Those garage units are the ones that suffer in summer, because a hot garage makes the compressor run nearly nonstop and dust settles on the condenser. Outdoor grills here usually come to us with ignition or low-flame problems; we check the gas supply and the regulator before we replace burners."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
+];
+
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍳', name: 'Stove Repair', slug: 'stove' },
+  { icon: '📻', name: 'Microwave Repair', slug: 'microwave' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🗑️', name: 'Garbage Disposal Repair', slug: 'garbage-disposal' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' }
+];
+
+const neighborhoods = [
+  { name: "North Pico Rivera", zip: "90660" },
+  { name: "Central Pico Rivera", zip: "90660" },
+  { name: "South Pico Rivera", zip: "90660" },
+  { name: "Rio Hondo side", zip: "90660" },
+  { name: "San Gabriel River side", zip: "90660" }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: "Real Pico Rivera customers",
+    body: "The reviews on this page come from Pico Rivera customers by name and date, and the repair listed is a real visit here — nothing on this page is a made-up story."
+  },
+  {
+    iconKey: 'shield' as const,
+    title: "Written estimate first",
+    body: "You get the diagnosis and a written price before any work. If the repair is not worth it on an older unit, we tell you so."
+  },
+  {
+    iconKey: 'parts' as const,
+    title: "Older kitchens, tight fits",
+    body: "Many Pico Rivera kitchens were laid out in the 1950s. We check the clearance and airflow around a refrigerator as part of the diagnosis, because a cramped opening is a common reason a fridge runs warm."
+  },
+  {
+    iconKey: 'clock' as const,
+    title: "One ZIP, whole city",
+    body: "All of 90660, from the Rio Hondo to the San Gabriel River — same dispatch, $89 diagnostic and 90-day warranty on parts and labor."
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Residential · Waived with repair · Written estimate' },
+  { appliance: 'Commercial Diagnostic', range: '$120', note: 'Restaurants & businesses · Waived with repair' },
+  { appliance: 'Standard Repair', range: '$150–$350', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true }
+];
+
+const faqs = [
+  {
+    question: "Do you offer same-day appliance repair in Pico Rivera?",
+    answer: "Yes. Pico Rivera is covered by our Pasadena branch, and same-day visits are possible when a technician is free — call early in the day for the best chance. We cover the whole city, ZIP 90660."
+  },
+  {
+    question: "What do Pico Rivera customers call you for most?",
+    answer: "Refrigerators and dryers, judging by our own records and the reviews Pico Rivera customers have left us, followed by washers and ranges. The most recent visit was a Samsung French-door refrigerator with a compressor that had stopped running."
+  },
+  {
+    question: "How much does a service call cost in Pico Rivera?",
+    answer: "$89 for a residential diagnostic and $120 for commercial. Both are waived when you approve the repair, and the estimate is written before any work begins."
+  },
+  {
+    question: "Can you repair a refrigerator or freezer kept in the garage?",
+    answer: "Yes. Garage units work harder in summer heat; the technician checks the condenser, the fans and the space around the unit along with the usual diagnosis, because heat and dust are often part of the problem."
+  },
+  {
+    question: "What is your warranty on Pico Rivera repairs?",
+    answer: "Every repair carries a 90-day warranty on parts and labor. If the same problem comes back within 90 days, we return at no charge."
+  },
+  {
+    question: "Are your Pico Rivera appliance repairs licensed and insured?",
+    answer: "Yes. Same Day Appliance Repair is BHGS #A49573, EPA 608 Universal certified (#1346255700410), licensed and insured, with a 90-day warranty on parts and labor on every Pico Rivera repair. $89 residential diagnostic, waived with repair."
+  }
+];
+
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Pico Rivera, CA"
+    subheadline="Same-day service across Pico Rivera, from the Rio Hondo to the San Gabriel River. Refrigerators, washers, dryers and ranges — all major brands. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={3}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Pico Rivera — postwar homes between two rivers"
+    paragraphs={introParagraphs}
+    bookingTitle="Pico Rivera Service"
+    bookingSub="Available Today"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Pico Rivera"
+    services={services}
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Pico Rivera Restaurants and Commercial Kitchens"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Pico Rivera Patios and Garage Refrigerators"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Pico Rivera Neighborhoods We Service"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={["Whittier Blvd", "Rosemead Blvd", "Washington Blvd", "Slauson Ave", "Passons Blvd", "Durfee Ave"]}
+  />
+
+  <RecentRepairs citySlug={citySlug} cityName={cityName} headline="Recent Repairs in Pico Rivera" />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Pico Rivera Calls Us"
+    reasons={whyReasons}
+  />
+
+  <ReviewsBlock citySlug={citySlug} cityName={cityName} />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Pico Rivera"
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Pico Rivera"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    citySlug={citySlug}
+    headline="Also Serving Nearby Cities"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Pico Rivera Repair Today"
+    body="Same-day service across Pico Rivera, ZIP 90660. Refrigerators, laundry, cooking — all major brands."
+  />
+</CityLayoutV2>

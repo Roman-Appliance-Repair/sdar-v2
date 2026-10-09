@@ -1,0 +1,292 @@
+---
+import CityLayoutV2 from '../layouts/CityLayoutV2.astro';
+import HeroSection from '../components/cities/v2/HeroSection.astro';
+import TrustBadgesRow from '../components/cities/v2/TrustBadgesRow.astro';
+import IntroNarrative from '../components/cities/v2/IntroNarrative.astro';
+import ServicesGrid from '../components/cities/v2/ServicesGrid.astro';
+import CommercialSection from '../components/cities/v2/CommercialSection.astro';
+import OutdoorSection from '../components/cities/v2/OutdoorSection.astro';
+import ServiceArea from '../components/cities/v2/ServiceArea.astro';
+import RecentRepairs from '../components/cities/v2/RecentRepairs.astro';
+import WhyCallsUsBack from '../components/cities/v2/WhyCallsUsBack.astro';
+import ReviewsBlock from '../components/cities/v2/ReviewsBlock.astro';
+import PricingCards from '../components/cities/v2/PricingCards.astro';
+import FAQAccordion from '../components/cities/v2/FAQAccordion.astro';
+import AlsoServingNearby from '../components/cities/v2/AlsoServingNearby.astro';
+import FinalCTA from '../components/cities/v2/FinalCTA.astro';
+import { CITIES } from '../data/cities';
+import { BRANCHES } from '../data/branches';
+import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
+
+import { mergeCredentials } from '../data/credentials-schema';
+
+// City stage 2 (2026-10-08): new hub — Rialto is a city we do real work in
+// (Fixar jobs since July 2026) but had no page. Content is specific to this city;
+// facts we could not confirm (named water supplier, hardness figures) are left out.
+// Recent repairs and reviews are REAL and selected by src/lib/recent-repairs.ts and
+// src/lib/reviews.ts — nothing on this page is hand-written as a customer story.
+const citySlug = 'rialto';
+const city = CITIES.find((c) => c.slug === citySlug)!;
+const branch = BRANCHES.find((b) => b.slug === city.primaryBranch)!;
+
+const cityName = "Rialto";
+const zips = ["92376", "92377"];
+
+const phoneRaw = `+1${branch.phone.replace(/\D/g, '')}`;
+
+const title = `Appliance Repair Rialto CA — Same Day Service`;
+const description = "Same-day appliance repair in Rialto, CA: refrigerators, washers, dryers, ovens. $89 diagnostic, waived with repair. BHGS #A49573, EPA 608.";
+const canonical = 'https://samedayappliance.repair/rialto/';
+
+const localBusinessSchema = mergeCredentials({
+  '@context': 'https://schema.org',
+  '@type': 'HomeAndConstructionBusiness',
+  name: branch.gbpName,
+  image: 'https://samedayappliance.repair/logo.webp',
+  url: canonical,
+  telephone: phoneRaw,
+  email: branch.email,
+  areaServed: [
+    { '@type': 'City', name: "Rialto", sameAs: "https://en.wikipedia.org/wiki/Rialto,_California" },
+    { '@type': 'Place', name: "North Rialto" },
+    { '@type': 'Place', name: "Downtown Rialto" },
+    { '@type': 'Place', name: "South Rialto" }
+  ],
+  openingHoursSpecification: OPENING_HOURS_SCHEMA,
+  priceRange: '$$',
+});
+
+const introParagraphs = [
+  "<strong>Rialto is one of our steadiest cities in San Bernardino County: since August 2026 our technicians at Same Day Appliance Repair have repaired refrigerators, dryers and washers here, from a Kenmore refrigerator control board to a seized LG dryer drum roller. $89 residential diagnostic, waived with repair. BHGS #A49573, EPA 608 Universal certified (#1346255700410).</strong>",
+  "Rialto spreads from the older neighborhoods around Riverside Avenue and Foothill Boulevard — the old Route 66 — north toward the newer subdivisions in 92377 near the foothills. South of the 10 the city mixes older homes with industrial and distribution space. Two ZIP codes cover it: 92376 for central and south Rialto, 92377 for the north.",
+  "Inland Empire summers are hard on appliances. Refrigerators run longer in hot kitchens and hotter garages, and dryers in garage laundry rooms work against the heat around them; worn drum rollers, failed thermostats and tired fans are common calls here. That is reflected in our Rialto jobs: refrigerators most often, then dryers and washers.",
+  `Rialto is covered by our Rancho Cucamonga branch together with Fontana and San Bernardino. Same $89 residential diagnostic as anywhere we work, no distance surcharge, and the fee is waived when you go ahead with the repair. Call <a href="tel:${phoneRaw}">${branch.phone}</a>.`
+];
+
+const commercialParagraphs = [
+  "Foothill Boulevard and Riverside Avenue carry most of Rialto's restaurants, markets and food service, and the city's industrial areas have their own break rooms and kitchens. We repair reach-in and walk-in refrigeration, ice machines, ovens, ranges, fryers and commercial dishwashers. The commercial diagnostic is $120, waived when you approve the repair, with a written estimate before any work starts."
+];
+
+const commercialBrandGroups = [
+  {
+    label: 'Refrigeration & cooking',
+    pills: [
+      { name: 'True', href: '/commercial/refrigeration/brands/true/' },
+      { name: 'Traulsen', href: '/commercial/refrigeration/brands/traulsen/' },
+      { name: 'Turbo Air', href: '/commercial/refrigeration/brands/turbo-air/' },
+      { name: 'Vulcan', href: '/brands/vulcan/' }
+    ]
+  },
+  {
+    label: 'Ice machines',
+    pills: [
+      { name: 'Hoshizaki', href: '/commercial/ice-machines/brands/hoshizaki/' },
+      { name: 'Manitowoc', href: '/commercial/ice-machines/brands/manitowoc/' },
+      { name: 'Scotsman', href: '/commercial/ice-machines/brands/scotsman/' }
+    ]
+  }
+];
+
+// icon must be a key of CommercialSection's ICONS map (snowflake, pizza-oven, fryer,
+// oven, droplet, laundry) — a wrong key renders an empty <path> silently.
+const commercialEquipment = [
+  { name: 'Commercial refrigeration', href: '/commercial/refrigeration/', icon: 'snowflake' },
+  { name: 'Ice machines', href: '/commercial/ice-machines/', icon: 'snowflake' },
+  { name: 'Walk-in coolers', href: '/commercial/refrigeration/walk-in-cooler-repair/', icon: 'snowflake' },
+  { name: 'Walk-in freezers', href: '/commercial/refrigeration/walk-in-freezer-repair/', icon: 'snowflake' },
+  { name: 'Commercial ovens', href: '/commercial/oven-repair/', icon: 'oven' },
+  { name: 'Ranges & stoves', href: '/commercial/stove-repair/', icon: 'oven' },
+  { name: 'Dishwashers', href: '/commercial/dishwasher-repair/', icon: 'droplet' },
+  { name: 'Fryers', href: '/commercial/fryer-repair/', icon: 'fryer' },
+  { name: 'Commercial laundry', href: '/commercial/laundry-repair/', icon: 'laundry' }
+];
+
+// No outdoor brand pills: nothing in our records for this city names an outdoor brand.
+const outdoorParagraphs = [
+  "In Rialto the backyard gets used for months on end, and the summer heat is what wears outdoor equipment out. A gas grill sitting in full sun corrodes faster and its igniter and burners go sooner; an outdoor or garage refrigerator in 100-degree weather may simply not be able to keep up if its condenser is dirty or its fan is weak. We check airflow and the gas supply before replacing major parts."
+];
+
+const outdoorLinks = [
+  { name: 'BBQ grill repair', href: '/services/bbq-grill-repair/' },
+  { name: 'Outdoor kitchen repair', href: '/outdoor/kitchen-repair/' },
+  { name: 'Outdoor refrigerator repair', href: '/services/outdoor-refrigerator-repair/' },
+  { name: 'Patio heater repair', href: '/outdoor/patio-heater-repair/' },
+  { name: 'Gas fireplace repair', href: '/outdoor/fireplace-repair/' }
+];
+
+const services = [
+  { icon: '❄️', name: 'Refrigerator Repair', slug: 'refrigerator' },
+  { icon: '🫧', name: 'Washer Repair', slug: 'washer' },
+  { icon: '💨', name: 'Dryer Repair', slug: 'dryer' },
+  { icon: '🍽️', name: 'Dishwasher Repair', slug: 'dishwasher' },
+  { icon: '🔥', name: 'Oven & Range Repair', slug: 'oven' },
+  { icon: '🍳', name: 'Stove Repair', slug: 'stove' },
+  { icon: '📻', name: 'Microwave Repair', slug: 'microwave' },
+  { icon: '🧊', name: 'Ice Maker Repair', slug: 'ice-maker' },
+  { icon: '🍷', name: 'Wine Cooler Repair', slug: 'wine-cooler' },
+  { icon: '🧊', name: 'Freezer Repair', slug: 'freezer' },
+  { icon: '🗑️', name: 'Garbage Disposal Repair', slug: 'garbage-disposal' },
+  { icon: '♨️', name: 'Cooktop Repair', slug: 'cooktop' }
+];
+
+const neighborhoods = [
+  { name: "North Rialto", zip: "92377" },
+  { name: "Foothill corridor", zip: "92376" },
+  { name: "Downtown Rialto / Riverside Ave", zip: "92376" },
+  { name: "Central Rialto", zip: "92376" },
+  { name: "South Rialto", zip: "92376" }
+];
+
+const whyReasons = [
+  {
+    iconKey: 'team' as const,
+    title: "Real Rialto jobs",
+    body: "The repairs on this page are real Rialto visits from our records — refrigerator, dryer and washer jobs — each with the month it happened."
+  },
+  {
+    iconKey: 'shield' as const,
+    title: "Straight answers",
+    body: "When a repair is not worth it — a Rialto washer this year needed a drive motor that cost more than the owner wanted to spend — we say so and you pay only the diagnostic."
+  },
+  {
+    iconKey: 'parts' as const,
+    title: "Built for inland heat",
+    body: "Dryer rollers and thermostats, refrigerator fans and boards — the parts that heat wears out are the parts we replace most in Rialto."
+  },
+  {
+    iconKey: 'clock' as const,
+    title: "Both ZIP codes",
+    body: "92376 and 92377 — same dispatch, $89 diagnostic and 90-day warranty on parts and labor."
+  }
+];
+
+const pricingTiers = [
+  { appliance: 'Diagnostic Fee', range: '$89', note: 'Residential · Waived with repair · Written estimate' },
+  { appliance: 'Commercial Diagnostic', range: '$120', note: 'Restaurants & businesses · Waived with repair' },
+  { appliance: 'Standard Repair', range: '$150–$350', note: 'Parts + labor · OEM parts · 90-day warranty' },
+  { appliance: 'Warranty', range: '90 Days', note: 'All repairs · Parts & labor · No-charge callback', featured: true }
+];
+
+const faqs = [
+  {
+    question: "Do you offer same-day appliance repair in Rialto?",
+    answer: "Yes. Rialto is covered by our Rancho Cucamonga branch together with Fontana and San Bernardino, and same-day visits are possible when a technician is free — call early in the day for the best chance. We cover 92376 and 92377."
+  },
+  {
+    question: "What do you repair most often in Rialto?",
+    answer: "Refrigerators, then dryers and washers. Recent Rialto jobs include a Kenmore refrigerator control board, an LG dryer with a broken cycling thermostat and a seized drum roller, and a dryer maintenance service."
+  },
+  {
+    question: "Why do dryers and refrigerators fail more in Rialto summers?",
+    answer: "Heat. A refrigerator in a hot kitchen or garage runs longer, and a dryer in a garage laundry room works against the air around it. Fans, thermostats and drum rollers wear faster, which is what we replace most here."
+  },
+  {
+    question: "How much is the diagnostic in Rialto?",
+    answer: "$89 residential and $120 commercial, waived when you approve the repair, with a written estimate first. No distance surcharge for Rialto."
+  },
+  {
+    question: "What is your warranty on Rialto repairs?",
+    answer: "Every repair carries a 90-day warranty on parts and labor. If the same problem returns within 90 days, we come back at no charge."
+  },
+  {
+    question: "Are your Rialto appliance repairs licensed and insured?",
+    answer: "Yes. Same Day Appliance Repair is BHGS #A49573, EPA 608 Universal certified (#1346255700410), licensed and insured, with a 90-day warranty on parts and labor on every Rialto repair. $89 residential diagnostic, waived with repair."
+  }
+];
+
+---
+
+<CityLayoutV2
+  title={title}
+  description={description}
+  canonical={canonical}
+  localBusinessSchema={localBusinessSchema}
+>
+  <HeroSection
+    citySlug={citySlug}
+    headlineTop="Appliance Repair in"
+    headlineCity="Rialto, CA"
+    subheadline="Same-day service across Rialto, 92376 and 92377. Refrigerators, washers, dryers and ovens — all major brands. $89 diagnostic, waived with repair."
+    zips={zips}
+    tier={3}
+  />
+
+  <TrustBadgesRow />
+
+  <IntroNarrative
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Rialto — Inland Empire heat and hard-working appliances"
+    paragraphs={introParagraphs}
+    bookingTitle="Rialto Service"
+    bookingSub="Available Today"
+  />
+
+  <ServicesGrid
+    cityName={cityName}
+    headline="Appliance Repair Services in Rialto"
+    services={services}
+  />
+
+  <CommercialSection
+    cityName={cityName}
+    eyebrow="COMMERCIAL KITCHENS"
+    headline="Rialto Restaurants and Commercial Kitchens"
+    paragraphs={commercialParagraphs}
+    brandGroups={commercialBrandGroups}
+    equipmentCards={commercialEquipment}
+    bridgeLink={{ text: 'Commercial ice machine repair', href: '/commercial/ice-machines/' }}
+    fee={{ label: 'Commercial diagnostic', amount: '$120', note: 'waived when you approve the repair' }}
+  />
+
+  <OutdoorSection
+    cityName={cityName}
+    headline="Rialto Backyards in the Inland Heat"
+    paragraphs={outdoorParagraphs}
+    serviceChips={outdoorLinks}
+    fee={{ label: 'Diagnostic', amount: '$89', note: 'waived with repair' }}
+  />
+
+  <ServiceArea
+    cityName={cityName}
+    headline="Rialto Neighborhoods We Service"
+    zips={zips}
+    neighborhoods={neighborhoods}
+    keyStreets={["Foothill Blvd", "Riverside Ave", "Baseline Rd", "Cedar Ave", "Valley Blvd", "Ayala Dr"]}
+  />
+
+  <RecentRepairs citySlug={citySlug} cityName={cityName} headline="Recent Repairs in Rialto" />
+
+  <WhyCallsUsBack
+    cityName={cityName}
+    headline="Why Rialto Calls Us"
+    reasons={whyReasons}
+  />
+
+  <ReviewsBlock citySlug={citySlug} cityName={cityName} />
+
+  <PricingCards
+    cityName={cityName}
+    headline="Repair Pricing in Rialto"
+    tiers={pricingTiers}
+    footnote={false}
+  />
+
+  <FAQAccordion
+    cityName={cityName}
+    headline="Frequently Asked Questions — Rialto"
+    faqs={faqs}
+  />
+
+  <AlsoServingNearby
+    citySlug={citySlug}
+    headline="Also Serving Nearby Inland Empire Cities"
+  />
+
+  <FinalCTA
+    citySlug={citySlug}
+    cityName={cityName}
+    headline="Schedule Your Rialto Repair Today"
+    body="Same-day service across 92376 and 92377. Refrigerators, laundry, cooking — all major brands."
+  />
+</CityLayoutV2>
