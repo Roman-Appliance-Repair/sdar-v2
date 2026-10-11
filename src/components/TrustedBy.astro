@@ -1,0 +1,215 @@
+---
+/** TrustedBy — commercial clients who agreed to be named (owner, 10.10.2026).
+ *  Data: src/data/trusted-by.ts (rules at the top of that file; image sources in
+ *  src/data/trusted-by.sources.md).
+ *
+ *  Props
+ *    strip   — logo / name strip ("Trusted by …"). Logos grey → colour on hover;
+ *              a business without a logo gets a text tile.
+ *    cards   — 'all' (every published case), 'path' (only cases whose
+ *              relatedServicePaths include this page's URL), or false.
+ *    compact — smaller strip for the homepage.
+ *    tone    — 'white' | 'gray' section background.
+ *    eyebrow — optional small label above the heading (e.g. a section number).
+ *
+ *  Renders nothing when there is nothing to show (e.g. cards='path' on a page with
+ *  no matching job and strip=false). No Review / AggregateRating schema — on purpose.
+ *  Never renders: Fixar job numbers, addresses, phones, contact names. */
+import { TRUSTED_BUSINESSES, publishedCases, casesForPath } from '../data/trusted-by';
+import { monthLabel } from '../lib/recent-repairs';
+
+export interface Props {
+  strip?: boolean;
+  cards?: 'all' | 'path' | false;
+  compact?: boolean;
+  tone?: 'white' | 'gray';
+  eyebrow?: string;
+  heading?: string;
+  id?: string;
+}
+
+const {
+  strip = true,
+  cards = false,
+  compact = false,
+  tone = 'white',
+  eyebrow,
+  heading,
+  id
+} = Astro.props;
+
+const cases = cards === 'all' ? publishedCases()
+  : cards === 'path' ? casesForPath(Astro.url.pathname)
+  : [];
+
+const show = strip || cases.length > 0;
+const onlyCards = !strip && cases.length > 0;
+
+const title = heading ?? (onlyCards
+  ? (cases.length === 1 ? 'A recent job on this equipment' : 'Recent jobs on this equipment')
+  : 'Trusted by Los Angeles restaurants & food businesses');
+const sub = onlyCards
+  ? 'A real job from our service records, named with the business owner’s permission.'
+  : (compact ? null : 'Southern California kitchens that call us when equipment goes down — named with their permission.');
+
+const cardData = cases.map((b) => {
+  const jobPhoto = b.card.photos[0];
+  const img = jobPhoto ?? b.venuePhoto ?? null;
+  return {
+    name: b.name,
+    area: b.area,
+    when: monthLabel(b.card.date),
+    equipment: b.card.equipment,
+    problem: b.card.problem,
+    work: b.card.work,
+    img,
+    imgKind: jobPhoto ? 'job' : (b.venuePhoto ? 'venue' : null),
+    logo: b.logo
+  };
+});
+---
+
+{show && (
+<section class:list={['tb', `tb--${tone}`, { 'tb--compact': compact }]} id={id} aria-labelledby={id ? `${id}-h` : undefined}>
+  <div class="tb__wrap">
+    {eyebrow && <p class="tb__eyebrow">{eyebrow}</p>}
+    <h2 class="tb__title" id={id ? `${id}-h` : undefined}>{title}</h2>
+    {sub && <p class="tb__sub">{sub}</p>}
+
+    {strip && (
+      <ul class="tb__strip" role="list">
+        {TRUSTED_BUSINESSES.map((b) => (
+          <li class:list={['tb__tile', { 'tb__tile--text': !b.logo }]}>
+            <div class="tb__logo">
+              {b.logo ? (
+                <img src={b.logo.src} width={b.logo.width} height={b.logo.height} alt={`${b.name} logo`} loading="lazy" decoding="async" />
+              ) : (
+                <span class="tb__wordmark">{b.name}</span>
+              )}
+            </div>
+            <p class="tb__name">{b.name}</p>
+            <p class="tb__area">{b.area}</p>
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {cardData.length > 0 && (
+      <div class:list={['tb__cards', { 'tb__cards--one': cardData.length === 1 }]}>
+        {cardData.map((c) => (
+          <article class="tb__card">
+            <div class="tb__media">
+              {c.img ? (
+                <img src={c.img.src} width="800" height="600" alt={c.img.alt} loading="lazy" decoding="async" />
+              ) : c.logo ? (
+                <div class="tb__media-logo"><img src={c.logo.src} width={c.logo.width} height={c.logo.height} alt={`${c.name} logo`} loading="lazy" decoding="async" /></div>
+              ) : (
+                <div class="tb__media-logo"><span class="tb__wordmark">{c.name}</span></div>
+              )}
+              {c.imgKind === 'job' && <span class="tb__badge">Our job photo</span>}
+            </div>
+            <div class="tb__body">
+              <p class="tb__meta"><strong>{c.name}</strong> · {c.area}</p>
+              <p class="tb__when">{c.when}</p>
+              <h3 class="tb__equip">{c.equipment}</h3>
+              <p class="tb__problem"><span>Problem</span>{c.problem}</p>
+              <p class="tb__work"><span>What we did</span>{c.work}</p>
+              <p class="tb__outcome">✓ Repaired</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    )}
+  </div>
+</section>
+)}
+
+<style>
+  .tb { padding: 72px 0; background: var(--white); font-family: var(--font-body); }
+  .tb--gray { background: var(--gray); }
+  .tb--compact { padding: 48px 0; }
+  .tb__wrap { max-width: var(--max-width); margin: 0 auto; padding: 0 var(--container-padding); box-sizing: border-box; }
+  .tb__eyebrow {
+    margin: 0 0 10px; font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--red); text-align: center;
+  }
+  .tb__title {
+    font-family: var(--font-display); font-size: 30px; font-weight: 700; line-height: 1.2;
+    color: var(--black); margin: 0 0 8px; text-align: center;
+  }
+  .tb--compact .tb__title { font-size: 22px; margin-bottom: 20px; }
+  .tb__sub { font-size: 16px; color: var(--muted); text-align: center; margin: 0 auto 32px; max-width: 720px; }
+
+  /* ── strip ── */
+  .tb__strip {
+    list-style: none; margin: 0; padding: 0;
+    display: grid; gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+  .tb__tile {
+    background: var(--white); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 10px 12px; text-align: center; min-width: 0;
+  }
+  .tb--white .tb__tile { background: var(--gray); }
+  .tb__logo { height: 56px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+  .tb--compact .tb__logo { height: 44px; }
+  .tb__logo img {
+    max-height: 100%; max-width: 100%; width: auto; height: auto;
+    filter: grayscale(1); opacity: 0.75; mix-blend-mode: multiply;
+    transition: filter 0.2s var(--ease), opacity 0.2s var(--ease);
+  }
+  .tb__tile:hover .tb__logo img { filter: none; opacity: 1; }
+  .tb__wordmark {
+    font-family: var(--font-display); font-weight: 700; font-size: 17px; line-height: 1.15;
+    color: var(--text); overflow-wrap: anywhere;
+  }
+  .tb__name { margin: 0; font-size: 13px; font-weight: 600; color: var(--text); line-height: 1.3; overflow-wrap: anywhere; }
+  .tb__area { margin: 2px 0 0; font-size: 12px; color: var(--muted); line-height: 1.3; }
+  .tb__tile--text .tb__name { display: none; }
+
+  /* ── cards ── */
+  .tb__cards { display: grid; gap: 20px; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); margin-top: 32px; }
+  .tb__cards--one { grid-template-columns: minmax(0, 560px); justify-content: center; }
+  .tb__strip + .tb__cards { margin-top: 40px; }
+  .tb__sub + .tb__cards { margin-top: 0; }
+  .tb__card {
+    background: var(--white); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    display: flex; flex-direction: column; min-width: 0;
+  }
+  .tb--white .tb__card { background: var(--gray); }
+  .tb__media { position: relative; aspect-ratio: 4 / 3; background: var(--gray-dark); }
+  .tb__media > img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .tb__media-logo { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; background: var(--white); }
+  .tb__media-logo img { max-width: 55%; max-height: 40%; width: auto; height: auto; }
+  .tb__badge {
+    position: absolute; left: 10px; bottom: 10px;
+    background: rgba(10, 10, 10, 0.72); color: #fff; font-size: 11px; font-weight: 600;
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .tb__body { padding: 20px 20px 22px; display: flex; flex-direction: column; gap: 6px; }
+  .tb__meta { margin: 0; font-size: 14px; color: var(--text); line-height: 1.4; }
+  .tb__when { margin: 0; font-size: 12px; color: var(--muted); }
+  .tb__equip { font-family: var(--font-display); font-size: 18px; font-weight: 600; color: var(--black); margin: 6px 0 4px; line-height: 1.3; }
+  .tb__problem, .tb__work { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text); }
+  .tb__problem span, .tb__work span {
+    display: block; font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+  }
+  .tb__work { margin-top: 4px; }
+  .tb__outcome { margin: 8px 0 0; font-size: 13px; font-weight: 600; color: var(--color-ok); }
+
+  @media (max-width: 640px) {
+    .tb { padding: 56px 0; }
+    .tb--compact { padding: 40px 0; }
+    .tb__wrap { padding: 0 16px; }
+    .tb__title { font-size: 24px; }
+    .tb__strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .tb__cards { grid-template-columns: minmax(0, 1fr); }
+    .tb--compact .tb__title { font-size: 20px; margin-bottom: 16px; }
+    .tb--compact .tb__strip { gap: 8px; }
+    .tb--compact .tb__tile { padding: 10px 8px; }
+    .tb--compact .tb__logo { height: 34px; margin-bottom: 6px; }
+    .tb--compact .tb__wordmark { font-size: 15px; }
+    .tb--compact .tb__name { font-size: 12px; }
+    .tb--compact .tb__area { font-size: 11px; }
+  }
+</style>
