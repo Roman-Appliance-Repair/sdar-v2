@@ -8,14 +8,16 @@
  *              a business without a logo gets a text tile.
  *    cards   — 'all' (every published case), 'path' (only cases whose
  *              relatedServicePaths include this page's URL), or false.
- *    compact — smaller strip for the homepage.
+ *    compact — homepage strip: only `featured` businesses (~10) + a link to the
+ *              full list at /commercial/#trusted-by. On phones it shows 9 tiles
+ *              (3×3) so the block stays no taller than before wave 2.
  *    tone    — 'white' | 'gray' section background.
  *    eyebrow — optional small label above the heading (e.g. a section number).
  *
  *  Renders nothing when there is nothing to show (e.g. cards='path' on a page with
  *  no matching job and strip=false). No Review / AggregateRating schema — on purpose.
  *  Never renders: Fixar job numbers, addresses, phones, contact names. */
-import { TRUSTED_BUSINESSES, publishedCases, casesForPath } from '../data/trusted-by';
+import { stripBusinesses, featuredBusinesses, publishedCases, casesForPath } from '../data/trusted-by';
 import { monthLabel } from '../lib/recent-repairs';
 
 export interface Props {
@@ -47,10 +49,18 @@ const onlyCards = !strip && cases.length > 0;
 
 const title = heading ?? (onlyCards
   ? (cases.length === 1 ? 'A recent job on this equipment' : 'Recent jobs on this equipment')
-  : 'Trusted by Los Angeles restaurants & food businesses');
+  : (compact ? 'Trusted by Southern California businesses' : 'Trusted by Southern California restaurants, hotels & institutions'));
 const sub = onlyCards
   ? 'A real job from our service records, named with the business owner’s permission.'
-  : (compact ? null : 'Southern California kitchens that call us when equipment goes down — named with their permission.');
+  : (compact ? null : 'Southern California restaurants, hotels, healthcare and community organizations that call us when equipment goes down — named with their permission.');
+
+// Full strip: two labelled groups (food & hospitality first). Compact: one flat list.
+const stripGroups = compact
+  ? [{ label: null, items: featuredBusinesses() }]
+  : [
+      { label: 'Restaurants, food & hospitality', items: stripBusinesses().filter((b) => b.group === 'food') },
+      { label: 'Healthcare, finance & community', items: stripBusinesses().filter((b) => b.group === 'institution') }
+    ].filter((g) => g.items.length > 0);
 
 const cardData = cases.map((b) => {
   const jobPhoto = b.card.photos[0];
@@ -76,9 +86,11 @@ const cardData = cases.map((b) => {
     <h2 class="tb__title" id={id ? `${id}-h` : undefined}>{title}</h2>
     {sub && <p class="tb__sub">{sub}</p>}
 
-    {strip && (
+    {strip && stripGroups.map((g) => (
+      <>
+      {g.label && <h3 class="tb__group">{g.label}</h3>}
       <ul class="tb__strip" role="list">
-        {TRUSTED_BUSINESSES.map((b) => (
+        {g.items.map((b) => (
           <li class:list={['tb__tile', { 'tb__tile--text': !b.logo }]}>
             <div class="tb__logo">
               {b.logo ? (
@@ -92,6 +104,10 @@ const cardData = cases.map((b) => {
           </li>
         ))}
       </ul>
+      </>
+    ))}
+    {strip && compact && (
+      <p class="tb__more"><a href="/commercial/#trusted-by">See all businesses we serve →</a></p>
     )}
 
     {cardData.length > 0 && (
@@ -141,14 +157,24 @@ const cardData = cases.map((b) => {
   .tb__sub { font-size: 16px; color: var(--muted); text-align: center; margin: 0 auto 32px; max-width: 720px; }
 
   /* ── strip ── */
+  .tb__group {
+    margin: 0 0 12px; font-family: var(--font-body); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); text-align: left;
+  }
+  .tb__strip + .tb__group { margin-top: 28px; }
   .tb__strip {
     list-style: none; margin: 0; padding: 0;
     display: grid; gap: 12px;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
+  .tb--compact .tb__strip { grid-template-columns: repeat(5, minmax(0, 1fr)); max-width: 1000px; margin: 0 auto; }
+  .tb__more { margin: 16px 0 0; text-align: center; font-size: 14px; font-weight: 600; }
+  .tb__more a { color: var(--red); text-decoration: none; }
+  .tb__more a:hover { text-decoration: underline; }
   .tb__tile {
     background: var(--white); border: 1px solid var(--border); border-radius: 10px;
     padding: 14px 10px 12px; text-align: center; min-width: 0;
+    display: flex; flex-direction: column; justify-content: flex-start;
   }
   .tb--white .tb__tile { background: var(--gray); }
   .tb__logo { height: 56px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
@@ -202,7 +228,17 @@ const cardData = cases.map((b) => {
     .tb--compact { padding: 40px 0; }
     .tb__wrap { padding: 0 16px; }
     .tb__title { font-size: 24px; }
-    .tb__strip { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .tb__strip { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .tb__tile { padding: 10px 6px; }
+    .tb__logo { height: 40px; margin-bottom: 6px; }
+    .tb__wordmark { font-size: 14px; }
+    .tb__name { font-size: 12px; }
+    .tb__area { font-size: 11px; }
+    .tb__group { font-size: 11px; margin-bottom: 10px; }
+    .tb__strip + .tb__group { margin-top: 22px; }
+    .tb--compact .tb__strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .tb--compact .tb__tile:nth-child(n+10) { display: none; }
+    .tb__more { margin-top: 12px; }
     .tb__cards { grid-template-columns: minmax(0, 1fr); }
     .tb--compact .tb__title { font-size: 20px; margin-bottom: 16px; }
     .tb--compact .tb__strip { gap: 8px; }
@@ -210,6 +246,7 @@ const cardData = cases.map((b) => {
     .tb--compact .tb__logo { height: 34px; margin-bottom: 6px; }
     .tb--compact .tb__wordmark { font-size: 15px; }
     .tb--compact .tb__name { font-size: 12px; }
-    .tb--compact .tb__area { font-size: 11px; }
+    /* phones: name only in the compact strip — keeps the homepage block under ~560px */
+    .tb--compact .tb__area { display: none; }
   }
 </style>

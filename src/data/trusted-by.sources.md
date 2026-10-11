@@ -20,6 +20,30 @@ webp q80 (sharp).
 | `zendejas-mexican-grill.webp` | Zendejas Mexican Grill (Rancho Cucamonga) | https://zendejasrestaurant.com/wp-content/uploads/2018/10/logo.jpg — site https://zendejasrestaurant.com (alt text: "Zendejas Mexican Grill in Rancho Cucamonga") | Small original (271×86), kept at 86 px |
 | — | IHOP — Lake Elsinore | none — FRANCHISE, no IHOP logo or corporate imagery by rule | text tile |
 
+### Wave 2 (owner permission 10.10.2026 — strip tiles only, no cards)
+
+Checked 2026-10-10 by fetching each candidate site and reading its title, logo and location text.
+
+| File | Business (as displayed) | Source (official website) | Notes |
+|---|---|---|---|
+| `hibachi-papi.webp` | Hibachi Papi (Westwood, Los Angeles) | https://static.spotapps.co/website_images/ab_websites/485468_website_v1/logo_new.png — header logo of https://hibachipapi.com (alt "Hibachi Papi logo") | Name corrected from "The Hibachi Papi" to the site's "Hibachi Papi"; site lists its location in Westwood (90024). Trimmed, 78×120 |
+| `pankina-grill.webp` | Pankina Grill (Tarzana, Los Angeles) | https://www.pankinagrill.com/images/logo.png — site https://www.pankinagrill.com | Site gives "Tarzana, CA" (an LA neighborhood), so the area reads "Tarzana, Los Angeles". Trimmed |
+| `hollywood-vip-hotel.webp` | Hollywood VIP Hotel (Hollywood) | https://www.hollywoodviphotel.com/wp-content/uploads/2019/07/Logo.png — site https://www.hollywoodviphotel.com | Small original (264×80), kept at 80 px |
+| `coast-plaza-hospital.webp` | Coast Plaza Hospital (Norwalk) | https://www.coastplazahospital.com/wp-content/uploads/sites/9/2022/01/coast-plaza.png — site https://www.coastplazahospital.com | The hospital's own site places it in Norwalk, CA, so the area is "Norwalk" (not "Los Angeles") |
+| `blind-childrens-center.webp` | Blind Children's Center (Los Angeles) | https://www.blindchildrenscenter.org/wp-content/uploads/2019/04/logo-title_SMV5.png — site https://www.blindchildrenscenter.org | Original sits on a solid teal box with white lettering (only logo on the site). Teal removed to white, lettering recoloured to #2b2b2b, dots kept. Shape unchanged. 275×120 |
+| `westwood-presbyterian-church.webp` | Westwood Presbyterian Church (Westwood, Los Angeles) | https://westwoodpres.org/assets/wpc-logos/wpc-logo-final-web-v3.svg — site https://westwoodpres.org | SVG rasterised, 497×120 |
+| — | Poki House (Los Angeles) | text tile — no official site found (pokihouse.com is a domain for sale). A "Poké House" franchise opened at Los Feliz in 2025; not confirmed to be this business | Name kept as the owner gave it. If it is the Poké House franchise, it stays text-only by the franchise rule |
+| — | Blair's (Silver Lake, Los Angeles) | text tile — official site https://blairsrestaurant.com (confirms Silver Lake / Rowena) has no logo image, only a text title | Display name "Blair's" as the site writes it ("Blair’s Restaurant") |
+| — | Yamuna Delights (Rosemead) | text tile — no official website found | |
+| — | Boba Boba (Saugus, Santa Clarita) | text tile — no official website found (bobabobacafe.com is an unrelated shop in Clearwater, FL) | |
+| — | El Ruiseñor de Mexico (Huntington Park) | text tile — elruisenor.com is a one-line placeholder page; cannot confirm it is theirs | |
+| — | Rose Bakery (Los Angeles) | text tile — several unrelated "Rose Bakery" businesses (Paris brand at Dover Street Market LA, a Valley cake shop, an OC café); rosebakery.com is "coming soon". Could not confirm which | |
+| — | The Valley Hunt Club (Pasadena) | text tile — official site https://www.valleyhuntclub.com logo (`/image/company_logo?img_id=11820`) is only 86×86, too low-res | Name as the site writes it |
+| — | Ramada by Wyndham Culver City | none — FRANCHISE, no Ramada / Wyndham logo or imagery by rule | text tile |
+| — | Krispy Krunchy Chicken (Los Angeles) | none — FRANCHISE, no Krispy Krunchy logo or imagery by rule | text tile |
+| — | 1st Century Bank (Century City, Los Angeles) | text tile — 1stcenturybank.com / 1cbank.com now redirect to MidFirst Bank (https://www.MidFirst.com/California/), i.e. the bank has merged into MidFirst | No MidFirst logo used. Owner to confirm the name is still wanted |
+| — | Boys & Girls Club (Santa Ana) | text tile — could not confirm the exact club name/official site (directories list the Santa Ana site both as "Boys and Girls Club of Santa Ana" and under "Boys & Girls Clubs of Central Orange Coast") | Shown as "Boys & Girls Club" · Santa Ana |
+
 ## Venue photos (`public/images/trusted-by/photos/`)
 
 | File | Business | Source | Kind |

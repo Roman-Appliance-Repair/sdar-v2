@@ -12,8 +12,11 @@
 //     BY THE OWNER. Never visitor photos, Street View, stock or AI images. When none
 //     is available, the card uses our own job photo, or no photo at all.
 //     Every file's source URL is recorded in src/data/trusted-by.sources.md.
-//   - IHOP Lake Elsinore is a FRANCHISE: no IHOP logo, no IHOP corporate imagery —
-//     text name + our job photo only.
+//   - FRANCHISES — IHOP Lake Elsinore, Ramada by Wyndham Culver City, Krispy Krunchy
+//     Chicken: no franchise-brand logo or corporate imagery, ever — text tile only
+//     (IHOP: text name + our job photo on its card).
+//   - Wave 2 (owner, 10.10.2026): strip tiles only, NO case cards — we have no
+//     verified job details for them. Add a card only from a Fixar record.
 //   - No invented quotes or testimonials, and NO Review / AggregateRating schema for
 //     this block (self-serving reviews).
 //   - Card text is only what the Fixar record says (estimate lines, technician notes,
@@ -54,6 +57,13 @@ export interface TrustedBusiness {
   type: string;
   /** City / neighborhood as printed. No street. */
   area: string;
+  /**
+   * Strip group: 'food' = restaurants, food & hospitality; 'institution' = healthcare,
+   * finance, education, community. Food & hospitality render first.
+   */
+  group: 'food' | 'institution';
+  /** Shown in the compact homepage strip (keep ~10, logos preferred). */
+  featured?: boolean;
   /** Logo from the business's own website (site path), webp, 120px tall. */
   logo?: { src: string; width: number; height: number };
   /** Venue photo from the business's own website / owner-uploaded Maps photo. 800×600 webp. */
@@ -67,6 +77,8 @@ const P = '/images/trusted-by/photos/';
 export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
   {
     slug: 'la-bettola-di-terroni',
+    group: 'food',
+    featured: true,
     name: 'La Bettola di Terroni',
     type: 'Italian restaurant',
     area: 'Larchmont Village, Los Angeles',
@@ -85,6 +97,8 @@ export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
   },
   {
     slug: 'paradise-buffet',
+    group: 'food',
+    featured: true,
     name: 'Paradise Buffet',
     type: 'Buffet restaurant',
     area: 'Bell & Montebello',
@@ -102,6 +116,8 @@ export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
   },
   {
     slug: 'fiora-pizzeria',
+    group: 'food',
+    featured: true,
     name: 'Fiora Pizzeria',
     type: 'Pizzeria',
     area: 'Redlands',
@@ -119,6 +135,8 @@ export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
   },
   {
     slug: 'trumans-bakery',
+    group: 'food',
+    featured: true,
     name: "Truman's Bakery",
     type: 'Gluten-free bakery',
     area: 'Beverly Grove, Los Angeles',
@@ -136,6 +154,8 @@ export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
   },
   {
     slug: 'milios-pizza',
+    group: 'food',
+    featured: true,
     name: "Milio's Pizza",
     type: 'Pizzeria',
     area: 'Downtown Santa Barbara',
@@ -157,6 +177,7 @@ export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
   {
     // FRANCHISE — no IHOP logo or corporate imagery, ever.
     slug: 'ihop-lake-elsinore',
+    group: 'food',
     name: 'IHOP — Lake Elsinore',
     type: 'Restaurant (franchise)',
     area: 'Lake Elsinore',
@@ -173,6 +194,7 @@ export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
   },
   {
     slug: 'made-by-meg-catering',
+    group: 'food',
     name: 'Made by Meg Catering',
     type: 'Catering company',
     area: 'Torrance',
@@ -180,12 +202,159 @@ export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
   },
   {
     slug: 'zendejas-mexican-grill',
+    group: 'food',
     name: 'Zendejas Mexican Grill',
     type: 'Mexican restaurant',
     area: 'Rancho Cucamonga',
     logo: { src: `${L}zendejas-mexican-grill.webp`, width: 266, height: 86 }
+  },
+  // ── Wave 2 (owner permission 10.10.2026) — strip only, no cards ──
+  {
+    slug: 'poki-house',
+    name: 'Poki House',
+    type: 'Poke restaurant',
+    area: 'Los Angeles',
+    group: 'food'
+  },
+  {
+    slug: 'blairs',
+    name: "Blair's",
+    type: 'Restaurant',
+    area: 'Silver Lake, Los Angeles',
+    group: 'food'
+  },
+  {
+    slug: 'yamuna-delights',
+    name: 'Yamuna Delights',
+    type: 'Restaurant',
+    area: 'Rosemead',
+    group: 'food'
+  },
+  {
+    slug: 'boba-boba',
+    name: 'Boba Boba',
+    type: 'Boba & dessert café',
+    area: 'Saugus, Santa Clarita',
+    group: 'food'
+  },
+  {
+    slug: 'el-ruisenor-de-mexico',
+    name: 'El Ruiseñor de Mexico',
+    type: 'Mexican restaurant',
+    area: 'Huntington Park',
+    group: 'food'
+  },
+  {
+    slug: 'hibachi-papi',
+    name: 'Hibachi Papi',
+    type: 'Hibachi restaurant',
+    area: 'Westwood, Los Angeles',
+    group: 'food',
+    featured: true,
+    logo: { src: `${L}hibachi-papi.webp`, width: 78, height: 120 }
+  },
+  {
+    slug: 'rose-bakery',
+    name: 'Rose Bakery',
+    type: 'Bakery',
+    area: 'Los Angeles',
+    group: 'food'
+  },
+  {
+    slug: 'pankina-grill',
+    name: 'Pankina Grill',
+    type: 'Mediterranean & Middle Eastern restaurant',
+    area: 'Tarzana, Los Angeles',
+    group: 'food',
+    logo: { src: `${L}pankina-grill.webp`, width: 118, height: 120 }
+  },
+  {
+    slug: 'valley-hunt-club',
+    name: 'The Valley Hunt Club',
+    type: 'Private club',
+    area: 'Pasadena',
+    group: 'food'
+  },
+  {
+    slug: 'hollywood-vip-hotel',
+    name: 'Hollywood VIP Hotel',
+    type: 'Hotel',
+    area: 'Hollywood',
+    group: 'food',
+    featured: true,
+    logo: { src: `${L}hollywood-vip-hotel.webp`, width: 264, height: 80 }
+  },
+  {
+    // FRANCHISE — no Ramada / Wyndham logo or imagery, ever.
+    slug: 'ramada-culver-city',
+    name: 'Ramada by Wyndham Culver City',
+    type: 'Hotel (franchise)',
+    area: 'Culver City',
+    group: 'food'
+  },
+  {
+    // FRANCHISE — no Krispy Krunchy logo or imagery, ever.
+    slug: 'krispy-krunchy-chicken-la',
+    name: 'Krispy Krunchy Chicken',
+    type: 'Restaurant (franchise)',
+    area: 'Los Angeles',
+    group: 'food'
+  },
+  {
+    slug: 'coast-plaza-hospital',
+    name: 'Coast Plaza Hospital',
+    type: 'Hospital',
+    area: 'Norwalk',
+    group: 'institution',
+    featured: true,
+    logo: { src: `${L}coast-plaza-hospital.webp`, width: 482, height: 120 }
+  },
+  {
+    slug: '1st-century-bank',
+    name: '1st Century Bank',
+    type: 'Bank',
+    area: 'Century City, Los Angeles',
+    group: 'institution'
+  },
+  {
+    slug: 'blind-childrens-center',
+    name: "Blind Children's Center",
+    type: 'Nonprofit',
+    area: 'Los Angeles',
+    group: 'institution',
+    featured: true,
+    logo: { src: `${L}blind-childrens-center.webp`, width: 275, height: 120 }
+  },
+  {
+    slug: 'boys-girls-club-santa-ana',
+    name: 'Boys & Girls Club',
+    type: 'Youth nonprofit',
+    area: 'Santa Ana',
+    group: 'institution'
+  },
+  {
+    slug: 'westwood-presbyterian-church',
+    name: 'Westwood Presbyterian Church',
+    type: 'Church',
+    area: 'Westwood, Los Angeles',
+    group: 'institution',
+    featured: true,
+    logo: { src: `${L}westwood-presbyterian-church.webp`, width: 497, height: 120 }
   }
 ];
+
+/** Strip order: food & hospitality first, then institutions (stable within a group). */
+export function stripBusinesses(): TrustedBusiness[] {
+  return [
+    ...TRUSTED_BUSINESSES.filter((b) => b.group === 'food'),
+    ...TRUSTED_BUSINESSES.filter((b) => b.group === 'institution')
+  ];
+}
+
+/** Compact homepage selection (`featured`), same order as the strip. */
+export function featuredBusinesses(): TrustedBusiness[] {
+  return stripBusinesses().filter((b) => b.featured);
+}
 
 /** Cards that may be shown, newest first. */
 export function publishedCases(): (TrustedBusiness & { card: TrustedCase })[] {
