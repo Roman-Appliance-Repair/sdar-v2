@@ -169,8 +169,6 @@ export const TRUSTED_BUSINESSES: TrustedBusiness[] = [
       photos: [],
       relatedServicePaths: ['/commercial/refrigeration/walk-in-freezer-repair/'],
       fixarJob: '101401',
-      published: false,
-      holdReason: 'On 10.10.2026 (day after the repair) the customer called: the freezer had only pulled down to 22°F. Dispatcher told her to allow 24 h; technician to return if it does not reach temperature. Publish only after the follow-up confirms the freezer holds temperature.'
     }
   },
   {
