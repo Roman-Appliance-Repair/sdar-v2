@@ -14,6 +14,8 @@ import ChatWidget from '../components/ChatWidget.astro';
 import StickyCallBar from '../components/StickyCallBar.astro';
 import QuoteSheet from '../components/QuoteSheet.astro';
 import { MAIN_PHONE } from '../data/branches';
+import { isArticlePath } from '../data/article-pages';
+import { buildArticleSchema } from '../lib/article-schema';
 
 export interface Props {
   title: string;
@@ -47,6 +49,12 @@ const headerPhone = stickyPhone ?? MAIN_PHONE;
 const headerPhoneHref = `tel:+1${headerPhone.replace(/\D/g, '')}`;
 const canonicalUrl = canonical || new URL(Astro.url.pathname, siteUrl).toString();
 const ogImage = new URL(image, siteUrl).toString();
+
+// Article JSON-LD for informational guides only (list + rule: src/data/article-pages.ts).
+// Never on service hubs, city pages or combos. Blog posts get BlogPosting from BlogLayout.
+const articleSchema = isArticlePath(Astro.url.pathname)
+  ? buildArticleSchema({ pathname: Astro.url.pathname, canonical: canonicalUrl, headline: title, description })
+  : null;
 ---
 
 <!DOCTYPE html>
@@ -123,6 +131,7 @@ const ogImage = new URL(image, siteUrl).toString();
 
     <!-- Page-specific head content (JSON-LD schema, etc.) -->
     <slot name="head-scripts" />
+    {articleSchema && <script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />}
 
     <!-- Microsoft Clarity — deferred with the SAME trigger mechanism as GTM below
          (idle after DOMContentLoaded / first interaction / hard 3s cap). Delay,

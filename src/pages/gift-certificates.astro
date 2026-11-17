@@ -24,7 +24,8 @@
 // site-wide, which emits both the visible trail and the BreadcrumbList JSON-LD.
 
 import Layout from '../layouts/Layout.astro';
-import { BUSINESS_HOURS, OPENING_HOURS_SCHEMA } from '../data/business-hours';
+import { BUSINESS_HOURS } from '../data/business-hours';
+import { buildOrganizationNode } from '../lib/organization-schema';
 
 const canonical = 'https://samedayappliance.repair/gift-certificates/';
 
@@ -130,19 +131,12 @@ const TERMS = [
 // description of this entity; what is needed here is a valid target for `seller`
 // plus the facts a buyer checks before paying: who we are, when we answer, and
 // where the certificate is good.
+// Shared builder (src/lib/organization-schema.ts): HomeAndConstructionBusiness, so
+// openingHoursSpecification is valid on it (it was not on a plain Organization —
+// Ahrefs flagged a schema.org validation error here on 2026-11-16).
 const organizationSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Organization',
-  '@id': ORG_ID,
-  name: 'Same Day Appliance Repair',
-  url: 'https://samedayappliance.repair/',
-  telephone: '+13238704790',
-  email: 'support@samedayappliance.repair',
-  openingHoursSpecification: OPENING_HOURS_SCHEMA,
-  areaServed: COUNTIES.map((c) => ({
-    '@type': 'AdministrativeArea',
-    name: c + ' County'
-  }))
+  ...buildOrganizationNode()
 };
 
 // Three Offers, one per denomination, each sold by the Organization above.

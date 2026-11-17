@@ -41,6 +41,15 @@ const faqs = [
     },
   ];
 
+const KENMORE_CATEGORIES: { name: string; url?: string }[] = [
+  { name: "Kenmore oven repair", url: "https://samedayappliance.repair/brands/kenmore-oven-repair/" },
+  { name: "Kenmore refrigerator repair" },
+  { name: "Kenmore washer + dryer repair" },
+  { name: "Kenmore dishwasher repair" },
+  { name: "Kenmore range repair" },
+  { name: "Kenmore cooktop + microwave" }
+];
+
 const schemaJsons = [
   { "@context": "https://schema.org", "@type": "LocalBusiness", "@id": canonical + "#business",
   "address": { "@type": "PostalAddress", "addressLocality": "West Hollywood", "addressRegion": "CA", "addressCountry": "US" },
@@ -80,6 +89,21 @@ const schemaJsons = [
       "@type": "SpeakableSpecification",
       "cssSelector": [".intro-speakable", ".faq-item:first-of-type"]
     }
+  },
+  // ItemList — the "Kenmore appliance categories we service" grid, item for item
+  // (same names, same order). Only the oven card has its own page, so only it gets a url.
+  {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "@id": canonical + "#categories",
+    "name": "Kenmore appliance categories we service",
+    "numberOfItems": KENMORE_CATEGORIES.length,
+    "itemListElement": KENMORE_CATEGORIES.map((c, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": c.name,
+      ...(c.url ? { "url": c.url } : {})
+    }))
   }
 ];
 ---

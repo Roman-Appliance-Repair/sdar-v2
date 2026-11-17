@@ -32,6 +32,15 @@
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
 
+# HTML pages are served at directory URLs (/x/y/), which /*.html never matched —
+# they got Pages' default max-age=0 and the zone cache revalidated every request
+# (cf-cache-status: EXPIRED on back-to-back hits, 2026-11-16; Ahrefs: 17 pages
+# "Slow server response for AI crawlers"). Browsers still revalidate (max-age=0);
+# the Cloudflare edge keeps a copy 10 min and serves it stale for up to a day while
+# it refreshes in the background. Deploys that must show at once: scripts/cf-purge.py.
+/*/
+  Cache-Control: public, max-age=0, s-maxage=600, stale-while-revalidate=86400
+
 # Preview hosts must never be indexed. sdar-v2.pages.dev serves a full copy of production with 200;
 # canonicals point to samedayappliance.repair, this makes it certain. Branch/deployment previews
 # (<branch>.sdar-v2.pages.dev, <hash>.sdar-v2.pages.dev) already get X-Robots-Tag: noindex from

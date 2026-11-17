@@ -7,6 +7,8 @@ import { mergeCredentials } from '../data/credentials-schema';
 import { OPENING_HOURS_SCHEMA } from '../data/business-hours';
 import { BRANCH_LOCATIONS_GEO_NEUTRAL } from '../lib/build-location-array';
 import { relatedPosts } from '../data/blog-posts';
+import { AUTHOR_PERSON, heroImageFor, pageDates } from '../lib/article-schema';
+import { ORG_PUBLISHER } from '../lib/organization-schema';
 
 export interface Props {
   title: string;
@@ -30,24 +32,28 @@ const {
 
 const canonical = `https://samedayappliance.repair/blog/${slug}/`;
 const related = relatedPosts(slug);
+// BlogPosting: author = the owner (Person node on /about/), publisher = the
+// #organization entity, dateModified = last git commit of the post (never earlier
+// than the published date). Same builders as Article on the guide pages.
+const blogPath = `/blog/${slug}/`;
+const gitDates = pageDates(blogPath);
+const dateModified =
+  gitDates.dateModified && gitDates.dateModified.slice(0, 10) > publishedDate ? gitDates.dateModified : publishedDate;
 const blogPostingSchema = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  "@id": `${canonical}#article`,
   "headline": title,
   "description": description,
   "url": canonical,
+  "image": heroImageFor(blogPath),
   "datePublished": publishedDate,
-  "author": {
-    "@type": "Organization",
-    "name": "Same Day Appliance Repair",
-    "url": "https://samedayappliance.repair/"
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": "Same Day Appliance Repair",
-    "url": "https://samedayappliance.repair/"
-  },
-  "mainEntityOfPage": canonical
+  "dateModified": dateModified,
+  "articleSection": category,
+  "author": AUTHOR_PERSON,
+  "publisher": ORG_PUBLISHER,
+  "mainEntityOfPage": { "@type": "WebPage", "@id": canonical },
+  "inLanguage": "en-US"
 };
 
 const breadcrumbSchema = {

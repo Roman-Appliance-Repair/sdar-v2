@@ -31,6 +31,7 @@ import { CANONICAL_CREDENTIALS, LEGAL_NAME } from '../../data/credentials-schema
 import { MEMBER_OF_SCHEMA } from '../../data/memberships';
 import { OPENING_HOURS_SCHEMA } from '../../data/business-hours';
 import { buildServiceCatalogSchema, SERVICE_CATALOG_REF } from '../../lib/build-service-catalog';
+import { buildOrganizationNode } from '../../lib/organization-schema';
 
 interface Props {}
 
@@ -173,29 +174,16 @@ function buildLocalBusiness(branch: Branch): Record<string, unknown> {
 }
 
 const graph: Array<Record<string, unknown>> = [
-  // 1. Organization
-  {
-    '@type': 'Organization',
-    '@id': ORG_ID,
-    name: 'Same Day Appliance Repair',
+  // 1. Organization — full company node from src/lib/organization-schema.ts
+  // (HomeAndConstructionBusiness: name, url, logo, image, telephone, email,
+  // city-level address, areaServed, openingHoursSpecification, sameAs), plus the
+  // homepage-only facts below. The ONLY full #organization node on this page.
+  buildOrganizationNode({
     alternateName: 'SDAR',
     legalName: LEGAL_NAME,
-    url: SITE_URL,
-    logo: {
-      '@type': 'ImageObject',
-      url: `${SITE_URL}/logo.webp`,
-      width: 512,
-      height: 512
-    },
-    // Organization-level sameAs — org-wide social profiles (FB + YT). The
-    // verified GBP listings live at the per-branch LocalBusiness level via
-    // branch.sameAs (place_id maps URLs), not duplicated here. Older
-    // share.google/* shortened links replaced with the canonical maps
-    // place_id form on the branch entries.
-    sameAs: [
-      'https://www.facebook.com/profile.php?id=61577069941613',
-      'https://www.youtube.com/@SameDayAppliance.Repair'
-    ],
+    // Organization-level sameAs (FB + YT) comes from buildOrganizationNode(),
+    // read from the HQ branch.sameAs minus its GBP maps link; the verified GBP
+    // listings stay on the per-branch LocalBusiness nodes.
     contactPoint: [{
       '@type': 'ContactPoint',
       telephone: phoneE164(MAIN_PHONE),
@@ -218,7 +206,7 @@ const graph: Array<Record<string, unknown>> = [
     // Same anchor that all 8 LocalBusiness point at (single SSOT, no payload
     // duplication across entities in this graph).
     hasOfferCatalog: SERVICE_CATALOG_REF
-  },
+  }),
 
   // 2. WebSite
   {

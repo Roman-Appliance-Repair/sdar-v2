@@ -21,6 +21,9 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 const OUT = path.join(__dirname, 'git-mtime-map.json');
+// First-commit dates per page file → datePublished in Article JSON-LD
+// (src/lib/article-schema.ts). Same rules as the mtime map: committed, refreshed locally.
+const OUT_CREATED = path.join(__dirname, 'git-ctime-map.json');
 const PREFIX = 'src/pages/';
 
 function run(cmd, opts = {}) {
@@ -79,6 +82,25 @@ for (const line of out.split('\n')) {
 
 const sorted = Object.fromEntries(Object.entries(map).sort(([a], [b]) => a.localeCompare(b)));
 const json = JSON.stringify(sorted, null, 2) + '\n';
+
+// git log is newest-first, so the LAST date seen for a file is its first commit.
+const created = {};
+currentDate = null;
+for (const line of out.split('\n')) {
+  if (line.startsWith('__SDAR_DATE__')) {
+    currentDate = line.slice('__SDAR_DATE__'.length);
+  } else if (line && currentDate && line in map) {
+    created[line] = currentDate;
+  }
+}
+const createdJson = JSON.stringify(
+  Object.fromEntries(Object.entries(created).sort(([a], [b]) => a.localeCompare(b))), null, 2) + '\n';
+let existingCreated = null;
+try { existingCreated = fs.readFileSync(OUT_CREATED, 'utf8'); } catch {}
+if (existingCreated !== createdJson) {
+  fs.writeFileSync(OUT_CREATED, createdJson);
+  console.log(`[mtime-map] wrote ${Object.keys(created).length} first-commit dates → scripts/git-ctime-map.json (commit it)`);
+}
 
 let existing = null;
 try { existing = fs.readFileSync(OUT, 'utf8'); } catch {}
