@@ -3,7 +3,7 @@
 > **Живой файл — обновляется ПОСЛЕ КАЖДОЙ значимой сессии.**
 > Это не справка, это рабочий журнал. Если тут что-то устарело — claude был ленивым.
 
-**Последняя синхронизация:** 2026-09-17 (Oceanside в маршрутизации San Diego — 4f825782)
+**Последняя синхронизация:** 2026-11-16 (AI Discoverability, Ahrefs — ca04b128)
 
 ---
 
@@ -107,6 +107,8 @@
 | 12 modified + 76 untracked файлов в wiki repo | wiki backlog 2 недели | P3 — отдельная сессия cleanup |
 
 ## Что закрыто недавно
+
+- **2026-11-16:** **AI Discoverability по Ahrefs 16.11, В ПРОДЕ** (`ca04b128`, `be84adb6`). Article на 120 гайдах (диагностика + `/price-list/*-cost/`) из Layout, автор Roman Abysov, издатель `#organization`, даты из git; BlogPosting на 20 постах обновлён; полный узел `#organization` (`src/lib/organization-schema.ts`) на главной и `/gift-certificates/` (снята ошибка schema.org); ItemList на `/brands/kenmore/`; HTML кэшируется на краю Cloudflare (`s-maxage=600`, SWR) — было EXPIRED на каждом запросе. Новые гайды — добавлять в `src/data/article-pages.ts`. Детали: `session-log/2026-11-16.md`.
 
 - **2026-09-17:** **Oceanside → филиал San Diego, В ПРОДЕ** (merge `4f825782`, ветка
   `feat/oceanside-routing`). 92054, 92056, 92057, 92058 (USPS: Oceanside, тип STANDARD)
