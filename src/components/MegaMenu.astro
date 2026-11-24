@@ -158,7 +158,12 @@ const mainPhoneTel = `+1${MAIN_PHONE.replace(/\D/g, '')}`;
 const _path = Astro.url.pathname;
 const _brandSlug = _path.startsWith('/brands/') ? _path.replace(/^\/brands\//, '').replace(/\/$/, '') : null;
 const isCommercialFee = _path.startsWith('/commercial/') || _path.startsWith('/marine/') || (_brandSlug !== null && COMMERCIAL_BRAND_SLUGS.has(_brandSlug));
-const diagnosticFee = isCommercialFee ? '$120' : '$89';
+// Owner 24.11.2026: commercial ice machines are a $150 diagnostic, walk-in coolers and
+// freezers $199. The pages say so in their own copy; the header promo must not say $120 there.
+const isIceFee = (_path.startsWith('/commercial/ice-machines/') && !_path.startsWith('/commercial/ice-machines/soft-serve')) || _path.startsWith('/price-list/commercial-ice-machine-repair-cost')
+  || _brandSlug === 'scotsman' || _brandSlug === 'manitowoc' || _brandSlug === 'avantco-ice-machine-repair' || _brandSlug === 'kold-draft-ice-machine-repair';
+const isWalkInFee = (/^\/commercial\/refrigeration\/walk-in-/.test(_path) && !/installation/.test(_path)) || /^\/price-list\/(commercial-walk-in-|walk-in-)/.test(_path);
+const diagnosticFee = isIceFee ? '$150' : isWalkInFee ? '$199' : isCommercialFee ? '$120' : '$89';
 
 type Link = { label: string; href: string };
 type Column = { title?: string; links?: Link[]; html?: string };

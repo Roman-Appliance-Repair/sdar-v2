@@ -32,7 +32,7 @@ export const PRICING_TIERS: PricingTier[] = [
     id: 'commercial',
     name: 'Commercial',
     diagnosticFee: 120,
-    waivedNote: 'Waived with repair · walk-in coolers & freezers $199',
+    waivedNote: 'Waived with repair · ice machines $150 · walk-in coolers & freezers $199',
     examples:
       'Walk-in cooler compressor: $1,200–$2,500 · Ice machine pump: $400–$700 · Hobart dishwasher heater: labor $375–$750 + parts · Pizza oven conveyor: labor $350–$700 + parts · Commercial fryer thermostat: $240–$420 · Vulcan range gas valve: $320–$520'
   }

@@ -108,17 +108,17 @@ export const SUB_CATALOGS: SubCatalog[] = [
   },
 
   // ─────────────────────────────────────────────────
-  // 4. Ice Machines Commercial — 5 services, $120 diagnostic
+  // 4. Ice Machines Commercial — 5 services, $150 ice machine diagnostic (slushie $120)
   // ─────────────────────────────────────────────────
   {
     id: 'catalog-ice-machines',
     name: 'Ice Machines Commercial',
     services: [
-      { id: 'commercial-ice-machine-repair',  name: 'Commercial Ice Machine Repair',          description: 'Compressor, water pump, evaporator plate, thermostat, and harvest cycle repair on cube, flake, and nugget ice machines.', priceTier: '$120' },
-      { id: 'commercial-ice-maker-repair',    name: 'Commercial Ice Maker Repair',            description: 'Water inlet, condenser, evaporator, harvest probe, and bin thermostat repair on undercounter and modular ice makers.', priceTier: '$120' },
+      { id: 'commercial-ice-machine-repair',  name: 'Commercial Ice Machine Repair',          description: 'Compressor, water pump, evaporator plate, thermostat, and harvest cycle repair on cube, flake, and nugget ice machines.', priceTier: '$150' },
+      { id: 'commercial-ice-maker-repair',    name: 'Commercial Ice Maker Repair',            description: 'Water inlet, condenser, evaporator, harvest probe, and bin thermostat repair on undercounter and modular ice makers.', priceTier: '$150' },
       { id: 'slushie-machine-repair',         name: 'Slushie/Frozen Beverage Machine Repair', description: 'Compressor, auger motor, gear box, drive coupler, and thermostat repair on frozen-beverage and slushie dispensers.', priceTier: '$120' },
-      { id: 'ice-dispenser-repair',           name: 'Ice Dispenser Repair',                   description: 'Auger motor, water valve, dispenser actuator, ice chute, and control board repair on countertop and floor-standing ice dispensers.', priceTier: '$120' },
-      { id: 'ice-bin-repair',                 name: 'Ice Bin Repair',                         description: 'Liner crack, drain line, level sensor, and gasket repair on commercial ice storage bins and combination bin/dispenser units.', priceTier: '$120' }
+      { id: 'ice-dispenser-repair',           name: 'Ice Dispenser Repair',                   description: 'Auger motor, water valve, dispenser actuator, ice chute, and control board repair on countertop and floor-standing ice dispensers.', priceTier: '$150' },
+      { id: 'ice-bin-repair',                 name: 'Ice Bin Repair',                         description: 'Liner crack, drain line, level sensor, and gasket repair on commercial ice storage bins and combination bin/dispenser units.', priceTier: '$150' }
     ]
   },
 

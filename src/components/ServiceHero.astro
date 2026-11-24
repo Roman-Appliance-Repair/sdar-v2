@@ -24,6 +24,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import BranchesBlock from './BranchesBlock.astro';
 import { MAIN_PHONE } from '../data/branches';
+import { COMMERCIAL_BRAND_SLUGS } from '../data/commercial-brand-slugs';
 import AIDiagnosticCard from './AIDiagnosticCard.astro';
 import { getDiagnosticPrefill } from '../data/aid-to-quote-map';
 
@@ -60,6 +61,12 @@ export interface Props {
   imageAlt?: string;
 }
 
+// Trust-bar fee follows the page (owner 24.11.2026): commercial ice machine brand pages $150,
+// other commercial-grade brand pages $120 (they say so in their own copy), everything else $89.
+const _svcBrand = Astro.url.pathname.startsWith('/brands/') ? Astro.url.pathname.replace(/^\/brands\//, '').replace(/\/$/, '') : '';
+const svcFee = ['scotsman', 'manitowoc', 'avantco-ice-machine-repair', 'kold-draft-ice-machine-repair'].includes(_svcBrand) ? '$150'
+  : COMMERCIAL_BRAND_SLUGS.has(_svcBrand) ? '$120' : '$89';
+
 const {
   eyebrow = 'LA · Orange · Ventura · San Bernardino · Riverside Counties',
   title,
@@ -74,7 +81,7 @@ const {
     '🛡️ Fully Insured',
     '⚡ Same Day Available',
     '🔩 OEM Parts on Truck',
-    '💬 $89 Diagnostic — Waived With Repair'
+    `💬 ${svcFee} Diagnostic — Waived With Repair`
   ],
   showBranches = true,
   slug,
